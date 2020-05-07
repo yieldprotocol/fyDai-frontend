@@ -1,18 +1,16 @@
 import React from 'react';
+import { useWeb3React } from '@web3-react/core';
 import logo from './logo.svg';
 import './App.css';
 
-import { useWeb3React } from '@web3-react/core'
+
 
 function App() {
-
   const { active } = useWeb3React();
 
-  React.useEffect(()=>{
-
+  React.useEffect(() => {
     console.log(active);
-
-  },[active])
+  }, [active]);
 
   return (
     <div className="App">
