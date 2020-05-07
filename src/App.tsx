@@ -2,7 +2,18 @@ import React from 'react';
 import logo from './logo.svg';
 import './App.css';
 
+import { useWeb3React } from '@web3-react/core'
+
 function App() {
+
+  const { active } = useWeb3React();
+
+  React.useEffect(()=>{
+
+    console.log(active);
+
+  },[active])
+
   return (
     <div className="App">
       <header className="App-header">
