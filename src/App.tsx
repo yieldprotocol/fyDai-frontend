@@ -1,16 +1,14 @@
 import React from 'react';
 import { useWeb3React } from '@web3-react/core';
-import { Button } from 'grommet';
-import { StatusGood, Connect } from 'grommet-icons';
-
-import { injected, trezor } from './connectors';
+import { Button, Box, Avatar, Text } from 'grommet';
+import { StatusGood, Connect, UserAdmin } from 'grommet-icons';
+import { injected, trezor, walletlink, torus, ledger } from './connectors';
 import { useGetWeiBalance, useEagerConnect, getNetworkName }  from './hooks/connectionFns';
-
 
 import './App.css';
 
 function App() {
-  const { active, activate, chainId, account } = useWeb3React();
+  const { active, activate, chainId, account, connector } = useWeb3React();
   const [balance, setBalance] = React.useState();
   const getWeiBalance = useGetWeiBalance();
   const eagerConnect = useEagerConnect();
@@ -36,12 +34,20 @@ function App() {
       <header className="App-header">
         { active ?  (
           <>
-            <StatusGood color='green' size='large' /><h1> Wallet connected.</h1>
-            <p>Connected to: {chainId && getNetworkName(chainId) } </p>
-            <p> with account:</p>
-            <p>{ account && account }</p>
-            <p>which has an WEI balance of:</p>
+            <StatusGood color="lightgreen" size='large' /><h1> Wallet connected.</h1>
+            <Text>Connected to:</Text> {chainId && getNetworkName(chainId) }
+            <p />
+            <Box direction="row" gap="small">
+              <Avatar size="small" background="accent-1">
+                <UserAdmin size="small" color="accent-2" />
+              </Avatar>
+              <Text>{ account && account }</Text>
+            </Box>
+            <p />
+            <Text size='small'>with a WEI balance of:</Text>
             <p>{ balance }</p>
+            <p />
+            {/* <Button icon={<Connect />} label="LogOut" onClick={() => connector && ( connector as any).close()} /> */}
           </>
         ):(
           <>
@@ -50,11 +56,13 @@ function App() {
             <Button icon={<Connect />} label="Metamask" onClick={() => activate(injected, console.log)} />
             <p />
             <Button icon={<Connect />} label="Trezor" onClick={() => activate(trezor, console.log)} />
+            <p />
+            <Button icon={<Connect />} label="Torus" onClick={() => activate(torus, console.log)} />
+            <p />
+            <Button icon={<Connect />} label="WalletLink" onClick={() => activate(walletlink, console.log)} />
           </>
         )}
       </header>
-
-
     </div>
   );
 }

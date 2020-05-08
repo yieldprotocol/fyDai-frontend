@@ -1,21 +1,21 @@
 import { InjectedConnector } from '@web3-react/injected-connector';
-import { NetworkConnector } from '@web3-react/network-connector';
+// import { NetworkConnector } from '@web3-react/network-connector';
 // import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
-// import { WalletLinkConnector } from '@web3-react/walletlink-connector';
-// import { LedgerConnector } from '@web3-react/ledger-connector';
+import { WalletLinkConnector } from '@web3-react/walletlink-connector';
+import { LedgerConnector } from '@web3-react/ledger-connector';
 import { TrezorConnector } from '@web3-react/trezor-connector';
 // import { FrameConnector } from '@web3-react/frame-connector';
 // import { AuthereumConnector } from '@web3-react/authereum-connector';
 // import { FortmaticConnector } from '@web3-react/fortmatic-connector';
 // import { PortisConnector } from '@web3-react/portis-connector';
 // import { SquarelinkConnector } from '@web3-react/squarelink-connector';
-// import { TorusConnector } from '@web3-react/torus-connector';
+import { TorusConnector } from '@web3-react/torus-connector';
 
 const POLLING_INTERVAL = 12000;
 const RPC_URLS: { [chainId: number]: string } = {
-  1: process.env.RPC_URL_1 as string,
-  4: process.env.RPC_URL_4 as string,
-  1337: process.env.RPC_URL_1337 as string,
+  1: '192.168.2.3',
+  4: process.env.REACT_APP_RPC_URL_4 as string,
+  1337: process.env.REACT_APP_RPC_URL_1337 as string,
 };
 
 export const injected = new InjectedConnector({ supportedChainIds: [1, 3, 4, 5, 42, 1337] });
@@ -33,12 +33,12 @@ export const injected = new InjectedConnector({ supportedChainIds: [1, 3, 4, 5, 
 //   pollingInterval: POLLING_INTERVAL
 // });
 
-// export const walletlink = new WalletLinkConnector({
-//   url: RPC_URLS[1],
-//   appName: 'web3-react example'
-// });
+export const walletlink = new WalletLinkConnector({
+  url: RPC_URLS[1],
+  appName: 'web3-react example'
+});
 
-// export const ledger = new LedgerConnector({ chainId: 1, url: RPC_URLS[1], pollingInterval: POLLING_INTERVAL });
+export const ledger = new LedgerConnector({ chainId: 1, url: RPC_URLS[1], pollingInterval: POLLING_INTERVAL });
 
 export const trezor = new TrezorConnector({
   chainId: 1,
@@ -61,4 +61,4 @@ export const trezor = new TrezorConnector({
 //   networks: [1, 100]
 // });
 
-// export const torus = new TorusConnector({ chainId: 1 });
+export const torus = new TorusConnector({ chainId: 1 });
