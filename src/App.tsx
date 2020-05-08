@@ -1,33 +1,30 @@
 import React from 'react';
 import { useWeb3React } from '@web3-react/core';
 import { injected } from './connectors';
-import { getNetworkName, useGetWeiBalance } from './hooks';
+import { useGetWeiBalance, useEagerConnect, getNetworkName }  from './hooks/connectionFns';
 
-
-import logo from './logo.svg';
 import './App.css';
 
-// const injected = new InjectedConnector({ supportedChainIds: [1, 3, 4, 5, 42, 1337] });
-
-// const manageConnection = async () => {
-//   const web3React = useWeb3React();
-//   return (<> </>);
-// };
-
 function App() {
-  const { activate, chainId, library, account } = useWeb3React();
-  const [balance, setBalance] = React.useState(0);
+  const { activate, chainId, account } = useWeb3React();
+  const [balance, setBalance] = React.useState();
   const getWeiBalance = useGetWeiBalance();
-  
+  const eagerConnect = useEagerConnect();
+
+  const manageConnection = async () => {
+    const result = await eagerConnect;
+    // !result && await activate(injected, console.log);
+  };
+
   const updateBalance = async () => {
     setBalance(await getWeiBalance);
   };
 
   React.useEffect(() => {
-    (async () => activate(injected, console.log))();
+    manageConnection();
+    // (async () => activate(injected, console.log))();
     updateBalance();
-    // manageConnection();
-  }, [ activate, account ]);
+  }, [ activate, account, chainId ]);
 
   return (
     <div className="App">
