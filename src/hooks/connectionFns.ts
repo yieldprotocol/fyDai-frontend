@@ -1,6 +1,12 @@
 import React from 'react';
 import { useWeb3React } from '@web3-react/core';
-import { injected } from '../connectors'; 
+import { injected, trezor, walletlink, torus } from '../connectors'; 
+
+import injectedImage from '../assets/images/metamask.png';
+import trezorImage from '../assets/images/trezor.png';
+import walletlinkImage from '../assets/images/walletlink.png';
+import torusImage from '../assets/images/torus.png';
+import noConnectionImage from '../assets/images/noconnection.png';
 
 export async function useGetWeiBalance() {
   const web3React = useWeb3React();
@@ -34,6 +40,25 @@ export function useEagerConnect() {
     }
   }, [tried, active]);
   return tried;
+}
+
+export function useConnectorImage() {
+  const { connector } = useWeb3React();
+  const [image, setImage] = React.useState<any>();
+  React.useEffect(()=>{
+    switch (connector) {
+      case injected : setImage(injectedImage);
+        break;
+      case trezor: setImage(trezorImage);
+        break;
+      case walletlink: setImage(walletlinkImage);
+        break;
+      case torus: setImage(torusImage);
+        break;
+      default: setImage(noConnectionImage);
+    }
+  }, [connector]);
+  return image;
 }
 
 export function getNetworkName(networkId: Number) {
