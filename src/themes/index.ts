@@ -28,8 +28,12 @@ export const yieldTheme = {
         'dark': '#111111',
         'light': '#EEEEEE'
       },
+      'background-frontheader': {
+        'dark': 'dark-2',
+        'light': 'light-3'
+      },
       'background-front': {
-        'dark': '#363537',
+        'dark': 'dark-1',
         'light': 'light-1'
       },
       'background-contrast': {
@@ -524,8 +528,11 @@ export const yieldTheme = {
   'scale': 0.5,
   'layer': {
     'background': {
-      'dark': '#111111',
-      'light': '#FFFFFF'
+      'dark': '#11111100',
+      'light': '#FFFFFF00',
+    },
+    'overlay' : {
+      'background': '#000000BF'
     }
   }
 };

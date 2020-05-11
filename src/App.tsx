@@ -1,34 +1,31 @@
 import React from 'react';
 import { useWeb3React } from '@web3-react/core';
-import { Grommet, grommet, Grid, Main, Image, Heading, Footer, Button, Box, Avatar, Text, CheckBox, ThemeContext } from 'grommet';
+import { Grommet, Header, Heading, base, Grid, Main, Footer, Button, Box, Text, CheckBox } from 'grommet';
 import { 
   FaSun as Sun,
   FaMoon as Moon,
-  FaUser as User,
-  FaPlug as Plug,
   FaCheckCircle as CheckCircle,
 } from 'react-icons/fa';
 
-import { base } from 'grommet/themes';
 import { deepMerge } from 'grommet/utils';
 
-import { injected, trezor, walletlink, torus, ledger } from './connectors';
-import { useGetWeiBalance, useEagerConnect, useConnectorImage, getNetworkName }  from './hooks/connectionFns';
-import { yieldTheme } from './theme';
+import { useGetWeiBalance, useEagerConnect, getNetworkName }  from './hooks/connectionFns';
+import { yieldTheme } from './themes';
 
-import Header from './components/header';
+import YieldHeader from './components/YieldHeader';
+import ConnectLayer from './components/ConnectLayer';
 
-import metamaskImage from './assets/images/metamask.png';
-import trezorImage from './assets/images/trezor.png';
-import walletlinkImage from './assets/images/walletlink.png';
-import torusImage from './assets/images/torus.png';
-// import noConnectionImage from '../assets/images/noconnection.png';
-
-import './App.css';
+// import metamaskImage from './assets/images/metamask.png';
+// import trezorImage from './assets/images/trezor.png';
+// import walletlinkImage from './assets/images/walletlink.png';
+// import torusImage from './assets/images/torus.png';
+// // import noConnectionImage from '../assets/images/noconnection.png';
 
 function App() {
   const { active, activate, chainId, account, connector } = useWeb3React();
   const [balance, setBalance] = React.useState();
+  const [showConnectLayer, setShowConnectLayer] = React.useState<boolean>(false);
+  const [showSideBar, setShowSideBar] = React.useState<boolean>(false);
   const [darkmode, setDarkmode] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const getWeiBalance = useGetWeiBalance();
@@ -52,60 +49,50 @@ function App() {
     updateBalance();
   }, [ active, account, chainId ]);
 
-  const connectorList = [
-    { name:'Metamask', image:metamaskImage, connection:injected },
-    { name:'Tezor', image:trezorImage, connection:trezor },
-    { name:'Torus', image:torusImage, connection:torus },
-    { name:'Walletlink', image:walletlinkImage, connection:walletlink }
-  ];
-
   return (
     <div className="App">
-      <Grommet theme={deepMerge(grommet, yieldTheme)} themeMode={darkmode?'dark':'light'} full>
+      <Grommet theme={deepMerge(base, yieldTheme)} themeMode={darkmode?'dark':'light'} full>
         <Grid fill rows={['auto', 'flex', 'auto']}>
-          <Header />
+          <YieldHeader openConnectLayer={()=>setShowConnectLayer(true)} />
           <Main pad='large'>
             <Box
               align="center" 
               justify="center"
             >
-              { !active ?  (
+              { showConnectLayer && <ConnectLayer closeLayer={()=>setShowConnectLayer(false)} />}
+              { active ? (
                 <Box 
                   background='background-front'
-                  wrap
-                  align="center"
-                  justify="center"
+                  // align="center"
+                  // justify="center"
                   elevation="small"
-                  pad="small"
-                  gap='small'
+                  // pad="large"
+                  round
                 >
-                  <h1>No wallet connection </h1>
-                  <p>Try connect with:</p>
-                  {connectorList.map((x) => (
-                    <Button 
-                      key={x.name}
-                      icon={<Box height="15px" width="15px"><Image src={x.image} fit='contain' /></Box>}
-                      label={x.name}
-                      onClick={() => activate(x.connection, console.log)}
-                    />
-                  ))}
-                </Box>
-              ):(
-                <Box background='background-front' align="center" justify="center" elevation="small" pad="large">
-                  <CheckCircle color={yieldTheme.global.colors.brand.dark} size='64' /><h1> Wallet connected.</h1>
-                  <Text>Connected to:</Text> {chainId && getNetworkName(chainId) }
-                  <p />
-                  <Box direction="row" gap="small">
-                    <Avatar size="small" background="accent-1">
-                      <User color="accent-2" />
-                    </Avatar>
-                    <Text style={{ overflow:'hidden' }}>{ account && account }</Text>
+                  <Header 
+                    round='medium'
+                    direction='column'
+                    background='background-frontheader'
+                    pad='medium'
+                  >
+                    <CheckCircle color={yieldTheme.global.colors.brand.dark} size='64' />
+                    <Heading> Wallet connected.</Heading>
+                  </Header>
+                  <Box
+                    pad="medium"
+                    align="center"
+                    justify="center"
+                    gap='small'
+                  >
+                    <Text size='xsmall'>Connected to:</Text> 
+                    <Text weight="bold">{chainId && getNetworkName(chainId) }</Text>
+                    <Text size='xsmall'>WEI balance:</Text>
+                    <Text>{ balance }</Text>
+                    <Button fill='horizontal' label='Connect to another wallet' onClick={()=>setShowConnectLayer(true)} />
                   </Box>
-                  <p />
-                  <Text size='small'>with a WEI balance of:</Text>
-                  <p>{ balance }</p>
-                  <p />
                 </Box>
+              ) : (
+                <Button label='Connect to a wallet' onClick={()=>setShowConnectLayer(true)} />
               )}
             </Box>
           </Main>
