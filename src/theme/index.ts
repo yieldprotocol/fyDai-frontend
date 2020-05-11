@@ -29,7 +29,7 @@ export const yieldTheme = {
         'light': '#EEEEEE'
       },
       'background-front': {
-        'dark': '#222222',
+        'dark': '#363537',
         'light': 'light-1'
       },
       'background-contrast': {
@@ -178,7 +178,7 @@ export const yieldTheme = {
   'meter': {},
   'button': {
     'border': {
-      'width': '2px',
+      'width': '1px',
       'radius': '15px'
     },
     'padding': {
