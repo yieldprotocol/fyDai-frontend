@@ -21,8 +21,10 @@ export const yieldTheme = {
         'light': '#49E303'
       },
       'background': {
-        'dark': '#111111',
-        'light': '#FFFFFF'
+        // 'dark': '#111111',
+        'dark': 'linear-gradient(135deg, rgba(138,5,12,1) 0%, rgba(17,17,17,1) 33%, rgba(17,17,17,1) 100%)',
+        // 'light': '#FFFFFF'
+        'light': 'linear-gradient(135deg, rgba(255,255,255,0) 66%, rgba(120,240,41,0.29735644257703087) 100%)',
       },
       'background-back': {
         'dark': '#111111',

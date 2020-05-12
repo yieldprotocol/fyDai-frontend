@@ -14,6 +14,7 @@ import { yieldTheme } from './themes';
 
 import YieldHeader from './components/YieldHeader';
 import ConnectLayer from './components/ConnectLayer';
+import AccountLayer from './components/AccountLayer';
 
 // import metamaskImage from './assets/images/metamask.png';
 // import trezorImage from './assets/images/trezor.png';
@@ -25,7 +26,7 @@ function App() {
   const { active, activate, chainId, account, connector } = useWeb3React();
   const [balance, setBalance] = React.useState();
   const [showConnectLayer, setShowConnectLayer] = React.useState<boolean>(false);
-  const [showSideBar, setShowSideBar] = React.useState<boolean>(false);
+  const [showAccountLayer, setShowAccountLayer] = React.useState<boolean>(false);
   const [darkmode, setDarkmode] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const getWeiBalance = useGetWeiBalance();
@@ -53,12 +54,13 @@ function App() {
     <div className="App">
       <Grommet theme={deepMerge(base, yieldTheme)} themeMode={darkmode?'dark':'light'} full>
         <Grid fill rows={['auto', 'flex', 'auto']}>
-          <YieldHeader openConnectLayer={()=>setShowConnectLayer(true)} />
+          <YieldHeader openConnectLayer={()=>setShowConnectLayer(true)} openAccountLayer={()=>setShowAccountLayer(true)} />
           <Main pad='large'>
             <Box
               align="center" 
               justify="center"
             >
+              { showAccountLayer && <AccountLayer closeLayer={()=>setShowAccountLayer(false)} /> }
               { showConnectLayer && <ConnectLayer closeLayer={()=>setShowConnectLayer(false)} />}
               { active ? (
                 <Box 

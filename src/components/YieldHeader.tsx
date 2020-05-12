@@ -7,18 +7,10 @@ import { useConnectorImage } from '../hooks/connectionFns';
 import logoDark from '../assets/images/yield.svg';
 import logoLight from '../assets/images/yield_light.svg';
 
-const ProfileButton = () => {
-  const { account } = useWeb3React();
-  const connectorImage = useConnectorImage();
-  return (<Button
-    icon={<Box height="15px" width="15px"><Image src={connectorImage} fit='contain' /></Box>}
-    label={`${account?.substring(0, 6)}...${account?.substring(account.length-4)}`}
-    onClick={()=>console.log('clicked')}
-  />);
-};
+import ProfileButton from './ProfileButton';
 
 const YieldHeader = (props:any) =>  {
-  const { openConnectLayer } = props;
+  const { openConnectLayer, openAccountLayer } = props;
   const { account } = useWeb3React();
   const theme = React.useContext<any>(ThemeContext);
 
@@ -32,10 +24,11 @@ const YieldHeader = (props:any) =>  {
       elevation="xsmall"
       gap="xlarge"
       fill="horizontal"
+      round={{ corner:'bottom', size:'medium' }}
       pad={{ horizontal: 'large', vertical:'xsmall' }}
     >
       <Box height='xsmall' align='start'><Box width='xsmall'><Image src={theme.dark?logoLight:logoDark} fit='contain' /></Box></Box>
-      {account ? <ProfileButton /> : <Button label='Connect to a wallet' onClick={()=>openConnectLayer()} />}
+      {account ? <ProfileButton action={()=>openAccountLayer()} /> : <Button label='Connect to a wallet' onClick={()=>openConnectLayer()} />}
     </Header>
   );
 };

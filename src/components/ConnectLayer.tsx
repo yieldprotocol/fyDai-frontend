@@ -1,6 +1,6 @@
 import React from 'react';
 import { useWeb3React } from '@web3-react/core';
-import { Grommet, grommet, Grid, Layer, Main, Image, Header, Heading, Footer, Button, Box, Avatar, Text, CheckBox, ThemeContext } from 'grommet';
+import { Anchor, Grommet, grommet, Grid, Layer, Main, Image, Header, Heading, Footer, Button, Box, Avatar, Text, CheckBox, ThemeContext, Paragraph } from 'grommet';
 import { 
   FaTimes as Close,
 } from 'react-icons/fa';
@@ -36,43 +36,57 @@ const ConnectLayer = (props:any) => {
   ];
 
   return (
-    <Layer animation='slide'>
+    <Layer animation='slide' position='right' full="vertical">
       <Box 
-        align="center"
-        direction="row"
-        gap="small"
-        justify="between"
-        round="medium"
-        elevation="medium"
-        // pad='none'
+        direction='column'
+        fill='vertical'
         background='background-front'
+         // alignContent='center'
+        style={{ minWidth: '240px' }}
       >
-        <Box fill='horizontal' pad='none'>
-          <Header round="medium" pad='medium' fill='horizontal' background='background-frontheader'>
-            <Heading level='3'>Connect to a Wallet</Heading>
-            <Close onClick={()=>closeLayer()} />
-          </Header>
+        <Header 
+          round={{ corner:'bottom', size:'medium' }}
+          fill='horizontal'
+          background='background-frontheader'
+          pad={{ horizontal: 'medium', vertical:'large' }}
+        >
+          {/* <Heading level='4' >Connect to a Wallet</Heading> */}
           <Box 
-            wrap
-            align="center"
-            justify="center"
-            pad="medium"
-            gap='small'
+            round='xlarge' 
+            // background='brand'
+            border={{ color: 'brand' }}
+            pad={{ horizontal: 'medium', vertical:'xsmall' }}
           >
-            <p>Try connect with:</p>
-            {connectorList.map((x) => (
-              <Button 
-                fill
-              // color="border"
-              // hoverIndicator="background"
-                key={x.name}
-                icon={<Box height="15px" width="15px"><Image src={x.image} fit='contain' /></Box>}
-                label={x.name}
-                onClick={() => handleSelectConnector(x.connection)}
-              />
-            ))}
+            <Text>Connect to a Wallet</Text>
           </Box>
+          <Anchor color='brand' onClick={()=>closeLayer()} size='xsmall' label='Cancel'/>
+        </Header>
+        <Box 
+          align='center'
+          pad='medium'
+          gap='small'
+        >
+          <Paragraph>Try connecting with:</Paragraph>
+          {connectorList.map((x) => (
+            <Button 
+              fill='horizontal'
+              color="border"
+              hoverIndicator="border"
+              key={x.name}
+              icon={<Box height="15px" width="15px"><Image src={x.image} fit='contain' /></Box>}
+              label={x.name}
+              onClick={() => handleSelectConnector(x.connection)}
+            />
+          ))}
         </Box>
+        <Footer
+          pad='medium'
+        >
+          <Box gap='xsmall' direction='row'>
+            <Anchor href="#" label="help!" size='xsmall' color='brand' />
+            <Text size='xsmall'> I'm not sure what this means.</Text>
+          </Box>
+        </Footer>
       </Box>
     </Layer>
   );
