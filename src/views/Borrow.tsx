@@ -9,8 +9,7 @@ const Borrow = () => {
       fill
       background='background-front'
     >
-      <Text> Beg borrow , steal
-
+      <Text> Borrow
       </Text>
     </Box> );
 
