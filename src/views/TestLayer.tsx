@@ -51,7 +51,7 @@ const TestLayer = (props:any) => {
           round={{ corner:'bottom', size:'medium' }}
           fill='horizontal'
           background='background-frontheader'
-          pad={{ horizontal: 'medium', vertical:'large' }}
+          pad={{ horizontal: 'small', vertical:'medium' }}
         >
           <Heading level='6'> FOR TESTING ONLY</Heading>
           <Anchor color='brand' onClick={()=>onClose()} size='xsmall' label='close' />

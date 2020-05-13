@@ -53,7 +53,7 @@ const AccountLayer = (props:any) => {
           pad={{ horizontal: 'medium', vertical:'large' }}
         >
           <ProfileButton />
-          {/* <Anchor color='brand' onClick={()=>onClose()} size='xsmall' label='Cancel' /> */}
+           <Anchor color='brand' onClick={()=>onClose()} size='xsmall' label='Close' />
         </Header>
 
         <Box
@@ -68,6 +68,7 @@ const AccountLayer = (props:any) => {
             <Text size='xsmall'>WEI balance:</Text>
             <Text>{ balance }</Text>
           </Box>
+          
           {/* <Button fill='horizontal' label='Connect to another wallet' onClick={()=>setShowConnectLayer(true)} /> */}
         </Box>
 
@@ -81,9 +82,9 @@ const AccountLayer = (props:any) => {
           <Text>Some Account Info</Text>
           <Text>Some Account Info</Text>
           <Text>Some Account Info</Text>
+          <Text>OR MAYBE TRANSACTIONS?</Text>
           <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
+          <Text>well, what ever else. </Text>
           <Text>Some Account Info</Text>
           <Text>Some Account Info</Text>
           <Text>Some Account Info</Text>

@@ -12,6 +12,7 @@ const ProfileButton = (props:any) => {
     icon={<Box height="15px" width="15px"><Image src={connectorImage} fit='contain' /></Box>}
     label={`${account?.substring(0, 6)}...${account?.substring(account.length-4)}`}
     onClick={()=>action && action()}
+    // style={{ minWidth:'150px' }}
   />);
 };
 

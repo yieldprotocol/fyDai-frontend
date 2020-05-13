@@ -1,6 +1,6 @@
 import React from 'react';
 import { useWeb3React } from '@web3-react/core';
-import { Anchor, Grommet, Header, Heading, base, Tabs, Tab, Grid, Main, Footer, Button, Box, Text, CheckBox } from 'grommet';
+import { Anchor, Grommet, DropButton, base, Tabs, Tab, Grid, Main, Footer, Button, Box, Text } from 'grommet';
 import { 
   FaSun as Sun,
   FaMoon as Moon,
@@ -8,6 +8,8 @@ import {
   FaGithub as Github,
   FaInfo as Info,
   FaFileAlt as Docs,
+  FaVial as Test,
+  FaCaretDown as CaretDown,
 } from 'react-icons/fa';
 
 import { deepMerge } from 'grommet/utils';
@@ -76,15 +78,40 @@ function App() {
           { showAccountLayer && <AccountLayer closeLayer={()=>setShowAccountLayer(false)} changeWallet={()=>changeConnection()} /> }
           { showConnectLayer && <ConnectLayer closeLayer={()=>setShowConnectLayer(false)} />}
           { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
-    
 
           <YieldHeader openConnectLayer={()=>setShowConnectLayer(true)} openAccountLayer={()=>setShowAccountLayer(true)} />
+          
           <Main
             align='center'
             pad={{ horizontal: 'none', vertical:'small' }}
           >
+
+            <Box 
+              fill='horizontal'
+              justify='end'
+              direction='row'
+              pad={{ horizontal:'medium', vertical:'none' }}
+              style={{ maxWidth:'600px', minWidth:'300px' }}
+            > 
+              <Box pad='small' direction='row' gap='small' align='baseline'>
+                <Box>
+                  <Text>Market:</Text>
+                </Box>
+                <DropButton
+                  color='background-front'
+                  label={<Box pad='xsmall' direction='row' gap='xsmall' align='center'>yDai <CaretDown /></Box>}
+                  dropAlign={{ top: 'bottom', right: 'right' }}
+                  dropContent={
+                    <Box pad="medium" background="light-2">
+                      <Text size='xsmall'>More markets coming soon!</Text> 
+                    </Box>
+                  }
+                />
+              </Box>
+            </Box>
+
             <Box
-              pad='medium'
+              pad={{ horizontal:'medium', vertical:'none' }}
               style={{ maxWidth:'600px', minWidth:'300px' }}
               round='medium'
               fill
@@ -104,7 +131,7 @@ function App() {
                 <Tab title={<Box pad='none' align='center'><Text weight={(indexTab===2?'bold':'normal')}>Position</Text></Box>}>
                   <Position />
                 </Tab>
-              </Tabs>               
+              </Tabs>
             </Box>
           </Main>
           <Footer
@@ -118,15 +145,10 @@ function App() {
               <Anchor color='background-frontheader'><Info /></Anchor>
             </Box>
             <Box>
-              { !active && <Button label='Connect to a wallet' onClick={()=>changeConnection()} />}
+              { !active && <Button style={{ minWidth:'160px' }} label='Connect to a wallet' onClick={()=>changeConnection()} />}
             </Box>
             <Box direction='row' gap='medium'>
-              <CheckBox 
-                checked={showTestLayer}
-                label='Test Layer'
-                reverse
-                onChange={()=>setShowTestLayer(!showTestLayer)}
-              />
+              <Test onClick={()=>setShowTestLayer(!showTestLayer)} color={showTestLayer?yieldTheme.global.colors.brand.light:'grey'} /> 
               <Box direction='row'>
                 {darkmode? 
                   <Sun onClick={()=>setDarkmode(!darkmode)} color={yieldTheme.global.colors.brand.light} />
