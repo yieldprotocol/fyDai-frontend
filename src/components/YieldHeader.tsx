@@ -21,10 +21,11 @@ const YieldHeader = (props:any) =>  {
 
   return (
     <Header
-      elevation="xsmall"
+      // elevation="xsmall"
+      
       gap="xlarge"
       fill="horizontal"
-      round={{ corner:'bottom', size:'medium' }}
+
       pad={{ horizontal: 'large', vertical:'xsmall' }}
     >
       <Box height='xsmall' align='start'><Box width='xsmall'><Image src={theme.dark?logoLight:logoDark} fit='contain' /></Box></Box>

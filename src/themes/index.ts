@@ -1,3 +1,6 @@
+import { css } from 'styled-components';
+import { NONCE_EXPIRED } from 'ethers/errors';
+
 export const yieldTheme = {
   'name': 'yieldTheme',
   'rounding': 24,
@@ -22,20 +25,23 @@ export const yieldTheme = {
       },
       'background': {
         // 'dark': '#111111',
-        'dark': 'linear-gradient(135deg, rgba(138,5,12,1) 0%, rgba(17,17,17,1) 33%, rgba(17,17,17,1) 100%)',
         // 'light': '#FFFFFF'
-        'light': 'linear-gradient(135deg, rgba(255,255,255,0) 66%, rgba(120,240,41,0.29735644257703087) 100%)',
+        'dark': 'linear-gradient(135deg, rgba(138,5,12,1) 0%, rgba(17,17,17,1) 33%, rgba(17,17,17,1) 100%)',
+        'light': 'linear-gradient(45deg, rgba(120,240,41,0.30) 0%, rgba(255,255,255,0) 33%, rgba(255,255,255,0) 100%)',
       },
       'background-back': {
         'dark': '#111111',
         'light': '#EEEEEE'
       },
       'background-frontheader': {
-        'dark': 'dark-2',
-        'light': 'light-3'
+        'dark': 'linear-gradient(135deg, rgba(138,5,12,1) 0%, rgba(17,17,17,1) 33%, rgba(17,17,17,1) 100%)',
+        'light': 'linear-gradient(45deg, rgba(120,240,41,0.30) 0%, #EEEEEE 33%, #EEEEEE 100%)'
+        // 'dark': 'dark-2',
+        // 'light': 'light-3'
       },
       'background-front': {
-        'dark': 'dark-1',
+        'dark': '#222222',
+        // 'dark': 'dark-1',
         'light': 'light-1'
       },
       'background-contrast': {
@@ -62,7 +68,7 @@ export const yieldTheme = {
         'dark': '#444444',
         'light': '#CCCCCC'
       },
-      'focus': 'brand',
+      'focus': 'none',
       'control': 'brand',
       'active-background': 'background-contrast',
       'active-text': 'text-strong',
@@ -536,5 +542,54 @@ export const yieldTheme = {
     'overlay' : {
       'background': '#000000BF'
     }
+  },
+
+  'table' : {
+    'focus': 'brand'
+  }, 
+
+  'tab': {
+    'margin' : { 'horizontal':'none', 'vertical': 'xxsmall' },
+    'color': 'active-text',
+    'active': {
+      'background': 'background-front',
+      // @ts-ignore
+      // extend: ({ theme }) => css`
+      // font-weight: 'bold';
+      // `
+    },
+    'border': { 
+      'side': 'all',
+      'size': 'xsmall',
+      'color' : 'background-front',
+      'edgeSize':'xlarge',
+      'hover': { 
+        'color': 'brand'
+      },
+      'active' : {
+        'color': 'background-front'
+      }
+    },
+    'pad': 'small',
+    // @ts-ignore
+    extend: ({ theme }) => css`
+    border-radius: ${theme.global.edgeSize.large};
+    width: ${theme.global.edgeSize.xlarge};
+    `,
+  },
+
+  'tabs': {
+    'gap': 'small',
+    // 'pad': 'xsmall',
+    'header': {
+      'pad': 'large',
+      'gap' : 'none', 
+    },
+    // @ts-ignore
+    extend: ({ theme }) => css`
+      flex: ${theme.global.edgeSize.small};
+      radius: ${theme.global.edgeSize.small};
+      `
   }
+
 };

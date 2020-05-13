@@ -1,16 +1,24 @@
 import React from 'react';
 import { useWeb3React } from '@web3-react/core';
-import { Grommet, Header, Heading, base, Grid, Main, Footer, Button, Box, Text, CheckBox } from 'grommet';
+import { Anchor, Grommet, Header, Heading, base, Tabs, Tab, Grid, Main, Footer, Button, Box, Text, CheckBox } from 'grommet';
 import { 
   FaSun as Sun,
   FaMoon as Moon,
   FaCheckCircle as CheckCircle,
+  FaGithub as Github,
+  FaInfo as Info,
+  FaFileAlt as Docs,
 } from 'react-icons/fa';
 
 import { deepMerge } from 'grommet/utils';
 
 import { useGetWeiBalance, useEagerConnect, getNetworkName }  from './hooks/connectionFns';
 import { yieldTheme } from './themes';
+
+import Borrow from './views/Borrow';
+import Lend from './views/Lend';
+import Position from './views/Position';
+import TestLayer from './views/TestLayer';
 
 import YieldHeader from './components/YieldHeader';
 import ConnectLayer from './components/ConnectLayer';
@@ -27,10 +35,16 @@ function App() {
   const [balance, setBalance] = React.useState();
   const [showConnectLayer, setShowConnectLayer] = React.useState<boolean>(false);
   const [showAccountLayer, setShowAccountLayer] = React.useState<boolean>(false);
+
+  const [showTestLayer, setShowTestLayer] = React.useState<boolean>(false);
+
   const [darkmode, setDarkmode] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const getWeiBalance = useGetWeiBalance();
   const eagerConnect = useEagerConnect();
+
+  const [indexTab, setIndexTab] = React.useState<number>(1);
+  const onActiveTab = (nextIndex: any) => setIndexTab(nextIndex);
 
   const manageConnection = async () => {
     setLoading(true);
@@ -44,6 +58,11 @@ function App() {
     setBalance(await getWeiBalance);
   };
 
+  const changeConnection = () => {
+    setShowAccountLayer(false);
+    setShowConnectLayer(true);
+  };
+
   React.useEffect(() => {
     manageConnection();
     // (async () => activate(injected, console.log))();
@@ -54,64 +73,67 @@ function App() {
     <div className="App">
       <Grommet theme={deepMerge(base, yieldTheme)} themeMode={darkmode?'dark':'light'} full>
         <Grid fill rows={['auto', 'flex', 'auto']}>
+          { showAccountLayer && <AccountLayer closeLayer={()=>setShowAccountLayer(false)} changeWallet={()=>changeConnection()} /> }
+          { showConnectLayer && <ConnectLayer closeLayer={()=>setShowConnectLayer(false)} />}
+          { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
+    
+
           <YieldHeader openConnectLayer={()=>setShowConnectLayer(true)} openAccountLayer={()=>setShowAccountLayer(true)} />
-          <Main pad='large'>
+          <Main
+            align='center'
+            pad={{ horizontal: 'none', vertical:'small' }}
+          >
             <Box
-              align="center" 
-              justify="center"
+              pad='medium'
+              style={{ maxWidth:'600px', minWidth:'300px' }}
+              round='medium'
+              fill
             >
-              { showAccountLayer && <AccountLayer closeLayer={()=>setShowAccountLayer(false)} /> }
-              { showConnectLayer && <ConnectLayer closeLayer={()=>setShowConnectLayer(false)} />}
-              { active ? (
-                <Box 
-                  background='background-front'
-                  // align="center"
-                  // justify="center"
-                  elevation="small"
-                  // pad="large"
-                  round
-                >
-                  <Header 
-                    round='medium'
-                    direction='column'
-                    background='background-frontheader'
-                    pad='medium'
-                  >
-                    <CheckCircle color={yieldTheme.global.colors.brand.dark} size='64' />
-                    <Heading> Wallet connected.</Heading>
-                  </Header>
-                  <Box
-                    pad="medium"
-                    align="center"
-                    justify="center"
-                    gap='small'
-                  >
-                    <Text size='xsmall'>Connected to:</Text> 
-                    <Text weight="bold">{chainId && getNetworkName(chainId) }</Text>
-                    <Text size='xsmall'>WEI balance:</Text>
-                    <Text>{ balance }</Text>
-                    <Button fill='horizontal' label='Connect to another wallet' onClick={()=>setShowConnectLayer(true)} />
-                  </Box>
-                </Box>
-              ) : (
-                <Button label='Connect to a wallet' onClick={()=>setShowConnectLayer(true)} />
-              )}
+              <Tabs 
+                justify='start'
+                flex={true}
+                activeIndex={indexTab}
+                onActive={onActiveTab}
+              >
+                <Tab title={<Box pad='none' align='center'><Text weight={(indexTab===0?'bold':'normal')}>Borrow</Text></Box>}>
+                  <Borrow />
+                </Tab>
+                <Tab title={<Box pad='none' align='center'><Text weight={(indexTab===1?'bold':'normal')}>Lend</Text></Box>}>
+                  <Lend />
+                </Tab>
+                <Tab title={<Box pad='none' align='center'><Text weight={(indexTab===2?'bold':'normal')}>Position</Text></Box>}>
+                  <Position />
+                </Tab>
+              </Tabs>               
             </Box>
           </Main>
           <Footer
-            pad="small"
-            justify="end"
+            gap="xlarge"
+            fill='horizontal'
+            pad={{ horizontal: 'large', vertical:'medium' }}
           >
-            {darkmode? 
-              <Sun onClick={()=>setDarkmode(!darkmode)} color={yieldTheme.global.colors.brand.light} />
-              :
-              <Moon onClick={()=>setDarkmode(!darkmode)} />}
-            <CheckBox 
-              checked={darkmode} 
-              reverse 
-              toggle={true} 
-              onChange={()=>setDarkmode(!darkmode)} 
-            />
+            <Box direction='row' gap='small'>
+              <Anchor color='background-frontheader'><Github /></Anchor>
+              <Anchor color='background-frontheader'><Docs /></Anchor>
+              <Anchor color='background-frontheader'><Info /></Anchor>
+            </Box>
+            <Box>
+              { !active && <Button label='Connect to a wallet' onClick={()=>changeConnection()} />}
+            </Box>
+            <Box direction='row' gap='medium'>
+              <CheckBox 
+                checked={showTestLayer}
+                label='Test Layer'
+                reverse
+                onChange={()=>setShowTestLayer(!showTestLayer)}
+              />
+              <Box direction='row'>
+                {darkmode? 
+                  <Sun onClick={()=>setDarkmode(!darkmode)} color={yieldTheme.global.colors.brand.light} />
+                  :
+                  <Moon onClick={()=>setDarkmode(!darkmode)} />}
+              </Box>
+            </Box>
           </Footer>
         </Grid>
       </Grommet>

@@ -7,9 +7,9 @@ import {
 
 import { useGetWeiBalance, getNetworkName }  from '../hooks/connectionFns';
 
-import ProfileButton from './ProfileButton';
+import ProfileButton from '../components/ProfileButton';
 
-const AccountLayer = (props:any) => {
+const TestLayer = (props:any) => {
   const [balance, setBalance] = React.useState();
   const { account, chainId } = useWeb3React();
   const { closeLayer, changeWallet } = props;
@@ -32,9 +32,9 @@ const AccountLayer = (props:any) => {
   return (
     <Layer 
       animation='slide'
-      position='right'
+      position='left'
       full="vertical"
-      // modal={false}
+      modal={false}
       onClickOutside={onClose}
       onEsc={onClose}
     >
@@ -46,14 +46,15 @@ const AccountLayer = (props:any) => {
         style={{ minWidth: '240px' }}
         gap='small'
       >
+
         <Header 
           round={{ corner:'bottom', size:'medium' }}
           fill='horizontal'
           background='background-frontheader'
           pad={{ horizontal: 'medium', vertical:'large' }}
         >
-          <ProfileButton />
-          {/* <Anchor color='brand' onClick={()=>onClose()} size='xsmall' label='Cancel' /> */}
+          <Heading level='6'> FOR TESTING ONLY</Heading>
+          <Anchor color='brand' onClick={()=>onClose()} size='xsmall' label='close' />
         </Header>
 
         <Box
@@ -62,43 +63,29 @@ const AccountLayer = (props:any) => {
           justify="center"
           gap='small'
         >
+          <ProfileButton />
           <Text size='xsmall'>Connected to:</Text> 
           <Text weight="bold">{chainId && getNetworkName(chainId) }</Text>
           <Box direction='row' gap='small'>
             <Text size='xsmall'>WEI balance:</Text>
             <Text>{ balance }</Text>
           </Box>
-          {/* <Button fill='horizontal' label='Connect to another wallet' onClick={()=>setShowConnectLayer(true)} /> */}
         </Box>
 
         <Box 
           align='center'
-          // pad='large'
-          // gap='small'
+          pad='large'
+          gap='small'
           overflow='auto'
         >
-          <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
 
+          <Button label='Test A' onClick={(e)=>console.log(e)} />
+          <Button label='Test B' />
+          <Button label='Test C' />
+          <Button label='Test D' />
+          <Button label='Test E' />
+          <Button label='Test F' />
+ 
         </Box>
         <Footer pad='medium' gap='xsmall' direction='row' justify='center' align='center'>
           <Box round>
@@ -117,4 +104,4 @@ const AccountLayer = (props:any) => {
   );
 };
 
-export default AccountLayer;
+export default TestLayer;
