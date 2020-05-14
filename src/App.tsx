@@ -83,10 +83,9 @@ function App() {
           
           <Main
             align='center'
-            pad={{ horizontal: 'none', vertical:'small' }}
+            pad={{ horizontal: 'none', vertical:'none' }}
           >
-
-            <Box 
+            {/* <Box 
               fill='horizontal'
               justify='end'
               direction='row'
@@ -108,7 +107,7 @@ function App() {
                   }
                 />
               </Box>
-            </Box>
+            </Box> */}
 
             <Box
               pad={{ horizontal:'medium', vertical:'none' }}

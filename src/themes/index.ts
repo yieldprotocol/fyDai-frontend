@@ -1,5 +1,4 @@
 import { css } from 'styled-components';
-import { NONCE_EXPIRED } from 'ethers/errors';
 
 export const yieldTheme = {
   'name': 'yieldTheme',
@@ -168,8 +167,8 @@ export const yieldTheme = {
       'responsiveBreakpoint': 'small'
     },
     'input': {
-      'padding': '10px',
-      'weight': 600
+      'padding': { 'vertical': 'xsmall', 'horizontal':'small' },
+      'weight': 100,
     },
     'spacing': '20px',
     'size': {
@@ -187,6 +186,10 @@ export const yieldTheme = {
   'diagram': {
     'line': {}
   },
+  'TextInput': {
+
+  },
+
   'meter': {},
   'button': {
     'border': {
