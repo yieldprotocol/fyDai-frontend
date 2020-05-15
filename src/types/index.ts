@@ -16,7 +16,7 @@ export interface INotification {
 
   callbackAction?: any;
   callbackCancel?: any
-  showTime?: number;
+  showFor?: number;
   position?: nPositionEnum;
 }
 

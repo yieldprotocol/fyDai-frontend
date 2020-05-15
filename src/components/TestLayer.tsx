@@ -6,12 +6,7 @@ import {
 } from 'react-icons/fa';
 
 import { useGetWeiBalance, getNetworkName }  from '../hooks/connectionFns';
-
-
-import { useNotify  }  from '../hooks/appFns';
-
 import ProfileButton from './ProfileButton';
-
 import { NotifyContext } from '../contexts/NotifyContext';
 
 const TestLayer = (props:any) => {
@@ -85,8 +80,10 @@ const TestLayer = (props:any) => {
           overflow='auto'
         >
 
-          <Button label='useNotify' onClick={()=>notify({message:'heeeeey!'})} />
-          <Button label='Test B' />
+          <Button label='useNotify_info' onClick={()=>notify({ message:'Something is happening!.. ', type:'info' })} />
+          <Button label='useNotify_error' onClick={()=>notify({ message:'oooops :(', type:'error' })} />
+          <Button label='useNotify_success' onClick={()=>notify({ message:'Successful!', type:'success' })} />
+          <Button label='useNotify_warn' onClick={()=>notify({ message:'Something might be a problem...', type:'warn' })} />
           <Button label='Test C' />
           <Button label='Test D' />
           <Button label='Test E' />

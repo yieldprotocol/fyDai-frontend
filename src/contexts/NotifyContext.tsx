@@ -10,28 +10,29 @@ const NotifyProvider = (props:any) => {
   const [position, setPosition] = React.useState<any>('bottom');
   const [msg, setMsg] = React.useState<string>('No message here!');
   const [type, setType] = React.useState<any>('info');
-  const [timerMs, setTimerMs] = React.useState<number>(5000);
+  const [timerMs, setTimerMs] = React.useState<number>(3000);
   const [callbackAction, setCallbackAction] = React.useState<any>();
   const [callbackCancel, setCallbackCancel] = React.useState<any>();
 
   const layerTimer = async () => {
-    if (timerMs > 0) {
+    if (timerMs >= 0) {
       setOpen(true);
       await setTimeout(() => {
         setOpen(false);
       }, timerMs);
+      setTimerMs(2000);
     } else {
       setOpen(true);
     }
   };
 
-  const emitNotification = (notification: INotification) => {
-    notification.message && setMsg(notification.message);
-    notification.type && setType(notification.type);
-    notification.position && setPosition(notification.position);
-    notification.showTime && setTimerMs(notification.showTime);
-    notification.callbackAction && setCallbackAction(notification.callbackAction);
-    notification.callbackCancel && setCallbackCancel(notification.callbackCancel);
+  const emitNotification = (n: INotification) => {
+    n.message && setMsg(n.message);
+    n.type && setType(n.type);
+    n.position && setPosition(n.position);
+    n.showFor && setTimerMs(n.showFor);
+    n.callbackAction && setCallbackAction(n.callbackAction);
+    n.callbackCancel && setCallbackCancel(n.callbackCancel);
     layerTimer();
   };
 
@@ -44,7 +45,7 @@ const NotifyProvider = (props:any) => {
         position,
         callbackAction,
         callbackCancel,
-        closeNotify: ()=>setOpen(false),
+        closeNotify: () => setOpen(false),
         notify: emitNotification,
       }}
     >

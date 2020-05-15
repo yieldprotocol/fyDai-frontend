@@ -21,7 +21,33 @@ function YieldSeries({ series, seriesAction }:YieldSeriesProps) {
   } = series;
 
   return (
-    <Stack anchor='top-right'>
+  //   <Stack anchor='top-right'>
+  //   <Box
+  //     onClick={()=>seriesAction()}
+  //     pad={{ horizontal:'medium', bottom:'small', top:'small' }}
+  //     elevation='xsmall'
+  //     margin='xsmall'
+  //     align='center'
+  //     justify='between'
+  //     direction='row'
+  //     hoverIndicator={{ color:'lightgrey' }}
+  //     round="small"
+  //   >
+  //     <Box>
+  //       <Text weight='bold'> yDai-{moment(date).format('MMYY')}</Text>
+  //     </Box>
+
+  //     <Box direction='column'>
+  //       <Box direction='row' gap='xsmall' wrap={false}> <Text size='xsmall'>Matures: </Text><Text size='xsmall' weight='bold'> {moment(date).format('MMM YYYY')}</Text></Box>
+  //       <Box direction='row' gap='xsmall' wrap={false}> <Text size='xsmall'>Current value:</Text> <Text size='xsmall' weight='bold'>{`${value} DAI`}</Text></Box>
+  //     </Box>
+
+  //   </Box>
+  //   <Box round pad={{ horizontal:'xsmall', vertical:'none' }} background='brand'>
+  //     <Text size='xsmall'> {interest}%</Text>
+  //   </Box>
+  // </Stack>
+    <>
       <Box
         onClick={()=>seriesAction()}
         pad={{ horizontal:'medium', bottom:'small', top:'small' }}
@@ -33,34 +59,23 @@ function YieldSeries({ series, seriesAction }:YieldSeriesProps) {
         hoverIndicator={{ color:'lightgrey' }}
         round="small"
       >
-        <Box>
+        <Box direction='column'>
           <Text weight='bold'> yDai-{moment(date).format('MMYY')}</Text>
+          <Box round align='center' pad={{ horizontal:'small', vertical:'none' }} background='brand'>
+            <Text size='xsmall'> {interest}%</Text>
+          </Box>
+          {/* <Box direction='row' gap='xsmall'> */}
+            
+          {/* </Box> */}
         </Box>
 
         <Box direction='column'>
-          <Box direction='row' gap='xsmall' wrap={false}> <Text size='xsmall'>Matures: </Text><Text size='xsmall' weight='bold'> {moment(date).format('MMM YYYY')}</Text></Box>
-          <Box direction='row' gap='xsmall' wrap={false}> <Text size='xsmall'>Current value:</Text> <Text size='xsmall' weight='bold'>{`${value} DAI`}</Text></Box>
+          <Box direction='row' gap='xsmall'> <Text size='xsmall'>Matures: </Text><Text size='xsmall' weight='bold'> {moment(date).format('MMM YYYY')}</Text></Box>
+          <Box direction='row' gap='xsmall'> <Text size='xsmall'>Current value:</Text> <Text size='xsmall' weight='bold'>{`${value} DAI`}</Text></Box>
         </Box>
-        {/* <Box round pad='xsmall' background='graph-1'> <Text size='xsmall'>{interest}%</Text></Box>
-         <Box> {moment(date).format('MMM YYYY')} </Box>
-        <Box> {`${value} DAI`}</Box> */}
 
-        {/* <DropButton
-        color='background-front'
-        label={<Box pad='xsmall' direction='row' gap='xsmall' align='center'><EllipseV color='lightgrey' /></Box>}
-        dropAlign={{ top: 'bottom', right: 'right' }}
-        dropContent={
-          <Box pad="medium" background="light-2">
-            Series Actions go here...
-          </Box>
-         }
-      /> */}
       </Box>
-      <Box round pad={{ horizontal:'xsmall', vertical:'none' }} background='brand'>
-        <Text size='xsmall'> {interest}%</Text>
-      </Box>
-    
-    </Stack>
+    </>
   );
 }
 

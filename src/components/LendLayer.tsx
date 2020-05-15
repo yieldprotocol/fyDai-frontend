@@ -9,6 +9,8 @@ import {
 import SlideConfirm from './SlideConfirm';
 import { IYieldSeries } from '../types';
 
+import { NotifyContext } from '../contexts/NotifyContext';
+
 type LendConfirmLayerProps = {
   series: IYieldSeries,
   closeLayer: any,
@@ -18,11 +20,20 @@ function LendLayer({ series, closeLayer }:LendConfirmLayerProps) {
   const [inputValue, setInputValue] = React.useState<any>();
   const [confirmOpen, setConfirmOpen] = React.useState<boolean>(false);
   const theme = React.useContext<any>(ThemeContext);
+  const { notify } = React.useContext(NotifyContext);
   const {
     maturityDate:date,
     interestRate:interest,
     currentValue:value,
   } = series;
+
+  const handleConfirm = async () => {
+    closeLayer();
+    notify({ message:'Transaction pending....', type:'info', showFor:4000 });
+    await setTimeout(() => {
+      notify({ message:'Transaction processed', type:'success' });
+    }, 3000);
+  };
 
   return (
     <Layer>
@@ -125,7 +136,7 @@ function LendLayer({ series, closeLayer }:LendConfirmLayerProps) {
               <Text> some other info? </Text>
             </Box>
             <Footer direction='row' justify='evenly' pad='medium'>
-              <SlideConfirm brandColor={theme.global.colors.brand.light} onConfirm={()=>closeLayer()} />
+              <SlideConfirm brandColor={theme.global.colors.brand.light} onConfirm={()=>handleConfirm()} />
             </Footer>
           </Box>
         </Collapsible>

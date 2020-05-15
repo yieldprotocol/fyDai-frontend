@@ -3,6 +3,9 @@ import { Layer, Box, DropButton, Button, TextInput, Header, Text, Heading, Foote
 import {
   FaCheckCircle as CheckCircle,
   FaTimes as Close,
+  FaInfoCircle as Info,
+  FaTimesCircle as Error,
+  FaExclamationCircle as Warn,
 } from 'react-icons/fa';
 
 import { NotifyContext } from '../contexts/NotifyContext';
@@ -21,6 +24,15 @@ function NotifyLayer() {
     callbackCancel,
   } = React.useContext<any>(NotifyContext);
 
+  const typeMap = (_type:string) => {
+    switch(_type) {
+      case 'warn' : return { color: 'orange', icon: <Warn /> };
+      case 'error' : return { color: 'pink', icon: <Error /> };
+      case 'success': return { color: 'lightgreen', icon: <CheckCircle /> };
+      default: return { color: 'lightgrey', icon: <Info /> };
+    }
+  };
+
   return (
     <>
       { open &&
@@ -36,15 +48,15 @@ function NotifyLayer() {
           fill
           align="center"
           direction="row"
-          gap="small"
+          gap="large"
           justify="between"
           round="medium"
           elevation="medium"
           pad={{ vertical: 'xsmall', horizontal: 'small' }}
-          background="status-ok"
+          background={typeMap(type).color}
         >
+          { typeMap(type).icon }
           <Box align="center" direction="row" gap="xsmall">
-            <CheckCircle />
             <Text>{ msg }</Text>
           </Box>
           <Button icon={<Close />} onClick={closeNotify} plain />

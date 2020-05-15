@@ -33,10 +33,10 @@ export const yieldTheme = {
         'light': '#EEEEEE'
       },
       'background-frontheader': {
-        'dark': 'linear-gradient(135deg, rgba(138,5,12,1) 0%, rgba(17,17,17,1) 33%, rgba(17,17,17,1) 100%)',
-        'light': 'linear-gradient(45deg, rgba(120,240,41,0.30) 0%, #EEEEEE 33%, #EEEEEE 100%)'
-        // 'dark': 'dark-2',
-        // 'light': 'light-3'
+        // 'dark': 'linear-gradient(135deg, rgba(138,5,12,1) 0%, rgba(17,17,17,1) 33%, rgba(17,17,17,1) 100%)',
+        // 'light': 'linear-gradient(45deg, rgba(120,240,41,0.30) 0%, #EEEEEE 33%, #EEEEEE 100%)'
+        'dark': 'dark-1',
+        'light': 'light-3'
       },
       'background-front': {
         'dark': '#222222',

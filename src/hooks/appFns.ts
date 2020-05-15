@@ -7,5 +7,3 @@ export async function useNotify(_msg:INotification) {
   const { notify } = React.useContext(NotifyContext);
   return notify(_msg);
 }
-
-  
