@@ -2,7 +2,6 @@
   "name": "ydai-frontend",
   "version": "0.0.1",
   "private": true,
-  "homepage":".",
   "dependencies": {
     "@web3-react/core": "^6.0.9",
     "@web3-react/fortmatic-connector": "^6.0.9",
