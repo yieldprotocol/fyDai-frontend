@@ -8,7 +8,7 @@ import {
 
 
 import YieldSeries from '../components/YieldSeries';
-import LendLayer from '../components/LendLayer';
+import LendLayer from '../components/layers/LendLayer';
 
 import { IYieldSeries } from '../types';
 

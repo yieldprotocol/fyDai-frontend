@@ -22,12 +22,12 @@ import Lend from './views/Lend';
 import Position from './views/Position';
 
 // TODO: remove for prod
-import TestLayer from './components/TestLayer';
+import TestLayer from './components/layers/TestLayer';
 
 import YieldHeader from './components/YieldHeader';
-import ConnectLayer from './components/ConnectLayer';
-import AccountLayer from './components/AccountLayer';
-import NotifyLayer from './components/NotifyLayer';
+import ConnectLayer from './components/layers/ConnectLayer';
+import AccountLayer from './components/layers/AccountLayer';
+import NotifyLayer from './components/layers/NotifyLayer';
 
 // import metamaskImage from './assets/images/metamask.png';
 // import trezorImage from './assets/images/trezor.png';

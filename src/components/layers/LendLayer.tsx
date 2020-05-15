@@ -6,10 +6,10 @@ import {
   FaTimes as Close,
 } from 'react-icons/fa';
 
-import SlideConfirm from './SlideConfirm';
-import { IYieldSeries } from '../types';
+import SlideConfirm from '../SlideConfirm';
+import { IYieldSeries } from '../../types';
 
-import { NotifyContext } from '../contexts/NotifyContext';
+import { NotifyContext } from '../../contexts/NotifyContext';
 
 type LendConfirmLayerProps = {
   series: IYieldSeries,

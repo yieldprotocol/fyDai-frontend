@@ -5,14 +5,14 @@ import {
   FaTimes as Close,
 } from 'react-icons/fa';
 
-import { injected, trezor, walletlink, torus, ledger } from '../connectors';
+import { injected, trezor, walletlink, torus, ledger } from '../../connectors';
 // import { useGetWeiBalance, useEagerConnect, useConnectorImage, getNetworkName }  from './hooks/connectionFns';
 
 
-import metamaskImage from '../assets/images/metamask.png';
-import trezorImage from '../assets/images/trezor.png';
-import walletlinkImage from '../assets/images/walletlink.png';
-import torusImage from '../assets/images/torus.png';
+import metamaskImage from '../../assets/images/metamask.png';
+import trezorImage from '../../assets/images/trezor.png';
+import walletlinkImage from '../../assets/images/walletlink.png';
+import torusImage from '../../assets/images/torus.png';
 // import noConnectionImage from '../assets/images/noconnection.png';
 
 const ConnectLayer = (props:any) => {
