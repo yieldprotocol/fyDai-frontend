@@ -8,7 +8,7 @@ import {
   FaExclamationCircle as Warn,
 } from 'react-icons/fa';
 
-import { NotifyContext } from '../contexts/NotifyContext';
+import { NotifyContext } from '../../contexts/NotifyContext';
 
 // import { INotification } from '../types';
 

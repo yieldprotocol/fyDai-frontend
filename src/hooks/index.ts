@@ -2,8 +2,8 @@ import {
   useGetWeiBalance,
   useEagerConnect,
   useConnectorImage,
-  getNetworkName, 
-} from './connectionFns';
+  getNetworkName,
+} from "./connectionFns";
 
 export const useConnectionFns = () => {
   return {

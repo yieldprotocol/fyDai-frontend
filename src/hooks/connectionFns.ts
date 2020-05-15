@@ -1,12 +1,12 @@
-import React from 'react';
-import { useWeb3React } from '@web3-react/core';
-import { injected, trezor, walletlink, torus } from '../connectors'; 
+import React from "react";
+import { useWeb3React } from "@web3-react/core";
+import { injected, trezor, walletlink, torus } from "../connectors";
 
-import injectedImage from '../assets/images/metamask.png';
-import trezorImage from '../assets/images/trezor.png';
-import walletlinkImage from '../assets/images/walletlink.png';
-import torusImage from '../assets/images/torus.png';
-import noConnectionImage from '../assets/images/noconnection.png';
+import injectedImage from "../assets/images/metamask.png";
+import trezorImage from "../assets/images/trezor.png";
+import walletlinkImage from "../assets/images/walletlink.png";
+import torusImage from "../assets/images/torus.png";
+import noConnectionImage from "../assets/images/noconnection.png";
 
 export async function useGetWeiBalance() {
   const web3React = useWeb3React();
@@ -14,11 +14,11 @@ export async function useGetWeiBalance() {
   if (!!library && !!account) {
     const bal = await library.getBalance(account);
     return bal.toString();
-  } 
-  return '-';
+  }
+  return "-";
 }
 
-// eager connect is an attempt to 'auto connect' to injected connection eg. Metamask. 
+// eager connect is an attempt to 'auto connect' to injected connection eg. Metamask.
 export function useEagerConnect() {
   const { activate, active } = useWeb3React();
   const [tried, setTried] = React.useState(false);
@@ -45,17 +45,22 @@ export function useEagerConnect() {
 export function useConnectorImage() {
   const { connector } = useWeb3React();
   const [image, setImage] = React.useState<any>();
-  React.useEffect(()=>{
+  React.useEffect(() => {
     switch (connector) {
-      case injected : setImage(injectedImage);
+      case injected:
+        setImage(injectedImage);
         break;
-      case trezor: setImage(trezorImage);
+      case trezor:
+        setImage(trezorImage);
         break;
-      case walletlink: setImage(walletlinkImage);
+      case walletlink:
+        setImage(walletlinkImage);
         break;
-      case torus: setImage(torusImage);
+      case torus:
+        setImage(torusImage);
         break;
-      default: setImage(noConnectionImage);
+      default:
+        setImage(noConnectionImage);
     }
   }, [connector]);
   return image;
@@ -64,25 +69,25 @@ export function useConnectorImage() {
 export function getNetworkName(networkId: Number) {
   switch (networkId) {
     case 1: {
-      return 'Main Ethereum Network';
+      return "Main Ethereum Network";
     }
     case 3: {
-      return 'Ropsten Test Network';
+      return "Ropsten Test Network";
     }
     case 4: {
-      return 'Rinkeby Test Network';
+      return "Rinkeby Test Network";
     }
     case 5: {
-      return 'Görli Test Network';
+      return "Görli Test Network";
     }
     case 42: {
-      return 'Kovan Test Network';
+      return "Kovan Test Network";
     }
     case 1337: {
-      return 'Ganache Localhost';
+      return "Ganache Localhost";
     }
     default: {
-      return 'the correct network';
+      return "the correct network";
     }
   }
 }

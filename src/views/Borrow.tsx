@@ -1,18 +1,12 @@
-import React from 'react';
-import { Box, Text } from 'grommet';
+import React from "react";
+import { Box, Text } from "grommet";
 
 const Borrow = () => {
-  return ( 
-    <Box
-      pad='medium'
-      round='medium'
-      fill
-      background='background-front'
-    >
-      <Text> Borrow
-      </Text>
-    </Box> );
-
+  return (
+    <Box pad="medium" round="medium" fill background="background-front">
+      <Text> Borrow</Text>
+    </Box>
+  );
 };
 
-export default Borrow; 
+export default Borrow;

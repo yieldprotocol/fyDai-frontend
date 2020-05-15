@@ -5,9 +5,9 @@ import {
   FaTimes as Close,
 } from 'react-icons/fa';
 
-import { useGetWeiBalance, getNetworkName }  from '../hooks/connectionFns';
+import { useGetWeiBalance, getNetworkName }  from '../../hooks/connectionFns';
 
-import ProfileButton from './ProfileButton';
+import ProfileButton from '../../components/ProfileButton';
 
 const AccountLayer = (props:any) => {
   const [balance, setBalance] = React.useState();
@@ -68,7 +68,6 @@ const AccountLayer = (props:any) => {
             <Text size='xsmall'>WEI balance:</Text>
             <Text>{ balance }</Text>
           </Box>
-          
           {/* <Button fill='horizontal' label='Connect to another wallet' onClick={()=>setShowConnectLayer(true)} /> */}
         </Box>
 
@@ -78,27 +77,10 @@ const AccountLayer = (props:any) => {
           // gap='small'
           overflow='auto'
         >
-          <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
-          <Text>OR MAYBE TRANSACTIONS?</Text>
-          <Text>Some Account Info</Text>
-          <Text>well, what ever else. </Text>
-          <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
-          <Text>Some Account Info</Text>
+          <Text>Previous TX Info?</Text>
+          <Text>Previous TX Info?</Text>
+          <Text>Previous TX Info?</Text>
+          <Text>Previous TX Info? </Text>
 
         </Box>
         <Footer pad='medium' gap='xsmall' direction='row' justify='center' align='center'>

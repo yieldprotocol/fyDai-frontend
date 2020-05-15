@@ -5,9 +5,9 @@ import {
   FaTimes as Close,
 } from 'react-icons/fa';
 
-import { useGetWeiBalance, getNetworkName }  from '../hooks/connectionFns';
-import ProfileButton from './ProfileButton';
-import { NotifyContext } from '../contexts/NotifyContext';
+import { useGetWeiBalance, getNetworkName }  from '../../hooks/connectionFns';
+import ProfileButton from '../../components/ProfileButton';
+import { NotifyContext } from '../../contexts/NotifyContext';
 
 const TestLayer = (props:any) => {
   const [balance, setBalance] = React.useState();

@@ -1,15 +1,15 @@
-import React from 'react';
+import React from "react";
 
-import { INotification } from '../types';
+import { INotification } from "../types";
 
 const NotifyContext = React.createContext<any>({});
 
-const NotifyProvider = (props:any) => {
+const NotifyProvider = (props: any) => {
   const { children } = props;
   const [open, setOpen] = React.useState<boolean>(false);
-  const [position, setPosition] = React.useState<any>('bottom');
-  const [msg, setMsg] = React.useState<string>('No message here!');
-  const [type, setType] = React.useState<any>('info');
+  const [position, setPosition] = React.useState<any>("bottom");
+  const [msg, setMsg] = React.useState<string>("No message here!");
+  const [type, setType] = React.useState<any>("info");
   const [timerMs, setTimerMs] = React.useState<number>(3000);
   const [callbackAction, setCallbackAction] = React.useState<any>();
   const [callbackCancel, setCallbackCancel] = React.useState<any>();
@@ -54,5 +54,4 @@ const NotifyProvider = (props:any) => {
   );
 };
 
-export { NotifyContext, NotifyProvider } ;
-
+export { NotifyContext, NotifyProvider };
