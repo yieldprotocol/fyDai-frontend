@@ -22,8 +22,6 @@ function LendLayer({ series, closeLayer }:LendConfirmLayerProps) {
     maturityDate:date,
     interestRate:interest,
     currentValue:value,
-    balance,
-    debt
   } = series;
 
   return (
@@ -33,57 +31,52 @@ function LendLayer({ series, closeLayer }:LendConfirmLayerProps) {
         round='medium'
         background='background-front'
         fill
-        // style={{ maxWidth:'600px' }}
       >
         <Collapsible direction='vertical' open={!confirmOpen}>
           <Header 
             round
             fill='horizontal'
             background='background-frontheader'
-          // justify='center'
             pad={{ horizontal: 'medium', vertical:'xsmall' }}
             align='center'
             direction='column'
           >
             <Heading level='4' margin={{ bottom:'none' }}> yDai-{moment(date).format('MMYY')}</Heading>
             <Box gap='xsmall' margin='small' align='center'>
-              <Text size='xsmall'> {`Maturation date: ${moment(date).format('MMM YYYY')}`} </Text>
-              <Text size='xsmall'> {`Est. Price: ${value} DAI`} </Text>
+              {/* <Text size='xsmall'> {`Maturation date: ${moment(date).format('MMM YYYY')}`} </Text>
+              <Text size='xsmall'> {`Est. Price: ${value} DAI`} </Text> */}
             </Box>
           </Header>
 
-          <Box margin='large' gap='large' direction='column' align='center'>
+          <Box margin='medium' direction='column' align='center'>
 
-            <Box direction='row' justify='end' align='baseline' fill='horizontal'>
-              {/* <Text> Price: </Text> */}
-              <Box>
-                <DropButton
-                  color='background-front'
-                  label={
-                    <Box 
-                    // pad='xsmall'
-                      direction='row'
-                      gap='xsmall'
-                    >
-                      <Text color='#FF007F'>🦄 Uniswap</Text>
-                      <CaretDown />
-                    </Box>
+            <Box margin={{ bottom:'small' }} direction='row' justify='end' fill='horizontal'>
+              <DropButton
+                color='background-front'
+                label={
+                  <Box 
+                    direction='row'
+                    gap='xsmall'
+                    align='center'
+                  >
+                    <Text color='#FF007F'><span role='img'>🦄</span> Uniswap</Text>
+                    <CaretDown />
+                  </Box>
                 }
-                  dropAlign={{ top: 'bottom', right: 'right' }}
-                  dropContent={
-                    <Box pad="medium" background="light-2" round="xsmall">
-                      <Text size='xsmall'>More providers coming soon!</Text> 
-                    </Box>
+                dropAlign={{ top: 'bottom', right: 'right' }}
+                dropContent={
+                  <Box pad="medium" background="light-2" round="xsmall">
+                    <Text size='xsmall'>More providers coming soon!</Text> 
+                  </Box>
                   }
-                />
-              </Box>
+              />
             </Box>
 
-            <Box gap='xsmall' direction='row' justify='between' align='baseline' fill='horizontal'>
+            <Box gap='xsmall' direction='row' justify='end' align='baseline' fill='horizontal'>
               {/* <Text> Buy  </Text> */}
-              <Box>
+              <Box fill>
                 <TextInput
-                  size='medium'
+                  size='large'
                   type="number"
                   placeholder="Amount"
                   value={inputValue}
@@ -94,7 +87,7 @@ function LendLayer({ series, closeLayer }:LendConfirmLayerProps) {
               </Box>
             </Box>
 
-            <Box pad='small' round='small' direction='row' justify='between' fill='horizontal' background='lightgrey'>
+            <Box pad='small' round='small' direction='row' justify='between' fill='horizontal'>
               <Box direction='column'>
                 <Text size='xsmall'>Interest @ maturity </Text>
                 <Text size='8px'> (includes Uniswap fee) </Text>
@@ -121,23 +114,20 @@ function LendLayer({ series, closeLayer }:LendConfirmLayerProps) {
             justify='center'
             direction='row'
           >
-            
             <Heading level='4' margin={{ bottom:'none' }}> Confirm transaction</Heading>
             <Button icon={<Close />} color='border' onClick={()=>closeLayer()} /> 
           </Header>
-
           <Box margin='large' gap='large' direction='column' align='center'>
-            {/* <Box border='all' elevation='xsmall'>
-              <Text>Buy {inputValue} yDai from the 'yDai-{moment(date).format('MMYY')}' series.</Text>
-              <Text>Maturation date is in {moment(date).format('mmmm YYYY')}.</Text>
-              <Text>On maturity Interest rate will be set at {interest}.</Text>
-              <Text>The current value is approxiamtely: {inputValue*value} Dai.</Text>
-            </Box> */}
+            <Box>
+              <Text> ** Tx Information **</Text>
+              <Text>'yDai-{moment(date).format('MMYY')}' series</Text>
+              <Text> {inputValue} yDai @ {value}</Text>
+              <Text> some other info? </Text>
+            </Box>
             <Footer direction='row' justify='evenly' pad='medium'>
               <SlideConfirm brandColor={theme.global.colors.brand.light} onConfirm={()=>closeLayer()} />
             </Footer>
           </Box>
-
         </Collapsible>
 
       </Box>

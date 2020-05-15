@@ -7,14 +7,20 @@ import {
 
 import { useGetWeiBalance, getNetworkName }  from '../hooks/connectionFns';
 
-import ProfileButton from '../components/ProfileButton';
+
+import { useNotify  }  from '../hooks/appFns';
+
+import ProfileButton from './ProfileButton';
+
+import { NotifyContext } from '../contexts/NotifyContext';
 
 const TestLayer = (props:any) => {
   const [balance, setBalance] = React.useState();
   const { account, chainId } = useWeb3React();
   const { closeLayer, changeWallet } = props;
-
   const getWeiBalance = useGetWeiBalance();
+
+  const { notify } = React.useContext(NotifyContext);
 
   const updateBalance = async () => {
     setBalance(await getWeiBalance);
@@ -79,7 +85,7 @@ const TestLayer = (props:any) => {
           overflow='auto'
         >
 
-          <Button label='Test A' onClick={(e)=>console.log(e)} />
+          <Button label='useNotify' onClick={()=>notify({message:'heeeeey!'})} />
           <Button label='Test B' />
           <Button label='Test C' />
           <Button label='Test D' />

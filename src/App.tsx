@@ -20,11 +20,14 @@ import { yieldTheme } from './themes';
 import Borrow from './views/Borrow';
 import Lend from './views/Lend';
 import Position from './views/Position';
-import TestLayer from './views/TestLayer';
+
+// TODO: remove for prod
+import TestLayer from './components/TestLayer';
 
 import YieldHeader from './components/YieldHeader';
 import ConnectLayer from './components/ConnectLayer';
 import AccountLayer from './components/AccountLayer';
+import NotifyLayer from './components/NotifyLayer';
 
 // import metamaskImage from './assets/images/metamask.png';
 // import trezorImage from './assets/images/trezor.png';
@@ -35,10 +38,10 @@ import AccountLayer from './components/AccountLayer';
 function App() {
   const { active, activate, chainId, account, connector } = useWeb3React();
   const [balance, setBalance] = React.useState();
+  // TODO move to layerContext
   const [showConnectLayer, setShowConnectLayer] = React.useState<boolean>(false);
   const [showAccountLayer, setShowAccountLayer] = React.useState<boolean>(false);
-
-  const [showTestLayer, setShowTestLayer] = React.useState<boolean>(false);
+  const [showTestLayer, setShowTestLayer] = React.useState<boolean>(true);
 
   const [darkmode, setDarkmode] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
@@ -75,12 +78,11 @@ function App() {
     <div className="App">
       <Grommet theme={deepMerge(base, yieldTheme)} themeMode={darkmode?'dark':'light'} full>
         <Grid fill rows={['auto', 'flex', 'auto']}>
+          <NotifyLayer />
           { showAccountLayer && <AccountLayer closeLayer={()=>setShowAccountLayer(false)} changeWallet={()=>changeConnection()} /> }
           { showConnectLayer && <ConnectLayer closeLayer={()=>setShowConnectLayer(false)} />}
           { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
-
           <YieldHeader openConnectLayer={()=>setShowConnectLayer(true)} openAccountLayer={()=>setShowAccountLayer(true)} />
-          
           <Main
             align='center'
             pad={{ horizontal: 'none', vertical:'none' }}

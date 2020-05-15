@@ -11,6 +11,11 @@ import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 
+import { NotifyProvider }  from './contexts/NotifyContext';
+
+// TODO: layers to context
+import { LayerProvider }  from './contexts/LayerContext';
+
 // TODO: ProviderType definition
 // TODO: Implement a 2nd/fallback provider for robustness
 
@@ -35,10 +40,16 @@ function getLibrary(provider : any) {
   return new ethers.providers.Web3Provider(provider);
 }
 
+// const NotifyContext = React.createContext()
+
 ReactDOM.render(
   <React.StrictMode>
     <Web3ReactProvider getLibrary={getLibrary}>
-      <App />
+      <NotifyProvider>
+        <LayerProvider>
+          <App />
+        </LayerProvider>
+      </NotifyProvider>
     </Web3ReactProvider>
   </React.StrictMode>,
   document.getElementById('root')

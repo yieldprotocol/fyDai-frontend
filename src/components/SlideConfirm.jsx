@@ -6,6 +6,7 @@ import {
   FaTimes as Reject, 
   FaCheck as Confirm,
   FaArrowAltCircleRight as ArrowRight,
+  FaThumbsUp,
 } from 'react-icons/fa';
 
 const SlideConfirm = (props) => {
@@ -31,7 +32,7 @@ const SlideConfirm = (props) => {
     color: 'white',
     padding: '5px',
     textDecoration:'none',
-    fontSize: '13px',
+    // fontSize: '15px',
     margin: '5px 5px',
     borderRadius: '36px',
   };
@@ -54,7 +55,7 @@ const SlideConfirm = (props) => {
             width:'75px',
           }}
         >
-          <Confirm />
+          <FaThumbsUp />
         </animated.div>
 
         <animated.div
@@ -63,8 +64,7 @@ const SlideConfirm = (props) => {
             marginRight:'5px',
             opacity: x.interpolate({ range: [0, 100], output: [1, 0] }),
           }}
-        >
-          Slide to confirm
+        > Slide to sign
         </animated.div>
       </animated.div>
     );
@@ -79,7 +79,6 @@ const SlideConfirm = (props) => {
           background: brandColor,
           maxWidth:'50px',
           textAlign:'center',
-          justify:'center',
           ...style,
         }}
       >

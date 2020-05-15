@@ -189,7 +189,9 @@ export const yieldTheme = {
   'TextInput': {
 
   },
-
+  'collapsible': {
+    'minSpeed': '100'
+  },
   'meter': {},
   'button': {
     'border': {
