@@ -1,17 +1,19 @@
-import React from 'react';
-
+import React from "react";
 
 const LayerContext = React.createContext<any>({});
 
-const LayerProvider = (props:any) => {
+const LayerProvider = (props: any) => {
   const { children } = props;
   return (
     <LayerContext.Provider
-      value={{ something: 'hello',
+      value={{
+        something: "hello",
         someObj: {
-          helloagain: 'helloagain',
-        }, 
-        somefunction: ()=>{ console.log('oof');},
+          helloagain: "helloagain",
+        },
+        somefunction: () => {
+          console.log("oof");
+        },
       }}
     >
       {children}
@@ -19,4 +21,4 @@ const LayerProvider = (props:any) => {
   );
 };
 
-export { LayerContext, LayerProvider } ;
+export { LayerContext, LayerProvider };

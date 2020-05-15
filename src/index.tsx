@@ -7,7 +7,7 @@ import {
 } from '@web3-react/injected-connector';
 import { ethers } from 'ethers';
 
-import './index.css';
+// import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 

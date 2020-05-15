@@ -22,12 +22,12 @@ import Lend from './views/Lend';
 import Position from './views/Position';
 
 // TODO: remove for prod
-import TestLayer from './components/layers/TestLayer';
+import TestLayer from './views/layers/TestLayer';
 
 import YieldHeader from './components/YieldHeader';
-import ConnectLayer from './components/layers/ConnectLayer';
-import AccountLayer from './components/layers/AccountLayer';
-import NotifyLayer from './components/layers/NotifyLayer';
+import ConnectLayer from './views/layers/ConnectLayer';
+import AccountLayer from './views/layers/AccountLayer';
+import NotifyLayer from './views/layers/NotifyLayer';
 
 // import metamaskImage from './assets/images/metamask.png';
 // import trezorImage from './assets/images/trezor.png';
@@ -41,7 +41,7 @@ function App() {
   // TODO move to layerContext
   const [showConnectLayer, setShowConnectLayer] = React.useState<boolean>(false);
   const [showAccountLayer, setShowAccountLayer] = React.useState<boolean>(false);
-  const [showTestLayer, setShowTestLayer] = React.useState<boolean>(true);
+  const [showTestLayer, setShowTestLayer] = React.useState<boolean>(false);
 
   const [darkmode, setDarkmode] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
@@ -141,9 +141,9 @@ function App() {
             pad={{ horizontal: 'large', vertical:'medium' }}
           >
             <Box direction='row' gap='small'>
-              <Anchor color='background-frontheader'><Github /></Anchor>
-              <Anchor color='background-frontheader'><Docs /></Anchor>
-              <Anchor color='background-frontheader'><Info /></Anchor>
+              <Anchor color='grey'><Github /></Anchor>
+              <Anchor color='grey'><Docs /></Anchor>
+              <Anchor color='grey'><Info /></Anchor>
             </Box>
             <Box>
               { !active && <Button style={{ minWidth:'160px' }} label='Connect to a wallet' onClick={()=>changeConnection()} />}

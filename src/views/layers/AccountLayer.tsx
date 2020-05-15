@@ -6,16 +6,15 @@ import {
 } from 'react-icons/fa';
 
 import { useGetWeiBalance, getNetworkName }  from '../../hooks/connectionFns';
-import ProfileButton from '../ProfileButton';
-import { NotifyContext } from '../../contexts/NotifyContext';
 
-const TestLayer = (props:any) => {
+import ProfileButton from '../../components/ProfileButton';
+
+const AccountLayer = (props:any) => {
   const [balance, setBalance] = React.useState();
   const { account, chainId } = useWeb3React();
   const { closeLayer, changeWallet } = props;
-  const getWeiBalance = useGetWeiBalance();
 
-  const { notify } = React.useContext(NotifyContext);
+  const getWeiBalance = useGetWeiBalance();
 
   const updateBalance = async () => {
     setBalance(await getWeiBalance);
@@ -33,9 +32,9 @@ const TestLayer = (props:any) => {
   return (
     <Layer 
       animation='slide'
-      position='left'
+      position='right'
       full="vertical"
-      modal={false}
+      // modal={false}
       onClickOutside={onClose}
       onEsc={onClose}
     >
@@ -47,15 +46,14 @@ const TestLayer = (props:any) => {
         style={{ minWidth: '240px' }}
         gap='small'
       >
-
         <Header 
           round={{ corner:'bottom', size:'medium' }}
           fill='horizontal'
           background='background-frontheader'
-          pad={{ horizontal: 'small', vertical:'medium' }}
+          pad={{ horizontal: 'medium', vertical:'large' }}
         >
-          <Heading level='6'> FOR TESTING ONLY</Heading>
-          <Anchor color='brand' onClick={()=>onClose()} size='xsmall' label='close' />
+          <ProfileButton />
+          <Anchor color='brand' onClick={()=>onClose()} size='xsmall' label='Close' />
         </Header>
 
         <Box
@@ -64,31 +62,26 @@ const TestLayer = (props:any) => {
           justify="center"
           gap='small'
         >
-          <ProfileButton />
           <Text size='xsmall'>Connected to:</Text> 
           <Text weight="bold">{chainId && getNetworkName(chainId) }</Text>
           <Box direction='row' gap='small'>
             <Text size='xsmall'>WEI balance:</Text>
             <Text>{ balance }</Text>
           </Box>
+          {/* <Button fill='horizontal' label='Connect to another wallet' onClick={()=>setShowConnectLayer(true)} /> */}
         </Box>
 
         <Box 
           align='center'
-          pad='large'
-          gap='small'
+          // pad='large'
+          // gap='small'
           overflow='auto'
         >
+          <Text>Previous TX Info?</Text>
+          <Text>Previous TX Info?</Text>
+          <Text>Previous TX Info?</Text>
+          <Text>Previous TX Info? </Text>
 
-          <Button label='useNotify_info' onClick={()=>notify({ message:'Something is happening!.. ', type:'info' })} />
-          <Button label='useNotify_error' onClick={()=>notify({ message:'oooops :(', type:'error' })} />
-          <Button label='useNotify_success' onClick={()=>notify({ message:'Successful!', type:'success' })} />
-          <Button label='useNotify_warn' onClick={()=>notify({ message:'Something might be a problem...', type:'warn' })} />
-          <Button label='Test C' />
-          <Button label='Test D' />
-          <Button label='Test E' />
-          <Button label='Test F' />
- 
         </Box>
         <Footer pad='medium' gap='xsmall' direction='row' justify='center' align='center'>
           <Box round>
@@ -107,4 +100,4 @@ const TestLayer = (props:any) => {
   );
 };
 
-export default TestLayer;
+export default AccountLayer;
