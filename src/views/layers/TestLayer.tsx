@@ -10,8 +10,6 @@ import ProfileButton from '../../components/ProfileButton';
 
 import { NotifyContext } from '../../contexts/NotifyContext';
 
-import { useNotify } from '../../hooks/appFns';
-
 const TestLayer = (props:any) => {
 
   const [balance, setBalance] = React.useState();
@@ -24,8 +22,6 @@ const TestLayer = (props:any) => {
   const updateBalance = async () => {
     setBalance(await getWeiBalance);
   };
-
-  const notify = useNotify();
 
   React.useEffect(() => {
     updateBalance();
