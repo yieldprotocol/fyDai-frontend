@@ -41,7 +41,7 @@ function App() {
   // TODO move to layerContext
   const [showConnectLayer, setShowConnectLayer] = React.useState<boolean>(false);
   const [showAccountLayer, setShowAccountLayer] = React.useState<boolean>(false);
-  const [showTestLayer, setShowTestLayer] = React.useState<boolean>(false);
+  const [showTestLayer, setShowTestLayer] = React.useState<boolean>(true);
 
   const [darkmode, setDarkmode] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
