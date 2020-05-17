@@ -5,10 +5,11 @@ import {
   FaTimes as Close,
 } from 'react-icons/fa';
 
-import { useGetWeiBalance, getNetworkName }  from '../../hooks/connectionFns';
-import ProfileButton from '../../components/ProfileButton';
 
+import { useGetWeiBalance, getNetworkName, useSendTx }  from '../../hooks/connectionFns';
+import ProfileButton from '../../components/ProfileButton';
 import { NotifyContext } from '../../contexts/NotifyContext';
+
 
 const TestLayer = (props:any) => {
 
@@ -17,6 +18,7 @@ const TestLayer = (props:any) => {
   const { closeLayer, changeWallet } = props;
 
   const getWeiBalance = useGetWeiBalance();
+  const sendTx  = useSendTx();
   const { dispatch } = React.useContext<any>(NotifyContext);
 
   const updateBalance = async () => {
@@ -87,10 +89,9 @@ const TestLayer = (props:any) => {
           <Button label='useNotify_success' onClick={()=>dispatch({ type: 'notify', payload: { message:'sucessfull', type:'success' } })} />
           <Button label='useNotify_warn' onClick={()=>dispatch({ type: 'notify', payload: { message:'maybe wrong?', type:'warn' } })} />
           <Button label='Test C' />
-          <Button label='Test D' />
-
+          <Button label='SendTest Transaction' onClick={()=> sendTx()} />
           <Button label='Test F' />
- 
+
         </Box>
         <Footer pad='medium' gap='xsmall' direction='row' justify='center' align='center'>
           <Box round>

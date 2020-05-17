@@ -1,6 +1,8 @@
 import React from 'react';
 import { useWeb3React } from '@web3-react/core';
+import { ethers }  from 'ethers'; 
 import { injected, trezor, walletlink, torus } from '../connectors';
+
 
 import injectedImage from '../assets/images/metamask.png';
 import trezorImage from '../assets/images/trezor.png';
@@ -87,7 +89,54 @@ export function getNetworkName(networkId: Number) {
       return 'Ganache Localhost';
     }
     default: {
-      return 'the correct network';
+      return '..ummm...';
     }
   }
 }
+
+
+export const useSendTx = () => {
+
+  const { library } = useWeb3React();
+
+  const signer = library && library.getSigner(); 
+
+  const transaction = {
+    nonce: 0,
+    gasLimit: 21000,
+    gasPrice: ethers.utils.bigNumberify('20000000000'),
+    to: '0x88a5C2d9919e46F883EB62F7b8Dd9d0CC45bc290',
+    // ... or supports ENS names
+    // to: "ricmoo.firefly.eth",
+    value: ethers.utils.parseEther('1.0'),
+    data: '0x',
+    // This ensures the transaction cannot be replayed on different networks
+    chainId: ethers.utils.getNetwork('homestead').chainId
+  };
+
+  const logSigner = () => console.log(signer);
+
+  const sendTx = () => {
+    signer && signer.sendTransaction(transaction);
+  };
+
+  return sendTx;
+
+  // // signer && signer.sendTransaction(transaction).then(console.log);
+  // return signer.sendTransaction(transaction);
+
+  // const signedTransaction = transaction;
+  // library.provider.sendTransaction(signedTransaction).then((tx:any) => {
+  // console.log(tx);
+  // {
+  //    // These will match the above values (excluded properties are zero)
+  //    "nonce", "gasLimit", "gasPrice", "to", "value", "data", "chainId"
+  //
+  //    // These will now be present
+  //    "from", "hash", "r", "s", "v"
+  //  }
+  // Hash:
+  // });
+
+};
+

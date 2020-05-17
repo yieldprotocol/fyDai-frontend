@@ -3,7 +3,7 @@ import {
   useEagerConnect,
   useConnectorImage,
   getNetworkName,
-} from "./connectionFns";
+} from './connectionFns';
 
 export const useConnectionFns = () => {
   return {

@@ -18,17 +18,17 @@ function notifyReducer(state:any, action:any) {
     case 'notify':
       return { 
         ...state,
-        timerMs: action.payload.showFor? action.payload.showFor: initState.timerMs,
         open: true,
         message: action.payload.message,
         type: action.payload.type? action.payload.type: initState.type,
+        timerMs: action.payload.showFor? action.payload.showFor: initState.timerMs,
         position: action.payload.position? action.payload.position : initState.position,
         callbackAction: action.payload.callbackAction? action.payload.callbackAction: null,
         callbackCancel: action.payload.callbackCancel? action.payload.callbackCancel: null,
       };
-    case 'closeNotify':
+    case '_closeNotify':
       return { ...state, open: false, timerMs: initState.timerMs };
-    case 'openNotify':
+    case '_openNotify':
       return { ...state, open: true };
     default:
       return state;
@@ -37,14 +37,15 @@ function notifyReducer(state:any, action:any) {
 
 const NotifyProvider = ({ children }:any) => {
   const [state, dispatch] = React.useReducer(notifyReducer, initState);
+
   React.useEffect( () => {
     state.open && ( async () => {
-      if (state.timerMs > 0) {
-        await setTimeout(() => {
-          dispatch({ type: 'closeNotify' });
-        }, state.timerMs);
+      if (state.timerMs === 0) {
+        dispatch({ type: '_openNotify' });
       } else {
-        dispatch({ type: 'openNotify' });
+        await setTimeout(() => {
+          dispatch({ type: '_closeNotify' });
+        }, state.timerMs);
       }
     })();
   }, [state.open]);

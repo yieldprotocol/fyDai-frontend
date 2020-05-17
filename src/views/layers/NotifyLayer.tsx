@@ -14,7 +14,7 @@ function NotifyLayer() {
 
   const  { state, dispatch }  = React.useContext<any>(NotifyContext);
 
-  const typeMap = (_type:string) => {
+  const notificationTypeMap = (_type:string) => {
     switch(_type) {
       case 'warn' : return { color: 'orange', icon: <Warn /> };
       case 'error' : return { color: 'pink', icon: <Error /> };
@@ -43,9 +43,9 @@ function NotifyLayer() {
           round="medium"
           elevation="medium"
           pad={{ vertical: 'xsmall', horizontal: 'small' }}
-          background={typeMap(state.type).color}
+          background={notificationTypeMap(state.type).color}
         >
-          { typeMap(state.type).icon }
+          { notificationTypeMap(state.type).icon }
           <Box align="center" direction="row" gap="xsmall">
             <Text>{ state.message }</Text>
           </Box>
