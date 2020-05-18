@@ -20,7 +20,7 @@ function LendLayer({ series, closeLayer }:LendConfirmLayerProps) {
   const [inputValue, setInputValue] = React.useState<any>();
   const [confirmOpen, setConfirmOpen] = React.useState<boolean>(false);
   const theme = React.useContext<any>(ThemeContext);
-  const { notify } = React.useContext(NotifyContext);
+  const { state, dispatch } = React.useContext(NotifyContext);
   const {
     maturityDate:date,
     interestRate:interest,
@@ -29,9 +29,9 @@ function LendLayer({ series, closeLayer }:LendConfirmLayerProps) {
 
   const handleConfirm = async () => {
     closeLayer();
-    notify({ message:'Transaction pending....', type:'info', showFor:4000 });
+    dispatch({ type: 'notify', payload:{ message:'Transaction pending....', type:'info', showFor:4000 }} );
     await setTimeout(() => {
-      notify({ message:'Transaction processed', type:'success' });
+      dispatch({ type: 'notify', payload:{ message:'Transaction processed', type:'success' }} );
     }, 3000);
   };
 

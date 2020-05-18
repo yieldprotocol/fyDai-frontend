@@ -1,6 +1,6 @@
 import React from 'react';
 import { useWeb3React } from '@web3-react/core';
-import { Anchor, Grommet, DropButton, base, Tabs, Tab, Grid, Main, Footer, Button, Box, Text } from 'grommet';
+import { Anchor, Grommet, Stack, base, Tabs, Tab, Grid, Main, Footer, Button, Box, Text } from 'grommet';
 import { 
   FaSun as Sun,
   FaMoon as Moon,
@@ -14,7 +14,7 @@ import {
 
 import { deepMerge } from 'grommet/utils';
 
-import { useGetWeiBalance, useEagerConnect, getNetworkName }  from './hooks/connectionFns';
+import { useGetWeiBalance, useEagerConnect, useMakerVault }  from './hooks/connectionFns';
 import { yieldTheme } from './themes';
 
 import Borrow from './views/Borrow';
@@ -29,15 +29,15 @@ import ConnectLayer from './views/layers/ConnectLayer';
 import AccountLayer from './views/layers/AccountLayer';
 import NotifyLayer from './views/layers/NotifyLayer';
 
-// import metamaskImage from './assets/images/metamask.png';
-// import trezorImage from './assets/images/trezor.png';
-// import walletlinkImage from './assets/images/walletlink.png';
-// import torusImage from './assets/images/torus.png';
-// // import noConnectionImage from '../assets/images/noconnection.png';
+import { PositionsContext } from './contexts/PositionsContext';
+
 
 function App() {
-  const { active, activate, chainId, account, connector } = useWeb3React();
+
+  const { active, activate, library, chainId, account, connector } = useWeb3React();
+  const { state: posState } = React.useContext(PositionsContext);
   const [balance, setBalance] = React.useState();
+
   // TODO move to layerContext
   const [showConnectLayer, setShowConnectLayer] = React.useState<boolean>(false);
   const [showAccountLayer, setShowAccountLayer] = React.useState<boolean>(false);
@@ -46,16 +46,22 @@ function App() {
   const [darkmode, setDarkmode] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const getWeiBalance = useGetWeiBalance();
-  const eagerConnect = useEagerConnect();
 
-  const [indexTab, setIndexTab] = React.useState<number>(1);
+  const eagerConnect = useEagerConnect();
+  // const makerVault = useMakerVault();
+
+  const [indexTab, setIndexTab] = React.useState<number>(0);
   const onActiveTab = (nextIndex: any) => setIndexTab(nextIndex);
 
   const manageConnection = async () => {
     setLoading(true);
-    !active && chainId && account && (
-      await eagerConnect
-    );
+    if ( !active && chainId && account ) {
+      console.log(library.provider);
+      // const maker = await createMaker(library.providers);
+      // await maker.authenticate();
+      // maker && console.log(`makerConnection: ${maker.currentAddress()}`);
+      await eagerConnect;
+    }
     setLoading(false);
   };
 
@@ -124,13 +130,38 @@ function App() {
                 onActive={onActiveTab}
               >
                 <Tab title={<Box pad='none' align='center'><Text weight={(indexTab===0?'bold':'normal')}>Borrow</Text></Box>}>
-                  <Borrow />
+                  <Box overflow='auto'>
+                    <Borrow />
+                  </Box>
                 </Tab>
                 <Tab title={<Box pad='none' align='center'><Text weight={(indexTab===1?'bold':'normal')}>Lend</Text></Box>}>
-                  <Lend />
+                  <Box overflow='auto'>
+                    <Lend />
+                  </Box>
                 </Tab>
-                <Tab title={<Box pad='none' align='center'><Text weight={(indexTab===2?'bold':'normal')}>Position</Text></Box>}>
-                  <Position />
+                <Tab 
+                  
+                  title={
+                    <Box 
+                      gap='xsmall'
+                      direction='row'
+                    >
+                      <Text weight={(indexTab===2?'bold':'normal')}>Positions</Text>
+                      { posState.positionsIndicator > 0 &&
+                      <Box
+                        background="brand"
+                        pad={{ horizontal: 'small', vertical:'none' }}
+                        align='center'
+                        round
+                      >
+                        <Text>{posState.positionsIndicator}</Text>
+                      </Box>}
+                    </Box>
+                  }
+                >
+                  <Box overflow='auto'>
+                    <Position />
+                  </Box>
                 </Tab>
               </Tabs>
             </Box>

@@ -3,6 +3,8 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
+    "@makerdao/dai": "^0.31.2",
+    "@makerdao/dai-plugin-mcd": "^1.4.1",
     "@web3-react/core": "^6.0.9",
     "@web3-react/fortmatic-connector": "^6.0.9",
     "@web3-react/injected-connector": "^6.0.7",
@@ -13,6 +15,7 @@
     "@web3-react/types": "^6.0.7",
     "@web3-react/walletlink-connector": "^6.0.9",
     "ethers": "^4.0.47",
+    "ethers-web3-bridge": "^0.0.1",
     "grommet": "^2.13.0",
     "grommet-icons": "^4.4.0",
     "moment": "^2.25.3",
@@ -38,7 +41,6 @@
     "extends": "react-app"
   },
   "devDependencies": {
-    "typescript": "~3.7.2",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
@@ -65,7 +67,8 @@
     "eslint-plugin-react-hooks": "^4.0.0",
     "prettier": "^2.0.5",
     "prettier-eslint": "^9.0.1",
-    "prettier-eslint-cli": "^5.0.0"
+    "prettier-eslint-cli": "^5.0.0",
+    "typescript": "~3.7.2"
   },
   "browserslist": {
     "production": [

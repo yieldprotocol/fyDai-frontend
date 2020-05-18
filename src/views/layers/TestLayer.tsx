@@ -5,17 +5,24 @@ import {
   FaTimes as Close,
 } from 'react-icons/fa';
 
-import { useGetWeiBalance, getNetworkName }  from '../../hooks/connectionFns';
+
+import { useGetWeiBalance, getNetworkName, useSendTx, useMakerVault }  from '../../hooks/connectionFns';
 import ProfileButton from '../../components/ProfileButton';
 import { NotifyContext } from '../../contexts/NotifyContext';
 
+
 const TestLayer = (props:any) => {
+
   const [balance, setBalance] = React.useState();
   const { account, chainId } = useWeb3React();
   const { closeLayer, changeWallet } = props;
-  const getWeiBalance = useGetWeiBalance();
 
-  const { notify } = React.useContext(NotifyContext);
+  const getWeiBalance = useGetWeiBalance();
+  const sendTx  = useSendTx();
+
+  const makerVault = useMakerVault();
+
+  const { dispatch } = React.useContext<any>(NotifyContext);
 
   const updateBalance = async () => {
     setBalance(await getWeiBalance);
@@ -80,15 +87,14 @@ const TestLayer = (props:any) => {
           overflow='auto'
         >
 
-          <Button label='useNotify_info' onClick={()=>notify({ message:'Something is happening!.. ', type:'info' })} />
-          <Button label='useNotify_error' onClick={()=>notify({ message:'oooops :(', type:'error' })} />
-          <Button label='useNotify_success' onClick={()=>notify({ message:'Successful!', type:'success' })} />
-          <Button label='useNotify_warn' onClick={()=>notify({ message:'Something might be a problem...', type:'warn' })} />
+          <Button label='useNotify_info' onClick={()=>dispatch( { type: 'notify', payload: { message:'Something is happening!.. ', type:'info', showFor:500 } } )} />
+          <Button label='useNotify_error' onClick={()=>dispatch({ type: 'notify', payload: { message:'oooops :( - must cancel manually', type:'error', showFor:0 } })} />
+          <Button label='useNotify_success' onClick={()=>dispatch({ type: 'notify', payload: { message:'sucessfull', type:'success' } })} />
+          <Button label='useNotify_warn' onClick={()=>dispatch({ type: 'notify', payload: { message:'maybe wrong?', type:'warn' } })} />
           <Button label='Test C' />
-          <Button label='Test D' />
-          <Button label='Test E' />
-          <Button label='Test F' />
- 
+          <Button label='SendTest Transaction' onClick={()=> sendTx()} />
+          <Button label='check Maker vault' onClick={()=> makerVault()} />
+
         </Box>
         <Footer pad='medium' gap='xsmall' direction='row' justify='center' align='center'>
           <Box round>

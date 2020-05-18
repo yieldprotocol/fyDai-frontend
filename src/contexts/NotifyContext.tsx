@@ -1,54 +1,57 @@
-import React from "react";
-
-import { INotification } from "../types";
+import React from 'react';
+import { INotification } from '../types';
 
 const NotifyContext = React.createContext<any>({});
 
-const NotifyProvider = (props: any) => {
-  const { children } = props;
-  const [open, setOpen] = React.useState<boolean>(false);
-  const [position, setPosition] = React.useState<any>("bottom");
-  const [msg, setMsg] = React.useState<string>("No message here!");
-  const [type, setType] = React.useState<any>("info");
-  const [timerMs, setTimerMs] = React.useState<number>(3000);
-  const [callbackAction, setCallbackAction] = React.useState<any>();
-  const [callbackCancel, setCallbackCancel] = React.useState<any>();
+const initState = {
+  open: false,
+  position: 'bottom',
+  message: '',
+  type: 'info',
+  timerMs: 3000,
+  callbackAction: null,
+  callbackCancel: null,
+};
 
-  const layerTimer = async () => {
-    if (timerMs >= 0) {
-      setOpen(true);
-      await setTimeout(() => {
-        setOpen(false);
-      }, timerMs);
-      setTimerMs(2000);
-    } else {
-      setOpen(true);
-    }
-  };
+function notifyReducer(state:any, action:any) {
+  switch (action.type) {
+    case 'notify':
+      return { 
+        ...state,
+        open: true,
+        message: action.payload.message,
+        type: action.payload.type? action.payload.type: initState.type,
+        timerMs: action.payload.showFor? action.payload.showFor: initState.timerMs,
+        position: action.payload.position? action.payload.position : initState.position,
+        callbackAction: action.payload.callbackAction? action.payload.callbackAction: null,
+        callbackCancel: action.payload.callbackCancel? action.payload.callbackCancel: null,
+      };
+    case '_closeNotify':
+      return { ...state, open: false, timerMs: initState.timerMs };
+    case '_openNotify':
+      return { ...state, open: true };
+    default:
+      return state;
+  }
+}
 
-  const emitNotification = (n: INotification) => {
-    n.message && setMsg(n.message);
-    n.type && setType(n.type);
-    n.position && setPosition(n.position);
-    n.showFor && setTimerMs(n.showFor);
-    n.callbackAction && setCallbackAction(n.callbackAction);
-    n.callbackCancel && setCallbackCancel(n.callbackCancel);
-    layerTimer();
-  };
+const NotifyProvider = ({ children }:any) => {
+  const [state, dispatch] = React.useReducer(notifyReducer, initState);
+
+  React.useEffect( () => {
+    state.open && ( async () => {
+      if (state.timerMs === 0) {
+        dispatch({ type: '_openNotify' });
+      } else {
+        await setTimeout(() => {
+          dispatch({ type: '_closeNotify' });
+        }, state.timerMs);
+      }
+    })();
+  }, [state.open]);
 
   return (
-    <NotifyContext.Provider
-      value={{
-        msg,
-        type,
-        open,
-        position,
-        callbackAction,
-        callbackCancel,
-        closeNotify: () => setOpen(false),
-        notify: emitNotification,
-      }}
-    >
+    <NotifyContext.Provider value={{ state, dispatch }}>
       {children}
     </NotifyContext.Provider>
   );

@@ -8,7 +8,6 @@ import {
 import { injected, trezor, walletlink, torus, ledger } from '../../connectors';
 // import { useGetWeiBalance, useEagerConnect, useConnectorImage, getNetworkName }  from './hooks/connectionFns';
 
-
 import metamaskImage from '../../assets/images/metamask.png';
 import trezorImage from '../../assets/images/trezor.png';
 import walletlinkImage from '../../assets/images/walletlink.png';

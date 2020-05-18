@@ -10,21 +10,11 @@ import {
 
 import { NotifyContext } from '../../contexts/NotifyContext';
 
-// import { INotification } from '../types';
-
 function NotifyLayer() {
 
-  const {
-    open,
-    msg,
-    type,
-    position,
-    closeNotify,
-    callbackAction,
-    callbackCancel,
-  } = React.useContext<any>(NotifyContext);
+  const  { state, dispatch }  = React.useContext<any>(NotifyContext);
 
-  const typeMap = (_type:string) => {
+  const notificationTypeMap = (_type:string) => {
     switch(_type) {
       case 'warn' : return { color: 'orange', icon: <Warn /> };
       case 'error' : return { color: 'pink', icon: <Error /> };
@@ -35,12 +25,12 @@ function NotifyLayer() {
 
   return (
     <>
-      { open &&
+      { state.open &&
       <Layer
-        position={position}
+        position={state.position}
         modal={false}
         margin={{ vertical: 'large', horizontal: 'xsmall' }}
-        onEsc={closeNotify}
+        onEsc={()=>dispatch({ type:'closeNotify' })}
         responsive={false}
         plain
       >
@@ -53,13 +43,13 @@ function NotifyLayer() {
           round="medium"
           elevation="medium"
           pad={{ vertical: 'xsmall', horizontal: 'small' }}
-          background={typeMap(type).color}
+          background={notificationTypeMap(state.type).color}
         >
-          { typeMap(type).icon }
+          { notificationTypeMap(state.type).icon }
           <Box align="center" direction="row" gap="xsmall">
-            <Text>{ msg }</Text>
+            <Text>{ state.message }</Text>
           </Box>
-          <Button icon={<Close />} onClick={closeNotify} plain />
+          <Button icon={<Close />} onClick={()=>dispatch({ type:'closeNotify' })} plain />
         </Box>
       </Layer>}
     </>
