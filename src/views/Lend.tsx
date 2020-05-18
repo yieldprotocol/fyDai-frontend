@@ -1,5 +1,6 @@
-import React from "react";
+import React from 'react';
 import {
+  Anchor,
   Box,
   Heading,
   Diagram,
@@ -9,72 +10,53 @@ import {
   DataTable,
   Meter,
   List,
-} from "grommet";
+  Layer,
+  TextInput,
+  DropButton,
+  Collapsible,
+
+} from 'grommet';
 import {
   FaSortAmountDownAlt as SortDes,
   FaSortAmountUpAlt as SortAsc,
   FaQuestionCircle as Question,
-} from "react-icons/fa";
+  FaCaretDown as CaretDown,
 
-import YieldSeries from "../components/YieldSeries";
-import LendLayer from "./layers/LendLayer";
+} from 'react-icons/fa';
 
-import { IYieldSeries } from "../types";
+import { SeriesContext } from '../contexts/SeriesContext';
 
-// const someData = [
-//   { maturityDate: new Date('30 June 2020'), interestRate: 3.22, currentValue: 0.9921 },
-//   { maturityDate: new Date('31 Sep 2020'), interestRate: 3.51, currentValue: 0.9829 },
-//   { maturityDate: new Date('31 Dec 2020'), interestRate: 3.69, currentValue: 0.9732 },
-//   { maturityDate: new Date('30 Mar 2021'), interestRate: 3.78, currentValue: 0.9636 },
-//   { maturityDate: new Date('30 June 2021'), interestRate: 3.91, currentValue: 0.9636 },
-// ];
+import YieldSeries from '../components/YieldSeries';
 
-const someData = [
-  {
-    maturityDate: new Date(),
-    interestRate: 3.22,
-    currentValue: 0.9921,
-    balance: 0,
-    debt: 0,
-  },
-  {
-    maturityDate: new Date(),
-    interestRate: 3.51,
-    currentValue: 0.9829,
-    balance: 0,
-    debt: 0,
-  },
-  {
-    maturityDate: new Date(),
-    interestRate: 3.69,
-    currentValue: 0.9732,
-    balance: 0,
-    debt: 0,
-  },
-  {
-    maturityDate: new Date(),
-    interestRate: 3.78,
-    currentValue: 0.9636,
-    balance: 0,
-    debt: 0,
-  },
-  {
-    maturityDate: new Date(),
-    interestRate: 3.91,
-    currentValue: 0.9636,
-    balance: 0,
-    debt: 0,
-  },
-];
+import LendForm from '../components/LendForm';
+
+// import LendLayer from './layers/LendLayer';
+
+import { IYieldSeries } from '../types';
 
 const Lend = () => {
   const [showLendLayer, setShowLendLayer] = React.useState<boolean>();
   const [selectedSeries, setSelectedSeries] = React.useState<IYieldSeries>();
-  const [sortAsc, setSortAsc] = React.useState<boolean>(true);
+  const [seriesList, setSeriesList] = React.useState<IYieldSeries[]>([]);
 
-  const handleSelectSeries = (_series: IYieldSeries) => {
-    setSelectedSeries(_series);
-    setShowLendLayer(true);
+  const [sortAsc, setSortAsc] = React.useState<boolean>(true);
+  const [showMore, setShowMore] = React.useState<boolean>(false);
+
+  const [openIndex, setOpenIndex] = React.useState<number | null >(null);
+  const { state } = React.useContext(SeriesContext);
+
+  // const handleSelectSeries = (_series: IYieldSeries) => {
+  //   setOpenIndex(1); 
+  //   // setSelectedSeries(_series);
+  //   // setShowLendLayer(true);
+  // };
+
+  const handleSelectSeries = (ind: number | null) => {
+    openIndex !== ind ?
+      setOpenIndex(ind) :
+      setOpenIndex(null);
+    // setSelectedSeries(_series);
+    // setShowLendLayer(true);
   };
 
   const handleCloseLayer = () => {
@@ -82,24 +64,13 @@ const Lend = () => {
   };
 
   React.useEffect(() => {
-    // some loading effect
-  }, []);
-
-  // const sortedData = (data:[IYieldSeries]) => {
-  //   return data.sort();
-  // };
+    showMore? setSeriesList(state.seriesData) : setSeriesList(state.seriesData.slice(0, 4));
+  }, [ showMore ]);
 
   return (
     <Box pad="medium" round="medium" fill background="background-front">
-      {showLendLayer && selectedSeries && (
-        <LendLayer
-          series={selectedSeries}
-          closeLayer={() => handleCloseLayer()}
-        />
-      )}
-
       <Box
-        pad={{ top: "small", bottom: "medium" }}
+        pad={{ top: 'small', bottom: 'medium' }}
         direction="row"
         justify="between"
       >
@@ -107,7 +78,7 @@ const Lend = () => {
           flex
           direction="row"
           justify="between"
-          pad={{ horizontal: "small" }}
+          pad={{ horizontal: 'small' }}
         >
           <Box>Select an available series:</Box>
           {sortAsc ? (
@@ -116,29 +87,36 @@ const Lend = () => {
             <SortDes onClick={() => setSortAsc(!sortAsc)} />
           )}
         </Box>
-        <Box margin={{ horizontal: "large" }} direction="row" />
       </Box>
 
-      <Box gap="small" overflow="auto" pad={{ right: "right" }}>
-        {someData.map((x, i) => {
+      <Box gap="small" pad={{ right: 'right' }}>
+        {seriesList.map((x:any, i:number) => {
+          const pKey = i;
           return (
             <Box
               direction="row"
-              key={x.maturityDate.toTimeString()}
+              key={pKey.toString()}
               justify="between"
               align="baseline"
             >
               <Box flex>
                 <YieldSeries
                   series={x}
-                  seriesAction={() => handleSelectSeries(x)}
-                />
+                  seriesAction={() => handleSelectSeries(i)}
+                >
+                  <Collapsible open={openIndex===i}>
+                    <LendForm series={x} closeLayer={()=>handleSelectSeries(null)} />
+                  </Collapsible>
+                </YieldSeries>
               </Box>
-              <Box margin={{ horizontal: "large" }}>{/* <Question /> */}</Box>
             </Box>
           );
         })}
+        <Box fill='horizontal' direction='row' justify='end' pad='medium'>
+          {!showMore ? <Anchor onClick={()=>setShowMore(true)} label='Show more...' /> : <Anchor onClick={()=>setShowMore(false)} label='Show less...' /> }
+        </Box>
       </Box>
+
     </Box>
   );
 };

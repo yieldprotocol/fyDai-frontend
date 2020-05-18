@@ -6,7 +6,7 @@ import {
 } from 'react-icons/fa';
 
 
-import { useGetWeiBalance, getNetworkName, useSendTx }  from '../../hooks/connectionFns';
+import { useGetWeiBalance, getNetworkName, useSendTx, useMakerVault }  from '../../hooks/connectionFns';
 import ProfileButton from '../../components/ProfileButton';
 import { NotifyContext } from '../../contexts/NotifyContext';
 
@@ -19,6 +19,9 @@ const TestLayer = (props:any) => {
 
   const getWeiBalance = useGetWeiBalance();
   const sendTx  = useSendTx();
+
+  const makerVault = useMakerVault();
+
   const { dispatch } = React.useContext<any>(NotifyContext);
 
   const updateBalance = async () => {
@@ -90,7 +93,7 @@ const TestLayer = (props:any) => {
           <Button label='useNotify_warn' onClick={()=>dispatch({ type: 'notify', payload: { message:'maybe wrong?', type:'warn' } })} />
           <Button label='Test C' />
           <Button label='SendTest Transaction' onClick={()=> sendTx()} />
-          <Button label='Test F' />
+          <Button label='check Maker vault' onClick={()=> makerVault()} />
 
         </Box>
         <Footer pad='medium' gap='xsmall' direction='row' justify='center' align='center'>

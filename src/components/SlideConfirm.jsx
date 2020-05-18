@@ -11,10 +11,10 @@ import {
 
 const SlideConfirm = (props) => {
 
-  const { brandColor, onConfirm }= props;
+  const { brandColor, onConfirm, disabled }= props;
   const [{ x, size, delta0 }, set] = useSpring(() => ({ x: 0, size:1, delta0: 0 }));
 
-  const bind = useDrag(({ event, down, movement, delta }) => set({
+  const bind = useDrag(({ event, down, movement, delta }) => !disabled && set({
     x: down ? movement[0]: 0,
     size: down? 1.1 : 1,
     delta0: delta[0],
@@ -27,7 +27,7 @@ const SlideConfirm = (props) => {
   // bg: `linear-gradient(120deg, ${delta[0] < 0 ? '#f093fb 0%, #f5576c' : '#96fbc4 0%, #f9f586'} 100%)`,
   //     <animated.div class="av" style={{ transform: avSize, justifySelf: delta[0] < 0 ? 'end' : 'start' }} />
   //     <animated.div class="fg" style={{ transform: interpolate([x, size], (x, s) => `translate3d(${x}px,0,0) scale(${s})`) }}>
-
+  
   const style = {
     color: 'white',
     padding: '5px',
@@ -64,7 +64,7 @@ const SlideConfirm = (props) => {
             marginRight:'5px',
             opacity: x.interpolate({ range: [0, 100], output: [1, 0] }),
           }}
-        > Slide to sign
+        > Slide to confirm
         </animated.div>
       </animated.div>
     );
@@ -76,7 +76,7 @@ const SlideConfirm = (props) => {
         {...bind()}
         style={{ 
           transform: interpolate([x, size], (_x, s) => `translate3d(${_x}px,0,0) scale(${s})`),
-          background: brandColor,
+          background: !disabled ? brandColor: 'lightgrey',
           maxWidth:'50px',
           textAlign:'center',
           ...style,
@@ -88,10 +88,12 @@ const SlideConfirm = (props) => {
   };
 
   return (
-    <Stack>
-      <BottomElement />
-      <TopElement />
-    </Stack>
+    <>
+      <Stack>
+        <BottomElement />
+        <TopElement />
+      </Stack>
+    </>
   );
 };
 

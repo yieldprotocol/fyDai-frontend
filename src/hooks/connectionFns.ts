@@ -1,8 +1,13 @@
 import React from 'react';
 import { useWeb3React } from '@web3-react/core';
 import { ethers }  from 'ethers'; 
-import { injected, trezor, walletlink, torus } from '../connectors';
 
+import Maker from '@makerdao/dai';
+import { McdPlugin } from '@makerdao/dai-plugin-mcd';
+
+import ProviderBridge from 'ethers-web3-bridge';
+
+import { injected, trezor, walletlink, torus } from '../connectors';
 
 import injectedImage from '../assets/images/metamask.png';
 import trezorImage from '../assets/images/trezor.png';
@@ -24,6 +29,7 @@ export async function useGetWeiBalance() {
 export function useEagerConnect() {
   const { activate, active } = useWeb3React();
   const [tried, setTried] = React.useState(false);
+
   React.useEffect(() => {
     injected.isAuthorized().then((isAuthorized: boolean) => {
       if (isAuthorized) {
@@ -35,6 +41,7 @@ export function useEagerConnect() {
       }
     });
   }, [activate]);
+
   // if the connection worked, wait until we get confirmation of that to flip the flag
   React.useEffect(() => {
     if (!tried && active) {
@@ -98,14 +105,12 @@ export function getNetworkName(networkId: Number) {
 export const useSendTx = () => {
 
   const { library } = useWeb3React();
-
   const signer = library && library.getSigner(); 
-
   const transaction = {
     nonce: 0,
     gasLimit: 21000,
     gasPrice: ethers.utils.bigNumberify('20000000000'),
-    to: '0x88a5C2d9919e46F883EB62F7b8Dd9d0CC45bc290',
+    to: '0xcd16CA1398DA7b8f072eCF0028A3f4677B19fcd0',
     // ... or supports ENS names
     // to: "ricmoo.firefly.eth",
     value: ethers.utils.parseEther('1.0'),
@@ -113,30 +118,42 @@ export const useSendTx = () => {
     // This ensures the transaction cannot be replayed on different networks
     chainId: ethers.utils.getNetwork('homestead').chainId
   };
-
-  const logSigner = () => console.log(signer);
-
   const sendTx = () => {
     signer && signer.sendTransaction(transaction);
   };
-
   return sendTx;
-
-  // // signer && signer.sendTransaction(transaction).then(console.log);
-  // return signer.sendTransaction(transaction);
-
-  // const signedTransaction = transaction;
-  // library.provider.sendTransaction(signedTransaction).then((tx:any) => {
-  // console.log(tx);
-  // {
-  //    // These will match the above values (excluded properties are zero)
-  //    "nonce", "gasLimit", "gasPrice", "to", "value", "data", "chainId"
-  //
-  //    // These will now be present
-  //    "from", "hash", "r", "s", "v"
-  //  }
-  // Hash:
-  // });
 
 };
 
+export const useMakerVault = () => {
+
+  const { library, connector } = useWeb3React();
+  const [maker, setMaker] = React.useState();
+  const web3Provider = library && new ProviderBridge(library.provider, library.getSigner());
+  // React.useEffect(()=>{
+  //   ( async () => {
+  //     const newMaker = await Maker.create('browser', { web3 : { inject : library.provider } } );
+  //     await newMaker.authenticate();
+  //     console.log('authed - check');
+  //     setMaker(newMaker);
+  //   }
+  //   )();
+  // }, []);
+
+  const makerVault = async () => {
+
+    // console.log( await connector?.getProvider() );
+    // const newMaker = connector &&  await Maker.create('http', { web3 : { inject : await connector.getProvider()}, autoAuthenticate:false } );
+    // const newMaker = web3Provider &&  await Maker.create('http', {} );
+    // await newMaker.authenticate();
+    // console.log('authed - check');
+    // setMaker(newMaker);
+
+    if (maker) {
+      console.log( maker );
+    }
+  };
+
+  return makerVault;
+
+};

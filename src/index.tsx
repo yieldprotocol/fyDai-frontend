@@ -16,6 +16,9 @@ import { NotifyProvider }  from './contexts/NotifyContext';
 // TODO: layers to context
 import { LayerProvider }  from './contexts/LayerContext';
 
+import { SeriesProvider }  from './contexts/SeriesContext';
+import { PositionsProvider }  from './contexts/PositionsContext';
+
 // TODO: ProviderType definition
 // TODO: Implement a 2nd/fallback provider for robustness
 
@@ -46,9 +49,13 @@ ReactDOM.render(
   <React.StrictMode>
     <Web3ReactProvider getLibrary={getLibrary}>
       <NotifyProvider>
-        <LayerProvider>
-          <App />
-        </LayerProvider>
+        <PositionsProvider>
+          <SeriesProvider>
+            <LayerProvider>
+              <App />
+            </LayerProvider>
+          </SeriesProvider>
+        </PositionsProvider>
       </NotifyProvider>
     </Web3ReactProvider>
   </React.StrictMode>,
