@@ -25,7 +25,7 @@ export async function useGetWeiBalance() {
   return '-';
 }
 
-// eager connect is an attempt to 'auto connect' to injected connection eg. Metamask.
+// Eager connect is an attempt to 'auto connect' to injected connection eg. Metamask.
 export function useEagerConnect() {
   const { activate, active } = useWeb3React();
   const [tried, setTried] = React.useState(false);
@@ -75,6 +75,7 @@ export function useConnectorImage() {
   return image;
 }
 
+// TODO: not a hook... but here for the time-being. 
 export function getNetworkName(networkId: Number) {
   switch (networkId) {
     case 1: {

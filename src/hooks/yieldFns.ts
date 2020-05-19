@@ -6,7 +6,6 @@ import { useWeb3React } from '@web3-react/core';
 // const tx = await signer.sendTransaction(tx);
 // const signature = await signer.signMessage('Hello world');
 
-
 const useContract = () => {
 
 };

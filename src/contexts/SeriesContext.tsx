@@ -66,7 +66,6 @@ const initState = {
   ],
 };
   
-
 function seriesReducer(state:any, action:any) {
   switch (action.type) {
     case 'update':

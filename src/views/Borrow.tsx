@@ -32,7 +32,7 @@ const Borrow = () => {
   
   return (
 
-    <Box pad="medium" round="medium" fill background="background-front">
+    <Box pad="medium" round="medium" fill background="background-front" overflow='auto'>
       <Box
         justify="between"
         pad='medium'

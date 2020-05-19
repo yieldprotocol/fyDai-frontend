@@ -1,9 +1,9 @@
-import React, { useEffect } from "react";
-import { useWeb3React } from "@web3-react/core";
-import { Image, Header, Button, Box, ThemeContext } from "grommet";
-import logoDark from "../assets/images/yield.svg";
-import logoLight from "../assets/images/yield_light.svg";
-import ProfileButton from "./ProfileButton";
+import React, { useEffect } from 'react';
+import { useWeb3React } from '@web3-react/core';
+import { Image, Header, Button, Box, ThemeContext } from 'grommet';
+import logoDark from '../assets/images/yield.svg';
+import logoLight from '../assets/images/yield_light.svg';
+import ProfileButton from './ProfileButton';
 
 const YieldHeader = (props: any) => {
   const { openConnectLayer, openAccountLayer } = props;
@@ -11,7 +11,6 @@ const YieldHeader = (props: any) => {
   const theme = React.useContext<any>(ThemeContext);
 
   useEffect(() => {
-    // Do something else
     // (async () => activate(injected, console.log))();
   }, []);
 
@@ -20,7 +19,7 @@ const YieldHeader = (props: any) => {
       // elevation="xsmall"
       gap="xlarge"
       fill="horizontal"
-      pad={{ horizontal: "large", vertical: "xsmall" }}
+      pad={{ horizontal: 'large', vertical: 'xsmall' }}
     >
       <Box height="xsmall" align="start">
         <Box width="xsmall">
@@ -31,7 +30,7 @@ const YieldHeader = (props: any) => {
         <ProfileButton action={() => openAccountLayer()} />
       ) : (
         <Button
-          style={{ minWidth: "160px" }}
+          style={{ minWidth: '160px' }}
           label="Connect to a wallet"
           onClick={() => openConnectLayer()}
         />

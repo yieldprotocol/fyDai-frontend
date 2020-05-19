@@ -1,27 +1,27 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Web3ReactProvider, UnsupportedChainIdError } from '@web3-react/core';
+import { 
+  Web3ReactProvider, 
+  UnsupportedChainIdError 
+} from '@web3-react/core';
 import {
   NoEthereumProviderError,
   UserRejectedRequestError as UserRejectedRequestErrorInjected
 } from '@web3-react/injected-connector';
 import { ethers } from 'ethers';
 
-// import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 
 import { NotifyProvider }  from './contexts/NotifyContext';
-
 // TODO: layers to context
 import { LayerProvider }  from './contexts/LayerContext';
-
 import { SeriesProvider }  from './contexts/SeriesContext';
 import { PositionsProvider }  from './contexts/PositionsContext';
 
 // TODO: ProviderType definition
 // TODO: Implement a 2nd/fallback provider for robustness
-
+// TODO: Move to seperate file
 function getErrorMessage(error: Error) {
   if (error instanceof NoEthereumProviderError) {
     return 'No Ethereum browser extension detected, install MetaMask on desktop or visit from a dApp browser on mobile.';
@@ -38,12 +38,11 @@ function getErrorMessage(error: Error) {
   return 'An unknown error occurred. Check the console for more details.';
 }
 
+// TODO: uncomment for production infura support.
 function getLibrary(provider : any) {
   // return new ethers.providers.InfuraProvider([network = “homestead”][,apiAccessToken])
   return new ethers.providers.Web3Provider(provider);
 }
-
-// const NotifyContext = React.createContext()
 
 ReactDOM.render(
   <React.StrictMode>
@@ -62,7 +61,4 @@ ReactDOM.render(
   document.getElementById('root')
 );
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
 serviceWorker.register();

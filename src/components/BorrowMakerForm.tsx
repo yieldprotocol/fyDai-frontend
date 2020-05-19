@@ -16,7 +16,7 @@ type LendConfirmLayerProps = {
   closeLayer: any,
 };
 
-function BorrowCollateralForm({ series, closeLayer }:LendConfirmLayerProps) {
+function BorrowMakerForm({ series, closeLayer }:LendConfirmLayerProps) {
   const [inputValue, setInputValue] = React.useState<any>();
   const [formReady, setFormReady] = React.useState<boolean>(false);
   // const [confirmOpen, setConfirmOpen] = React.useState<boolean>(false);
@@ -138,4 +138,4 @@ function BorrowCollateralForm({ series, closeLayer }:LendConfirmLayerProps) {
   );
 }
 
-export default BorrowCollateralForm;
+export default BorrowMakerForm;
