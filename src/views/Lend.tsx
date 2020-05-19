@@ -55,8 +55,9 @@ const Lend = () => {
     openIndex !== ind ?
       setOpenIndex(ind) :
       setOpenIndex(null);
-    // setSelectedSeries(_series);
-    // setShowLendLayer(true);
+  };
+  const isHighlighted = (ind: number) => {
+    return (ind === openIndex);
   };
 
   const handleCloseLayer = () => {
@@ -68,55 +69,58 @@ const Lend = () => {
   }, [ showMore ]);
 
   return (
-    <Box pad="medium" round="medium" fill background="background-front">
-      <Box
-        pad={{ top: 'small', bottom: 'medium' }}
-        direction="row"
-        justify="between"
-      >
+    <Box overflow='visible'>
+      { openIndex!==null && <Layer /> }
+      <Box pad="medium" round="medium" fill background="background-front">
         <Box
-          flex
+          pad={{ top: 'small', bottom: 'medium' }}
           direction="row"
           justify="between"
-          pad={{ horizontal: 'small' }}
         >
-          <Box>Select an available series:</Box>
-          {sortAsc ? (
-            <SortAsc onClick={() => setSortAsc(!sortAsc)} />
-          ) : (
-            <SortDes onClick={() => setSortAsc(!sortAsc)} />
-          )}
+          <Box
+            flex
+            direction="row"
+            justify="between"
+            pad={{ horizontal: 'small' }}
+          >
+            <Box>Select an available series:</Box>
+            {sortAsc ? (
+              <SortAsc onClick={() => setSortAsc(!sortAsc)} />
+            ) : (
+              <SortDes onClick={() => setSortAsc(!sortAsc)} />
+            )}
+          </Box>
         </Box>
-      </Box>
 
-      <Box gap="small" pad={{ right: 'right' }}>
-        {seriesList.map((x:any, i:number) => {
-          const pKey = i;
-          return (
-            <Box
-              direction="row"
-              key={pKey.toString()}
-              justify="between"
-              align="baseline"
-            >
-              <Box flex>
-                <YieldSeries
-                  series={x}
-                  seriesAction={() => handleSelectSeries(i)}
-                >
-                  <Collapsible open={openIndex===i}>
-                    <LendForm series={x} closeLayer={()=>handleSelectSeries(null)} />
-                  </Collapsible>
-                </YieldSeries>
+        <Box gap="small" pad={{ right: 'right' }}>
+          {seriesList.map((x:any, i:number) => {
+            const pKey = i;
+            return (
+              <Box
+                direction="row"
+                key={pKey.toString()}
+                justify="between"
+                align="baseline"
+              >
+                <Box flex>
+                  <YieldSeries
+                    series={x}
+                    seriesAction={() => handleSelectSeries(i)}
+                    highlighted={isHighlighted(i)}
+                  >
+                    <Collapsible open={openIndex===i}>
+                      <LendForm series={x} closeLayer={()=>handleSelectSeries(null)} />
+                    </Collapsible>
+                  </YieldSeries>
+                </Box>
               </Box>
-            </Box>
-          );
-        })}
-        <Box fill='horizontal' direction='row' justify='end' pad='medium'>
-          {!showMore ? <Anchor onClick={()=>setShowMore(true)} label='Show more...' /> : <Anchor onClick={()=>setShowMore(false)} label='Show less...' /> }
+            );
+          })}
+          <Box fill='horizontal' direction='row' justify='end' pad='medium'>
+            {!showMore ? <Anchor onClick={()=>setShowMore(true)} label='Show more...' /> : <Anchor onClick={()=>setShowMore(false)} label='Show less...' /> }
+          </Box>
         </Box>
       </Box>
-
     </Box>
   );
 };

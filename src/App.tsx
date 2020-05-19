@@ -81,6 +81,7 @@ function App() {
 
   return (
     <div className="App">
+
       <Grommet theme={deepMerge(base, yieldTheme)} themeMode={darkmode?'dark':'light'} full>
         <Grid fill rows={['auto', 'flex', 'auto']}>
           <NotifyLayer />
@@ -130,15 +131,20 @@ function App() {
                 activeIndex={indexTab}
                 onActive={onActiveTab}
               >
-                <Tab title={<Box pad='none' align='center'><Text weight={(indexTab===0?'bold':'normal')}>Borrow</Text></Box>}>
-                  {/* <Box overflow='auto'> */}
+                <Tab 
+                  title={
+                    <Box 
+                      pad='none' 
+                      align='center'
+                    >
+                      <Text weight={(indexTab===0?'bold':'normal')}>Borrow</Text>
+                    </Box>
+                  }
+                >
                   <Borrow />
-                  {/* </Box> */}
                 </Tab>
                 <Tab title={<Box pad='none' align='center'><Text weight={(indexTab===1?'bold':'normal')}>Lend</Text></Box>}>
-                  <Box overflow='auto'>
-                    <Lend />
-                  </Box>
+                  <Lend />
                 </Tab>
                 <Tab 
                   title={
@@ -159,9 +165,7 @@ function App() {
                     </Box>
                   }
                 >
-                  <Box overflow='auto'>
-                    <Position />
-                  </Box>
+                  <Position />
                 </Tab>
               </Tabs>
             </Box>
