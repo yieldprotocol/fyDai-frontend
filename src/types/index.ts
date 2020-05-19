@@ -8,21 +8,20 @@ export interface IYieldSeries {
 }
 
 const enum notificationEnum {
-  "warn",
-  "info",
-  "error",
-  "success",
+  'warn',
+  'info',
+  'error',
+  'success',
 }
 const enum nPositionEnum {
-  "top",
-  "center",
-  "bottom",
+  'top',
+  'center',
+  'bottom',
 }
 export interface INotification {
   message: string;
   // type: notificationEnum;
   type?: string;
-
   callbackAction?: any;
   callbackCancel?: any;
   showFor?: number;

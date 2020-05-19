@@ -1,5 +1,4 @@
 import React from 'react';
-
 import moment from 'moment'; 
 
 const SeriesContext = React.createContext<any>({});
@@ -66,7 +65,6 @@ const initState = {
   ],
 };
   
-
 function seriesReducer(state:any, action:any) {
   switch (action.type) {
     case 'update':

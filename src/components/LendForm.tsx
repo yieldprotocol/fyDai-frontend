@@ -113,7 +113,6 @@ function LendForm({ series, closeLayer }:LendConfirmLayerProps) {
         <Button label='Cancel' color='border' onClick={()=>closeLayer()} />
         <SlideConfirm disabled={!formReady} brandColor={theme.global.colors.brand.light} onConfirm={()=>handleConfirm()} />
         {/* <Button primary label='Buy' onClick={()=>setConfirmOpen(true)} />  */}
-
       </Footer>
 
       {/* <Collapsible direction='vertical' open={confirmOpen}>
