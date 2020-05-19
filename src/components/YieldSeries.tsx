@@ -8,9 +8,10 @@ type YieldSeriesProps = {
   series: IYieldSeries;
   seriesAction: any;
   children: any;
+  highlighted?: boolean;
 };
 
-function YieldSeries({ series, seriesAction, children }: YieldSeriesProps) {
+function YieldSeries({ series, seriesAction, children, highlighted }: YieldSeriesProps) {
 
   const {
     maturityDate: date,
@@ -27,6 +28,8 @@ function YieldSeries({ series, seriesAction, children }: YieldSeriesProps) {
       elevation="xsmall"
       round="small"
       pad={{ horizontal: 'medium' }}
+      background='background-front'
+      style={highlighted?{ zIndex:500 }:{ zIndex:0 }}
     >
       <Box
         onClick={() => seriesAction()}
@@ -37,6 +40,7 @@ function YieldSeries({ series, seriesAction, children }: YieldSeriesProps) {
         justify="between"
         direction="row"
         hoverIndicator={{ color: 'lightgrey' }}
+        background={highlighted? { color: 'lightgrey' }: {}}
         round="small"
       >
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import moment from 'moment'; 
 
 const PositionsContext = React.createContext<any>({});
 
@@ -6,11 +7,40 @@ const initState = {
   positionsIndicator: 1,
   positionsData : [
     {
-      maturityDate: new Date(),
+      posId: 1,
+      series_id: `yDai-${moment().add(3, 'months').format('MMYY')}`,
+      maturityDate: moment().add(3, 'months').toDate(),
       interestRate: 3.22,
       currentValue: 0.9921,
-      balance: 0,
-      debt: 0,
+      collateral: [ 
+        { type: 'ETH', value: 1.2, debt: 100, balance: 100 },
+        { type: 'CHAI', value: 20, debt: 15, balance: 15 },
+        { type: 'DAI', value: 30, debt: 20, balance: 20 },
+      ],
+    },
+    {
+      posId: 2,
+      series_id: `yDai-${moment().add(6, 'months').format('MMYY')}`,
+      maturityDate: moment().add(3, 'months').toDate(),
+      interestRate: 3.22,
+      currentValue: 0.9921,
+      collateral: [
+        { type: 'ETH', value: 1.2, debt: 100, balance: 100 },
+        { type: 'CHAI', value: 20, debt: 15, balance: 15 },
+        { type: 'DAI', value: 30, debt: 20, balance: 20 },
+      ],
+    },
+    {
+      posId: 3,
+      series_id: `yDai-${moment().add(12, 'months').format('MMYY')}`,
+      maturityDate: moment().add(3, 'months').toDate(),
+      interestRate: 3.22,
+      currentValue: 0.9921,
+      collateral: [ 
+        { type: 'ETH', value: 1.2, debt: 100, balance: 100 },
+        { type: 'CHAI', value: 20, debt: 15, balance: 15 },
+        { type: 'DAI', value: 30, debt: 20, balance: 20 },
+      ],
     },
   ],
 };

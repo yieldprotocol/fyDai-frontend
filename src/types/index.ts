@@ -1,4 +1,5 @@
 export interface IYieldSeries {
+  id: any;
   maturityDate: Date;
   interestRate: number;
   currentValue: number;

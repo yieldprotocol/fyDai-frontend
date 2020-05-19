@@ -7,6 +7,7 @@ const initState = {
   demoData: true,
   seriesData : [
     {
+      id: `yDai-${moment().add(3, 'days').format('MMYY')}`,
       maturityDate: moment().add(3, 'days').toDate(),
       interestRate: 3.22,
       currentValue: 0.9921,
@@ -14,6 +15,7 @@ const initState = {
       debt: 0,
     },
     {
+      id: `yDai-${moment().add(3, 'months').format('MMYY')}`,
       maturityDate: moment().add(3, 'months').toDate(),
       interestRate: 3.51,
       currentValue: 0.9829,
@@ -21,6 +23,7 @@ const initState = {
       debt: 0,
     },
     {
+      id: `yDai-${moment().add(6, 'months').format('MMYY')}`,
       maturityDate: moment().add(6, 'months').toDate(),
       interestRate: 3.69,
       currentValue: 0.9732,
@@ -28,6 +31,7 @@ const initState = {
       debt: 0,
     },
     {
+      id: `yDai-${moment().add(9, 'months').format('MMYY')}`,
       maturityDate: moment().add(9, 'months').toDate(),
       interestRate: 3.78,
       currentValue: 0.9636,
@@ -35,6 +39,7 @@ const initState = {
       debt: 0,
     },
     {
+      id: `yDai-${moment().add(12, 'months').format('MMYY')}`,
       maturityDate: moment().add(12, 'months').toDate(),
       interestRate: 3.91,
       currentValue: 0.9636,
@@ -42,6 +47,7 @@ const initState = {
       debt: 0,
     },
     {
+      id: `yDai-${moment().add(15, 'months').format('MMYY')}`,
       maturityDate: moment().add(15, 'months').toDate(),
       interestRate: 3.69,
       currentValue: 0.9732,
@@ -49,6 +55,7 @@ const initState = {
       debt: 0,
     },
     {
+      id: `yDai-${moment().add(18, 'months').format('MMYY')}`,
       maturityDate: moment().add(18, 'months').toDate(),
       interestRate: 3.78,
       currentValue: 0.9636,
@@ -56,6 +63,7 @@ const initState = {
       debt: 0,
     },
     {
+      id: `yDai-${moment().add(21, 'months').format('MMYY')}`,
       maturityDate: moment().add(21, 'months').toDate(),
       interestRate: 3.91,
       currentValue: 0.9636,

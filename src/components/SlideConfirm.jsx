@@ -11,7 +11,7 @@ import {
 
 const SlideConfirm = (props) => {
 
-  const { brandColor, onConfirm, disabled }= props;
+  const { brandColor, onConfirm, disabled, label }= props;
   const [{ x, size, delta0 }, set] = useSpring(() => ({ x: 0, size:1, delta0: 0 }));
 
   const bind = useDrag(({ event, down, movement, delta }) => !disabled && set({
@@ -55,6 +55,7 @@ const SlideConfirm = (props) => {
             width:'75px',
           }}
         >
+          {/* <img width='15px' src='https://picsum.photos/200' />  */}
           <FaThumbsUp />
         </animated.div>
 
@@ -63,8 +64,10 @@ const SlideConfirm = (props) => {
           style={{ 
             marginRight:'5px',
             opacity: x.interpolate({ range: [0, 100], output: [1, 0] }),
+            whiteSpace: 'nowrap',
           }}
-        > Slide to confirm
+
+        > { label || 'Slide to confirm' }
         </animated.div>
       </animated.div>
     );
