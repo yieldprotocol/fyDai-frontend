@@ -1,4 +1,5 @@
 import React from 'react';
+
 import moment from 'moment'; 
 
 const SeriesContext = React.createContext<any>({});
@@ -15,6 +16,7 @@ const initState = {
       debt: 0,
     },
     {
+
       id: `yDai-${moment().add(3, 'months').format('MMYY')}`,
       maturityDate: moment().add(3, 'months').toDate(),
       interestRate: 3.51,
@@ -47,6 +49,7 @@ const initState = {
       debt: 0,
     },
     {
+
       id: `yDai-${moment().add(15, 'months').format('MMYY')}`,
       maturityDate: moment().add(15, 'months').toDate(),
       interestRate: 3.69,
