@@ -83,9 +83,16 @@ const BorrowForm = ({ series, closeLayer, collateralMethod, setCollateralMethod 
     >
       { stepperIndex === 0 &&
       <>
-        <Box margin='medium' direction='column'> Current Position: </Box>
-        <Box margin={{ vertical:'none', horizontal:'medium' }}>
+        <Box margin={{ vertical:'none', horizontal:'medium' }} direction='column'> Current Position: </Box>
+        
+        {/* <Box margin={{ vertical:'none', horizontal:'medium' }} direction='row' justify='between' align='baseline'>
+          <Box> Type </Box>
+          <Box> Value </Box>
+          <Box> Debt </Box>
+          <Box> Balance </Box>
+        </Box> */}
 
+        <Box margin={{ vertical:'none', horizontal:'medium' }} gap='xsmall'>
           {seriesPosition ?
             seriesPosition.collateral.map((x:any)=>{
               return (
@@ -94,7 +101,7 @@ const BorrowForm = ({ series, closeLayer, collateralMethod, setCollateralMethod 
                 </Box>
               );
             })
-            : <Box background='accent-4' pad='small' align='center' round> No collateralization yet.</Box> }
+            : <Box color='border' pad='small' align='center' round> No collateralization yet.</Box> }
 
         </Box>
         <Box margin='medium' direction='column' align='center'>
@@ -136,7 +143,7 @@ const BorrowForm = ({ series, closeLayer, collateralMethod, setCollateralMethod 
               />
             </Box>
             <Box alignSelf='end' margin={{ horizontal:'small' }}>
-              <Text size='8px'> <Anchor onClick={()=>setCollateralMethod('MAKER')}> or convert a Maker vault  </Anchor> </Text>
+              <Text size='10px'> <Anchor onClick={()=>setCollateralMethod('MAKER')}> or convert a Maker vault  </Anchor> </Text>
             </Box>
             <Box pad='small' round='small' direction='row' justify='between' fill='horizontal'>
               {/* <Box>
@@ -145,11 +152,15 @@ const BorrowForm = ({ series, closeLayer, collateralMethod, setCollateralMethod 
             </Box>
           </>}
           { collateralMethod === 'MAKER'  && 
-          <>
-            <Box>
-              MAKER SECTION
-            </Box> 
-          </>}
+          <Box fill='horizontal'>
+            <Text>Connected Maker Vault:</Text>
+            <Box background='accent-4' pad='small' align='center' round>
+              <Text>Unfortunately, no Maker Vaults were found.</Text>
+            </Box>
+            <Box alignSelf='end' margin={{ horizontal:'small' }}>
+              <Text size='10px'> <Anchor onClick={()=>setCollateralMethod('DEPOSIT')}> Alternatively, deposit collateral </Anchor> </Text>
+            </Box>
+          </Box>}
 
           <Footer direction='row' justify='evenly' pad='medium'>
             <Button label='Cancel' color='border' onClick={()=>closeLayer()} />
@@ -159,26 +170,36 @@ const BorrowForm = ({ series, closeLayer, collateralMethod, setCollateralMethod 
               brandColor={theme.global.colors.brand.light}
               onConfirm={()=>handleDeposit()}
             />
-            <Button label='Skip' color='none' onClick={()=>setStepperIndex(stepperIndex+1)} />
+            { seriesPosition && <Button label='Skip' color='none' onClick={()=>setStepperIndex(stepperIndex+1)} /> } 
           </Footer>
         </Box>
       </>}
 
       {stepperIndex === 1 &&
       <>
-        <Box margin='medium'>
+        {/* <Box margin={{ vertical:'none', horizontal:'medium' }} direction='row' justify='between' align='baseline'>
+          <Box> Type </Box>
+          <Box> Value </Box>
+          <Box> Debt </Box>
+          <Box> Balance </Box>
+          <Box />
+        </Box> */}
+        
+        <Box margin='medium' gap='xsmall'>
           { seriesPosition ? 
             seriesPosition.collateral.map((x:any)=>{
               return (
                 <Box key={x.type}>
-                  <YieldPosition position={x} />
+                  <YieldPosition position={x} input={true} />
                 </Box>
               );
             })
             :
             <Box gap='small'>
               <Box background='accent-4' pad='small' align='center' round> No collateralization yet.</Box>
-              <Anchor alignSelf='end' onClick={()=>setStepperIndex(0)}> <Text size='small'> Deposit Collateral </Text></Anchor>
+              <Anchor alignSelf='end' onClick={()=>setStepperIndex(0)}> 
+                <Text size='10px'> Deposit Collateral </Text>
+              </Anchor>
             </Box>}
         </Box>
 
