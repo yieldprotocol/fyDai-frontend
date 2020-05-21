@@ -540,24 +540,27 @@ export const yieldTheme = {
     },
   },
   scale: 0.5,
-  menu : {
-    zIndex:'1500'
-  },
+
   layer: {
     background: {
       dark: '#11111100',
       light: '#FFFFFF00',
     },
     container : {
-      zIndex: '500',
+      zIndex: '20',
     },
-    zIndex : '200',
+    zIndex : '15',
     overlay: {
       //  background: '#000000BF', //75%
       background: '#00000080', // 50%
       // background: '#00000054', // 33%
       // background: '#00000040', // 25%
     },
+    // @ts-ignore
+    extend: ({ theme }) => css`
+        filter: blur(3px);
+      `,
+
   },
 
   table: {
@@ -591,6 +594,7 @@ export const yieldTheme = {
     extend: ({ theme }) => css`
       border-radius: ${theme.global.edgeSize.large};
       width: ${theme.global.edgeSize.xlarge};
+      positon: fixed;
     `,
   },
 
@@ -600,11 +604,25 @@ export const yieldTheme = {
     header: {
       pad: 'large',
       gap: 'none',
+      // // @ts-ignore
+      // extend: ({ theme }) => css`
+      // position: fixed;
+      // `
+    },
+    panel : {
+      // @ts-ignore
+      extend: ({ theme }) => css`
+      overflow: auto;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+      ::-webkit-scrollbar { display:none; }
+    `
+    // scroll-behavior: smooth;
     },
     // @ts-ignore
     extend: ({ theme }) => css`
       flex: ${theme.global.edgeSize.small};
-      radius: ${theme.global.edgeSize.small};
+      radius: ${theme.global.edgeSize.large};
     `,
   },
 };

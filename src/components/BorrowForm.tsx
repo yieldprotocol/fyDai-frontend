@@ -25,7 +25,7 @@ type BorrowConfirmLayerProps = {
 
 const BorrowForm = ({ series, closeLayer, collateralMethod, setCollateralMethod }:BorrowConfirmLayerProps) => {
 
-  const [inputValue, setInputValue] = React.useState<any>();
+  const [inputValue, setInputValue] = React.useState<number>();
   const [formReady, setFormReady] = React.useState<boolean>(false);
   const [collateralType, setCollateralType] = React.useState<any>('ETH');
   const [ seriesPosition, setSeriesPosition] = React.useState<any>();
@@ -69,7 +69,7 @@ const BorrowForm = ({ series, closeLayer, collateralMethod, setCollateralMethod 
   }, [positionsState]);
 
   React.useEffect(()=>{
-    if( inputValue > 0) {
+    if( inputValue && inputValue > 0) {
       setFormReady(true);
     } else setFormReady(false);
   }, [inputValue]);
@@ -107,7 +107,7 @@ const BorrowForm = ({ series, closeLayer, collateralMethod, setCollateralMethod 
         <Box margin='medium' direction='column' align='center'>
           { collateralMethod === 'DEPOSIT' && 
           <>
-            <Text alignSelf='start' margin='small'> Deposit collateral: </Text>
+            <Text alignSelf='start' margin='small'> Deposit Collateral: </Text>
             <Box gap='none' direction='row' justify='end' align='baseline' fill='horizontal'>
               <Box fill>
                 <TextInput
@@ -115,15 +115,16 @@ const BorrowForm = ({ series, closeLayer, collateralMethod, setCollateralMethod 
                   type="number"
                   placeholder="Deposit Amount"
                   value={inputValue}
-                  style={{ borderRadius:'24px 0px 0px 24px' }}
-                  onChange={event => setInputValue(event.target.value)}
+                  // style={{ borderRadius:'24px 0px 0px 24px' }}
+                  onChange={event => setInputValue(Number(event.target.value))}
+                  icon={<Text>ETH</Text>}
                   reverse
                 />
               </Box>
-
+              {/* 
               <DropButton
                 size='small'
-                style={{ zIndex:2000, borderRadius:'0px 24px 24px 0px' }}
+                style={{ borderRadius:'0px 24px 24px 0px' }}
                 label={
                   <Box 
                     direction='row'
@@ -135,12 +136,13 @@ const BorrowForm = ({ series, closeLayer, collateralMethod, setCollateralMethod 
                   </Box>
                 }
                 dropAlign={{ top: 'bottom', right: 'right' }}
-                dropContent={
-                  <Box pad="medium" background="light-2" round="xsmall" style={{ zIndex:2000 }}>
-                    <Text size='xsmall'>something</Text>
-                  </Box>
+                dropContent={<>hello</>
+                  // <Box pad="medium" background="light-2" round="xsmall" style={{ zIndex:2000 }}>
+                  //   <Text size='xsmall'>something</Text>
+                  // </Box>
               }
-              />
+              /> */}
+
             </Box>
             <Box alignSelf='end' margin={{ horizontal:'small' }}>
               <Text size='10px'> <Anchor onClick={()=>setCollateralMethod('MAKER')}> or convert a Maker vault  </Anchor> </Text>
@@ -206,7 +208,7 @@ const BorrowForm = ({ series, closeLayer, collateralMethod, setCollateralMethod 
         <Footer direction='row' justify='evenly' pad='medium'>
           <Button label='Cancel' color='border' onClick={()=>closeLayer()} />
           <Button label='Back' color='border' onClick={()=>setStepperIndex(stepperIndex-1)} />
-          <SlideConfirm 
+          <SlideConfirm
             label='Slide to borrow'
             disabled={!formReady} 
             brandColor={theme.global.colors.brand.light} 

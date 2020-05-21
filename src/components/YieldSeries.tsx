@@ -24,12 +24,12 @@ function YieldSeries({ series, seriesAction, children, highlighted }: YieldSerie
   // const [open, setOpen] = React.useState<boolean>(false);
 
   return (
-    <Box 
+    <Box
       elevation="xsmall"
       round="small"
       pad={{ horizontal: 'medium' }}
       background='background-front'
-      style={highlighted?{ zIndex:500 }:{ zIndex:0 }}
+      style={highlighted?{ zIndex:20 }:{ zIndex:0 }}
     >
       <Box
         onClick={() => seriesAction()}

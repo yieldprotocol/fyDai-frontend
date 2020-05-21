@@ -81,7 +81,6 @@ function App() {
 
   return (
     <div className="App">
-
       <Grommet theme={deepMerge(base, yieldTheme)} themeMode={darkmode?'dark':'light'} full>
         <Grid fill rows={['auto', 'flex', 'auto']}>
           <NotifyLayer />
@@ -90,7 +89,7 @@ function App() {
           { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
           <YieldHeader 
             openConnectLayer={()=>setShowConnectLayer(true)} 
-            openAccountLayer={()=>setShowAccountLayer(true)} 
+            openAccountLayer={()=>setShowAccountLayer(true)}
           />
           <Main
             align='center'
@@ -140,13 +139,14 @@ function App() {
                       <Text weight={(indexTab===0?'bold':'normal')}>Borrow</Text>
                     </Box>
                   }
+                  
                 >
                   <Borrow />
                 </Tab>
                 <Tab title={<Box pad='none' align='center'><Text weight={(indexTab===1?'bold':'normal')}>Lend</Text></Box>}>
                   <Lend />
                 </Tab>
-                <Tab 
+                <Tab
                   title={
                     <Box 
                       gap='xsmall'
@@ -154,14 +154,14 @@ function App() {
                     >
                       <Text weight={(indexTab===2?'bold':'normal')}>Positions</Text>
                       { posState.positionsIndicator > 0 &&
-                      <Box
-                        background="brand"
-                        pad={{ horizontal: 'small', vertical:'none' }}
-                        align='center'
-                        round
-                      >
-                        <Text>{posState.positionsIndicator}</Text>
-                      </Box>}
+                        <Box
+                          background="brand"
+                          pad={{ horizontal: 'small', vertical:'none' }}
+                          align='center'
+                          round
+                        >
+                          <Text>{posState.positionsIndicator}</Text>
+                        </Box>}
                     </Box>
                   }
                 >
@@ -170,7 +170,6 @@ function App() {
               </Tabs>
             </Box>
           </Main>
-
           <YieldFooter 
             showTestLayer={showTestLayer}
             setShowTestLayer={setShowTestLayer}

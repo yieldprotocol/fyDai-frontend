@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { createRef } from 'react';
 import { Anchor, Box, Button, Collapsible, Layer } from 'grommet';
 
 import { SeriesContext } from '../contexts/SeriesContext';
@@ -7,22 +7,20 @@ import { IYieldSeries } from '../types';
 
 import BorrowForm from '../components/BorrowForm';
 
-// const scrollToRef = (ref:any) => window.scrollTo(0, ref.current);
-
-const Borrow = () => {
+const Borrow = (props:any) => {
 
   const [showMore, setShowMore] = React.useState<boolean>(false);
   const [openIndex, setOpenIndex] = React.useState<number | null >(null);
   const [seriesList, setSeriesList] = React.useState<IYieldSeries[]>([]);
+
+  const refs = React.useRef<Array<HTMLDivElement | null>>([]);
+
+  // const refsArray = React.useRef([]);
+  // const elementsRef = React.useRef(seriesList.map(() => createRef()));
+
   // TODO: convert to reducer if get more 
   const [collateralMethod, setCollateralMethod ]= React.useState<string>('DEPOSIT');
-
-  const { state } = React.useContext(SeriesContext);
-
-  const refs = seriesList.reduce((acc:any, value:any) => {
-    acc[value.id] = React.createRef();
-    return acc;
-  }, {});
+  const { state } = React.useContext( SeriesContext );
 
   const handleSelectSeries = (ind: number | null) => {
     openIndex !== ind ?
@@ -30,20 +28,29 @@ const Borrow = () => {
       setOpenIndex(null);
   };
 
-  const isHighlighted = (ind: number) => {
-    return (ind === openIndex);
-  };
+  React.useEffect(() => {
+    if (openIndex && refs.current[openIndex]) {
+      // @ts-ignore
+      refs.current[openIndex].scrollIntoView({
+        block: 'nearest',
+        inline: 'start',
+        behavior: 'auto',
+      });
+    }
+  }, [openIndex]);
 
   React.useEffect(() => {
     showMore? setSeriesList(state.seriesData) : setSeriesList(state.seriesData.slice(0, 4));
   }, [ showMore ]);
   
   return (
-
-    <Box overflow='auto'>
-      { openIndex!==null && <Layer /> }
-
-      <Box pad="medium" round="medium" fill background="background-front" overflow='auto'>
+    <Box>
+      <Box 
+        pad="medium" 
+        round="medium"
+        fill
+        background="background-front"
+      >
         <Box
           justify="between"
           pad='medium'
@@ -64,30 +71,34 @@ const Borrow = () => {
             />
           </Box>
         </Box>
+        
+
         <Box
           justify="between"
           pad='medium'
           gap='medium'
         >
+
           <Box>Choose an available series:</Box>
+
+
+          { openIndex!==null && <Layer />}
           <Box gap="small" pad={{ right: 'right' }}>
-
             {seriesList.map((x:any, i:number) => {
-
-              const pKey = i;
               return (
                 <Box
-                  ref={refs[x.id]}
-                  key={pKey.toString()}
+                  id={x.id}
+                  key={x.id}
                   direction="row"
                   justify="between"
                   align="baseline"
+                  ref={(el:any) => {refs.current[i] = el;}}
                 >
                   <Box flex>
                     <YieldSeries
                       series={x}
-                      seriesAction={() => { handleSelectSeries(i);}}
-                      highlighted={isHighlighted(i)}
+                      seriesAction={() => handleSelectSeries(i)}
+                      highlighted={openIndex === i}
                     >
                       <Collapsible open={openIndex===i}>
                         <BorrowForm 
@@ -106,9 +117,10 @@ const Borrow = () => {
               {!showMore ? <Anchor onClick={()=>setShowMore(true)} label='Show more...' /> : <Anchor onClick={()=>setShowMore(false)} label='Show less...' /> }
             </Box>
           </Box>
+
         </Box>
       </Box>
-    </Box>
+      </Box>
   );
 };
 
