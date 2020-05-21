@@ -10,6 +10,9 @@ import {
 } from '@web3-react/injected-connector';
 import { ethers } from 'ethers';
 
+import smoothscroll from 'smoothscroll-polyfill';
+
+import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 
@@ -18,6 +21,9 @@ import { NotifyProvider }  from './contexts/NotifyContext';
 import { LayerProvider }  from './contexts/LayerContext';
 import { SeriesProvider }  from './contexts/SeriesContext';
 import { PositionsProvider }  from './contexts/PositionsContext';
+
+// TODO: better smoothscroll solution
+smoothscroll.polyfill();
 
 // TODO: ProviderType definition
 // TODO: Implement a 2nd/fallback provider for robustness
