@@ -14,8 +14,6 @@ const initState = {
       currentValue: 0.9921,
       collateral: [ 
         { type: 'ETH', value: 1.2, debt: 100, balance: 100 },
-        { type: 'CHAI', value: 20, debt: 15, balance: 15 },
-        { type: 'DAI', value: 30, debt: 20, balance: 20 },
       ],
     },
     {
@@ -26,8 +24,6 @@ const initState = {
       currentValue: 0.9921,
       collateral: [
         { type: 'ETH', value: 1.2, debt: 100, balance: 100 },
-        { type: 'CHAI', value: 20, debt: 15, balance: 15 },
-        { type: 'DAI', value: 30, debt: 20, balance: 20 },
       ],
     },
     {
@@ -38,8 +34,6 @@ const initState = {
       currentValue: 0.9921,
       collateral: [ 
         { type: 'ETH', value: 1.2, debt: 100, balance: 100 },
-        { type: 'CHAI', value: 20, debt: 15, balance: 15 },
-        { type: 'DAI', value: 30, debt: 20, balance: 20 },
       ],
     },
   ],
