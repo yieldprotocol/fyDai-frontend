@@ -1,0 +1,12 @@
+html {
+    height: 100vh;
+    scroll-behavior: smooth;
+    /* -ms-overflow-style: none;
+    scrollbar-width: none; */
+}
+/* ::-webkit-scrollbar { display:none; } */
+@media screen and (prefers-reduced-motion: reduce) {
+	html {
+		scroll-behavior: auto;
+	}
+}

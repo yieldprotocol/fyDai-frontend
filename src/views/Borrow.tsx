@@ -34,7 +34,7 @@ const Borrow = (props:any) => {
       refs.current[openIndex].scrollIntoView({
         block: 'nearest',
         inline: 'start',
-        behavior: 'auto',
+        // behavior: 'smooth',
       });
     }
   }, [openIndex]);
@@ -81,7 +81,6 @@ const Borrow = (props:any) => {
 
           <Box>Choose an available series:</Box>
 
-
           { openIndex!==null && <Layer />}
           <Box gap="small" pad={{ right: 'right' }}>
             {seriesList.map((x:any, i:number) => {
@@ -120,7 +119,7 @@ const Borrow = (props:any) => {
 
         </Box>
       </Box>
-      </Box>
+    </Box>
   );
 };
 

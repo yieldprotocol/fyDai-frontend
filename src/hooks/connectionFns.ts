@@ -9,11 +9,11 @@ import ProviderBridge from 'ethers-web3-bridge';
 
 import { injected, trezor, walletlink, torus } from '../connectors';
 
-import injectedImage from '../assets/images/metamask.png';
-import trezorImage from '../assets/images/trezor.png';
-import walletlinkImage from '../assets/images/walletlink.png';
-import torusImage from '../assets/images/torus.png';
-import noConnectionImage from '../assets/images/noconnection.png';
+import injectedImage from '../assets/images/providers/metamask.png';
+import trezorImage from '../assets/images/providers/trezor.png';
+import walletlinkImage from '../assets/images/providers/walletlink.png';
+import torusImage from '../assets/images/providers/torus.png';
+import noConnectionImage from '../assets/images/providers/noconnection.png';
 
 export async function useGetWeiBalance() {
   const web3React = useWeb3React();

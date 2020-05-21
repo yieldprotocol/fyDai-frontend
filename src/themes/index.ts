@@ -556,10 +556,10 @@ export const yieldTheme = {
       // background: '#00000054', // 33%
       // background: '#00000040', // 25%
     },
-    // @ts-ignore
-    extend: ({ theme }) => css`
-        filter: blur(3px);
-      `,
+    // // @ts-ignore
+    // extend: ({ theme }) => css`
+    //     filter: blur(3px);
+    //   `,
 
   },
 
@@ -617,7 +617,6 @@ export const yieldTheme = {
       scrollbar-width: none;
       ::-webkit-scrollbar { display:none; }
     `
-    // scroll-behavior: smooth;
     },
     // @ts-ignore
     extend: ({ theme }) => css`
