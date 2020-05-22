@@ -28,95 +28,80 @@ const Borrow = (props:any) => {
       setOpenIndex(null);
   };
 
-  React.useEffect(() => {
-    if (openIndex && refs.current[openIndex]) {
-      // @ts-ignore
-      refs.current[openIndex].scrollIntoView({
-        block: 'nearest',
-        inline: 'start',
-        // behavior: 'smooth',
-      });
-    }
-  }, [openIndex]);
+  // React.useEffect(() => {
+  //   if (openIndex && refs.current[openIndex]) {
+  //     // @ts-ignore
+  //     refs.current[openIndex].scrollIntoView({
+  //       block: 'nearest',
+  //       inline: 'start',
+  //       // behavior: 'smooth',
+  //     });
+  //   }
+  // }, [openIndex]);
 
   React.useEffect(() => {
     showMore? setSeriesList(state.seriesData) : setSeriesList(state.seriesData.slice(0, 4));
   }, [ showMore ]);
   
   return (
-    <Box>
-      <Box 
-        pad="medium" 
-        round="medium"
-        fill
-        background="background-front"
-      >
-        <Box
-          justify="between"
-          pad='medium'
-          gap='medium'
-        >
-          <Box gap='none' direction='row' fill='horizontal' justify='center'>
-            <Button 
-              primary={collateralMethod === 'DEPOSIT'}
-              label='Deposit Collateral'
-              style={{ borderRadius:'24px 0px 0px 24px' }}
-              onClick={()=>setCollateralMethod('DEPOSIT')}
-            />
-            <Button 
-              primary={collateralMethod === 'MAKER'}
-              label='Collaterize a Maker Vault'
-              style={{ borderRadius:'0px 24px 24px 0px' }}
-              onClick={()=>setCollateralMethod('MAKER')}
-            />
-          </Box>
-        </Box>
-        
+    <Box 
+      pad="medium" 
+      round="medium"
+      background="background-front"
+    >
+      <Box pad='medium' gap='none' direction='row' fill='horizontal' justify='center'>
+        <Button 
+          primary={collateralMethod === 'DEPOSIT'}
+          label='Deposit Collateral'
+          style={{ borderRadius:'24px 0px 0px 24px' }}
+          onClick={()=>setCollateralMethod('DEPOSIT')}
+        />
+        <Button 
+          primary={collateralMethod === 'MAKER'}
+          label='Convert a Maker Vault'
+          style={{ borderRadius:'0px 24px 24px 0px' }}
+          onClick={()=>setCollateralMethod('MAKER')}
+        />
+      </Box>
 
-        <Box
-          justify="between"
-          pad='medium'
-          gap='medium'
-        >
+      {/* <Box align='center' flex>Choose an available series:</Box> */}
 
-          <Box>Choose an available series:</Box>
-
-          { openIndex!==null && <Layer />}
-          <Box gap="small" pad={{ right: 'right' }}>
-            {seriesList.map((x:any, i:number) => {
-              return (
-                <Box
-                  id={x.id}
-                  key={x.id}
-                  direction="row"
-                  justify="between"
-                  align="baseline"
-                  ref={(el:any) => {refs.current[i] = el;}}
-                >
-                  <Box flex>
-                    <YieldSeries
+      <Box justify="between" gap='small'>
+        {seriesList.map((x:any, i:number) => {
+          return (
+            <Box
+              key={x.id}
+              id={x.id}
+              ref={(el:any) => {refs.current[i] = el;}}
+            >
+              { openIndex === i ?
+                <Layer animation="fadeIn">
+                  <YieldSeries
+                    series={x}
+                    seriesAction={() => handleSelectSeries(i)}
+                    highlighted={openIndex === i}
+                  >
+                    <BorrowForm 
                       series={x}
-                      seriesAction={() => handleSelectSeries(i)}
-                      highlighted={openIndex === i}
-                    >
-                      <Collapsible open={openIndex===i}>
-                        <BorrowForm 
-                          series={x}
-                          closeLayer={()=>handleSelectSeries(null)}
-                          collateralMethod={collateralMethod}
-                          setCollateralMethod={setCollateralMethod}
-                        />
-                      </Collapsible>
-                    </YieldSeries>
-                  </Box>
-                </Box>
-              );
-            })}
-            <Box fill='horizontal' direction='row' justify='end' pad='medium'>
-              {!showMore ? <Anchor onClick={()=>setShowMore(true)} label='Show more...' /> : <Anchor onClick={()=>setShowMore(false)} label='Show less...' /> }
+                      closeLayer={()=>handleSelectSeries(null)}
+                      collateralMethod={collateralMethod}
+                      setCollateralMethod={setCollateralMethod}
+                    />
+                  </YieldSeries>
+                </Layer>
+                :
+                <Box flex>
+                  <YieldSeries
+                    series={x}
+                    seriesAction={() => handleSelectSeries(i)}
+                    highlighted={openIndex === i}
+                  />
+                </Box>}
             </Box>
-          </Box>
-
+          );
+        })}
+        <Box fill='horizontal' direction='row' justify='end' pad='medium'>
+          {!showMore ? <Anchor onClick={()=>setShowMore(true)} label='Show more...' /> : <Anchor onClick={()=>setShowMore(false)} label='Show less...' /> }
         </Box>
       </Box>
     </Box>

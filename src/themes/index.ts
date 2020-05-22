@@ -113,7 +113,7 @@ export const yieldTheme = {
     },
     drop: {
       border: {
-        radius: '24px',
+        // radius: '24px',
       },
     },
     borderSize: {

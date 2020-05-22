@@ -13,7 +13,7 @@ const initState = {
       interestRate: 3.22,
       currentValue: 0.9921,
       collateral: [ 
-        { type: 'ETH', value: 1.2, debt: 100, balance: 100 },
+        { type: 'ETH', value: 1.21234, debt: 100, balance: 100 },
       ],
     },
     {
@@ -23,7 +23,7 @@ const initState = {
       interestRate: 3.22,
       currentValue: 0.9921,
       collateral: [
-        { type: 'ETH', value: 1.2, debt: 100, balance: 100 },
+        { type: 'ETH', value: 1.2234234234, debt: 100, balance: 100 },
       ],
     },
     {
@@ -33,7 +33,7 @@ const initState = {
       interestRate: 3.22,
       currentValue: 0.9921,
       collateral: [ 
-        { type: 'ETH', value: 1.2, debt: 100, balance: 100 },
+        { type: 'ETH', value: 1.223423423423423423234, debt: 100, balance: 100 },
       ],
     },
   ],

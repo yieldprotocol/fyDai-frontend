@@ -76,35 +76,29 @@ const BorrowForm = ({ series, closeLayer, collateralMethod, setCollateralMethod 
 
   return (
     <Box
-      pad='none'
+      pad='xsmall'
       round='medium'
       background='background-front'
       fill
     >
+      <Box margin={{ vertical:'small' }} direction='column'> 
+        Current Position: 
+      </Box>
       { stepperIndex === 0 &&
       <>
-        <Box margin={{ vertical:'none', horizontal:'medium' }} direction='column'> Current Position: </Box>
-        
-        {/* <Box margin={{ vertical:'none', horizontal:'medium' }} direction='row' justify='between' align='baseline'>
-          <Box> Type </Box>
-          <Box> Value </Box>
-          <Box> Debt </Box>
-          <Box> Balance </Box>
-        </Box> */}
-
-        <Box margin={{ vertical:'none', horizontal:'medium' }} gap='xsmall'>
-          {seriesPosition ?
+        <Box margin={{ vertical:'none' }} gap='xsmall'>
+          { seriesPosition ?
             seriesPosition.collateral.map((x:any)=>{
               return (
                 <Box key={x.type}>
-                  <YieldPosition position={x} />
+                  <YieldPosition position={x} input={false} selectPositionFn={(e:any)=>console.log(e)} />
                 </Box>
               );
             })
             : <Box color='border' pad='small' align='center' round> No collateralization yet.</Box> }
-
         </Box>
-        <Box margin='medium' direction='column' align='center'>
+
+        <Box pad='medium' direction='column' align='center'>
           { collateralMethod === 'DEPOSIT' && 
           <>
             <Text alignSelf='start' margin='small'> Deposit Collateral: </Text>
@@ -121,28 +115,6 @@ const BorrowForm = ({ series, closeLayer, collateralMethod, setCollateralMethod 
                   reverse
                 />
               </Box>
-              {/* 
-              <DropButton
-                size='small'
-                style={{ borderRadius:'0px 24px 24px 0px' }}
-                label={
-                  <Box 
-                    direction='row'
-                    gap='small'
-                    align='center'
-                  >
-                    <Text>{collateralType}</Text>
-                    <CaretDown />
-                  </Box>
-                }
-                dropAlign={{ top: 'bottom', right: 'right' }}
-                dropContent={<>hello</>
-                  // <Box pad="medium" background="light-2" round="xsmall" style={{ zIndex:2000 }}>
-                  //   <Text size='xsmall'>something</Text>
-                  // </Box>
-              }
-              /> */}
-
             </Box>
             <Box alignSelf='end' margin={{ horizontal:'small' }}>
               <Text size='10px'> <Anchor onClick={()=>setCollateralMethod('MAKER')}> or convert a Maker vault  </Anchor> </Text>
@@ -152,7 +124,8 @@ const BorrowForm = ({ series, closeLayer, collateralMethod, setCollateralMethod 
             <Text size='xsmall'>{interest}%</Text>
           </Box> */}
             </Box>
-          </>}
+          </> }
+
           { collateralMethod === 'MAKER'  && 
           <Box fill='horizontal'>
             <Text>Connected Maker Vault:</Text>
@@ -164,7 +137,7 @@ const BorrowForm = ({ series, closeLayer, collateralMethod, setCollateralMethod 
             </Box>
           </Box>}
 
-          <Footer direction='row' justify='evenly' pad='medium'>
+          <Footer direction='row-responsive' justify='evenly' pad='medium'>
             <Button label='Cancel' color='border' onClick={()=>closeLayer()} />
             <SlideConfirm 
               label='Slide to deposit'
@@ -179,20 +152,12 @@ const BorrowForm = ({ series, closeLayer, collateralMethod, setCollateralMethod 
 
       {stepperIndex === 1 &&
       <>
-        {/* <Box margin={{ vertical:'none', horizontal:'medium' }} direction='row' justify='between' align='baseline'>
-          <Box> Type </Box>
-          <Box> Value </Box>
-          <Box> Debt </Box>
-          <Box> Balance </Box>
-          <Box />
-        </Box> */}
-        
-        <Box margin='medium' gap='xsmall'>
+        <Box margin={{ vertical:'none', horizontal:'medium' }} gap='xsmall'>
           { seriesPosition ? 
             seriesPosition.collateral.map((x:any)=>{
               return (
-                <Box key={x.type}>
-                  <YieldPosition position={x} input={true} />
+                <Box key={x.posId}>
+                  <YieldPosition position={x} input={true} selectPositionFn={(e:any)=>console.log(e)} />
                 </Box>
               );
             })
@@ -205,7 +170,7 @@ const BorrowForm = ({ series, closeLayer, collateralMethod, setCollateralMethod 
             </Box>}
         </Box>
 
-        <Footer direction='row' justify='evenly' pad='medium'>
+        <Footer direction='row-responsive' justify='evenly' pad='medium'>
           <Button label='Cancel' color='border' onClick={()=>closeLayer()} />
           <Button label='Back' color='border' onClick={()=>setStepperIndex(stepperIndex-1)} />
           <SlideConfirm
