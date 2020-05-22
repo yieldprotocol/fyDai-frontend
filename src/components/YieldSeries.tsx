@@ -7,7 +7,7 @@ import { IYieldSeries } from '../types';
 type YieldSeriesProps = {
   series: IYieldSeries;
   seriesAction: any;
-  children: any;
+  children?: any;
   highlighted?: boolean;
 };
 
@@ -17,19 +17,17 @@ function YieldSeries({ series, seriesAction, children, highlighted }: YieldSerie
     maturityDate: date,
     interestRate: interest,
     currentValue: value,
-    balance,
-    debt,
   } = series;
-
-  // const [open, setOpen] = React.useState<boolean>(false);
 
   return (
     <Box
-      elevation="xsmall"
+      // elevation="xsmall"
+      // border='all'
       round="small"
       pad={{ horizontal: 'medium' }}
       background='background-front'
-      style={highlighted?{ zIndex:20 }:{ zIndex:0 }}
+     // style={highlighted?{ zIndex:20 }:{ zIndex:0 }}
+      fill
     >
       <Box
         onClick={() => seriesAction()}
@@ -37,11 +35,12 @@ function YieldSeries({ series, seriesAction, children, highlighted }: YieldSerie
         pad={{ horizontal: 'medium', bottom: 'small', top: 'small' }}
         margin={{ vertical:'xsmall' }}
         align="center"
-        justify="between"
+        justify="start"
         direction="row"
         hoverIndicator={{ color: 'lightgrey' }}
         background={highlighted? { color: 'lightgrey' }: {}}
         round="small"
+        gap="small"
       >
 
         <Box direction="column">
@@ -54,8 +53,6 @@ function YieldSeries({ series, seriesAction, children, highlighted }: YieldSerie
           >
             <Text size="xsmall"> {interest}%</Text>
           </Box>
-          {/* <Box direction='row' gap='xsmall'> */}
-          {/* </Box> */}
         </Box>
 
         <Box direction="column">
@@ -71,7 +68,7 @@ function YieldSeries({ series, seriesAction, children, highlighted }: YieldSerie
           </Box>
         </Box>
       </Box>
-      { children }
+      { children  }
     </Box>
   );
 }
