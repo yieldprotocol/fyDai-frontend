@@ -14,6 +14,7 @@ type YieldSeriesProps = {
 function YieldSeries({ series, seriesAction, children, highlighted }: YieldSeriesProps) {
 
   const {
+    id,
     maturityDate: date,
     interestRate: interest,
     currentValue: value,
@@ -44,7 +45,7 @@ function YieldSeries({ series, seriesAction, children, highlighted }: YieldSerie
       >
 
         <Box direction="column">
-          <Text weight="bold"> yDai-{moment(date).format('MMYY')}</Text>
+          <Text weight="bold"> {id}</Text>
           <Box
             round
             align="center"

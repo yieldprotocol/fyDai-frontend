@@ -9,6 +9,7 @@ import {
   FaWeightHanging as  Debt,
   FaTimes as Close,
   FaExchangeAlt as Exchange,
+  // FaEllipsisV as Exchange,
 } from 'react-icons/fa';
 
 function YieldPosition({ position, input, selectPositionFn }: any) {
@@ -47,73 +48,66 @@ function YieldPosition({ position, input, selectPositionFn }: any) {
           // elevation='xsmall'
           // style={{ borderRadius:'0px 24px 24px 0px' }}
         >
-          <Stack anchor='top' onClick={()=>handleMenuClick(['DEPOSIT'])}>
-            <Box pad='small' direction='row'>
-              <Box margin='xsmall' pad={{ vertical:'none', horizontal:'xsmall' }} gap='xsmall' direction='row'>
-                <Text>{position.value}</Text>
-                <Text>{position.type}</Text>
+          <Box onClick={()=>handleMenuClick(['DEPOSIT'])} hoverIndicator='background' round>
+            <Stack anchor='top'>
+              <Box pad='small' direction='row'>
+                <Box margin='xsmall' pad={{ vertical:'none', horizontal:'xsmall' }} gap='xsmall' direction='row'>
+                  <Text>{position.value}</Text>
+                  <Text>{position.type}</Text>
+                </Box>
               </Box>
-            </Box>
-            <Box margin={{ bottom:'xsmall' }}>
-              <Text size='10px'>Deposited</Text>
-            </Box>
-          </Stack>
+              <Box margin={{ bottom:'xsmall' }}>
+                <Text size='10px'>Deposited</Text>
+              </Box>
+            </Stack>
+          </Box>
           
           <Box direction='row' justify='center'>
-            <Stack anchor='top' onClick={()=>handleMenuClick(['PAYBACK'])}>
-              <Box pad='small' direction='row'>
-                <Box 
-                  margin='xsmall'
-                  pad={{ vertical:'none', horizontal:'xsmall' }}
-                  gap='xsmall'
-                  direction='row'
-                  round
-                  background='pink'
-                >
-                  {position.debt}
-                  yDai
-                </Box>
-              </Box>
-              <Box margin={{ bottom:'xsmall' }}>
-                <Text size='10px'>Debt</Text>
-              </Box>
-            </Stack>
+            <Box onClick={()=>handleMenuClick(['PAYBACK'])} hoverIndicator='background' round>
 
-            <Stack anchor='top' onClick={()=>handleMenuClick(['SELL'])}>
-              <Box pad='small' direction='row'>
-                <Box margin='xsmall' pad={{ vertical:'none', horizontal:'xsmall' }} gap='xsmall' direction='row' round background='lightgreen'>
-                  {position.balance}
-                  yDai
+              <Stack anchor='top' onClick={()=>handleMenuClick(['PAYBACK'])}>
+                <Box pad='small' direction='row'>
+                  <Box 
+                    margin='xsmall'
+                    pad={{ vertical:'none', horizontal:'xsmall' }}
+                    gap='xsmall'
+                    direction='row'
+                    round
+                    background='pink'
+                  >
+                    {position.debt}
+                    yDai
+                  </Box>
                 </Box>
-              </Box>
-              <Box margin={{ bottom:'xsmall' }}>
-                <Text size='10px'>Balance</Text>
-              </Box>
-            </Stack>
+                <Box margin={{ bottom:'xsmall' }}>
+                  <Text size='10px'>Debt</Text>
+                </Box>
+              </Stack>
+            </Box>
+
+            <Box onClick={()=>handleMenuClick(['SELL'])} hoverIndicator='background' round>
+              <Stack anchor='top' onClick={()=>handleMenuClick(['SELL'])}>
+                <Box pad='small' direction='row'>
+                  <Box margin='xsmall' pad={{ vertical:'none', horizontal:'xsmall' }} gap='xsmall' direction='row' round background='lightgreen'>
+                    {position.balance}
+                    yDai
+                  </Box>
+                </Box>
+                <Box margin={{ bottom:'xsmall' }}>
+                  <Text size='10px'>Balance</Text>
+                </Box>
+              </Stack>
+            </Box>
+
           </Box>
 
         </Box>
         <Box direction='row' align='center' pad='small'>
 
           
-
-
           { menuOpen?
-            <Close onClick={()=>handleMenuClick([])} />
+            <Box pad='small'><Close onClick={()=>handleMenuClick([])} /></Box>
             :
-            // <Exchange color="grey" onClick={()=>handleMenuClick([])} />
-            // <DropButton
-            //   label={<Box alignSelf="start"><Exchange color="grey" /></Box>}
-            //   dropAlign={{ 'top': 'top', 'right': 'left' }}
-            //   dropContent={
-            //     <Box round>
-            //       <Box pad='xsmall' background="light-2" onClick={()=>handleMenuClick(['DEPOSIT'])}>Deposit</Box>
-            //       <Box pad='xsmall' background="light-2" onClick={()=>handleMenuClick(['BORROW'])}>Borrow</Box>
-            //       <Box pad='xsmall' background="light-2" onClick={()=>handleMenuClick(['PAYBACK'])}>Payback Debt</Box>
-            //       <Box pad='xsmall' background="light-2" onClick={()=>handleMenuClick(['SELL'])}>Sell</Box>
-            //     </Box>
-            //     }
-            // />
             <Menu
               dropAlign={{ 'top': 'top', 'left': 'left' }}
               label={<Box><Exchange color="grey" /></Box>}
@@ -124,9 +118,7 @@ function YieldPosition({ position, input, selectPositionFn }: any) {
                 { label: 'Sell', onClick: ()=>handleMenuClick(['SELL']) },
               ]}
               icon={false}
-            />
-            }
-
+            />}
         </Box>
       </Box>
 
