@@ -7,6 +7,7 @@ import {
   Tab, 
   Grid,
   Main,
+  Heading,
   Box,
   Text 
 } from 'grommet';
@@ -132,18 +133,21 @@ function App() {
               >
                 <Tab 
                   title={
-                    <Box 
-                      pad='none' 
-                      align='center'
-                    >
-                      <Text weight={(indexTab===0?'bold':'normal')}>Borrow</Text>
+                    <Box pad='none' align='center'>
+                      <Heading margin='none' level={(indexTab===0?5:6)}>Borrow</Heading>
                     </Box>
                   }
                   
                 >
                   <Borrow />
                 </Tab>
-                <Tab title={<Box pad='none' align='center'><Text weight={(indexTab===1?'bold':'normal')}>Lend</Text></Box>}>
+                <Tab 
+                  title={
+                    <Box pad='none' align='center'>
+                      <Heading margin='none' level={(indexTab===1?5:6)}>Lend</Heading>
+                    </Box>
+                  }
+                >
                   <Lend />
                 </Tab>
                 <Tab
@@ -152,7 +156,7 @@ function App() {
                       gap='xsmall'
                       direction='row'
                     >
-                      <Text weight={(indexTab===2?'bold':'normal')}>Positions</Text>
+                      <Heading margin='none' level={(indexTab===2?5:6)}>Positions</Heading>
                       { posState.positionsIndicator > 0 &&
                         <Box
                           background="brand"
