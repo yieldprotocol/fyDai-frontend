@@ -7,27 +7,34 @@ import {
   Tab, 
   Grid,
   Main,
+  Heading,
   Box,
   Text 
 } from 'grommet';
 import { deepMerge } from 'grommet/utils';
+
+import { FaSeedling as YieldLeaf } from 'react-icons/fa';
+
 import { yieldTheme } from './themes';
+
+
 
 import { useGetWeiBalance, useEagerConnect }  from './hooks/connectionFns';
 
-import Borrow from './views/Borrow';
-import Lend from './views/Lend';
-import Position from './views/Position';
+import Borrow from './views/x_Borrow_depreciated';
+import Lend from './views/x_Lend_depreciated';
+import Series from './views/Series';
+import Positions from './views/Positions';
 
 import YieldHeader from './components/YieldHeader';
 import YieldFooter from './components/YieldFooter';
 // import YieldTabs from './components/YieldTabs';
 
-import ConnectLayer from './views/layers/ConnectLayer';
-import AccountLayer from './views/layers/AccountLayer';
-import NotifyLayer from './views/layers/NotifyLayer';
+import ConnectLayer from './components/layers/ConnectLayer';
+import AccountLayer from './components/layers/AccountLayer';
+import NotifyLayer from './components/layers/NotifyLayer';
 // TODO: remove testLayer for prod
-import TestLayer from './views/layers/TestLayer';
+import TestLayer from './components/layers/TestLayer';
 
 import { PositionsContext } from './contexts/PositionsContext';
 
@@ -81,7 +88,6 @@ function App() {
 
   return (
     <div className="App">
-
       <Grommet theme={deepMerge(base, yieldTheme)} themeMode={darkmode?'dark':'light'} full>
         <Grid fill rows={['auto', 'flex', 'auto']}>
           <NotifyLayer />
@@ -90,7 +96,7 @@ function App() {
           { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
           <YieldHeader 
             openConnectLayer={()=>setShowConnectLayer(true)} 
-            openAccountLayer={()=>setShowAccountLayer(true)} 
+            openAccountLayer={()=>setShowAccountLayer(true)}
           />
           <Main
             align='center'
@@ -133,44 +139,57 @@ function App() {
               >
                 <Tab 
                   title={
-                    <Box 
-                      pad='none' 
-                      align='center'
-                    >
-                      <Text weight={(indexTab===0?'bold':'normal')}>Borrow</Text>
+                    <Box pad='none' align='center'>
+                      <Heading margin='none' level='6'>Current Series</Heading>
                     </Box>
                   }
                 >
-                  <Borrow />
+                  <Series />
                 </Tab>
-                <Tab title={<Box pad='none' align='center'><Text weight={(indexTab===1?'bold':'normal')}>Lend</Text></Box>}>
-                  <Lend />
-                </Tab>
-                <Tab 
+                <Tab
                   title={
                     <Box 
                       gap='xsmall'
                       direction='row'
                     >
-                      <Text weight={(indexTab===2?'bold':'normal')}>Positions</Text>
+                      <Heading margin='none' level='6'>Positions</Heading>
                       { posState.positionsIndicator > 0 &&
-                      <Box
-                        background="brand"
-                        pad={{ horizontal: 'small', vertical:'none' }}
-                        align='center'
-                        round
-                      >
-                        <Text>{posState.positionsIndicator}</Text>
-                      </Box>}
+                        <Box
+                          background="brand"
+                          pad={{ horizontal: 'small', vertical:'none' }}
+                          align='center'
+                          round
+                        >
+                          <Text>{posState.positionsIndicator}</Text>
+                        </Box>}
                     </Box>
                   }
                 >
-                  <Position />
+                  <Positions />
                 </Tab>
+                <Tab
+                  disabled
+                  title={
+                    <Box
+                      gap='xsmall'
+                      direction='row'
+                    >
+                      <YieldLeaf /><Heading margin='none' level={(indexTab===2?5:6)}>Yield Market</Heading>
+                    </Box>
+                  }
+                >
+                  <Box 
+                    pad="medium" 
+                    border={{ side:'all', color:'lightgreen' }}
+                    round
+                    gap='large'
+                  >  Market 
+                  </Box>
+                </Tab>
+
               </Tabs>
             </Box>
           </Main>
-
           <YieldFooter 
             showTestLayer={showTestLayer}
             setShowTestLayer={setShowTestLayer}

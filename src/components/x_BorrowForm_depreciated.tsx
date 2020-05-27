@@ -25,7 +25,7 @@ type BorrowConfirmLayerProps = {
 
 const BorrowForm = ({ series, closeLayer, collateralMethod, setCollateralMethod }:BorrowConfirmLayerProps) => {
 
-  const [inputValue, setInputValue] = React.useState<any>();
+  const [inputValue, setInputValue] = React.useState<number>();
   const [formReady, setFormReady] = React.useState<boolean>(false);
   const [collateralType, setCollateralType] = React.useState<any>('ETH');
   const [ seriesPosition, setSeriesPosition] = React.useState<any>();
@@ -69,45 +69,36 @@ const BorrowForm = ({ series, closeLayer, collateralMethod, setCollateralMethod 
   }, [positionsState]);
 
   React.useEffect(()=>{
-    if( inputValue > 0) {
+    if( inputValue && inputValue > 0) {
       setFormReady(true);
     } else setFormReady(false);
   }, [inputValue]);
 
   return (
     <Box
-      pad='none'
+      pad='xsmall'
       round='medium'
       background='background-front'
       fill
     >
       { stepperIndex === 0 &&
       <>
-        <Box margin={{ vertical:'none', horizontal:'medium' }} direction='column'> Current Position: </Box>
-        
-        {/* <Box margin={{ vertical:'none', horizontal:'medium' }} direction='row' justify='between' align='baseline'>
-          <Box> Type </Box>
-          <Box> Value </Box>
-          <Box> Debt </Box>
-          <Box> Balance </Box>
-        </Box> */}
-
-        <Box margin={{ vertical:'none', horizontal:'medium' }} gap='xsmall'>
-          {seriesPosition ?
+        <Box margin={{ vertical:'none' }} gap='xsmall'>
+          { seriesPosition ?
             seriesPosition.collateral.map((x:any)=>{
               return (
                 <Box key={x.type}>
-                  <YieldPosition position={x} />
+                  <YieldPosition position={x} input={false} selectPositionFn={(e:any)=>console.log(e)} />
                 </Box>
               );
             })
             : <Box color='border' pad='small' align='center' round> No collateralization yet.</Box> }
-
         </Box>
-        <Box margin='medium' direction='column' align='center'>
+
+        <Box pad='medium' direction='column' align='center'>
           { collateralMethod === 'DEPOSIT' && 
           <>
-            <Text alignSelf='start' margin='small'> Deposit collateral: </Text>
+            <Text alignSelf='start' margin='small'> Deposit Collateral: </Text>
             <Box gap='none' direction='row' justify='end' align='baseline' fill='horizontal'>
               <Box fill>
                 <TextInput
@@ -115,32 +106,12 @@ const BorrowForm = ({ series, closeLayer, collateralMethod, setCollateralMethod 
                   type="number"
                   placeholder="Deposit Amount"
                   value={inputValue}
-                  style={{ borderRadius:'24px 0px 0px 24px' }}
-                  onChange={event => setInputValue(event.target.value)}
+                  // style={{ borderRadius:'24px 0px 0px 24px' }}
+                  onChange={event => setInputValue(Number(event.target.value))}
+                  icon={<Text>ETH</Text>}
                   reverse
                 />
               </Box>
-
-              <DropButton
-                size='small'
-                style={{ zIndex:2000, borderRadius:'0px 24px 24px 0px' }}
-                label={
-                  <Box 
-                    direction='row'
-                    gap='small'
-                    align='center'
-                  >
-                    <Text>{collateralType}</Text>
-                    <CaretDown />
-                  </Box>
-                }
-                dropAlign={{ top: 'bottom', right: 'right' }}
-                dropContent={
-                  <Box pad="medium" background="light-2" round="xsmall" style={{ zIndex:2000 }}>
-                    <Text size='xsmall'>something</Text>
-                  </Box>
-              }
-              />
             </Box>
             <Box alignSelf='end' margin={{ horizontal:'small' }}>
               <Text size='10px'> <Anchor onClick={()=>setCollateralMethod('MAKER')}> or convert a Maker vault  </Anchor> </Text>
@@ -150,7 +121,8 @@ const BorrowForm = ({ series, closeLayer, collateralMethod, setCollateralMethod 
             <Text size='xsmall'>{interest}%</Text>
           </Box> */}
             </Box>
-          </>}
+          </> }
+
           { collateralMethod === 'MAKER'  && 
           <Box fill='horizontal'>
             <Text>Connected Maker Vault:</Text>
@@ -162,7 +134,7 @@ const BorrowForm = ({ series, closeLayer, collateralMethod, setCollateralMethod 
             </Box>
           </Box>}
 
-          <Footer direction='row' justify='evenly' pad='medium'>
+          <Footer direction='row-responsive' justify='evenly' pad='medium'>
             <Button label='Cancel' color='border' onClick={()=>closeLayer()} />
             <SlideConfirm 
               label='Slide to deposit'
@@ -177,20 +149,12 @@ const BorrowForm = ({ series, closeLayer, collateralMethod, setCollateralMethod 
 
       {stepperIndex === 1 &&
       <>
-        {/* <Box margin={{ vertical:'none', horizontal:'medium' }} direction='row' justify='between' align='baseline'>
-          <Box> Type </Box>
-          <Box> Value </Box>
-          <Box> Debt </Box>
-          <Box> Balance </Box>
-          <Box />
-        </Box> */}
-        
-        <Box margin='medium' gap='xsmall'>
+        <Box margin={{ vertical:'none', horizontal:'medium' }} gap='xsmall'>
           { seriesPosition ? 
             seriesPosition.collateral.map((x:any)=>{
               return (
-                <Box key={x.type}>
-                  <YieldPosition position={x} input={true} />
+                <Box key={x.posId}>
+                  <YieldPosition position={x} input={true} selectPositionFn={(e:any)=>console.log(e)} />
                 </Box>
               );
             })
@@ -203,10 +167,10 @@ const BorrowForm = ({ series, closeLayer, collateralMethod, setCollateralMethod 
             </Box>}
         </Box>
 
-        <Footer direction='row' justify='evenly' pad='medium'>
+        <Footer direction='row-responsive' justify='evenly' pad='medium'>
           <Button label='Cancel' color='border' onClick={()=>closeLayer()} />
           <Button label='Back' color='border' onClick={()=>setStepperIndex(stepperIndex-1)} />
-          <SlideConfirm 
+          <SlideConfirm
             label='Slide to borrow'
             disabled={!formReady} 
             brandColor={theme.global.colors.brand.light} 

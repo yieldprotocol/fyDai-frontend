@@ -8,38 +8,34 @@ const initState = {
   positionsData : [
     {
       posId: 1,
-      series_id: `yDai-${moment().add(3, 'months').format('MMYY')}`,
+      series_id: `yDai-${moment().add(3, 'months').format('YY-MM-30')}`,
       maturityDate: moment().add(3, 'months').toDate(),
       interestRate: 3.22,
       currentValue: 0.9921,
       collateral: [ 
-        { type: 'ETH', value: 1.2, debt: 100, balance: 100 },
-        { type: 'CHAI', value: 20, debt: 15, balance: 15 },
-        { type: 'DAI', value: 30, debt: 20, balance: 20 },
+        { type: 'ETH', value: 1.21234, debt: 100, balance: 100 },
       ],
     },
     {
       posId: 2,
-      series_id: `yDai-${moment().add(6, 'months').format('MMYY')}`,
+      series_id: `yDai-${moment().add(6, 'months').format('YY-MM-30')}`,
       maturityDate: moment().add(3, 'months').toDate(),
       interestRate: 3.22,
       currentValue: 0.9921,
       collateral: [
-        { type: 'ETH', value: 1.2, debt: 100, balance: 100 },
-        { type: 'CHAI', value: 20, debt: 15, balance: 15 },
-        { type: 'DAI', value: 30, debt: 20, balance: 20 },
+        { type: 'ETH', value: 1.2234234234, debt: 100, balance: 100 },
+        { type: 'CHAI', value: 100, debt: 50, balance: 50},
+
       ],
     },
     {
       posId: 3,
-      series_id: `yDai-${moment().add(12, 'months').format('MMYY')}`,
+      series_id: `yDai-${moment().add(12, 'months').format('YY-MM-30')}`,
       maturityDate: moment().add(3, 'months').toDate(),
       interestRate: 3.22,
       currentValue: 0.9921,
       collateral: [ 
-        { type: 'ETH', value: 1.2, debt: 100, balance: 100 },
-        { type: 'CHAI', value: 20, debt: 15, balance: 15 },
-        { type: 'DAI', value: 30, debt: 20, balance: 20 },
+        { type: 'ETH', value: 1.223423423423423423234, debt: 100, balance: 100 },
       ],
     },
   ],
