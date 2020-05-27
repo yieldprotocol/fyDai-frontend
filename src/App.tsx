@@ -12,23 +12,29 @@ import {
   Text 
 } from 'grommet';
 import { deepMerge } from 'grommet/utils';
+
+import { FaSeedling as YieldLeaf } from 'react-icons/fa';
+
 import { yieldTheme } from './themes';
+
+
 
 import { useGetWeiBalance, useEagerConnect }  from './hooks/connectionFns';
 
-import Borrow from './views/Borrow';
-import Lend from './views/Lend';
-import Position from './views/Position';
+import Borrow from './views/x_Borrow_depreciated';
+import Lend from './views/x_Lend_depreciated';
+import Series from './views/Series';
+import Positions from './views/Positions';
 
 import YieldHeader from './components/YieldHeader';
 import YieldFooter from './components/YieldFooter';
 // import YieldTabs from './components/YieldTabs';
 
-import ConnectLayer from './views/layers/ConnectLayer';
-import AccountLayer from './views/layers/AccountLayer';
-import NotifyLayer from './views/layers/NotifyLayer';
+import ConnectLayer from './components/layers/ConnectLayer';
+import AccountLayer from './components/layers/AccountLayer';
+import NotifyLayer from './components/layers/NotifyLayer';
 // TODO: remove testLayer for prod
-import TestLayer from './views/layers/TestLayer';
+import TestLayer from './components/layers/TestLayer';
 
 import { PositionsContext } from './contexts/PositionsContext';
 
@@ -134,21 +140,11 @@ function App() {
                 <Tab 
                   title={
                     <Box pad='none' align='center'>
-                      <Heading margin='none' level={(indexTab===0?5:6)}>Borrow</Heading>
-                    </Box>
-                  }
-                  
-                >
-                  <Borrow />
-                </Tab>
-                <Tab 
-                  title={
-                    <Box pad='none' align='center'>
-                      <Heading margin='none' level={(indexTab===1?5:6)}>Lend</Heading>
+                      <Heading margin='none' level='6'>Current Series</Heading>
                     </Box>
                   }
                 >
-                  <Lend />
+                  <Series />
                 </Tab>
                 <Tab
                   title={
@@ -156,7 +152,7 @@ function App() {
                       gap='xsmall'
                       direction='row'
                     >
-                      <Heading margin='none' level={(indexTab===2?5:6)}>Positions</Heading>
+                      <Heading margin='none' level='6'>Positions</Heading>
                       { posState.positionsIndicator > 0 &&
                         <Box
                           background="brand"
@@ -169,8 +165,28 @@ function App() {
                     </Box>
                   }
                 >
-                  <Position />
+                  <Positions />
                 </Tab>
+                <Tab
+                  disabled
+                  title={
+                    <Box
+                      gap='xsmall'
+                      direction='row'
+                    >
+                      <YieldLeaf /><Heading margin='none' level={(indexTab===2?5:6)}>Yield Market</Heading>
+                    </Box>
+                  }
+                >
+                  <Box 
+                    pad="medium" 
+                    border={{ side:'all', color:'lightgreen' }}
+                    round
+                    gap='large'
+                  >  Market 
+                  </Box>
+                </Tab>
+
               </Tabs>
             </Box>
           </Main>

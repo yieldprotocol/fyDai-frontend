@@ -1,47 +1,26 @@
-import React from 'react';
-import {
-  Anchor,
-  Box,
-  Heading,
-  Diagram,
-  Stack,
-  Grid,
-  Text,
-  DataTable,
-  Meter,
-  List,
-  Layer,
-  TextInput,
-  DropButton,
-  Collapsible,
-
-} from 'grommet';
-import {
-  FaSortAmountDownAlt as SortDes,
-  FaSortAmountUpAlt as SortAsc,
-
-} from 'react-icons/fa';
+import React, { createRef } from 'react';
+import { Anchor, Box, Button, Collapsible, Layer } from 'grommet';
 
 import { SeriesContext } from '../contexts/SeriesContext';
-
 import YieldSeries from '../components/YieldSeries';
-
-import LendForm from '../components/LendForm';
-
-// import LendLayer from './layers/LendLayer';
-
 import { IYieldSeries } from '../types';
 
-const Lend = () => {
-  // const [showLendLayer, setShowLendLayer] = React.useState<boolean>();
-  // const [selectedSeries, setSelectedSeries] = React.useState<IYieldSeries>();
-  const [seriesList, setSeriesList] = React.useState<IYieldSeries[]>([]);
-  const [sortAsc, setSortAsc] = React.useState<boolean>(true);
+import BorrowForm from '../components/x_BorrowForm_depreciated';
+
+const Borrow = (props:any) => {
+
   const [showMore, setShowMore] = React.useState<boolean>(false);
   const [openIndex, setOpenIndex] = React.useState<number | null >(null);
-  const { state } = React.useContext(SeriesContext);
+  const [seriesList, setSeriesList] = React.useState<IYieldSeries[]>([]);
 
   const refs = React.useRef<Array<HTMLDivElement | null>>([]);
+
+  // const refsArray = React.useRef([]);
+  // const elementsRef = React.useRef(seriesList.map(() => createRef()));
+
+  // TODO: convert to reducer if get more 
+  const [collateralMethod, setCollateralMethod ]= React.useState<string>('DEPOSIT');
+  const { state } = React.useContext( SeriesContext );
 
   const handleSelectSeries = (ind: number | null) => {
     openIndex !== ind ?
@@ -55,7 +34,7 @@ const Lend = () => {
   //     refs.current[openIndex].scrollIntoView({
   //       block: 'nearest',
   //       inline: 'start',
-  //       behavior: 'auto',
+  //       // behavior: 'smooth',
   //     });
   //   }
   // }, [openIndex]);
@@ -63,62 +42,60 @@ const Lend = () => {
   React.useEffect(() => {
     showMore? setSeriesList(state.seriesData) : setSeriesList(state.seriesData.slice(0, 4));
   }, [ showMore ]);
-
+  
   return (
     <Box 
       pad="medium" 
-      round="medium" 
+      round="medium"
       background="background-front"
     >
-      <Box
-        pad={{ top: 'small', bottom: 'medium' }}
-        direction="row"
-        justify="between"
-      >
-        <Box
-          flex
-          direction="row"
-          justify="between"
-          pad={{ horizontal: 'small' }}
-        >
-          <Box>Select an available series:</Box>
-          {sortAsc ? (
-            <SortAsc onClick={() => setSortAsc(!sortAsc)} />
-          ) : (
-            <SortDes onClick={() => setSortAsc(!sortAsc)} />
-          )}
-        </Box>
+      <Box pad='medium' gap='none' direction='row' fill='horizontal' justify='center'>
+        <Button 
+          primary={collateralMethod === 'DEPOSIT'}
+          label='Deposit Collateral'
+          style={{ borderRadius:'24px 0px 0px 24px' }}
+          onClick={()=>setCollateralMethod('DEPOSIT')}
+        />
+        <Button 
+          primary={collateralMethod === 'MAKER'}
+          label='Convert a Maker Vault'
+          style={{ borderRadius:'0px 24px 24px 0px' }}
+          onClick={()=>setCollateralMethod('MAKER')}
+        />
       </Box>
 
-      <Box gap="small" pad={{ right: 'right' }}>
+      {/* <Box align='center' flex>Choose an available series:</Box> */}
+
+      <Box justify="between" gap='small'>
         {seriesList.map((x:any, i:number) => {
           return (
             <Box
-              id={x.id}
               key={x.id}
-              direction="row"
-              justify="between"
-              align="baseline"
+              id={x.id}
               ref={(el:any) => {refs.current[i] = el;}}
             >
-              { openIndex === i?
+              { openIndex === i ?
                 <Layer animation="fadeIn">
                   <YieldSeries
                     series={x}
                     seriesAction={() => handleSelectSeries(i)}
                     highlighted={openIndex === i}
                   >
-                    <LendForm series={x} closeLayer={()=>handleSelectSeries(null)} />
+                    <BorrowForm 
+                      series={x}
+                      closeLayer={()=>handleSelectSeries(null)}
+                      collateralMethod={collateralMethod}
+                      setCollateralMethod={setCollateralMethod}
+                    />
                   </YieldSeries>
-                </Layer>:
+                </Layer>
+                :
                 <Box flex>
                   <YieldSeries
                     series={x}
                     seriesAction={() => handleSelectSeries(i)}
                     highlighted={openIndex === i}
-                  >
-                    {null}
-                  </YieldSeries>
+                  />
                 </Box>}
             </Box>
           );
@@ -131,4 +108,4 @@ const Lend = () => {
   );
 };
 
-export default Lend;
+export default Borrow;

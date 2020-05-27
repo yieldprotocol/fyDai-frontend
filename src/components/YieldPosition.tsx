@@ -12,46 +12,91 @@ import {
   // FaEllipsisV as Exchange,
 } from 'react-icons/fa';
 
-function YieldPosition({ position, input, selectPositionFn }: any) {
-  const [open, setOpen] = React.useState<boolean>(false);
+import PaybackAction from './PaybackAction';
+import BorrowAction from './BorrowAction';
+import SellAction from './SellAction';
+import BuyAction from './BuyAction';
+import ActionMenu from './ActionMenu';
+import WithdrawAction from './WithdrawAction';
+import DepositAction from './DepositAction';
+
+
+function YieldPosition({ position, header }: any) {
+  // const [open, setOpen] = React.useState<boolean>(false);
   const [menuOpen, setMenuOpen] = React.useState<boolean>(false);
-  const [inputValue, setInputValue]= React.useState<any>();
+  // const [summaryOpen, setSummaryOpen] = React.useState<boolean>(false);
+  // const [inputValue, setInputValue]= React.useState<any>();
 
-  const [actionsVisible, setActionsVisible] = React.useState<any>([]);
+  const [actionsOpen, setActionsOpen] = React.useState<string | null>(null);
 
-  const handleMenuClick = (arr:any) =>{
-    setActionsVisible(arr);
-    setMenuOpen(!menuOpen);
+  const [balanceGroupActions, setBalanceGroupActions] = React.useState<string>('BORROW');
+  const [debtGroupActions, setDebtGroupActions] = React.useState<string>('PAYBACK');
+  const [collateralGroupActions, setCollateralGroupActions] = React.useState<string>('DEPOSIT');
+
+  // const [actionsVisible, setActionsVisible] = React.useState<any>([]);
+
+  const handleActionView = (action:string) =>{
+    actionsOpen === action ? setActionsOpen(null) : setActionsOpen(action);
+    action !== null && setMenuOpen(false);
+    // action === 'CANCEL' && handleMenuToggle();
   };
 
-  const handleSelectPosition= (e:any) =>{
-    // console.log(e);
-    selectPositionFn(e);
+  const handleMenuToggle= () => {
+    setActionsOpen(null);
+    setMenuOpen(!menuOpen);
   };
 
   return (
     <Box
-      elevation={menuOpen?'xsmall':'none'}
+      elevation={menuOpen || actionsOpen ?'xsmall':'none'}
       round='small'
-     // style={{ borderRadius:'24px 0px 0px 24px' }}
+      margin={{ top:'small' }}
+      border={{ color:'background-frontheader' }}
+      fill
     >
-      <Box direction='row'>
+
+      { header && 
+      <Box
+        background='background-front'
+        round={{ size: 'small', corner: 'top' }}
+        pad='small'
+        justify='between'
+        direction='row'
+      >
+        <Text size='small'>yDai-20-05-30</Text>
+        <Text size='small'>Matures in 3 months</Text>
+      </Box>}
+
+      <Box
+        direction='row'
+        hoverIndicator='background-frontheader'
+        onClick={()=>handleMenuToggle()}
+        round={header?{ size: 'small', corner: 'bottom' }:'small'}
+      >
+
         <Box style={{ borderRadius:'24px 0px 0px 24px' }} direction='row' align='center' pad='small'>
           <EthLogo />
         </Box>
         <Box 
           direction='row-responsive'
           justify='between'
-          align='baseline'
+          align='center'
           gap='none'
           flex
-          // elevation='xsmall'
-          // style={{ borderRadius:'0px 24px 24px 0px' }}
         >
-          <Box onClick={()=>handleMenuClick(['DEPOSIT'])} hoverIndicator='background' round>
+          <Box round>
             <Stack anchor='top'>
               <Box pad='small' direction='row'>
-                <Box margin='xsmall' pad={{ vertical:'none', horizontal:'xsmall' }} gap='xsmall' direction='row'>
+                <Box 
+                  margin='xsmall' 
+                  pad={{ vertical:'none', horizontal:'xsmall' }} 
+                  gap='xsmall' 
+                  direction='row'
+                  onClick={(e:any) => {e.stopPropagation(); handleActionView('COLLATERALGROUP');}}
+                  hoverIndicator='background'
+                  round
+                  style={{ zIndex:25 }}
+                >
                   <Text>{position.value}</Text>
                   <Text>{position.type}</Text>
                 </Box>
@@ -63,9 +108,8 @@ function YieldPosition({ position, input, selectPositionFn }: any) {
           </Box>
           
           <Box direction='row' justify='center'>
-            <Box onClick={()=>handleMenuClick(['PAYBACK'])} hoverIndicator='background' round>
-
-              <Stack anchor='top' onClick={()=>handleMenuClick(['PAYBACK'])}>
+            <Box round>
+              <Stack anchor='top'>
                 <Box pad='small' direction='row'>
                   <Box 
                     margin='xsmall'
@@ -73,7 +117,11 @@ function YieldPosition({ position, input, selectPositionFn }: any) {
                     gap='xsmall'
                     direction='row'
                     round
-                    background='pink'
+                    onClick={(e:any) => {e.stopPropagation(); handleActionView('DEBTGROUP');}}
+                    hoverIndicator='pink'
+                    // background='pink'
+                    border={{ color:'pink' }}
+                    style={{ zIndex:25 }}
                   >
                     {position.debt}
                     yDai
@@ -85,10 +133,20 @@ function YieldPosition({ position, input, selectPositionFn }: any) {
               </Stack>
             </Box>
 
-            <Box onClick={()=>handleMenuClick(['SELL'])} hoverIndicator='background' round>
-              <Stack anchor='top' onClick={()=>handleMenuClick(['SELL'])}>
-                <Box pad='small' direction='row'>
-                  <Box margin='xsmall' pad={{ vertical:'none', horizontal:'xsmall' }} gap='xsmall' direction='row' round background='lightgreen'>
+            <Box round>
+              <Stack anchor='top'>
+                <Box align='center' pad='small' direction='row'>
+                  <Box 
+                    margin='xsmall'
+                    pad={{ vertical:'none', horizontal:'xsmall' }}
+                    gap='xsmall'
+                    direction='row'
+                    round
+                    // background='lightgreen'
+                    onClick={(e:any) => {e.stopPropagation(); handleActionView('BALANCEGROUP');}} 
+                    hoverIndicator='lightgreen'
+                    border={{ color:'lightgreen' }}
+                  >
                     {position.balance}
                     yDai
                   </Box>
@@ -98,31 +156,19 @@ function YieldPosition({ position, input, selectPositionFn }: any) {
                 </Box>
               </Stack>
             </Box>
-
           </Box>
-
         </Box>
         <Box direction='row' align='center' pad='small'>
-
-          
-          { menuOpen?
-            <Box pad='small'><Close onClick={()=>handleMenuClick([])} /></Box>
+          {/* { summaryOpen || menuOpen? */}
+          { actionsOpen !== null ?
+            <CaretUp color="grey" />
             :
-            <Menu
-              dropAlign={{ 'top': 'top', 'left': 'left' }}
-              label={<Box><Exchange color="grey" /></Box>}
-              items={[
-                { label: 'Deposit', onClick: ()=>handleMenuClick(['DEPOSIT']) },
-                { label: 'Borrow', onClick: ()=>handleMenuClick(['BORROW']) },
-                { label: 'Payback Debt', onClick: ()=>handleMenuClick(['PAYBACK']) },
-                { label: 'Sell', onClick: ()=>handleMenuClick(['SELL']) },
-              ]}
-              icon={false}
-            />}
+            <Exchange color="grey" />}
         </Box>
       </Box>
 
-      <Collapsible open={menuOpen}>
+
+      <Collapsible open={actionsOpen !== null}>
         <Box
           elevation='none'
           style={{ borderRadius:'0px 0px 24px 24px' }}
@@ -130,85 +176,118 @@ function YieldPosition({ position, input, selectPositionFn }: any) {
           direction='column'
           margin='small'
         >
-          {actionsVisible.includes('BORROW') &&
-          <Box gap='xsmall' direction='row' align='baseline'>
-            <Box direction='row' gap='small'>
-              Borrow against Collateral : 
+          { actionsOpen === 'BORROW' && <BorrowAction close={()=>setActionsOpen(null)} /> }
+          { actionsOpen === 'PAYBACK' && <PaybackAction close={()=>setActionsOpen(null)} /> }
+          { actionsOpen === 'SELL' && <SellAction close={()=>setActionsOpen(null)} /> }
+          { actionsOpen === 'BUY' && <BuyAction close={()=>setActionsOpen(null)} /> }
+          { actionsOpen === 'WITHDRAW' && <WithdrawAction close={()=>setActionsOpen(null)} /> }
+          { actionsOpen === 'DEPOSIT' && <DepositAction close={()=>setActionsOpen(null)} /> }
+
+          { actionsOpen === 'BALANCEGROUP' &&
+          <Box pad='small'>
+            <Box direction='row' fill='horizontal' justify='between' align='baseline' margin={{ bottom:'medium' }}>
+              <Text> I would like to: </Text>
+              <Box direction='row'>
+                <Button 
+                  primary={balanceGroupActions === 'BORROW'}
+                  label='Borrow'
+                  hoverIndicator='brand'
+                  color='brand'
+                  style={{ borderRadius:'24px 0px 0px 24px' }}
+                  onClick={()=>setBalanceGroupActions('BORROW')}
+                />
+                <Button 
+                  primary={balanceGroupActions === 'SELL'}
+                  label='Sell'
+                  style={{ borderRadius:'0px 0px 0px 0px' }}
+                  hoverIndicator='brand'
+                  color='brand'
+                  onClick={()=>setBalanceGroupActions('SELL')}
+                />
+                <Button 
+                  primary={balanceGroupActions === 'BUY'}
+                  label='Buy'
+                  hoverIndicator='brand'
+                  color='brand'
+                  style={{ borderRadius:'0px 24px 24px 0px' }}
+                  onClick={()=>setBalanceGroupActions('BUY')}
+                />
+              </Box>
+              <Box pad='xsmall' round hoverIndicator='background-front' onClick={()=>handleMenuToggle()}> 
+                <Text size='10px'> Do something else. </Text>
+              </Box>
             </Box>
-            <Box flex>
-              <TextInput
-                size='small'
-                type="number"
-                placeholder="Amount to borrow"
-                value={inputValue}
-                onChange={(event:any) => setInputValue(event.target.value)}
-                icon={<Text>yDai</Text>}
-                reverse
-              />
-            </Box>
-            {/* { actionsVisible.length === 1 && <Close onClick={()=>handleMenuClick([])} /> } */}
+              { balanceGroupActions === 'BUY' && <BuyAction close={()=>setActionsOpen(null)} /> }
+              { balanceGroupActions === 'SELL' && <SellAction close={()=>setActionsOpen(null)} /> }
+              { balanceGroupActions === 'BORROW' && <BorrowAction close={()=>setActionsOpen(null)} /> }
           </Box>}
 
-          {actionsVisible.includes('PAYBACK') &&
-          <Box gap='xsmall' direction='row' align='baseline'>
-            <Box direction='row' gap='small'>
-              Payback existing debt : 
+          { actionsOpen === 'DEBTGROUP' &&
+          <Box pad='small'>
+            <Box direction='row' fill='horizontal' justify='between' align='baseline' margin={{ bottom:'medium' }}>
+              <Text> I would like to: </Text>
+              <Box direction='row'>
+                <Button 
+                  primary={debtGroupActions === 'PAYBACK'}
+                  label='Payback debt'
+                  style={{ borderRadius:'24px 0px 0px 24px' }}
+                  hoverIndicator='brand'
+                  color='brand'
+                  onClick={()=>setDebtGroupActions('PAYBACK')}
+                />
+                <Button 
+                  primary={debtGroupActions === 'BORROW'}
+                  label='Borrow yDai'
+                  hoverIndicator='brand'
+                  color='brand'
+                  style={{ borderRadius:'0px 24px 24px 0px' }}
+                  onClick={()=>setDebtGroupActions('BORROW')}
+                />
+              </Box>
+              <Box pad='xsmall' round hoverIndicator='background-front' onClick={()=>handleMenuToggle()}> 
+                <Text size='10px'> Do something else. </Text>
+              </Box>
             </Box>
-            <Box flex>
-              <TextInput
-                size='small'
-                type="number"
-                placeholder="Amount to payback"
-                value={inputValue}
-                onChange={(event:any) => setInputValue(event.target.value)}
-                icon={<Text>yDai</Text>}
-                reverse
-              />
-            </Box>
-            {/* { actionsVisible.length === 1 && <Close onClick={()=>handleMenuClick([])} /> } */}
+              { debtGroupActions === 'PAYBACK' && <PaybackAction close={()=>setActionsOpen(null)} /> }
+              { debtGroupActions === 'BORROW' && <BorrowAction close={()=>setActionsOpen(null)} /> }
           </Box>}
 
-          {actionsVisible.includes('SELL') &&
-          <Box gap='xsmall' direction='row' align='baseline' justify='between'>
-            <Box direction='row' gap='small'>
-              Sell on <Text color='#FF007F'><span role='img'> 🦄</span> Uniswap :</Text>
+          { actionsOpen === 'COLLATERALGROUP' &&
+          <Box pad='small'>
+            <Box direction='row' fill='horizontal' justify='between' align='baseline' margin={{ bottom:'medium' }}>
+              <Text> I would like to: </Text>
+              <Box direction='row'>
+                <Button 
+                  primary={collateralGroupActions === 'DEPOSIT'}
+                  label='Deposit'
+                  style={{ borderRadius:'24px 0px 0px 24px' }}
+                  hoverIndicator='brand'
+                  color='brand'
+                  onClick={()=>setCollateralGroupActions('DEPOSIT')}
+                />
+                <Button 
+                  primary={collateralGroupActions === 'WITHDRAW'}
+                  label='Withdraw'
+                  hoverIndicator='brand'
+                  color='brand'
+                  style={{ borderRadius:'0px 24px 24px 0px' }}
+                  onClick={()=>setCollateralGroupActions('WITHDRAW')}
+                />
+              </Box>
+              <Box pad='xsmall' round hoverIndicator='background-front' onClick={()=>handleMenuToggle()}> 
+                <Text size='10px'> Do something else. </Text>
+              </Box>
             </Box>
-            <Box flex>
-              <TextInput
-                size='small'
-                type="number"
-                placeholder="Amount to sell"
-                value={inputValue}
-                onChange={(event:any) => setInputValue(event.target.value)}
-                icon={<Text>yDai</Text>}
-                reverse
-              />
-            </Box>
-            {/* { actionsVisible.length === 1 && <Close onClick={()=>handleMenuClick([])} /> } */}
-          </Box>}
-
-          {actionsVisible.includes('DEPOSIT') &&
-          <Box gap='xsmall' direction='row' align='baseline' justify='between'>
-            <Box direction='row' gap='small'>
-              Deposit more ETH collateral : 
-            </Box>
-            <Box flex>
-              <TextInput
-                size='small'
-                type="number"
-                placeholder="Amount to deposit"
-                value={inputValue}
-                onChange={(event:any) => setInputValue(event.target.value)}
-                icon={<Text>yDai</Text>}
-                reverse
-              />
-            </Box>
-            {/* { actionsVisible.length === 1 && <Close onClick={()=>handleMenuClick([])} /> } */}
+            { collateralGroupActions === 'DEPOSIT' && <DepositAction close={()=>setActionsOpen(null)} />}
+            { collateralGroupActions === 'WITHDRAW' &&<WithdrawAction close={()=>setActionsOpen(null)} />}
           </Box>}
 
         </Box>
       </Collapsible>
 
+      <Collapsible open={menuOpen}>
+        <ActionMenu handleSelectAction={handleActionView} />
+      </Collapsible>
     </Box>
 
   );

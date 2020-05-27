@@ -25,6 +25,19 @@ export async function useGetWeiBalance() {
   return '-';
 }
 
+export const useRandomFn = ()=>{
+  const { library } = useWeb3React();
+  const signer = library && library.getSigner();
+
+  const randFn = async () => {
+    console.log(ethers);
+    console.log(await library.getNetwork());
+    // console.log(ethers.utils.getNetwork('').chainId); 
+    // signer && signer.sendTransaction(transaction);
+  };
+  return randFn;
+};
+
 // Eager connect is an attempt to 'auto connect' to injected connection eg. Metamask.
 export function useEagerConnect() {
   const { activate, active } = useWeb3React();
@@ -41,7 +54,6 @@ export function useEagerConnect() {
       }
     });
   }, [activate]);
-
   // if the connection worked, wait until we get confirmation of that to flip the flag
   React.useEffect(() => {
     if (!tried && active) {
@@ -102,11 +114,10 @@ export function getNetworkName(networkId: Number) {
   }
 }
 
-
 export const useSendTx = () => {
-
   const { library } = useWeb3React();
   const signer = library && library.getSigner(); 
+
   const transaction = {
     nonce: 0,
     gasLimit: 21000,
@@ -123,13 +134,12 @@ export const useSendTx = () => {
     signer && signer.sendTransaction(transaction);
   };
   return sendTx;
-
 };
 
 export const useMakerVault = () => {
-
   const { library, connector } = useWeb3React();
   const [maker, setMaker] = React.useState();
+
   const web3Provider = library && new ProviderBridge(library.provider, library.getSigner());
   // React.useEffect(()=>{
   //   ( async () => {
@@ -142,7 +152,6 @@ export const useMakerVault = () => {
   // }, []);
 
   const makerVault = async () => {
-
     // console.log( await connector?.getProvider() );
     // const newMaker = connector &&  await Maker.create('http', { web3 : { inject : await connector.getProvider()}, autoAuthenticate:false } );
     // const newMaker = web3Provider &&  await Maker.create('http', {} );
