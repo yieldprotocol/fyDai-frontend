@@ -15,11 +15,10 @@ const POLLING_INTERVAL = 12000;
 const RPC_URLS: { [chainId: number]: string } = {
   1: '192.168.2.3',
   4: process.env.REACT_APP_RPC_URL_4 as string,
-  1337: process.env.REACT_APP_RPC_URL_1337 as string,
 };
 
 export const injected = new InjectedConnector({
-  supportedChainIds: [1, 3, 4, 5, 42, 1337],
+  supportedChainIds: [1, 3, 4, 5, 42, 1337, 5777],
 });
 
 // export const network = new NetworkConnector({

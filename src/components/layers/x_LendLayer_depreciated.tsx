@@ -6,7 +6,7 @@ import {
   FaTimes as Close,
 } from 'react-icons/fa';
 
-import SlideConfirm from '../../components/SlideConfirm';
+import SlideConfirm from '../SlideConfirm';
 import { IYieldSeries } from '../../types';
 
 import { NotifyContext } from '../../contexts/NotifyContext';

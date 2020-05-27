@@ -81,9 +81,6 @@ const BorrowForm = ({ series, closeLayer, collateralMethod, setCollateralMethod 
       background='background-front'
       fill
     >
-      <Box margin={{ vertical:'small' }} direction='column'> 
-        Current Position: 
-      </Box>
       { stepperIndex === 0 &&
       <>
         <Box margin={{ vertical:'none' }} gap='xsmall'>

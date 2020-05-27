@@ -1,28 +1,17 @@
 import React from 'react';
 import { useWeb3React } from '@web3-react/core';
-import { Anchor, Grommet, grommet, Grid, Layer, Main, Image, Header, Heading, Footer, Button, Box, Avatar, Text, CheckBox, ThemeContext, Paragraph } from 'grommet';
-import { 
-  FaTimes as Close,
-} from 'react-icons/fa';
+import { Anchor, Layer, Header, Footer, Button, Box, Text } from 'grommet';
 
+import { useGetWeiBalance, getNetworkName }  from '../../hooks/connectionFns';
 
-import { useGetWeiBalance, getNetworkName, useSendTx, useMakerVault }  from '../../hooks/connectionFns';
-import ProfileButton from '../../components/ProfileButton';
-import { NotifyContext } from '../../contexts/NotifyContext';
+import ProfileButton from '../ProfileButton';
 
-
-const TestLayer = (props:any) => {
-
+const AccountLayer = (props:any) => {
   const [balance, setBalance] = React.useState();
-  const { account, chainId } = useWeb3React();
+  const { chainId } = useWeb3React();
   const { closeLayer, changeWallet } = props;
 
   const getWeiBalance = useGetWeiBalance();
-  const sendTx  = useSendTx();
-
-  const makerVault = useMakerVault();
-
-  const { dispatch } = React.useContext<any>(NotifyContext);
 
   const updateBalance = async () => {
     setBalance(await getWeiBalance);
@@ -40,9 +29,9 @@ const TestLayer = (props:any) => {
   return (
     <Layer 
       animation='slide'
-      position='left'
+      position='right'
       full="vertical"
-      modal={false}
+      // modal={false}
       onClickOutside={onClose}
       onEsc={onClose}
     >
@@ -54,15 +43,14 @@ const TestLayer = (props:any) => {
         style={{ minWidth: '240px' }}
         gap='small'
       >
-
         <Header 
           round={{ corner:'bottom', size:'medium' }}
           fill='horizontal'
           background='background-frontheader'
-          pad={{ horizontal: 'small', vertical:'medium' }}
+          pad={{ horizontal: 'medium', vertical:'large' }}
         >
-          <Heading level='6'> FOR TESTING ONLY</Heading>
-          <Anchor color='brand' onClick={()=>onClose()} size='xsmall' label='close' />
+          <ProfileButton />
+          <Anchor color='brand' onClick={()=>onClose()} size='xsmall' label='Close' />
         </Header>
 
         <Box
@@ -71,29 +59,25 @@ const TestLayer = (props:any) => {
           justify="center"
           gap='small'
         >
-          <ProfileButton />
           <Text size='xsmall'>Connected to:</Text> 
           <Text weight="bold">{chainId && getNetworkName(chainId) }</Text>
           <Box direction='row' gap='small'>
             <Text size='xsmall'>WEI balance:</Text>
             <Text>{ balance }</Text>
           </Box>
+          {/* <Button fill='horizontal' label='Connect to another wallet' onClick={()=>setShowConnectLayer(true)} /> */}
         </Box>
 
         <Box 
           align='center'
-          pad='large'
-          gap='small'
+          // pad='large'
+          // gap='small'
           overflow='auto'
         >
-
-          <Button label='useNotify_info' onClick={()=>dispatch( { type: 'notify', payload: { message:'Something is happening!.. ', type:'info', showFor:500 } } )} />
-          <Button label='useNotify_error' onClick={()=>dispatch({ type: 'notify', payload: { message:'oooops :( - must cancel manually', type:'error', showFor:0 } })} />
-          <Button label='useNotify_success' onClick={()=>dispatch({ type: 'notify', payload: { message:'sucessfull', type:'success' } })} />
-          <Button label='useNotify_warn' onClick={()=>dispatch({ type: 'notify', payload: { message:'maybe wrong?', type:'warn' } })} />
-          <Button label='Test C' />
-          <Button label='SendTest Transaction' onClick={()=> sendTx()} />
-          <Button label='check Maker vault' onClick={()=> makerVault()} />
+          <Text>Previous TX Info?</Text>
+          <Text>Previous TX Info?</Text>
+          <Text>Previous TX Info?</Text>
+          <Text>Previous TX Info? </Text>
 
         </Box>
         <Footer pad='medium' gap='xsmall' direction='row' justify='center' align='center'>
@@ -113,4 +97,4 @@ const TestLayer = (props:any) => {
   );
 };
 
-export default TestLayer;
+export default AccountLayer;
