@@ -14,6 +14,7 @@ const Series = (props:any) => {
   const [seriesList, setSeriesList] = React.useState<IYieldSeries[]>([]);
 
   const refs = React.useRef<Array<HTMLDivElement | null>>([]);
+  const boxRef = React.useRef<any>(null);
 
   // const refsArray = React.useRef([]);
   // const elementsRef = React.useRef(seriesList.map(() => createRef()));
@@ -51,8 +52,9 @@ const Series = (props:any) => {
       pad="medium"
       border={{ side:'all', color:'lightgreen' }}
       round
+      ref={boxRef}
     >
-      <Box justify="between" gap='small'>
+      <Box justify="between" gap='small' >
         {seriesList.map((x:any, i:number) => {
           return (
             <Box
@@ -60,7 +62,6 @@ const Series = (props:any) => {
               id={x.id}
               ref={(el:any) => {refs.current[i] = el;}}
               round="small"
-              // background="background-front"
             >
               <YieldSeriesSummary
                 series={x}
@@ -68,7 +69,7 @@ const Series = (props:any) => {
                 highlighted={openIndex === i}
               />
               { openIndex === i &&
-                <Layer animation="fadeIn">
+                <Layer animation="fadeIn" >
                   <YieldSeries
                     series={x}
                     seriesAction={() => handleSelectSeries(i)}

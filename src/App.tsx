@@ -16,6 +16,7 @@ import { deepMerge } from 'grommet/utils';
 import { FaSeedling as YieldLeaf } from 'react-icons/fa';
 
 import { yieldTheme } from './themes';
+import bckgrnd from './assets/images/background.png';
 
 
 
@@ -136,11 +137,12 @@ function App() {
                 flex={true}
                 activeIndex={indexTab}
                 onActive={onActiveTab}
+                
               >
                 <Tab 
                   title={
-                    <Box pad='none' align='center'>
-                      <Heading margin='none' level='6'>Current Series</Heading>
+                    <Box pad='none' align='center' >
+                      <Text size='small' weight={indexTab===0?'bold':'normal'}>Current Series</Text>
                     </Box>
                   }
                 >
@@ -152,7 +154,8 @@ function App() {
                       gap='xsmall'
                       direction='row'
                     >
-                      <Heading margin='none' level='6'>Positions</Heading>
+                      <Text size='small' weight={indexTab===1?'bold':'normal'}>Positions</Text>
+                      {/* <Heading margin='none' level='6'>Positions</Heading> */}
                       { posState.positionsIndicator > 0 &&
                         <Box
                           background="brand"
@@ -174,7 +177,7 @@ function App() {
                       gap='xsmall'
                       direction='row'
                     >
-                      <YieldLeaf /><Heading margin='none' level={(indexTab===2?5:6)}>Yield Market</Heading>
+                      <YieldLeaf /><Text margin='none' weight={(indexTab===2?'bold':'normal')}>Yield Market</Text>
                     </Box>
                   }
                 >
