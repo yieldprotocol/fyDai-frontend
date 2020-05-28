@@ -1,4 +1,5 @@
 import { css } from 'styled-components';
+import background from '../assets/images/background.png'
 
 export const yieldTheme = {
   name: 'yieldTheme',
@@ -597,12 +598,12 @@ export const yieldTheme = {
     margin: { horizontal: 'none', vertical: 'xxsmall' },
     color: 'active-text',
     active: {
-      // background: 'background-front',
       background: 'brand',
+      // background: `url("${background}")`,
       // @ts-ignore
-      // extend: ({ theme }) => css`
-      // font-weight: 'bold';
-      // `
+      extend: ({ theme }) => css`
+      font-weight: 'bold';
+      `
     },
 
     border: {
@@ -623,7 +624,7 @@ export const yieldTheme = {
       border-radius: ${theme.global.edgeSize.large};
       positon: fixed;
     `,
-    //      width: ${theme.global.edgeSize.xlarge};
+
   },
 
   tabs: {

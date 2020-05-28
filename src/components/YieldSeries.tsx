@@ -48,7 +48,7 @@ const YieldSeries = ({
     <Box
       round="small"
       background='background-front'
-      style={{ minWidth:'600px', minHeight:'600px' }}
+      style={{ minWidth:'300px', minHeight:'400px' }}
       fill
       justify='between'
     >
