@@ -1,27 +1,19 @@
 import React from 'react';
 import { useWeb3React } from '@web3-react/core';
-import { Anchor, Grommet, grommet, Grid, Layer, Main, Image, Header, Heading, Footer, Button, Box, Avatar, Text, CheckBox, ThemeContext, Paragraph } from 'grommet';
-import { 
-  FaTimes as Close,
-} from 'react-icons/fa';
+import { Anchor, Layer, Header, Heading, Footer, Button, Box, Text } from 'grommet';
 
 import { useGetWeiBalance, getNetworkName, useSendTx, useMakerVault, useRandomFn }  from '../../hooks/connectionFns';
 import ProfileButton from '../ProfileButton';
 import { NotifyContext } from '../../contexts/NotifyContext';
 
-
 const TestLayer = (props:any) => {
   const [balance, setBalance] = React.useState();
-  const { account, chainId } = useWeb3React();
+  const { chainId } = useWeb3React();
   const { closeLayer, changeWallet } = props;
 
   const getWeiBalance = useGetWeiBalance();
   const sendTx  = useSendTx();
-
-
   const randomFn  = useRandomFn();
-
-
   const makerVault = useMakerVault();
   const { dispatch } = React.useContext<any>(NotifyContext);
 

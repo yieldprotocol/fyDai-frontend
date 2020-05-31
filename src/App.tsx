@@ -18,12 +18,8 @@ import { FaSeedling as YieldLeaf } from 'react-icons/fa';
 import { yieldTheme } from './themes';
 import bckgrnd from './assets/images/background.png';
 
-
-
 import { useGetWeiBalance, useEagerConnect }  from './hooks/connectionFns';
 
-import Borrow from './views/x_Borrow_depreciated';
-import Lend from './views/x_Lend_depreciated';
 import Series from './views/Series';
 import Positions from './views/Positions';
 
