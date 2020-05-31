@@ -28,10 +28,10 @@ const YieldSeries = ({
   highlighted }: YieldSeriesProps) => {
 
   const {
-    id,
-    maturityDate: date,
-    interestRate: interest,
-    currentValue: value,
+    name,
+    maturity,
+    rate,
+    currentValue,
   } = series;
 
   const [ seriesPosition, setSeriesPosition] = React.useState<any>();
@@ -64,26 +64,26 @@ const YieldSeries = ({
           round="small"
         >
           <Box direction="column">
-            <Text weight="bold"> {id}</Text>
+            <Text weight="bold"> {name}</Text>
             <Box
               round
               align="center"
               pad={{ horizontal: 'small', vertical: 'none' }}
               background="brand"
             >
-              <Text size="xsmall"> {interest}%</Text>
+              <Text size="xsmall"> x%</Text>
             </Box>
           </Box>
           <Box direction="column" align='end'>
             <Box direction="row" gap="xsmall">
               <Text size="xsmall">Matures: </Text>
               <Text size="xsmall" weight="bold">
-                {moment(date).format('MMM YYYY')}
+                {moment(maturity).format('MMM YYYY')}
               </Text>
             </Box>
             <Box direction="row" gap="xsmall">
               <Text size="xsmall">Current value:</Text>{' '}
-              <Text size="xsmall" weight="bold">{`${value} DAI`}</Text>
+              <Text size="xsmall" weight="bold">{`${currentValue} DAI`}</Text>
             </Box>
           </Box>
           {highlighted && <Box pad='xsmall'><Close /></Box>}

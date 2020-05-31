@@ -18,10 +18,10 @@ const YieldSeriesSummary = ({
   highlighted }: YieldSeriesProps) => {
 
   const {
-    id,
-    maturityDate: date,
-    interestRate: interest,
-    currentValue: value,
+    name,
+    maturity,
+    rate,
+    currentValue,
   } = series;
 
   return (
@@ -38,26 +38,27 @@ const YieldSeriesSummary = ({
       round="small"
     >
       <Box direction="column">
-        <Text weight="bold"> {id}</Text>
+        <Text weight="bold"> {name}</Text>
         <Box
           round
           align="center"
           pad={{ horizontal: 'small', vertical: 'none' }}
           background="brand"
         >
-          <Text size="xsmall"> {interest}%</Text>
+          {/* <Text size="xsmall"> {rate}%</Text> */}
+          <Text size="xsmall"> {rate.toString()} %</Text>
         </Box>
       </Box>
       <Box direction="column" align='end'>
         <Box direction="row" gap="xsmall">
           <Text size="xsmall">Matures: </Text>
           <Text size="xsmall" weight="bold">
-            {moment(date).format('MMM YYYY')}
+            { moment(maturity).format('MMM YYYY') }
           </Text>
         </Box>
         <Box direction="row" gap="xsmall">
           <Text size="xsmall">Current value:</Text>{' '}
-          <Text size="xsmall" weight="bold">{`${value} DAI`}</Text>
+          <Text size="xsmall" weight="bold">{`${currentValue} DAI`}</Text>
         </Box>
       </Box>
     </Box>
