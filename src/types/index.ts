@@ -1,24 +1,16 @@
 export interface IYieldSeries {
-  id: any;
-  maturityDate: Date;
-  interestRate: number;
-  currentValue: number;
-  balance: number; // credit?
-  debt: number;
-  // isAcceptable(s: string): boolean;
+  name: string
+  maturity: number|Date;
+  YDai: string;
+  ChaiDealer: string;
+  Mint: string;
+  WethDealer: string;
+  symbol:string;
+  id?: string;
+  rate?: any;
+  currentValue?: any;
 }
 
-const enum notificationEnum {
-  'warn',
-  'info',
-  'error',
-  'success',
-}
-const enum nPositionEnum {
-  'top',
-  'center',
-  'bottom',
-}
 export interface INotification {
   message: string;
   // type: notificationEnum;
@@ -26,9 +18,16 @@ export interface INotification {
   callbackAction?: any;
   callbackCancel?: any;
   showFor?: number;
-  position?: nPositionEnum;
+  position?: string;
 }
 
 export interface IYieldAccount {}
 
 export interface IMakerVault {}
+
+// export interface ICallTx {
+//   addr:string;
+//   contract:string;
+//   fn:string;
+//   data?:any[];
+// }

@@ -5,10 +5,10 @@ const NotifyContext = React.createContext<any>({});
 
 const initState = {
   open: false,
-  position: 'bottom',
+  position: 'top-right',
   message: '',
   type: 'info',
-  timerMs: 3000,
+  timerMs: 2000,
   callbackAction: null,
   callbackCancel: null,
 };

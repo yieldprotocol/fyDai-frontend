@@ -20,12 +20,12 @@ const AddCollateralForm = ({ series, hasPosition }:BorrowConfirmLayerProps) => {
   const [formReady, setFormReady] = React.useState<boolean>(false);
   const [collateralMethod, setCollateralMethod ]= React.useState<string | null>(null);
   const theme = React.useContext<any>(ThemeContext);
-  const { state, dispatch } = React.useContext(NotifyContext);
+  const { state: notifyState, dispatch: notifyDispatch } = React.useContext(NotifyContext);
 
   const handleDeposit = async () => {
-    dispatch({ type: 'notify', payload:{ message:'Transaction pending....', type:'info', showFor:4000 } } );
+    notifyDispatch({ type: 'notify', payload:{ message:'Transaction pending....', type:'info' } } );
     await setTimeout(() => {
-      dispatch({ type: 'notify', payload:{ message:'Transaction processed', type:'success' } } );
+      notifyDispatch({ type: 'notify', payload:{ message:'Transaction processed', type:'success' } } );
       // setStepperIndex(stepperIndex+1);
     }, 3000);
   };

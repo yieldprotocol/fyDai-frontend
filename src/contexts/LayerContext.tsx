@@ -4,7 +4,7 @@ const LayerContext = React.createContext<any>({});
 
 const initState = {
   open: false,
-  position: 'bottom',
+  position: 'top-right',
   message: '',
   type: 'info',
   timerMs: 3000,

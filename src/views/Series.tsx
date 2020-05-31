@@ -4,6 +4,8 @@ import { Anchor, Box, Layer } from 'grommet';
 import { IYieldSeries } from '../types';
 import { SeriesContext } from '../contexts/SeriesContext';
 
+import { Spinner } from '../components/LoadingSpinner';
+
 import YieldSeriesSummary from '../components/YieldSeriesSummary';
 import YieldSeries from '../components/YieldSeries';
 
@@ -29,24 +31,18 @@ const Series = (props:any) => {
       setOpenIndex(null);
   };
 
-  // React.useEffect(() => {
-  //   if (openIndex && refs.current[openIndex]) {
-  //     // @ts-ignore
-  //     refs.current[openIndex].scrollIntoView({
-  //       block: 'nearest',
-  //       inline: 'start',
-  //       // behavior: 'smooth',
-  //     });
-  //   }
-  // }, [openIndex]);
-
   React.useEffect(() => {
-    showMore? 
-      setSeriesList(state.seriesData) 
-      : 
-      setSeriesList(state.seriesData.slice(0, 4));
-  }, [ showMore ]);
-  
+    console.log(state);
+    !state.isLoading && setSeriesList(state.seriesData)
+  }, [ state.isLoading ]);
+
+  // React.useEffect(() => {
+  //   showMore? 
+  //     setSeriesList(state.seriesData) 
+  //     : 
+  //     setSeriesList(state.seriesData.slice(0, 4));
+  // }, [ showMore ]);
+
   return (
     <Box 
       pad="medium"
@@ -55,11 +51,12 @@ const Series = (props:any) => {
       ref={boxRef}
     >
       <Box justify="between" gap='small' >
+        {state.isLoading && <Spinner/>}
         {seriesList.map((x:any, i:number) => {
           return (
             <Box
-              key={x.id}
-              id={x.id}
+              key={x.name}
+              id={x.name}
               ref={(el:any) => {refs.current[i] = el;}}
               round="small"
             >
@@ -79,9 +76,9 @@ const Series = (props:any) => {
             </Box>
           );
         })}
-        <Box fill='horizontal' direction='row' justify='end' pad='medium'>
+        {/* <Box fill='horizontal' direction='row' justify='end' pad='medium'>
           {!showMore ? <Anchor onClick={()=>setShowMore(true)} label='Show more...' /> : <Anchor onClick={()=>setShowMore(false)} label='Show less...' /> }
-        </Box>
+        </Box> */}
       </Box>
     </Box>
   );
