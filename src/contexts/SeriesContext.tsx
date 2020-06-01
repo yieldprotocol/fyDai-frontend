@@ -80,7 +80,7 @@ const SeriesProvider = ({ children }:any) => {
       chainData.push(x);
       try {
         chainData[i].rate = await callTx(x.YDai, 'YDai', 'rate', []);
-        chainData[i].currentValue = (await callTx( sysAddrList.Vat, 'Vat', 'ilks', [ethers.utils.formatBytes32String('weth')] )).spot;
+        // chainData[i].currentValue = (await callTx( sysAddrList.Vat, 'Vat', 'ilks', [ethers.utils.formatBytes32String('weth')] )).spot;
       } catch (e) { console.log(`Could not load series blockchain data: ${e}`); }
     }));
     return chainData;
