@@ -4,7 +4,6 @@ import { ethers }  from 'ethers';
 
 import YDai from '../contracts/YDai.json';
 import Chai from '../contracts/Chai.json';
-import UniLPOracle from '../contracts/UniLPOracle.json';
 import ChaiOracle from '../contracts/ChaiOracle.json';
 import WethOracle from '../contracts/WethOracle.json';
 import Vat from '../contracts/Vat.json';
@@ -18,7 +17,6 @@ ethers.errors.setLogLevel('error');
 const contractMap = new Map<string, any>([
   ['YDai', YDai.abi],
   ['Chai', Chai.abi],
-  ['UniLPOracle', UniLPOracle.abi],
   ['ChaiOracle', ChaiOracle.abi],
   ['WethOracle', WethOracle.abi],
   ['Vat', Vat.abi],

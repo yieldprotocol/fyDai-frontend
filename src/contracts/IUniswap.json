@@ -1,0 +1,482 @@
+{
+  "contractName": "IUniswap",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "getReserves",
+      "outputs": [
+        {
+          "internalType": "uint112",
+          "name": "",
+          "type": "uint112"
+        },
+        {
+          "internalType": "uint112",
+          "name": "",
+          "type": "uint112"
+        },
+        {
+          "internalType": "uint32",
+          "name": "",
+          "type": "uint32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "totalSupply",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.6.2+commit.bacdbe57\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"getReserves\",\"outputs\":[{\"internalType\":\"uint112\",\"name\":\"\",\"type\":\"uint112\"},{\"internalType\":\"uint112\",\"name\":\"\",\"type\":\"uint112\"},{\"internalType\":\"uint32\",\"name\":\"\",\"type\":\"uint32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"totalSupply\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"Interface to interact with the Uniswap V2 Pair contract Contract at: https://github.com/Uniswap/uniswap-v2-core/blob/master/contracts/UniswapV2Pair.sol\",\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/IUniswap.sol\":\"IUniswap\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/IUniswap.sol\":{\"keccak256\":\"0xd84dde060fd2db5a8b9634a5126d7bbfc2d21b9061be6923c646d4c39c1d74aa\",\"urls\":[\"bzz-raw://ed40e3275e9c3bfd6eaebe9f745cbd9d1c1521afcf5e4ff87dedeff53a0d7555\",\"dweb:/ipfs/Qma51YEq5vDMFBATDuri1vx8Wo5Aey2YnQHB3ND6yXe2t3\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "pragma solidity ^0.6.2;\n\n\n/// @dev Interface to interact with the Uniswap V2 Pair contract\n/// Contract at: https://github.com/Uniswap/uniswap-v2-core/blob/master/contracts/UniswapV2Pair.sol\ninterface IUniswap {\n    function getReserves() external view returns (uint112, uint112, uint32);\n    function totalSupply() external view returns (uint256);\n}",
+  "sourcePath": "/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/IUniswap.sol",
+  "ast": {
+    "absolutePath": "/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/IUniswap.sol",
+    "exportedSymbols": {
+      "IUniswap": [
+        3018
+      ]
+    },
+    "id": 3019,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 3003,
+        "literals": [
+          "solidity",
+          "^",
+          "0.6",
+          ".2"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:15"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": "@dev Interface to interact with the Uniswap V2 Pair contract\n Contract at: https://github.com/Uniswap/uniswap-v2-core/blob/master/contracts/UniswapV2Pair.sol",
+        "fullyImplemented": false,
+        "id": 3018,
+        "linearizedBaseContracts": [
+          3018
+        ],
+        "name": "IUniswap",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "0902f1ac",
+            "id": 3012,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getReserves",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 3004,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "236:2:15"
+            },
+            "returnParameters": {
+              "id": 3011,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3006,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 3012,
+                  "src": "262:7:15",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint112",
+                    "typeString": "uint112"
+                  },
+                  "typeName": {
+                    "id": 3005,
+                    "name": "uint112",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "262:7:15",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint112",
+                      "typeString": "uint112"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3008,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 3012,
+                  "src": "271:7:15",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint112",
+                    "typeString": "uint112"
+                  },
+                  "typeName": {
+                    "id": 3007,
+                    "name": "uint112",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "271:7:15",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint112",
+                      "typeString": "uint112"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3010,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 3012,
+                  "src": "280:6:15",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint32",
+                    "typeString": "uint32"
+                  },
+                  "typeName": {
+                    "id": 3009,
+                    "name": "uint32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "280:6:15",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint32",
+                      "typeString": "uint32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "261:26:15"
+            },
+            "scope": 3018,
+            "src": "216:72:15",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "18160ddd",
+            "id": 3017,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "totalSupply",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 3013,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "313:2:15"
+            },
+            "returnParameters": {
+              "id": 3016,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3015,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 3017,
+                  "src": "339:7:15",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3014,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "339:7:15",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "338:9:15"
+            },
+            "scope": 3018,
+            "src": "293:55:15",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 3019,
+        "src": "191:159:15"
+      }
+    ],
+    "src": "0:350:15"
+  },
+  "legacyAST": {
+    "absolutePath": "/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/IUniswap.sol",
+    "exportedSymbols": {
+      "IUniswap": [
+        3018
+      ]
+    },
+    "id": 3019,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 3003,
+        "literals": [
+          "solidity",
+          "^",
+          "0.6",
+          ".2"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:15"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": "@dev Interface to interact with the Uniswap V2 Pair contract\n Contract at: https://github.com/Uniswap/uniswap-v2-core/blob/master/contracts/UniswapV2Pair.sol",
+        "fullyImplemented": false,
+        "id": 3018,
+        "linearizedBaseContracts": [
+          3018
+        ],
+        "name": "IUniswap",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "0902f1ac",
+            "id": 3012,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getReserves",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 3004,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "236:2:15"
+            },
+            "returnParameters": {
+              "id": 3011,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3006,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 3012,
+                  "src": "262:7:15",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint112",
+                    "typeString": "uint112"
+                  },
+                  "typeName": {
+                    "id": 3005,
+                    "name": "uint112",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "262:7:15",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint112",
+                      "typeString": "uint112"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3008,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 3012,
+                  "src": "271:7:15",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint112",
+                    "typeString": "uint112"
+                  },
+                  "typeName": {
+                    "id": 3007,
+                    "name": "uint112",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "271:7:15",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint112",
+                      "typeString": "uint112"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3010,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 3012,
+                  "src": "280:6:15",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint32",
+                    "typeString": "uint32"
+                  },
+                  "typeName": {
+                    "id": 3009,
+                    "name": "uint32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "280:6:15",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint32",
+                      "typeString": "uint32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "261:26:15"
+            },
+            "scope": 3018,
+            "src": "216:72:15",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "18160ddd",
+            "id": 3017,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "totalSupply",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 3013,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "313:2:15"
+            },
+            "returnParameters": {
+              "id": 3016,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3015,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 3017,
+                  "src": "339:7:15",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3014,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "339:7:15",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "338:9:15"
+            },
+            "scope": 3018,
+            "src": "293:55:15",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 3019,
+        "src": "191:159:15"
+      }
+    ],
+    "src": "0:350:15"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.6.2+commit.bacdbe57.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.0.23",
+  "updatedAt": "2020-06-01T11:27:12.780Z",
+  "devdoc": {
+    "details": "Interface to interact with the Uniswap V2 Pair contract Contract at: https://github.com/Uniswap/uniswap-v2-core/blob/master/contracts/UniswapV2Pair.sol",
+    "methods": {}
+  },
+  "userdoc": {
+    "methods": {}
+  }
+}

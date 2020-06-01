@@ -96,7 +96,7 @@ const TestLayer = (props:any) => {
           <Button label='useNotify_info' onClick={()=>dispatch( { type: 'notify', payload: { message:'Something is happening!.. ', type:'info', showFor:500 } } )} />
           {/* <Button label='sendTx' onClick={()=> sendTx('0xcd16CA1398DA7b8f072eCF0028A3f4677B19fcd0', '1.2', 'no data')} /> */}
           <Button label='add TST balance' onClick={()=> sendTx(state.sysAddrList.Weth, 'Weth', 'mint', [account, '7598550064000000000'] )} />
-          <Button label='payTx' onClick={()=> payTx('0x78584D4D1961D050bc6084ab5941aeC1C9384b20', '0.01')} />
+          <Button label='payTx' onClick={()=> payTx('0xe4Be16e13267466B6241dEA1252bE231dfA8D86c', '0.01')} />
           {/* <Button label='check Maker vault' onClick={()=> makerVault()} /> */}
 
           <Button label='RANDOM FN BUTTON' onClick={()=>console.log('wahh')} />
