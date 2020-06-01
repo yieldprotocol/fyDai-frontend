@@ -3,27 +3,29 @@ import { useWeb3React } from '@web3-react/core';
 import { ethers }  from 'ethers';
 
 import YDai from '../contracts/YDai.json';
-import Chai from '../contracts/Chai.json';
-import ChaiOracle from '../contracts/ChaiOracle.json';
-import WethOracle from '../contracts/WethOracle.json';
+import Dealer from '../contracts/Dealer.json';
+
 import Vat from '../contracts/Vat.json';
 import Pot from '../contracts/Pot.json';
 import Treasury from '../contracts/Treasury.json';
-import IUniswap from '../contracts/IUniswap.json';
+
 import TestERC20 from '../contracts/TestERC20.json';
+
+import GemJoin from '../contracts/GemJoin.json';
+import DaiJoin from '../contracts/DaiJoin.json';
 
 ethers.errors.setLogLevel('error');
 
 const contractMap = new Map<string, any>([
   ['YDai', YDai.abi],
-  ['Chai', Chai.abi],
-  ['ChaiOracle', ChaiOracle.abi],
-  ['WethOracle', WethOracle.abi],
+  ['Dealer', Dealer.abi],
   ['Vat', Vat.abi],
   ['Pot', Pot.abi],
   ['Treasury', Treasury.abi],
-  ['IUniswap', IUniswap.abi],
   ['Weth', TestERC20.abi],
+  ['WethJoin', GemJoin.abi],
+  ['DaiJoin', DaiJoin.abi],
+  ['Chai', TestERC20.abi],
 ]);
 
 export function useGetBalance() {
@@ -58,17 +60,17 @@ export const useCallTx = () => {
 };
 
 export const useSendTx = () => {
-  const { library } = useWeb3React();
+  const { library, account } = useWeb3React();
   const [ sendTxActive, setSendTxActive ] = React.useState<boolean>();
-  const signer = library.getSigner();
+  const signer = library?.getSigner();
   const sendTx = async (contractAddr:string, contractName:string, fn:string, data:any[] ) => {
     setSendTxActive(true);
     const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), signer);
-    const tx = await contract[fn](...data);
-    console.log(tx.hash);
-    // await tx.wait();
-    // setSendTxActive(false);
-    // console.log('tx complete');
+    const tx = await contract[fn](...data); 
+    console.log(`${tx.hash} pending`);
+    await tx.wait();
+    setSendTxActive(false);
+    console.log(`${tx.hash} send tx complete`);
   };
   return [ sendTx, sendTxActive ] as const;
 };
@@ -76,7 +78,7 @@ export const useSendTx = () => {
 export const usePayTx = () => {
   const { library } = useWeb3React();
   const [ payTxActive, setPayTxActive ] = React.useState<boolean>();
-  const signer = library.getSigner();
+  const signer = library?.getSigner();
   const transaction = {
     nonce: 0,
     gasLimit: 21000,
@@ -101,18 +103,3 @@ export const usePayTx = () => {
   };
   return [ payTx, payTxActive ] as const;
 };
-
-// export const useNumberFns = () => {
-//   const RAD = ethers.utils.bigNumberify('49');
-//   const bnRAY  = ethers.utils.bigNumberify('1000000000000000000000000000');
-//   const fromRay = (bn:any) => {
-//     bn.div();
-//   };
-//   const toRay = () => {
-//   };
-//   return [fromRay, toRay];
-// };
-
-
-
-

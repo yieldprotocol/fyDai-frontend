@@ -1,4 +1,6 @@
 import React from 'react';
+
+import { ethers } from 'ethers';
 import { useWeb3React } from '@web3-react/core';
 import { Anchor, Layer, Header, Heading, Footer, Button, Box, Text } from 'grommet';
 
@@ -78,13 +80,24 @@ const TestLayer = (props:any) => {
 
           <Box direction='row' gap='small'>
             <Text size='xsmall'>ETH balance:</Text>
-            <Text>{ balance }</Text>
+            <Text size='xsmall'>{ balance }</Text>
           </Box>
           <Box direction='row' gap='small'>
             <Text size='xsmall'>WEI balance:</Text>
-            <Text>{ weiBalance }</Text>
+            <Text size='xsmall'>{ weiBalance }</Text>
           </Box>
-
+          <Box direction='row' gap='small'>
+            <Text size='xsmall'>Collateral WETH balance:</Text>
+            <Text size='xsmall'>x </Text>
+          </Box>
+          <Box direction='row' gap='small'>
+            <Text size='xsmall'>yDai balance:</Text>
+            <Text size='xsmall'>balance</Text>
+          </Box>
+          <Box direction='row' gap='small'>
+            <Text size='xsmall'>yDai debt:</Text>
+            <Text size='xsmall'>debt </Text>
+          </Box>
         </Box>
 
         <Box 
@@ -93,10 +106,23 @@ const TestLayer = (props:any) => {
           gap='small'
           overflow='auto'
         >
-          <Button label='useNotify_info' onClick={()=>dispatch( { type: 'notify', payload: { message:'Something is happening!.. ', type:'info', showFor:500 } } )} />
+          {/* <Button label='useNotify_info' onClick={()=>dispatch( { type: 'notify', payload: { message:'Something is happening!.. ', type:'info', showFor:500 } } )} /> */}
           {/* <Button label='sendTx' onClick={()=> sendTx('0xcd16CA1398DA7b8f072eCF0028A3f4677B19fcd0', '1.2', 'no data')} /> */}
-          <Button label='add TST balance' onClick={()=> sendTx(state.sysAddrList.Weth, 'Weth', 'mint', [account, '7598550064000000000'] )} />
-          <Button label='payTx' onClick={()=> payTx('0xe4Be16e13267466B6241dEA1252bE231dfA8D86c', '0.01')} />
+          <Button label='Add (weth)-DEV' onClick={()=> sendTx(state.sysAddrList.Weth, 'Weth', 'mint', [account, '10000000000000000000'] )} />
+          <Button label='Weth Approve WethJoin' onClick={()=> sendTx(state.sysAddrList.Weth, 'Weth', 'approve', [state.sysAddrList.WethJoin, '1500000000000000000'] )} />
+
+          <> oops.. hmm. console action reqd.  vat.rely( wethJoin Address) </>
+          <Button label='WethJoin Join' onClick={()=> sendTx(state.sysAddrList.WethJoin, 'WethJoin', 'join', [account, '1500000000000000000'] )} />
+          <Button label='Post Collateral' onClick={()=> sendTx(state.seriesData[0].Dealer, 'Dealer', 'post', [ ethers.utils.formatBytes32String('WETH'), account, '1500000000000000000'] )} />
+          <Button label='Withdraw' onClick={()=> sendTx(state.seriesData[0].Dealer, 'Dealer', 'withdraw', [ ethers.utils.formatBytes32String('WETH'), account, '1500000000000000000'] )} />
+
+          {/* <Button label='transfer Weth to treasury' onClick={()=> sendTx(state.sysAddrList.Weth, 'Weth', 'transfer', [state.sysAddrList.Treasury, '999999999999999'] )} /> */}
+          {/* <Button label='push treasury' onClick={()=> sendTx(state.sysAddrList.Treasury, 'Treasury', 'pushWeth', [] )} /> */}
+          {/* <Button label='Add 1 (chai)-DEV' onClick={()=> sendTx(state.sysAddrList.Chai, 'Chai', 'mint', [account, '1000000000000000000'] )} /> */}
+          {/* <Button label='Add 0.1 (weth)-testnet' onClick={()=> sendTx(state.sysAddrList.Weth, 'Weth', 'mint', [account, '10000000000000000'] )} /> */}
+          {/* <Button label='Add 0.1 (chai)-testnet' onClick={()=> sendTx(state.sysAddrList.Chai, 'Chai', 'mint', [account, '10000000000000000'] )} /> */}
+
+          {/* <Button label='payTx 10eth e4Be...' onClick={()=> payTx('0xe4Be16e13267466B6241dEA1252bE231dfA8D86c', '10')} /> */}
           {/* <Button label='check Maker vault' onClick={()=> makerVault()} /> */}
 
           <Button label='RANDOM FN BUTTON' onClick={()=>console.log('wahh')} />

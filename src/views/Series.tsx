@@ -32,8 +32,7 @@ const Series = (props:any) => {
   };
 
   React.useEffect(() => {
-    console.log(state);
-    !state.isLoading && setSeriesList(state.seriesData)
+    !state.isLoading && setSeriesList(state.seriesData);
   }, [ state.isLoading ]);
 
   // React.useEffect(() => {
@@ -50,8 +49,8 @@ const Series = (props:any) => {
       round
       ref={boxRef}
     >
-      <Box justify="between" gap='small' >
-        {state.isLoading && <Spinner/>}
+      <Box justify="between" gap='small'>
+        {state.isLoading && <Spinner />}
         {seriesList.map((x:any, i:number) => {
           return (
             <Box
@@ -66,7 +65,7 @@ const Series = (props:any) => {
                 highlighted={openIndex === i}
               />
               { openIndex === i &&
-                <Layer animation="fadeIn" >
+                <Layer animation="fadeIn">
                   <YieldSeries
                     series={x}
                     seriesAction={() => handleSelectSeries(i)}
@@ -76,9 +75,6 @@ const Series = (props:any) => {
             </Box>
           );
         })}
-        {/* <Box fill='horizontal' direction='row' justify='end' pad='medium'>
-          {!showMore ? <Anchor onClick={()=>setShowMore(true)} label='Show more...' /> : <Anchor onClick={()=>setShowMore(false)} label='Show less...' /> }
-        </Box> */}
       </Box>
     </Box>
   );
