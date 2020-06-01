@@ -1,6 +1,5 @@
 import React from 'react';
 import { useWeb3React } from '@web3-react/core';
-import { ethers }  from 'ethers'; 
 
 import Maker from '@makerdao/dai';
 import { McdPlugin } from '@makerdao/dai-plugin-mcd';
@@ -14,29 +13,6 @@ import trezorImage from '../assets/images/providers/trezor.png';
 import walletlinkImage from '../assets/images/providers/walletlink.png';
 import torusImage from '../assets/images/providers/torus.png';
 import noConnectionImage from '../assets/images/providers/noconnection.png';
-
-export async function useGetWeiBalance() {
-  const web3React = useWeb3React();
-  const { library, account } = web3React;
-  if (!!library && !!account) {
-    const bal = await library.getBalance(account);
-    return bal.toString();
-  }
-  return '-';
-}
-
-export const useRandomFn = ()=>{
-  const { library } = useWeb3React();
-  const signer = library && library.getSigner();
-
-  const randFn = async () => {
-    console.log(ethers);
-    console.log(await library.getNetwork());
-    // console.log(ethers.utils.getNetwork('').chainId); 
-    // signer && signer.sendTransaction(transaction);
-  };
-  return randFn;
-};
 
 // Eager connect is an attempt to 'auto connect' to injected connection eg. Metamask.
 export function useEagerConnect() {
@@ -60,7 +36,7 @@ export function useEagerConnect() {
       setTried(true);
     }
   }, [tried, active]);
-  return tried;
+  return [ tried ] as const;
 }
 
 export function useConnectorImage() {
@@ -114,32 +90,9 @@ export function getNetworkName(networkId: Number) {
   }
 }
 
-export const useSendTx = () => {
-  const { library } = useWeb3React();
-  const signer = library && library.getSigner(); 
-
-  const transaction = {
-    nonce: 0,
-    gasLimit: 21000,
-    gasPrice: ethers.utils.bigNumberify('20000000000'),
-    to: '0xcd16CA1398DA7b8f072eCF0028A3f4677B19fcd0',
-    // ... or supports ENS names
-    // to: "ricmoo.firefly.eth",
-    value: ethers.utils.parseEther('1.0'),
-    data: '0x',
-    // This ensures the transaction cannot be replayed on different networks
-    chainId: ethers.utils.getNetwork('homestead').chainId
-  };
-  const sendTx = () => {
-    signer && signer.sendTransaction(transaction);
-  };
-  return sendTx;
-};
-
 export const useMakerVault = () => {
   const { library, connector } = useWeb3React();
   const [maker, setMaker] = React.useState();
-
   const web3Provider = library && new ProviderBridge(library.provider, library.getSigner());
   // React.useEffect(()=>{
   //   ( async () => {
@@ -150,8 +103,7 @@ export const useMakerVault = () => {
   //   }
   //   )();
   // }, []);
-
-  const makerVault = async () => {
+  const connectMakerVault = async () => {
     // console.log( await connector?.getProvider() );
     // const newMaker = connector &&  await Maker.create('http', { web3 : { inject : await connector.getProvider()}, autoAuthenticate:false } );
     // const newMaker = web3Provider &&  await Maker.create('http', {} );
@@ -164,6 +116,6 @@ export const useMakerVault = () => {
     }
   };
 
-  return makerVault;
+  return [ connectMakerVault ] as const;
 
 };

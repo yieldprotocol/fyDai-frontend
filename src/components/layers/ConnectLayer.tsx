@@ -1,9 +1,6 @@
 import React from 'react';
 import { useWeb3React } from '@web3-react/core';
 import { Anchor, Grommet, grommet, Grid, Layer, Main, Image, Header, Heading, Footer, Button, Box, Avatar, Text, CheckBox, ThemeContext, Paragraph } from 'grommet';
-import { 
-  FaTimes as Close,
-} from 'react-icons/fa';
 
 import { injected, trezor, walletlink, torus, ledger } from '../../connectors';
 // import { useGetWeiBalance, useEagerConnect, useConnectorImage, getNetworkName }  from './hooks/connectionFns';
