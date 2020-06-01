@@ -1,0 +1,418 @@
+{
+  "contractName": "Constants",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "RAD",
+      "outputs": [
+        {
+          "internalType": "uint8",
+          "name": "",
+          "type": "uint8"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "RAY",
+      "outputs": [
+        {
+          "internalType": "uint8",
+          "name": "",
+          "type": "uint8"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "WAD",
+      "outputs": [
+        {
+          "internalType": "uint8",
+          "name": "",
+          "type": "uint8"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.6.2+commit.bacdbe57\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"RAD\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"RAY\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"WAD\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/Constants.sol\":\"Constants\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/Constants.sol\":{\"keccak256\":\"0x7b1b545425f196ddfec6cfd7860f51677ddb0994b3cc8aeb334297d1ea98501b\",\"urls\":[\"bzz-raw://9ac9e0bb8327110b59bf62f0c6bf7733d1efac877860892f628417a728221119\",\"dweb:/ipfs/QmTN6nuAM3X2WgETLHsGP2UHHcwPqqgSKZGGDYdE61AyTj\"]}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b5060ec8061001f6000396000f3fe6080604052348015600f57600080fd5b5060043610603c5760003560e01c806306f405fd146041578063552033c41460635780636a146024146085575b600080fd5b604760a7565b604051808260ff1660ff16815260200191505060405180910390f35b606960ac565b604051808260ff1660ff16815260200191505060405180910390f35b608b60b1565b604051808260ff1660ff16815260200191505060405180910390f35b602d81565b601b81565b60128156fea2646970667358221220ec02d029ed2dec50d44edf4126fc8389aac9f95e0a28542f212672cd2fd84e6f64736f6c63430006020033",
+  "deployedBytecode": "0x6080604052348015600f57600080fd5b5060043610603c5760003560e01c806306f405fd146041578063552033c41460635780636a146024146085575b600080fd5b604760a7565b604051808260ff1660ff16815260200191505060405180910390f35b606960ac565b604051808260ff1660ff16815260200191505060405180910390f35b608b60b1565b604051808260ff1660ff16815260200191505060405180910390f35b602d81565b601b81565b60128156fea2646970667358221220ec02d029ed2dec50d44edf4126fc8389aac9f95e0a28542f212672cd2fd84e6f64736f6c63430006020033",
+  "sourceMap": "26:177:1:-:0;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;26:177:1;;;;;;;",
+  "deployedSourceMap": "26:177:1:-:0;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;26:177:1;;;;;;;;;;;;;;;;;;;;;;;;;;;;;170:30;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;134;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;98;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;170;198:2;170:30;:::o;134:::-;162:2;134:30;:::o;98:::-;126:2;98:30;:::o",
+  "source": "pragma solidity ^0.6.2;\n\n\ncontract Constants {\n    // Fixed point256 precisions from MakerDao\n    uint8 constant public WAD = 18;\n    uint8 constant public RAY = 27;\n    uint8 constant public RAD = 45;\n}",
+  "sourcePath": "/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/Constants.sol",
+  "ast": {
+    "absolutePath": "/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/Constants.sol",
+    "exportedSymbols": {
+      "Constants": [
+        73
+      ]
+    },
+    "id": 74,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 63,
+        "literals": [
+          "solidity",
+          "^",
+          "0.6",
+          ".2"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:1"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 73,
+        "linearizedBaseContracts": [
+          73
+        ],
+        "name": "Constants",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "constant": true,
+            "functionSelector": "6a146024",
+            "id": 66,
+            "name": "WAD",
+            "nodeType": "VariableDeclaration",
+            "overrides": null,
+            "scope": 73,
+            "src": "98:30:1",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint8",
+              "typeString": "uint8"
+            },
+            "typeName": {
+              "id": 64,
+              "name": "uint8",
+              "nodeType": "ElementaryTypeName",
+              "src": "98:5:1",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint8",
+                "typeString": "uint8"
+              }
+            },
+            "value": {
+              "argumentTypes": null,
+              "hexValue": "3138",
+              "id": 65,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "number",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "126:2:1",
+              "subdenomination": null,
+              "typeDescriptions": {
+                "typeIdentifier": "t_rational_18_by_1",
+                "typeString": "int_const 18"
+              },
+              "value": "18"
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": true,
+            "functionSelector": "552033c4",
+            "id": 69,
+            "name": "RAY",
+            "nodeType": "VariableDeclaration",
+            "overrides": null,
+            "scope": 73,
+            "src": "134:30:1",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint8",
+              "typeString": "uint8"
+            },
+            "typeName": {
+              "id": 67,
+              "name": "uint8",
+              "nodeType": "ElementaryTypeName",
+              "src": "134:5:1",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint8",
+                "typeString": "uint8"
+              }
+            },
+            "value": {
+              "argumentTypes": null,
+              "hexValue": "3237",
+              "id": 68,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "number",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "162:2:1",
+              "subdenomination": null,
+              "typeDescriptions": {
+                "typeIdentifier": "t_rational_27_by_1",
+                "typeString": "int_const 27"
+              },
+              "value": "27"
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": true,
+            "functionSelector": "06f405fd",
+            "id": 72,
+            "name": "RAD",
+            "nodeType": "VariableDeclaration",
+            "overrides": null,
+            "scope": 73,
+            "src": "170:30:1",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint8",
+              "typeString": "uint8"
+            },
+            "typeName": {
+              "id": 70,
+              "name": "uint8",
+              "nodeType": "ElementaryTypeName",
+              "src": "170:5:1",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint8",
+                "typeString": "uint8"
+              }
+            },
+            "value": {
+              "argumentTypes": null,
+              "hexValue": "3435",
+              "id": 71,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "number",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "198:2:1",
+              "subdenomination": null,
+              "typeDescriptions": {
+                "typeIdentifier": "t_rational_45_by_1",
+                "typeString": "int_const 45"
+              },
+              "value": "45"
+            },
+            "visibility": "public"
+          }
+        ],
+        "scope": 74,
+        "src": "26:177:1"
+      }
+    ],
+    "src": "0:203:1"
+  },
+  "legacyAST": {
+    "absolutePath": "/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/Constants.sol",
+    "exportedSymbols": {
+      "Constants": [
+        73
+      ]
+    },
+    "id": 74,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 63,
+        "literals": [
+          "solidity",
+          "^",
+          "0.6",
+          ".2"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:1"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 73,
+        "linearizedBaseContracts": [
+          73
+        ],
+        "name": "Constants",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "constant": true,
+            "functionSelector": "6a146024",
+            "id": 66,
+            "name": "WAD",
+            "nodeType": "VariableDeclaration",
+            "overrides": null,
+            "scope": 73,
+            "src": "98:30:1",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint8",
+              "typeString": "uint8"
+            },
+            "typeName": {
+              "id": 64,
+              "name": "uint8",
+              "nodeType": "ElementaryTypeName",
+              "src": "98:5:1",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint8",
+                "typeString": "uint8"
+              }
+            },
+            "value": {
+              "argumentTypes": null,
+              "hexValue": "3138",
+              "id": 65,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "number",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "126:2:1",
+              "subdenomination": null,
+              "typeDescriptions": {
+                "typeIdentifier": "t_rational_18_by_1",
+                "typeString": "int_const 18"
+              },
+              "value": "18"
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": true,
+            "functionSelector": "552033c4",
+            "id": 69,
+            "name": "RAY",
+            "nodeType": "VariableDeclaration",
+            "overrides": null,
+            "scope": 73,
+            "src": "134:30:1",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint8",
+              "typeString": "uint8"
+            },
+            "typeName": {
+              "id": 67,
+              "name": "uint8",
+              "nodeType": "ElementaryTypeName",
+              "src": "134:5:1",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint8",
+                "typeString": "uint8"
+              }
+            },
+            "value": {
+              "argumentTypes": null,
+              "hexValue": "3237",
+              "id": 68,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "number",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "162:2:1",
+              "subdenomination": null,
+              "typeDescriptions": {
+                "typeIdentifier": "t_rational_27_by_1",
+                "typeString": "int_const 27"
+              },
+              "value": "27"
+            },
+            "visibility": "public"
+          },
+          {
+            "constant": true,
+            "functionSelector": "06f405fd",
+            "id": 72,
+            "name": "RAD",
+            "nodeType": "VariableDeclaration",
+            "overrides": null,
+            "scope": 73,
+            "src": "170:30:1",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint8",
+              "typeString": "uint8"
+            },
+            "typeName": {
+              "id": 70,
+              "name": "uint8",
+              "nodeType": "ElementaryTypeName",
+              "src": "170:5:1",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint8",
+                "typeString": "uint8"
+              }
+            },
+            "value": {
+              "argumentTypes": null,
+              "hexValue": "3435",
+              "id": 71,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "number",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "198:2:1",
+              "subdenomination": null,
+              "typeDescriptions": {
+                "typeIdentifier": "t_rational_45_by_1",
+                "typeString": "int_const 45"
+              },
+              "value": "45"
+            },
+            "visibility": "public"
+          }
+        ],
+        "scope": 74,
+        "src": "26:177:1"
+      }
+    ],
+    "src": "0:203:1"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.6.2+commit.bacdbe57.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.0.23",
+  "updatedAt": "2020-06-01T11:27:12.672Z",
+  "devdoc": {
+    "methods": {}
+  },
+  "userdoc": {
+    "methods": {}
+  }
+}
