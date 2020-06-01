@@ -2,7 +2,9 @@ import React from 'react';
 import { useWeb3React } from '@web3-react/core';
 import { Anchor, Layer, Header, Footer, Button, Box, Text } from 'grommet';
 
-import { useGetWeiBalance, getNetworkName }  from '../../hooks/connectionFns';
+import { getNetworkName }  from '../../hooks/connectionFns';
+
+import { useGetBalance }  from '../../hooks/txHooks';
 
 import ProfileButton from '../ProfileButton';
 
@@ -10,15 +12,10 @@ const AccountLayer = (props:any) => {
   const [balance, setBalance] = React.useState();
   const { chainId } = useWeb3React();
   const { closeLayer, changeWallet } = props;
-
-  const getWeiBalance = useGetWeiBalance();
-
-  const updateBalance = async () => {
-    setBalance(await getWeiBalance);
-  };
+  const [ getBalance ] = useGetBalance();
 
   React.useEffect(() => {
-    updateBalance();
+    ( async () => setBalance( await getBalance()) )();
     // (async () => activate(injected, console.log))();
   }, []);
 
@@ -62,7 +59,7 @@ const AccountLayer = (props:any) => {
           <Text size='xsmall'>Connected to:</Text> 
           <Text weight="bold">{chainId && getNetworkName(chainId) }</Text>
           <Box direction='row' gap='small'>
-            <Text size='xsmall'>WEI balance:</Text>
+            <Text size='xsmall'>ETH balance:</Text>
             <Text>{ balance }</Text>
           </Box>
           {/* <Button fill='horizontal' label='Connect to another wallet' onClick={()=>setShowConnectLayer(true)} /> */}
