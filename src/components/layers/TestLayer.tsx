@@ -98,6 +98,11 @@ const TestLayer = (props:any) => {
             <Text size='xsmall'>yDai debt:</Text>
             <Text size='xsmall'>debt </Text>
           </Box>
+          <Box direction='row' gap='small'>
+            <Text size='xsmall'>WEI balance:</Text>
+            <Text>{ weiBalance }</Text>
+          </Box>
+
         </Box>
 
         <Box 
