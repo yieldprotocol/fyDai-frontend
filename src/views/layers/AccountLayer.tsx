@@ -6,7 +6,7 @@ import { getNetworkName }  from '../../hooks/connectionHooks';
 
 import { useGetBalance }  from '../../hooks/yieldHooks';
 
-import ProfileButton from '../ProfileButton';
+import ProfileButton from '../../components/ProfileButton';
 
 const AccountLayer = (props:any) => {
   const [ balance, setBalance ] = React.useState<string|null>('-');

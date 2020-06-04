@@ -7,7 +7,6 @@ import { NotifyContext } from '../contexts/NotifyContext';
 import YDai from '../contracts/YDai.json';
 import Dealer from '../contracts/Dealer.json';
 import Mint from '../contracts/Mint.json';
-
 import TestERC20 from '../contracts/TestERC20.json';
 
 // import Vat from '../contracts/Vat.json';
@@ -77,7 +76,6 @@ export const useDealer = () => {
   const { abi: dealerAbi } = Dealer;
   const { library, account } = useWeb3React();
   const  { dispatch: notifyDispatch }  = React.useContext<any>(NotifyContext);
-
   const [ postActive, setPostActive ] = React.useState<boolean>(false);
   const [ withdrawActive, setWithdrawActive ] = React.useState<boolean>(false);
   const [ borrowActive, setBorrowActive ] = React.useState<boolean>(false);
@@ -104,6 +102,7 @@ export const useDealer = () => {
       tx = await contract.post(collateralBytes, fromAddr, parsedAmount);
     } catch (e) {
       notifyDispatch({ type: 'notify', payload:{ message:`${e.data.message}`, type:'error' } } );
+      setPostActive(false);
       return;
     }
 
@@ -130,6 +129,7 @@ export const useDealer = () => {
       tx = await contract.withdraw(collateralBytes, toAddr, parsedAmount);
     } catch (e) {
       notifyDispatch({ type: 'notify', payload:{ message:`${e.data.message}`, type:'error' } } );
+      setWithdrawActive(false);
       return;
     }
     notifyDispatch({ type: 'notify', payload:{ message: `Withdraw of ${amount} ${collateral} pending...`, type:'info' } } );
@@ -154,6 +154,7 @@ export const useDealer = () => {
       tx = await contract.borrow(collateralBytes, toAddr, parsedYDai);
     } catch (e) {
       notifyDispatch({ type: 'notify', payload:{ message:`${e.data.message}`, type:'error' } } );
+      setBorrowActive(false);
       return;
     }
     notifyDispatch({ type: 'notify', payload:{ message: `Borrowing of ${yDai} from ${collateral} pending...`, type:'info' } } );
@@ -178,6 +179,7 @@ export const useDealer = () => {
       tx = await contract.repayDai(collateralBytes, fromAddr, parsedDai);
     } catch (e) {
       notifyDispatch({ type: 'notify', payload:{ message:`${e.data.message}`, type:'error' } } );
+      setRepayDaiActive(false);
       return;
     }
     notifyDispatch({ type: 'notify', payload:{ message: `Repayment of ${dai} Dai with ${collateral} pending...`, type:'info' } } );
@@ -202,6 +204,7 @@ export const useDealer = () => {
       tx = await contract.repayYDai(collateralBytes, fromAddr, parsedYDai);
     } catch (e) {
       notifyDispatch({ type: 'notify', payload:{ message:`${e.data.message}`, type:'error' } } );
+      setRepayYDaiActive(false);
       return;
     }
     notifyDispatch({ type: 'notify', payload:{ message: `Repayment of ${yDai} yDai with ${collateral} pending...`, type:'info' } } );
@@ -226,6 +229,7 @@ export const useDealer = () => {
       tx = await contract.approve(ethers.utils.getAddress(dealerAddr), parsedAmount);
     } catch (e) {
       notifyDispatch({ type: 'notify', payload:{ message:`${e.data.message}`, type:'error' } } );
+      setApproveDealerActive(false);
       return;
     }
     notifyDispatch({ type: 'notify', payload:{ message: `Token approval of ${amount} pending...`, type:'info' } } );
@@ -271,6 +275,7 @@ export const useMint = () => {
       tx = await contract.mint(userAddr, parsedDai);
     } catch (e) {
       notifyDispatch({ type: 'notify', payload:{ message:`${e.data.message}`, type:'error' } } );
+      setMintActive(false);
       return;
     }
 
@@ -297,6 +302,7 @@ export const useMint = () => {
       tx = await contract.redeem(userAddr, parsedYDai);
     } catch (e) {
       notifyDispatch({ type: 'notify', payload:{ message:`${e.data.message}`, type:'error' } } );
+      setRedeemActive(false);
       return;
     }
     notifyDispatch({ type: 'notify', payload:{ message: `Redeeming ${yDai} yDai. Tx pending...`, type:'info' } } );
