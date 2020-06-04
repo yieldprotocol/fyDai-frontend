@@ -52,6 +52,33 @@ function NotifyLayer() {
           <Button icon={<Close />} onClick={()=>dispatch({ type:'closeNotify' })} plain />
         </Box>
       </Layer>}
+
+      {state.fatalOpen && 
+      <Layer
+        position='center'
+        modal={true}
+        margin={{ vertical: 'large', horizontal: 'large' }}
+        onEsc={()=>dispatch({ type:'closeNotify' })}
+        // responsive={true}
+        // plain
+      >
+        <Box
+          fill
+          align="center"
+          direction="row"
+          gap="large"
+          round="medium"
+          elevation="medium"
+          pad={{ vertical: 'large', horizontal: 'large' }}
+          background='pink'
+        >
+          { notificationTypeMap(state.type).icon }
+          <Box align="center" direction="row" gap="xsmall">
+            <Text>{ state.fatalMsg }</Text>
+          </Box>
+        </Box>
+      </Layer>}
+
     </>
   );
 }

@@ -8,6 +8,8 @@ import { IYieldSeries } from '../types';
 
 import { useCallTx } from '../hooks/yieldHooks';
 
+import { NotifyContext } from './NotifyContext';
+
 const SeriesContext = React.createContext<any>({});
 
 firebase.initializeApp({
@@ -21,6 +23,9 @@ const SeriesProvider = ({ children }:any) => {
   const initState = { isLoading: true, seriesData : [], deployedCore: {} };
   const [ state, dispatch ] = React.useReducer(seriesReducer, initState);
   const { chainId } = useWeb3React();
+
+  const { dispatch: notifyDispatch } = React.useContext(NotifyContext);
+
   const [ callTx ] = useCallTx();
 
   // reducer
@@ -58,6 +63,9 @@ const SeriesProvider = ({ children }:any) => {
       await firebase.firestore().collection(networkId.toString())
         .get()
         .then( (querySnapshot:any) => {
+          if ( !querySnapshot.docs.includes('deployedCore')) { 
+            throw new Error('Core not deployed');
+          }
           querySnapshot.forEach((doc:any) => {
             if ( doc.id === 'deployedCore') {
               deployedCore = doc.data();
@@ -67,7 +75,8 @@ const SeriesProvider = ({ children }:any) => {
           });
         });
     } catch (e) {
-      console.log(`Could not load Yield Addresses: ${e}`);
+      notifyDispatch({ type: 'fatal', payload:{ message: `${e}` } } );
+      // console.log(`Error loading Yield contract addresses: ${e}`);
     }
     return [ seriesAddrs, deployedCore];
   };
@@ -81,7 +90,9 @@ const SeriesProvider = ({ children }:any) => {
       try {
         chainData[i].rate = await callTx(x.YDai, 'YDai', 'rate', []);
         // chainData[i].currentValue = (await callTx( deployedCore.Vat, 'Vat', 'ilks', [ethers.utils.formatBytes32String('weth')] )).spot;
-      } catch (e) { console.log(`Could not load series blockchain data: ${e}`); }
+      } catch (e) { 
+        console.log(`Could not load series blockchain data: ${e}`);
+      }
     }));
     return chainData;
   };
@@ -91,8 +102,8 @@ const SeriesProvider = ({ children }:any) => {
     const processedData:any[] = [];
     chainData.forEach(async (x:any, i:any) =>{
       processedData.push(x);
-      processedData[i].rate = x.rate.div(Constants.BN_RAY).toNumber();
-      processedData[i].maturity = new Date( (x.maturity as number) * 1000 );
+      processedData[i].rate = x.rate?.div(Constants.BN_RAY).toNumber();
+      processedData[i].maturity = new Date( (x?.maturity as number) * 1000 );
     });
     return processedData;
   };
