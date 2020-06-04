@@ -17,7 +17,7 @@ import { FaSeedling as YieldLeaf } from 'react-icons/fa';
 
 import { yieldTheme } from './themes';
 
-import { useEagerConnect }  from './hooks/connectionFns';
+import { useEagerConnect }  from './hooks/connectionHooks';
 
 import Series from './views/Series';
 import Positions from './views/Positions';

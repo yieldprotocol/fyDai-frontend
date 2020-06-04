@@ -5,7 +5,7 @@ import { ethers } from 'ethers';
 import { useWeb3React } from '@web3-react/core';
 import { Anchor, Layer, Header, Heading, Footer, Button, Box, Text } from 'grommet';
 
-import { getNetworkName, useMakerVault }  from '../../hooks/connectionFns';
+import { getNetworkName, useMakerVault }  from '../../hooks/connectionHooks';
 import ProfileButton from '../ProfileButton';
 import { NotifyContext } from '../../contexts/NotifyContext';
 
@@ -22,17 +22,13 @@ const TestLayer = (props:any) => {
   const [ balance, setBalance ] = React.useState<string|null>('-');
   const [ weiBalance, setWeiBalance ] = React.useState<string|null>('-');
   const [ wethBalance, setWethBalance ] = React.useState<string|null>('-');
-
   const { closeLayer, changeWallet } = props;
   const [ connectMakerVault ] = useMakerVault();
   const { dispatch } = React.useContext<any>(NotifyContext);
 
   const [ sendTx ]  = useSendTx();
-
   const [ callTx ]  = useCallTx();
-
   const { post, approveDealer, withdraw, borrow, postActive, withdrawActive }  = useDealer();
-  
   const [ getBalance, getWeiBalance, getWethBalance ]  = useGetBalance();
 
   React.useEffect(()=>{
