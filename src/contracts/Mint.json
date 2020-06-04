@@ -3584,12 +3584,12 @@
     "1337": {
       "events": {},
       "links": {},
-      "address": "0x68a49B1DAA1e31269d279cb43d46661fa4a14d6A",
-      "transactionHash": "0xf6b7adb3633c92c83e3cf9ff024f72bd32dcbf4a02de9535305b63a06aaa7f4f"
+      "address": "0x323b5d5E2f31E3Cc723De7a61A59Be0030832FBE",
+      "transactionHash": "0x3df46da3f33a65aa1e6c49779cfdd4033b1edb82cd4b36a0c6a4f40b840786f0"
     }
   },
   "schemaVersion": "3.0.23",
-  "updatedAt": "2020-06-01T11:27:33.023Z",
+  "updatedAt": "2020-06-03T11:23:32.196Z",
   "networkType": "ethereum",
   "devdoc": {
     "details": "Mint manages a Dai/yDai pair. Note that Dai is underlying, not collateral, and therefore the functions are minting and redeeming, instead of borrowing and repaying.",

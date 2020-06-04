@@ -15643,12 +15643,12 @@
         }
       },
       "links": {},
-      "address": "0x7C4532b7020Fb5650d8Ab549dC2f4F16315429B6",
-      "transactionHash": "0x5c607b02ac50589999b13c18258dfb5612a653afcc23951c070ad03d0f4653b2"
+      "address": "0x78C44a9aA7B0B2FB217d4EAeaddc720A9289Db6E",
+      "transactionHash": "0x193564b071cf6d93f6e2bf40d9d2a51b9255ecb13a0d5d99071d7ae8f6722d49"
     }
   },
   "schemaVersion": "3.0.23",
-  "updatedAt": "2020-06-01T11:27:33.042Z",
+  "updatedAt": "2020-06-03T11:23:32.211Z",
   "networkType": "ethereum",
   "devdoc": {
     "details": "A dealer takes collateral and issues yDai. There is one Dealer per series.",

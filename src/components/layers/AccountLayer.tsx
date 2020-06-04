@@ -4,7 +4,7 @@ import { Anchor, Layer, Header, Footer, Button, Box, Text } from 'grommet';
 
 import { getNetworkName }  from '../../hooks/connectionFns';
 
-import { useGetBalance }  from '../../hooks/txHooks';
+import { useGetBalance }  from '../../hooks/yieldHooks';
 
 import ProfileButton from '../ProfileButton';
 
