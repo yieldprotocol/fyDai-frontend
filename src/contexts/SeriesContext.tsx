@@ -6,7 +6,7 @@ import { useWeb3React } from '@web3-react/core';
 import * as Constants from '../constants';
 import { IYieldSeries } from '../types';
 
-import { useCallTx } from '../hooks/txHooks';
+import { useCallTx } from '../hooks/yieldHooks';
 
 const SeriesContext = React.createContext<any>({});
 
@@ -18,7 +18,7 @@ firebase.initializeApp({
 
 const SeriesProvider = ({ children }:any) => {
 
-  const initState = { isLoading: true, seriesData : [], sysAddrList: {} };
+  const initState = { isLoading: true, seriesData : [], deployedCore: {} };
   const [ state, dispatch ] = React.useReducer(seriesReducer, initState);
   const { chainId } = useWeb3React();
   const [ callTx ] = useCallTx();
@@ -31,10 +31,10 @@ const SeriesProvider = ({ children }:any) => {
           ...redState,
           seriesData: action.payload,
         };
-      case 'updateSysAddrList':
+      case 'updatedeployedCore':
         return {
           ...redState,
-          sysAddrList: action.payload,
+          deployedCore: action.payload,
         };
       case 'updateRates':
         return {
@@ -53,14 +53,14 @@ const SeriesProvider = ({ children }:any) => {
   // async get all yield addresses from db in a single call
   const getYieldAddrs = async (networkId:number|string): Promise<any[]> => {
     const seriesAddrs:any[] = [];
-    let sysAddrList = {};
+    let deployedCore = {};
     try {
       await firebase.firestore().collection(networkId.toString())
         .get()
         .then( (querySnapshot:any) => {
           querySnapshot.forEach((doc:any) => {
-            if ( doc.id === 'sysAddrList') {
-              sysAddrList = doc.data();
+            if ( doc.id === 'deployedCore') {
+              deployedCore = doc.data();
             } else {
               seriesAddrs.push(doc.data());
             }
@@ -69,18 +69,18 @@ const SeriesProvider = ({ children }:any) => {
     } catch (e) {
       console.log(`Could not load Yield Addresses: ${e}`);
     }
-    return [ seriesAddrs, sysAddrList];
+    return [ seriesAddrs, deployedCore];
   };
 
   // async add blockchain data
-  const getChainData = async (seriesAddrs:IYieldSeries[], sysAddrList:any): Promise<IYieldSeries[]> => {
+  const getChainData = async (seriesAddrs:IYieldSeries[], deployedCore:any): Promise<IYieldSeries[]> => {
     const chainData:any[] = [];
-    console.log(sysAddrList);
+    console.log(deployedCore);
     await Promise.all(seriesAddrs.map( async (x:any, i:number)=> {
       chainData.push(x);
       try {
         chainData[i].rate = await callTx(x.YDai, 'YDai', 'rate', []);
-        // chainData[i].currentValue = (await callTx( sysAddrList.Vat, 'Vat', 'ilks', [ethers.utils.formatBytes32String('weth')] )).spot;
+        // chainData[i].currentValue = (await callTx( deployedCore.Vat, 'Vat', 'ilks', [ethers.utils.formatBytes32String('weth')] )).spot;
       } catch (e) { console.log(`Could not load series blockchain data: ${e}`); }
     }));
     return chainData;
@@ -100,12 +100,12 @@ const SeriesProvider = ({ children }:any) => {
   const getAllData = async (networkId:number|string) => {
     dispatch({ type:'isLoading', payload: true });
     // fetch yield addresses from db
-    const [ addrData, sysAddrList] = await getYieldAddrs(networkId);
+    const [ addrData, deployedCore] = await getYieldAddrs(networkId);
     // fetch chain data
-    const chainData:any = await getChainData(addrData, sysAddrList);
+    const chainData:any = await getChainData(addrData, deployedCore);
     // process chain data (number formats, dates etc.)
     const processedData:any = processSeriesData(chainData);
-    dispatch({ type:'updateSysAddrList', payload: sysAddrList });
+    dispatch({ type:'updatedeployedCore', payload: deployedCore });
     dispatch({ type:'updateSeries', payload: processedData });
     dispatch({ type:'isLoading', payload: false });
   };

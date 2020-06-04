@@ -8007,12 +8007,12 @@
         }
       },
       "links": {},
-      "address": "0xdCF90f5049c15448c7fE68926e97b075B83708e0",
-      "transactionHash": "0x237c46f1dba524fb350bb414da92363c19fadc1277e4423084ef3bef0aa4897d"
+      "address": "0x68a49B1DAA1e31269d279cb43d46661fa4a14d6A",
+      "transactionHash": "0x046121a2f2912f9a800571201338a9310b159b187488f5fc798e497fd1d9e228"
     }
   },
   "schemaVersion": "3.0.23",
-  "updatedAt": "2020-06-01T11:27:33.016Z",
+  "updatedAt": "2020-06-03T11:23:32.189Z",
   "networkType": "ethereum",
   "devdoc": {
     "details": "yDai is a yToken targeting Dai",

@@ -20471,12 +20471,12 @@
         }
       },
       "links": {},
-      "address": "0x7e16923382B2B3241CE264D9043B5a34c4F2AE24",
-      "transactionHash": "0x2ff6ed7401244cbab731815a6e9e1d40971a09737d25352c7194aa4c6aeb2f77"
+      "address": "0x7CA0FC482CFa3Fe9adA20e012789e2F9B9942503",
+      "transactionHash": "0xa78373f55d833c084be2935c473cd862487254cd3b0f51b5a9c8780e56a38f1a"
     }
   },
   "schemaVersion": "3.0.23",
-  "updatedAt": "2020-06-01T11:27:32.992Z",
+  "updatedAt": "2020-06-03T11:23:32.163Z",
   "networkType": "ethereum",
   "devdoc": {
     "details": "Treasury manages the Dai, interacting with MakerDAO's vat and chai when needed.",
