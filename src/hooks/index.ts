@@ -2,9 +2,9 @@ import {
   useEagerConnect,
   useConnectorImage,
   getNetworkName,
-} from './connectionFns';
+} from './connectionHooks';
 
-// CURRENTLY DISCONNECTED - using indivudal hook group files!
+// NB: CURRENTLY DISCONNECTED - using indivudal hook group files!
 
 // TODO: use this eventually as the hook repository. 
 export const useConnectionFns = () => {

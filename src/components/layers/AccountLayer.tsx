@@ -2,14 +2,14 @@ import React from 'react';
 import { useWeb3React } from '@web3-react/core';
 import { Anchor, Layer, Header, Footer, Button, Box, Text } from 'grommet';
 
-import { getNetworkName }  from '../../hooks/connectionFns';
+import { getNetworkName }  from '../../hooks/connectionHooks';
 
 import { useGetBalance }  from '../../hooks/yieldHooks';
 
 import ProfileButton from '../ProfileButton';
 
 const AccountLayer = (props:any) => {
-  const [balance, setBalance] = React.useState();
+  const [ balance, setBalance ] = React.useState<string|null>('-');
   const { chainId } = useWeb3React();
   const { closeLayer, changeWallet } = props;
   const [ getBalance ] = useGetBalance();
