@@ -66,7 +66,7 @@ const Positions = () => {
 
       <Box>
         <Box 
-          fill='horizontal' 
+          fill='horizontal'
           justify='between'
           direction='row'
           pad={{ horizontal:'small' }}
@@ -97,8 +97,8 @@ const Positions = () => {
       </Box>
 
       <Box>
-        <Box 
-          fill='horizontal' 
+        <Box
+          fill='horizontal'
           justify='between'
           direction='row'
           pad={{ horizontal:'small' }}

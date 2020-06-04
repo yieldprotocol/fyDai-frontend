@@ -1,5 +1,4 @@
 import {
-  useGetWeiBalance,
   useEagerConnect,
   useConnectorImage,
   getNetworkName,
@@ -10,7 +9,6 @@ import {
 // TODO: use this eventually as the hook repository. 
 export const useConnectionFns = () => {
   return {
-    useGetWeiBalance,
     useEagerConnect,
     useConnectorImage,
     getNetworkName,

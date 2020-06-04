@@ -16,14 +16,9 @@ import { deepMerge } from 'grommet/utils';
 import { FaSeedling as YieldLeaf } from 'react-icons/fa';
 
 import { yieldTheme } from './themes';
-import bckgrnd from './assets/images/background.png';
 
+import { useEagerConnect }  from './hooks/connectionFns';
 
-
-import { useGetWeiBalance, useEagerConnect }  from './hooks/connectionFns';
-
-import Borrow from './views/x_Borrow_depreciated';
-import Lend from './views/x_Lend_depreciated';
 import Series from './views/Series';
 import Positions from './views/Positions';
 
@@ -41,10 +36,8 @@ import { PositionsContext } from './contexts/PositionsContext';
 
 function App() {
   const { active, library, chainId, account } = useWeb3React();
-  const [ balance, setBalance ] = React.useState();
   const [darkmode, setDarkmode] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
-
   const [indexTab, setIndexTab] = React.useState<number>(0);
 
   const { state: posState } = React.useContext(PositionsContext);
@@ -54,7 +47,6 @@ function App() {
   const [showAccountLayer, setShowAccountLayer] = React.useState<boolean>(false);
   const [showTestLayer, setShowTestLayer] = React.useState<boolean>(false);
 
-  const getWeiBalance = useGetWeiBalance();
   const eagerConnect = useEagerConnect();
   // const makerVault = useMakerVault();
 
@@ -63,17 +55,12 @@ function App() {
   const manageConnection = async () => {
     setLoading(true);
     if ( !active && chainId && account ) {
-      console.log(library.provider);
+      await eagerConnect;
       // const maker = await createMaker(library.providers);
       // await maker.authenticate();
       // maker && console.log(`makerConnection: ${maker.currentAddress()}`);
-      await eagerConnect;
     }
     setLoading(false);
-  };
-
-  const updateBalance = async () => {
-    setBalance(await getWeiBalance);
   };
 
   const changeConnection = () => {
@@ -84,7 +71,6 @@ function App() {
   React.useEffect(() => {
     // (async () => activate(injected, console.log))();
     manageConnection();
-    updateBalance();
   }, [ active, account, chainId ]);
 
   return (

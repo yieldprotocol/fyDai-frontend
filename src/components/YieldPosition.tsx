@@ -54,7 +54,6 @@ function YieldPosition({ position, header }: any) {
       border={{ color:'background-frontheader' }}
       fill
     >
-
       { header && 
       <Box
         background='background-front'
