@@ -26,11 +26,11 @@ import YieldHeader from './components/YieldHeader';
 import YieldFooter from './components/YieldFooter';
 // import YieldTabs from './components/YieldTabs';
 
-import ConnectLayer from './components/layers/ConnectLayer';
-import AccountLayer from './components/layers/AccountLayer';
-import NotifyLayer from './components/layers/NotifyLayer';
+import ConnectLayer from './views/layers/ConnectLayer';
+import AccountLayer from './views/layers/AccountLayer';
+import NotifyLayer from './views/layers/NotifyLayer';
 // TODO: remove testLayer for prod
-import TestLayer from './components/layers/TestLayer';
+import TestLayer from './views/layers/TestLayer';
 
 import { PositionsContext } from './contexts/PositionsContext';
 

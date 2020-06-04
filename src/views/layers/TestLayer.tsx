@@ -6,7 +6,7 @@ import { useWeb3React } from '@web3-react/core';
 import { Anchor, Layer, Header, Heading, Footer, Button, Box, Text } from 'grommet';
 
 import { getNetworkName, useMakerVault }  from '../../hooks/connectionHooks';
-import ProfileButton from '../ProfileButton';
+import ProfileButton from '../../components/ProfileButton';
 import { NotifyContext } from '../../contexts/NotifyContext';
 
 import { useSendTx, useCallTx, useDealer, useGetBalance } from '../../hooks/yieldHooks';
@@ -37,7 +37,6 @@ const TestLayer = (props:any) => {
   
   React.useEffect(() => {
     (async () => setBalance( await getBalance()) )();
-
     // (async () => setWeiBalance( await getWeiBalance()) )();
     // (async () => activate(injected, console.log))();
   }, [chainId, account]);
@@ -125,7 +124,7 @@ const TestLayer = (props:any) => {
           <Button label='1. Add (100 weth)- DEV' onClick={()=> sendTx(state.deployedCore.Weth, 'Weth', 'mint', [account, ethers.utils.parseEther('100').toString()] )} />
          
           <Button label='2. Weth approve dealer' onClick={()=> approveDealer(state.deployedCore.Weth, state.seriesData[0].Dealer, 1.5)} />
-          <Button label='3. Post Collateral' onClick={()=> account && post(state.seriesData[0].Dealer, 'WETH', account, 1.5 )} />
+          <Button label='3. Post Collateral' disabled={postActive} onClick={()=> account && post(state.seriesData[0].Dealer, 'WETH', account, 1.5 )} />
           <Button label='(4. Withdraw)' onClick={()=> account && withdraw(state.seriesData[0].Dealer, 'WETH', account, 1.5 )} />
           
           <Button label='5.Borrow' onClick={()=> account && borrow(state.seriesData[0].Dealer, 'WETH', account, 0.5 )} />
