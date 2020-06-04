@@ -60,12 +60,12 @@ const SeriesProvider = ({ children }:any) => {
     const seriesAddrs:any[] = [];
     let deployedCore = {};
     try {
+      // if ( !firebase.firestore().collection(networkId.toString()).doc('deployedCore').get() ) {
+      //   throw new Error('Core not deployed');
+      // }
       await firebase.firestore().collection(networkId.toString())
         .get()
         .then( (querySnapshot:any) => {
-          if ( !querySnapshot.docs.includes('deployedCore')) { 
-            throw new Error('Core not deployed');
-          }
           querySnapshot.forEach((doc:any) => {
             if ( doc.id === 'deployedCore') {
               deployedCore = doc.data();
@@ -75,8 +75,7 @@ const SeriesProvider = ({ children }:any) => {
           });
         });
     } catch (e) {
-      notifyDispatch({ type: 'fatal', payload:{ message: `${e}` } } );
-      // console.log(`Error loading Yield contract addresses: ${e}`);
+      notifyDispatch({ type: 'fatal', payload:{ message: `${e} - try changing networks` } } );
     }
     return [ seriesAddrs, deployedCore];
   };
