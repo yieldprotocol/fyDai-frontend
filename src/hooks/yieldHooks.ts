@@ -45,14 +45,14 @@ export function useGetBalance() {
       return bal.toString();
     } return '';
   };
-  const getTokenBalance = async (tokenAddr:string) => {
+  const getWethBalance = async (tokenAddr:string) => {
     if (!!library && !!account) {
       const contract = new ethers.Contract(tokenAddr, contractMap.get('Weth'), library);
       const balance = await contract.balanceOf(account);
       return balance.toString();
     } return '';
   };
-  return [getBalance, getWeiBalance, getTokenBalance] as const;
+  return [getBalance, getWeiBalance, getWethBalance] as const;
 }
 
 export const useCallTx = () => {
