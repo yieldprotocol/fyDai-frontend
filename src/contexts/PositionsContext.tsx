@@ -54,6 +54,7 @@ const PositionsProvider = ({ children }:any) => {
       seriesData.map( async (x:any, i:number)=> {
         chainData.push(x);
         try {
+          chainData[i].yDaiBalance = await callTx(x.YDai, 'YDai', 'balanceOf', [account]);
           chainData[i].daiDebt = await callTx(x.Dealer, 'Dealer', 'debtDai', [WETH, account]);
           chainData[i].yDaiDebtWeth = await callTx(x.Dealer, 'Dealer', 'debtYDai', [WETH, account]);
           chainData[i].yDaiDebtChai = await callTx(x.Dealer, 'Dealer', 'debtYDai', [CHAI, account]);
@@ -72,6 +73,7 @@ const PositionsProvider = ({ children }:any) => {
     return chainData.map((x:any, i:number) => {
       return { 
         ...x,
+        yDaiBalance: ethers.utils.formatEther(x.yDaiBalance.toString()),
         daiDebt: ethers.utils.formatEther(x.daiDebt.toString()),
         yDaiDebtWeth: ethers.utils.formatEther(x.yDaiDebtWeth.toString()),
         yDaiDebtChai: ethers.utils.formatEther(x.yDaiDebtChai.toString()),

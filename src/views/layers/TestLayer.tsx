@@ -28,7 +28,7 @@ const TestLayer = (props:any) => {
 
   const [ sendTx ]  = useSendTx();
   const [ callTx ]  = useCallTx();
-  const { post, approveDealer, withdraw, borrow, postActive, withdrawActive }  = useDealer();
+  const { post, approveDealer, withdraw, borrow, repayYDai, repayDai, postActive, withdrawActive }  = useDealer();
   const [ getBalance, getWeiBalance, getWethBalance ]  = useGetBalance();
 
   React.useEffect(()=>{
@@ -128,6 +128,9 @@ const TestLayer = (props:any) => {
           <Button label='(4. Withdraw)' onClick={()=> account && withdraw(state.seriesData[0].Dealer, 'WETH', account, 1.5 )} />
           
           <Button label='5.Borrow' onClick={()=> account && borrow(state.seriesData[0].Dealer, 'WETH', account, 0.5 )} />
+
+          <Button label='5.PayBack 0.5 Debt in yDai' onClick={()=> account && repayYDai(state.seriesData[0].Dealer, 'WETH', account, 0.5 )} />
+          <Button label='5.PayBack 0.5 Debt in Dai' onClick={()=> account && repayDai(state.seriesData[0].Dealer, 'WETH', account, 0.5 )} />
 
           {/* <Button label='5.log debt' onClick={()=> console.log( ) borrow(state.seriesData[0].Dealer, 'WETH', account, 0.5 )} /> */}
           {/* <Button label='payTx 10eth e4Be...' onClick={()=> payTx('0xe4Be16e13267466B6241dEA1252bE231dfA8D86c', '10')} /> */}
