@@ -11,7 +11,7 @@ const PositionsContext = React.createContext<any>({});
 
 function reducer(redState:any, action:any) {
   switch (action.type) {
-    case 'updatePositions':
+    case 'updateAllPositions':
       return { 
         ...redState,
         positionsData: action.payload,
@@ -41,6 +41,7 @@ function reducer(redState:any, action:any) {
 }
 
 const PositionsProvider = ({ children }:any) => {
+
   const { chainId, account } = useWeb3React();
   const { WETH, CHAI } = constants; 
   const initState = { positionsIndicator: 0, positionsData : [] };
@@ -83,23 +84,30 @@ const PositionsProvider = ({ children }:any) => {
     });
   };
 
-  const getAllPositions = async () => {
+  const getPositions = async (seriesArr:any) => {
     if(!seriesState?.isLoading) {
+      console.log(' get all actioned');
       dispatch({ type:'isLoading', payload: true });
-      const chainData:any = await fetchChainData(seriesState.seriesData);
+      const chainData:any = await fetchChainData(seriesArr);
       const parsedData:any = await parseChainData(chainData);
       console.log(parsedData);
-      dispatch( { type:'updatePositions', payload: parsedData });
+      dispatch( { type:'updateAllPositions', payload: parsedData });
       dispatch({ type:'isLoading', payload: false });
     }
   };
 
+  const actions = {
+    getPositions: () => getPositions([seriesState.seriesData[0]]),
+  };
+
   React.useEffect( () => {
-    ( async () => chainId && getAllPositions())();
+    ( async () => { 
+      chainId && !seriesState?.isLoading && getPositions([seriesState.seriesData[0]]); 
+    })();
   }, [ chainId, seriesState ]);
 
   return (
-    <PositionsContext.Provider value={{ state, dispatch }}>
+    <PositionsContext.Provider value={{ state, actions }}>
       {children}
     </PositionsContext.Provider>
   );

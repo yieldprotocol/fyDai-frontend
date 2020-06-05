@@ -12,15 +12,17 @@ import { NotifyContext } from '../../contexts/NotifyContext';
 import { useSendTx, useCallTx, useDealer, useGetBalance } from '../../hooks/yieldHooks';
 
 import { SeriesContext } from '../../contexts/SeriesContext';
+import { PositionsContext } from '../../contexts/PositionsContext';
 
 const TestLayer = (props:any) => {
   const { chainId, account } = useWeb3React();
 
   const web3 = useWeb3React();
 
-  const { state } = React.useContext( SeriesContext );
+  const { state: seriesState } = React.useContext( SeriesContext );
+  const { state: positionsState, actions: positionsActions } = React.useContext( PositionsContext );
   const [ balance, setBalance ] = React.useState<string|null>('-');
-  const [ weiBalance, setWeiBalance ] = React.useState<string|null>('-');
+  const [ flow, setFlow ] = React.useState<string|null>('WETH');
   const [ wethBalance, setWethBalance ] = React.useState<string|null>('-');
   const { closeLayer, changeWallet } = props;
   const [ connectMakerVault ] = useMakerVault();
@@ -31,9 +33,12 @@ const TestLayer = (props:any) => {
   const { post, approveDealer, withdraw, borrow, repayYDai, repayDai, postActive, withdrawActive }  = useDealer();
   const [ getBalance, getWeiBalance, getWethBalance ]  = useGetBalance();
 
+  const { positionsData } = positionsState;
+  const { deployedCore } = seriesState; 
+
   React.useEffect(()=>{
-    (async () => setWethBalance( await getWethBalance(state.deployedCore.Weth)) )();
-  }, [state.deployedCore.Weth, postActive, withdrawActive]);
+    (async () => setWethBalance( await getWethBalance(seriesState.deployedCore.Weth)) )();
+  }, [seriesState.deployedCore.Weth, postActive, withdrawActive]);
   
   React.useEffect(() => {
     (async () => setBalance( await getBalance()) )();
@@ -48,8 +53,8 @@ const TestLayer = (props:any) => {
   return (
     <Layer 
       animation='slide'
-      position='left'
-      full="vertical"
+      position='center'
+      full
       modal={false}
       onClickOutside={onClose}
       onEsc={onClose}
@@ -62,7 +67,6 @@ const TestLayer = (props:any) => {
         style={{ minWidth: '240px' }}
         gap='small'
       >
-
         <Header 
           round={{ corner:'bottom', size:'medium' }}
           fill='horizontal'
@@ -73,72 +77,110 @@ const TestLayer = (props:any) => {
           <Anchor color='brand' onClick={()=>onClose()} size='xsmall' label='close' />
         </Header>
 
-        <Box
-          pad="medium"
-          align="center"
-          justify="center"
-          gap='small'
-        >
-          <ProfileButton />
-          <Text size='xsmall'>Connected to:</Text> 
-          <Text weight="bold">{chainId && getNetworkName(chainId) }</Text>
-          <Text weight="bold">{chainId && chainId }</Text>
+        <Box direction='row' justify='evenly'>
 
-          <Box direction='row' gap='small'>
-            <Text size='xsmall'>ETH balance:</Text>
-            <Text size='xsmall'>{ balance }</Text>
-          </Box>
-          {/* <Box direction='row' gap='small'>
+          <Box
+            pad="medium"
+            align="center"
+            justify="center"
+            gap='small'
+          >
+          
+            <ProfileButton />
+            <Text size='xsmall'>Connected to:</Text> 
+            <Text weight="bold">{chainId && getNetworkName(chainId) }</Text>
+            <Text weight="bold">{chainId && chainId }</Text>
+
+            <Box direction='row' gap='small'>
+              <Text size='xsmall'>ETH balance:</Text>
+              <Text size='xsmall'>{ balance }</Text>
+            </Box>
+            {/* <Box direction='row' gap='small'>
             <Text size='xsmall'>WEI balance:</Text>
             <Text size='xsmall'>{ weiBalance }</Text>
           </Box> */}
-          <Box direction='row' gap='small'>
-            <Text size='xsmall'>WETH balance:</Text>
-            <Text size='xsmall'>{ wethBalance && ethers.utils.formatEther(wethBalance.toString()) }</Text>
+            <Box direction='row' gap='small'>
+              <Text size='xsmall'>WETH balance:</Text>
+              <Text size='xsmall'>{ wethBalance && ethers.utils.formatEther(wethBalance.toString()) }</Text>
+            </Box>
           </Box>
 
-          <Box direction='row' gap='small'>
-            <Text size='xsmall'>yDai[0] collateral balance:</Text>
-            <Text size='xsmall'>balance</Text>
+
+
+          <Box 
+            align='center'
+            pad='large'
+            gap='small'
+            overflow='auto'
+          >
+            <Box direction='row'>
+              <Button primary={flow==='WETH'} label='WETH flow' onClick={()=>setFlow('WETH')} style={{ borderRadius:'24px 0px 0px 24px' }} />
+              <Button primary={flow==='CHAI'} label='CHAI flow' onClick={()=>setFlow('CHAI')} style={{ borderRadius:'0px 0px 0px 0px' }} />
+              <Button primary={flow==='MATURITY'} label='Maturity' onClick={()=>setFlow('MATURITY')} style={{ borderRadius:'0px 24px 24px 0px' }} />
+            </Box>
+
+            { flow === 'WETH' && 
+            <>
+              {/* <Button label='useNotify_info' onClick={()=>dispatch( { type: 'notify', payload: { message:'Something is happening!.. ', type:'info', showFor:500 } } )} /> */}
+              <Button label='1. Add (100 weth)- DEV' onClick={()=> sendTx(seriesState.deployedCore.Weth, 'Weth', 'mint', [account, ethers.utils.parseEther('100').toString()] )} />
+              <Button label='2. Weth approve dealer 1.5' onClick={()=> approveDealer(seriesState.deployedCore.Weth, seriesState.seriesData[0].Dealer, 1.5)} />
+              <Button label='3. Post Collateral 1.5' disabled={postActive} onClick={()=> account && post(seriesState.seriesData[0].Dealer, 'WETH', account, 1.5 )} />
+              <Button label='(4. Withdraw 1.5)' onClick={()=> account && withdraw(seriesState.seriesData[0].Dealer, 'WETH', account, 1.5 )} />
+              <Button label='5.Borrow 0.5' onClick={()=> account && borrow(seriesState.seriesData[0].Dealer, 'WETH', account, 0.5 )} />
+              <Button label='6.1 Repay 0.5 in yDai' onClick={()=> account && repayYDai(seriesState.seriesData[0].Dealer, 'WETH', account, 0.5 )} />
+              <Button label='( 6.2 Repay 0.5 in Dai) ' onClick={()=> account && repayDai(seriesState.seriesData[0].Dealer, 'WETH', account, 0.5 )} />
+            </>}
+
+            { flow === 'CHAI' && 
+            <>
+              {/* <Button label='useNotify_info' onClick={()=>dispatch( { type: 'notify', payload: { message:'Something is happening!.. ', type:'info', showFor:500 } } )} /> */}
+              <Button label='1. Add (100 chai)- DEV' onClick={()=> sendTx(seriesState.deployedCore.Weth, 'Weth', 'mint', [account, ethers.utils.parseEther('100').toString()] )} />
+              <Button label='2. CHAI approve dealer 1.5' onClick={()=> approveDealer(seriesState.deployedCore.Weth, seriesState.seriesData[0].Dealer, 1.5)} />
+              <Button label='3. Post CHAI Collateral 1.5' disabled={postActive} onClick={()=> account && post(seriesState.seriesData[0].Dealer, 'WETH', account, 1.5 )} />
+              <Button label='(4. Withdraw 1.5 CHAI)' onClick={()=> account && withdraw(seriesState.seriesData[0].Dealer, 'WETH', account, 1.5 )} />
+              <Button label='5.Borrow 0.5' onClick={()=> account && borrow(seriesState.seriesData[0].Dealer, 'WETH', account, 0.5 )} />
+              <Button label='( 6.1 Repay 0.5 in yDai )' onClick={()=> account && repayYDai(seriesState.seriesData[0].Dealer, 'WETH', account, 0.5 )} />
+              <Button label='6.2 Repay 0.5 in Dai' onClick={()=> account && repayDai(seriesState.seriesData[0].Dealer, 'WETH', account, 0.5 )} />
+            </>}
+
+            { flow === 'MATURITY' && 
+            <>
+              {/* <Button label='useNotify_info' onClick={()=>dispatch( { type: 'notify', payload: { message:'Something is happening!.. ', type:'info', showFor:500 } } )} /> */}
+              <Button label='Mature yDai' onClick={()=> account && withdraw(seriesState.seriesData[0].Dealer, 'WETH', account, 1.5 )} />
+              <Button label='Redeem Dai' onClick={()=> account && withdraw(seriesState.seriesData[0].Dealer, 'WETH', account, 1.5 )} />
+            </>}
+
           </Box>
 
-          <Box direction='row' gap='small'>
-            <Text size='xsmall'>yDai[0] balance:</Text>
-            <Text size='xsmall'>balance</Text>
-          </Box>
-          <Box direction='row' gap='small'>
-            <Text size='xsmall'>yDai[0] debt:</Text>
-            <Text size='xsmall'>debt </Text>
+          <Box
+            pad="medium"
+            align="center"
+            justify="center"
+            gap='small'
+          > 
+            { positionsData.length > 0 && !positionsState.isLoading ? 
+              <Box pad='small' gap='medium' fill>
+                <Box direction='row'>
+                  <Text weight='bold'>yDai[0]: {positionsData[0].symbol}</Text>
+                </Box>
+                <Box gap='small'>
+                  <Text>weth posted: { positionsData[0].wethPosted }</Text>
+                  <Text>chai posted: { positionsData[0].chaiPosted }</Text>
+                  <Text> yDai Balance: { positionsData[0].yDaiBalance }</Text>
+                  <Text>yDai Debt (WETH): { positionsData[0].yDaiDebtWeth }</Text>
+                  <Text>yDai Debt (CHAI): { positionsData[0].yDaiDebtChai }</Text>
+                  <Text>Dai Debt: { positionsData[0].daiDebt }</Text>
+                </Box>
+                <Button label='refresh' onClick={()=>positionsActions.getPositions()} />
+              </Box>
+              :
+              <Box pad='small' fill align='center' justify='center'> 
+                <Text>Loading... </Text>
+              </Box>}
           </Box>
 
         </Box>
 
-        <Box 
-          align='center'
-          pad='large'
-          gap='small'
-          overflow='auto'
-        >
-          {/* <Button label='useNotify_info' onClick={()=>dispatch( { type: 'notify', payload: { message:'Something is happening!.. ', type:'info', showFor:500 } } )} /> */}
-
-          <Button label='1. Add (100 weth)- DEV' onClick={()=> sendTx(state.deployedCore.Weth, 'Weth', 'mint', [account, ethers.utils.parseEther('100').toString()] )} />
-         
-          <Button label='2. Weth approve dealer' onClick={()=> approveDealer(state.deployedCore.Weth, state.seriesData[0].Dealer, 1.5)} />
-          <Button label='3. Post Collateral' disabled={postActive} onClick={()=> account && post(state.seriesData[0].Dealer, 'WETH', account, 1.5 )} />
-          <Button label='(4. Withdraw)' onClick={()=> account && withdraw(state.seriesData[0].Dealer, 'WETH', account, 1.5 )} />
-          
-          <Button label='5.Borrow' onClick={()=> account && borrow(state.seriesData[0].Dealer, 'WETH', account, 0.5 )} />
-
-          <Button label='5.PayBack 0.5 Debt in yDai' onClick={()=> account && repayYDai(state.seriesData[0].Dealer, 'WETH', account, 0.5 )} />
-          <Button label='5.PayBack 0.5 Debt in Dai' onClick={()=> account && repayDai(state.seriesData[0].Dealer, 'WETH', account, 0.5 )} />
-
-          {/* <Button label='5.log debt' onClick={()=> console.log( ) borrow(state.seriesData[0].Dealer, 'WETH', account, 0.5 )} /> */}
-          {/* <Button label='payTx 10eth e4Be...' onClick={()=> payTx('0xe4Be16e13267466B6241dEA1252bE231dfA8D86c', '10')} /> */}
-          {/* <Button label='check Maker vault' onClick={()=> makerVault()} /> */}
-
-          <Button label='RANDOM FN BUTTON' onClick={()=>console.log('wahh')} />
-
-        </Box>
         <Footer pad='medium' gap='xsmall' direction='row' justify='center' align='center'>
           <Box round>
             <Button 
