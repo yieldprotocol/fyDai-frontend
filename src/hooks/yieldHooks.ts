@@ -79,8 +79,8 @@ export const useDealer = () => {
   const [ postActive, setPostActive ] = React.useState<boolean>(false);
   const [ withdrawActive, setWithdrawActive ] = React.useState<boolean>(false);
   const [ borrowActive, setBorrowActive ] = React.useState<boolean>(false);
-  const [ repayDaiActive, setRepayDaiActive ] = React.useState<boolean>(false);
-  const [ repayYDaiActive, setRepayYDaiActive ] = React.useState<boolean>(false);
+  const [ repayActive, setRepayActive ] = React.useState<boolean>(false);
+  // const [ repayYDaiActive, setRepayYDaiActive ] = React.useState<boolean>(false);
   const [ approveDealerActive, setApproveDealerActive ] = React.useState<boolean>(false);
   const signer = library?.getSigner();
 
@@ -170,7 +170,7 @@ export const useDealer = () => {
     const collateralBytes = ethers.utils.formatBytes32String(collateral);
     const fromAddr = ethers.utils.getAddress(from);
     const dealerAddr = ethers.utils.getAddress(dealerAddress);
-    setRepayDaiActive(true);
+    setRepayActive(true);
     const contract = new ethers.Contract(
       dealerAddr,
       dealerAbi,
@@ -180,12 +180,12 @@ export const useDealer = () => {
       tx = await contract.repayDai(collateralBytes, fromAddr, parsedDai);
     } catch (e) {
       notifyDispatch({ type: 'notify', payload:{ message:`${e.data.message}`, type:'error' } } );
-      setRepayDaiActive(false);
+      setRepayActive(false);
       return;
     }
     notifyDispatch({ type: 'notify', payload:{ message: `Repayment of ${dai} Dai with ${collateral} pending...`, type:'info' } } );
     await tx.wait();
-    setRepayDaiActive(false);
+    setRepayActive(false);
     notifyDispatch({ type: 'notify', payload:{ message: `Repayment of ${dai} yDai with ${collateral} complete.`, type:'success' } } );
   };
 
@@ -195,7 +195,7 @@ export const useDealer = () => {
     const collateralBytes = ethers.utils.formatBytes32String(collateral);
     const fromAddr = ethers.utils.getAddress(from);
     const dealerAddr = ethers.utils.getAddress(dealerAddress);
-    setRepayYDaiActive(true);
+    setRepayActive(true);
     const contract = new ethers.Contract(
       dealerAddr,
       dealerAbi,
@@ -205,12 +205,12 @@ export const useDealer = () => {
       tx = await contract.repayYDai(collateralBytes, fromAddr, parsedYDai);
     } catch (e) {
       notifyDispatch({ type: 'notify', payload:{ message:`${e.data.message}`, type:'error' } } );
-      setRepayYDaiActive(false);
+      setRepayActive(false);
       return;
     }
     notifyDispatch({ type: 'notify', payload:{ message: `Repayment of ${yDai} yDai with ${collateral} pending...`, type:'info' } } );
     await tx.wait();
-    setRepayYDaiActive(false);
+    setRepayActive(false);
     notifyDispatch({ type: 'notify', payload:{ message: `Repayment of ${yDai} yDai complete.`, type:'success' } } );
   };
 
@@ -243,8 +243,8 @@ export const useDealer = () => {
     post, postActive,
     withdraw, withdrawActive,
     borrow, borrowActive,
-    repayDai, repayDaiActive,
-    repayYDai, repayYDaiActive,
+    repayDai, repayActive,
+    repayYDai, // repayYDaiActive,
     approveDealer, approveDealerActive,
   } as const;
 };

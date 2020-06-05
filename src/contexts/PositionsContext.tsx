@@ -43,7 +43,7 @@ function reducer(redState:any, action:any) {
 const PositionsProvider = ({ children }:any) => {
 
   const { chainId, account } = useWeb3React();
-  const { WETH, CHAI } = constants; 
+  const { WETH, CHAI } = constants;
   const initState = { positionsIndicator: 0, positionsData : [] };
   const [ state, dispatch ] = React.useReducer(reducer, initState);
   const { state: seriesState } = React.useContext(SeriesContext);
@@ -61,7 +61,7 @@ const PositionsProvider = ({ children }:any) => {
           chainData[i].yDaiDebtChai = await callTx(x.Dealer, 'Dealer', 'debtYDai', [CHAI, account]);
           chainData[i].wethPosted = await callTx(x.Dealer, 'Dealer', 'posted', [WETH, account]);
           chainData[i].chaiPosted = await callTx(x.Dealer, 'Dealer', 'posted', [CHAI, account]);
-        } catch (e) { 
+        } catch (e) {
           console.log(`Could not load series blockchain data: ${e}`);
         }
       })
@@ -96,15 +96,15 @@ const PositionsProvider = ({ children }:any) => {
     }
   };
 
-  const actions = {
-    getPositions: () => getPositions([seriesState.seriesData[0]]),
-  };
-
   React.useEffect( () => {
     ( async () => { 
       chainId && !seriesState?.isLoading && getPositions([seriesState.seriesData[0]]); 
     })();
   }, [ chainId, seriesState ]);
+
+  const actions = {
+    getPositions: (x:any[]) => getPositions(x),
+  };
 
   return (
     <PositionsContext.Provider value={{ state, actions }}>
