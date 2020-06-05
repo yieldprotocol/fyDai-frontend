@@ -54,13 +54,13 @@ ReactDOM.render(
   <React.StrictMode>
     <Web3ReactProvider getLibrary={getLibrary}>
       <NotifyProvider>
-        <PositionsProvider>
-          <SeriesProvider>
+        <SeriesProvider>
+          <PositionsProvider>
             <LayerProvider>
               <App />
             </LayerProvider>
-          </SeriesProvider>
-        </PositionsProvider>
+          </PositionsProvider>
+        </SeriesProvider>
       </NotifyProvider>
     </Web3ReactProvider>
   </React.StrictMode>,

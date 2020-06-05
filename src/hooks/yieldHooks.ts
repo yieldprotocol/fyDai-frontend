@@ -45,14 +45,14 @@ export function useGetBalance() {
       return bal.toString();
     } return '';
   };
-  const getWethBalance = async (tokenAddr:string) => {
+  const getTokenBalance = async (tokenAddr:string) => {
     if (!!library && !!account) {
       const contract = new ethers.Contract(tokenAddr, contractMap.get('Weth'), library);
       const balance = await contract.balanceOf(account);
       return balance.toString();
     } return '';
   };
-  return [getBalance, getWeiBalance, getWethBalance] as const;
+  return [getBalance, getWeiBalance, getTokenBalance] as const;
 }
 
 export const useCallTx = () => {
@@ -86,12 +86,13 @@ export const useDealer = () => {
 
   const post = async (dealerAddress:string, collateral:string, from:string, amount:number) => {
     let tx:any;
-    // processing and sanitizing
+    // Processing and sanitizing input
     const parsedAmount = formatNumber(amount);
     const collateralBytes = ethers.utils.formatBytes32String(collateral);
     const fromAddr = ethers.utils.getAddress(from);
     const dealerAddr = ethers.utils.getAddress(dealerAddress);
-    // contract interaction
+    
+    // Contract interaction
     setPostActive(true);
     const contract = new ethers.Contract(
       dealerAddr,
@@ -106,7 +107,7 @@ export const useDealer = () => {
       return;
     }
 
-    // Transaction reporting/tracking
+    // Transaction reporting & tracking
     notifyDispatch({ type: 'notify', payload:{ message:`Deposit of ${amount} ${collateral} pending...`, type:'info' } } );
     await tx.wait();
     setPostActive(false);
@@ -245,7 +246,6 @@ export const useDealer = () => {
     repayDai, repayDaiActive,
     repayYDai, repayYDaiActive,
     approveDealer, approveDealerActive,
-    
   } as const;
 };
 

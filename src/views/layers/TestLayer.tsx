@@ -13,27 +13,32 @@ import { useSendTx, useCallTx, useDealer, useGetBalance } from '../../hooks/yiel
 
 import { SeriesContext } from '../../contexts/SeriesContext';
 
+import { PositionsContext } from '../../contexts/PositionsContext';
+
 const TestLayer = (props:any) => {
   const { chainId, account } = useWeb3React();
 
   const web3 = useWeb3React();
 
-  const { state } = React.useContext( SeriesContext );
+  const { state: seriesState } = React.useContext( SeriesContext );
+  const { state: positionsState, dispatch: positionsDispactch } = React.useContext( PositionsContext );
+
   const [ balance, setBalance ] = React.useState<string|null>('-');
   const [ weiBalance, setWeiBalance ] = React.useState<string|null>('-');
   const [ wethBalance, setWethBalance ] = React.useState<string|null>('-');
   const { closeLayer, changeWallet } = props;
   const [ connectMakerVault ] = useMakerVault();
+  
   const { dispatch } = React.useContext<any>(NotifyContext);
 
   const [ sendTx ]  = useSendTx();
   const [ callTx ]  = useCallTx();
-  const { post, approveDealer, withdraw, borrow, postActive, withdrawActive }  = useDealer();
+  const { post, approveDealer, withdraw, borrow, repayYDai, postActive, withdrawActive }  = useDealer();
   const [ getBalance, getWeiBalance, getWethBalance ]  = useGetBalance();
 
   React.useEffect(()=>{
-    (async () => setWethBalance( await getWethBalance(state.deployedCore.Weth)) )();
-  }, [state.deployedCore.Weth, postActive, withdrawActive]);
+    (async () => setWethBalance( await getWethBalance(seriesState.deployedCore.Weth)) )();
+  }, [seriesState.deployedCore.Weth, postActive, withdrawActive]);
   
   React.useEffect(() => {
     (async () => setBalance( await getBalance()) )();
@@ -88,18 +93,20 @@ const TestLayer = (props:any) => {
             <Text size='xsmall'>ETH balance:</Text>
             <Text size='xsmall'>{ balance }</Text>
           </Box>
+
           {/* <Box direction='row' gap='small'>
             <Text size='xsmall'>WEI balance:</Text>
             <Text size='xsmall'>{ weiBalance }</Text>
           </Box> */}
+
           <Box direction='row' gap='small'>
             <Text size='xsmall'>WETH balance:</Text>
             <Text size='xsmall'>{ wethBalance && ethers.utils.formatEther(wethBalance.toString()) }</Text>
           </Box>
 
           <Box direction='row' gap='small'>
-            <Text size='xsmall'>yDai[0] collateral balance:</Text>
-            <Text size='xsmall'>balance</Text>
+            <Text size='xsmall'>yDai[0] WEth collateral balance:</Text>
+            <Text size='xsmall'> </Text>
           </Box>
 
           <Box direction='row' gap='small'>
@@ -121,13 +128,14 @@ const TestLayer = (props:any) => {
         >
           {/* <Button label='useNotify_info' onClick={()=>dispatch( { type: 'notify', payload: { message:'Something is happening!.. ', type:'info', showFor:500 } } )} /> */}
 
-          <Button label='1. Add (100 weth)- DEV' onClick={()=> sendTx(state.deployedCore.Weth, 'Weth', 'mint', [account, ethers.utils.parseEther('100').toString()] )} />
-         
-          <Button label='2. Weth approve dealer' onClick={()=> approveDealer(state.deployedCore.Weth, state.seriesData[0].Dealer, 1.5)} />
-          <Button label='3. Post Collateral' disabled={postActive} onClick={()=> account && post(state.seriesData[0].Dealer, 'WETH', account, 1.5 )} />
-          <Button label='(4. Withdraw)' onClick={()=> account && withdraw(state.seriesData[0].Dealer, 'WETH', account, 1.5 )} />
+          <Button label='1. Add (100 weth)- DEV' onClick={()=> sendTx(seriesState.deployedCore.Weth, 'Weth', 'mint', [account, ethers.utils.parseEther('100').toString()] )} />
+          <Button label='2. Weth approve dealer' onClick={()=> approveDealer(seriesState.deployedCore.Weth, seriesState.seriesData[0].Dealer, 1.5)} />
+          <Button label='3. Post Collateral' disabled={postActive} onClick={()=> account && post(seriesState.seriesData[0].Dealer, 'WETH', account, 1.5 )} />
+          <Button label='(4. Withdraw)' onClick={()=> account && withdraw(seriesState.seriesData[0].Dealer, 'WETH', account, 1.5 )} />
           
-          <Button label='5.Borrow' onClick={()=> account && borrow(state.seriesData[0].Dealer, 'WETH', account, 0.5 )} />
+          <Button label='5.Borrow' onClick={()=> account && borrow(seriesState.seriesData[0].Dealer, 'WETH', account, 0.5 )} />
+
+          <Button label='6.Repay 1.1 yDai' onClick={()=> account && repayYDai(seriesState.seriesData[0].Dealer, 'WETH', account, 1.1 )} />
 
           {/* <Button label='5.log debt' onClick={()=> console.log( ) borrow(state.seriesData[0].Dealer, 'WETH', account, 0.5 )} /> */}
           {/* <Button label='payTx 10eth e4Be...' onClick={()=> payTx('0xe4Be16e13267466B6241dEA1252bE231dfA8D86c', '10')} /> */}

@@ -17,8 +17,6 @@ const Positions = () => {
   const [showCurrent, setShowCurrent] = React.useState<boolean>(true);
   const [showMature, setShowMature] = React.useState<boolean>(false);
   const [showSettled, setShowSettled] = React.useState<boolean>(false);
-
-  const [ seriesPosition, setSeriesPosition] = React.useState<any>();
   const { state: positionsState, dispatch: positionsDispatch } = React.useContext(PositionsContext);
 
   // React.useEffect(()=>{

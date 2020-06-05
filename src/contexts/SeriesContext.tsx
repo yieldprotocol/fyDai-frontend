@@ -1,9 +1,9 @@
 import React from 'react';
 import firebase, { firestore } from 'firebase';
-import { ethers } from 'ethers';
+
 import { useWeb3React } from '@web3-react/core';
 
-import * as Constants from '../constants';
+import * as constants from '../constants';
 import { IYieldSeries } from '../types';
 
 import { useCallTx } from '../hooks/yieldHooks';
@@ -17,43 +17,41 @@ firebase.initializeApp({
   projectId: 'yield-ydai'
 });
 
+// reducer
+function reducer(redState:any, action:any) {
+  switch (action.type) {
+    case 'updateSeries':
+      return {
+        ...redState,
+        seriesData: action.payload,
+      };
+    case 'updatedeployedCore':
+      return {
+        ...redState,
+        deployedCore: action.payload,
+      };
+    case 'updateRates':
+      return {
+        ...redState,
+      };
+    case 'isLoading':
+      return { 
+        ...redState,
+        isLoading: action.payload,
+      };
+    default:
+      return redState;
+  }
+}
 
 const SeriesProvider = ({ children }:any) => {
 
   const initState = { isLoading: true, seriesData : [], deployedCore: {} };
-  const [ state, dispatch ] = React.useReducer(seriesReducer, initState);
+  const [ state, dispatch ] = React.useReducer(reducer, initState);
   const { chainId } = useWeb3React();
-
+  const { WETH, CHAI, BN_RAY } = constants; 
   const { dispatch: notifyDispatch } = React.useContext(NotifyContext);
-
   const [ callTx ] = useCallTx();
-
-  // reducer
-  function seriesReducer(redState:any, action:any) {
-    switch (action.type) {
-      case 'updateSeries':
-        return {
-          ...redState,
-          seriesData: action.payload,
-        };
-      case 'updatedeployedCore':
-        return {
-          ...redState,
-          deployedCore: action.payload,
-        };
-      case 'updateRates':
-        return {
-          ...redState,
-        };
-      case 'isLoading':
-        return { 
-          ...redState,
-          isLoading: action.payload,
-        };
-      default:
-        return redState;
-    }
-  }
 
   // async get all yield addresses from db in a single call
   const getYieldAddrs = async (networkId:number|string): Promise<any[]> => {
@@ -81,42 +79,43 @@ const SeriesProvider = ({ children }:any) => {
   };
 
   // async add blockchain data
-  const getChainData = async (seriesAddrs:IYieldSeries[], deployedCore:any): Promise<IYieldSeries[]> => {
+  const fetchChainData = async (seriesAddrs:IYieldSeries[], deployedCore:any): Promise<IYieldSeries[]> => {
     const chainData:any[] = [];
-    console.log(deployedCore);
-    await Promise.all(seriesAddrs.map( async (x:any, i:number)=> {
-      chainData.push(x);
-      try {
-        chainData[i].rate = await callTx(x.YDai, 'YDai', 'rate', []);
+    await Promise.all(
+      seriesAddrs.map( async (x:any, i:number)=> {
+        chainData.push(x);
+        try {
+          chainData[i].rate = await callTx(x.YDai, 'YDai', 'rate', []);
         // chainData[i].currentValue = (await callTx( deployedCore.Vat, 'Vat', 'ilks', [ethers.utils.formatBytes32String('weth')] )).spot;
-      } catch (e) { 
-        console.log(`Could not load series blockchain data: ${e}`);
-      }
-    }));
+        } catch (e) { 
+          console.log(`Could not load series blockchain data: ${e}`);
+        }
+      })
+    );
     return chainData;
   };
 
   // post fetching data processing
-  const processSeriesData = (chainData:IYieldSeries[]): IYieldSeries[] => {
-    const processedData:any[] = [];
-    chainData.forEach(async (x:any, i:any) =>{
-      processedData.push(x);
-      processedData[i].rate = x.rate?.div(Constants.BN_RAY).toNumber();
-      processedData[i].maturity = new Date( (x?.maturity as number) * 1000 );
+  const parseChainData = (chainData:IYieldSeries[]): IYieldSeries[] => {
+    return chainData.map((x:any, i:number) => {
+      return { 
+        ...x,
+        rate: x.rate?.div(BN_RAY).toNumber(),
+        date: new Date( (x?.maturity as number) * 1000 ),
+      };
     });
-    return processedData;
   };
 
   const getAllData = async (networkId:number|string) => {
     dispatch({ type:'isLoading', payload: true });
-    // fetch yield addresses from db
+    // Get yield addresses from db
     const [ addrData, deployedCore] = await getYieldAddrs(networkId);
-    // fetch chain data
-    const chainData:any = await getChainData(addrData, deployedCore);
-    // process chain data (number formats, dates etc.)
-    const processedData:any = processSeriesData(chainData);
+    // Get blockchain based data
+    const chainData:any = await fetchChainData(addrData, deployedCore);
+    // Process chain data (number formats, dates etc.)
+    const parsedData:any = parseChainData(chainData);
     dispatch({ type:'updatedeployedCore', payload: deployedCore });
-    dispatch({ type:'updateSeries', payload: processedData });
+    dispatch({ type:'updateSeries', payload: parsedData });
     dispatch({ type:'isLoading', payload: false });
   };
 
