@@ -109,7 +109,6 @@ const TestLayer = (props:any) => {
 
           <Box 
             align='center'
-            pad='large'
             gap='small'
             overflow='auto'
           >
@@ -120,7 +119,7 @@ const TestLayer = (props:any) => {
             </Box>
 
             { flow === 'WETH' && 
-            <>
+            <Box gap='small'>
               {/* <Button label='useNotify_info' onClick={()=>dispatch( { type: 'notify', payload: { message:'Something is happening!.. ', type:'info', showFor:500 } } )} /> */}
               <Button label='1. Add (100 weth)- DEV' onClick={()=> sendTx(seriesState.deployedCore.Weth, 'Weth', 'mint', [account, ethers.utils.parseEther('100').toString()] )} />
               <Button label='2. Weth approve dealer 1.5' onClick={()=> approveDealer(seriesState.deployedCore.Weth, seriesState.seriesData[0].Dealer, 1.5)} />
@@ -129,10 +128,10 @@ const TestLayer = (props:any) => {
               <Button label='5.Borrow 0.5' onClick={()=> account && borrow(seriesState.seriesData[0].Dealer, 'WETH', account, 0.5 )} />
               <Button label='6.1 Repay 0.5 in yDai' onClick={()=> account && repayYDai(seriesState.seriesData[0].Dealer, 'WETH', account, 0.5 )} />
               <Button label='( 6.2 Repay 0.5 in Dai) ' onClick={()=> account && repayDai(seriesState.seriesData[0].Dealer, 'WETH', account, 0.5 )} />
-            </>}
+            </Box>}
 
             { flow === 'CHAI' && 
-            <>
+            <Box gap='small'>
               {/* <Button label='useNotify_info' onClick={()=>dispatch( { type: 'notify', payload: { message:'Something is happening!.. ', type:'info', showFor:500 } } )} /> */}
               <Button label='1. Add (100 chai)- DEV' onClick={()=> sendTx(seriesState.deployedCore.Weth, 'Weth', 'mint', [account, ethers.utils.parseEther('100').toString()] )} />
               <Button label='2. CHAI approve dealer 1.5' onClick={()=> approveDealer(seriesState.deployedCore.Weth, seriesState.seriesData[0].Dealer, 1.5)} />
@@ -141,14 +140,14 @@ const TestLayer = (props:any) => {
               <Button label='5.Borrow 0.5' onClick={()=> account && borrow(seriesState.seriesData[0].Dealer, 'WETH', account, 0.5 )} />
               <Button label='( 6.1 Repay 0.5 in yDai )' onClick={()=> account && repayYDai(seriesState.seriesData[0].Dealer, 'WETH', account, 0.5 )} />
               <Button label='6.2 Repay 0.5 in Dai' onClick={()=> account && repayDai(seriesState.seriesData[0].Dealer, 'WETH', account, 0.5 )} />
-            </>}
+            </Box>}
 
             { flow === 'MATURITY' && 
-            <>
+            <Box gap='small'>
               {/* <Button label='useNotify_info' onClick={()=>dispatch( { type: 'notify', payload: { message:'Something is happening!.. ', type:'info', showFor:500 } } )} /> */}
               <Button label='Mature yDai' onClick={()=> account && withdraw(seriesState.seriesData[0].Dealer, 'WETH', account, 1.5 )} />
               <Button label='Redeem Dai' onClick={()=> account && withdraw(seriesState.seriesData[0].Dealer, 'WETH', account, 1.5 )} />
-            </>}
+            </Box>}
 
           </Box>
 
