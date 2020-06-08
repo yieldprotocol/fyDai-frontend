@@ -52,7 +52,8 @@ const PositionsProvider = ({ children }:any) => {
   const fetchChainData = async (seriesData:any) => {
     const chainData:any[] = [];
     await Promise.all(
-      seriesData.map( async (x:any, i:number)=> {
+
+      seriesData.map( async (x:any, i:number) => {
         chainData.push(x);
         try {
           chainData[i].yDaiBalance = await callTx(x.YDai, 'YDai', 'balanceOf', [account]);
@@ -86,7 +87,7 @@ const PositionsProvider = ({ children }:any) => {
 
   const getPositions = async (seriesArr:any) => {
     if(!seriesState?.isLoading) {
-      console.log(' get all actioned');
+      console.log('Get positions actioned');
       dispatch({ type:'isLoading', payload: true });
       const chainData:any = await fetchChainData(seriesArr);
       const parsedData:any = await parseChainData(chainData);
@@ -114,42 +115,3 @@ const PositionsProvider = ({ children }:any) => {
 };
 
 export { PositionsContext, PositionsProvider };
-
-
-// const initState_old = {
-//   positionsIndicator: 1,
-//   positionsData : [
-//     {
-//       posId: 1,
-//       series_id: `yDai-${moment().add(3, 'months').format('YY-MM-30')}`,
-//       maturityDate: moment().add(3, 'months').toDate(),
-//       interestRate: 3.22,
-//       currentValue: 0.9921,
-//       collateral: [ 
-//         { type: 'ETH', value: 1.21234, debt: 100, balance: 100 },
-//       ],
-//     },
-//     {
-//       posId: 2,
-//       series_id: `yDai-${moment().add(6, 'months').format('YY-MM-30')}`,
-//       maturityDate: moment().add(3, 'months').toDate(),
-//       interestRate: 3.22,
-//       currentValue: 0.9921,
-//       collateral: [
-//         { type: 'ETH', value: 1.2234234234, debt: 100, balance: 100 },
-//         { type: 'CHAI', value: 100, debt: 50, balance: 50},
-
-//       ],
-//     },
-//     {
-//       posId: 3,
-//       series_id: `yDai-${moment().add(12, 'months').format('YY-MM-30')}`,
-//       maturityDate: moment().add(3, 'months').toDate(),
-//       interestRate: 3.22,
-//       currentValue: 0.9921,
-//       collateral: [ 
-//         { type: 'ETH', value: 1.223423423423423423234, debt: 100, balance: 100 },
-//       ],
-//     },
-//   ],
-// };

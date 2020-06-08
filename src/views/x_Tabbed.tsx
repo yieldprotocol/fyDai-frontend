@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Tabs, Tab, Text } from 'grommet';
-import Series from './Series';
-import Positions from './Positions';
+import Series from './x_Series';
+import Positions from './x_Positions';
 import { PositionsContext } from '../contexts/PositionsContext';
 
 

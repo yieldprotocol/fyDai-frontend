@@ -58,9 +58,6 @@ const SeriesProvider = ({ children }:any) => {
     const seriesAddrs:any[] = [];
     let deployedCore = {};
     try {
-      // if ( !firebase.firestore().collection(networkId.toString()).doc('deployedCore').get() ) {
-      //   throw new Error('Core not deployed');
-      // }
       await firebase.firestore().collection(networkId.toString())
         .get()
         .then( (querySnapshot:any) => {

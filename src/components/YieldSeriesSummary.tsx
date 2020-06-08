@@ -2,6 +2,18 @@ import React from 'react';
 import { Box, Text } from 'grommet';
 import moment from 'moment';
 
+// import {
+//   FaRegEye as EyeOpen,
+//   FaRegEyeSlash as EyeClosed,
+//   FaStar as Star,
+// } from 'react-icons/fa';
+
+import {
+  FiEye as EyeOpen,
+  FiEyeOff as EyeClosed,
+  FiStar as Star,
+} from 'react-icons/fi';
+
 import { IYieldSeries } from '../types';
 
 type YieldSeriesProps = {
@@ -35,7 +47,9 @@ const YieldSeriesSummary = ({
       hoverIndicator={{ color: 'background-frontheader' }}
       // background={highlighted? { color: 'lightgrey' }: {}}
       border={{ color:'background-front' }}
-      round="small"
+      round="xsmall"
+      gap='small'
+      fill='horizontal'
     >
       <Box direction="column">
         <Text weight="bold"> {name}</Text>
@@ -61,6 +75,10 @@ const YieldSeriesSummary = ({
           <Text size="xsmall" weight="bold">{`${currentValue} DAI`}</Text>
         </Box>
       </Box>
+
+      <EyeOpen />
+      <Star />
+
     </Box>
   );
 };

@@ -26,12 +26,13 @@ const YieldHeader = (props: any) => {
   return (
     <Header
       // elevation="xsmall"
-      gap="xlarge"
+      // gap="xlarge"
       fill="horizontal"
       pad={{ horizontal: 'large', vertical: 'xsmall' }}
+      // align='end'
     >
-      <Box align="center" direction='row' gap='small'>
-        <Box height="xsmall" width="xsmall">
+      <Box align="center" direction='row' gap='small' margin='none' pad='none'>
+        <Box height="xsmall" width="small" margin='none' pad='xsmall'>
           <Image src={theme.dark ? logoLight : logoDark} fit="contain" />
         </Box>
       </Box>
@@ -60,13 +61,19 @@ const YieldHeader = (props: any) => {
         </Box>
       </Box>
       {account ? (
-        <ProfileButton action={() => openAccountLayer()} />
+        <Box pad='small'>
+          <ProfileButton action={() => openAccountLayer()} />
+        </Box>
       ) : (
-        <Button
-          style={{ minWidth: '160px' }}
-          label="Connect to a wallet"
-          onClick={() => openConnectLayer()}
-        />
+        <Box pad='small'>
+          <Button
+          // alignSelf='center'
+          // pad='xsmall'
+            style={{ minWidth: '160px' }}
+            label="Connect to a wallet"
+            onClick={() => openConnectLayer()}
+          />
+        </Box>
       )}
     </Header>
   );

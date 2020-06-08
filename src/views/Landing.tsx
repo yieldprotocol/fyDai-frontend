@@ -4,7 +4,12 @@ import { Box, Grid, Heading, Text, Collapsible, Markdown, Layer } from 'grommet'
 
 const Landing = () => {
   return (
-    <Box margin='large' gap='large' align='center'>
+    <Box 
+      margin='large'
+      gap='large'
+      align='center'
+      // background='background'
+    >
       <Heading>
         I am a borrower.
       </Heading>

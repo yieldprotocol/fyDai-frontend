@@ -9,8 +9,6 @@ import { Spinner } from '../../components/LoadingSpinner';
 import YieldSeriesSummary from '../../components/YieldSeriesSummary';
 import YieldSeries from '../../components/YieldSeries';
 
-import { FaEye as Eye, FaStar as Star } from 'react-icons/fa';
-
 
 const SeriesLayer = (props:any) => {
 
@@ -57,7 +55,7 @@ const SeriesLayer = (props:any) => {
         background='background-frontheader'
         pad={{ horizontal: 'medium', vertical:'large' }}
       >
-        <Text>Select a series:</Text>
+        <Text>yDai Series:</Text>
         <Anchor onClick={()=>closeLayer()} size='xsmall' label='Cancel' />
       </Header>
       <Box background='background' pad='medium'>
@@ -69,7 +67,7 @@ const SeriesLayer = (props:any) => {
                 key={x.name}
                 id={x.name}
                 ref={(el:any) => {refs.current[i] = el;}}
-                round="small"
+                round="xsmall"
                 direction='row'
               >
                 <YieldSeriesSummary
@@ -77,8 +75,6 @@ const SeriesLayer = (props:any) => {
                   seriesAction={() => handleSelectSeries(x)}
                   highlighted={openIndex === i}
                 />
-                <Eye />
-                <Star />
               </Box>
             );
           })}
