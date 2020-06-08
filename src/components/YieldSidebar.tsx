@@ -56,7 +56,7 @@ import YieldSeries from './YieldSeries';
 //   </Box>
 // );
 
-const YieldSidebar = ({ activeSeries, setActiveSeries, setShowSeriesLayer }:{activeSeries:IYieldSeries|null, setActiveSeries:any , setShowSeriesLayer:any}) => {
+const YieldSidebar = ({ activeSeries, setActiveSeries, setShowSeriesLayer }:{activeSeries:IYieldSeries|null, setActiveSeries:any, setShowSeriesLayer:any}) => {
   const { state } = React.useContext( SeriesContext );
   const [seriesList, setSeriesList] = React.useState<IYieldSeries[]>([]);
   const [showMore, setShowMore] = React.useState<boolean>(false);
@@ -99,7 +99,7 @@ const YieldSidebar = ({ activeSeries, setActiveSeries, setShowSeriesLayer }:{act
           color='background-frontheader'
           hoverIndicator='background-frontheader'
           onClick={()=>setShowSeriesLayer(true)}
-          label='Discover more'
+          label={<Text size='xsmall'>Discover more</Text>}
         />
       </Box>
     </Sidebar>

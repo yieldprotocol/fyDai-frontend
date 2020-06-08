@@ -12,7 +12,7 @@ const AccountLayer = (props:any) => {
   const [ balance, setBalance ] = React.useState<string|null>('-');
   const { chainId } = useWeb3React();
   const { closeLayer, changeWallet } = props;
-  const [ getBalance ] = useGetBalance();
+  const { getBalance } = useGetBalance();
 
   React.useEffect(() => {
     ( async () => setBalance( await getBalance()) )();
@@ -41,7 +41,7 @@ const AccountLayer = (props:any) => {
         gap='small'
       >
         <Header 
-          round={{ corner:'bottom', size:'medium' }}
+          // round={{ corner:'bottom', size:'medium' }}
           fill='horizontal'
           background='background-frontheader'
           pad={{ horizontal: 'medium', vertical:'large' }}

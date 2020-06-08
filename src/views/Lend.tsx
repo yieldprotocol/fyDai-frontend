@@ -3,8 +3,8 @@ import moment from 'moment';
 import { Box, Grid, Heading, Text, Collapsible, Markdown } from 'grommet';
 
 import { FiCheckCircle, FiCircle, FiRefreshCw as Refresh } from 'react-icons/fi';
-import Series from './Series';
-import Positions from './Positions';
+import Series from './x_Series';
+import Positions from './x_Positions';
 
 // import BuyAction from '../components/BuyAction';
 // import SellAction from '../components/SellAction';

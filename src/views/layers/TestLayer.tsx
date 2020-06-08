@@ -29,6 +29,7 @@ const TestLayer = (props:any) => {
 
   const [ sendTx ]  = useSendTx();
   const [ callTx ]  = useCallTx();
+  
   const { 
     post, 
     approveDealer,
@@ -36,16 +37,13 @@ const TestLayer = (props:any) => {
     borrow,
     repayYDai,
     repayDai,
-    // mature,
-    // redeem,
     postActive,
     withdrawActive,
     repayActive,
     borrowActive,
-  
   }  = useDealer();
 
-  const [ getBalance, getWeiBalance, getWethBalance ]  = useGetBalance();
+  const { getBalance, getWeiBalance, getWethBalance }  = useGetBalance();
 
   const { positionsData } = positionsState;
   const { deployedCore } = seriesState;

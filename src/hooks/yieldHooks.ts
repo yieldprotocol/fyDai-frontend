@@ -9,12 +9,6 @@ import Dealer from '../contracts/Dealer.json';
 import Mint from '../contracts/Mint.json';
 import TestERC20 from '../contracts/TestERC20.json';
 
-// import Vat from '../contracts/Vat.json';
-// import Pot from '../contracts/Pot.json';
-// import Treasury from '../contracts/Treasury.json';
-// import GemJoin from '../contracts/GemJoin.json';
-// import DaiJoin from '../contracts/DaiJoin.json';
-
 ethers.errors.setLogLevel('error');
 
 const contractMap = new Map<string, any>([
@@ -24,11 +18,7 @@ const contractMap = new Map<string, any>([
   ['Mint', Mint.abi],
   ['Weth', TestERC20.abi],
   ['Chai', TestERC20.abi],
-  // ['Vat', Vat.abi],
-  // ['Pot', Pot.abi],
-  // ['Treasury', Treasury.abi],
-  // ['WethJoin', GemJoin.abi],
-  // ['DaiJoin', DaiJoin.abi],
+
 ]);
 
 export function useGetBalance() {
@@ -52,7 +42,7 @@ export function useGetBalance() {
       return balance.toString();
     } return '';
   };
-  return [getBalance, getWeiBalance, getWethBalance] as const;
+  return { getBalance, getWeiBalance, getWethBalance } as const;
 }
 
 export const useCallTx = () => {

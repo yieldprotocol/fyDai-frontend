@@ -31,7 +31,7 @@ const YieldSeriesMenuItem = ({
   } = series;
 
   const [over, setOver] = React.useState<boolean>();
-  const tooltipColor = { color: 'background-frontheader', opacity: 0.9 };
+  const tooltipColor = { color: 'background-frontheader', opacity: 1 };
   const ref = React.useRef<any>();
 
   return (
@@ -78,7 +78,7 @@ const YieldSeriesMenuItem = ({
         </Box>
       </Box>
 
-      <Collapsible open={ref.current && over && !selected}>
+      {/* <Collapsible open={ref.current && over && !selected}>
         <Box
           animation="slideRight"
           pad="small"
@@ -98,8 +98,9 @@ const YieldSeriesMenuItem = ({
             </Box>
           </Box>
         </Box>
-      </Collapsible>
-      {/* {ref.current && over && !selected && (
+      </Collapsible> */}
+
+      {ref.current && over && !selected && (
         <Drop align={{ left: 'right' }} target={ref.current} plain>
           <Box
             animation="slideRight"
@@ -107,7 +108,7 @@ const YieldSeriesMenuItem = ({
             background={tooltipColor}
             round={{ size: 'large', corner: 'right' }}
           >
-            <Box direction="column" align='end'>
+            <Box direction="column" align='center'>
               <Box direction="row" gap="xsmall">
                 <Text size="xsmall">Matures: </Text>
                 <Text size="xsmall" weight="bold">
@@ -121,7 +122,7 @@ const YieldSeriesMenuItem = ({
             </Box>
           </Box>
         </Drop>
-      )} */}
+      )}
     </Box>
   );
 };
