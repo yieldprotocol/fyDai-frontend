@@ -37,13 +37,13 @@ function BuyAction({ close }:any) {
         </Box>
 
         <Box direction='row' justify='evenly' fill='horizontal' align='baseline'>
-          <Box hoverIndicator='background' onClick={()=>close()} round pad={{ horizontal:'large', vertical:'xsmall' }}> 
+          <Box hoverIndicator='background' onClick={()=>console.log('hello')} round pad={{ horizontal:'large', vertical:'xsmall' }}> 
             <Text color='lightgrey'>Cancel</Text>
           </Box>
           <Button
             label='Confirm'
             disabled={false}
-            onClick={()=>close()}
+            onClick={()=>console.log('jello')}
           />
           {/* <SlideConfirm 
             label='Slide to payback'

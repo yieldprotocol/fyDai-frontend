@@ -24,12 +24,12 @@ export const yieldTheme = {
         light: '#49E303',
       },
       background: {
-        // 'dark': '#111111',
-        // 'light': '#FFFFFF'
-        dark:
-          'linear-gradient(135deg, rgba(138,5,12,1) 0%, rgba(17,17,17,1) 33%, rgba(17,17,17,1) 100%)',
-        light:
-          'linear-gradient(45deg, rgba(120,240,41,0.30) 0%, rgba(255,255,255,0) 33%, rgba(255,255,255,0) 100%)',
+        'dark': '#111111',
+        'light': '#FFFFFF'
+        // dark:
+        //   'linear-gradient(135deg, rgba(138,5,12,1) 0%, rgba(17,17,17,1) 33%, rgba(17,17,17,1) 100%)',
+        // light:
+        //   'linear-gradient(45deg, rgba(120,240,41,0.30) 0%, rgba(255,255,255,0) 33%, rgba(255,255,255,0) 100%)',
       },
       'background-back': {
         dark: '#111111',
@@ -535,6 +535,19 @@ export const yieldTheme = {
     },
   },
   text: {
+
+    xxxsmall: {
+      size: '8px',
+      height: '14px',
+      maxWidth: '220px',
+    },
+
+    xxsmall: {
+      size: '10px',
+      height: '15px',
+      maxWidth: '243px',
+    },
+
     xsmall: {
       size: '13px',
       height: '18px',
@@ -598,12 +611,15 @@ export const yieldTheme = {
     margin: { horizontal: 'none', vertical: 'xxsmall' },
     color: 'active-text',
     active: {
-      background: 'brand',
+      // background: 'brand',
       // background: `url("${background}")`,
       // @ts-ignore
       extend: ({ theme }) => css`
       font-weight: 'bold';
       `
+    },
+    hover: {
+      background:'background-front',
     },
 
     border: {
@@ -615,15 +631,16 @@ export const yieldTheme = {
         color: 'brand',
       },
       active: {
-        color: 'none',
+        color: 'brand',
       },
     },
     pad: 'small',
     // @ts-ignore
     extend: ({ theme }) => css`
-      border-radius: ${theme.global.edgeSize.large};
-      positon: fixed;
-    `,
+    border-radius: ${theme.global.edgeSize.xsmall};
+    positon: fixed;
+  `,
+
 
   },
 

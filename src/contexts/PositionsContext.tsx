@@ -72,7 +72,7 @@ const PositionsProvider = ({ children }:any) => {
   // post fetching data processing
   const parseChainData = (chainData:any) => {
     return chainData.map((x:any, i:number) => {
-      return { 
+      return {
         ...x,
         yDaiBalance: ethers.utils.formatEther(x.yDaiBalance.toString()),
         daiDebt: ethers.utils.formatEther(x.daiDebt.toString()),
