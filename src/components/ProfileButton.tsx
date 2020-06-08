@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import { Image, Button, Box } from 'grommet';
 
-import { useConnectorImage } from '../hooks/connectionFns';
+import { useConnectorImage } from '../hooks/connectionHooks';
 
 const ProfileButton = (props: any) => {
   const { account } = useWeb3React();

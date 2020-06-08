@@ -94,13 +94,13 @@ const YieldSeries = ({
             <>
               <Box><Heading level='5'> Positions held in this series:</Heading></Box>
               <Box margin={{ vertical:'none' }} gap='small'>
-                { seriesPosition.collateral.map((x:any)=>{
+                {/* { seriesPosition.collateral.map((x:any)=>{
                   return (
                     <Box key={x.type}>
                       <YieldPosition position={x} input={false} selectPositionFn={(e:any)=>console.log(e)} />
                     </Box>
                   );
-                })}
+                })} */}
               </Box>
             </>
             :

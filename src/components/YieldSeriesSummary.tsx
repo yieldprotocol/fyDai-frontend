@@ -46,7 +46,7 @@ const YieldSeriesSummary = ({
           background="brand"
         >
           {/* <Text size="xsmall"> {rate}%</Text> */}
-          <Text size="xsmall"> {rate.toString()} %</Text>
+          <Text size="xsmall"> {rate?.toString()} %</Text>
         </Box>
       </Box>
       <Box direction="column" align='end'>

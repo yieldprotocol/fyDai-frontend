@@ -11,6 +11,10 @@ export interface IYieldSeries {
   currentValue?: any;
 }
 
+export interface ISeriesPosition {
+
+}
+
 export interface INotification {
   message: string;
   // type: notificationEnum;
@@ -24,10 +28,3 @@ export interface INotification {
 export interface IYieldAccount {}
 
 export interface IMakerVault {}
-
-// export interface ICallTx {
-//   addr:string;
-//   contract:string;
-//   fn:string;
-//   data?:any[];
-// }

@@ -11,6 +11,8 @@ const initState = {
   timerMs: 2000,
   callbackAction: null,
   callbackCancel: null,
+  fatalOpen: false,
+  fatalMsg: '', 
 };
 
 function notifyReducer(state:any, action:any) {
@@ -25,6 +27,12 @@ function notifyReducer(state:any, action:any) {
         position: action.payload.position? action.payload.position : initState.position,
         callbackAction: action.payload.callbackAction? action.payload.callbackAction: null,
         callbackCancel: action.payload.callbackCancel? action.payload.callbackCancel: null,
+      };
+    case 'fatal':
+      return { 
+        ...state, 
+        fatalOpen: true,
+        fatalMsg: action.payload.message,
       };
     case '_closeNotify':
       return { ...state, open: false, timerMs: initState.timerMs };
