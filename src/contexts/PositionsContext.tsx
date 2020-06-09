@@ -59,14 +59,11 @@ const PositionsProvider = ({ children }:any) => {
         try {
           chainData[i].yDaiBalance = await callTx(x.YDai, 'YDai', 'balanceOf', [account]);
           chainData[i].wethPosted = await callTx(deployedCore.WethDealer, 'Dealer', 'posted', [account]);
+          chainData[i].totalDebtDai = await callTx(deployedCore.WethDealer, 'Dealer', 'totalDebtDai', [account]);
+          chainData[i].totalDebtWeth = await callTx(deployedCore.WethDealer, 'Dealer', 'totalDebtYDai', [account]);
 
           chainData[i].debtDai = await callTx(deployedCore.WethDealer, 'Dealer', 'debtDai', [x.maturity, account]);
           chainData[i].debtYDai = await callTx(deployedCore.WethDealer, 'Dealer', 'debtYDai', [x.maturity, account]);
-
-          chainData[i].totalDebtDai = await callTx(deployedCore.WethDealer, 'Dealer', 'totalDebtDai', [account]);
-          chainData[i].totalDebtWeth = await callTx(deployedCore.WethDealer, 'Dealer', 'totalDebtYDai', [account]);
-          // chainData[i].yDaiDebtChai = await callTx(deployedCore.ChaiDealer, 'Dealer', 'debtYDai', [account]);
-          // chainData[i].chaiPosted = await callTx(deployedCore.ChaiDealer, 'Dealer', 'posted', [account]);
         } catch (e) {
           console.log(`Could not load series blockchain data: ${e}`);
         }

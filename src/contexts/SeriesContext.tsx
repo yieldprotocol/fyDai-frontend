@@ -1,6 +1,7 @@
 import React from 'react';
 import firebase, { firestore } from 'firebase';
 
+import { ethers } from 'ethers';
 import { useWeb3React } from '@web3-react/core';
 
 import * as constants from '../constants';
@@ -20,19 +21,20 @@ firebase.initializeApp({
 // reducer
 function reducer(redState:any, action:any) {
   switch (action.type) {
-    case 'updateSeries':
+    case 'updateSeriesData':
       return {
         ...redState,
         seriesData: action.payload,
       };
-    case 'updatedeployedCore':
+    case 'updateDeployedCore':
       return {
         ...redState,
         deployedCore: action.payload,
       };
-    case 'updateRates':
+    case 'updateVatData': 
       return {
         ...redState,
+        vatData: action.payload,
       };
     case 'isLoading':
       return { 
@@ -46,9 +48,9 @@ function reducer(redState:any, action:any) {
 
 const SeriesProvider = ({ children }:any) => {
 
-  const initState = { isLoading: true, seriesData : [], deployedCore: {} };
+  const initState = { isLoading: true, seriesData : [], deployedCore: {}, vatData: {}  };
   const [ state, dispatch ] = React.useReducer(reducer, initState);
-  const { chainId } = useWeb3React();
+  const { chainId, account } = useWeb3React();
   const { WETH, CHAI, BN_RAY } = constants; 
   const { dispatch: notifyDispatch } = React.useContext(NotifyContext);
   const [ callTx ] = useCallTx();
@@ -83,13 +85,18 @@ const SeriesProvider = ({ children }:any) => {
         chainData.push(x);
         try {
           chainData[i].rate = await callTx(x.YDai, 'YDai', 'rate', []);
-        // chainData[i].currentValue = (await callTx( deployedCore.Vat, 'Vat', 'ilks', [ethers.utils.formatBytes32String('weth')] )).spot;
         } catch (e) { 
           console.log(`Could not load series blockchain data: ${e}`);
         }
       })
     );
     return chainData;
+  };
+
+  const fetchVatData = async (deployedCore:any): Promise<any> => {
+    const ilks = await callTx(deployedCore.Vat, 'Vat', 'ilks', [ethers.utils.formatBytes32String('ETH-A')]);
+    const urns = await callTx(deployedCore.Vat, 'Vat', 'urns', [ethers.utils.formatBytes32String('ETH-A'), account ]);
+    return { ilks, urns };
   };
 
   // post fetching data processing
@@ -103,16 +110,41 @@ const SeriesProvider = ({ children }:any) => {
     });
   };
 
+  // post fetching data processing
+  const parseVatData = (vatData:any): any => {
+    console.log(vatData);
+    return { 
+      ilks: { 
+        Art: vatData.ilks.Art.toString(),
+        spot: vatData.ilks.spot.toString(),
+        rate: vatData.ilks.rate.toString(),
+        line: vatData.ilks.line.toString(),
+        dust: vatData.ilks.dust.toString(),
+      },
+      urns: {
+        art: vatData.urns.art.toString(),
+        ink: vatData.urns.ink.toString(),
+      }
+    };
+  };
+
   const getAllData = async (networkId:number|string) => {
     dispatch({ type:'isLoading', payload: true });
     // Get yield addresses from db
     const [ addrData, deployedCore] = await getYieldAddrs(networkId);
-    // Get blockchain based data
-    const chainData:any = await fetchChainData(addrData, deployedCore);
+    
+    // get Vat data from blockchain: 
+    const vatData = fetchVatData(deployedCore);
+
+    // Get blockchain based data for each series
+    const chainData:any = fetchChainData(addrData, deployedCore);
+    
     // Process chain data (number formats, dates etc.)
-    const parsedData:any = parseChainData(chainData);
-    dispatch({ type:'updatedeployedCore', payload: deployedCore });
-    dispatch({ type:'updateSeries', payload: parsedData });
+    // const parsedData:any = parseChainData(chainData);
+
+    dispatch({ type:'updateVatData', payload: parseVatData(await vatData) });
+    dispatch({ type:'updateDeployedCore', payload: deployedCore });
+    dispatch({ type:'updateSeriesData', payload: parseChainData(await chainData) });
     dispatch({ type:'isLoading', payload: false });
   };
 

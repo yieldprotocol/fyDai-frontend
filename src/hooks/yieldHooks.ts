@@ -7,7 +7,14 @@ import { NotifyContext } from '../contexts/NotifyContext';
 import YDai from '../contracts/YDai.json';
 import Dealer from '../contracts/Dealer.json';
 import Mint from '../contracts/Mint.json';
+
 import TestERC20 from '../contracts/TestERC20.json';
+import WETH9 from '../contracts/WETH9.json';
+
+import GemJoin from '../contracts/GemJoin.json';
+import DaiJoin from '../contracts/DaiJoin.json';
+import Chai from '../contracts/Chai.json';
+import Vat from '../contracts/Vat.json';
 
 ethers.errors.setLogLevel('error');
 
@@ -15,8 +22,13 @@ const contractMap = new Map<string, any>([
   ['YDai', YDai.abi],
   ['Dealer', Dealer.abi],
   ['Mint', Mint.abi],
+  ['Dai', TestERC20.abi],
   ['Weth', TestERC20.abi],
-  ['Chai', TestERC20.abi],
+
+  ['Chai', Chai.abi],
+  ['WethJoin', GemJoin.abi],
+  ['DaiJoin', DaiJoin.abi],
+  ['Vat', Vat.abi],
 ]);
 
 export function useGetBalance() {
@@ -25,22 +37,37 @@ export function useGetBalance() {
     if (!!library && !!account) {
       const bal = await library.getBalance(account);
       return ethers.utils.formatEther(bal);
-    } return '';
+    } return '0';
   };
   const getWeiBalance = async () => {
     if (!!library && !!account) {
       const bal = await library.getBalance(account);
       return bal.toString();
-    } return '';
+    } return '0';
   };
   const getWethBalance = async (tokenAddr:string) => {
     if (!!library && !!account) {
       const contract = new ethers.Contract(tokenAddr, contractMap.get('Weth'), library);
       const balance = await contract.balanceOf(account);
       return balance.toString();
-    } return '';
+    } return '0';
   };
-  return { getBalance, getWeiBalance, getWethBalance } as const;
+  const getChaiBalance = async (tokenAddr:string) => {
+    if (!!library && !!account) {
+      const contract = new ethers.Contract(tokenAddr, contractMap.get('Chai'), library);
+      const balance = await contract.balanceOf(account);
+      return balance.toString();
+    } return '0';
+  };
+  const getDaiBalance = async (tokenAddr:string) => {
+    if (!!library && !!account) {
+      const contract = new ethers.Contract(tokenAddr, contractMap.get('Dai'), library);
+      const balance = await contract.balanceOf(account);
+      return balance.toString();
+    } return '0';
+  };
+
+  return { getBalance, getWeiBalance, getWethBalance, getChaiBalance, getDaiBalance } as const;
 }
 
 export const useCallTx = () => {
@@ -297,33 +324,4 @@ export const useSendTx = () => {
     console.log(`${tx.hash} send tx complete`);
   };
   return [ sendTx, sendTxActive ] as const;
-};
-
-export const usePayTx = () => {
-  const { library } = useWeb3React();
-  const [ payTxActive, setPayTxActive ] = React.useState<boolean>();
-  const signer = library?.getSigner();
-  const transaction = {
-    nonce: 0,
-    gasLimit: 21000,
-    gasPrice: ethers.utils.bigNumberify('20000000000'),
-    // TODO: for production uncomment ensure the transaction cannot be replayed on different networks
-    // chainId: ethers.utils.getNetwork('homestead').chainId
-    to: '',
-    value: ethers.utils.parseEther('0'),
-    // data: '0x',
-    // ... or supports ENS names
-    // to: "someone.somwhere.eth",
-  };
-  const payTx = async (to:string, amount:string) => {
-    setPayTxActive(true);
-    transaction.to = to;
-    transaction.value = ethers.utils.parseEther(amount);
-    const tx = await signer.sendTransaction(transaction);
-    console.log(tx.hash);
-    await tx.wait();
-    setPayTxActive(true);
-    console.log('tx complete');
-  };
-  return [ payTx, payTxActive ] as const;
 };
