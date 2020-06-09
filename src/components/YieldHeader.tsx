@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useWeb3React } from '@web3-react/core';
-import { Image, Header, Button, Box, ThemeContext } from 'grommet';
+import { Text, Image, Header, Button, Box, ThemeContext } from 'grommet';
 
 import { FaSeedling as YieldLeaf } from 'react-icons/fa';
 
@@ -28,7 +28,7 @@ const YieldHeader = (props: any) => {
       // elevation="xsmall"
       // gap="xlarge"
       fill="horizontal"
-      pad={{ horizontal: 'large', vertical: 'xsmall' }}
+      pad={{ horizontal: 'large', vertical: 'none' }}
       // align='end'
     >
       <Box align="center" direction='row' gap='small' margin='none' pad='none'>
@@ -54,10 +54,11 @@ const YieldHeader = (props: any) => {
         <Box 
           pad='small' 
           border={activeView === 'AMM' && { size: 'medium', side: 'bottom', color:'brand' }}
-          onClick={()=>setActiveView('AMM')}
+          // onClick={()=>setActiveView('AMM')}
           direction='row'
           gap='small'
-        ><YieldLeaf />YIELD AMM
+        >
+          <Text color='border'><YieldLeaf /> YIELD AMM</Text>
         </Box>
       </Box>
       {account ? (

@@ -131,25 +131,28 @@ const TestLayer = (props:any) => {
               {/* <Button label='useNotify_info' onClick={()=>dispatch( { type: 'notify', payload: { message:'Something is happening!.. ', type:'info', showFor:500 } } )} /> */}
               <Button label='1. Add (100 weth)- DEV' onClick={()=> sendTx(seriesState.deployedCore.Weth, 'Weth', 'mint', [account, ethers.utils.parseEther('100').toString()] )} />
              
-              <Button label='2. Weth approve dealer 1.5' onClick={()=> approveDealer(seriesState.deployedCore.Weth, seriesState.seriesData[0].Dealer, 1.5)} />
-              <Button label='3. Post Collateral 1.5' disabled={postActive} onClick={()=> account && post(seriesState.seriesData[0].Dealer, 'WETH', account, 1.5 )} />
-              <Button label='(4. Withdraw 1.5)' onClick={()=> account && withdraw(seriesState.seriesData[0].Dealer, 'WETH', account, 1.5 )} />
-              <Button label='5.Borrow 0.5' onClick={()=> account && borrow(seriesState.seriesData[0].Dealer, 'WETH', account, 0.5 )} />
-              <Button label='6.1 Repay 0.5 in yDai' onClick={()=> account && repayYDai(seriesState.seriesData[0].Dealer, 'WETH', account, 0.5 )} />
-              <Button label='( 6.2 Repay 0.5 in Dai) ' onClick={()=> account && repayDai(seriesState.seriesData[0].Dealer, 'WETH', account, 0.5 )} />
+              <Button label='2. Weth approve dealer 1.5' onClick={()=> approveDealer(seriesState.deployedCore.Weth, seriesState.deployedCore.WethDealer, 1.5)} />
+              <Button label='3. Post Collateral 1.5' disabled={postActive} onClick={()=> account && post(seriesState.deployedCore.WethDealer, account, 1.5 )} />
+              <Button label='(4. Withdraw 1.5)' onClick={()=> account && withdraw(seriesState.deployedCore.WethDealer, account, 1.5 )} />
+              
+              <Button label='5.Borrow 0.5' onClick={()=> account && borrow(seriesState.deployedCore.WethDealer, seriesState.seriesData[0].maturity, account, 0.5 )} />
+              <Button label='6.1 Repay 0.5 in yDai' onClick={()=> account && repayYDai(seriesState.deployedCore.WethDealer, seriesState.seriesData[0].maturity, account, 0.5 )} />
+              <Button label='( 6.2 Repay 0.5 in Dai) ' onClick={()=> account && repayDai(seriesState.deployedCore.WethDealer, seriesState.seriesData[0].maturity, account, 0.5 )} />
             </Box>}
 
             { flow === 'CHAI' && 
             <Box gap='small'>
               {/* <Button label='useNotify_info' onClick={()=>dispatch( { type: 'notify', payload: { message:'Something is happening!.. ', type:'info', showFor:500 } } )} /> */}
-              <Button label='1. Add (100 chai)- DEV' onClick={()=> sendTx(seriesState.deployedCore.Weth, 'Weth', 'mint', [account, ethers.utils.parseEther('100').toString()] )} />
+              {/* <Button label='1. Add (100 chai)- DEV' onClick={()=> sendTx(seriesState.deployedCore.Weth, 'Weth', 'mint', [account, ethers.utils.parseEther('100').toString()] )} />
               <Button label='2. CHAI approve dealer 1.5' onClick={()=> approveDealer(seriesState.deployedCore.Weth, seriesState.seriesData[0].Dealer, 1.5)} />
               <Button label='3. Post CHAI Collateral 1.5' disabled={postActive} onClick={()=> account && post(seriesState.seriesData[0].Dealer, 'WETH', account, 1.5 )} />
               <Button label='(4. Withdraw 1.5 CHAI)' onClick={()=> account && withdraw(seriesState.seriesData[0].Dealer, 'WETH', account, 1.5 )} />
               <Button label='5.Borrow 0.5' onClick={()=> account && borrow(seriesState.seriesData[0].Dealer, 'WETH', account, 0.5 )} />
               <Button label='( 6.1 Repay 0.5 in yDai )' onClick={()=> account && repayYDai(seriesState.seriesData[0].Dealer, 'WETH', account, 0.5 )} />
-              <Button label='6.2 Repay 0.5 in Dai' onClick={()=> account && repayDai(seriesState.seriesData[0].Dealer, 'WETH', account, 0.5 )} />
-            </Box>}
+              <Button label='6.2 Repay 0.5 in Dai' onClick={()=> account && repayDai(seriesState.seriesData[0].Dealer, 'WETH', account, 0.5 )} /> */}
+            </Box>
+            
+            }
 
             { flow === 'MATURITY' && 
             <Box gap='small'>
@@ -173,11 +176,14 @@ const TestLayer = (props:any) => {
                 </Box>
                 <Box gap='small'>
                   <Text>weth posted: { positionsData[0].wethPosted }</Text>
-                  <Text>chai posted: { positionsData[0].chaiPosted }</Text>
+                  {/* <Text>chai posted: { positionsData[0].chaiPosted }</Text> */}
                   <Text> yDai Balance: { positionsData[0].yDaiBalance }</Text>
-                  <Text>yDai Debt (WETH): { positionsData[0].yDaiDebtWeth }</Text>
-                  <Text>yDai Debt (CHAI): { positionsData[0].yDaiDebtChai }</Text>
-                  <Text>Dai Debt: { positionsData[0].daiDebt }</Text>
+                  <Text>yDai Debt (WETH): { positionsData[0].debtYDai }</Text>
+                  {/* <Text>yDai Debt (CHAI): { positionsData[0].yDaiDebtChai }</Text> */}
+                  <Text>Dai Debt: { positionsData[0].debtDai }</Text>
+
+                  <Text>Total Debt Weth: { positionsData[0].totalDebtWeth }</Text>
+                  <Text>Total Debt Dai: { positionsData[0].totalDebtDai }</Text>
                 </Box>
                 <Button label='refresh' onClick={()=>positionsActions.getPositions([seriesState.seriesData[0]])} />
               </Box>

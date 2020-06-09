@@ -5,7 +5,7 @@ export const yieldTheme = {
   name: 'yieldTheme',
   rounding: 24,
   spacing: 20,
-  pad: 'xlarge',
+  pad: 'medium',
   defaultMode: 'light',
   global: {
     elevation: {
@@ -198,6 +198,16 @@ export const yieldTheme = {
     input: {
       padding: { vertical: 'xsmall', horizontal: 'small' },
       weight: 100,
+      extend: () => css`
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+    `
     },
     spacing: '20px',
     size: {
@@ -215,7 +225,26 @@ export const yieldTheme = {
   diagram: {
     line: {},
   },
-  TextInput: {},
+  grommet: {
+    // @ts-ignore
+    extend: () => css`
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+
+    overflow: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    ::-webkit-scrollbar { display:none; }
+    `
+  },
+  TextInput: {
+  },
   collapsible: {
     minSpeed: '100',
   },
@@ -302,76 +331,8 @@ export const yieldTheme = {
     },
     round: '24px',
   },
-  calendar: {
-    small: {
-      fontSize: '13.333333333333334px',
-      lineHeight: 1.375,
-      daySize: '22.86px',
-    },
-    medium: {
-      fontSize: '15px',
-      lineHeight: 1.45,
-      daySize: '45.71px',
-    },
-    large: {
-      fontSize: '20px',
-      lineHeight: 1.11,
-      daySize: '91.43px',
-    },
-  },
-  clock: {
-    analog: {
-      hour: {
-        width: '7px',
-        size: '20px',
-      },
-      minute: {
-        width: '3px',
-        size: '10px',
-      },
-      second: {
-        width: '3px',
-        size: '8px',
-      },
-      size: {
-        small: '60px',
-        medium: '80px',
-        large: '120px',
-        xlarge: '180px',
-        huge: '240px',
-      },
-    },
-    digital: {
-      text: {
-        xsmall: {
-          size: '11.666666666666666px',
-          height: 1.5,
-        },
-        small: {
-          size: '13.333333333333334px',
-          height: 1.43,
-        },
-        medium: {
-          size: '15px',
-          height: 1.375,
-        },
-        large: {
-          size: '16.666666666666668px',
-          height: 1.167,
-        },
-        xlarge: {
-          size: '18.333333333333332px',
-          height: 1.1875,
-        },
-        xxlarge: {
-          size: '21.666666666666668px',
-          height: 1.125,
-        },
-      },
-    },
-  },
-  heading: {
 
+  heading: {
     level: {
       '1': {
         small: {
@@ -656,13 +617,13 @@ export const yieldTheme = {
       // `
     },
     panel : {
-      // @ts-ignore
-      extend: ({ theme }) => css`
-      overflow: auto;
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-      ::-webkit-scrollbar { display:none; }
-    `
+    //   // @ts-ignore
+    //   extend: ({ theme }) => css`
+    //   overflow: auto;
+    //   -ms-overflow-style: none;
+    //   scrollbar-width: none;
+    //   ::-webkit-scrollbar { display:none; }
+    // `
     },
     // @ts-ignore
     extend: ({ theme }) => css`
@@ -670,4 +631,15 @@ export const yieldTheme = {
       radius: ${theme.global.edgeSize.large};
     `,
   },
+  rangeInput: {
+    track: {
+      // color: 'accent-2',
+      height: 'small',
+      extend: () => 'border-radius: 10px'
+    },
+    thumb: {
+      color: 'brand'
+    }
+  },
+
 };

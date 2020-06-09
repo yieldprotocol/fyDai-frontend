@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Button, Heading, TextInput, Text, CheckBox, Collapsible } from 'grommet';
+import { Box, Button, Heading, TextInput, Text, CheckBox, Collapsible, RangeInput } from 'grommet';
 import { FiCheckCircle } from 'react-icons/fi';
 
 import { IYieldSeries } from '../types';
@@ -14,6 +14,7 @@ const BorrowAction = (props:BorrowActionProps) => {
 
   const [inputValue, setInputValue] = React.useState<any>();
   const [borrowOpen, setBorrowOpen] = React.useState<boolean>(false);
+  const slideRef = React.useRef<any>();
 
   return (
 
@@ -44,6 +45,36 @@ const BorrowAction = (props:BorrowActionProps) => {
 
       <Collapsible open={borrowOpen}>
         <Box direction='column' gap='medium' pad='medium' align='center'>
+          
+          <Box 
+            direction='row'
+            gap='small'
+            // background='background-front'
+            fill
+            round
+            pad='small'
+            border={{ color:'background' }}
+          >
+            <Box round='xsmall' border='all' pad={{ horizontal:'small' }}> Max
+              {/* <Button round='xsmall' label='MAX' /> */}
+            </Box>
+            <Box round='xsmall' border='all' pad={{ horizontal:'small' }}> Max
+              {/* <Button round='xsmall' label='MAX' /> */}
+            </Box>
+            <RangeInput
+              ref={slideRef}
+              value={inputValue}
+              max='100'
+              // @ts-ignore
+              step='0.10'
+              onChange={(e:any) => setInputValue(e.target.value)}
+            />
+            <Box round='xsmall' border='all' pad={{ horizontal:'small' }}> Max
+              {/* <Button round='xsmall' label='MAX' /> */}
+            </Box>
+          </Box>
+
+
           <Box gap='none' direction='row' align='baseline'>
             <Box
               style={{ borderRadius:'24px 0px 0px 24px' }}
@@ -82,6 +113,7 @@ const BorrowAction = (props:BorrowActionProps) => {
             />
           </Box>
         </Box>
+
       </Collapsible>
     </Box>
 

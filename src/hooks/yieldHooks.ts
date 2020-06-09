@@ -12,13 +12,11 @@ import TestERC20 from '../contracts/TestERC20.json';
 ethers.errors.setLogLevel('error');
 
 const contractMap = new Map<string, any>([
-  
   ['YDai', YDai.abi],
   ['Dealer', Dealer.abi],
   ['Mint', Mint.abi],
   ['Weth', TestERC20.abi],
   ['Chai', TestERC20.abi],
-
 ]);
 
 export function useGetBalance() {
@@ -74,23 +72,18 @@ export const useDealer = () => {
   const [ approveDealerActive, setApproveDealerActive ] = React.useState<boolean>(false);
   const signer = library?.getSigner();
 
-  const post = async (dealerAddress:string, collateral:string, from:string, amount:number) => {
+  const post = async (dealerAddress:string, from:string, amount:number) => {
     let tx:any;
     // Processing and sanitizing input
     const parsedAmount = formatNumber(amount);
-    const collateralBytes = ethers.utils.formatBytes32String(collateral);
     const fromAddr = ethers.utils.getAddress(from);
     const dealerAddr = ethers.utils.getAddress(dealerAddress);
     
     // Contract interaction
     setPostActive(true);
-    const contract = new ethers.Contract(
-      dealerAddr,
-      dealerAbi,
-      signer
-    );
+    const contract = new ethers.Contract( dealerAddr, dealerAbi, signer );
     try {
-      tx = await contract.post(collateralBytes, fromAddr, parsedAmount);
+      tx = await contract.post(fromAddr, parsedAmount);
     } catch (e) {
       notifyDispatch({ type: 'notify', payload:{ message:`${e.data.message}`, type:'error' } } );
       setPostActive(false);
@@ -98,107 +91,89 @@ export const useDealer = () => {
     }
 
     // Transaction reporting & tracking
-    notifyDispatch({ type: 'notify', payload:{ message:`Deposit of ${amount} ${collateral} pending...`, type:'info' } } );
+    notifyDispatch({ type: 'notify', payload:{ message:`Deposit of ${amount} pending...`, type:'info' } } );
     await tx.wait();
     setPostActive(false);
-    notifyDispatch({ type: 'notify', payload:{ message: `Deposit of ${amount} ${collateral} complete.`, type:'success' } } );
+    notifyDispatch({ type: 'notify', payload:{ message: `Deposit of ${amount} complete.`, type:'success' } } );
   };
 
-  const withdraw = async (dealerAddress:string, collateral:string, to:string, amount:number) => {
+  const withdraw = async (dealerAddress:string, to:string, amount:number) => {
     let tx:any;
     const parsedAmount = formatNumber(amount);
-    const collateralBytes = ethers.utils.formatBytes32String(collateral);
+    // const collateralBytes = ethers.utils.formatBytes32String(collateral);
     const toAddr = ethers.utils.getAddress(to);
     const dealerAddr = ethers.utils.getAddress(dealerAddress);
     setWithdrawActive(true);
-    const contract = new ethers.Contract(
-      dealerAddr,
-      dealerAbi,
-      signer
-    );
+    const contract = new ethers.Contract( dealerAddr, dealerAbi, signer );
     try {
-      tx = await contract.withdraw(collateralBytes, toAddr, parsedAmount);
+      tx = await contract.withdraw(toAddr, parsedAmount);
     } catch (e) {
       notifyDispatch({ type: 'notify', payload:{ message:`${e.data.message}`, type:'error' } } );
       setWithdrawActive(false);
       return;
     }
-    notifyDispatch({ type: 'notify', payload:{ message: `Withdraw of ${amount} ${collateral} pending...`, type:'info' } } );
+    notifyDispatch({ type: 'notify', payload:{ message: `Withdraw of ${amount} pending...`, type:'info' } } );
     await tx.wait();
     setWithdrawActive(false);
-    notifyDispatch({ type: 'notify', payload:{ message: `Withdrawal of ${amount} ${collateral} complete.`, type:'success' } } );
+    notifyDispatch({ type: 'notify', payload:{ message: `Withdrawal of ${amount} complete.`, type:'success' } } );
   };
 
-  const borrow = async (dealerAddress:string, collateral:string, to:string, yDai:number) => {
+  const borrow = async (dealerAddress:string, maturity:string, to:string, yDai:number) => {
     let tx:any;
     const parsedYDai = formatNumber(yDai);
-    const collateralBytes = ethers.utils.formatBytes32String(collateral);
+    // const collateralBytes = ethers.utils.formatBytes32String(collateral);
     const toAddr = ethers.utils.getAddress(to);
     const dealerAddr = ethers.utils.getAddress(dealerAddress);
     setBorrowActive(true);
-    const contract = new ethers.Contract(
-      dealerAddr,
-      dealerAbi,
-      signer
-    );
+    const contract = new ethers.Contract( dealerAddr, dealerAbi, signer );
     try {
-      tx = await contract.borrow(collateralBytes, toAddr, parsedYDai);
+      tx = await contract.borrow(maturity, toAddr, parsedYDai);
     } catch (e) {
       notifyDispatch({ type: 'notify', payload:{ message:`${e.data.message}`, type:'error' } } );
       setBorrowActive(false);
       return;
     }
-    notifyDispatch({ type: 'notify', payload:{ message: `Borrowing of ${yDai} from ${collateral} pending...`, type:'info' } } );
+    notifyDispatch({ type: 'notify', payload:{ message: `Borrowing of ${yDai} pending...`, type:'info' } } );
     await tx.wait();
     setBorrowActive(false);
-    notifyDispatch({ type: 'notify', payload:{ message: `Borrowing of ${yDai} from ${collateral} complete.`, type:'success' } } );
+    notifyDispatch({ type: 'notify', payload:{ message: `Borrowing of ${yDai} complete.`, type:'success' } } );
   };
 
-  const repayDai = async (dealerAddress:string, collateral:string, from:string, dai:number) => {
+  const repayDai = async (dealerAddress:string, maturity:string, from:string, dai:number) => {
     let tx:any;
     const parsedDai = formatNumber(dai);
-    const collateralBytes = ethers.utils.formatBytes32String(collateral);
     const fromAddr = ethers.utils.getAddress(from);
     const dealerAddr = ethers.utils.getAddress(dealerAddress);
     setRepayActive(true);
-    const contract = new ethers.Contract(
-      dealerAddr,
-      dealerAbi,
-      signer
-    );
+    const contract = new ethers.Contract( dealerAddr, dealerAbi, signer );
     try {
-      tx = await contract.repayDai(collateralBytes, fromAddr, parsedDai);
+      tx = await contract.repayDai(maturity, fromAddr, parsedDai);
     } catch (e) {
       notifyDispatch({ type: 'notify', payload:{ message:`${e.data.message}`, type:'error' } } );
       setRepayActive(false);
       return;
     }
-    notifyDispatch({ type: 'notify', payload:{ message: `Repayment of ${dai} Dai with ${collateral} pending...`, type:'info' } } );
+    notifyDispatch({ type: 'notify', payload:{ message: `Repayment of ${dai} Dai pending...`, type:'info' } } );
     await tx.wait();
     setRepayActive(false);
-    notifyDispatch({ type: 'notify', payload:{ message: `Repayment of ${dai} yDai with ${collateral} complete.`, type:'success' } } );
+    notifyDispatch({ type: 'notify', payload:{ message: `Repayment of ${dai} yDai complete.`, type:'success' } } );
   };
 
-  const repayYDai = async (dealerAddress:string, collateral:string, from:string, yDai:number) => {
+  const repayYDai = async (dealerAddress:string, maturity:string, from:string, yDai:number) => {
     let tx:any;
     const parsedYDai = formatNumber(yDai);
-    const collateralBytes = ethers.utils.formatBytes32String(collateral);
     const fromAddr = ethers.utils.getAddress(from);
     const dealerAddr = ethers.utils.getAddress(dealerAddress);
     setRepayActive(true);
-    const contract = new ethers.Contract(
-      dealerAddr,
-      dealerAbi,
-      signer
-    );
+    const contract = new ethers.Contract( dealerAddr, dealerAbi, signer );
     try {
-      tx = await contract.repayYDai(collateralBytes, fromAddr, parsedYDai);
+      tx = await contract.repayYDai(maturity, fromAddr, parsedYDai);
     } catch (e) {
       notifyDispatch({ type: 'notify', payload:{ message:`${e.data.message}`, type:'error' } } );
       setRepayActive(false);
       return;
     }
-    notifyDispatch({ type: 'notify', payload:{ message: `Repayment of ${yDai} yDai with ${collateral} pending...`, type:'info' } } );
+    notifyDispatch({ type: 'notify', payload:{ message: `Repayment of ${yDai} yDai pending...`, type:'info' } } );
     await tx.wait();
     setRepayActive(false);
     notifyDispatch({ type: 'notify', payload:{ message: `Repayment of ${yDai} yDai complete.`, type:'success' } } );
