@@ -11,7 +11,7 @@ import { useCallTx } from '../hooks/yieldHooks';
 
 import { NotifyContext } from './NotifyContext';
 
-const SeriesContext = React.createContext<any>({});
+const YieldContext = React.createContext<any>({});
 
 firebase.initializeApp({
   apiKey: 'AIzaSyATOt3mpg8B512V-6Pl_2ZqjY1WjE5q49s',
@@ -77,20 +77,21 @@ const SeriesProvider = ({ children }:any) => {
     return [ seriesAddrs, deployedCore];
   };
 
-  // async add blockchain data
+  // async add blockchain data (if reqd. - nothing at this point)
   const fetchChainData = async (seriesAddrs:IYieldSeries[], deployedCore:any): Promise<IYieldSeries[]> => {
     const chainData:any[] = [];
-    await Promise.all(
-      seriesAddrs.map( async (x:any, i:number)=> {
-        chainData.push(x);
-        try {
-          chainData[i].rate = await callTx(x.YDai, 'YDai', 'rate', []);
-        } catch (e) { 
-          console.log(`Could not load series blockchain data: ${e}`);
-        }
-      })
-    );
-    return chainData;
+    // await Promise.all(
+    //   seriesAddrs.map( async (x:any, i:number)=> {
+    //     chainData.push(x);
+    //     try {
+    //       chainData[i].rate = await callTx(x.YDai, 'YDai', 'rate', []);
+    //     } catch (e) { 
+    //       console.log(`Could not load series blockchain data: ${e}`);
+    //     }
+    //   })
+    // );
+    // return chainData;
+    return seriesAddrs;
   };
 
   const fetchVatData = async (deployedCore:any): Promise<any> => {
@@ -102,17 +103,16 @@ const SeriesProvider = ({ children }:any) => {
   // post fetching data processing
   const parseChainData = (chainData:IYieldSeries[]): IYieldSeries[] => {
     return chainData.map((x:any, i:number) => {
-      return { 
+      return {
         ...x,
         rate: x.rate?.div(BN_RAY).toNumber(),
-        date: new Date( (x?.maturity as number) * 1000 ),
+        date: new Date( (x.maturity) * 1000 ),
       };
     });
   };
 
   // post fetching data processing
   const parseVatData = (vatData:any): any => {
-    console.log(vatData);
     return { 
       ilks: { 
         Art: vatData.ilks.Art.toString(),
@@ -132,19 +132,15 @@ const SeriesProvider = ({ children }:any) => {
     dispatch({ type:'isLoading', payload: true });
     // Get yield addresses from db
     const [ addrData, deployedCore] = await getYieldAddrs(networkId);
-    
     // get Vat data from blockchain: 
-    const vatData = fetchVatData(deployedCore);
-
+    const vatData = await fetchVatData(deployedCore);
     // Get blockchain based data for each series
-    const chainData:any = fetchChainData(addrData, deployedCore);
-    
-    // Process chain data (number formats, dates etc.)
-    // const parsedData:any = parseChainData(chainData);
+    const chainData:any = await fetchChainData(addrData, deployedCore);
 
-    dispatch({ type:'updateVatData', payload: parseVatData(await vatData) });
+    // TODO: Maybe convert to a single dispatch call. See after app dust has settled.
+    dispatch({ type:'updateVatData', payload: parseVatData(vatData) });
     dispatch({ type:'updateDeployedCore', payload: deployedCore });
-    dispatch({ type:'updateSeriesData', payload: parseChainData(await chainData) });
+    dispatch({ type:'updateSeriesData', payload: parseChainData(chainData) });
     dispatch({ type:'isLoading', payload: false });
   };
 
@@ -153,10 +149,10 @@ const SeriesProvider = ({ children }:any) => {
   }, [chainId]);
 
   return (
-    <SeriesContext.Provider value={{ state, dispatch }}>
+    <YieldContext.Provider value={{ state, dispatch }}>
       {children}
-    </SeriesContext.Provider>
+    </YieldContext.Provider>
   );
 };
 
-export { SeriesContext, SeriesProvider };
+export { YieldContext, SeriesProvider };

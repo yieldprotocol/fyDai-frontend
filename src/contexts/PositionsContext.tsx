@@ -2,9 +2,11 @@ import React from 'react';
 import { ethers } from 'ethers';
 import { useWeb3React } from '@web3-react/core';
 import moment from 'moment';
-import * as constants from '../constants';
-import { SeriesContext } from './SeriesContext';
 
+
+import * as constants from '../constants';
+import * as utils from '../helpers/utils';
+import { YieldContext } from './YieldContext';
 import { useCallTx } from '../hooks/yieldHooks';
 
 const PositionsContext = React.createContext<any>({});
@@ -43,10 +45,10 @@ function reducer(redState:any, action:any) {
 const PositionsProvider = ({ children }:any) => {
 
   const { chainId, account } = useWeb3React();
-  const { WETH, CHAI } = constants;
+  
   const initState = { positionsIndicator: 0, positionsData : [] };
   const [ state, dispatch ] = React.useReducer(reducer, initState);
-  const { state: seriesState } = React.useContext(SeriesContext);
+  const { state: seriesState } = React.useContext(YieldContext);
   const [ callTx ] = useCallTx();
 
   const { deployedCore } = seriesState; 

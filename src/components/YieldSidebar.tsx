@@ -17,7 +17,7 @@ import logoLight from '../assets/images/yield_light.svg';
 import { Spinner } from './LoadingSpinner';
 
 import { IYieldSeries } from '../types';
-import { SeriesContext } from '../contexts/SeriesContext';
+import { YieldContext } from '../contexts/YieldContext';
 import YieldSeriesMenuItem from './YieldSeriesMenuItem';
 
 import YieldSeries from './YieldSeries';
@@ -57,7 +57,7 @@ import YieldSeries from './YieldSeries';
 // );
 
 const YieldSidebar = ({ activeSeries, setActiveSeries, setShowSeriesLayer }:{activeSeries:IYieldSeries|null, setActiveSeries:any, setShowSeriesLayer:any}) => {
-  const { state } = React.useContext( SeriesContext );
+  const { state } = React.useContext( YieldContext );
   const [seriesList, setSeriesList] = React.useState<IYieldSeries[]>([]);
   const [showMore, setShowMore] = React.useState<boolean>(false);
   const [openIndex, setOpenIndex] = React.useState<number | null >(null);

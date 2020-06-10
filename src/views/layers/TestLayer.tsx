@@ -5,20 +5,24 @@ import { ethers } from 'ethers';
 import { useWeb3React } from '@web3-react/core';
 import { Anchor, Layer, Header, Heading, Footer, Button, Box, Text } from 'grommet';
 
+import * as utils from '../../helpers/utils';
+
 import { getNetworkName, useMakerVault }  from '../../hooks/connectionHooks';
 import ProfileButton from '../../components/ProfileButton';
 import { NotifyContext } from '../../contexts/NotifyContext';
 
 import { useSendTx, useCallTx, useDealer, useGetBalance } from '../../hooks/yieldHooks';
 
-import { SeriesContext } from '../../contexts/SeriesContext';
+import { YieldContext } from '../../contexts/YieldContext';
 import { PositionsContext } from '../../contexts/PositionsContext';
 
 const TestLayer = (props:any) => {
   const { chainId, account } = useWeb3React();
 
+  console.log(utils);
+
   const web3 = useWeb3React();
-  const { state: seriesState } = React.useContext( SeriesContext );
+  const { state: seriesState } = React.useContext( YieldContext );
   const { state: positionsState, actions: positionsActions } = React.useContext( PositionsContext );
   const [ balance, setBalance ] = React.useState<string|null>('-');
   const [ flow, setFlow ] = React.useState<string|null>('WETH');

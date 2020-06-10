@@ -66,7 +66,6 @@ export function useGetBalance() {
       return balance.toString();
     } return '0';
   };
-
   return { getBalance, getWeiBalance, getWethBalance, getChaiBalance, getDaiBalance } as const;
 }
 

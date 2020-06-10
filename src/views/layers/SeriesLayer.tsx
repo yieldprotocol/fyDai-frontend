@@ -2,7 +2,7 @@ import React from 'react';
 import { Anchor, Text, Box, Layer, Header } from 'grommet';
 
 import { IYieldSeries } from '../../types';
-import { SeriesContext } from '../../contexts/SeriesContext';
+import { YieldContext } from '../../contexts/YieldContext';
 
 import { Spinner } from '../../components/LoadingSpinner';
 
@@ -26,7 +26,7 @@ const SeriesLayer = (props:any) => {
 
   // TODO: convert to reducer if get more 
 
-  const { state } = React.useContext( SeriesContext );
+  const { state } = React.useContext( YieldContext );
 
   const handleSelectSeries = (series: any) => {
     setActiveSeries(series);

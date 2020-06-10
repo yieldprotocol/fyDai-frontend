@@ -84,7 +84,7 @@ function App() {
         <NotifyLayer />
         { showAccountLayer && <AccountLayer closeLayer={()=>setShowAccountLayer(false)} changeWallet={()=>changeConnection()} /> }
         { showConnectLayer && <ConnectLayer closeLayer={()=>setShowConnectLayer(false)} />}
-        { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
+        { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(true)} /> }
         { showSeriesLayer  && <SeriesLayer setActiveSeries={setActiveSeries} closeLayer={()=>setShowSeriesLayer(false)} /> }
         <Box direction="row" height={{ min: '100%' }}>
           <Box flex>
