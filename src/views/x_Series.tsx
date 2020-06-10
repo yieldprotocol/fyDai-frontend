@@ -46,7 +46,7 @@ const Series = (props:any) => {
     <Box 
       pad="medium"
       border={{ side:'all', color:'lightgreen' }}
-      round
+      // round
       ref={boxRef}
     >
       <Box justify="between" gap='small'>
