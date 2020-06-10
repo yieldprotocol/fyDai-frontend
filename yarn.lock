@@ -15330,6 +15330,11 @@ react-lifecycles-compat@^3.0.2:
   resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz#4f1a273afdfc8f3488a8c516bfda78f872352362"
   integrity sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==
 
+react-range@^1.6.6:
+  version "1.6.6"
+  resolved "https://registry.yarnpkg.com/react-range/-/react-range-1.6.6.tgz#dd92af04d30f80c79b7572756393896ffc9b7daf"
+  integrity sha512-4hxMwxx/TPYjxdKWrD8PYCvvO3vgbNqTcFI4qMEld1Ddp9gBJEZcS2BM634vUsSwGcrWTP67FxRhpbjI2Sbjfw==
+
 react-scripts@3.4.1:
   version "3.4.1"
   resolved "https://registry.yarnpkg.com/react-scripts/-/react-scripts-3.4.1.tgz#f551298b5c71985cc491b9acf3c8e8c0ae3ada0a"

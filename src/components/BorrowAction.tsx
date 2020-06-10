@@ -61,12 +61,13 @@ const BorrowAction = (props:BorrowActionProps) => {
             <Box round='xsmall' border='all' pad={{ horizontal:'small' }}> Max
               {/* <Button round='xsmall' label='MAX' /> */}
             </Box>
+
             <RangeInput
               ref={slideRef}
               value={inputValue}
               max='100'
               // @ts-ignore
-              step='0.10'
+              step={0.1}
               onChange={(e:any) => setInputValue(e.target.value)}
             />
             <Box round='xsmall' border='all' pad={{ horizontal:'small' }}> Max
