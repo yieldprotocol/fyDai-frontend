@@ -53,9 +53,9 @@ export const divRay = (x:ethers.utils.BigNumber, ray:ethers.utils.BigNumber) => 
   return unit.mul(bigNumberify(x)).div(bigNumberify(ray));
 };
 
-
 // @dev Takes a bignumber in RAY and converts it to a human accesible number string
-export const RayToHuman = (x:any) => {
+export const rayToHuman = (x:any) => {
   // const unit = bigNumberify('10').pow(bigNumberify('27'));
   return x.toString();
 };
+

@@ -32,14 +32,14 @@ const Series = (props:any) => {
   };
 
   React.useEffect(() => {
-    !state.isLoading && setSeriesList(state.seriesData);
+    !state.isLoading && setSeriesList(state.deployedSeries);
   }, [ state.isLoading ]);
 
   // React.useEffect(() => {
   //   showMore? 
-  //     setSeriesList(state.seriesData) 
+  //     setSeriesList(state.deployedSeries) 
   //     : 
-  //     setSeriesList(state.seriesData.slice(0, 4));
+  //     setSeriesList(state.deployedSeries.slice(0, 4));
   // }, [ showMore ]);
 
   return (

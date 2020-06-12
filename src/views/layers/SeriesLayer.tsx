@@ -23,8 +23,7 @@ const SeriesLayer = (props:any) => {
 
   // const refsArray = React.useRef([]);
   // const elementsRef = React.useRef(seriesList.map(() => createRef()));
-
-  // TODO: convert to reducer if get more 
+  // TODO: convert to reducer if get more
 
   const { state } = React.useContext( YieldContext );
 
@@ -34,14 +33,14 @@ const SeriesLayer = (props:any) => {
   };
 
   React.useEffect(() => {
-    !state.isLoading && setSeriesList(state.seriesData);
+    !state.isLoading && setSeriesList(state.deployedSeries);
   }, [ state.isLoading ]);
 
   // React.useEffect(() => {
   //   showMore? 
-  //     setSeriesList(state.seriesData) 
+  //     setSeriesList(state.deployedSeries) 
   //     : 
-  //     setSeriesList(state.seriesData.slice(0, 4));
+  //     setSeriesList(state.deployedSeries.slice(0, 4));
   // }, [ showMore ]);
 
   return (

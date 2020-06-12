@@ -71,7 +71,7 @@ const YieldSidebar = ({ activeSeries, setActiveSeries, setShowSeriesLayer }:{act
   // };
 
   React.useEffect(() => {
-    !state.isLoading && setSeriesList(state.seriesData);
+    !state.isLoading && setSeriesList(state.deployedSeries);
   }, [ state.isLoading ]);
 
   return (

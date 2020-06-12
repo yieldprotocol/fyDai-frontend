@@ -1,11 +1,10 @@
 import React from 'react';
-import firebase, { firestore } from 'firebase';
+import firebase from 'firebase';
 
 import { ethers } from 'ethers';
 import { useWeb3React } from '@web3-react/core';
 
-import * as constants from '../constants';
-import * as utils from '../helpers/utils';
+import * as utils from '../utils';
 
 import { IYieldSeries } from '../types';
 
@@ -23,20 +22,20 @@ firebase.initializeApp({
 // reducer
 function reducer(redState:any, action:any) {
   switch (action.type) {
-    case 'updateSeriesData':
+    case 'updateDeployedSeries':
       return {
         ...redState,
-        seriesData: action.payload,
+        deployedSeries: action.payload,
       };
     case 'updateDeployedCore':
       return {
         ...redState,
         deployedCore: action.payload,
       };
-    case 'updateVatData': 
+    case 'updateMakerData': 
       return {
         ...redState,
-        vatData: action.payload,
+        makerData: action.payload,
       };
     case 'isLoading':
       return { 
@@ -48,12 +47,11 @@ function reducer(redState:any, action:any) {
   }
 }
 
-const SeriesProvider = ({ children }:any) => {
+const YieldProvider = ({ children }:any) => {
 
-  const initState = { isLoading: true, seriesData : [], deployedCore: {}, vatData: {}  };
+  const initState = { isLoading: true, deployedSeries : [], deployedCore: {}, makerData: {} };
   const [ state, dispatch ] = React.useReducer(reducer, initState);
   const { chainId, account } = useWeb3React();
-  const { WETH, CHAI, BN_RAY } = constants; 
   const { dispatch: notifyDispatch } = React.useContext(NotifyContext);
   const [ callTx ] = useCallTx();
 
@@ -96,9 +94,8 @@ const SeriesProvider = ({ children }:any) => {
     return seriesAddrs;
   };
 
-  const fetchVatData = async (deployedCore:any): Promise<any> => {
+  const fetchMakerData = async (deployedCore:any): Promise<any> => {
     const pot = await callTx(deployedCore.Pot, 'Pot', 'chi', []);
-    console.log(pot); 
     const ilks = await callTx(deployedCore.Vat, 'Vat', 'ilks', [ethers.utils.formatBytes32String('ETH-A')]);
     const urns = await callTx(deployedCore.Vat, 'Vat', 'urns', [ethers.utils.formatBytes32String('ETH-A'), account ]);
     return { ilks, urns, pot };
@@ -109,30 +106,30 @@ const SeriesProvider = ({ children }:any) => {
     return chainData.map((x:any, i:number) => {
       return {
         ...x,
-        rate: x.rate?.div(BN_RAY).toNumber(),
-        date: new Date( (x.maturity) * 1000 ),
+        // rate_p: x.rate?.toString(),
+        maturity_p: new Date( (x.maturity) * 1000 ),
       };
     });
   };
 
   // post fetching data processing
-  const parseVatData = (vatData:any): any => {
+  const parseMakerData = (makerData:any): any => {
     return { 
       ilks: {
-        ...vatData.ilks,
-        Art_f: utils.RayToHuman(vatData.ilks.Art),
-        spot_f: utils.RayToHuman(vatData.ilks.spot),
-        rate_f: utils.RayToHuman(vatData.ilks.rate),
-        line_f: utils.RayToHuman(vatData.ilks.line),
-        dust_f: utils.RayToHuman(vatData.ilks.dust),
+        ...makerData.ilks,
+        Art_p: utils.rayToHuman(makerData.ilks.Art),
+        spot_p: utils.rayToHuman(makerData.ilks.spot),
+        rate_p: utils.rayToHuman(makerData.ilks.rate),
+        line_p: utils.rayToHuman(makerData.ilks.line),
+        dust_p: utils.rayToHuman(makerData.ilks.dust),
       },
       urns: {
-        ...vatData.urns,
-        art_f: utils.RayToHuman(vatData.urns.art),
-        ink_f: utils.RayToHuman(vatData.urns.ink),
+        ...makerData.urns,
+        art_p: utils.rayToHuman(makerData.urns.art),
+        ink_p: utils.rayToHuman(makerData.urns.ink),
       },
-      pot: { 
-        chi: vatData.pot.chi,
+      pot: {
+        chi_p: makerData.pot.chi,
       }
     };
   };
@@ -142,14 +139,14 @@ const SeriesProvider = ({ children }:any) => {
     // Get yield addresses from db
     const [ addrData, deployedCore] = await getYieldAddrs(networkId);
     // get Vat data from blockchain: 
-    const vatData = await fetchVatData(deployedCore);
+    const makerData = await fetchMakerData(deployedCore);
     // Get blockchain based data for each series
     const chainData:any = await fetchChainData(addrData, deployedCore);
 
     // TODO: Maybe convert to a single dispatch call. See after app dust has settled.
-    dispatch({ type:'updateVatData', payload: parseVatData(vatData) });
+    dispatch({ type:'updateMakerData', payload: parseMakerData(makerData) });
     dispatch({ type:'updateDeployedCore', payload: deployedCore });
-    dispatch({ type:'updateSeriesData', payload: parseChainData(chainData) });
+    dispatch({ type:'updateDeployedSeries', payload: parseChainData(chainData) });
     dispatch({ type:'isLoading', payload: false });
   };
 
@@ -164,4 +161,4 @@ const SeriesProvider = ({ children }:any) => {
   );
 };
 
-export { YieldContext, SeriesProvider };
+export { YieldContext, YieldProvider };
