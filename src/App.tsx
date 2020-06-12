@@ -51,7 +51,7 @@ function App() {
   // TODO move to layerContext
   const [showConnectLayer, setShowConnectLayer] = React.useState<boolean>(false);
   const [showAccountLayer, setShowAccountLayer] = React.useState<boolean>(false);
-  const [showTestLayer, setShowTestLayer] = React.useState<boolean>(false);
+  const [showTestLayer, setShowTestLayer] = React.useState<boolean>(true);
   const [showSeriesLayer, setShowSeriesLayer] = React.useState<boolean>(false);
 
   const eagerConnect = useEagerConnect();
@@ -84,7 +84,7 @@ function App() {
         <NotifyLayer />
         { showAccountLayer && <AccountLayer closeLayer={()=>setShowAccountLayer(false)} changeWallet={()=>changeConnection()} /> }
         { showConnectLayer && <ConnectLayer closeLayer={()=>setShowConnectLayer(false)} />}
-        { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(true)} /> }
+        { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
         { showSeriesLayer  && <SeriesLayer setActiveSeries={setActiveSeries} closeLayer={()=>setShowSeriesLayer(false)} /> }
         <Box direction="row" height={{ min: '100%' }}>
           <Box flex>

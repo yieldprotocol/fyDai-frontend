@@ -39050,12 +39050,12 @@
         }
       },
       "links": {},
-      "address": "0xD697ff0aFFF50451E7511Eadc2D9f9aCB73E704A",
-      "transactionHash": "0x073ddb0b32e12bc727f39849e07685f0ea328dbd421e158c7116bb56bd8de6d7"
+      "address": "0x7FF151D627E2b7DC326507677d35F3b8Ff33d844",
+      "transactionHash": "0x6d1b5b8fcd7443d0097e10be4317229ec0a44c921515125627f4fc6bc4f52c1d"
     }
   },
   "schemaVersion": "3.0.23",
-  "updatedAt": "2020-06-08T17:25:07.313Z",
+  "updatedAt": "2020-06-11T16:17:05.984Z",
   "networkType": "ethereum",
   "devdoc": {
     "methods": {}

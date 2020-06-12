@@ -48,10 +48,10 @@ const PositionsProvider = ({ children }:any) => {
   
   const initState = { positionsIndicator: 0, positionsData : [] };
   const [ state, dispatch ] = React.useReducer(reducer, initState);
-  const { state: seriesState } = React.useContext(YieldContext);
+  const { state: yieldState } = React.useContext(YieldContext);
   const [ callTx ] = useCallTx();
 
-  const { deployedCore } = seriesState; 
+  const { deployedCore } = yieldState; 
 
   const fetchChainData = async (seriesData:any) => {
     const chainData:any[] = [];
@@ -92,7 +92,7 @@ const PositionsProvider = ({ children }:any) => {
   };
 
   const getPositions = async (seriesArr:any) => {
-    if(!seriesState?.isLoading) {
+    if(!yieldState?.isLoading) {
       console.log('Get positions actioned');
       dispatch({ type:'isLoading', payload: true });
       const chainData:any = await fetchChainData(seriesArr);
@@ -105,9 +105,9 @@ const PositionsProvider = ({ children }:any) => {
 
   React.useEffect( () => {
     ( async () => { 
-      chainId && !seriesState?.isLoading && getPositions([seriesState.seriesData[0]]); 
+      chainId && !yieldState?.isLoading && getPositions([yieldState.seriesData[0]]); 
     })();
-  }, [ chainId, seriesState ]);
+  }, [ chainId, yieldState ]);
 
   const actions = {
     getPositions: (x:any[]) => getPositions(x),

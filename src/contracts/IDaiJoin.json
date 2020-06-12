@@ -1,0 +1,809 @@
+{
+  "contractName": "IDaiJoin",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "usr",
+          "type": "address"
+        }
+      ],
+      "name": "rely",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "usr",
+          "type": "address"
+        }
+      ],
+      "name": "deny",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "cage",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "usr",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "WAD",
+          "type": "uint256"
+        }
+      ],
+      "name": "join",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "usr",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "WAD",
+          "type": "uint256"
+        }
+      ],
+      "name": "exit",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.6.2+commit.bacdbe57\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"cage\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"usr\",\"type\":\"address\"}],\"name\":\"deny\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"usr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"WAD\",\"type\":\"uint256\"}],\"name\":\"exit\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"usr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"WAD\",\"type\":\"uint256\"}],\"name\":\"join\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"usr\",\"type\":\"address\"}],\"name\":\"rely\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"Interface to interact with the `Join.sol` contract from MakerDAO using Dai\",\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/IDaiJoin.sol\":\"IDaiJoin\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/IDaiJoin.sol\":{\"keccak256\":\"0xac02f8262dee376b28345c6ecbfdddb78b231160b3567e37d01327887fdf671a\",\"urls\":[\"bzz-raw://7dd3d8ef48208ad3a7933980e791c6b9fd461e0fd36985198cd680bddc146fa1\",\"dweb:/ipfs/QmZfVa1s5vHqbpaxRHuXFHtRRd41Y6snSZxtUZTBDhUWeV\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "pragma solidity ^0.6.2;\n\n\n/// @dev Interface to interact with the `Join.sol` contract from MakerDAO using Dai\ninterface IDaiJoin {\n    function rely(address usr) external;\n    function deny(address usr) external;\n    function cage() external;\n    function join(address usr, uint WAD) external;\n    function exit(address usr, uint WAD) external;\n}",
+  "sourcePath": "/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/IDaiJoin.sol",
+  "ast": {
+    "absolutePath": "/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/IDaiJoin.sol",
+    "exportedSymbols": {
+      "IDaiJoin": [
+        3184
+      ]
+    },
+    "id": 3185,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 3156,
+        "literals": [
+          "solidity",
+          "^",
+          "0.6",
+          ".2"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:9"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": "@dev Interface to interact with the `Join.sol` contract from MakerDAO using Dai",
+        "fullyImplemented": false,
+        "id": 3184,
+        "linearizedBaseContracts": [
+          3184
+        ],
+        "name": "IDaiJoin",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "65fae35e",
+            "id": 3161,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "rely",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 3159,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3158,
+                  "name": "usr",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 3161,
+                  "src": "149:11:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3157,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "149:7:9",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "148:13:9"
+            },
+            "returnParameters": {
+              "id": 3160,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "170:0:9"
+            },
+            "scope": 3184,
+            "src": "135:36:9",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "9c52a7f1",
+            "id": 3166,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "deny",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 3164,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3163,
+                  "name": "usr",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 3166,
+                  "src": "190:11:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3162,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "190:7:9",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "189:13:9"
+            },
+            "returnParameters": {
+              "id": 3165,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "211:0:9"
+            },
+            "scope": 3184,
+            "src": "176:36:9",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "69245009",
+            "id": 3169,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "cage",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 3167,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "230:2:9"
+            },
+            "returnParameters": {
+              "id": 3168,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "241:0:9"
+            },
+            "scope": 3184,
+            "src": "217:25:9",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "3b4da69f",
+            "id": 3176,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "join",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 3174,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3171,
+                  "name": "usr",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 3176,
+                  "src": "261:11:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3170,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "261:7:9",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3173,
+                  "name": "WAD",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 3176,
+                  "src": "274:8:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3172,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "274:4:9",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "260:23:9"
+            },
+            "returnParameters": {
+              "id": 3175,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "292:0:9"
+            },
+            "scope": 3184,
+            "src": "247:46:9",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "ef693bed",
+            "id": 3183,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "exit",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 3181,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3178,
+                  "name": "usr",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 3183,
+                  "src": "312:11:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3177,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "312:7:9",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3180,
+                  "name": "WAD",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 3183,
+                  "src": "325:8:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3179,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "325:4:9",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "311:23:9"
+            },
+            "returnParameters": {
+              "id": 3182,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "343:0:9"
+            },
+            "scope": 3184,
+            "src": "298:46:9",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 3185,
+        "src": "110:236:9"
+      }
+    ],
+    "src": "0:346:9"
+  },
+  "legacyAST": {
+    "absolutePath": "/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/IDaiJoin.sol",
+    "exportedSymbols": {
+      "IDaiJoin": [
+        3184
+      ]
+    },
+    "id": 3185,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 3156,
+        "literals": [
+          "solidity",
+          "^",
+          "0.6",
+          ".2"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:9"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": "@dev Interface to interact with the `Join.sol` contract from MakerDAO using Dai",
+        "fullyImplemented": false,
+        "id": 3184,
+        "linearizedBaseContracts": [
+          3184
+        ],
+        "name": "IDaiJoin",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "65fae35e",
+            "id": 3161,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "rely",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 3159,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3158,
+                  "name": "usr",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 3161,
+                  "src": "149:11:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3157,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "149:7:9",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "148:13:9"
+            },
+            "returnParameters": {
+              "id": 3160,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "170:0:9"
+            },
+            "scope": 3184,
+            "src": "135:36:9",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "9c52a7f1",
+            "id": 3166,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "deny",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 3164,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3163,
+                  "name": "usr",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 3166,
+                  "src": "190:11:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3162,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "190:7:9",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "189:13:9"
+            },
+            "returnParameters": {
+              "id": 3165,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "211:0:9"
+            },
+            "scope": 3184,
+            "src": "176:36:9",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "69245009",
+            "id": 3169,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "cage",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 3167,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "230:2:9"
+            },
+            "returnParameters": {
+              "id": 3168,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "241:0:9"
+            },
+            "scope": 3184,
+            "src": "217:25:9",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "3b4da69f",
+            "id": 3176,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "join",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 3174,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3171,
+                  "name": "usr",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 3176,
+                  "src": "261:11:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3170,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "261:7:9",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3173,
+                  "name": "WAD",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 3176,
+                  "src": "274:8:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3172,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "274:4:9",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "260:23:9"
+            },
+            "returnParameters": {
+              "id": 3175,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "292:0:9"
+            },
+            "scope": 3184,
+            "src": "247:46:9",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "ef693bed",
+            "id": 3183,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "exit",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 3181,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3178,
+                  "name": "usr",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 3183,
+                  "src": "312:11:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3177,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "312:7:9",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 3180,
+                  "name": "WAD",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 3183,
+                  "src": "325:8:9",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3179,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "325:4:9",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "311:23:9"
+            },
+            "returnParameters": {
+              "id": 3182,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "343:0:9"
+            },
+            "scope": 3184,
+            "src": "298:46:9",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 3185,
+        "src": "110:236:9"
+      }
+    ],
+    "src": "0:346:9"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.6.2+commit.bacdbe57.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.0.23",
+  "updatedAt": "2020-06-08T16:21:52.093Z",
+  "devdoc": {
+    "details": "Interface to interact with the `Join.sol` contract from MakerDAO using Dai",
+    "methods": {}
+  },
+  "userdoc": {
+    "methods": {}
+  }
+}

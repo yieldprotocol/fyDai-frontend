@@ -17516,12 +17516,12 @@
         }
       },
       "links": {},
-      "address": "0x216661E84c1c2B84f71D93Ec3c0e3c345e47F1A9",
-      "transactionHash": "0xdecabc78d2f9faad30b06ff76d156cffe1965f26f5180fb3ffa3b190bec6eb30"
+      "address": "0xEF730d5F3295b96D99B24B0A753433fd8808E4f4",
+      "transactionHash": "0x524f2c376592a85dc780efcd74b5fa37576f84fef08d09886df9eee991a6a249"
     }
   },
   "schemaVersion": "3.0.23",
-  "updatedAt": "2020-06-08T17:25:07.340Z",
+  "updatedAt": "2020-06-11T16:17:06.006Z",
   "networkType": "ethereum",
   "devdoc": {
     "methods": {}

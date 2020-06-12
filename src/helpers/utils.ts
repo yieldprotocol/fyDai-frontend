@@ -23,28 +23,39 @@ export const toRad = (value:number) => {
   return bigNumberify(value*10**10).mul(exponent);
 };
 
+export const toWei = (value:string|number) => {
+  return ethers.utils.parseEther(value.toString()); 
+};
+
 // / @dev Adds two numbers
 // / I.e. addBN(ray(x), ray(y)) = ray(x - y)
-export const addBN = (x:number, y:number) => {
+export const addBN = (x:string, y:string) => {
   return bigNumberify(x).add(bigNumberify(y));
 };
 
 // / @dev Substracts a number from another
 // / I.e. subBN(ray(x), ray(y)) = ray(x - y)
-export const subBN = (x:number, y:number) => {
+export const subBN = (x:string, y:string) => {
   return bigNumberify(x).sub(bigNumberify(y));
 };
 
 // / @dev Multiplies a number in any precision by a number in RAY precision, with the output in the first parameter's precision.
 // / I.e. mulRay(wad(x), ray(y)) = wad(x*y)
-export const mulRay = (x:number, ray:number) => {
+export const mulRay = (x:ethers.utils.BigNumber, ray:ethers.utils.BigNumber) => {
   const unit = bigNumberify('10').pow(bigNumberify('27'));
   return bigNumberify(x).mul(bigNumberify(ray)).div(unit);
 };
 
 // / @dev Divides a number in any precision by a number in RAY precision, with the output in the first parameter's precision.
 // / I.e. divRay(wad(x), ray(y)) = wad(x/y)
-export const divRay = (x:number, ray:number) => {
+export const divRay = (x:ethers.utils.BigNumber, ray:ethers.utils.BigNumber) => {
   const unit = bigNumberify('10').pow(bigNumberify('27'));
   return unit.mul(bigNumberify(x)).div(bigNumberify(ray));
+};
+
+
+// @dev Takes a bignumber in RAY and converts it to a human accesible number string
+export const RayToHuman = (x:any) => {
+  // const unit = bigNumberify('10').pow(bigNumberify('27'));
+  return x.toString();
 };

@@ -5,6 +5,8 @@ import { ethers } from 'ethers';
 import { useWeb3React } from '@web3-react/core';
 
 import * as constants from '../constants';
+import * as utils from '../helpers/utils';
+
 import { IYieldSeries } from '../types';
 
 import { useCallTx } from '../hooks/yieldHooks';
@@ -95,9 +97,11 @@ const SeriesProvider = ({ children }:any) => {
   };
 
   const fetchVatData = async (deployedCore:any): Promise<any> => {
+    const pot = await callTx(deployedCore.Pot, 'Pot', 'chi', []);
+    console.log(pot); 
     const ilks = await callTx(deployedCore.Vat, 'Vat', 'ilks', [ethers.utils.formatBytes32String('ETH-A')]);
     const urns = await callTx(deployedCore.Vat, 'Vat', 'urns', [ethers.utils.formatBytes32String('ETH-A'), account ]);
-    return { ilks, urns };
+    return { ilks, urns, pot };
   };
 
   // post fetching data processing
@@ -114,16 +118,21 @@ const SeriesProvider = ({ children }:any) => {
   // post fetching data processing
   const parseVatData = (vatData:any): any => {
     return { 
-      ilks: { 
-        Art: vatData.ilks.Art.toString(),
-        spot: vatData.ilks.spot.toString(),
-        rate: vatData.ilks.rate.toString(),
-        line: vatData.ilks.line.toString(),
-        dust: vatData.ilks.dust.toString(),
+      ilks: {
+        ...vatData.ilks,
+        Art_f: utils.RayToHuman(vatData.ilks.Art),
+        spot_f: utils.RayToHuman(vatData.ilks.spot),
+        rate_f: utils.RayToHuman(vatData.ilks.rate),
+        line_f: utils.RayToHuman(vatData.ilks.line),
+        dust_f: utils.RayToHuman(vatData.ilks.dust),
       },
       urns: {
-        art: vatData.urns.art.toString(),
-        ink: vatData.urns.ink.toString(),
+        ...vatData.urns,
+        art_f: utils.RayToHuman(vatData.urns.art),
+        ink_f: utils.RayToHuman(vatData.urns.ink),
+      },
+      pot: { 
+        chi: vatData.pot.chi,
       }
     };
   };
