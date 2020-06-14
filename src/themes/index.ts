@@ -20,8 +20,22 @@ export const yieldTheme = {
     },
     colors: {
       brand: {
-        dark: '#78F029',
-        light: '#49E303',
+        // dark: '#78F029',
+        // light: '#49E303',
+        dark: '#009E83',
+        light:'#009E83',
+      },
+      brandTransparent: {
+        dark: 'rgba(0, 158, 131, 0.1)',
+        light: 'rgba(0, 158, 131, 0.1)',
+      },
+      secondary: {
+        dark: '#627EEA',
+        light:'#627EEA'
+      },
+      secondaryTransparent: {
+        dark: 'rgb(98, 126, 234, 0.1)',
+        light: 'rgb(98, 126, 234, 0.1)',
       },
       background: {
         'dark': '#111111',
@@ -67,8 +81,10 @@ export const yieldTheme = {
         light: '#666666',
       },
       border: {
-        dark: '#444444',
-        light: '#CCCCCC',
+        // dark: '#444444',
+        // light: '#CCCCCC',
+        dark: 'rgba(0, 0, 0, 0.08)',
+        light: 'rgba(0, 0, 0, 0.08)',
       },
       focus: 'none',
       control: 'brand',

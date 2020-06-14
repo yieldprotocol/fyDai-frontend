@@ -19,6 +19,8 @@ firebase.initializeApp({
   projectId: 'yield-ydai'
 });
 
+const seriesColors = ['#726a95', '#709fb0', '#a0c1b8', '#f4ebc1', '#3f51b5', '#5677fc', '#03a9f4', '#00bcd4', '#009688', '#259b24', '#8bc34a', '#afb42b', '#ff9800', '#ff5722', '#795548', '#607d8b']; 
+
 // reducer
 function reducer(redState:any, action:any) {
   switch (action.type) {
@@ -80,18 +82,19 @@ const YieldProvider = ({ children }:any) => {
   // async add blockchain data (if reqd. - nothing at this point)
   const fetchChainData = async (seriesAddrs:IYieldSeries[], deployedCore:any): Promise<IYieldSeries[]> => {
     const chainData:any[] = [];
-    // await Promise.all(
-    //   seriesAddrs.map( async (x:any, i:number)=> {
-    //     chainData.push(x);
-    //     try {
-    //       chainData[i].rate = await callTx(x.YDai, 'YDai', 'rate', []);
-    //     } catch (e) { 
-    //       console.log(`Could not load series blockchain data: ${e}`);
-    //     }
-    //   })
-    // );
-    // return chainData;
-    return seriesAddrs;
+    await Promise.all(
+      seriesAddrs.map( async (x:any, i:number)=> {
+        chainData.push(x);
+        try {
+          // chainData[i].rate = await callTx(x.YDai, 'YDai', 'rate', []);
+          chainData[i].yDaiBalance = await callTx(x.YDai, 'YDai', 'balanceOf', [account]);
+        } catch (e) { 
+          console.log(`Could not load series blockchain data: ${e}`);
+        }
+      })
+    );
+    return chainData;
+
   };
 
   const fetchMakerData = async (deployedCore:any): Promise<any> => {
@@ -106,8 +109,9 @@ const YieldProvider = ({ children }:any) => {
     return chainData.map((x:any, i:number) => {
       return {
         ...x,
-        // rate_p: x.rate?.toString(),
+        yDaiBalance_p: ethers.utils.formatEther(x.yDaiBalance.toString()),
         maturity_p: new Date( (x.maturity) * 1000 ),
+        seriesColor: seriesColors[i],
       };
     });
   };

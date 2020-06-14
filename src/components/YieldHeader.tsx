@@ -4,8 +4,10 @@ import { Text, Image, Header, Button, Box, ThemeContext } from 'grommet';
 
 import { FaSeedling as YieldLeaf } from 'react-icons/fa';
 
-import logoDark from '../assets/images/yield.svg';
-import logoLight from '../assets/images/yield_light.svg';
+import { FiSettings as Gear } from 'react-icons/fi';
+
+import logoDark from '../assets/images/logo.svg';
+import logoLight from '../assets/images/logo_light.svg';
 import ProfileButton from './ProfileButton';
 
 
@@ -26,56 +28,83 @@ const YieldHeader = (props: any) => {
   return (
     <Header
       // elevation="xsmall"
-      // gap="xlarge"
       fill="horizontal"
-      pad={{ horizontal: 'large', vertical: 'none' }}
-      // align='end'
+      pad={{ horizontal: 'small', vertical: 'none' }}
     >
       <Box align="center" direction='row' gap='small' margin='none' pad='none'>
-        <Box height="xsmall" width="small" margin='none' pad='xsmall'>
+        <Box height="xsmall" width="xsmall" margin='none' pad='xsmall'>
           <Image src={theme.dark ? logoLight : logoDark} fit="contain" />
         </Box>
       </Box>
-      <Box direction='row' gap='medium'>
+
+      <Box justify='center' direction='row' gap='none'>
         <Box 
+          justify='end'
           pad='small' 
-          border={activeView === 'BORROW' && { size: 'medium', side: 'bottom', color:'brand' }}
+          border={activeView === 'BORROW' && { size: 'xsmall', side: 'bottom', color:'brand' }}
           onClick={()=>setActiveView('BORROW')}
-        >BORROWER
+          
+        > 
+          <Text color={activeView === 'BORROW'? 'brand':'text'}>
+            Borrow
+          </Text>
         </Box>
 
         <Box 
           pad='small' 
-          border={activeView === 'LEND' && { size: 'medium', side: 'bottom', color:'brand' }}
+          border={activeView === 'LEND' && { size: 'xsmall', side: 'bottom', color:'brand' }}
           onClick={()=>setActiveView('LEND')}
-        >LENDER
+        >
+          <Text color={activeView === 'LEND'? 'brand':'text'}>
+            Lend
+          </Text>
         </Box>
 
-        <Box 
-          pad='small' 
-          border={activeView === 'AMM' && { size: 'medium', side: 'bottom', color:'brand' }}
+        <Box
+          pad='small'
+          border={activeView === 'HISTORY' && { size: 'xsmall', side: 'bottom', color:'brand' }}
           // onClick={()=>setActiveView('AMM')}
           direction='row'
           gap='small'
         >
-          <Text color='border'><YieldLeaf /> YIELD AMM</Text>
+          <Text color={activeView === 'HISTORY'? 'brand':'text'}>
+            History
+          </Text>
+        </Box>
+
+        <Box
+          pad='small'
+          border={activeView === 'AMM' && { size: 'xsmall', side: 'bottom', color:'brand' }}
+          // onClick={()=>setActiveView('AMM')}
+          direction='row'
+          gap='small'
+        >
+          <Text color={activeView === 'AMM'? 'brand':'text'}>
+            Yield AMM
+          </Text>
+        </Box>
+
+      </Box>
+
+      <Box direction='row' align='baseline'>
+        {account ? (
+          <Box pad='small'>
+            <ProfileButton action={() => openAccountLayer()} />
+          </Box>
+        ) : (
+          <Box pad='small'>
+            <Button
+              color='border'
+              style={{ minWidth: '160px' }}
+              label="Connect to a wallet"
+              onClick={() => openConnectLayer()}
+            />
+          </Box>
+        )}
+        <Box>
+          <Gear />
         </Box>
       </Box>
-      {account ? (
-        <Box pad='small'>
-          <ProfileButton action={() => openAccountLayer()} />
-        </Box>
-      ) : (
-        <Box pad='small'>
-          <Button
-          // alignSelf='center'
-          // pad='xsmall'
-            style={{ minWidth: '160px' }}
-            label="Connect to a wallet"
-            onClick={() => openConnectLayer()}
-          />
-        </Box>
-      )}
     </Header>
   );
 };

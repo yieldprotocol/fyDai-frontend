@@ -13,7 +13,7 @@ import {
 } from 'grommet';
 import { deepMerge } from 'grommet/utils';
 
-import { FaSeedling as YieldLeaf } from 'react-icons/fa';
+import { FaSeedling as YieldLeaf, FaLessThanEqual } from 'react-icons/fa';
 import { yieldTheme } from './themes';
 import { useEagerConnect }  from './hooks/connectionHooks';
 
@@ -51,7 +51,7 @@ function App() {
   // TODO move to layerContext
   const [showConnectLayer, setShowConnectLayer] = React.useState<boolean>(false);
   const [showAccountLayer, setShowAccountLayer] = React.useState<boolean>(false);
-  const [showTestLayer, setShowTestLayer] = React.useState<boolean>(true);
+  const [showTestLayer, setShowTestLayer] = React.useState<boolean>(false);
   const [showSeriesLayer, setShowSeriesLayer] = React.useState<boolean>(false);
 
   const eagerConnect = useEagerConnect();
@@ -99,16 +99,16 @@ function App() {
                 // align='center'
                 // pad={{ horizontal: 'none', vertical:'none' }}
                 pad='none'
-                background='background-front'
+                // background='background-front'
                 direction='row'
                 flex
               >
-                <Grid fill columns={['20%', 'auto', '20%']}>
+                <Grid fill columns={['25%', 'auto', '20%']}>
                   <YieldSidebar setShowSeriesLayer={setShowSeriesLayer} activeSeries={activeSeries} setActiveSeries={setActiveSeries} />
                   <Box align='center'>
                     {!activeSeries && <Landing />}
-                    {activeSeries && activeView === 'BORROW' && <Borrow activeSeries={activeSeries} setActiveSeries={setActiveSeries} setShowSeriesLayer={setShowSeriesLayer}/>}
-                    {activeSeries && activeView === 'LEND' && <Lend activeSeries={activeSeries} setActiveSeries={setActiveSeries} setShowSeriesLayer={setShowSeriesLayer}/>}
+                    {activeSeries && activeView === 'BORROW' && <Borrow activeSeries={activeSeries} setActiveSeries={setActiveSeries} setShowSeriesLayer={setShowSeriesLayer} />}
+                    {activeSeries && activeView === 'LEND' && <Lend activeSeries={activeSeries} setActiveSeries={setActiveSeries} setShowSeriesLayer={setShowSeriesLayer} />}
                     {activeSeries && activeView === 'AMM' && <Amm />}
                   </Box>
                   <Box background='background' />

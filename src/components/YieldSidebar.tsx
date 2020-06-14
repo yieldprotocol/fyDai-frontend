@@ -20,41 +20,7 @@ import { IYieldSeries } from '../types';
 import { YieldContext } from '../contexts/YieldContext';
 import YieldSeriesMenuItem from './YieldSeriesMenuItem';
 
-import YieldSeries from './YieldSeries';
-
-// const SidebarHeader = () => {
-//   const theme = React.useContext<any>(ThemeContext);
-//   return (
-//     <Box height="xsmall" width="small" pad='none'>
-//       <Image src={theme.dark ? logoLight : logoDark} fit="contain" />
-//     </Box>
-//   );
-// };
-
-// const SidebarFooter = () => {
-//   return (
-//     <div>
-//       <Nav>
-//         {['Analytics', 'Stakeholder', 'Calculator'].map((iconName, index) => (
-//           <SidebarButton key={iconName} icon={iconName} index={index} label={iconName} />
-//         ))}
-//       </Nav>
-//     </div>
-//   );
-// };
-
-// const SidebarButton = ({ icon, label, ...rest }:{icon:any, label:string, index:number}) => (
-//   <Box pad="small">
-//     <Button
-//       gap="medium"
-//       alignSelf="start"
-//       plain
-//       icon={icon}
-//       label={label}
-//       {...rest}
-//     />
-//   </Box>
-// );
+// import YieldSeries from './YieldSeries';
 
 const YieldSidebar = ({ activeSeries, setActiveSeries, setShowSeriesLayer }:{activeSeries:IYieldSeries|null, setActiveSeries:any, setShowSeriesLayer:any}) => {
   const { state } = React.useContext( YieldContext );
@@ -75,6 +41,7 @@ const YieldSidebar = ({ activeSeries, setActiveSeries, setShowSeriesLayer }:{act
   }, [ state.isLoading ]);
 
   return (
+    
     <Sidebar
       // overflow="auto"
       background="background"
@@ -82,7 +49,12 @@ const YieldSidebar = ({ activeSeries, setActiveSeries, setShowSeriesLayer }:{act
       // footer={<SidebarFooter />}
       pad="none"
       gap='small'
+      // align='center'
     >
+      <Box margin={{ left: 'small', vertical:'none' }} pad='small'>
+        <Text size='large'> Series Available </Text>
+      </Box>
+      
       {state.isLoading && <Spinner />}
       {seriesList.map((x:any, i:number) => {
         return (

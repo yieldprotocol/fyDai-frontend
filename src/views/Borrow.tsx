@@ -21,9 +21,15 @@ interface BorrowProps {
 
 const Borrow = ({ setActiveSeries, activeSeries, setShowSeriesLayer }:BorrowProps) => {
 
-  const { state: positionsState, dispatch: positionsDispatch } = React.useContext(PositionsContext);
-
+  const { state: positionsState, actions: positionsActions } = React.useContext(PositionsContext);
   const [ layerOpen, setLayerOpen ] = React.useState<String|null>(null);
+
+  React.useEffect( () => {
+    ( async () => { 
+      !positionsState?.isLoading && positionsActions.getPositions([activeSeries]);
+    })();
+    console.log(positionsState);
+  }, [ activeSeries ]);
 
   const {
     name,

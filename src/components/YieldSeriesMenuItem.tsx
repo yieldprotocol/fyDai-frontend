@@ -2,10 +2,11 @@ import React from 'react';
 import { Box, Image, Text, Drop, Button, Collapsible } from 'grommet';
 import moment from 'moment';
 
-import { IoIosRadioButtonOn, IoIosRadioButtonOff } from 'react-icons/io';
-import { RiCoinLine } from 'react-icons/ri';
-// import coin from '../assets/images/coin.svg';
-
+import {
+  FiEye as EyeOpen,
+  FiEyeOff as EyeClosed,
+  FiStar as Star,
+} from 'react-icons/fi';
 
 
 import { IYieldSeries } from '../types';
@@ -25,20 +26,30 @@ const YieldSeriesMenuItem = ({
 
   const {
     name,
-    maturity,
-    rate,
+    maturity_p,
+    yDaiBalance_p,
     currentValue,
+    seriesColor,
   } = series;
 
   const [over, setOver] = React.useState<boolean>();
   const tooltipColor = { color: 'background-frontheader', opacity: 1 };
   const ref = React.useRef<any>();
 
+  const getBalanceColor = (_bal:string, _selected:boolean ):string => {
+    if (parseInt(_bal, 10) > 0) {
+      return _selected? 'brand' : 'brandTransparent';
+    } if (parseInt(_bal, 10) > 0) {
+      return _selected? 'secondary': 'secondaryTransparent';
+    } 
+    return _selected? 'text': 'border';
+  };
+
   return (
     <Box
       // margin={{ left: 'small', vertical:'small' }}
       margin={{ left: 'small', vertical:'none' }}
-      align="center"
+      align="start"
       justify="between"
         // hoverIndicator={{ color: 'background-frontheader' }}
       background={selected? 'background-front': {}}
@@ -51,31 +62,51 @@ const YieldSeriesMenuItem = ({
       onBlur={() => setOver(false)}
       hoverIndicator={tooltipColor}
       onClick={() => seriesAction()}
-      round={{size:'small', corner:'left'}}
-      // elevation={selected ? 'small':'none'}
+      round={{ size:'medium', corner:'left' }}
     >
+
       <Box 
         direction='row'
         gap='small'
         align='center'
         pad='small'
-      > 
-        {/* <Box width='15px' height='15px'>
-            {!selected? <IoIosRadioButtonOff />:<IoIosRadioButtonOn />}
-            <Image src={coin} fit="contain" />
-          </Box> */}
-        <Box>
-          <Text size="xsmall" weight={selected ? 'bold': 'normal'}>{name}</Text>
+        justify='between'
+        fill='horizontal'
+      >
+        <Box 
+          direction='row'
+          gap='small'
+        >
           <Box
-            round
-            align="center"
-            pad={{ horizontal: 'small', vertical: 'none' }}
-            background={selected ? 'brand':'none'}
-            border='all'
+            round='xlarge'
+            width='xxsmall'
+            height='xxsmall'
+            background={seriesColor}
+            align='center'
+            justify='center'
           >
-            <Text size="xsmall" color={!selected? 'border': 'text'}> {rate?.toString()}% </Text>
+            <Text size="xxsmall" weight={selected ? 'bold': 'normal'}>3.45%</Text>
+          </Box>
+
+          <Box>
+            <Text size="small" weight={selected ? 'bold': 'normal'}>{moment(maturity_p).format('MMMM Y')}</Text>
+            <Text 
+              size="xsmall" 
+              color={getBalanceColor(yDaiBalance_p, !!selected)}
+            >
+              Balance: {yDaiBalance_p} yDai
+            </Text> 
           </Box>
         </Box>
+
+        <Box direction='row'>
+          <Box justify='end'>
+            <Text color={parseInt(yDaiBalance_p, 10) === 0 ? 'border': seriesColor}> 
+              <Star />
+            </Text>
+          </Box>
+        </Box>
+
       </Box>
 
       {/* <Collapsible open={ref.current && over && !selected}>
@@ -106,13 +137,13 @@ const YieldSeriesMenuItem = ({
             animation="slideRight"
             pad="small"
             background={tooltipColor}
-            round={{ size: 'large', corner: 'right' }}
+            round={{ size: 'medium', corner: 'right' }}
           >
             <Box direction="column" align='center'>
               <Box direction="row" gap="xsmall">
                 <Text size="xsmall">Matures: </Text>
                 <Text size="xsmall" weight="bold">
-                  { moment(maturity).format('MMM YYYY') }
+                  { moment(maturity_p).format('MMM YYYY') }
                 </Text>
               </Box>
               <Box direction="row" gap="xsmall">
