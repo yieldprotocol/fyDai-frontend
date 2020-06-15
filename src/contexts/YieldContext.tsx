@@ -34,6 +34,11 @@ function reducer(redState:any, action:any) {
         ...redState,
         deployedCore: action.payload,
       };
+    case 'updateYieldData':
+      return {
+        ...redState,
+        yieldData: action.payload,
+      };
     case 'updateMakerData': 
       return {
         ...redState,
@@ -51,13 +56,13 @@ function reducer(redState:any, action:any) {
 
 const YieldProvider = ({ children }:any) => {
 
-  const initState = { isLoading: true, deployedSeries : [], deployedCore: {}, makerData: {} };
+  const initState = { isLoading: true, deployedSeries : [], deployedCore: {}, yieldData: {}, makerData: {} };
   const [ state, dispatch ] = React.useReducer(reducer, initState);
   const { chainId, account } = useWeb3React();
   const { dispatch: notifyDispatch } = React.useContext(NotifyContext);
   const [ callTx ] = useCallTx();
 
-  // async get all yield addresses from db in a single call
+  // async get all yield addresses from db in single call
   const getYieldAddrs = async (networkId:number|string): Promise<any[]> => {
     const seriesAddrs:any[] = [];
     let deployedCore = {};
@@ -79,8 +84,8 @@ const YieldProvider = ({ children }:any) => {
     return [ seriesAddrs, deployedCore];
   };
 
-  // async add blockchain data (if reqd. - nothing at this point)
-  const fetchChainData = async (seriesAddrs:IYieldSeries[], deployedCore:any): Promise<IYieldSeries[]> => {
+  // Async add blockchain data for each series
+  const fetchSeriesData = async (seriesAddrs:IYieldSeries[]): Promise<IYieldSeries[]> => {
     const chainData:any[] = [];
     await Promise.all(
       seriesAddrs.map( async (x:any, i:number)=> {
@@ -93,19 +98,7 @@ const YieldProvider = ({ children }:any) => {
         }
       })
     );
-    return chainData;
-
-  };
-
-  const fetchMakerData = async (deployedCore:any): Promise<any> => {
-    const pot = await callTx(deployedCore.Pot, 'Pot', 'chi', []);
-    const ilks = await callTx(deployedCore.Vat, 'Vat', 'ilks', [ethers.utils.formatBytes32String('ETH-A')]);
-    const urns = await callTx(deployedCore.Vat, 'Vat', 'urns', [ethers.utils.formatBytes32String('ETH-A'), account ]);
-    return { ilks, urns, pot };
-  };
-
-  // post fetching data processing
-  const parseChainData = (chainData:IYieldSeries[]): IYieldSeries[] => {
+    // Parse and return data
     return chainData.map((x:any, i:number) => {
       return {
         ...x,
@@ -116,41 +109,74 @@ const YieldProvider = ({ children }:any) => {
     });
   };
 
-  // post fetching data processing
-  const parseMakerData = (makerData:any): any => {
+  // async yield data for the user address
+  const fetchYieldData = async (deployedCore:any): Promise<any> => {
+    const yieldData:any = {};
+    yieldData.wethPosted = await callTx(deployedCore.WethDealer, 'Dealer', 'posted', [account]);
+    yieldData.chaiPosted = await callTx(deployedCore.ChaiDealer, 'Dealer', 'posted', [account]);
+    yieldData.chaiTotalDebtDai = await callTx(deployedCore.ChaiDealer, 'Dealer', 'totalDebtDai', [account]);
+    yieldData.chaiTotalDebtYDai = await callTx(deployedCore.ChaiDealer, 'Dealer', 'totalDebtYDai', [account]);
+    yieldData.wethTotalDebtDai = await callTx(deployedCore.WethDealer, 'Dealer', 'totalDebtDai', [account]);
+    yieldData.wethTotalDebtYDai = await callTx(deployedCore.WethDealer, 'Dealer', 'totalDebtYDai', [account]);
+    // parse and return maker data
+    return {
+      ...yieldData,
+      wethPosted_p: ethers.utils.formatEther(yieldData.wethPosted.toString()),
+      chaiPosted_p: ethers.utils.formatEther(yieldData.chaiPosted.toString()),
+      wethTotalDebtDai_p: ethers.utils.formatEther(yieldData.wethTotalDebtDai.toString()),
+      wethTotalDebtYDai_p: ethers.utils.formatEther(yieldData.wethTotalDebtYDai.toString()),
+      chaiTotalDebtDai_p: ethers.utils.formatEther(yieldData.chaiTotalDebtDai.toString()),
+      chaiTotalDebtYDai_p: ethers.utils.formatEther(yieldData.chaiTotalDebtYDai.toString()),
+    };
+  };
+
+  const fetchMakerData = async (deployedCore:any): Promise<any> => {
+    const pot = await callTx(deployedCore.Pot, 'Pot', 'chi', []);
+    const ilks = await callTx(deployedCore.Vat, 'Vat', 'ilks', [ethers.utils.formatBytes32String('ETH-A')]);
+    const urns = await callTx(deployedCore.Vat, 'Vat', 'urns', [ethers.utils.formatBytes32String('ETH-A'), account ]);
+    // parse and return maker data
     return { 
       ilks: {
-        ...makerData.ilks,
-        Art_p: utils.rayToHuman(makerData.ilks.Art),
-        spot_p: utils.rayToHuman(makerData.ilks.spot),
-        rate_p: utils.rayToHuman(makerData.ilks.rate),
-        line_p: utils.rayToHuman(makerData.ilks.line),
-        dust_p: utils.rayToHuman(makerData.ilks.dust),
+        ...ilks,
+        Art_p: utils.rayToHuman(ilks.Art),
+        spot_p: utils.rayToHuman(ilks.spot),
+        rate_p: utils.rayToHuman(ilks.rate),
+        line_p: utils.rayToHuman(ilks.line),
+        dust_p: utils.rayToHuman(ilks.dust),
       },
       urns: {
-        ...makerData.urns,
-        art_p: utils.rayToHuman(makerData.urns.art),
-        ink_p: utils.rayToHuman(makerData.urns.ink),
+        ...urns,
+        art_p: utils.rayToHuman(urns.art),
+        ink_p: utils.rayToHuman(urns.ink),
       },
       pot: {
-        chi_p: makerData.pot.chi,
+        ...pot,
+        chi_p: pot.chi,
       }
     };
   };
 
   const getAllData = async (networkId:number|string) => {
-    dispatch({ type:'isLoading', payload: true });
-    // Get yield addresses from db
-    const [ addrData, deployedCore] = await getYieldAddrs(networkId);
-    // get Vat data from blockchain: 
-    const makerData = await fetchMakerData(deployedCore);
-    // Get blockchain based data for each series
-    const chainData:any = await fetchChainData(addrData, deployedCore);
 
     // TODO: Maybe convert to a single dispatch call. See after app dust has settled.
-    dispatch({ type:'updateMakerData', payload: parseMakerData(makerData) });
+    dispatch({ type:'isLoading', payload: true });
+    
+    // #1 Get yield addresses from db
+    const [ addrData, deployedCore] = await getYieldAddrs(networkId);
     dispatch({ type:'updateDeployedCore', payload: deployedCore });
-    dispatch({ type:'updateDeployedSeries', payload: parseChainData(chainData) });
+
+    // #2 Get blockchain data for each series
+    const seriesData:any = await fetchSeriesData(addrData);
+    dispatch({ type:'updateDeployedSeries', payload: seriesData });
+
+    // #3 Get yield data (user) from blockchain
+    const yieldData = await fetchYieldData(deployedCore);
+    dispatch({ type:'updateYieldData', payload: yieldData });
+
+    // #4 get MakerDao data
+    const makerData = await fetchMakerData(deployedCore);
+    dispatch({ type:'updateMakerData', payload: makerData });
+
     dispatch({ type:'isLoading', payload: false });
   };
 
