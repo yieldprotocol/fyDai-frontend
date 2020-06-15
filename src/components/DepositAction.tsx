@@ -6,10 +6,11 @@ import ethLogo from '../assets/images/tokens/eth.svg';
 
 const DepositAction = ({ close }:any) => {
 
-  const [inputValue, setInputValue] = React.useState<number>();
+  const [inputValue, setInputValue] = React.useState<any>();
+  const [depositDisabled, setDepositDisabled] = React.useState<boolean>(false);
 
   return (
-    <Box align='center' gap='small'>
+    <Box align='center' flex='grow' justify='between'>
       <Box margin={{ vertical:'medium' }} gap='xsmall' align='center' fill='horizontal'>
         <Text alignSelf='start' size='xsmall'> Amount to deposit </Text>
         <Box round='small' border={{ color:'secondary' }} direction='row' fill='horizontal'>
@@ -20,6 +21,7 @@ const DepositAction = ({ close }:any) => {
             type="number"
             placeholder="0"
             value={inputValue}
+            disabled={depositDisabled}
             plain
             onChange={(event:any) => setInputValue(event.target.value)}
             icon={<Text alignSelf='start' size='xsmall'>Eth</Text>}
@@ -58,6 +60,7 @@ const DepositAction = ({ close }:any) => {
         <Button
           fill='horizontal'
           primary
+          disabled={!(inputValue>0) || depositDisabled}
           color='secondary'
           onClick={()=>console.log({ inputValue })}
           label={`Deposit ${inputValue || ''} Eth`}

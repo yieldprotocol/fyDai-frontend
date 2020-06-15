@@ -3,7 +3,7 @@ import { Box, Button, Heading, TextInput, Text } from 'grommet';
 import BorrowAction from './BorrowAction';
 import RepayAction from './RepayAction';
 
-const BorrowRepay = ({ close }:any) => {
+const BorrowRepay = ({ activeSeries }:any) => {
 
   const [inputValue, setInputValue] = React.useState<any>();
   const [taskView, setTaskView] = React.useState<string>('BORROW');

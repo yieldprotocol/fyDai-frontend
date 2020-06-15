@@ -6,8 +6,8 @@ import SlideConfirm from './SlideConfirm';
 
 import { IYieldSeries } from '../types';
 
-import BuyAction from './BuyAction';
-import SellAction from './SellAction';
+import BuyAction from './x_BuyAction';
+import SellAction from './x_SellAction';
 
 interface BuySellActionProps {
   activeSeries?:IYieldSeries,

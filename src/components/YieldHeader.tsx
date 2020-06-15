@@ -67,7 +67,7 @@ const YieldHeader = (props: any) => {
           direction='row'
           gap='small'
         >
-          <Text color={activeView === 'HISTORY'? 'brand':'text'}>
+          <Text color={activeView === 'HISTORY'? 'brand':'lightgrey'}>
             History
           </Text>
         </Box>
@@ -79,7 +79,7 @@ const YieldHeader = (props: any) => {
           direction='row'
           gap='small'
         >
-          <Text color={activeView === 'AMM'? 'brand':'text'}>
+          <Text color={activeView === 'AMM'? 'brand':'lightgrey'}>
             Yield AMM
           </Text>
         </Box>

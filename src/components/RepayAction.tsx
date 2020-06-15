@@ -39,7 +39,7 @@ function PaybackAction({ close }:RepayActionProps) {
               </Box>
           }
             icon={false}
-            onChange={({ option }) => setRepayType(option)}
+            onChange={(e:any) => {e.stopPropagation(); setRepayType(e.option);}}
           />
         </Box>
       </Box>
@@ -49,7 +49,7 @@ function PaybackAction({ close }:RepayActionProps) {
 
   return (
 
-    <Box align='center' gap='small'>
+    <Box flex='grow' justify='between'>
       <Box margin={{ top:'medium' }} gap='xsmall' align='center' fill='horizontal'>
         <Text alignSelf='start' size='xsmall'> Amount to repay</Text>
         <Box 
@@ -83,7 +83,7 @@ function PaybackAction({ close }:RepayActionProps) {
         </Box>
       </Box>
 
-      <Box direction='row' fill='horizontal' >
+      <Box direction='row' fill='horizontal'>
         <Box pad='xsmall'>
           <Box direction='row' gap='small'>
             <Text size='xsmall'>
@@ -107,10 +107,10 @@ function PaybackAction({ close }:RepayActionProps) {
         </Box> */}
       </Box>
 
-      <Box direction='row' gap='small'>
-        <SettingsGear /> 
-        <Text size='xsmall'>
-          Advanced Options 
+      <Box direction='row' gap='small' margin={{ bottom:'medium' }}>
+         
+        <Text size='xxsmall'>
+          <SettingsGear /> Advanced Options 
         </Text>
       </Box>
 
@@ -118,10 +118,11 @@ function PaybackAction({ close }:RepayActionProps) {
         <Button
           fill='horizontal'
           primary
+          disabled={!(inputValue>0)}
         // plain
           color='brand'
           onClick={()=>console.log({ inputValue })}
-          label={`Repay with ${inputValue || ''} ${repayType}`}
+          label={`Repay ${inputValue || ''} ${repayType}`}
         />
       </Box>
     </Box>

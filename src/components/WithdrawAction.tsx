@@ -9,7 +9,7 @@ const WithdrawAction = ({ close }:any) => {
   const [inputValue, setInputValue] = React.useState<any>();
 
   return (
-    <Box align='center' gap='large'>
+    <Box align='center' flex='grow' justify='between'>
       <Box margin={{ vertical:'medium' }} gap='xsmall' align='center' fill='horizontal'>
         <Text alignSelf='start' size='xsmall'> Amount to withdraw </Text>
         <Box round='small' border={{ color:'secondary' }} direction='row' fill='horizontal'>
@@ -58,7 +58,7 @@ const WithdrawAction = ({ close }:any) => {
         <Button
           fill='horizontal'
           primary
-        // plain
+          disabled={!(inputValue>0)}
           color='secondary'
           onClick={()=>console.log({ inputValue })}
           label={`Withdraw ${inputValue || ''} Eth`}

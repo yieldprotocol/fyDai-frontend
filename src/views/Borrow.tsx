@@ -28,9 +28,12 @@ const Borrow = ({ setActiveSeries, activeSeries, setShowSeriesLayer }:BorrowProp
 
   const { state: yieldState, dispatch: yieldDispatch } = React.useContext(YieldContext);
   const { state: positionsState, actions: positionsActions } = React.useContext(PositionsContext);
+  // const [ nextColor, setNextColor ] = React.useState<string>('');
 
   const [ activePosition, setActivePosition ] = React.useState<any>(null);
-  const [ layerOpen, setLayerOpen ] = React.useState<String|null>(null);
+  // const [ layerOpen, setLayerOpen ] = React.useState<String|null>(null);
+  const [ borrowRepayActive, setBorrowRepayActive ] = React.useState<boolean>(true);
+  const [ depositWithdrawActive, setDepositWithdrawActive ] = React.useState<boolean>(true);
 
   const { isLoading: positionsLoading, positionsData } = positionsState; 
   const { isLoading: yieldLoading, deployedSeries, deployedCore, yieldData, makerData }  = yieldState;
@@ -140,8 +143,14 @@ const Borrow = ({ setActiveSeries, activeSeries, setShowSeriesLayer }:BorrowProp
 
       <Box flex='grow' direction='column'>
         <Box direction='row-responsive' gap='small' justify='between'>
-          <DepositWithdraw />
-          <BorrowRepay />
+          <DepositWithdraw 
+            activeSeries={activeSeries}
+            active={depositWithdrawActive}
+          />
+          <BorrowRepay 
+            activeSeries={activeSeries}
+            active={borrowRepayActive}
+          />
         </Box>
       </Box>
     </Box>

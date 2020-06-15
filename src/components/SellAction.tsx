@@ -1,56 +1,134 @@
 import React from 'react';
-import { Box, Button, TextInput, Text, Heading } from 'grommet';
-import SlideConfirm from './SlideConfirm';
+import { Box, Button, Image, Select, TextInput, Text, Heading, Collapsible } from 'grommet';
+import { 
+  FiCheckCircle, 
+  FiInfo as Info,
+  FiHelpCircle as Help,
+  FiChevronDown as CaretDown,
+  FiSettings as SettingsGear,
+} from 'react-icons/fi';
 
-function SellAction({ close }:any) {
+import { IYieldSeries } from '../types';
+import ethLogo from '../assets/images/tokens/eth.svg';
+
+interface RepayActionProps {
+  activeSeries?:IYieldSeries,
+  fixedOpen?:boolean,
+  close?:any,
+}
+
+function PaybackAction({ close }:RepayActionProps) {
 
   const [inputValue, setInputValue] = React.useState<any>();
+  const [sellType, setSellType] = React.useState<string>('Dai');
+
+  const TokenSelector = () => {
+    return (
+      <Box justify='center'>
+        <Box round background='border' pad={{ horizontal:'small' }}>
+          <Select
+            id="select"
+            name="select"
+            plain
+            value={sellType}
+            options={['yDai', 'Dai']}
+            valueLabel={
+              <Box width='xsmall' direction='row' justify='center' align='baseline' gap='xsmall'>
+                <Text color='brand' size='xsmall'>{ sellType }</Text>
+                <Text color='brand' size='xsmall'><CaretDown /></Text>
+              </Box>
+          }
+            icon={false}
+            onChange={(e:any) => {e.stopPropagation(); setSellType(e.option);}}
+          />
+        </Box>
+      </Box>
+    );
+  };
+
 
   return (
-    <Box>
-      <Heading level='5'>Sell on <Text color='#FF007F'><span role='img'> 🦄</span> Uniswap</Text></Heading>
-      <Box direction='column' gap='medium'>
-        <Box gap='none' direction='row' align='baseline'>
-          <Box
-            style={{ borderRadius:'24px 0px 0px 24px' }}
-            border='all'
-            pad={{ horizontal:'large', vertical:'xsmall' }}
-            hoverIndicator='background'
-            onClick={()=>console.log('somehting')}
-          > 
-            <Text size='14px'>Max</Text>
+
+    <Box flex='grow' justify='between'>
+      <Box margin={{ top:'medium' }} gap='xsmall' align='center' fill='horizontal'>
+        <Text alignSelf='start' size='xsmall'> Amount to remove</Text>
+        <Box 
+          round='small'
+          border={{ color:'brand' }}
+          direction='row'
+          fill='horizontal'
+          align='baseline'
+        >
+          <Box width='15px' height='15px'>
+            <Image src={ethLogo} fit='contain' />
           </Box>
           <TextInput
-            style={{ borderRadius:'0px 24px 24px 0px' }}
             type="number"
-            placeholder="Amount to sell"
+            placeholder="0"
             value={inputValue}
+            plain
             onChange={(event:any) => setInputValue(event.target.value)}
-            icon={<Text>yDai</Text>}
             reverse
           />
+          <TokenSelector />
         </Box>
+        <Box
+          round
+          onClick={()=>console.log('max button clicked')}
+          hoverIndicator='brandTransparent'
+          border='all'
+          pad={{ horizontal:'small', vertical:'none' }}
+        >
+          <Text alignSelf='start' size='xsmall'>Use max</Text>
+        </Box>
+      </Box>
 
-        <Box direction='row' justify='evenly' fill='horizontal' align='baseline'>
-          <Box hoverIndicator='background' onClick={()=>console.log('somethign')} round pad={{ horizontal:'large', vertical:'xsmall' }}> 
-            <Text color='lightgrey'>Cancel</Text>
+      <Box fill='horizontal' margin={{ vertical:'medium' }}>
+        {/* <Box pad='xsmall'>
+          <Box direction='row' gap='small' justify='between'>
+            <Text size='xsmall'>
+              Estimated APR:
+            </Text>
+            <Help />
           </Box>
-          <Button
-            label='Confirm'
-            disabled={false}
-            onClick={()=>console.log('somethign')}
-          />
-          {/* <SlideConfirm 
-            label='Slide to payback'
-            disabled={false}
-            brandColor='green'
-            onConfirm={()=>close()}
-          /> */}
+          <Text weight='bold' size='xsmall'>
+            3.45 %
+          </Text>
+        </Box> */}
+
+        <Box pad='xsmall'>
+          <Box direction='row' gap='small' justify='between'>
+            <Text size='xsmall'>
+              Estimated yDai removed:
+            </Text>
+            <Help />
+          </Box>
+          <Text weight='bold' size='xsmall'>
+            0 yDai
+          </Text>
         </Box>
-        {/* { actionsVisible.length === 1 && <Close onClick={()=>handleMenuClick([])} /> } */}
+      </Box>
+
+      <Box direction='row' gap='small' margin={{ bottom:'medium' }}>
+         
+        <Text size='xxsmall'>
+          <SettingsGear /> Advanced Options
+        </Text>
+      </Box>
+
+      <Box fill='horizontal' alignSelf='end'>
+        <Button
+          fill='horizontal'
+          primary
+          disabled={!(inputValue>0)}
+        // plain
+          color='brand'
+          onClick={()=>console.log({ inputValue })}
+          label={`Remove ${inputValue || ''} ${sellType}`}
+        />
       </Box>
     </Box>
   );
 }
 
-export default SellAction;
+export default PaybackAction;

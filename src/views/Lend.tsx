@@ -1,31 +1,52 @@
 import React from 'react';
 import moment from 'moment';
-import { Box, Grid, Heading, Text, Collapsible, Markdown } from 'grommet';
+import { Box, Grid, Heading, Text, Collapsible, Markdown, Layer } from 'grommet';
+import RotateLoader from 'react-spinners/RotateLoader';
 
 import { FiCheckCircle, FiCircle, FiRefreshCw as Refresh } from 'react-icons/fi';
 import Series from './x_Series';
 import Positions from './x_Positions';
-
-// import BuyAction from '../components/BuyAction';
-// import SellAction from '../components/SellAction';
-
-import BuySellAction from '../components/BuySellAction';
+import BorrowAction from '../components/BorrowAction';
+import RepayAction from '../components/RepayAction';
 
 import TransactionHistory from '../components/TransactionHistory';
 
+import { YieldContext } from '../contexts/YieldContext';
 import { PositionsContext } from '../contexts/PositionsContext';
 import { IYieldSeries } from '../types';
 
+import DepositWithdraw from '../components/DepositWithdraw';
+import BorrowRepay from '../components/BorrowRepay';
+import BuySell from '../components/BuySell';
 
 interface BorrowProps {
   setActiveSeries: any,
   activeSeries:IYieldSeries,
-  setShowSeriesLayer:any,
+  setShowSeriesLayer: any, 
 }
 
 const Lend = ({ setActiveSeries, activeSeries, setShowSeriesLayer }:BorrowProps) => {
 
-  const { state: positionsState, dispatch: positionsDispatch } = React.useContext(PositionsContext);
+  const { state: yieldState, dispatch: yieldDispatch } = React.useContext(YieldContext);
+  const { state: positionsState, actions: positionsActions } = React.useContext(PositionsContext);
+  // const [ nextColor, setNextColor ] = React.useState<string>('');
+
+  const [ activePosition, setActivePosition ] = React.useState<any>(null);
+  // const [ layerOpen, setLayerOpen ] = React.useState<String|null>(null);
+  const [ borrowRepayActive, setBorrowRepayActive ] = React.useState<boolean>(true);
+  const [ depositWithdrawActive, setDepositWithdrawActive ] = React.useState<boolean>(true);
+
+  const { isLoading: positionsLoading, positionsData } = positionsState; 
+  const { isLoading: yieldLoading, deployedSeries, deployedCore, yieldData, makerData }  = yieldState;
+
+
+  React.useEffect( () => {
+    ( async () => {
+      !positionsLoading && await positionsActions.getPositions([activeSeries]);
+      setActivePosition(positionsData.get(activeSeries.symbol));
+    })();
+    console.log(positionsState);
+  }, [ activeSeries ]);
 
   const {
     name,
@@ -35,84 +56,92 @@ const Lend = ({ setActiveSeries, activeSeries, setShowSeriesLayer }:BorrowProps)
     currentValue,
   } = activeSeries;
 
-  const { state: posState } = React.useContext(PositionsContext);
-
   return (
-    <Box
-      pad={{ horizontal:'medium', vertical:'medium' }}
-      // round='medium'
-      fill
-      gap='small'
-    >
-      {/* <Grid columns={['auto', '1/3']}> */}
-      <Box direction='row-responsive'>
-        <Box 
-          // elevation='xsmall'
-          flex='grow'
-          background='background'
-          pad='medium'
-          round={{ size:'xsmall', corner:'left' }}
-        >
-          <Box 
-            direction='row'
-          // justify='between'
-            align='baseline'
-            gap='small'
-          >
-            <Heading>{activeSeries?.name}</Heading>
-            <Refresh onClick={()=>setShowSeriesLayer(true)} />
+
+    <Box gap='small' pad={{ vertical:'small', horizontal:'large' }}>
+      <Box justify='between'>
+        <Box direction='row' justify='between'>
+          <Box width='75%'>
+            <Heading level='3'>Lend Dai</Heading>
+            <Box pad={{ vertical:'small' }}>
+              <Text size='small'>
+                Interest is calculated on a yearly basis and paid out when the term matures: 
+                In this case 3 months, earning you 3.5% - 4% APR through yDai.
+              </Text>
+            </Box>
           </Box>
 
-          <Box direction="column" align='start'>
-          
-            <Box direction="row" gap="xsmall">
-              <Text size="xxsmall">
-                ID #: {symbol}
-              </Text>
+          { positionsLoading? 
+            <Box
+              round='xlarge'
+              width='xsmall'
+              height='xsmall'
+              // background={activePosition?.seriesColor}
+              justify='center'
+              align='center'
+              margin='small'
+            >
+              {/* <RotateLoader color='#009E83' /> */}
+              <RotateLoader color={activePosition?.seriesColor || '#009E83'} />
             </Box>
+            :
+            <Box
+              round='xlarge'
+              width='xsmall'
+              height='xsmall'
+              background={activePosition?.seriesColor}
+              justify='center'
+              align='center'
+              margin='small'
+            >
+              <Box align='center'>
+                <Text weight='bold'>{moment(activePosition?.maturity_p).format('MMM')}</Text>
+                <Text>{moment(activePosition?.maturity_p).format('Y')}</Text>
+              </Box>
+            </Box>}
+        </Box>
+      </Box>
 
-            <Box direction="row" gap="xsmall">
-              <Text size="xxsmall">Matures: </Text>
-              <Text size="xxsmall" weight="bold">
-                { moment(maturity).format('MMM YYYY') } ( { moment(maturity).toNow() } )
-              </Text>
-            </Box>
-            <Box direction="row" gap="xsmall">
-              <Text size="xxsmall">Current value:</Text>{' '}
-              <Text size="xxsmall" weight="bold">{`${currentValue} DAI`}</Text>
-            </Box>
+      <Box 
+        direction='row-responsive'
+        gap='xsmall'
+        justify='between'
+        align='baseline'
+        margin={{ vertical:'medium' }}
+      >
+        <Box
+          direction='row'
+          gap='xsmall'
+          align='baseline'
+        >
+          <Box>
+            <Text weight='bold' size='xsmall'> yDai Balance </Text>
+          </Box>
+          <Box
+            background='brandTransparent'
+            round
+            pad={{ horizontal:'small', vertical:'xsmall' }}
+          >
+            <Text size='xsmall' color='brand'>{'12'} yDai ≈ 12.01 Dai</Text>
           </Box>
         </Box>
 
-        <Box 
-          direction='row' 
-          background='#d4f8d4' 
-          pad='medium' 
-          align='center' 
-          justify='evenly'
-          round={{ size:'xsmall', corner:'right' }}
-          gap='small'
-        >
-          <Box direction='column'>
-            <Text size='xxsmall'>Current Price:</Text>
-            <Text size='small'>1.01 Dai</Text>
-            {/* <Text size='xxsmall'>Liquidation Price</Text>
-            <Text size='small'>150</Text> */}
-          </Box>
-          <Box>
-            <Text size='xxsmall'>Current Balance:</Text>
-            <Text size='small'>25 yDai</Text>
-            {/* <Text size='xxsmall'>Borrowing Power:</Text>
-            <Text size='small'>13 yDai</Text> */}
+        <Box direction='row' gap='small' align='baseline'> 
+          <Text weight='bold' size='xsmall'>Maturity: </Text>
+          <Box round border='all' pad={{ horizontal:'small', vertical:'xsmall' }}>
+            <Text size='xsmall'>{moment(activePosition?.maturity_p).format('MMMM DD, YYYY')}</Text>
           </Box>
         </Box>
       </Box>
-      
-      <BuySellAction activeSeries={activeSeries} fixedOpen={false} />
 
-      <TransactionHistory activeSeries={activeSeries} fixedOpen={false} />
-
-
+      <Box flex='grow' direction='column'>
+        <Box direction='row-responsive' gap='small' justify='between'>
+          <BuySell
+            activeSeries={activeSeries}
+            active={depositWithdrawActive}
+          />
+        </Box>
+      </Box>
     </Box>
   );
 };

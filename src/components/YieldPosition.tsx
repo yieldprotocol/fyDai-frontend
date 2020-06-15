@@ -14,8 +14,8 @@ import {
 
 import RepayAction from './RepayAction';
 import BorrowAction from './BorrowAction';
-import SellAction from './SellAction';
-import BuyAction from './BuyAction';
+import SellAction from './x_SellAction';
+import BuyAction from './x_BuyAction';
 import ActionMenu from './ActionMenu';
 import WithdrawAction from './WithdrawAction';
 import DepositAction from './DepositAction';

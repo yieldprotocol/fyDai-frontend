@@ -51,7 +51,7 @@ const BorrowAction = (props:BorrowActionProps) => {
   };
   
   return (
-    <Box gap='small' fill>
+    <Box flex='grow' justify='between'>
       <Box margin={{ top:'medium' }} gap='xsmall' align='center' fill='horizontal'>
         <Text alignSelf='start' size='xsmall'> Amount to borrow </Text>
         <Box 
@@ -75,38 +75,41 @@ const BorrowAction = (props:BorrowActionProps) => {
           />
           <TokenSelector />
         </Box>
+
+        <Box direction='row' fill='horizontal' margin={{top:'small'}}>
+          <Box pad='xsmall' width='50%'>
+            <Box direction='row' gap='small'>
+              <Text size='xsmall'>
+                Est. APR 
+              </Text>
+              <Help />
+            </Box>
+            <Text weight='bold' size='xsmall'>
+              3.45%
+            </Text>
+          </Box>
+          <Box pad='xsmall'>
+            <Box direction='row' gap='small'>
+              <Text size='xsmall'>
+                Expected Dai
+              </Text>
+              <Help />
+            </Box>
+            <Text weight='bold' size='xsmall'>
+              0 Dai
+            </Text>
+          </Box>
+        </Box>
+      
       </Box>
 
-      <Box direction='row' fill='horizontal' >
-        <Box pad='xsmall' width='50%'>
-          <Box direction='row' gap='small'>
-            <Text size='xsmall'>
-              Est. APR 
-            </Text>
-            <Help />
-          </Box>
-          <Text weight='bold' size='xsmall'>
-            3.45%
-          </Text>
-        </Box>
-        <Box pad='xsmall'>
-          <Box direction='row' gap='small'>
-            <Text size='xsmall'>
-              Expected Dai
-            </Text>
-            <Help />
-          </Box>
-          <Text weight='bold' size='xsmall'>
-            0 Dai
-          </Text>
-        </Box>
-      </Box>
 
-      <Box fill='horizontal'>
+
+      <Box fill='horizontal' alignSelf='end'>
         <Button
           fill='horizontal'
           primary
-        // plain
+          disabled={!(inputValue>0)}
           color='brand'
           onClick={()=>console.log({ inputValue })}
           label={`Borrow ${inputValue || ''} ${borrowType}`}
