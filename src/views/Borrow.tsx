@@ -1,6 +1,7 @@
 import React from 'react';
 import moment from 'moment';
 import { Box, Grid, Heading, Text, Collapsible, Markdown, Layer } from 'grommet';
+import RotateLoader from 'react-spinners/RotateLoader';
 
 import { FiCheckCircle, FiCircle, FiRefreshCw as Refresh } from 'react-icons/fi';
 import Series from './x_Series';
@@ -67,21 +68,34 @@ const Borrow = ({ setActiveSeries, activeSeries, setShowSeriesLayer }:BorrowProp
             </Box>
           </Box>
 
-          <Box
-            round='xlarge'
-            width='xsmall'
-            height='xsmall'
-            background={activePosition?.seriesColor}
-            justify='center'
-            align='center'
-            margin='small'
-          >
-            <Box align='center'>
-              <Text weight='bold'>{moment(activePosition?.maturity_p).format('MMM')}</Text>
-              <Text>{moment(activePosition?.maturity_p).format('Y')}</Text>
+          { positionsLoading? 
+            <Box
+              round='xlarge'
+              width='xsmall'
+              height='xsmall'
+              // background={activePosition?.seriesColor}
+              justify='center'
+              align='center'
+              margin='small'
+            >
+              {/* <RotateLoader color='#009E83' /> */}
+              <RotateLoader color={activePosition?.seriesColor || '#009E83'} />
             </Box>
-
-          </Box>
+            :
+            <Box
+              round='xlarge'
+              width='xsmall'
+              height='xsmall'
+              background={activePosition?.seriesColor}
+              justify='center'
+              align='center'
+              margin='small'
+            >
+              <Box align='center'>
+                <Text weight='bold'>{moment(activePosition?.maturity_p).format('MMM')}</Text>
+                <Text>{moment(activePosition?.maturity_p).format('Y')}</Text>
+              </Box>
+            </Box>}
         </Box>
       </Box>
 

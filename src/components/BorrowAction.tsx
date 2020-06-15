@@ -51,7 +51,7 @@ const BorrowAction = (props:BorrowActionProps) => {
   };
   
   return (
-    <Box align='center' gap='small'>
+    <Box gap='small' fill>
       <Box margin={{ top:'medium' }} gap='xsmall' align='center' fill='horizontal'>
         <Text alignSelf='start' size='xsmall'> Amount to borrow </Text>
         <Box 
@@ -102,7 +102,7 @@ const BorrowAction = (props:BorrowActionProps) => {
         </Box>
       </Box>
 
-      <Box fill='horizontal' alignSelf='end'>
+      <Box fill='horizontal'>
         <Button
           fill='horizontal'
           primary

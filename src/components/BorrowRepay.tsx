@@ -46,9 +46,10 @@ const BorrowRepay = ({ close }:any) => {
           </Text>
         </Box>
       </Box>
-
-      { taskView==='BORROW' && <BorrowAction /> }
-      { taskView==='REPAY' && <RepayAction /> }
+      <Box flex='grow'>
+        { taskView==='BORROW' && <BorrowAction /> }
+        { taskView==='REPAY' && <RepayAction /> }
+      </Box>
     </Box>
   );
 };

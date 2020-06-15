@@ -26,6 +26,7 @@
     "react-icons": "^3.10.0",
     "react-range": "^1.6.6",
     "react-scripts": "3.4.1",
+    "react-spinners": "^0.8.3",
     "react-spring": "^8.0.27",
     "react-stepper-horizontal": "^1.0.11",
     "react-use-gesture": "^7.0.15",
