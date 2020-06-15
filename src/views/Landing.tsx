@@ -2,6 +2,8 @@ import React from 'react';
 import { Box, Grid, Heading, Text, Collapsible, Markdown, Layer, Drop, TextInput, Paragraph } from 'grommet';
 
 import { Range } from 'react-range';
+import DepositWithdraw from '../components/DepositWithdraw';
+import BorrowRepay from '../components/BorrowRepay';
 
 const Landing = () => {
 
@@ -47,13 +49,8 @@ const Landing = () => {
 
       <Box flex='grow' direction='column'>
         <Box direction='row-responsive' gap='small' justify='between'>
-          <Box background="grey" fill>
-            task 1
-          </Box>
-          '>>'
-          <Box background="grey" fill>
-            task 2
-          </Box>
+          <DepositWithdraw />
+          <BorrowRepay />
         </Box>
       </Box>
     </Box>

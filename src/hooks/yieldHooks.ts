@@ -69,7 +69,12 @@ export function useGetBalance() {
 export const useCallTx = () => {
   const { library } = useWeb3React();
   const [ callTxActive, setCallTxActive ] = React.useState<boolean>();
-  const callTx = async (contractAddr:string, contractName:string, fn:string, data:any[] ) => {
+  const callTx = async (
+    contractAddr:string,
+    contractName:string,
+    fn:string,
+    data:any[]
+  ) => {
     setCallTxActive(true);
     const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), library);
     const retVal = await contract[fn](...data);
@@ -87,10 +92,14 @@ export const useDealer = () => {
   const [ withdrawActive, setWithdrawActive ] = React.useState<boolean>(false);
   const [ borrowActive, setBorrowActive ] = React.useState<boolean>(false);
   const [ repayActive, setRepayActive ] = React.useState<boolean>(false);
-  const [ approveDealerActive, setApproveDealerActive ] = React.useState<boolean>(false);
+  const [ approveActive, setApproveActive ] = React.useState<boolean>(false);
   const signer = library?.getSigner();
 
-  const post = async (dealerAddress:string, from:string, amount:ethers.utils.BigNumber ) => {
+  const post = async (
+    dealerAddress:string,
+    from:string,
+    amount:ethers.utils.BigNumber
+  ) => {
     let tx:any;
     // Processing and sanitizing input
     const parsedAmount = amount;
@@ -113,7 +122,11 @@ export const useDealer = () => {
     notifyDispatch({ type: 'notify', payload:{ message: `Deposit of ${parsedAmount} complete.`, type:'success' } } );
   };
 
-  const withdraw = async (dealerAddress:string, to:string, amount:ethers.utils.BigNumber) => {
+  const withdraw = async (
+    dealerAddress:string,
+    to:string,
+    amount:ethers.utils.BigNumber
+  ) => {
     let tx:any;
     const parsedAmount = amount;
     const toAddr = ethers.utils.getAddress(to);
@@ -133,7 +146,12 @@ export const useDealer = () => {
     notifyDispatch({ type: 'notify', payload:{ message: `Withdrawal of ${parsedAmount} complete.`, type:'success' } } );
   };
 
-  const borrow = async (dealerAddress:string, maturity:string, to:string, amount:ethers.utils.BigNumber) => {
+  const borrow = async (
+    dealerAddress:string,
+    maturity:string,
+    to:string,
+    amount:ethers.utils.BigNumber
+  ) => {
     let tx:any;
     const parsedAmount = amount;
     const toAddr = ethers.utils.getAddress(to);
@@ -153,7 +171,13 @@ export const useDealer = () => {
     notifyDispatch({ type: 'notify', payload:{ message: `Borrowing of ${parsedAmount} complete.`, type:'success' } } );
   };
 
-  const repay = async (dealerAddress:string, maturity:string, from:string, amount:ethers.utils.BigNumber, type:string) => {
+  const repay = async (
+    dealerAddress:string,
+    maturity:string,
+    from:string,
+    amount:ethers.utils.BigNumber,
+    type:string
+  ) => {
     let tx:any;
     const parsedAmount = amount;
     const fromAddr = ethers.utils.getAddress(from);
@@ -179,12 +203,16 @@ export const useDealer = () => {
   };
 
   // Not strictly a Dealer Contract function. But associated enough to keep in here. 
-  const approveDealer = async (tokenAddress:string, dealerAddress:string, amount:ethers.utils.BigNumber) => {
+  const approveDealer = async (
+    tokenAddress:string,
+    dealerAddress:string,
+    amount:ethers.utils.BigNumber
+  ) => {
     let tx:any;
     const parsedAmount = amount;
     const dealerAddr = ethers.utils.getAddress(dealerAddress);
     const tokenAddr = ethers.utils.getAddress(tokenAddress);
-    setApproveDealerActive(true);
+    setApproveActive(true);
 
     const contract = new ethers.Contract(
       tokenAddr,
@@ -196,12 +224,12 @@ export const useDealer = () => {
       tx = await contract.approve(dealerAddr, amount);
     } catch (e) {
       notifyDispatch({ type: 'notify', payload:{ message:`${e.data.message}`, type:'error' } } );
-      setApproveDealerActive(false);
+      setApproveActive(false);
       return;
     }
     notifyDispatch({ type: 'notify', payload:{ message: `Token approval of ${parsedAmount} pending...`, type:'info' } } );
     await tx.wait();
-    setApproveDealerActive(false);
+    setApproveActive(false);
     notifyDispatch({ type: 'notify', payload:{ message: `Token approval of ${parsedAmount} complete. ${tokenAddress} and ${dealerAddress}`, type:'success' } } );
   };
 
@@ -210,7 +238,7 @@ export const useDealer = () => {
     withdraw, withdrawActive,
     borrow, borrowActive,
     repay, repayActive,
-    approveDealer, approveDealerActive,
+    approveDealer, approveActive,
   } as const;
 };
 

@@ -62,7 +62,7 @@ const YieldSeriesMenuItem = ({
       onBlur={() => setOver(false)}
       hoverIndicator={tooltipColor}
       onClick={() => seriesAction()}
-      round={{ size:'medium', corner:'left' }}
+      round={over&&!selected?{ size:'medium', corner:'left' }: {size:'medium'}}
     >
 
       <Box 
@@ -108,28 +108,6 @@ const YieldSeriesMenuItem = ({
         </Box>
 
       </Box>
-
-      {/* <Collapsible open={ref.current && over && !selected}>
-        <Box
-          animation="slideRight"
-          pad="small"
-          background={tooltipColor}
-          round={{ size: 'large', corner: 'right' }}
-        >
-          <Box direction="column" align='end'>
-            <Box direction="row" gap="xsmall">
-              <Text size="xsmall">Matures</Text>
-              <Text size="xsmall">
-                { moment(maturity).toNow() }
-              </Text>
-            </Box>
-            <Box direction="row" gap="xsmall">
-              <Text size="xsmall">Current value:</Text>{' '}
-              <Text size="xsmall" weight="bold">{`${currentValue} DAI`}</Text>
-            </Box>
-          </Box>
-        </Box>
-      </Collapsible> */}
 
       {ref.current && over && !selected && (
         <Drop align={{ left: 'right' }} target={ref.current} plain>

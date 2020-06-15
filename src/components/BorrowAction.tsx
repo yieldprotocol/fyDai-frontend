@@ -1,6 +1,14 @@
 import React from 'react';
-import { Box, Button, Heading, TextInput, Text, CheckBox, Collapsible, RangeInput } from 'grommet';
-import { FiCheckCircle } from 'react-icons/fi';
+import { Box, Button, Select, Image, TextInput, Text, CheckBox, Collapsible, RangeInput } from 'grommet';
+import { 
+  FiCheckCircle, 
+  FiInfo as Info,
+  FiHelpCircle as Help,
+  FiChevronDown as CaretDown,
+} from 'react-icons/fi';
+
+
+import ethLogo from '../assets/images/tokens/eth.svg';
 
 import { IYieldSeries } from '../types';
 
@@ -10,112 +18,100 @@ interface BorrowActionProps {
   close?:any,
 }
 
+
 const BorrowAction = (props:BorrowActionProps) => {
 
   const [inputValue, setInputValue] = React.useState<any>();
+  const [ borrowType, setBorrowType ] = React.useState<string>('yDai');
   const [borrowOpen, setBorrowOpen] = React.useState<boolean>(false);
   const slideRef = React.useRef<any>();
 
-  return (
-
-    <Box 
-      elevation={borrowOpen?'xsmall':'none'} 
-      fill='horizontal'
-      background='background'
-      pad='medium'
-    >
-      <Box 
-        direction='row'
-        justify='between'
-        onClick={()=>setBorrowOpen(!borrowOpen)}
-      >
-        <Box direction='row' align='baseline' gap='small'>
-          <Text weight='bold'>Borrow yDai</Text>
-          <Text size='10px'> at an interest rate of <Text weight='bold' size='10px'>{' 3.86%'}</Text> </Text>
+  const TokenSelector = () => {
+    return (
+      <Box justify='center'>
+        <Box round background='border' justify='center' pad={{ horizontal:'small' }}>
+          <Select
+            id="select"
+            name="select"
+            plain
+            value={borrowType}
+            options={['yDai', 'Dai']}
+            valueLabel={
+              <Box width='xsmall' direction='row' align='baseline' justify='center' gap='xsmall'>
+                <Text color='brand' size='xsmall'>{ borrowType }</Text>
+                <Text color='brand' size='xsmall'><CaretDown /></Text>
+              </Box>
+          }
+            icon={false}
+            onChange={({ option }) => setBorrowType(option)}
+          />
         </Box>
-        <Box gap='small' direction='row'>
-          <Box align='center'>
-
-            <FiCheckCircle color='green' />
-            <Text size='10px'> Collateral Posted </Text>
-
+      </Box>
+    );
+  };
+  
+  return (
+    <Box align='center' gap='small'>
+      <Box margin={{ top:'medium' }} gap='xsmall' align='center' fill='horizontal'>
+        <Text alignSelf='start' size='xsmall'> Amount to borrow </Text>
+        <Box 
+          round='small'
+          border={{ color:'brand' }}
+          direction='row'
+          fill='horizontal'
+          align='baseline'
+        >
+          <Box width='15px' height='15px'>
+            <Image src={ethLogo} fit='contain' />
           </Box>
+          <TextInput
+            type="number"
+            placeholder="0"
+            value={inputValue}
+            plain
+            onChange={(event:any) => setInputValue(event.target.value)}
+            // icon={<TokenSelector />}
+            reverse
+          />
+          <TokenSelector />
         </Box>
       </Box>
 
-      <Collapsible open={borrowOpen}>
-        <Box direction='column' gap='medium' pad='medium' align='center'>
-          
-          <Box 
-            direction='row'
-            gap='small'
-            // background='background-front'
-            fill
-            round
-            pad='small'
-            border={{ color:'background' }}
-          >
-            <Box round='xsmall' border='all' pad={{ horizontal:'small' }}> Max
-              {/* <Button round='xsmall' label='MAX' /> */}
-            </Box>
-            <Box round='xsmall' border='all' pad={{ horizontal:'small' }}> Max
-              {/* <Button round='xsmall' label='MAX' /> */}
-            </Box>
-
-            <RangeInput
-              ref={slideRef}
-              value={inputValue}
-              max='100'
-              // @ts-ignore
-              step={0.1}
-              onChange={(e:any) => setInputValue(e.target.value)}
-            />
-            <Box round='xsmall' border='all' pad={{ horizontal:'small' }}> Max
-              {/* <Button round='xsmall' label='MAX' /> */}
-            </Box>
+      <Box direction='row' fill='horizontal' >
+        <Box pad='xsmall' width='50%'>
+          <Box direction='row' gap='small'>
+            <Text size='xsmall'>
+              Est. APR 
+            </Text>
+            <Help />
           </Box>
-
-
-          <Box gap='none' direction='row' align='baseline'>
-            <Box
-              style={{ borderRadius:'24px 0px 0px 24px' }}
-              border='all'
-              pad={{ horizontal:'large', vertical:'xsmall' }}
-              hoverIndicator='background'
-              onClick={()=>console.log('somehting')}
-            >
-              <Text size='14px'>Max</Text>
-            </Box>
-            <TextInput
-              style={{ borderRadius:'0px 24px 24px 0px' }}
-              type="number"
-              placeholder="Amount to borrow"
-              value={inputValue}
-              onChange={(event:any) => setInputValue(event.target.value)}
-              icon={<Text>yDai</Text>}
-              reverse
-            />
-          </Box>
-          <Box direction='row' justify='between'>
-            <Box />
-            <Box>
-              <CheckBox label={<Box direction='row' gap='xsmall'> Sell immediately for DAI on <Text color='#FF007F'><span role='img'> 🦄</span> Uniswap</Text></Box>} reverse />
-            </Box>
-          </Box>
-
-          <Box pad='medium' direction='row' justify='evenly' fill='horizontal' align='baseline'>
-            <Box hoverIndicator='background' onClick={()=>setBorrowOpen(!borrowOpen)} round pad={{ horizontal:'large', vertical:'xsmall' }}> 
-              <Text color='border'>Cancel</Text>
-            </Box>
-            <Button
-              label='Confirm'
-              disabled={false}
-              onClick={()=>setBorrowOpen(!borrowOpen)}
-            />
-          </Box>
+          <Text weight='bold' size='xsmall'>
+            3.45%
+          </Text>
         </Box>
+        <Box pad='xsmall'>
+          <Box direction='row' gap='small'>
+            <Text size='xsmall'>
+              Expected Dai
+            </Text>
+            <Help />
+          </Box>
+          <Text weight='bold' size='xsmall'>
+            0 Dai
+          </Text>
+        </Box>
+      </Box>
 
-      </Collapsible>
+      <Box fill='horizontal' alignSelf='end'>
+        <Button
+          fill='horizontal'
+          primary
+        // plain
+          color='brand'
+          onClick={()=>console.log({ inputValue })}
+          label={`Borrow ${inputValue || ''} ${borrowType}`}
+        />
+      </Box>
     </Box>
 
   );

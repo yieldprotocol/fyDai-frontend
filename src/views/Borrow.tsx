@@ -14,6 +14,9 @@ import { YieldContext } from '../contexts/YieldContext';
 import { PositionsContext } from '../contexts/PositionsContext';
 import { IYieldSeries } from '../types';
 
+import DepositWithdraw from '../components/DepositWithdraw';
+import BorrowRepay from '../components/BorrowRepay';
+
 interface BorrowProps {
   setActiveSeries: any,
   activeSeries:IYieldSeries,
@@ -87,7 +90,8 @@ const Borrow = ({ setActiveSeries, activeSeries, setShowSeriesLayer }:BorrowProp
         gap='xsmall'
         justify='between'
         align='baseline'
-      > 
+        margin={{ vertical:'medium' }}
+      >
         <Box
           direction='row'
           gap='xsmall'
@@ -99,34 +103,31 @@ const Borrow = ({ setActiveSeries, activeSeries, setShowSeriesLayer }:BorrowProp
           <Box
             background='brandTransparent'
             round
-            pad='xsmall'
+            pad={{ horizontal:'small', vertical:'xsmall' }}
           >
             <Text size='xsmall' color='brand'>{yieldData.wethPosted_p} ETH</Text>
           </Box>
           <Box
             background='secondaryTransparent'
             round
-            pad='xsmall'
+            pad={{ horizontal:'small', vertical:'xsmall' }}
           >
             <Text size='xsmall' color='secondary'>{yieldData.chaiPosted_p} DAI</Text>
           </Box>
         </Box>
 
-        <Box direction='row' gap='small'> 
+        <Box direction='row' gap='small' align='baseline'> 
           <Text weight='bold' size='xsmall'>Maturity: </Text>
-          <Text size='xsmall'>{moment(activePosition?.maturity_p).format('MMMM DD, YYYY')}</Text>
+          <Box round border='all' pad={{ horizontal:'small', vertical:'xsmall' }}>
+            <Text size='xsmall'>{moment(activePosition?.maturity_p).format('MMMM DD, YYYY')}</Text>
+          </Box>
         </Box>
       </Box>
 
       <Box flex='grow' direction='column'>
         <Box direction='row-responsive' gap='small' justify='between'>
-          <Box background="grey" fill>
-            task 1
-          </Box>
-          '>>'
-          <Box background="grey" fill>
-            task 2
-          </Box>
+          <DepositWithdraw />
+          <BorrowRepay />
         </Box>
       </Box>
     </Box>

@@ -276,7 +276,7 @@ export const yieldTheme = {
   button: {
     border: {
       width: '1px',
-      radius: '15px',
+      radius: '8px',
     },
     padding: {
       vertical: '3px',

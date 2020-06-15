@@ -103,7 +103,7 @@ function App() {
                 direction='row'
                 flex
               >
-                <Grid fill columns={['25%', 'auto', '20%']}>
+                <Grid fill columns={['25%', 'auto', '15%']}>
                   <YieldSidebar setShowSeriesLayer={setShowSeriesLayer} activeSeries={activeSeries} setActiveSeries={setActiveSeries} />
                   <Box align='center'>
                     {!activeSeries && <Landing />}
