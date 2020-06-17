@@ -14,6 +14,20 @@
     },
     {
       "inputs": [],
+      "name": "CHAI",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [],
       "name": "RAD",
       "outputs": [
         {
@@ -56,6 +70,20 @@
     },
     {
       "inputs": [],
+      "name": "WETH",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [],
       "name": "_pot",
       "outputs": [
         {
@@ -82,11 +110,11 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.6.2+commit.bacdbe57\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"pot_\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"RAD\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"RAY\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"WAD\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"_pot\",\"outputs\":[{\"internalType\":\"contract IPot\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"price\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"ChaiOracle retrieves the price for Chai as the DSR fee from Pot\",\"methods\":{\"constructor\":{\"details\":\"ChaiOracle connects to Pot\"},\"price()\":{\"details\":\"We update chi and retrieve it from pot as the price chai = (1/chi) * dai dai = chi * chai price = chi\"}}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/ChaiOracle.sol\":\"ChaiOracle\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/ChaiOracle.sol\":{\"keccak256\":\"0x3f4db4b2d4fb76b23c7fc2c381a87011fc47d42c73e6806894a9955a9fdbf28f\",\"urls\":[\"bzz-raw://e820737510dea3b5b0b1723164dc5df69c88f55636dca090a4a4ff824433cde4\",\"dweb:/ipfs/QmVxT3EqGLGVf38oCZxaki4hkr8xUaqv7CgoJ7Ytc93KRk\"]},\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/Constants.sol\":{\"keccak256\":\"0x7b1b545425f196ddfec6cfd7860f51677ddb0994b3cc8aeb334297d1ea98501b\",\"urls\":[\"bzz-raw://9ac9e0bb8327110b59bf62f0c6bf7733d1efac877860892f628417a728221119\",\"dweb:/ipfs/QmTN6nuAM3X2WgETLHsGP2UHHcwPqqgSKZGGDYdE61AyTj\"]},\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/IOracle.sol\":{\"keccak256\":\"0x1c01c3a9a34c5f4cc50fdfc42ac7b8c4b475a60f6d49daf1f04900618ca9f1e5\",\"urls\":[\"bzz-raw://8d0264d8aa3cd9e46d416cf0c89c66cd4fb617e435df9ce55c28873ad80d5b1b\",\"dweb:/ipfs/QmdQJg3hXCxGUmFiwj27yHz2M3QdaQ32w1irbhfdLjHqwq\"]},\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/IPot.sol\":{\"keccak256\":\"0x11493f6191d55d4ddf341e5f4b72b2c74377b090ff83e9dccdb0c45fb733f53e\",\"urls\":[\"bzz-raw://16895998d56fdebd344229f079267749d3c7564abed603eef290f23c282dc65b\",\"dweb:/ipfs/QmVvEHwi5FnNw9nC2sasTMWTGfQxsSwkhjofz9ppPF2EQJ\"]},\"@hq20/contracts/contracts/math/DecimalMath.sol\":{\"keccak256\":\"0x1b0a023d51f37310e253602378d07217f6c67de2ebd8df296db3c3c276c854ed\",\"urls\":[\"bzz-raw://994ba929f5b5242f43b02e3a9b992b4b42c79414ca0a0dca46d407d36d9003b5\",\"dweb:/ipfs/QmQV12GQvCRQgNq3JHkjAa2CqNFye5s5DrfTLVC3GpMqK3\"]},\"@openzeppelin/contracts/math/SafeMath.sol\":{\"keccak256\":\"0x04d34b3cd5677bea25f8dfceb6dec0eaa071d4d4b789a43f13fe0c415ba4c296\",\"urls\":[\"bzz-raw://e7e8b526a6839e5ba14f0d23a830387fec47f7043ce01d42c9f285b709a9d080\",\"dweb:/ipfs/QmXmhhFmX5gcAvVzNiDPAGA35iHMPNaYtQkACswRHBVTNw\"]},\"@openzeppelin/contracts/math/SignedSafeMath.sol\":{\"keccak256\":\"0xfadc24a31d75d6b3f955190cffe13bbe6e24a274c12b2b60e8c4004131487ce8\",\"urls\":[\"bzz-raw://0ec35367d49b2ea45f556a439f836e208d2460faeb6e2341e9130d163128b619\",\"dweb:/ipfs/QmTwKCBdkVAarY5hteSdwQ1J4GpogZoxCZHrbieMQVzuQJ\"]}},\"version\":1}",
-  "bytecode": "0x608060405234801561001057600080fd5b5060405161042b38038061042b8339818101604052602081101561003357600080fd5b8101908080519060200190929190505050806000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555050610397806100946000396000f3fe608060405234801561001057600080fd5b50600436106100575760003560e01c806306f405fd1461005c578063552033c4146100805780636a146024146100a4578063a035b1fe146100c8578063ac2f573f146100e6575b600080fd5b610064610130565b604051808260ff1660ff16815260200191505060405180910390f35b610088610135565b604051808260ff1660ff16815260200191505060405180910390f35b6100ac61013a565b604051808260ff1660ff16815260200191505060405180910390f35b6100d061013f565b6040518082815260200191505060405180910390f35b6100ee61033c565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b602d81565b601b81565b601281565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff166320aba08b6040518163ffffffff1660e01b8152600401602060405180830381600087803b1580156101aa57600080fd5b505af11580156101be573d6000803e3d6000fd5b505050506040513d60208110156101d457600080fd5b81019080805190602001909291905050504211610292576000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1663c92aecc46040518163ffffffff1660e01b815260040160206040518083038186803b15801561025257600080fd5b505afa158015610266573d6000803e3d6000fd5b505050506040513d602081101561027c57600080fd5b8101908080519060200190929190505050610337565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16639f678cca6040518163ffffffff1660e01b8152600401602060405180830381600087803b1580156102fb57600080fd5b505af115801561030f573d6000803e3d6000fd5b505050506040513d602081101561032557600080fd5b81019080805190602001909291905050505b905090565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff168156fea2646970667358221220a93f0d2329fa46654dae809b54061ab0ebc0b1a6b91b4e11d95b2303a7c2c00764736f6c63430006020033",
-  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100575760003560e01c806306f405fd1461005c578063552033c4146100805780636a146024146100a4578063a035b1fe146100c8578063ac2f573f146100e6575b600080fd5b610064610130565b604051808260ff1660ff16815260200191505060405180910390f35b610088610135565b604051808260ff1660ff16815260200191505060405180910390f35b6100ac61013a565b604051808260ff1660ff16815260200191505060405180910390f35b6100d061013f565b6040518082815260200191505060405180910390f35b6100ee61033c565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b602d81565b601b81565b601281565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff166320aba08b6040518163ffffffff1660e01b8152600401602060405180830381600087803b1580156101aa57600080fd5b505af11580156101be573d6000803e3d6000fd5b505050506040513d60208110156101d457600080fd5b81019080805190602001909291905050504211610292576000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1663c92aecc46040518163ffffffff1660e01b815260040160206040518083038186803b15801561025257600080fd5b505afa158015610266573d6000803e3d6000fd5b505050506040513d602081101561027c57600080fd5b8101908080519060200190929190505050610337565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16639f678cca6040518163ffffffff1660e01b8152600401602060405180830381600087803b1580156102fb57600080fd5b505af115801561030f573d6000803e3d6000fd5b505050506040513d602081101561032557600080fd5b81019080805190602001909291905050505b905090565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff168156fea2646970667358221220a93f0d2329fa46654dae809b54061ab0ebc0b1a6b91b4e11d95b2303a7c2c00764736f6c63430006020033",
+  "metadata": "{\"compiler\":{\"version\":\"0.6.2+commit.bacdbe57\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"pot_\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"CHAI\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"RAD\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"RAY\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"WAD\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"WETH\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"_pot\",\"outputs\":[{\"internalType\":\"contract IPot\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"price\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"ChaiOracle retrieves the price for Chai as the DSR fee from Pot\",\"methods\":{\"constructor\":{\"details\":\"ChaiOracle connects to Pot\"},\"price()\":{\"details\":\"We update chi and retrieve it from pot as the price chai = (1/chi) * dai dai = chi * chai price = chi\"}}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/ChaiOracle.sol\":\"ChaiOracle\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/ChaiOracle.sol\":{\"keccak256\":\"0x3f4db4b2d4fb76b23c7fc2c381a87011fc47d42c73e6806894a9955a9fdbf28f\",\"urls\":[\"bzz-raw://e820737510dea3b5b0b1723164dc5df69c88f55636dca090a4a4ff824433cde4\",\"dweb:/ipfs/QmVxT3EqGLGVf38oCZxaki4hkr8xUaqv7CgoJ7Ytc93KRk\"]},\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/Constants.sol\":{\"keccak256\":\"0x4fce3c7234c92373731036711aee9d29d9a00f71a8505d1280743819489f1b2a\",\"urls\":[\"bzz-raw://2b5d28b17d2a41bd07aad8f736e24e936cad972f99df96e5c5b8c19bd0723355\",\"dweb:/ipfs/QmU71Vjw6kTdSmofmRi7PxfB1EHTmeJLnmbhaavQc8vPxx\"]},\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/IOracle.sol\":{\"keccak256\":\"0x1c01c3a9a34c5f4cc50fdfc42ac7b8c4b475a60f6d49daf1f04900618ca9f1e5\",\"urls\":[\"bzz-raw://8d0264d8aa3cd9e46d416cf0c89c66cd4fb617e435df9ce55c28873ad80d5b1b\",\"dweb:/ipfs/QmdQJg3hXCxGUmFiwj27yHz2M3QdaQ32w1irbhfdLjHqwq\"]},\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/IPot.sol\":{\"keccak256\":\"0x11493f6191d55d4ddf341e5f4b72b2c74377b090ff83e9dccdb0c45fb733f53e\",\"urls\":[\"bzz-raw://16895998d56fdebd344229f079267749d3c7564abed603eef290f23c282dc65b\",\"dweb:/ipfs/QmVvEHwi5FnNw9nC2sasTMWTGfQxsSwkhjofz9ppPF2EQJ\"]},\"@hq20/contracts/contracts/math/DecimalMath.sol\":{\"keccak256\":\"0x1b0a023d51f37310e253602378d07217f6c67de2ebd8df296db3c3c276c854ed\",\"urls\":[\"bzz-raw://994ba929f5b5242f43b02e3a9b992b4b42c79414ca0a0dca46d407d36d9003b5\",\"dweb:/ipfs/QmQV12GQvCRQgNq3JHkjAa2CqNFye5s5DrfTLVC3GpMqK3\"]},\"@openzeppelin/contracts/math/SafeMath.sol\":{\"keccak256\":\"0x04d34b3cd5677bea25f8dfceb6dec0eaa071d4d4b789a43f13fe0c415ba4c296\",\"urls\":[\"bzz-raw://e7e8b526a6839e5ba14f0d23a830387fec47f7043ce01d42c9f285b709a9d080\",\"dweb:/ipfs/QmXmhhFmX5gcAvVzNiDPAGA35iHMPNaYtQkACswRHBVTNw\"]},\"@openzeppelin/contracts/math/SignedSafeMath.sol\":{\"keccak256\":\"0xfadc24a31d75d6b3f955190cffe13bbe6e24a274c12b2b60e8c4004131487ce8\",\"urls\":[\"bzz-raw://0ec35367d49b2ea45f556a439f836e208d2460faeb6e2341e9130d163128b619\",\"dweb:/ipfs/QmTwKCBdkVAarY5hteSdwQ1J4GpogZoxCZHrbieMQVzuQJ\"]}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b506040516104d53803806104d58339818101604052602081101561003357600080fd5b8101908080519060200190929190505050806000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555050610441806100946000396000f3fe608060405234801561001057600080fd5b506004361061007d5760003560e01c8063a035b1fe1161005b578063a035b1fe146100ee578063ac2f573f1461010c578063ad5c464814610156578063b6dbf9ce146101745761007d565b806306f405fd14610082578063552033c4146100a65780636a146024146100ca575b600080fd5b61008a610192565b604051808260ff1660ff16815260200191505060405180910390f35b6100ae610197565b604051808260ff1660ff16815260200191505060405180910390f35b6100d261019c565b604051808260ff1660ff16815260200191505060405180910390f35b6100f66101a1565b6040518082815260200191505060405180910390f35b61011461039e565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b61015e6103c3565b6040518082815260200191505060405180910390f35b61017c6103e7565b6040518082815260200191505060405180910390f35b602d81565b601b81565b601281565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff166320aba08b6040518163ffffffff1660e01b8152600401602060405180830381600087803b15801561020c57600080fd5b505af1158015610220573d6000803e3d6000fd5b505050506040513d602081101561023657600080fd5b810190808051906020019092919050505042116102f4576000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1663c92aecc46040518163ffffffff1660e01b815260040160206040518083038186803b1580156102b457600080fd5b505afa1580156102c8573d6000803e3d6000fd5b505050506040513d60208110156102de57600080fd5b8101908080519060200190929190505050610399565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16639f678cca6040518163ffffffff1660e01b8152600401602060405180830381600087803b15801561035d57600080fd5b505af1158015610371573d6000803e3d6000fd5b505050506040513d602081101561038757600080fd5b81019080805190602001909291905050505b905090565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b7f574554480000000000000000000000000000000000000000000000000000000081565b7f43484149000000000000000000000000000000000000000000000000000000008156fea26469706673582212208396c61fcb4d08e31f0c124cb45282f88f895c5267b41124b9b87ba3eb7828ec64736f6c63430006020033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b506004361061007d5760003560e01c8063a035b1fe1161005b578063a035b1fe146100ee578063ac2f573f1461010c578063ad5c464814610156578063b6dbf9ce146101745761007d565b806306f405fd14610082578063552033c4146100a65780636a146024146100ca575b600080fd5b61008a610192565b604051808260ff1660ff16815260200191505060405180910390f35b6100ae610197565b604051808260ff1660ff16815260200191505060405180910390f35b6100d261019c565b604051808260ff1660ff16815260200191505060405180910390f35b6100f66101a1565b6040518082815260200191505060405180910390f35b61011461039e565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b61015e6103c3565b6040518082815260200191505060405180910390f35b61017c6103e7565b6040518082815260200191505060405180910390f35b602d81565b601b81565b601281565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff166320aba08b6040518163ffffffff1660e01b8152600401602060405180830381600087803b15801561020c57600080fd5b505af1158015610220573d6000803e3d6000fd5b505050506040513d602081101561023657600080fd5b810190808051906020019092919050505042116102f4576000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1663c92aecc46040518163ffffffff1660e01b815260040160206040518083038186803b1580156102b457600080fd5b505afa1580156102c8573d6000803e3d6000fd5b505050506040513d60208110156102de57600080fd5b8101908080519060200190929190505050610399565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16639f678cca6040518163ffffffff1660e01b8152600401602060405180830381600087803b15801561035d57600080fd5b505af1158015610371573d6000803e3d6000fd5b505050506040513d602081101561038757600080fd5b81019080805190602001909291905050505b905090565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b7f574554480000000000000000000000000000000000000000000000000000000081565b7f43484149000000000000000000000000000000000000000000000000000000008156fea26469706673582212208396c61fcb4d08e31f0c124cb45282f88f895c5267b41124b9b87ba3eb7828ec64736f6c63430006020033",
   "sourceMap": "249:514:0:-:0;;;429:68;8:9:-1;5:2;;;30:1;27;20:12;5:2;429:68:0;;;;;;;;;;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;429:68:0;;;;;;;;;;;;;;;;485:4;473;;:17;;;;;;;;;;;;;;;;;;429:68;249:514;;;;;;",
-  "deployedSourceMap": "249:514:0:-:0;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;249:514:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;170:30:1;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;134;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;98;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;642:119:0;;;:::i;:::-;;;;;;;;;;;;;;;;;;;366:16;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;170:30:1;198:2;170:30;:::o;134:::-;162:2;134:30;:::o;98:::-;126:2;98:30;:::o;642:119:0:-;683:7;716:4;;;;;;;;;;;:8;;;:10;;;;;;;;;;;;;;;;;;;;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;716:10:0;;;;8:9:-1;5:2;;;45:16;42:1;39;24:38;77:16;74:1;67:27;5:2;716:10:0;;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;716:10:0;;;;;;;;;;;;;;;;710:3;:16;709:45;;744:4;;;;;;;;;;;:8;;;:10;;;;;;;;;;;;;;;;;;;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;744:10:0;;;;8:9:-1;5:2;;;45:16;42:1;39;24:38;77:16;74:1;67:27;5:2;744:10:0;;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;744:10:0;;;;;;;;;;;;;;;;709:45;;;730:4;;;;;;;;;;;:9;;;:11;;;;;;;;;;;;;;;;;;;;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;730:11:0;;;;8:9:-1;5:2;;;45:16;42:1;39;24:38;77:16;74:1;67:27;5:2;730:11:0;;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;730:11:0;;;;;;;;;;;;;;;;709:45;702:52;;642:119;:::o;366:16::-;;;;;;;;;;;;;:::o",
+  "deployedSourceMap": "249:514:0:-:0;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;249:514:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;170:30:1;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;134;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;98;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;642:119:0;;;:::i;:::-;;;;;;;;;;;;;;;;;;;366:16;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;207:37:1;;;:::i;:::-;;;;;;;;;;;;;;;;;;;294;;;:::i;:::-;;;;;;;;;;;;;;;;;;;170:30;198:2;170:30;:::o;134:::-;162:2;134:30;:::o;98:::-;126:2;98:30;:::o;642:119:0:-;683:7;716:4;;;;;;;;;;;:8;;;:10;;;;;;;;;;;;;;;;;;;;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;716:10:0;;;;8:9:-1;5:2;;;45:16;42:1;39;24:38;77:16;74:1;67:27;5:2;716:10:0;;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;716:10:0;;;;;;;;;;;;;;;;710:3;:16;709:45;;744:4;;;;;;;;;;;:8;;;:10;;;;;;;;;;;;;;;;;;;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;744:10:0;;;;8:9:-1;5:2;;;45:16;42:1;39;24:38;77:16;74:1;67:27;5:2;744:10:0;;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;744:10:0;;;;;;;;;;;;;;;;709:45;;;730:4;;;;;;;;;;;:9;;;:11;;;;;;;;;;;;;;;;;;;;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;730:11:0;;;;8:9:-1;5:2;;;45:16;42:1;39;24:38;77:16;74:1;67:27;5:2;730:11:0;;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;730:11:0;;;;;;;;;;;;;;;;709:45;702:52;;642:119;:::o;366:16::-;;;;;;;;;;;;;:::o;207:37:1:-;;;:::o;294:::-;;;:::o",
   "source": "pragma solidity ^0.6.2;\nimport \"@hq20/contracts/contracts/math/DecimalMath.sol\";\nimport \"./Constants.sol\";\nimport \"./interfaces/IPot.sol\";\nimport \"./interfaces/IOracle.sol\";\n\n\n/// @dev ChaiOracle retrieves the price for Chai as the DSR fee from Pot\ncontract ChaiOracle is IOracle, Constants {\n    using DecimalMath for uint256;\n    using DecimalMath for uint8;\n\n    IPot public _pot;\n\n    /// @dev ChaiOracle connects to Pot\n    constructor (address pot_) public {\n        _pot = IPot(pot_);\n    }\n\n    /// @dev We update chi and retrieve it from pot as the price\n    /// chai = (1/chi) * dai\n    /// dai = chi * chai\n    /// price = chi\n    function price() public override returns(uint256) {\n        return (now > _pot.rho()) ? _pot.drip() : _pot.chi();\n    }\n}",
   "sourcePath": "/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/ChaiOracle.sol",
   "ast": {
@@ -116,7 +144,7 @@
         "id": 2,
         "nodeType": "ImportDirective",
         "scope": 52,
-        "sourceUnit": 6681,
+        "sourceUnit": 9977,
         "src": "24:56:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -127,7 +155,7 @@
         "id": 3,
         "nodeType": "ImportDirective",
         "scope": 52,
-        "sourceUnit": 64,
+        "sourceUnit": 70,
         "src": "81:25:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -138,7 +166,7 @@
         "id": 4,
         "nodeType": "ImportDirective",
         "scope": 52,
-        "sourceUnit": 3258,
+        "sourceUnit": 5203,
         "src": "107:31:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -149,7 +177,7 @@
         "id": 5,
         "nodeType": "ImportDirective",
         "scope": 52,
-        "sourceUnit": 3223,
+        "sourceUnit": 5168,
         "src": "139:34:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -164,10 +192,10 @@
               "id": 6,
               "name": "IOracle",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 3222,
+              "referencedDeclaration": 5167,
               "src": "272:7:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_IOracle_$3222",
+                "typeIdentifier": "t_contract$_IOracle_$5167",
                 "typeString": "contract IOracle"
               }
             },
@@ -182,10 +210,10 @@
               "id": 8,
               "name": "Constants",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 63,
+              "referencedDeclaration": 69,
               "src": "281:9:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_Constants_$63",
+                "typeIdentifier": "t_contract$_Constants_$69",
                 "typeString": "contract Constants"
               }
             },
@@ -195,8 +223,8 @@
           }
         ],
         "contractDependencies": [
-          63,
-          3222
+          69,
+          5167
         ],
         "contractKind": "contract",
         "documentation": "@dev ChaiOracle retrieves the price for Chai as the DSR fee from Pot",
@@ -204,8 +232,8 @@
         "id": 51,
         "linearizedBaseContracts": [
           51,
-          63,
-          3222
+          69,
+          5167
         ],
         "name": "ChaiOracle",
         "nodeType": "ContractDefinition",
@@ -217,10 +245,10 @@
               "id": 10,
               "name": "DecimalMath",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 6680,
+              "referencedDeclaration": 9976,
               "src": "303:11:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_DecimalMath_$6680",
+                "typeIdentifier": "t_contract$_DecimalMath_$9976",
                 "typeString": "library DecimalMath"
               }
             },
@@ -244,10 +272,10 @@
               "id": 13,
               "name": "DecimalMath",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 6680,
+              "referencedDeclaration": 9976,
               "src": "338:11:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_DecimalMath_$6680",
+                "typeIdentifier": "t_contract$_DecimalMath_$9976",
                 "typeString": "library DecimalMath"
               }
             },
@@ -276,7 +304,7 @@
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_contract$_IPot_$3257",
+              "typeIdentifier": "t_contract$_IPot_$5202",
               "typeString": "contract IPot"
             },
             "typeName": {
@@ -284,10 +312,10 @@
               "id": 16,
               "name": "IPot",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 3257,
+              "referencedDeclaration": 5202,
               "src": "366:4:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_IPot_$3257",
+                "typeIdentifier": "t_contract$_IPot_$5202",
                 "typeString": "contract IPot"
               }
             },
@@ -317,7 +345,7 @@
                       "referencedDeclaration": 17,
                       "src": "473:4:0",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_IPot_$3257",
+                        "typeIdentifier": "t_contract$_IPot_$5202",
                         "typeString": "contract IPot"
                       }
                     },
@@ -351,10 +379,10 @@
                         "name": "IPot",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 3257,
+                        "referencedDeclaration": 5202,
                         "src": "480:4:0",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_IPot_$3257_$",
+                          "typeIdentifier": "t_type$_t_contract$_IPot_$5202_$",
                           "typeString": "type(contract IPot)"
                         }
                       },
@@ -369,13 +397,13 @@
                       "src": "480:10:0",
                       "tryCall": false,
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_IPot_$3257",
+                        "typeIdentifier": "t_contract$_IPot_$5202",
                         "typeString": "contract IPot"
                       }
                     },
                     "src": "473:17:0",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_IPot_$3257",
+                      "typeIdentifier": "t_contract$_IPot_$5202",
                       "typeString": "contract IPot"
                     }
                   },
@@ -442,7 +470,7 @@
           },
           {
             "baseFunctions": [
-              3221
+              5166
             ],
             "body": {
               "id": 49,
@@ -495,7 +523,7 @@
                                 "referencedDeclaration": 17,
                                 "src": "716:4:0",
                                 "typeDescriptions": {
-                                  "typeIdentifier": "t_contract$_IPot_$3257",
+                                  "typeIdentifier": "t_contract$_IPot_$5202",
                                   "typeString": "contract IPot"
                                 }
                               },
@@ -506,7 +534,7 @@
                               "lValueRequested": false,
                               "memberName": "rho",
                               "nodeType": "MemberAccess",
-                              "referencedDeclaration": 3241,
+                              "referencedDeclaration": 5186,
                               "src": "716:8:0",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_function_external_nonpayable$__$returns$_t_uint256_$",
@@ -562,7 +590,7 @@
                           "referencedDeclaration": 17,
                           "src": "744:4:0",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_contract$_IPot_$3257",
+                            "typeIdentifier": "t_contract$_IPot_$5202",
                             "typeString": "contract IPot"
                           }
                         },
@@ -573,7 +601,7 @@
                         "lValueRequested": false,
                         "memberName": "chi",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 3229,
+                        "referencedDeclaration": 5174,
                         "src": "744:8:0",
                         "typeDescriptions": {
                           "typeIdentifier": "t_function_external_view$__$returns$_t_uint256_$",
@@ -616,7 +644,7 @@
                           "referencedDeclaration": 17,
                           "src": "730:4:0",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_contract$_IPot_$3257",
+                            "typeIdentifier": "t_contract$_IPot_$5202",
                             "typeString": "contract IPot"
                           }
                         },
@@ -627,7 +655,7 @@
                         "lValueRequested": false,
                         "memberName": "drip",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 3246,
+                        "referencedDeclaration": 5191,
                         "src": "730:9:0",
                         "typeDescriptions": {
                           "typeIdentifier": "t_function_external_nonpayable$__$returns$_t_uint256_$",
@@ -755,7 +783,7 @@
         "id": 2,
         "nodeType": "ImportDirective",
         "scope": 52,
-        "sourceUnit": 6681,
+        "sourceUnit": 9977,
         "src": "24:56:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -766,7 +794,7 @@
         "id": 3,
         "nodeType": "ImportDirective",
         "scope": 52,
-        "sourceUnit": 64,
+        "sourceUnit": 70,
         "src": "81:25:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -777,7 +805,7 @@
         "id": 4,
         "nodeType": "ImportDirective",
         "scope": 52,
-        "sourceUnit": 3258,
+        "sourceUnit": 5203,
         "src": "107:31:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -788,7 +816,7 @@
         "id": 5,
         "nodeType": "ImportDirective",
         "scope": 52,
-        "sourceUnit": 3223,
+        "sourceUnit": 5168,
         "src": "139:34:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -803,10 +831,10 @@
               "id": 6,
               "name": "IOracle",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 3222,
+              "referencedDeclaration": 5167,
               "src": "272:7:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_IOracle_$3222",
+                "typeIdentifier": "t_contract$_IOracle_$5167",
                 "typeString": "contract IOracle"
               }
             },
@@ -821,10 +849,10 @@
               "id": 8,
               "name": "Constants",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 63,
+              "referencedDeclaration": 69,
               "src": "281:9:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_Constants_$63",
+                "typeIdentifier": "t_contract$_Constants_$69",
                 "typeString": "contract Constants"
               }
             },
@@ -834,8 +862,8 @@
           }
         ],
         "contractDependencies": [
-          63,
-          3222
+          69,
+          5167
         ],
         "contractKind": "contract",
         "documentation": "@dev ChaiOracle retrieves the price for Chai as the DSR fee from Pot",
@@ -843,8 +871,8 @@
         "id": 51,
         "linearizedBaseContracts": [
           51,
-          63,
-          3222
+          69,
+          5167
         ],
         "name": "ChaiOracle",
         "nodeType": "ContractDefinition",
@@ -856,10 +884,10 @@
               "id": 10,
               "name": "DecimalMath",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 6680,
+              "referencedDeclaration": 9976,
               "src": "303:11:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_DecimalMath_$6680",
+                "typeIdentifier": "t_contract$_DecimalMath_$9976",
                 "typeString": "library DecimalMath"
               }
             },
@@ -883,10 +911,10 @@
               "id": 13,
               "name": "DecimalMath",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 6680,
+              "referencedDeclaration": 9976,
               "src": "338:11:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_DecimalMath_$6680",
+                "typeIdentifier": "t_contract$_DecimalMath_$9976",
                 "typeString": "library DecimalMath"
               }
             },
@@ -915,7 +943,7 @@
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_contract$_IPot_$3257",
+              "typeIdentifier": "t_contract$_IPot_$5202",
               "typeString": "contract IPot"
             },
             "typeName": {
@@ -923,10 +951,10 @@
               "id": 16,
               "name": "IPot",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 3257,
+              "referencedDeclaration": 5202,
               "src": "366:4:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_IPot_$3257",
+                "typeIdentifier": "t_contract$_IPot_$5202",
                 "typeString": "contract IPot"
               }
             },
@@ -956,7 +984,7 @@
                       "referencedDeclaration": 17,
                       "src": "473:4:0",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_IPot_$3257",
+                        "typeIdentifier": "t_contract$_IPot_$5202",
                         "typeString": "contract IPot"
                       }
                     },
@@ -990,10 +1018,10 @@
                         "name": "IPot",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 3257,
+                        "referencedDeclaration": 5202,
                         "src": "480:4:0",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_IPot_$3257_$",
+                          "typeIdentifier": "t_type$_t_contract$_IPot_$5202_$",
                           "typeString": "type(contract IPot)"
                         }
                       },
@@ -1008,13 +1036,13 @@
                       "src": "480:10:0",
                       "tryCall": false,
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_IPot_$3257",
+                        "typeIdentifier": "t_contract$_IPot_$5202",
                         "typeString": "contract IPot"
                       }
                     },
                     "src": "473:17:0",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_IPot_$3257",
+                      "typeIdentifier": "t_contract$_IPot_$5202",
                       "typeString": "contract IPot"
                     }
                   },
@@ -1081,7 +1109,7 @@
           },
           {
             "baseFunctions": [
-              3221
+              5166
             ],
             "body": {
               "id": 49,
@@ -1134,7 +1162,7 @@
                                 "referencedDeclaration": 17,
                                 "src": "716:4:0",
                                 "typeDescriptions": {
-                                  "typeIdentifier": "t_contract$_IPot_$3257",
+                                  "typeIdentifier": "t_contract$_IPot_$5202",
                                   "typeString": "contract IPot"
                                 }
                               },
@@ -1145,7 +1173,7 @@
                               "lValueRequested": false,
                               "memberName": "rho",
                               "nodeType": "MemberAccess",
-                              "referencedDeclaration": 3241,
+                              "referencedDeclaration": 5186,
                               "src": "716:8:0",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_function_external_nonpayable$__$returns$_t_uint256_$",
@@ -1201,7 +1229,7 @@
                           "referencedDeclaration": 17,
                           "src": "744:4:0",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_contract$_IPot_$3257",
+                            "typeIdentifier": "t_contract$_IPot_$5202",
                             "typeString": "contract IPot"
                           }
                         },
@@ -1212,7 +1240,7 @@
                         "lValueRequested": false,
                         "memberName": "chi",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 3229,
+                        "referencedDeclaration": 5174,
                         "src": "744:8:0",
                         "typeDescriptions": {
                           "typeIdentifier": "t_function_external_view$__$returns$_t_uint256_$",
@@ -1255,7 +1283,7 @@
                           "referencedDeclaration": 17,
                           "src": "730:4:0",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_contract$_IPot_$3257",
+                            "typeIdentifier": "t_contract$_IPot_$5202",
                             "typeString": "contract IPot"
                           }
                         },
@@ -1266,7 +1294,7 @@
                         "lValueRequested": false,
                         "memberName": "drip",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 3246,
+                        "referencedDeclaration": 5191,
                         "src": "730:9:0",
                         "typeDescriptions": {
                           "typeIdentifier": "t_function_external_nonpayable$__$returns$_t_uint256_$",
@@ -1375,12 +1403,12 @@
     "1337": {
       "events": {},
       "links": {},
-      "address": "0xdd03CFe5FA57901aC5CdC9d2E582441249A2ce4E",
-      "transactionHash": "0xd57e237a744890217513d877b9cd9b2c7a194aa5bd191db3b109f7c7de38af51"
+      "address": "0xDF237b0bb01b9411c3C4a688d2304a8729007e23",
+      "transactionHash": "0xd7d1e2e6f97d72d9591b588fffb181f80e99cde0b2784249ac650a68b57f267d"
     }
   },
   "schemaVersion": "3.0.23",
-  "updatedAt": "2020-06-11T16:17:06.088Z",
+  "updatedAt": "2020-06-17T11:33:08.936Z",
   "networkType": "ethereum",
   "devdoc": {
     "details": "ChaiOracle retrieves the price for Chai as the DSR fee from Pot",

@@ -71,6 +71,7 @@
       "react/jsx-wrap-multilines": "off",
       "react/destructuring-assignment": "off",
       "react-hooks/exhaustive-deps" :"off",
-      "camelcase": "off"
+      "camelcase": "off",
+      "no-underscore-dangle":"off"
     }
   }

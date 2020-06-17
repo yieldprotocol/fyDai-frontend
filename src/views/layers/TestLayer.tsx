@@ -21,21 +21,35 @@ const TestLayer = (props:any) => {
   const { chainId, account } = useWeb3React();
 
   // const web3 = useWeb3React();
-  const { state: yieldState } = React.useContext( YieldContext );
+  const { state: yieldState, actions: yieldActions } = React.useContext( YieldContext );
   const { state: positionsState, actions: positionsActions } = React.useContext( PositionsContext );
-  const [ balance, setBalance ] = React.useState<string|null>('-');
   const [ flow, setFlow ] = React.useState<string|null>('WETH');
 
-  const [ wethBalance, setWethBalance ] = React.useState<string|null|number>(0);
-  const [ chaiBalance, setChaiBalance ] = React.useState<string|null|number>(0);
-  const [ daiBalance, setDaiBalance ] = React.useState<string|null|number>(0);
+  
+  const { positionsData } = positionsState;
+  const { yieldData, deployedCore, deployedSeries, deployedExternal, extBalances } = yieldState;
+  
+  // const updateBalances = yieldActions.updateExtBalances(deployedExternal);
+  
+  const { 
+    wethBalance,
+    wethBalance_p,
+    ethBalance_p,
+    ethBalance,
+    daiBalance,
+    daiBalance_p,
+    chaiBalance,
+    chaiBalance_p
+  } = extBalances;
 
-  const [daiDebt, setDaiDebt] = React.useState<number>(0);
-  const [daiTokens, setDaiTokens] = React.useState<number>(0);
-  const [wethTokens, setWethTokens] = React.useState<number>(0);
-  const [chaiTokens, setChaiTokens] = React.useState<number>(0);
+  // const [ wethBalance, setWethBalance ] = React.useState<string|null|number>(0);
+  // const [ chaiBalance, setChaiBalance ] = React.useState<string|null|number>(0);
+  // const [ daiBalance, setDaiBalance ] = React.useState<string|null|number>(0);
 
-  const [selectedSeries, setSelectedSeries] = React.useState<any>();
+  const [daiDebt, setDaiDebt] = React.useState<string>('');
+  const [daiTokens, setDaiTokens] = React.useState<string>('');
+  const [wethTokens, setWethTokens] = React.useState<string>('');
+  const [chaiTokens, setChaiTokens] = React.useState<string>('');
 
   const { closeLayer, changeWallet } = props;
   const [ connectMakerVault ] = useMakerVault();
@@ -56,40 +70,37 @@ const TestLayer = (props:any) => {
     borrowActive,
   }  = useDealer();
 
-  const { getEthBalance, getChaiBalance, getWethBalance, getDaiBalance }  = useGetBalance();
+  // const { getChaiBalance, getWethBalance, getDaiBalance }  = useGetBalance();
 
-  const { positionsData } = positionsState;
-  const { yieldData, deployedCore, deployedSeries } = yieldState;
-
-  React.useEffect(()=>{
-    (async () => setWethBalance( await getWethBalance(deployedCore.Weth)) )();
-    (async () => setChaiBalance( await getChaiBalance(deployedCore.Chai)) )();
-    (async () => setDaiBalance( await getDaiBalance(deployedCore.Dai)) )();
-  }, [deployedCore.Weth, postActive, withdrawActive]);
+  // React.useEffect(()=>{
+  //   (async () => setWethBalance( await getWethBalance(deployedExternal.Weth)) )();
+  //   (async () => setChaiBalance( await getChaiBalance(deployedExternal.Chai)) )();
+  //   (async () => setDaiBalance( await getDaiBalance(deployedExternal.Dai)) )();
+  // }, [deployedExternal, postActive, withdrawActive]);
 
   React.useEffect(()=>{
-    const daiD = utils.toWad(12);
+    const daiD = utils.toWad(10);
     const chi  = utils.toRay(1.25);
-    setDaiDebt( parseFloat(ethers.utils.formatEther(daiD))  );
+    // setDaiDebt( parseFloat(ethers.utils.formatEther(daiD)) );
+    setDaiDebt( daiD.toString() );
     if ( yieldState?.makerData?.ilks?.rate  ) {
       console.log(yieldState.makerData);
       const daiT = utils.mulRay( daiD, yieldState.makerData.ilks.rate);
       const wethT = utils.divRay( daiT, yieldState.makerData.ilks.spot);
       const chaiT = utils.divRay(daiT, chi);
-      setDaiTokens( parseFloat(ethers.utils.formatEther(daiT)));
-      setWethTokens( parseFloat(ethers.utils.formatEther(wethT)));
-      setChaiTokens( parseFloat(ethers.utils.formatEther(chaiT)));
-      console.log(chaiT.toString()); 
+
+      setDaiTokens(daiT.toString());
+      setWethTokens(wethT.toString());
+      setChaiTokens(chaiT.toString());
     }
-    
+
   }, [ yieldState ] );
 
-
-  React.useEffect(() => {
-    (async () => setBalance( await getEthBalance()) )();
-    // (async () => setWeiBalance( await getWeiBalance()) )();
-    // (async () => activate(injected, console.log))();
-  }, [chainId, account]);
+  // React.useEffect(() => {
+  //   // (async () => setBalance( await getEthBalance()) )();
+  //   // (async () => setWeiBalance( await getWeiBalance()) )();
+  //   // (async () => activate(injected, console.log))();
+  // }, [chainId, account]);
 
   const onClose = () => {
     closeLayer();
@@ -136,7 +147,7 @@ const TestLayer = (props:any) => {
 
             <Box direction='row' gap='small'>
               <Text size='xsmall'>ETH balance:</Text>
-              <Text size='xsmall'>{ balance }</Text>
+              <Text size='xsmall'>{ extBalances.ethBalance_p || '' }</Text>
             </Box>
             {/* <Box direction='row' gap='small'>
             <Text size='xsmall'>WEI balance:</Text>
@@ -144,20 +155,20 @@ const TestLayer = (props:any) => {
           </Box> */}
             <Box direction='row' gap='small'>
               <Text size='xsmall'>WETH balance:</Text>
-              <Text size='xsmall'>{ wethBalance && wethBalance.toString() }</Text>
+              <Text size='xsmall'>{ extBalances.wethBalance_p || '' }</Text>
             </Box>
 
             <Box direction='row' gap='small'>
               <Text size='xsmall'>CHAI balance:</Text>
               {/* <Text size='xsmall'>{ chaiBalance && ethers.utils.formatEther(chaiBalance.toString()) }</Text> */}
-              <Text size='xsmall'>{ chaiBalance && chaiBalance.toString() }</Text>
+              <Text size='xsmall'>{ extBalances.chaiBalance_p || '' }</Text>
 
             </Box>
 
             <Box direction='row' gap='small'>
               <Text size='xsmall'>DAI balance:</Text>
               {/* <Text size='xsmall'>{ daiBalance && ethers.utils.formatEther(daiBalance.toString()) }</Text> */}
-              <Text size='xsmall'>{ daiBalance && daiBalance.toString() }</Text>
+              <Text size='xsmall'>{ extBalances.daiBalance_p || '' }</Text>
             </Box>
 
             <Box direction='column' gap='small'>
@@ -191,16 +202,16 @@ const TestLayer = (props:any) => {
 
               get WETH: 
               {/* <Button label='useNotify_info' onClick={()=>dispatch( { type: 'notify', payload: { message:'Something is happening!.. ', type:'info', showFor:500 } } )} /> */}
-              <Button label='1. Add 10 weth DEV' onClick={()=> sendTx(deployedCore.Weth, 'Weth', 'deposit', [], utils.toWei('10'))} />
+              <Button label='1. wrap 10 eth to weth' onClick={()=> sendTx(deployedExternal.Weth, 'Weth', 'deposit', [], utils.toWei('10'))} />
 
               WETH deposit and borrow: 
-              <Button label='2. Weth approve dealer 1.5' onClick={()=> approveDealer(deployedCore.Weth, deployedCore.WethDealer, 1.5 )} />
-              <Button label='3. Post Collateral 1.5' disabled={postActive} onClick={()=> post(deployedCore.WethDealer, 1.5 )} />
-              <Button label='(4. Withdraw 1.5)' onClick={()=> withdraw(deployedCore.WethDealer, 1.5 )} />
-              <Button label='5.Borrow 0.5' onClick={()=> borrow(deployedCore.WethDealer, yieldState.deployedSeries[0].maturity, 0.5 )} />
+              <Button label='2. Weth approve YieldDealer for 1.5' onClick={()=> approveDealer(deployedExternal.Weth, deployedCore.Dealer, 1.5 )} />
+              <Button label='3. Post Collateral 1.5' disabled={postActive} onClick={()=> post(deployedCore.Dealer, 'WETH', 1.5)} />
+              <Button label='(4. Withdraw 1.5)' onClick={()=> withdraw(deployedCore.Dealer, 'WETH', 1.5 )} />
+              <Button label='5.Borrow 0.5' onClick={()=> borrow(deployedCore.Dealer, 'WETH', yieldState.deployedSeries[0].maturity, 0.5 )} />
               WETH repay:
-              <Button label='6.1 Repay 0.5 in yDai' onClick={()=> repay(deployedCore.WethDealer, yieldState.deployedSeries[0].maturity, 0.5, 'YDAI' )} />
-              <Button label='( 6.2 Repay 0.5 in Dai) ' onClick={()=> repay(deployedCore.WethDealer, yieldState.deployedSeries[0].maturity, 0.5, 'DAI' )} />
+              <Button label='6.1 Repay 0.5 wethdebt in yDai' onClick={()=> repay(deployedCore.Dealer, 'WETH', yieldState.deployedSeries[0].maturity, 0.5, 'YDAI' )} />
+              <Button label='( 6.2 Repay 0.5 wethdebt in Dai) ' onClick={()=> repay(deployedCore.Dealer, 'WETH', yieldState.deployedSeries[0].maturity, 0.5, 'DAI' )} />
             </Box>}
 
             { flow === 'CHAI' && 
@@ -208,43 +219,45 @@ const TestLayer = (props:any) => {
               
               Get Dai:
               
-              <Button label='1. Approve Wethjoin for 10' onClick={()=> sendTx(deployedCore.Weth, 'Weth', 'approve', [deployedCore.WethJoin, utils.toWei(10).toString()], bigNumberify(0) )} />
-              <Button label='2. wethJoin join (take 10)' onClick={()=> sendTx(deployedCore.WethJoin, 'WethJoin', 'join', [account, utils.toWei(10).toString()], bigNumberify(0) )} />
+              <Button label='1. Approve Wethjoin for 10weth' onClick={()=> sendTx(deployedExternal.Weth, 'Weth', 'approve', [deployedExternal.WethJoin, utils.toWei(10)], bigNumberify(0) )} />
+              
+              {/* <Button label='x. Vat > hope wethJoin' onClick={()=> sendTx(deployedExternal.Vat, 'Vat', 'hope', [deployedExternal.WethJoin], bigNumberify(0))} /> */}
+              
+              <Button label='2. wethJoin join (take 10weth)' onClick={()=> sendTx(deployedExternal.WethJoin, 'WethJoin', 'join', [account, utils.toWei(10)], bigNumberify(0) )} />
 
-              <Button 
-                label='3. Vat frob'
-                onClick={()=> sendTx(deployedCore.Vat, 'Vat', 'frob', 
+              <Button
+                label='3. Vat frob (open vault?)'
+                onClick={()=> sendTx(deployedExternal.Vat, 'Vat', 'frob', 
                   [
                     ethers.utils.formatBytes32String('ETH-A'),
                     account,
                     account,
                     account,
                     wethTokens,
-                    daiDebt, 
+                    daiDebt,
                   ], 
                   bigNumberify(0)
                 )}
               />
-              <Button label='x. Vat hope daiJoin' onClick={()=> sendTx(deployedCore.Vat, 'Vat', 'hope', [deployedCore.DaiJoin], bigNumberify(0))} />
-
-              <Button label='4. daiJoin EXit' onClick={()=> sendTx(deployedCore.DaiJoin, 'DaiJoin', 'exit', [account, daiTokens ], bigNumberify(0) )} />
+              <Button label='(x. Vat hope daiJoin)' onClick={()=> sendTx(deployedExternal.Vat, 'Vat', 'hope', [deployedExternal.DaiJoin], bigNumberify(0))} />
+             
+              <Button label='4. daiJoin EXit (daiDebt = 10)' onClick={()=> sendTx(deployedExternal.DaiJoin, 'DaiJoin', 'exit', [account, daiTokens ], bigNumberify(0) )} />
               
               Convert Dai to Chai:
-              <Button label='5. Approve chai' onClick={()=> sendTx(deployedCore.Dai, 'Dai', 'approve', [deployedCore.Chai, daiTokens ], bigNumberify(0) )} />
-              <Button label='6. Chai join ' onClick={()=> sendTx(deployedCore.Chai, 'Chai', 'join', [account, daiTokens ], bigNumberify(0) )} />
+              <Button label='5. Approve chai (approx. 10)' onClick={()=> sendTx(deployedExternal.Dai, 'Dai', 'approve', [deployedExternal.Chai, daiTokens ], bigNumberify(0) )} />
+              <Button label='6. Chai join (approx. 10)' onClick={()=> sendTx(deployedExternal.Chai, 'Chai', 'join', [account, daiTokens ], bigNumberify(0) )} />
 
   
               Chai deposit and borrow:
-
-              {/* <Button label='5. Chai approve chaiDealer Alt' onClick={()=> sendTx(deployedCore.Chai, 'Chai', 'approve', [deployedCore.ChaiDealer, utils.divRay(daiTokens, chi) ] )} /> */}
-              <Button label='2. Chai approve chaiDealer' onClick={()=> approveDealer(deployedCore.Chai, deployedCore.ChaiDealer, chaiTokens )} />
-              <Button label='3. Post Chai Collateral' disabled={postActive} onClick={()=> post(deployedCore.ChaiDealer, chaiTokens )} />
-              <Button label='(4. Withdraw 0.1 chai)' onClick={()=> withdraw(deployedCore.ChaiDealer, 0.1 )} />
-              <Button label='5.Borrow 0.1 with chai' onClick={()=> borrow(deployedCore.ChaiDealer, deployedSeries[0].maturity, 0.1 )} />
+              {/* <Button label='5. Chai approve chaiDealer Alt' onClick={()=> sendTx(deployedCore.Dealer, 'Chai', 'approve', [deployedCore.DealerDealer, utils.divRay(daiTokens, chi) ] )} /> */}
+              <Button label='2. Chai approve chaiDealer 1.5' onClick={()=> approveDealer(deployedExternal.Chai, deployedCore.Dealer, 1.5 )} />
+              <Button label='3. Post Chai Collateral 1.5' disabled={postActive} onClick={()=> post(deployedCore.Dealer, 'CHAI', 1.5 )} />
+              <Button label='(4. Withdraw 1.5 chai)' onClick={()=> withdraw(deployedCore.Dealer, 'CHAI', 1.5 )} />
+              <Button label='5.Borrow 0.5 with chai' onClick={()=> borrow(deployedCore.Dealer, 'CHAI', deployedSeries[0].maturity, 0.5 )} />
 
               Chai repay; 
-              <Button label='(6.1 Repay 0.1 in yDai)' onClick={()=> repay(deployedCore.ChaiDealer, deployedSeries[0].maturity, 0.1, 'YDAI' )} />
-              <Button label=' 6.2 Repay 0.01 in Dai ' onClick={()=> repay(deployedCore.ChaiDealer, deployedSeries[0].maturity, 0.01, 'DAI' )} />
+              <Button label='(6.1 Repay 0.5 chaidebt in yDai)' onClick={()=> repay(deployedCore.Dealer, 'CHAI', deployedSeries[0].maturity, 0.5, 'YDAI' )} />
+              <Button label=' 6.2 Repay 0.5 chaidebt in Dai ' onClick={()=> repay(deployedCore.Dealer, 'CHAI', deployedSeries[0].maturity, 0.5, 'DAI' )} />
             </Box>}
 
             { flow === 'MATURITY' && 
@@ -294,7 +307,7 @@ const TestLayer = (props:any) => {
 
         <Footer pad='medium' gap='xsmall' direction='row' justify='between' align='center'>
           <Box round>
-            <Button 
+            <Button
               fill='horizontal'
               size='small' 
               onClick={()=>changeWallet()}
@@ -303,7 +316,17 @@ const TestLayer = (props:any) => {
               hoverIndicator='background'
             />
           </Box>
-          <Button alignSelf='end' label='refresh' onClick={()=>positionsActions.getPositions([yieldState.deployedSeries[0]])} />
+          <Button
+            alignSelf='end'
+            label='refresh' 
+            onClick={
+            ()=> {
+              positionsActions.refreshPositions([yieldState.deployedSeries[0]]);
+              yieldActions.updateYieldBalances(yieldState.deployedCore);
+              yieldActions.updateExtBalances(yieldState.deployedExternal);
+            }
+          }
+          />
 
         </Footer>
       </Box>

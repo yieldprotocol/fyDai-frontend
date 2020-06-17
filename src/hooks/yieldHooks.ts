@@ -30,41 +30,44 @@ const contractMap = new Map<string, any>([
 
 export function useGetBalance() {
   const { library, account } = useWeb3React();
-  const getEthBalance = async () : Promise<string> => {
-    if (!!library && !!account) {
-      const bal = await library.getBalance(account);
-      return ethers.utils.formatEther(bal);
-    } return '0';
-  };
+  // const getEthBalance = async () : Promise<string> => {
+  //   if (!!library && !!account) {
+  //     const bal = await library.getBalance(account);
+  //     return ethers.utils.formatEther(bal);
+  //   } return '0';
+  // };
   const getWeiBalance = async () => {
     if (!!library && !!account) {
-      const bal = await library.getBalance(account);
-      return bal.toString();
-    } return '0';
+      const balance = await library.getBalance(account);
+      // return bal.toString();
+      return balance;
+    } return ethers.utils.bigNumberify('0');
   };
   const getWethBalance = async (tokenAddr:string) => {
     if (!!library && !!account) {
       const contract = new ethers.Contract(tokenAddr, contractMap.get('Weth'), library);
       const balance = await contract.balanceOf(account);
       // return ethers.utils.formatEther(balance.toString());
-      return parseFloat(ethers.utils.formatEther(balance.toString()));
-    } return 0;
+      return balance;
+    } return ethers.utils.bigNumberify('0');
   };
   const getChaiBalance = async (tokenAddr:string) => {
     if (!!library && !!account) {
       const contract = new ethers.Contract(tokenAddr, contractMap.get('Chai'), library);
       const balance = await contract.balanceOf(account);
-      return ethers.utils.formatEther(balance.toString());
-    } return '0';
+      return balance;
+      // return ethers.utils.formatEther(balance.toString());
+    } return ethers.utils.bigNumberify('0');
   };
   const getDaiBalance = async (tokenAddr:string) => {
     if (!!library && !!account) {
       const contract = new ethers.Contract(tokenAddr, contractMap.get('Dai'), library);
       const balance = await contract.balanceOf(account);
-      return ethers.utils.formatEther(balance.toString());
-    } return '0';
+      return balance;
+      // return ethers.utils.formatEther(balance.toString());
+    } return ethers.utils.bigNumberify('0');
   };
-  return { getEthBalance, getWeiBalance, getWethBalance, getChaiBalance, getDaiBalance } as const;
+  return { getWeiBalance, getWethBalance, getChaiBalance, getDaiBalance } as const;
 }
 
 export const useCallTx = () => {
@@ -98,7 +101,7 @@ export const useDealer = () => {
 
   const post = async (
     dealerAddress:string,
-    // from:string,
+    collateral:string,
     amount:number
   ) => {
     let tx:any;
@@ -106,12 +109,14 @@ export const useDealer = () => {
     // console.log(ethers.utils.parseEther(amount.toString()));
     const parsedAmount = ethers.utils.parseEther(amount.toString());
     const fromAddr = account && ethers.utils.getAddress(account);
+    const toAddr = fromAddr;
     const dealerAddr = ethers.utils.getAddress(dealerAddress);
+    const collateralBytes = ethers.utils.formatBytes32String(collateral);
     // Contract interaction
     setPostActive(true);
     const contract = new ethers.Contract( dealerAddr, dealerAbi, signer );
     try {
-      tx = await contract.post(fromAddr, parsedAmount);
+      tx = await contract.post(collateralBytes, fromAddr, toAddr, parsedAmount);
     } catch (e) {
       notifyDispatch({ type: 'notify', payload:{ message:`${e.data.message}`, type:'error' } } );
       setPostActive(false);
@@ -126,17 +131,20 @@ export const useDealer = () => {
 
   const withdraw = async (
     dealerAddress:string,
-    // to:string,
+    collateral:string,
     amount:number
   ) => {
     let tx:any;
     const parsedAmount = ethers.utils.parseEther(amount.toString());
-    const toAddr = account && ethers.utils.getAddress(account);
+    const fromAddr = account && ethers.utils.getAddress(account);
+    const toAddr = fromAddr;
     const dealerAddr = ethers.utils.getAddress(dealerAddress);
+    const collateralBytes = ethers.utils.formatBytes32String(collateral);
+
     setWithdrawActive(true);
     const contract = new ethers.Contract( dealerAddr, dealerAbi, signer );
     try {
-      tx = await contract.withdraw(toAddr, parsedAmount);
+      tx = await contract.withdraw(collateralBytes, fromAddr, toAddr, parsedAmount);
     } catch (e) {
       notifyDispatch({ type: 'notify', payload:{ message:'Error Withdrawing funds', type:'error' } } );
       setWithdrawActive(false);
@@ -150,6 +158,7 @@ export const useDealer = () => {
 
   const borrow = async (
     dealerAddress:string,
+    collateral:string,
     maturity:string,
     // to:string,
     amount:number
@@ -158,10 +167,12 @@ export const useDealer = () => {
     const parsedAmount = ethers.utils.parseEther(amount.toString());
     const toAddr = account && ethers.utils.getAddress(account);
     const dealerAddr = ethers.utils.getAddress(dealerAddress);
+    const collateralBytes = ethers.utils.formatBytes32String(collateral);
+
     setBorrowActive(true);
     const contract = new ethers.Contract( dealerAddr, dealerAbi, signer );
     try {
-      tx = await contract.borrow(maturity, toAddr, parsedAmount);
+      tx = await contract.borrow(collateralBytes, maturity, toAddr, parsedAmount);
     } catch (e) {
       notifyDispatch({ type: 'notify', payload:{ message:`${e.data.message}`, type:'error' } } );
       setBorrowActive(false);
@@ -175,6 +186,7 @@ export const useDealer = () => {
 
   const repay = async (
     dealerAddress:string,
+    collateral:string,
     maturity:string,
     // from:string,
     amount:number,
@@ -185,14 +197,16 @@ export const useDealer = () => {
     const fromAddr = account && ethers.utils.getAddress(account);
     const dealerAddr = ethers.utils.getAddress(dealerAddress);
     const typeCaps = type.toUpperCase();
+    const collateralBytes = ethers.utils.formatBytes32String(collateral);
+
     setRepayActive(true);
 
     const contract = new ethers.Contract( dealerAddr, dealerAbi, signer );
     try {
       if (typeCaps === 'YDAI') {
-        tx = await contract.repayYDai(maturity, fromAddr, parsedAmount);
+        tx = await contract.repayYDai(collateralBytes, maturity, fromAddr, parsedAmount);
       } else if (typeCaps === 'DAI') {
-        tx = await contract.repayDai(maturity, fromAddr, parsedAmount);
+        tx = await contract.repayDai(collateralBytes, maturity, fromAddr, parsedAmount);
       }
     } catch (e) {
       notifyDispatch({ type: 'notify', payload:{ message:`${e.data.message}`, type:'error' } } );
@@ -215,6 +229,7 @@ export const useDealer = () => {
     const parsedAmount = ethers.utils.parseEther(amount.toString());
     const dealerAddr = ethers.utils.getAddress(dealerAddress);
     const tokenAddr = ethers.utils.getAddress(tokenAddress);
+    
     setApproveActive(true);
 
     const contract = new ethers.Contract(
@@ -252,6 +267,7 @@ export const useSendTx = () => {
   const signer = library?.getSigner();
   const sendTx = async (contractAddr:string, contractName:string, fn:string, data:any[], value:ethers.utils.BigNumber ) => {
     let tx;
+    console.log(contractAddr, contractMap.get(contractName), signer); 
     setSendTxActive(true);
     const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), signer);
     if (!value.isZero()) {
