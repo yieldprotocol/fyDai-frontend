@@ -17,7 +17,7 @@ const DepositAction = ({ close }:any) => {
             pad={{ horizontal:'large', vertical:'xsmall' }}
             hoverIndicator='background'
             onClick={()=>console.log('somehting')}
-          > 
+          >
             <Text size='14px'>Max</Text>
           </Box>
           <TextInput

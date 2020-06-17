@@ -17,7 +17,6 @@ export interface ISeriesPosition {
 
 export interface INotification {
   message: string;
-  // type: notificationEnum;
   type?: string;
   callbackAction?: any;
   callbackCancel?: any;

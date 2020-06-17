@@ -2,33 +2,19 @@ import React from 'react';
 import { ethers } from 'ethers';
 import { useWeb3React } from '@web3-react/core';
 import moment from 'moment';
-import * as constants from '../constants';
-import { SeriesContext } from './SeriesContext';
 
+import * as utils from '../utils';
+import { YieldContext } from './YieldContext';
 import { useCallTx } from '../hooks/yieldHooks';
 
 const PositionsContext = React.createContext<any>({});
 
 function reducer(redState:any, action:any) {
   switch (action.type) {
-    case 'updateAllPositions':
-      return { 
+    case 'updatePositions':
+      return {
         ...redState,
         positionsData: action.payload,
-      };
-    case 'addNewPosition':
-      return { 
-        ...redState,
-      };
-    case 'indicatorPlus':
-      return { 
-        ...redState,
-        positionsIndicator: redState.positionsIndicator+1,
-      };
-    case 'indicatorMinus':
-      return { 
-        ...redState,
-        positionsIndicator: redState.positionsIndicator-1
       };
     case 'isLoading':
       return { 
@@ -43,24 +29,34 @@ function reducer(redState:any, action:any) {
 const PositionsProvider = ({ children }:any) => {
 
   const { chainId, account } = useWeb3React();
-  const { WETH, CHAI } = constants;
-  const initState = { positionsIndicator: 0, positionsData : [] };
+  
+  const initState = { positionsIndicator: 0, positionsData : new Map(), positionSelected: '' };
   const [ state, dispatch ] = React.useReducer(reducer, initState);
-  const { state: seriesState } = React.useContext(SeriesContext);
+  const { state: yieldState } = React.useContext(YieldContext);
   const [ callTx ] = useCallTx();
 
-  const fetchChainData = async (seriesData:any) => {
+  const { deployedCore } = yieldState; 
+
+  const fetchChainData = async (deployedSeries:any) => {
     const chainData:any[] = [];
     await Promise.all(
-      seriesData.map( async (x:any, i:number)=> {
+      deployedSeries.map( async (x:any, i:number) => {
         chainData.push(x);
         try {
           chainData[i].yDaiBalance = await callTx(x.YDai, 'YDai', 'balanceOf', [account]);
-          chainData[i].daiDebt = await callTx(x.Dealer, 'Dealer', 'debtDai', [WETH, account]);
-          chainData[i].yDaiDebtWeth = await callTx(x.Dealer, 'Dealer', 'debtYDai', [WETH, account]);
-          chainData[i].yDaiDebtChai = await callTx(x.Dealer, 'Dealer', 'debtYDai', [CHAI, account]);
-          chainData[i].wethPosted = await callTx(x.Dealer, 'Dealer', 'posted', [WETH, account]);
-          chainData[i].chaiPosted = await callTx(x.Dealer, 'Dealer', 'posted', [CHAI, account]);
+
+          chainData[i].wethPosted = await callTx(deployedCore.WethDealer, 'Dealer', 'posted', [account]);
+          chainData[i].wethTotalDebtDai = await callTx(deployedCore.WethDealer, 'Dealer', 'totalDebtDai', [account]);
+          chainData[i].wethTotalDebtYDai = await callTx(deployedCore.WethDealer, 'Dealer', 'totalDebtYDai', [account]);
+          chainData[i].wethDebtDai = await callTx(deployedCore.WethDealer, 'Dealer', 'debtDai', [x.maturity, account]);
+          chainData[i].wethDebtYDai = await callTx(deployedCore.WethDealer, 'Dealer', 'debtYDai', [x.maturity, account]);
+
+          chainData[i].chaiPosted = await callTx(deployedCore.ChaiDealer, 'Dealer', 'posted', [account]);
+          chainData[i].chaiTotalDebtDai = await callTx(deployedCore.ChaiDealer, 'Dealer', 'totalDebtDai', [account]);
+          chainData[i].chaiTotalDebtYDai = await callTx(deployedCore.ChaiDealer, 'Dealer', 'totalDebtYDai', [account]);
+          chainData[i].chaiDebtDai = await callTx(deployedCore.ChaiDealer, 'Dealer', 'debtDai', [x.maturity, account]);
+          chainData[i].chaiDebtYDai = await callTx(deployedCore.ChaiDealer, 'Dealer', 'debtYDai', [x.maturity, account]);
+
         } catch (e) {
           console.log(`Could not load series blockchain data: ${e}`);
         }
@@ -71,39 +67,72 @@ const PositionsProvider = ({ children }:any) => {
 
   // post fetching data processing
   const parseChainData = (chainData:any) => {
-    return chainData.map((x:any, i:number) => {
-      return { 
-        ...x,
-        yDaiBalance: ethers.utils.formatEther(x.yDaiBalance.toString()),
-        daiDebt: ethers.utils.formatEther(x.daiDebt.toString()),
-        yDaiDebtWeth: ethers.utils.formatEther(x.yDaiDebtWeth.toString()),
-        yDaiDebtChai: ethers.utils.formatEther(x.yDaiDebtChai.toString()),
-        wethPosted: ethers.utils.formatEther(x.wethPosted.toString()),
-        chaiPosted: ethers.utils.formatEther(x.chaiPosted.toString()),
-      };
+    const positions = state.positionsData;
+    chainData.forEach((x:any)=>{
+      positions.set(
+        x.symbol, 
+        { ...x,
+          yDaiBalance_p: ethers.utils.formatEther(x.yDaiBalance.toString()),
+          wethPosted_p: ethers.utils.formatEther(x.wethPosted.toString()),
+          wethTotalDebtDai_p: ethers.utils.formatEther(x.wethTotalDebtDai.toString()),
+          wethTotalDebtYDai_p: ethers.utils.formatEther(x.wethTotalDebtYDai.toString()),
+          wethDebtDai_p: ethers.utils.formatEther(x.wethDebtDai.toString()),
+          wethDebtYDai_p: ethers.utils.formatEther(x.wethDebtYDai.toString()),
+          chaiPosted_p: ethers.utils.formatEther(x.chaiPosted.toString()),
+          chaiTotalDebtDai_p: ethers.utils.formatEther(x.chaiTotalDebtDai.toString()),
+          chaiTotalDebtYDai_p: ethers.utils.formatEther(x.chaiTotalDebtYDai.toString()),
+          chaiDebtDai_p: ethers.utils.formatEther(x.chaiDebtDai.toString()),
+          chaiDebtYDai_p: ethers.utils.formatEther(x.chaiDebtYDai.toString()),
+        }
+      );
     });
+    return positions;
+    // chainData.map((x:any, i:number) => {
+    //   return {
+    //     ...x,
+    //     yDaiBalance_p: ethers.utils.formatEther(x.yDaiBalance.toString()),
+
+    //     wethPosted_p: ethers.utils.formatEther(x.wethPosted.toString()),
+    //     wethTotalDebtDai_p: ethers.utils.formatEther(x.wethTotalDebtDai.toString()),
+    //     wethTotalDebtYDai_p: ethers.utils.formatEther(x.wethTotalDebtYDai.toString()),
+    //     wethDebtDai_p: ethers.utils.formatEther(x.wethDebtDai.toString()),
+    //     wethDebtYDai_p: ethers.utils.formatEther(x.wethDebtYDai.toString()),
+
+    //     chaiPosted_p: ethers.utils.formatEther(x.chaiPosted.toString()),
+    //     chaiTotalDebtDai_p: ethers.utils.formatEther(x.chaiTotalDebtDai.toString()),
+    //     chaiTotalDebtYDai_p: ethers.utils.formatEther(x.chaiTotalDebtYDai.toString()),
+    //     chaiDebtDai_p: ethers.utils.formatEther(x.chaiDebtDai.toString()),
+    //     chaiDebtYDai_p: ethers.utils.formatEther(x.chaiDebtYDai.toString()),
+    //   };
+    // });
   };
 
   const getPositions = async (seriesArr:any) => {
-    if(!seriesState?.isLoading) {
-      console.log(' get all actioned');
+    if(!yieldState?.isLoading) {
+      console.log('Get positions actioned');
       dispatch({ type:'isLoading', payload: true });
       const chainData:any = await fetchChainData(seriesArr);
       const parsedData:any = await parseChainData(chainData);
       console.log(parsedData);
-      dispatch( { type:'updateAllPositions', payload: parsedData });
+      dispatch( { type:'updatePositions', payload: parsedData });
       dispatch({ type:'isLoading', payload: false });
     }
   };
 
+  const setSelectedPosition = (seriesSymbol:string) => {
+    console.log(seriesSymbol);
+    // dispatch({ type:'setSelectedPosition', payload: seriesSymbol });
+  };
+
   React.useEffect( () => {
     ( async () => { 
-      chainId && !seriesState?.isLoading && getPositions([seriesState.seriesData[0]]); 
+      chainId && !yieldState?.isLoading && getPositions([yieldState.deployedSeries[0]]); 
     })();
-  }, [ chainId, seriesState ]);
+  }, [ chainId, yieldState ]);
 
   const actions = {
     getPositions: (x:any[]) => getPositions(x),
+    setSelectedPosition: (x:string) => setSelectedPosition(x),
   };
 
   return (
@@ -114,42 +143,3 @@ const PositionsProvider = ({ children }:any) => {
 };
 
 export { PositionsContext, PositionsProvider };
-
-
-// const initState_old = {
-//   positionsIndicator: 1,
-//   positionsData : [
-//     {
-//       posId: 1,
-//       series_id: `yDai-${moment().add(3, 'months').format('YY-MM-30')}`,
-//       maturityDate: moment().add(3, 'months').toDate(),
-//       interestRate: 3.22,
-//       currentValue: 0.9921,
-//       collateral: [ 
-//         { type: 'ETH', value: 1.21234, debt: 100, balance: 100 },
-//       ],
-//     },
-//     {
-//       posId: 2,
-//       series_id: `yDai-${moment().add(6, 'months').format('YY-MM-30')}`,
-//       maturityDate: moment().add(3, 'months').toDate(),
-//       interestRate: 3.22,
-//       currentValue: 0.9921,
-//       collateral: [
-//         { type: 'ETH', value: 1.2234234234, debt: 100, balance: 100 },
-//         { type: 'CHAI', value: 100, debt: 50, balance: 50},
-
-//       ],
-//     },
-//     {
-//       posId: 3,
-//       series_id: `yDai-${moment().add(12, 'months').format('YY-MM-30')}`,
-//       maturityDate: moment().add(3, 'months').toDate(),
-//       interestRate: 3.22,
-//       currentValue: 0.9921,
-//       collateral: [ 
-//         { type: 'ETH', value: 1.223423423423423423234, debt: 100, balance: 100 },
-//       ],
-//     },
-//   ],
-// };

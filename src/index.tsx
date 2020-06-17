@@ -19,7 +19,7 @@ import * as serviceWorker from './serviceWorker';
 import { NotifyProvider }  from './contexts/NotifyContext';
 // TODO: layers to context
 import { LayerProvider }  from './contexts/LayerContext';
-import { SeriesProvider }  from './contexts/SeriesContext';
+import { YieldProvider }  from './contexts/YieldContext';
 import { PositionsProvider }  from './contexts/PositionsContext';
 
 // TODO: better smoothscroll solution
@@ -54,13 +54,13 @@ ReactDOM.render(
   <React.StrictMode>
     <Web3ReactProvider getLibrary={getLibrary}>
       <NotifyProvider>
-        <SeriesProvider>
+        <YieldProvider>
           <PositionsProvider>
             <LayerProvider>
               <App />
             </LayerProvider>
           </PositionsProvider>
-        </SeriesProvider>
+        </YieldProvider>
       </NotifyProvider>
     </Web3ReactProvider>
   </React.StrictMode>,

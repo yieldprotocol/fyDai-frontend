@@ -12,14 +12,13 @@ import {
   // FaEllipsisV as Exchange,
 } from 'react-icons/fa';
 
-import PaybackAction from './PaybackAction';
+import RepayAction from './RepayAction';
 import BorrowAction from './BorrowAction';
 import SellAction from './SellAction';
 import BuyAction from './BuyAction';
 import ActionMenu from './ActionMenu';
 import WithdrawAction from './WithdrawAction';
 import DepositAction from './DepositAction';
-
 
 function YieldPosition({ position, header }: any) {
   // const [open, setOpen] = React.useState<boolean>(false);
@@ -176,7 +175,7 @@ function YieldPosition({ position, header }: any) {
           margin='small'
         >
           { actionsOpen === 'BORROW' && <BorrowAction close={()=>setActionsOpen(null)} /> }
-          { actionsOpen === 'PAYBACK' && <PaybackAction close={()=>setActionsOpen(null)} /> }
+          { actionsOpen === 'PAYBACK' && <RepayAction close={()=>setActionsOpen(null)} /> }
           { actionsOpen === 'SELL' && <SellAction close={()=>setActionsOpen(null)} /> }
           { actionsOpen === 'BUY' && <BuyAction close={()=>setActionsOpen(null)} /> }
           { actionsOpen === 'WITHDRAW' && <WithdrawAction close={()=>setActionsOpen(null)} /> }
@@ -247,7 +246,7 @@ function YieldPosition({ position, header }: any) {
                 <Text size='10px'> Do something else. </Text>
               </Box>
             </Box>
-              { debtGroupActions === 'PAYBACK' && <PaybackAction close={()=>setActionsOpen(null)} /> }
+              { debtGroupActions === 'PAYBACK' && <RepayAction close={()=>setActionsOpen(null)} /> }
               { debtGroupActions === 'BORROW' && <BorrowAction close={()=>setActionsOpen(null)} /> }
           </Box>}
 
