@@ -1,4 +1,7 @@
 import React from 'react';
+
+import moment from 'moment';
+
 import { Box, Button, Heading, TextInput, Text } from 'grommet';
 import DepositAction from './DepositAction';
 import WithdrawAction from './WithdrawAction';
@@ -7,12 +10,13 @@ import { YieldContext } from '../contexts/YieldContext';
 import { PositionsContext } from '../contexts/PositionsContext';
 
 import { useDealer, useGetBalance } from '../hooks/yieldHooks';
+import RedeemAction from './RedeemAction';
 
-const DepositWithdraw = ({ close }:any) => {
+const Redeem = ({ activeSeries }:any) => {
 
   const [over, setOver] = React.useState<boolean>(false);
   const [inputValue, setInputValue] = React.useState<any>();
-  const [taskView, setTaskView] = React.useState<string>('DEPOSIT');
+  const [taskView, setTaskView] = React.useState<string>('TIMER');
   const [ wethBalance, setWethBalance ] = React.useState<number>(0);
   const [ wethPosted, setWethPosted ] = React.useState<number>(0);
   const { state, dispatch } = React.useContext(YieldContext);
@@ -63,23 +67,23 @@ const DepositWithdraw = ({ close }:any) => {
     >
       <Box direction='row-responsive' justify='start' gap='medium'>
         <Box 
-          background={taskView==='DEPOSIT'? 'secondaryTransparent': 'none'}
+          background={taskView==='REDEEM'? 'secondaryTransparent': 'none'}
           round
           pad={{ horizontal:'small', vertical:'xsmall' }}
           hoverIndicator='secondaryTransparent'
-          onClick={()=>{setTaskView('DEPOSIT');}}
+          onClick={()=>{setTaskView('REDEEM');}}
         >
           <Text 
             size='xsmall'
-            color={taskView==='DEPOSIT'? 'secondary': 'text'}
-            weight={taskView==='DEPOSIT'? 'bold': 'normal'}
+            color={taskView==='REDEEM'? 'secondary': 'text'}
+            weight={taskView==='REDEEM'? 'bold': 'normal'}
             wordBreak='keep-all'
             truncate
           >
-            Deposit Eth
+            Redeem
           </Text>
         </Box>
-        <Box
+        {/* <Box
           background={taskView==='WITHDRAW'? 'secondaryTransparent': 'none'}
           round 
           pad={{ horizontal:'small', vertical:'xsmall' }}
@@ -95,20 +99,18 @@ const DepositWithdraw = ({ close }:any) => {
           >
             Withdraw Eth
           </Text>
-        </Box>
+        </Box> */}
       </Box>
-      { taskView==='DEPOSIT' && 
-        <DepositAction 
-          deposit={(x:number) => depositSteps(x)}
-          maxValue={wethBalance}
-        />}
-      { taskView==='WITHDRAW' && 
-      <WithdrawAction 
-        withdraw={(x:number) => withdrawSteps(x)}
-        maxValue={wethPosted}
-      /> }
+      { taskView==='REDEEM' && 
+      <RedeemAction />}
+      { taskView==='TIMER' && 
+      <Box>
+
+        Series matures { moment(activeSeries.maturity_p).fromNow() }
+
+      </Box> }
     </Box>
   );
 };
 
-export default DepositWithdraw;
+export default Redeem;

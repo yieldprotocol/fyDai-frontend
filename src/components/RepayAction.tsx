@@ -12,12 +12,15 @@ import { IYieldSeries } from '../types';
 import ethLogo from '../assets/images/tokens/eth.svg';
 
 interface RepayActionProps {
-  activeSeries?:IYieldSeries,
-  fixedOpen?:boolean,
-  close?:any,
+  repayFn:any
+  maxValue:number
+
+  // activeSeries?:IYieldSeries,
+  // fixedOpen?:boolean,
+  // close?:any,
 }
 
-function PaybackAction({ close }:RepayActionProps) {
+function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
 
   const [inputValue, setInputValue] = React.useState<any>();
   const [repayType, setRepayType] = React.useState<string>('yDai');
@@ -46,9 +49,8 @@ function PaybackAction({ close }:RepayActionProps) {
     );
   };
 
-
   return (
-
+    
     <Box flex='grow' justify='between'>
       <Box margin={{ top:'medium' }} gap='xsmall' align='center' fill='horizontal'>
         <Text alignSelf='start' size='xsmall'> Amount to repay</Text>
@@ -58,10 +60,11 @@ function PaybackAction({ close }:RepayActionProps) {
           direction='row'
           fill='horizontal'
           align='baseline'
+          pad={{ horizontal:'small' }}
         >
-          <Box width='15px' height='15px'>
+          {/* <Box width='15px' height='15px'>
             <Image src={ethLogo} fit='contain' />
-          </Box>
+          </Box> */}
           <TextInput
             type="number"
             placeholder="0"
@@ -74,7 +77,7 @@ function PaybackAction({ close }:RepayActionProps) {
         </Box>
         <Box
           round
-          onClick={()=>console.log('max button clicked')}
+          onClick={()=>setInputValue(maxValue)}
           hoverIndicator='brandTransparent'
           border='all'
           pad={{ horizontal:'small', vertical:'none' }}
@@ -119,9 +122,8 @@ function PaybackAction({ close }:RepayActionProps) {
           fill='horizontal'
           primary
           disabled={!(inputValue>0)}
-        // plain
           color='brand'
-          onClick={()=>console.log({ inputValue })}
+          onClick={()=>repayFn(inputValue, repayType)}
           label={`Repay ${inputValue || ''} ${repayType}`}
         />
       </Box>

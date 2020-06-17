@@ -29,7 +29,7 @@ const YieldHeader = (props: any) => {
     <Header
       // elevation="xsmall"
       fill="horizontal"
-      pad={{ horizontal: 'small', vertical: 'none' }}
+      pad={{ horizontal: 'small', vertical: 'small' }}
     >
       <Box align="center" direction='row' gap='small' margin='none' pad='none'>
         <Box height="xsmall" width="xsmall" margin='none' pad='xsmall'>

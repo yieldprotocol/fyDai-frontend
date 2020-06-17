@@ -33,8 +33,8 @@ function PaybackAction({ close }:RepayActionProps) {
             value={buyType}
             options={['yDai', 'Dai']}
             valueLabel={
-              <Box width='xsmall' direction='row' justify='center' align='baseline' gap='xsmall'>
-                <Text color='brand' size='xsmall'>{ buyType }</Text>
+              <Box width='small' direction='row' justify='center' align='baseline' gap='xsmall'>
+                <Text color='brand' size='xsmall'>{`in ${buyType}`}</Text>
                 <Text color='brand' size='xsmall'><CaretDown /></Text>
               </Box>
           }
@@ -58,10 +58,11 @@ function PaybackAction({ close }:RepayActionProps) {
           direction='row'
           fill='horizontal'
           align='baseline'
+          pad={{ horizontal:'small' }}
         >
-          <Box width='15px' height='15px'>
+          {/* <Box width='15px' height='15px'>
             <Image src={ethLogo} fit='contain' />
-          </Box>
+          </Box> */}
           <TextInput
             type="number"
             placeholder="0"

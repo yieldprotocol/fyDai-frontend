@@ -3,13 +3,52 @@ import { Box, Button, Heading, TextInput, Text } from 'grommet';
 import BorrowAction from './BorrowAction';
 import RepayAction from './RepayAction';
 
-const BorrowRepay = ({ activeSeries }:any) => {
+import { YieldContext } from '../contexts/YieldContext';
+import { PositionsContext } from '../contexts/PositionsContext';
 
+import { useDealer, useGetBalance } from '../hooks/yieldHooks';
+
+const BorrowRepay = ({ active, activeSeries }:any) => {
+  const [over, setOver] = React.useState<boolean>(false);
   const [inputValue, setInputValue] = React.useState<any>();
   const [taskView, setTaskView] = React.useState<string>('BORROW');
+  const { state, dispatch } = React.useContext(YieldContext);
+  const { deployedCore, yieldData } = state;
+  const {
+    post,
+    approveDealer,
+    withdraw,
+    borrow,
+    repay,
+    postActive,
+    withdrawActive,
+    repayActive,
+    borrowActive,
+  }  = useDealer();
+
+  const borrowSteps = async (value:number) => {
+    await borrow(deployedCore.WethDealer, activeSeries.maturity, value );
+  };
+
+  const repaySteps = async (value:number, collateral:string) => {
+    console.log(activeSeries);
+    await repay(deployedCore.WethDealer, activeSeries.maturity, value, collateral );
+  };
 
   return (
-    <Box round='medium' border='all' fill pad='small' width={{ min:'280px' }} height={{ min:'280px' }}>
+    <Box 
+      round='medium'
+      border='all'
+      fill
+      pad='small'
+      width={{ min:'280px' }}
+      height={{ min:'280px' }}
+      onMouseOver={() => setOver(true)}
+      onMouseLeave={() => setOver(false)}
+      onFocus={() => setOver(true)}
+      // onBlur={() => setOver(false)}
+      elevation={over?'large':undefined}
+    >
       <Box direction='row-responsive' justify='start' gap='medium'>
         <Box 
           background={taskView==='BORROW'? 'brandTransparent': 'none'}
@@ -47,8 +86,16 @@ const BorrowRepay = ({ activeSeries }:any) => {
         </Box>
       </Box>
       <Box flex='grow'>
-        { taskView==='BORROW' && <BorrowAction /> }
-        { taskView==='REPAY' && <RepayAction /> }
+        { taskView==='BORROW' && 
+        <BorrowAction 
+          borrowFn={(x:number)=>borrowSteps(x)}
+          // maxValue={activeSeries}
+        /> }
+        { taskView==='REPAY' && 
+        <RepayAction
+          repayFn={(x:number, c:string)=>repaySteps(x, c)}
+          maxValue={10}
+        /> }
       </Box>
     </Box>
   );

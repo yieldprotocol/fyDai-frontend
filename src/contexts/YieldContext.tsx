@@ -8,7 +8,7 @@ import * as utils from '../utils';
 
 import { IYieldSeries } from '../types';
 
-import { useCallTx } from '../hooks/yieldHooks';
+import { useCallTx, useGetBalance } from '../hooks/yieldHooks';
 
 import { NotifyContext } from './NotifyContext';
 
@@ -39,6 +39,11 @@ function reducer(redState:any, action:any) {
         ...redState,
         yieldData: action.payload,
       };
+    case 'updateBalances': 
+      return {
+        ...redState,
+        balanceState: action.payload,
+      };
     case 'updateMakerData': 
       return {
         ...redState,
@@ -56,7 +61,14 @@ function reducer(redState:any, action:any) {
 
 const YieldProvider = ({ children }:any) => {
 
-  const initState = { isLoading: true, deployedSeries : [], deployedCore: {}, yieldData: {}, makerData: {} };
+  const initState = { 
+    isLoading: true,
+    deployedSeries : [],
+    deployedCore: {},
+    yieldData: {},
+    makerData: {},
+    balances:{},
+  };
   const [ state, dispatch ] = React.useReducer(reducer, initState);
   const { chainId, account } = useWeb3React();
   const { dispatch: notifyDispatch } = React.useContext(NotifyContext);
@@ -121,12 +133,12 @@ const YieldProvider = ({ children }:any) => {
     // parse and return maker data
     return {
       ...yieldData,
-      wethPosted_p: ethers.utils.formatEther(yieldData.wethPosted.toString()),
-      chaiPosted_p: ethers.utils.formatEther(yieldData.chaiPosted.toString()),
-      wethTotalDebtDai_p: ethers.utils.formatEther(yieldData.wethTotalDebtDai.toString()),
-      wethTotalDebtYDai_p: ethers.utils.formatEther(yieldData.wethTotalDebtYDai.toString()),
-      chaiTotalDebtDai_p: ethers.utils.formatEther(yieldData.chaiTotalDebtDai.toString()),
-      chaiTotalDebtYDai_p: ethers.utils.formatEther(yieldData.chaiTotalDebtYDai.toString()),
+      wethPosted_p: parseFloat(ethers.utils.formatEther(yieldData.wethPosted.toString())),
+      chaiPosted_p: parseFloat(ethers.utils.formatEther(yieldData.chaiPosted.toString())),
+      wethTotalDebtDai_p: parseFloat(ethers.utils.formatEther(yieldData.wethTotalDebtDai.toString())),
+      wethTotalDebtYDai_p: parseFloat(ethers.utils.formatEther(yieldData.wethTotalDebtYDai.toString())),
+      chaiTotalDebtDai_p: parseFloat(ethers.utils.formatEther(yieldData.chaiTotalDebtDai.toString())),
+      chaiTotalDebtYDai_p: parseFloat(ethers.utils.formatEther(yieldData.chaiTotalDebtYDai.toString())),
     };
   };
 
@@ -160,7 +172,7 @@ const YieldProvider = ({ children }:any) => {
 
     // TODO: Maybe convert to a single dispatch call. See after app dust has settled.
     dispatch({ type:'isLoading', payload: true });
-    
+
     // #1 Get yield addresses from db
     const [ addrData, deployedCore] = await getYieldAddrs(networkId);
     dispatch({ type:'updateDeployedCore', payload: deployedCore });
@@ -173,7 +185,7 @@ const YieldProvider = ({ children }:any) => {
     const yieldData = await fetchYieldData(deployedCore);
     dispatch({ type:'updateYieldData', payload: yieldData });
 
-    // #4 get MakerDao data
+    // # 5get MakerDao data
     const makerData = await fetchMakerData(deployedCore);
     dispatch({ type:'updateMakerData', payload: makerData });
 

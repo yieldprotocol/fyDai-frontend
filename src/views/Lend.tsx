@@ -4,8 +4,7 @@ import { Box, Grid, Heading, Text, Collapsible, Markdown, Layer } from 'grommet'
 import RotateLoader from 'react-spinners/RotateLoader';
 
 import { FiCheckCircle, FiCircle, FiRefreshCw as Refresh } from 'react-icons/fi';
-import Series from './x_Series';
-import Positions from './x_Positions';
+
 import BorrowAction from '../components/BorrowAction';
 import RepayAction from '../components/RepayAction';
 
@@ -18,6 +17,7 @@ import { IYieldSeries } from '../types';
 import DepositWithdraw from '../components/DepositWithdraw';
 import BorrowRepay from '../components/BorrowRepay';
 import BuySell from '../components/BuySell';
+import Redeem from '../components/Redeem';
 
 interface BorrowProps {
   setActiveSeries: any,
@@ -38,6 +38,12 @@ const Lend = ({ setActiveSeries, activeSeries, setShowSeriesLayer }:BorrowProps)
 
   const { isLoading: positionsLoading, positionsData } = positionsState; 
   const { isLoading: yieldLoading, deployedSeries, deployedCore, yieldData, makerData }  = yieldState;
+  const {
+    maturity_p,
+    yDaiBalance_p,
+    // currentValue,
+    seriesColor,
+  }  = activeSeries;
 
 
   React.useEffect( () => {
@@ -122,7 +128,7 @@ const Lend = ({ setActiveSeries, activeSeries, setShowSeriesLayer }:BorrowProps)
             round
             pad={{ horizontal:'small', vertical:'xsmall' }}
           >
-            <Text size='xsmall' color='brand'>{'12'} yDai ≈ 12.01 Dai</Text>
+            <Text size='xsmall' color='brand'>{yDaiBalance_p} yDai ≈ {yDaiBalance_p*1.01} Dai</Text>
           </Box>
         </Box>
 
@@ -139,6 +145,9 @@ const Lend = ({ setActiveSeries, activeSeries, setShowSeriesLayer }:BorrowProps)
           <BuySell
             activeSeries={activeSeries}
             active={depositWithdrawActive}
+          />
+          <Redeem
+            activeSeries={activeSeries}
           />
         </Box>
       </Box>

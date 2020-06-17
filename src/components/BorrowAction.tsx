@@ -5,6 +5,7 @@ import {
   FiInfo as Info,
   FiHelpCircle as Help,
   FiChevronDown as CaretDown,
+  FiAlertTriangle as Warning,
 } from 'react-icons/fi';
 
 
@@ -13,18 +14,15 @@ import ethLogo from '../assets/images/tokens/eth.svg';
 import { IYieldSeries } from '../types';
 
 interface BorrowActionProps {
-  activeSeries?:IYieldSeries,
-  fixedOpen?:boolean,
-  close?:any,
+  borrowFn:any
+  // activeSeries?:IYieldSeries,
+  maxValue?:number
 }
 
+const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
 
-const BorrowAction = (props:BorrowActionProps) => {
-
-  const [inputValue, setInputValue] = React.useState<any>();
+  const [ inputValue, setInputValue ] = React.useState<any>();
   const [ borrowType, setBorrowType ] = React.useState<string>('yDai');
-  const [borrowOpen, setBorrowOpen] = React.useState<boolean>(false);
-  const slideRef = React.useRef<any>();
 
   const TokenSelector = () => {
     return (
@@ -60,10 +58,12 @@ const BorrowAction = (props:BorrowActionProps) => {
           direction='row'
           fill='horizontal'
           align='baseline'
+          pad={{ horizontal:'small' }}
         >
-          <Box width='15px' height='15px'>
+          {/* <Box width='60px' height='60px' margin='none'>
             <Image src={ethLogo} fit='contain' />
-          </Box>
+          </Box> */}
+
           <TextInput
             type="number"
             placeholder="0"
@@ -76,7 +76,7 @@ const BorrowAction = (props:BorrowActionProps) => {
           <TokenSelector />
         </Box>
 
-        <Box direction='row' fill='horizontal' margin={{top:'small'}}>
+        <Box direction='row' fill='horizontal' margin={{ top:'small' }}>
           <Box pad='xsmall' width='50%'>
             <Box direction='row' gap='small'>
               <Text size='xsmall'>
@@ -100,8 +100,15 @@ const BorrowAction = (props:BorrowActionProps) => {
             </Text>
           </Box>
         </Box>
-      
       </Box>
+
+      {inputValue > 150 &&
+      <Box direction='row' border={{ color:'red' }} pad='small' margin={{ vertical:'small' }}> 
+        <Text size='xsmall' color='red'>
+          <Warning /> 
+          {' Wooah. If you borrow that much there is a good chance you\'ll get liquidated soon. Proceed with caution!'}
+        </Text>
+      </Box>}
 
 
 
@@ -111,7 +118,7 @@ const BorrowAction = (props:BorrowActionProps) => {
           primary
           disabled={!(inputValue>0)}
           color='brand'
-          onClick={()=>console.log({ inputValue })}
+          onClick={()=>borrowFn(inputValue)}
           label={`Borrow ${inputValue || ''} ${borrowType}`}
         />
       </Box>

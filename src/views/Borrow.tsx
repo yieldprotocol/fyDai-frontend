@@ -4,8 +4,7 @@ import { Box, Grid, Heading, Text, Collapsible, Markdown, Layer } from 'grommet'
 import RotateLoader from 'react-spinners/RotateLoader';
 
 import { FiCheckCircle, FiCircle, FiRefreshCw as Refresh } from 'react-icons/fi';
-import Series from './x_Series';
-import Positions from './x_Positions';
+
 import BorrowAction from '../components/BorrowAction';
 import RepayAction from '../components/RepayAction';
 
@@ -31,9 +30,8 @@ const Borrow = ({ setActiveSeries, activeSeries, setShowSeriesLayer }:BorrowProp
   // const [ nextColor, setNextColor ] = React.useState<string>('');
 
   const [ activePosition, setActivePosition ] = React.useState<any>(null);
-  // const [ layerOpen, setLayerOpen ] = React.useState<String|null>(null);
   const [ borrowRepayActive, setBorrowRepayActive ] = React.useState<boolean>(true);
-  const [ depositWithdrawActive, setDepositWithdrawActive ] = React.useState<boolean>(true);
+  const [ depositWithdrawActive, setDepositWithdrawActive ] = React.useState<boolean>(false);
 
   const { isLoading: positionsLoading, positionsData } = positionsState; 
   const { isLoading: yieldLoading, deployedSeries, deployedCore, yieldData, makerData }  = yieldState;
@@ -143,13 +141,13 @@ const Borrow = ({ setActiveSeries, activeSeries, setShowSeriesLayer }:BorrowProp
 
       <Box flex='grow' direction='column'>
         <Box direction='row-responsive' gap='small' justify='between'>
-          <DepositWithdraw 
+          <DepositWithdraw
             activeSeries={activeSeries}
             active={depositWithdrawActive}
           />
-          <BorrowRepay 
+          <BorrowRepay
             activeSeries={activeSeries}
-            active={borrowRepayActive}
+            active={yieldData.wethPosted_p > 0}
           />
         </Box>
       </Box>

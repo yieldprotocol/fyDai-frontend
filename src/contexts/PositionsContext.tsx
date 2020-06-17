@@ -62,10 +62,10 @@ const PositionsProvider = ({ children }:any) => {
       positions.set(
         x.symbol,
         { ...x,
-          wethDebtDai_p: ethers.utils.formatEther(x.wethDebtDai.toString()),
-          wethDebtYDai_p: ethers.utils.formatEther(x.wethDebtYDai.toString()),
-          chaiDebtDai_p: ethers.utils.formatEther(x.chaiDebtDai.toString()),
-          chaiDebtYDai_p: ethers.utils.formatEther(x.chaiDebtYDai.toString()),
+          wethDebtDai_p: parseFloat(ethers.utils.formatEther(x.wethDebtDai.toString())),
+          wethDebtYDai_p: parseFloat(ethers.utils.formatEther(x.wethDebtYDai.toString())),
+          chaiDebtDai_p: parseFloat(ethers.utils.formatEther(x.chaiDebtDai.toString())),
+          chaiDebtYDai_p: parseFloat(ethers.utils.formatEther(x.chaiDebtYDai.toString())),
         }
       );
     });

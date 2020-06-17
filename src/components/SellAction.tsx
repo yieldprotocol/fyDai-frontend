@@ -58,10 +58,8 @@ function PaybackAction({ close }:RepayActionProps) {
           direction='row'
           fill='horizontal'
           align='baseline'
+          pad={{ horizontal:'small' }}
         >
-          <Box width='15px' height='15px'>
-            <Image src={ethLogo} fit='contain' />
-          </Box>
           <TextInput
             type="number"
             placeholder="0"

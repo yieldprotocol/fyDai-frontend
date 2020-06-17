@@ -4,7 +4,13 @@ import { FiInfo as Info } from 'react-icons/fi';
 
 import ethLogo from '../assets/images/tokens/eth.svg'; 
 
-const WithdrawAction = ({ close }:any) => {
+
+interface IWithDrawActionProps {
+  withdraw: any;
+  maxValue: number;
+}
+
+const WithdrawAction = ({ withdraw, maxValue }:IWithDrawActionProps) => {
 
   const [inputValue, setInputValue] = React.useState<any>();
 
@@ -12,10 +18,16 @@ const WithdrawAction = ({ close }:any) => {
     <Box align='center' flex='grow' justify='between'>
       <Box margin={{ vertical:'medium' }} gap='xsmall' align='center' fill='horizontal'>
         <Text alignSelf='start' size='xsmall'> Amount to withdraw </Text>
-        <Box round='small' border={{ color:'secondary' }} direction='row' fill='horizontal'>
-          <Box width='15px' height='15px'>
+        <Box 
+          round='small' 
+          border={{ color:'secondary' }}
+          direction='row'
+          fill='horizontal'
+          pad={{ horizontal:'small' }}
+          >
+          {/* <Box width='15px' height='15px'>
             <Image src={ethLogo} fit='contain' />
-          </Box>
+          </Box> */}
           <TextInput
             type="number"
             placeholder="0"
@@ -28,7 +40,8 @@ const WithdrawAction = ({ close }:any) => {
         </Box>
         <Box
           round
-          onClick={()=>console.log('max button clicked')}
+          // onClick={()=>console.log('max button clicked')}
+          onClick={()=>setInputValue(maxValue)}
           hoverIndicator='secondaryTransparent'
           border='all'
           pad={{ horizontal:'small', vertical:'none' }}
@@ -48,11 +61,11 @@ const WithdrawAction = ({ close }:any) => {
         <Text alignSelf='start' size='xsmall'>Convert a Maker vault</Text>
       </Box> */}
 
-      {/* <Box pad='xsmall'>
+      <Box pad='xsmall'>
         <Text alignSelf='start' size='xxsmall'>
-          <Info /> You need to deposit collateral in order to Borrow yDai or Dai. 
+          <Info /> Repay some debt if you want to withdraw more collateral.
         </Text>
-      </Box> */}
+      </Box>
 
       <Box fill='horizontal'>
         <Button
@@ -60,7 +73,7 @@ const WithdrawAction = ({ close }:any) => {
           primary
           disabled={!(inputValue>0)}
           color='secondary'
-          onClick={()=>console.log({ inputValue })}
+          onClick={()=>withdraw(inputValue)}
           label={`Withdraw ${inputValue || ''} Eth`}
         />
       </Box>

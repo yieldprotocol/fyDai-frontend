@@ -30,7 +30,7 @@ const contractMap = new Map<string, any>([
 
 export function useGetBalance() {
   const { library, account } = useWeb3React();
-  const getBalance = async () : Promise<string> => {
+  const getEthBalance = async () : Promise<string> => {
     if (!!library && !!account) {
       const bal = await library.getBalance(account);
       return ethers.utils.formatEther(bal);
@@ -46,24 +46,25 @@ export function useGetBalance() {
     if (!!library && !!account) {
       const contract = new ethers.Contract(tokenAddr, contractMap.get('Weth'), library);
       const balance = await contract.balanceOf(account);
-      return balance.toString();
-    } return '0';
+      // return ethers.utils.formatEther(balance.toString());
+      return parseFloat(ethers.utils.formatEther(balance.toString()));
+    } return 0;
   };
   const getChaiBalance = async (tokenAddr:string) => {
     if (!!library && !!account) {
       const contract = new ethers.Contract(tokenAddr, contractMap.get('Chai'), library);
       const balance = await contract.balanceOf(account);
-      return balance.toString();
+      return ethers.utils.formatEther(balance.toString());
     } return '0';
   };
   const getDaiBalance = async (tokenAddr:string) => {
     if (!!library && !!account) {
       const contract = new ethers.Contract(tokenAddr, contractMap.get('Dai'), library);
       const balance = await contract.balanceOf(account);
-      return balance.toString();
+      return ethers.utils.formatEther(balance.toString());
     } return '0';
   };
-  return { getBalance, getWeiBalance, getWethBalance, getChaiBalance, getDaiBalance } as const;
+  return { getEthBalance, getWeiBalance, getWethBalance, getChaiBalance, getDaiBalance } as const;
 }
 
 export const useCallTx = () => {
@@ -86,7 +87,7 @@ export const useCallTx = () => {
 
 export const useDealer = () => {
   const { abi: dealerAbi } = Dealer;
-  const { library } = useWeb3React();
+  const { library, account } = useWeb3React();
   const  { dispatch: notifyDispatch }  = React.useContext<any>(NotifyContext);
   const [ postActive, setPostActive ] = React.useState<boolean>(false);
   const [ withdrawActive, setWithdrawActive ] = React.useState<boolean>(false);
@@ -97,119 +98,121 @@ export const useDealer = () => {
 
   const post = async (
     dealerAddress:string,
-    from:string,
-    amount:ethers.utils.BigNumber
+    // from:string,
+    amount:number
   ) => {
     let tx:any;
     // Processing and sanitizing input
-    const parsedAmount = amount;
-    const fromAddr = ethers.utils.getAddress(from);
+    // console.log(ethers.utils.parseEther(amount.toString()));
+    const parsedAmount = ethers.utils.parseEther(amount.toString());
+    const fromAddr = account && ethers.utils.getAddress(account);
     const dealerAddr = ethers.utils.getAddress(dealerAddress);
     // Contract interaction
     setPostActive(true);
     const contract = new ethers.Contract( dealerAddr, dealerAbi, signer );
     try {
-      tx = await contract.post(fromAddr, amount);
+      tx = await contract.post(fromAddr, parsedAmount);
     } catch (e) {
       notifyDispatch({ type: 'notify', payload:{ message:`${e.data.message}`, type:'error' } } );
       setPostActive(false);
       return;
     }
     // Transaction reporting & tracking
-    notifyDispatch({ type: 'notify', payload:{ message:`Deposit of ${parsedAmount} pending...`, type:'info' } } );
+    notifyDispatch({ type: 'notify', payload:{ message:`Deposit of ${amount} pending...`, type:'info' } } );
     await tx.wait();
     setPostActive(false);
-    notifyDispatch({ type: 'notify', payload:{ message: `Deposit of ${parsedAmount} complete.`, type:'success' } } );
+    notifyDispatch({ type: 'notify', payload:{ message: `Deposit of ${amount} complete.`, type:'success' } } );
   };
 
   const withdraw = async (
     dealerAddress:string,
-    to:string,
-    amount:ethers.utils.BigNumber
+    // to:string,
+    amount:number
   ) => {
     let tx:any;
-    const parsedAmount = amount;
-    const toAddr = ethers.utils.getAddress(to);
+    const parsedAmount = ethers.utils.parseEther(amount.toString());
+    const toAddr = account && ethers.utils.getAddress(account);
     const dealerAddr = ethers.utils.getAddress(dealerAddress);
     setWithdrawActive(true);
     const contract = new ethers.Contract( dealerAddr, dealerAbi, signer );
     try {
-      tx = await contract.withdraw(toAddr, amount);
+      tx = await contract.withdraw(toAddr, parsedAmount);
     } catch (e) {
       notifyDispatch({ type: 'notify', payload:{ message:'Error Withdrawing funds', type:'error' } } );
       setWithdrawActive(false);
       return;
     }
-    notifyDispatch({ type: 'notify', payload:{ message: `Withdraw of ${parsedAmount} pending...`, type:'info' } } );
+    notifyDispatch({ type: 'notify', payload:{ message: `Withdraw of ${amount} pending...`, type:'info' } } );
     await tx.wait();
     setWithdrawActive(false);
-    notifyDispatch({ type: 'notify', payload:{ message: `Withdrawal of ${parsedAmount} complete.`, type:'success' } } );
+    notifyDispatch({ type: 'notify', payload:{ message: `Withdrawal of ${amount} complete.`, type:'success' } } );
   };
 
   const borrow = async (
     dealerAddress:string,
     maturity:string,
-    to:string,
-    amount:ethers.utils.BigNumber
+    // to:string,
+    amount:number
   ) => {
     let tx:any;
-    const parsedAmount = amount;
-    const toAddr = ethers.utils.getAddress(to);
+    const parsedAmount = ethers.utils.parseEther(amount.toString());
+    const toAddr = account && ethers.utils.getAddress(account);
     const dealerAddr = ethers.utils.getAddress(dealerAddress);
     setBorrowActive(true);
     const contract = new ethers.Contract( dealerAddr, dealerAbi, signer );
     try {
-      tx = await contract.borrow(maturity, toAddr, amount);
+      tx = await contract.borrow(maturity, toAddr, parsedAmount);
     } catch (e) {
       notifyDispatch({ type: 'notify', payload:{ message:`${e.data.message}`, type:'error' } } );
       setBorrowActive(false);
       return;
     }
-    notifyDispatch({ type: 'notify', payload:{ message: `Borrowing of ${parsedAmount} pending...`, type:'info' } } );
+    notifyDispatch({ type: 'notify', payload:{ message: `Borrowing of ${amount} pending...`, type:'info' } } );
     await tx.wait();
     setBorrowActive(false);
-    notifyDispatch({ type: 'notify', payload:{ message: `Borrowing of ${parsedAmount} complete.`, type:'success' } } );
+    notifyDispatch({ type: 'notify', payload:{ message: `Borrowing of ${amount} complete.`, type:'success' } } );
   };
 
   const repay = async (
     dealerAddress:string,
     maturity:string,
-    from:string,
-    amount:ethers.utils.BigNumber,
-    type:string
+    // from:string,
+    amount:number,
+    type:string,
   ) => {
     let tx:any;
-    const parsedAmount = amount;
-    const fromAddr = ethers.utils.getAddress(from);
+    const parsedAmount = ethers.utils.parseEther(amount.toString());
+    const fromAddr = account && ethers.utils.getAddress(account);
     const dealerAddr = ethers.utils.getAddress(dealerAddress);
+    const typeCaps = type.toUpperCase();
     setRepayActive(true);
 
     const contract = new ethers.Contract( dealerAddr, dealerAbi, signer );
     try {
-      if (type === 'YDAI') {
-        tx = await contract.repayYDai(maturity, fromAddr, amount);
-      } else if (type === 'DAI') {
-        tx = await contract.repayDai(maturity, fromAddr, amount);
+      if (typeCaps === 'YDAI') {
+        tx = await contract.repayYDai(maturity, fromAddr, parsedAmount);
+      } else if (typeCaps === 'DAI') {
+        tx = await contract.repayDai(maturity, fromAddr, parsedAmount);
       }
     } catch (e) {
       notifyDispatch({ type: 'notify', payload:{ message:`${e.data.message}`, type:'error' } } );
       setRepayActive(false);
       return;
     }
-    notifyDispatch({ type: 'notify', payload:{ message: `Repayment of ${parsedAmount} Dai pending...`, type:'info' } } );
+    notifyDispatch({ type: 'notify', payload:{ message: `Repayment of ${amount} Dai pending...`, type:'info' } } );
     await tx.wait();
     setRepayActive(false);
-    notifyDispatch({ type: 'notify', payload:{ message: `Repayment of ${parsedAmount} yDai complete.`, type:'success' } } );
+    notifyDispatch({ type: 'notify', payload:{ message: `Repayment of ${amount} yDai complete.`, type:'success' } } );
   };
 
   // Not strictly a Dealer Contract function. But associated enough to keep in here. 
   const approveDealer = async (
     tokenAddress:string,
     dealerAddress:string,
-    amount:ethers.utils.BigNumber
+    amount:number
   ) => {
     let tx:any;
-    const parsedAmount = amount;
+    const parsedAmount = ethers.utils.parseEther(amount.toString());
     const dealerAddr = ethers.utils.getAddress(dealerAddress);
     const tokenAddr = ethers.utils.getAddress(tokenAddress);
     setApproveActive(true);
@@ -221,16 +224,16 @@ export const useDealer = () => {
     );
 
     try {
-      tx = await contract.approve(dealerAddr, amount);
+      tx = await contract.approve(dealerAddr, parsedAmount);
     } catch (e) {
       notifyDispatch({ type: 'notify', payload:{ message:`${e.data.message}`, type:'error' } } );
       setApproveActive(false);
       return;
     }
-    notifyDispatch({ type: 'notify', payload:{ message: `Token approval of ${parsedAmount} pending...`, type:'info' } } );
+    notifyDispatch({ type: 'notify', payload:{ message: `Token approval of ${amount} pending...`, type:'info' } } );
     await tx.wait();
     setApproveActive(false);
-    notifyDispatch({ type: 'notify', payload:{ message: `Token approval of ${parsedAmount} complete. ${tokenAddress} and ${dealerAddress}`, type:'success' } } );
+    notifyDispatch({ type: 'notify', payload:{ message: `Token approval of ${amount} complete. ${tokenAddress} and ${dealerAddress}`, type:'success' } } );
   };
 
   return {

@@ -25,7 +25,6 @@ import Amm from './views/Amm';
 import YieldHeader from './components/YieldHeader';
 import YieldFooter from './components/YieldFooter';
 import YieldSidebar from './components/YieldSidebar';
-// import YieldTabs from './components/YieldTabs';
 
 import ConnectLayer from './views/layers/ConnectLayer';
 import AccountLayer from './views/layers/AccountLayer';

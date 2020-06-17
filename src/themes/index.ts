@@ -265,6 +265,7 @@ export const yieldTheme = {
     -ms-overflow-style: none;
     scrollbar-width: none;
     ::-webkit-scrollbar { display:none; }
+
     `
   },
   TextInput: {
@@ -520,7 +521,6 @@ export const yieldTheme = {
     },
   },
   text: {
-
     xxxsmall: {
       size: '8px',
       height: '14px',

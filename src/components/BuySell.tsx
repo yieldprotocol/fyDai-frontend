@@ -5,7 +5,8 @@ import SellAction from './SellAction';
 import BuyAction from './BuyAction';
 
 const BuySell = ({ activeSeries }:any) => {
-
+  
+  const [over, setOver] = React.useState<boolean>(false);
   const [inputValue, setInputValue] = React.useState<any>();
   const [taskView, setTaskView] = React.useState<string>('BUY');
 
@@ -17,6 +18,10 @@ const BuySell = ({ activeSeries }:any) => {
       pad='small'
       width={{ min:'280px', max:'50%' }}
       height={{ min:'280px' }}
+      elevation={over?'large':undefined}
+      onMouseOver={() => setOver(true)}
+      onMouseLeave={() => setOver(false)}
+      onFocus={() => setOver(true)}
     >
       <Box direction='row-responsive' justify='start' gap='medium'>
         <Box 

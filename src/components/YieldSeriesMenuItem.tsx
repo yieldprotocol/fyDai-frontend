@@ -51,10 +51,8 @@ const YieldSeriesMenuItem = ({
       margin={{ left: 'small', vertical:'none' }}
       align="start"
       justify="between"
-        // hoverIndicator={{ color: 'background-frontheader' }}
-      background={selected? 'background-front': {}}
-      // border={selected? { color:'brand' } : { color:'border' }}
-      // round={selected? { size: 'small' }: { size: 'small', corner: 'left' }}
+      background={selected? ('background-frontheader'): {}}
+      // background={selected? ( seriesColor || 'background-front'): {}}
       ref={ref}
       onMouseOver={() => setOver(true)}
       onMouseLeave={() => setOver(false)}
@@ -62,7 +60,7 @@ const YieldSeriesMenuItem = ({
       onBlur={() => setOver(false)}
       hoverIndicator={tooltipColor}
       onClick={() => seriesAction()}
-      round={over&&!selected?{ size:'medium', corner:'left' }: {size:'medium'}}
+      round={over&&!selected?{ size:'medium', corner:'left' }: { size:'medium' }}
     >
 
       <Box 

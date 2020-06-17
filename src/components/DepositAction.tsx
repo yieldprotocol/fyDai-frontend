@@ -4,7 +4,14 @@ import { FiInfo as Info } from 'react-icons/fi';
 
 import ethLogo from '../assets/images/tokens/eth.svg'; 
 
-const DepositAction = ({ close }:any) => {
+interface DepositProps {
+  deposit:any
+  convert?:any
+  maxValue:number
+  disabled?:boolean
+}
+
+const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) => {
 
   const [inputValue, setInputValue] = React.useState<any>();
   const [depositDisabled, setDepositDisabled] = React.useState<boolean>(false);
@@ -13,10 +20,16 @@ const DepositAction = ({ close }:any) => {
     <Box align='center' flex='grow' justify='between'>
       <Box margin={{ vertical:'medium' }} gap='xsmall' align='center' fill='horizontal'>
         <Text alignSelf='start' size='xsmall'> Amount to deposit </Text>
-        <Box round='small' border={{ color:'secondary' }} direction='row' fill='horizontal'>
-          <Box width='15px' height='15px'>
+        <Box 
+          round='small' 
+          border={{ color:'secondary' }}
+          direction='row'
+          fill='horizontal'
+          pad={{ horizontal:'small' }}
+        >
+          {/* <Box width='15px' height='15px'>
             <Image src={ethLogo} fit='contain' />
-          </Box>
+          </Box> */}
           <TextInput
             type="number"
             placeholder="0"
@@ -30,7 +43,7 @@ const DepositAction = ({ close }:any) => {
         </Box>
         <Box
           round
-          onClick={()=>console.log('max button clicked')}
+          onClick={()=>setInputValue(maxValue)}
           hoverIndicator='secondaryTransparent'
           border='all'
           pad={{ horizontal:'small', vertical:'none' }}
@@ -40,14 +53,15 @@ const DepositAction = ({ close }:any) => {
       </Box>
 
       <Box
-        round
-        onClick={()=>console.log('max button clicked')}
+        round='small'
+        onClick={()=>console.log('maker vault clickced')}
         hoverIndicator='secondaryTransparent'
         border='all'
-        fill='vertical'
-        pad={{ horizontal:'small', vertical:'none' }}
+        fill='horizontal'
+        pad={{ horizontal:'xsmall', vertical:'xsmall' }}
+        align='center'
       >
-        <Text alignSelf='start' size='xsmall'>Convert a Maker vault</Text>
+        <Text size='xsmall'>Convert a Maker vault</Text>
       </Box>
 
       <Box pad='xsmall'>
@@ -62,7 +76,7 @@ const DepositAction = ({ close }:any) => {
           primary
           disabled={!(inputValue>0) || depositDisabled}
           color='secondary'
-          onClick={()=>console.log({ inputValue })}
+          onClick={()=> deposit(inputValue)}
           label={`Deposit ${inputValue || ''} Eth`}
         />
       </Box>
