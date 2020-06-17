@@ -27,12 +27,12 @@ const BorrowRepay = ({ active, activeSeries }:any) => {
   }  = useDealer();
 
   const borrowSteps = async (value:number) => {
-    await borrow(deployedCore.WethDealer, activeSeries.maturity, value );
+    await borrow(deployedCore.Dealer, 'WETH', activeSeries.maturity, value );
   };
 
   const repaySteps = async (value:number, collateral:string) => {
     console.log(activeSeries);
-    await repay(deployedCore.WethDealer, activeSeries.maturity, value, collateral );
+    await repay(deployedCore.Dealer, 'WETH', activeSeries.maturity, value, collateral );
   };
 
   return (

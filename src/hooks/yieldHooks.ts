@@ -98,7 +98,7 @@ export const useDealer = () => {
 
   const post = async (
     dealerAddress:string,
-    // from:string,
+    collateral:string,
     amount:number
   ) => {
     let tx:any;
@@ -106,12 +106,14 @@ export const useDealer = () => {
     // console.log(ethers.utils.parseEther(amount.toString()));
     const parsedAmount = ethers.utils.parseEther(amount.toString());
     const fromAddr = account && ethers.utils.getAddress(account);
+    const toAddr = fromAddr;
     const dealerAddr = ethers.utils.getAddress(dealerAddress);
+    const collateralBytes = ethers.utils.formatBytes32String(collateral);
     // Contract interaction
     setPostActive(true);
     const contract = new ethers.Contract( dealerAddr, dealerAbi, signer );
     try {
-      tx = await contract.post(fromAddr, parsedAmount);
+      tx = await contract.post(collateralBytes, fromAddr, toAddr, parsedAmount);
     } catch (e) {
       notifyDispatch({ type: 'notify', payload:{ message:`${e.data.message}`, type:'error' } } );
       setPostActive(false);
@@ -126,17 +128,20 @@ export const useDealer = () => {
 
   const withdraw = async (
     dealerAddress:string,
-    // to:string,
+    collateral:string,
     amount:number
   ) => {
     let tx:any;
     const parsedAmount = ethers.utils.parseEther(amount.toString());
-    const toAddr = account && ethers.utils.getAddress(account);
+    const fromAddr = account && ethers.utils.getAddress(account);
+    const toAddr = fromAddr;
     const dealerAddr = ethers.utils.getAddress(dealerAddress);
+    const collateralBytes = ethers.utils.formatBytes32String(collateral);
+
     setWithdrawActive(true);
     const contract = new ethers.Contract( dealerAddr, dealerAbi, signer );
     try {
-      tx = await contract.withdraw(toAddr, parsedAmount);
+      tx = await contract.withdraw(collateralBytes, fromAddr, toAddr, parsedAmount);
     } catch (e) {
       notifyDispatch({ type: 'notify', payload:{ message:'Error Withdrawing funds', type:'error' } } );
       setWithdrawActive(false);
@@ -150,6 +155,7 @@ export const useDealer = () => {
 
   const borrow = async (
     dealerAddress:string,
+    collateral:string,
     maturity:string,
     // to:string,
     amount:number
@@ -158,10 +164,12 @@ export const useDealer = () => {
     const parsedAmount = ethers.utils.parseEther(amount.toString());
     const toAddr = account && ethers.utils.getAddress(account);
     const dealerAddr = ethers.utils.getAddress(dealerAddress);
+    const collateralBytes = ethers.utils.formatBytes32String(collateral);
+
     setBorrowActive(true);
     const contract = new ethers.Contract( dealerAddr, dealerAbi, signer );
     try {
-      tx = await contract.borrow(maturity, toAddr, parsedAmount);
+      tx = await contract.borrow(collateralBytes, maturity, toAddr, parsedAmount);
     } catch (e) {
       notifyDispatch({ type: 'notify', payload:{ message:`${e.data.message}`, type:'error' } } );
       setBorrowActive(false);
@@ -175,6 +183,7 @@ export const useDealer = () => {
 
   const repay = async (
     dealerAddress:string,
+    collateral:string,
     maturity:string,
     // from:string,
     amount:number,
@@ -185,14 +194,16 @@ export const useDealer = () => {
     const fromAddr = account && ethers.utils.getAddress(account);
     const dealerAddr = ethers.utils.getAddress(dealerAddress);
     const typeCaps = type.toUpperCase();
+    const collateralBytes = ethers.utils.formatBytes32String(collateral);
+
     setRepayActive(true);
 
     const contract = new ethers.Contract( dealerAddr, dealerAbi, signer );
     try {
       if (typeCaps === 'YDAI') {
-        tx = await contract.repayYDai(maturity, fromAddr, parsedAmount);
+        tx = await contract.repayYDai(collateralBytes, maturity, fromAddr, parsedAmount);
       } else if (typeCaps === 'DAI') {
-        tx = await contract.repayDai(maturity, fromAddr, parsedAmount);
+        tx = await contract.repayDai(collateralBytes, maturity, fromAddr, parsedAmount);
       }
     } catch (e) {
       notifyDispatch({ type: 'notify', payload:{ message:`${e.data.message}`, type:'error' } } );
@@ -215,6 +226,7 @@ export const useDealer = () => {
     const parsedAmount = ethers.utils.parseEther(amount.toString());
     const dealerAddr = ethers.utils.getAddress(dealerAddress);
     const tokenAddr = ethers.utils.getAddress(tokenAddress);
+    
     setApproveActive(true);
 
     const contract = new ethers.Contract(
@@ -252,6 +264,7 @@ export const useSendTx = () => {
   const signer = library?.getSigner();
   const sendTx = async (contractAddr:string, contractName:string, fn:string, data:any[], value:ethers.utils.BigNumber ) => {
     let tx;
+    console.log(contractAddr, contractMap.get(contractName), signer); 
     setSendTxActive(true);
     const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), signer);
     if (!value.isZero()) {

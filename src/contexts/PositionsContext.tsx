@@ -9,20 +9,20 @@ import { useCallTx } from '../hooks/yieldHooks';
 
 const PositionsContext = React.createContext<any>({});
 
-function reducer(redState:any, action:any) {
+function reducer(state:any, action:any) {
   switch (action.type) {
     case 'updatePositions':
       return {
-        ...redState,
+        ...state,
         positionsData: action.payload,
       };
     case 'isLoading':
       return { 
-        ...redState,
+        ...state,
         isLoading: action.payload
       };
     default:
-      return redState;
+      return state;
   }
 }
 
@@ -43,10 +43,10 @@ const PositionsProvider = ({ children }:any) => {
       deployedSeries.map( async (x:any, i:number) => {
         chainData.push(x);
         try {
-          chainData[i].wethDebtDai = await callTx(deployedCore.WethDealer, 'Dealer', 'debtDai', [x.maturity, account]);
-          chainData[i].wethDebtYDai = await callTx(deployedCore.WethDealer, 'Dealer', 'debtYDai', [x.maturity, account]);
-          chainData[i].chaiDebtDai = await callTx(deployedCore.ChaiDealer, 'Dealer', 'debtDai', [x.maturity, account]);
-          chainData[i].chaiDebtYDai = await callTx(deployedCore.ChaiDealer, 'Dealer', 'debtYDai', [x.maturity, account]);
+          chainData[i].wethDebtDai = await callTx(deployedCore.Dealer, 'Dealer', 'debtDai', [utils.WETH, x.maturity, account]);
+          chainData[i].wethDebtYDai = await callTx(deployedCore.Dealer, 'Dealer', 'debtYDai', [utils.WETH, x.maturity, account]);
+          chainData[i].chaiDebtDai = await callTx(deployedCore.Dealer, 'Dealer', 'debtDai', [utils.CHAI, x.maturity, account]);
+          chainData[i].chaiDebtYDai = await callTx(deployedCore.Dealer, 'Dealer', 'debtYDai', [utils.CHAI, x.maturity, account]);
         } catch (e) {
           console.log(`Could not load series blockchain data: ${e}`);
         }
