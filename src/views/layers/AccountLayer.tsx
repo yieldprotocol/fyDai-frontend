@@ -12,10 +12,10 @@ const AccountLayer = (props:any) => {
   const [ balance, setBalance ] = React.useState<string|null>('-');
   const { chainId } = useWeb3React();
   const { closeLayer, changeWallet } = props;
-  const { getBalance } = useGetBalance();
+  const { getEthBalance } = useGetBalance();
 
   React.useEffect(() => {
-    ( async () => setBalance( await getBalance()) )();
+    ( async () => setBalance( await getEthBalance()) )();
     // (async () => activate(injected, console.log))();
   }, []);
 

@@ -1,53 +1,81 @@
 import React from 'react';
-import { Box, Button, Heading, TextInput, Text } from 'grommet';
-import SlideConfirm from './SlideConfirm';
+import { Box, Button, Image, TextInput, Text } from 'grommet';
+import { FiInfo as Info } from 'react-icons/fi'; 
 
-const WithdrawAction = ({ close }:any) => {
+import ethLogo from '../assets/images/tokens/eth.svg'; 
+
+
+interface IWithDrawActionProps {
+  withdraw: any;
+  maxValue: number;
+}
+
+const WithdrawAction = ({ withdraw, maxValue }:IWithDrawActionProps) => {
 
   const [inputValue, setInputValue] = React.useState<any>();
 
   return (
-    <Box>
-      <Heading level='5'>Withdraw Collateral</Heading>
-      <Box direction='column' gap='medium'>
-
-        <Box gap='none' direction='row' align='baseline'>
-          <Box
-            style={{ borderRadius:'24px 0px 0px 24px' }}
-            border='all'
-            pad={{ horizontal:'large', vertical:'xsmall' }}
-            hoverIndicator='background'
-            onClick={()=>console.log('somehting')}
-          > 
-            <Text size='14px'>Max</Text>
-          </Box>
+    <Box align='center' flex='grow' justify='between'>
+      <Box margin={{ vertical:'medium' }} gap='xsmall' align='center' fill='horizontal'>
+        <Text alignSelf='start' size='xsmall'> Amount to withdraw </Text>
+        <Box 
+          round='small' 
+          border={{ color:'secondary' }}
+          direction='row'
+          fill='horizontal'
+          pad={{ horizontal:'small' }}
+          >
+          {/* <Box width='15px' height='15px'>
+            <Image src={ethLogo} fit='contain' />
+          </Box> */}
           <TextInput
-            style={{ borderRadius:'0px 24px 24px 0px' }}
             type="number"
-            placeholder="Amount to withdraw"
+            placeholder="0"
             value={inputValue}
+            plain
             onChange={(event:any) => setInputValue(event.target.value)}
-            icon={<Text>ETH</Text>}
+            icon={<Text alignSelf='start' size='xsmall'>Eth</Text>}
             reverse
           />
         </Box>
-
-        <Box direction='row' justify='evenly' fill='horizontal' align='baseline'>
-          <Box hoverIndicator='background' onClick={()=>close()} round pad={{ horizontal:'large', vertical:'xsmall' }}> 
-            <Text color='lightgrey'>Cancel</Text>
-          </Box>
-          <Button
-            label='Confirm'
-            disabled={false}
-            onClick={()=>close()}
-          />
-          {/* <SlideConfirm 
-            label='Slide to payback'
-            disabled={false}
-            brandColor='green'
-            onConfirm={()=>close()}
-          /> */}
+        <Box
+          round
+          // onClick={()=>console.log('max button clicked')}
+          onClick={()=>setInputValue(maxValue)}
+          hoverIndicator='secondaryTransparent'
+          border='all'
+          pad={{ horizontal:'small', vertical:'none' }}
+        >
+          <Text alignSelf='start' size='xsmall'>Withdraw all</Text>
         </Box>
+      </Box>
+
+      {/* <Box
+        round
+        onClick={()=>console.log('max button clicked')}
+        hoverIndicator='secondaryTransparent'
+        border='all'
+        fill='vertical'
+        pad={{ horizontal:'small', vertical:'none' }}
+      >
+        <Text alignSelf='start' size='xsmall'>Convert a Maker vault</Text>
+      </Box> */}
+
+      <Box pad='xsmall'>
+        <Text alignSelf='start' size='xxsmall'>
+          <Info /> Repay some debt if you want to withdraw more collateral.
+        </Text>
+      </Box>
+
+      <Box fill='horizontal'>
+        <Button
+          fill='horizontal'
+          primary
+          disabled={!(inputValue>0)}
+          color='secondary'
+          onClick={()=>withdraw(inputValue)}
+          label={`Withdraw ${inputValue || ''} Eth`}
+        />
       </Box>
     </Box>
   );

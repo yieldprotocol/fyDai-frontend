@@ -1,51 +1,84 @@
 import React from 'react';
-import { Box, Button, Heading, TextInput, Text } from 'grommet';
-import SlideConfirm from './SlideConfirm';
+import { Box, Button, Image, TextInput, Text } from 'grommet';
+import { FiInfo as Info } from 'react-icons/fi'; 
 
-const DepositAction = ({ close }:any) => {
+import ethLogo from '../assets/images/tokens/eth.svg'; 
+
+interface DepositProps {
+  deposit:any
+  convert?:any
+  maxValue:number
+  disabled?:boolean
+}
+
+const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) => {
 
   const [inputValue, setInputValue] = React.useState<any>();
+  const [depositDisabled, setDepositDisabled] = React.useState<boolean>(false);
 
   return (
-    <Box>
-      <Heading level='5'>Deposit Collateral</Heading>
-      <Box direction='column' gap='medium'>
-        <Box gap='none' direction='row' align='baseline'>
-          <Box
-            style={{ borderRadius:'24px 0px 0px 24px' }}
-            border='all'
-            pad={{ horizontal:'large', vertical:'xsmall' }}
-            hoverIndicator='background'
-            onClick={()=>console.log('somehting')}
-          >
-            <Text size='14px'>Max</Text>
-          </Box>
+    <Box align='center' flex='grow' justify='between'>
+      <Box margin={{ vertical:'medium' }} gap='xsmall' align='center' fill='horizontal'>
+        <Text alignSelf='start' size='xsmall'> Amount to deposit </Text>
+        <Box 
+          round='small' 
+          border={{ color:'secondary' }}
+          direction='row'
+          fill='horizontal'
+          pad={{ horizontal:'small' }}
+        >
+          {/* <Box width='15px' height='15px'>
+            <Image src={ethLogo} fit='contain' />
+          </Box> */}
           <TextInput
-            style={{ borderRadius:'0px 24px 24px 0px' }}
             type="number"
-            placeholder="Amount to deposit"
+            placeholder="0"
             value={inputValue}
+            disabled={depositDisabled}
+            plain
             onChange={(event:any) => setInputValue(event.target.value)}
-            icon={<Text>ETH</Text>}
+            icon={<Text alignSelf='start' size='xsmall'>Eth</Text>}
             reverse
           />
         </Box>
-        <Box direction='row' justify='evenly' fill='horizontal' align='baseline'>
-          <Box hoverIndicator='background' onClick={()=>close()} round pad={{ horizontal:'large', vertical:'xsmall' }}> 
-            <Text color='lightgrey'>Cancel</Text>
-          </Box>
-          <Button
-            label='Confirm'
-            disabled={false}
-            onClick={()=>close()}
-          />
-          {/* <SlideConfirm 
-            label='Slide to payback'
-            disabled={false}
-            brandColor='green'
-            onConfirm={()=>close()}
-          /> */}
+        <Box
+          round
+          onClick={()=>setInputValue(maxValue)}
+          hoverIndicator='secondaryTransparent'
+          border='all'
+          pad={{ horizontal:'small', vertical:'none' }}
+        >
+          <Text alignSelf='start' size='xsmall'>Use max</Text>
         </Box>
+      </Box>
+
+      <Box
+        round='small'
+        onClick={()=>console.log('maker vault clickced')}
+        hoverIndicator='secondaryTransparent'
+        border='all'
+        fill='horizontal'
+        pad={{ horizontal:'xsmall', vertical:'xsmall' }}
+        align='center'
+      >
+        <Text size='xsmall'>Convert a Maker vault</Text>
+      </Box>
+
+      <Box pad='xsmall'>
+        <Text alignSelf='start' size='xxsmall'>
+          <Info /> You need to deposit collateral in order to Borrow yDai or Dai. 
+        </Text>
+      </Box>
+
+      <Box fill='horizontal'>
+        <Button
+          fill='horizontal'
+          primary
+          disabled={!(inputValue>0) || depositDisabled}
+          color='secondary'
+          onClick={()=> deposit(inputValue)}
+          label={`Deposit ${inputValue || ''} Eth`}
+        />
       </Box>
     </Box>
   );

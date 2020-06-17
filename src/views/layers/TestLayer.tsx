@@ -26,14 +26,14 @@ const TestLayer = (props:any) => {
   const [ balance, setBalance ] = React.useState<string|null>('-');
   const [ flow, setFlow ] = React.useState<string|null>('WETH');
 
-  const [ wethBalance, setWethBalance ] = React.useState<string|null>('-');
-  const [ chaiBalance, setChaiBalance ] = React.useState<string|null>('-');
-  const [ daiBalance, setDaiBalance ] = React.useState<string|null>('-');
+  const [ wethBalance, setWethBalance ] = React.useState<string|null|number>(0);
+  const [ chaiBalance, setChaiBalance ] = React.useState<string|null|number>(0);
+  const [ daiBalance, setDaiBalance ] = React.useState<string|null|number>(0);
 
-  const [daiDebt, setDaiDebt] = React.useState<any>();
-  const [daiTokens, setDaiTokens] = React.useState<any>();
-  const [wethTokens, setWethTokens] = React.useState<any>();
-  const [chaiTokens, setChaiTokens] = React.useState<any>();
+  const [daiDebt, setDaiDebt] = React.useState<number>(0);
+  const [daiTokens, setDaiTokens] = React.useState<number>(0);
+  const [wethTokens, setWethTokens] = React.useState<number>(0);
+  const [chaiTokens, setChaiTokens] = React.useState<number>(0);
 
   const [selectedSeries, setSelectedSeries] = React.useState<any>();
 
@@ -56,31 +56,29 @@ const TestLayer = (props:any) => {
     borrowActive,
   }  = useDealer();
 
-  const { getBalance, getChaiBalance, getWethBalance, getDaiBalance }  = useGetBalance();
+  const { getEthBalance, getChaiBalance, getWethBalance, getDaiBalance }  = useGetBalance();
 
   const { positionsData } = positionsState;
-  const { deployedCore, deployedSeries } = yieldState;
+  const { yieldData, deployedCore, deployedSeries } = yieldState;
 
   React.useEffect(()=>{
     (async () => setWethBalance( await getWethBalance(deployedCore.Weth)) )();
     (async () => setChaiBalance( await getChaiBalance(deployedCore.Chai)) )();
     (async () => setDaiBalance( await getDaiBalance(deployedCore.Dai)) )();
-
   }, [deployedCore.Weth, postActive, withdrawActive]);
 
   React.useEffect(()=>{
     const daiD = utils.toWad(12);
     const chi  = utils.toRay(1.25);
-
-    setDaiDebt(daiD);
+    setDaiDebt( parseFloat(ethers.utils.formatEther(daiD))  );
     if ( yieldState?.makerData?.ilks?.rate  ) {
       console.log(yieldState.makerData);
-      const daiT = utils.mulRay( daiD, yieldState.makerData.ilks.rate );
+      const daiT = utils.mulRay( daiD, yieldState.makerData.ilks.rate);
       const wethT = utils.divRay( daiT, yieldState.makerData.ilks.spot);
       const chaiT = utils.divRay(daiT, chi);
-      setDaiTokens(daiT);
-      setWethTokens(wethT);
-      setChaiTokens(wethT);
+      setDaiTokens( parseFloat(ethers.utils.formatEther(daiT)));
+      setWethTokens( parseFloat(ethers.utils.formatEther(wethT)));
+      setChaiTokens( parseFloat(ethers.utils.formatEther(chaiT)));
       console.log(chaiT.toString()); 
     }
     
@@ -88,7 +86,7 @@ const TestLayer = (props:any) => {
 
 
   React.useEffect(() => {
-    (async () => setBalance( await getBalance()) )();
+    (async () => setBalance( await getEthBalance()) )();
     // (async () => setWeiBalance( await getWeiBalance()) )();
     // (async () => activate(injected, console.log))();
   }, [chainId, account]);
@@ -146,7 +144,7 @@ const TestLayer = (props:any) => {
           </Box> */}
             <Box direction='row' gap='small'>
               <Text size='xsmall'>WETH balance:</Text>
-              <Text size='xsmall'>{ wethBalance && ethers.utils.formatEther(wethBalance.toString()) }</Text>
+              <Text size='xsmall'>{ wethBalance && wethBalance.toString() }</Text>
             </Box>
 
             <Box direction='row' gap='small'>
@@ -193,16 +191,16 @@ const TestLayer = (props:any) => {
 
               get WETH: 
               {/* <Button label='useNotify_info' onClick={()=>dispatch( { type: 'notify', payload: { message:'Something is happening!.. ', type:'info', showFor:500 } } )} /> */}
-              <Button label='1. Add (90 weth)- DEV' onClick={()=> sendTx(deployedCore.Weth, 'Weth', 'deposit', [], utils.toWei('90'))} />
+              <Button label='1. Add 10 weth DEV' onClick={()=> sendTx(deployedCore.Weth, 'Weth', 'deposit', [], utils.toWei('10'))} />
 
               WETH deposit and borrow: 
-              <Button label='2. Weth approve dealer 1.5' onClick={()=> approveDealer(deployedCore.Weth, deployedCore.WethDealer, utils.toWei(1.5) )} />
-              <Button label='3. Post Collateral 1.5' disabled={postActive} onClick={()=> account && post(deployedCore.WethDealer, account, utils.toWei(1.5) )} />
-              <Button label='(4. Withdraw 1.5)' onClick={()=> account && withdraw(deployedCore.WethDealer, account, utils.toWei(1.5) )} />
-              <Button label='5.Borrow 0.5' onClick={()=> account && borrow(deployedCore.WethDealer, yieldState.deployedSeries[0].maturity, account, utils.toWad(0.5) )} />
+              <Button label='2. Weth approve dealer 1.5' onClick={()=> approveDealer(deployedCore.Weth, deployedCore.WethDealer, 1.5 )} />
+              <Button label='3. Post Collateral 1.5' disabled={postActive} onClick={()=> post(deployedCore.WethDealer, 1.5 )} />
+              <Button label='(4. Withdraw 1.5)' onClick={()=> withdraw(deployedCore.WethDealer, 1.5 )} />
+              <Button label='5.Borrow 0.5' onClick={()=> borrow(deployedCore.WethDealer, yieldState.deployedSeries[0].maturity, 0.5 )} />
               WETH repay:
-              <Button label='6.1 Repay 0.5 in yDai' onClick={()=> account && repay(deployedCore.WethDealer, yieldState.deployedSeries[0].maturity, account, utils.toWad(0.5), 'YDAI' )} />
-              <Button label='( 6.2 Repay 0.5 in Dai) ' onClick={()=> account && repay(deployedCore.WethDealer, yieldState.deployedSeries[0].maturity, account, utils.toWad(0.5), 'DAI' )} />
+              <Button label='6.1 Repay 0.5 in yDai' onClick={()=> repay(deployedCore.WethDealer, yieldState.deployedSeries[0].maturity, 0.5, 'YDAI' )} />
+              <Button label='( 6.2 Repay 0.5 in Dai) ' onClick={()=> repay(deployedCore.WethDealer, yieldState.deployedSeries[0].maturity, 0.5, 'DAI' )} />
             </Box>}
 
             { flow === 'CHAI' && 
@@ -240,13 +238,13 @@ const TestLayer = (props:any) => {
 
               {/* <Button label='5. Chai approve chaiDealer Alt' onClick={()=> sendTx(deployedCore.Chai, 'Chai', 'approve', [deployedCore.ChaiDealer, utils.divRay(daiTokens, chi) ] )} /> */}
               <Button label='2. Chai approve chaiDealer' onClick={()=> approveDealer(deployedCore.Chai, deployedCore.ChaiDealer, chaiTokens )} />
-              <Button label='3. Post Chai Collateral' disabled={postActive} onClick={()=> account && post(deployedCore.ChaiDealer, account, chaiTokens )} />
-              <Button label='(4. Withdraw 0.1 chai)' onClick={()=> account && withdraw(deployedCore.ChaiDealer, account, utils.toWad(0.1) )} />
-              <Button label='5.Borrow 0.1 with chai' onClick={()=> account && borrow(deployedCore.ChaiDealer, yieldState.deployedSeries[0].maturity, account, utils.toWad(0.1) )} />
+              <Button label='3. Post Chai Collateral' disabled={postActive} onClick={()=> post(deployedCore.ChaiDealer, chaiTokens )} />
+              <Button label='(4. Withdraw 0.1 chai)' onClick={()=> withdraw(deployedCore.ChaiDealer, 0.1 )} />
+              <Button label='5.Borrow 0.1 with chai' onClick={()=> borrow(deployedCore.ChaiDealer, deployedSeries[0].maturity, 0.1 )} />
 
               Chai repay; 
-              <Button label='(6.1 Repay 0.1 in yDai)' onClick={()=> account && repay(deployedCore.ChaiDealer, yieldState.deployedSeries[0].maturity, account, utils.toWad(0.1), 'YDAI' )} />
-              <Button label=' 6.2 Repay 0.01 in Dai ' onClick={()=> account && repay(deployedCore.ChaiDealer, yieldState.deployedSeries[0].maturity, account, utils.toWad(0.01), 'DAI' )} />
+              <Button label='(6.1 Repay 0.1 in yDai)' onClick={()=> repay(deployedCore.ChaiDealer, deployedSeries[0].maturity, 0.1, 'YDAI' )} />
+              <Button label=' 6.2 Repay 0.01 in Dai ' onClick={()=> repay(deployedCore.ChaiDealer, deployedSeries[0].maturity, 0.01, 'DAI' )} />
             </Box>}
 
             { flow === 'MATURITY' && 
@@ -271,20 +269,20 @@ const TestLayer = (props:any) => {
                 </Box>
                 <Box gap='small'>
                   <Text weight='bold'>Posted collateral:</Text>
-                  <Text>weth posted: { positionsData.get('yDai-2020-09-30').wethPosted_p }</Text>
-                  <Text>chai posted: { positionsData.get('yDai-2020-09-30').chaiPosted_p }</Text>
+                  <Text>weth posted: { yieldData.wethPosted_p }</Text>
+                  <Text>chai posted: { yieldData.chaiPosted_p }</Text>
                   <Text weight='bold'>yDai balance:</Text>
                   <Text>yDai Balance: { positionsData.get('yDai-2020-09-30').yDaiBalance_p }</Text>
                   <Text weight='bold'>Weth Dealer:</Text>
                   <Text>weth Debt Dai: { positionsData.get('yDai-2020-09-30').wethDebtDai_p }</Text>
                   <Text>weth Debt YDai: { positionsData.get('yDai-2020-09-30').wethDebtYDai_p }</Text>
-                  <Text>weth Total Debt Dai { positionsData.get('yDai-2020-09-30').wethTotalDebtDai_p }</Text>
-                  <Text> weth Total Debt YDai: { positionsData.get('yDai-2020-09-30').wethTotalDebtYDai_p }</Text>
+                  <Text>weth Total Debt Dai { yieldData.wethTotalDebtDai_p }</Text>
+                  <Text> weth Total Debt YDai: { yieldData.wethTotalDebtYDai_p }</Text>
                   <Text weight='bold'>ChaiDealer:</Text>
                   <Text>chai Debt Dai : { positionsData.get('yDai-2020-09-30').chaiDebtDai_p}</Text>
                   <Text>chai Debt yDai : { positionsData.get('yDai-2020-09-30').chaiDebtYDai_p}</Text>
-                  <Text>chai Total Debt Dai: { positionsData.get('yDai-2020-09-30').chaiTotalDebtDai_p }</Text>
-                  <Text>chai Total Debt YDai: { positionsData.get('yDai-2020-09-30').chaiTotalDebtYDai_p }</Text>
+                  <Text>chai Total Debt Dai: { yieldData.chaiTotalDebtDai_p }</Text>
+                  <Text>chai Total Debt YDai: { yieldData.chaiTotalDebtYDai_p }</Text>
                 </Box>
               </Box>
               :

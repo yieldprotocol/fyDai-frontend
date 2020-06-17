@@ -7,7 +7,7 @@ import { YieldContext } from '../../contexts/YieldContext';
 import { Spinner } from '../../components/LoadingSpinner';
 
 import YieldSeriesSummary from '../../components/YieldSeriesSummary';
-import YieldSeries from '../../components/YieldSeries';
+// import YieldSeries from '../../components/YieldSeries';
 
 
 const SeriesLayer = (props:any) => {
