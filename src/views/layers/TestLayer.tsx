@@ -77,9 +77,7 @@ const TestLayer = (props:any) => {
       const daiT = utils.mulRay( daiD, yieldState.makerData.ilks.rate);
       const wethT = utils.divRay( daiT, yieldState.makerData.ilks.spot);
       const chaiT = utils.divRay(daiT, chi);
-      // setDaiTokens( parseFloat(ethers.utils.formatEther(daiT)));
-      // setWethTokens( parseFloat(ethers.utils.formatEther(wethT)));
-      // setChaiTokens( parseFloat(ethers.utils.formatEther(chaiT)));
+
       setDaiTokens(daiT.toString());
       setWethTokens(wethT.toString());
       setChaiTokens(chaiT.toString());
@@ -194,16 +192,16 @@ const TestLayer = (props:any) => {
 
               get WETH: 
               {/* <Button label='useNotify_info' onClick={()=>dispatch( { type: 'notify', payload: { message:'Something is happening!.. ', type:'info', showFor:500 } } )} /> */}
-              <Button label='1. Add 10 weth DEV' onClick={()=> sendTx(deployedExternal.Weth, 'Weth', 'deposit', [], utils.toWei('10'))} />
+              <Button label='1. wrap 10 eth to weth' onClick={()=> sendTx(deployedExternal.Weth, 'Weth', 'deposit', [], utils.toWei('10'))} />
 
               WETH deposit and borrow: 
-              <Button label='2. Weth approve dealer 1.5' onClick={()=> approveDealer(deployedExternal.Weth, deployedCore.Dealer, 1.5 )} />
+              <Button label='2. Weth approve YieldDealer for 1.5' onClick={()=> approveDealer(deployedExternal.Weth, deployedCore.Dealer, 1.5 )} />
               <Button label='3. Post Collateral 1.5' disabled={postActive} onClick={()=> post(deployedCore.Dealer, 'WETH', 1.5)} />
               <Button label='(4. Withdraw 1.5)' onClick={()=> withdraw(deployedCore.Dealer, 'WETH', 1.5 )} />
               <Button label='5.Borrow 0.5' onClick={()=> borrow(deployedCore.Dealer, 'WETH', yieldState.deployedSeries[0].maturity, 0.5 )} />
               WETH repay:
-              <Button label='6.1 Repay 0.5 in yDai' onClick={()=> repay(deployedCore.Dealer, 'WETH', yieldState.deployedSeries[0].maturity, 0.5, 'YDAI' )} />
-              <Button label='( 6.2 Repay 0.5 in Dai) ' onClick={()=> repay(deployedCore.Dealer, 'WETH', yieldState.deployedSeries[0].maturity, 0.5, 'DAI' )} />
+              <Button label='6.1 Repay 0.5 wethdebt in yDai' onClick={()=> repay(deployedCore.Dealer, 'WETH', yieldState.deployedSeries[0].maturity, 0.5, 'YDAI' )} />
+              <Button label='( 6.2 Repay 0.5 wethdebt in Dai) ' onClick={()=> repay(deployedCore.Dealer, 'WETH', yieldState.deployedSeries[0].maturity, 0.5, 'DAI' )} />
             </Box>}
 
             { flow === 'CHAI' && 
@@ -211,14 +209,14 @@ const TestLayer = (props:any) => {
               
               Get Dai:
               
-              <Button label='1. Approve Wethjoin for 10' onClick={()=> sendTx(deployedExternal.Weth, 'Weth', 'approve', [deployedExternal.WethJoin, utils.toWei(10)], bigNumberify(0) )} />
+              <Button label='1. Approve Wethjoin for 10weth' onClick={()=> sendTx(deployedExternal.Weth, 'Weth', 'approve', [deployedExternal.WethJoin, utils.toWei(10)], bigNumberify(0) )} />
               
               {/* <Button label='x. Vat > hope wethJoin' onClick={()=> sendTx(deployedExternal.Vat, 'Vat', 'hope', [deployedExternal.WethJoin], bigNumberify(0))} /> */}
               
-              <Button label='2. wethJoin join (take 10)' onClick={()=> sendTx(deployedExternal.WethJoin, 'WethJoin', 'join', [account, utils.toWei(10)], bigNumberify(0) )} />
+              <Button label='2. wethJoin join (take 10weth)' onClick={()=> sendTx(deployedExternal.WethJoin, 'WethJoin', 'join', [account, utils.toWei(10)], bigNumberify(0) )} />
 
               <Button
-                label='3. Vat frob'
+                label='3. Vat frob (open vault?)'
                 onClick={()=> sendTx(deployedExternal.Vat, 'Vat', 'frob', 
                   [
                     ethers.utils.formatBytes32String('ETH-A'),
@@ -233,11 +231,11 @@ const TestLayer = (props:any) => {
               />
               <Button label='(x. Vat hope daiJoin)' onClick={()=> sendTx(deployedExternal.Vat, 'Vat', 'hope', [deployedExternal.DaiJoin], bigNumberify(0))} />
              
-              <Button label='4. daiJoin EXit' onClick={()=> sendTx(deployedExternal.DaiJoin, 'DaiJoin', 'exit', [account, daiTokens ], bigNumberify(0) )} />
+              <Button label='4. daiJoin EXit (daiDebt = 10)' onClick={()=> sendTx(deployedExternal.DaiJoin, 'DaiJoin', 'exit', [account, daiTokens ], bigNumberify(0) )} />
               
               Convert Dai to Chai:
-              <Button label='5. Approve chai' onClick={()=> sendTx(deployedExternal.Dai, 'Dai', 'approve', [deployedExternal.Chai, daiTokens ], bigNumberify(0) )} />
-              <Button label='6. Chai join ' onClick={()=> sendTx(deployedExternal.Chai, 'Chai', 'join', [account, daiTokens ], bigNumberify(0) )} />
+              <Button label='5. Approve chai (approx. 10)' onClick={()=> sendTx(deployedExternal.Dai, 'Dai', 'approve', [deployedExternal.Chai, daiTokens ], bigNumberify(0) )} />
+              <Button label='6. Chai join (approx. 10)' onClick={()=> sendTx(deployedExternal.Chai, 'Chai', 'join', [account, daiTokens ], bigNumberify(0) )} />
 
   
               Chai deposit and borrow:
@@ -248,8 +246,8 @@ const TestLayer = (props:any) => {
               <Button label='5.Borrow 0.5 with chai' onClick={()=> borrow(deployedCore.Dealer, 'CHAI', deployedSeries[0].maturity, 0.5 )} />
 
               Chai repay; 
-              <Button label='(6.1 Repay 0.5 in yDai)' onClick={()=> repay(deployedCore.Dealer, 'CHAI', deployedSeries[0].maturity, 0.5, 'YDAI' )} />
-              <Button label=' 6.2 Repay 0.5 in Dai ' onClick={()=> repay(deployedCore.Dealer, 'CHAI', deployedSeries[0].maturity, 0.5, 'DAI' )} />
+              <Button label='(6.1 Repay 0.5 chaidebt in yDai)' onClick={()=> repay(deployedCore.Dealer, 'CHAI', deployedSeries[0].maturity, 0.5, 'YDAI' )} />
+              <Button label=' 6.2 Repay 0.5 chaidebt in Dai ' onClick={()=> repay(deployedCore.Dealer, 'CHAI', deployedSeries[0].maturity, 0.5, 'DAI' )} />
             </Box>}
 
             { flow === 'MATURITY' && 
