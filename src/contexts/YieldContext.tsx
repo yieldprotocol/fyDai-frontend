@@ -49,10 +49,10 @@ function reducer(state:any, action:any) {
         ...state,
         yieldData: action.payload,
       };
-    case 'updateBalances': 
+    case 'updateExtBalances': 
       return {
         ...state,
-        balanceState: action.payload,
+        extBalances: action.payload,
       };
     case 'updateMakerData': 
       return {
@@ -79,12 +79,14 @@ const YieldProvider = ({ children }:any) => {
     deployedExternal: {},
     yieldData: {},
     makerData: {},
-    balances:{},
+    ExtBalances:{},
   };
   const [ state, dispatch ] = React.useReducer(reducer, initState);
   const { chainId, account } = useWeb3React();
   const { dispatch: notifyDispatch } = React.useContext(NotifyContext);
   const [ callTx ] = useCallTx();
+
+  const { getWeiBalance, getChaiBalance, getWethBalance, getDaiBalance }  = useGetBalance();
 
   // async get all yield addresses from db 
   const getYieldAddrs = async (networkId:number|string): Promise<any[]> => {
@@ -138,49 +140,66 @@ const YieldProvider = ({ children }:any) => {
 
   // async yield data for the user address
   const fetchYieldData = async (deployedCore:any): Promise<any> => {
-    const yieldData:any = {};
-    yieldData.wethPosted = await callTx(deployedCore.Dealer, 'Dealer', 'posted', [utils.WETH, account]);
-    yieldData.chaiPosted = await callTx(deployedCore.Dealer, 'Dealer', 'posted', [utils.CHAI, account]);
+    const _yieldData:any = {};
+    _yieldData.wethPosted = await callTx(deployedCore.Dealer, 'Dealer', 'posted', [utils.WETH, account]);
+    _yieldData.chaiPosted = await callTx(deployedCore.Dealer, 'Dealer', 'posted', [utils.CHAI, account]);
 
-    yieldData.chaiTotalDebtDai = await callTx(deployedCore.Dealer, 'Dealer', 'totalDebtDai', [utils.CHAI, account]);
-    yieldData.chaiTotalDebtYDai = await callTx(deployedCore.Dealer, 'Dealer', 'totalDebtYDai', [utils.CHAI, account]);
+    _yieldData.chaiTotalDebtDai = await callTx(deployedCore.Dealer, 'Dealer', 'totalDebtDai', [utils.CHAI, account]);
+    _yieldData.chaiTotalDebtYDai = await callTx(deployedCore.Dealer, 'Dealer', 'totalDebtYDai', [utils.CHAI, account]);
 
-    yieldData.wethTotalDebtDai = await callTx(deployedCore.Dealer, 'Dealer', 'totalDebtDai', [utils.WETH, account]);
-    yieldData.wethTotalDebtYDai = await callTx(deployedCore.Dealer, 'Dealer', 'totalDebtYDai', [utils.WETH, account]);
+    _yieldData.wethTotalDebtDai = await callTx(deployedCore.Dealer, 'Dealer', 'totalDebtDai', [utils.WETH, account]);
+    _yieldData.wethTotalDebtYDai = await callTx(deployedCore.Dealer, 'Dealer', 'totalDebtYDai', [utils.WETH, account]);
     // parse and return maker data
     return {
-      ...yieldData,
-      wethPosted_p: parseFloat(ethers.utils.formatEther(yieldData.wethPosted.toString())),
-      chaiPosted_p: parseFloat(ethers.utils.formatEther(yieldData.chaiPosted.toString())),
-      wethTotalDebtDai_p: parseFloat(ethers.utils.formatEther(yieldData.wethTotalDebtDai.toString())),
-      wethTotalDebtYDai_p: parseFloat(ethers.utils.formatEther(yieldData.wethTotalDebtYDai.toString())),
-      chaiTotalDebtDai_p: parseFloat(ethers.utils.formatEther(yieldData.chaiTotalDebtDai.toString())),
-      chaiTotalDebtYDai_p: parseFloat(ethers.utils.formatEther(yieldData.chaiTotalDebtYDai.toString())),
+      ..._yieldData,
+      wethPosted_p: parseFloat(ethers.utils.formatEther(_yieldData.wethPosted.toString())),
+      chaiPosted_p: parseFloat(ethers.utils.formatEther(_yieldData.chaiPosted.toString())),
+      wethTotalDebtDai_p: parseFloat(ethers.utils.formatEther(_yieldData.wethTotalDebtDai.toString())),
+      wethTotalDebtYDai_p: parseFloat(ethers.utils.formatEther(_yieldData.wethTotalDebtYDai.toString())),
+      chaiTotalDebtDai_p: parseFloat(ethers.utils.formatEther(_yieldData.chaiTotalDebtDai.toString())),
+      chaiTotalDebtYDai_p: parseFloat(ethers.utils.formatEther(_yieldData.chaiTotalDebtYDai.toString())),
+    };
+  };
+
+  const fetchExtBalances = async (deployedExternal:any): Promise<any> => {
+    const _balanceData:any = {};
+    _balanceData.ethBalance = await getWeiBalance();
+    _balanceData.wethBalance = await getWethBalance(deployedExternal.Weth);
+    _balanceData.chaiBalance = await getChaiBalance(deployedExternal.Chai);
+    _balanceData.daiBalance = await getDaiBalance(deployedExternal.Dai);
+    
+    // parse and return maker data
+    return {
+      ..._balanceData,
+      ethBalance_p: parseFloat(ethers.utils.formatEther(_balanceData.ethBalance.toString())),
+      wethBalance_p: parseFloat(ethers.utils.formatEther(_balanceData.wethBalance.toString())),
+      chaiBalance_p: parseFloat(ethers.utils.formatEther(_balanceData.chaiBalance.toString())),
+      daiBalance_p: parseFloat(ethers.utils.formatEther(_balanceData.daiBalance.toString())),
     };
   };
 
   const fetchMakerData = async (deployedExternal:any): Promise<any> => {
-    const pot = await callTx(deployedExternal.Pot, 'Pot', 'chi', []);
-    const ilks = await callTx(deployedExternal.Vat, 'Vat', 'ilks', [ethers.utils.formatBytes32String('ETH-A')]);
-    const urns = await callTx(deployedExternal.Vat, 'Vat', 'urns', [ethers.utils.formatBytes32String('ETH-A'), account ]);
+    const _pot = await callTx(deployedExternal.Pot, 'Pot', 'chi', []);
+    const _ilks = await callTx(deployedExternal.Vat, 'Vat', 'ilks', [ethers.utils.formatBytes32String('ETH-A')]);
+    const _urns = await callTx(deployedExternal.Vat, 'Vat', 'urns', [ethers.utils.formatBytes32String('ETH-A'), account ]);
     // parse and return maker data
     return { 
       ilks: {
-        ...ilks,
-        Art_p: utils.rayToHuman(ilks.Art),
-        spot_p: utils.rayToHuman(ilks.spot),
-        rate_p: utils.rayToHuman(ilks.rate),
-        line_p: utils.rayToHuman(ilks.line),
-        dust_p: utils.rayToHuman(ilks.dust),
+        ..._ilks,
+        Art_p: utils.rayToHuman(_ilks.Art),
+        spot_p: utils.rayToHuman(_ilks.spot),
+        rate_p: utils.rayToHuman(_ilks.rate),
+        line_p: utils.rayToHuman(_ilks.line),
+        dust_p: utils.rayToHuman(_ilks.dust),
       },
       urns: {
-        ...urns,
-        art_p: utils.rayToHuman(urns.art),
-        ink_p: utils.rayToHuman(urns.ink),
+        ..._urns,
+        art_p: utils.rayToHuman(_urns.art),
+        ink_p: utils.rayToHuman(_urns.ink),
       },
       pot: {
-        ...pot,
-        chi_p: pot.chi,
+        ..._pot,
+        chi_p: _pot.chi,
       }
     };
   };
@@ -200,9 +219,14 @@ const YieldProvider = ({ children }:any) => {
     const extraSeriesData:any = await fetchSeriesData(deployedSeries);
     dispatch({ type:'updateDeployedSeries', payload: extraSeriesData });
 
-    // #3 Get yield data for the user from blockchain
+    // #3 Get yield core/system data for the user from blockchain
     const yieldData = await fetchYieldData(deployedCore);
     dispatch({ type:'updateYieldData', payload: yieldData });
+
+    // #4 Get Balance data
+    const balances = await fetchExtBalances(deployedExternal);
+    console.log(balances)
+    dispatch({ type:'updateExtBalances', payload: balances });
 
     // #4 Get MakerDao data
     const makerData = await fetchMakerData(deployedExternal);
@@ -211,12 +235,19 @@ const YieldProvider = ({ children }:any) => {
     dispatch({ type:'isLoading', payload: false });
   };
 
+  
+
   React.useEffect( () => {
     ( async () => chainId && getAllData(chainId))();
   }, [chainId]);
 
+  const actions = {
+    updateExtBalances: (x:any) => fetchExtBalances(x).then((res:any)=> dispatch({ type:'updateExtBalances', payload: res })),
+    updateYieldBalances: (x:any) => fetchYieldData(x).then((res:any)=> dispatch({ type:'updateYieldData', payload: res }))
+  };
+
   return (
-    <YieldContext.Provider value={{ state, dispatch }}>
+    <YieldContext.Provider value={{ state, actions }}>
       {children}
     </YieldContext.Provider>
   );

@@ -30,41 +30,44 @@ const contractMap = new Map<string, any>([
 
 export function useGetBalance() {
   const { library, account } = useWeb3React();
-  const getEthBalance = async () : Promise<string> => {
-    if (!!library && !!account) {
-      const bal = await library.getBalance(account);
-      return ethers.utils.formatEther(bal);
-    } return '0';
-  };
+  // const getEthBalance = async () : Promise<string> => {
+  //   if (!!library && !!account) {
+  //     const bal = await library.getBalance(account);
+  //     return ethers.utils.formatEther(bal);
+  //   } return '0';
+  // };
   const getWeiBalance = async () => {
     if (!!library && !!account) {
-      const bal = await library.getBalance(account);
-      return bal.toString();
-    } return '0';
+      const balance = await library.getBalance(account);
+      // return bal.toString();
+      return balance;
+    } return ethers.utils.bigNumberify('0');
   };
   const getWethBalance = async (tokenAddr:string) => {
     if (!!library && !!account) {
       const contract = new ethers.Contract(tokenAddr, contractMap.get('Weth'), library);
       const balance = await contract.balanceOf(account);
       // return ethers.utils.formatEther(balance.toString());
-      return parseFloat(ethers.utils.formatEther(balance.toString()));
-    } return 0;
+      return balance;
+    } return ethers.utils.bigNumberify('0');
   };
   const getChaiBalance = async (tokenAddr:string) => {
     if (!!library && !!account) {
       const contract = new ethers.Contract(tokenAddr, contractMap.get('Chai'), library);
       const balance = await contract.balanceOf(account);
-      return ethers.utils.formatEther(balance.toString());
-    } return '0';
+      return balance;
+      // return ethers.utils.formatEther(balance.toString());
+    } return ethers.utils.bigNumberify('0');
   };
   const getDaiBalance = async (tokenAddr:string) => {
     if (!!library && !!account) {
       const contract = new ethers.Contract(tokenAddr, contractMap.get('Dai'), library);
       const balance = await contract.balanceOf(account);
-      return ethers.utils.formatEther(balance.toString());
-    } return '0';
+      return balance;
+      // return ethers.utils.formatEther(balance.toString());
+    } return ethers.utils.bigNumberify('0');
   };
-  return { getEthBalance, getWeiBalance, getWethBalance, getChaiBalance, getDaiBalance } as const;
+  return { getWeiBalance, getWethBalance, getChaiBalance, getDaiBalance } as const;
 }
 
 export const useCallTx = () => {

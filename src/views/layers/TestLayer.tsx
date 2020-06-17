@@ -21,21 +21,35 @@ const TestLayer = (props:any) => {
   const { chainId, account } = useWeb3React();
 
   // const web3 = useWeb3React();
-  const { state: yieldState } = React.useContext( YieldContext );
+  const { state: yieldState, actions: yieldActions } = React.useContext( YieldContext );
   const { state: positionsState, actions: positionsActions } = React.useContext( PositionsContext );
-  const [ balance, setBalance ] = React.useState<string|null>('-');
   const [ flow, setFlow ] = React.useState<string|null>('WETH');
 
-  const [ wethBalance, setWethBalance ] = React.useState<string|null|number>(0);
-  const [ chaiBalance, setChaiBalance ] = React.useState<string|null|number>(0);
-  const [ daiBalance, setDaiBalance ] = React.useState<string|null|number>(0);
+  
+  const { positionsData } = positionsState;
+  const { yieldData, deployedCore, deployedSeries, deployedExternal, extBalances } = yieldState;
+  
+  // const updateBalances = yieldActions.updateExtBalances(deployedExternal);
+  
+  const { 
+    wethBalance,
+    wethBalance_p,
+    ethBalance_p,
+    ethBalance,
+    daiBalance,
+    daiBalance_p,
+    chaiBalance,
+    chaiBalance_p
+  } = extBalances;
+
+  // const [ wethBalance, setWethBalance ] = React.useState<string|null|number>(0);
+  // const [ chaiBalance, setChaiBalance ] = React.useState<string|null|number>(0);
+  // const [ daiBalance, setDaiBalance ] = React.useState<string|null|number>(0);
 
   const [daiDebt, setDaiDebt] = React.useState<string>('');
   const [daiTokens, setDaiTokens] = React.useState<string>('');
   const [wethTokens, setWethTokens] = React.useState<string>('');
   const [chaiTokens, setChaiTokens] = React.useState<string>('');
-
-  const [selectedSeries, setSelectedSeries] = React.useState<any>();
 
   const { closeLayer, changeWallet } = props;
   const [ connectMakerVault ] = useMakerVault();
@@ -56,16 +70,13 @@ const TestLayer = (props:any) => {
     borrowActive,
   }  = useDealer();
 
-  const { getEthBalance, getChaiBalance, getWethBalance, getDaiBalance }  = useGetBalance();
+  // const { getChaiBalance, getWethBalance, getDaiBalance }  = useGetBalance();
 
-  const { positionsData } = positionsState;
-  const { yieldData, deployedCore, deployedSeries, deployedExternal } = yieldState;
-
-  React.useEffect(()=>{
-    (async () => setWethBalance( await getWethBalance(deployedExternal.Weth)) )();
-    (async () => setChaiBalance( await getChaiBalance(deployedExternal.Chai)) )();
-    (async () => setDaiBalance( await getDaiBalance(deployedExternal.Dai)) )();
-  }, [deployedExternal, postActive, withdrawActive]);
+  // React.useEffect(()=>{
+  //   (async () => setWethBalance( await getWethBalance(deployedExternal.Weth)) )();
+  //   (async () => setChaiBalance( await getChaiBalance(deployedExternal.Chai)) )();
+  //   (async () => setDaiBalance( await getDaiBalance(deployedExternal.Dai)) )();
+  // }, [deployedExternal, postActive, withdrawActive]);
 
   React.useEffect(()=>{
     const daiD = utils.toWad(10);
@@ -85,12 +96,11 @@ const TestLayer = (props:any) => {
 
   }, [ yieldState ] );
 
-
-  React.useEffect(() => {
-    (async () => setBalance( await getEthBalance()) )();
-    // (async () => setWeiBalance( await getWeiBalance()) )();
-    // (async () => activate(injected, console.log))();
-  }, [chainId, account]);
+  // React.useEffect(() => {
+  //   // (async () => setBalance( await getEthBalance()) )();
+  //   // (async () => setWeiBalance( await getWeiBalance()) )();
+  //   // (async () => activate(injected, console.log))();
+  // }, [chainId, account]);
 
   const onClose = () => {
     closeLayer();
@@ -137,7 +147,7 @@ const TestLayer = (props:any) => {
 
             <Box direction='row' gap='small'>
               <Text size='xsmall'>ETH balance:</Text>
-              <Text size='xsmall'>{ balance }</Text>
+              <Text size='xsmall'>{ extBalances.ethBalance_p || '' }</Text>
             </Box>
             {/* <Box direction='row' gap='small'>
             <Text size='xsmall'>WEI balance:</Text>
@@ -145,20 +155,20 @@ const TestLayer = (props:any) => {
           </Box> */}
             <Box direction='row' gap='small'>
               <Text size='xsmall'>WETH balance:</Text>
-              <Text size='xsmall'>{ wethBalance && wethBalance.toString() }</Text>
+              <Text size='xsmall'>{ extBalances.wethBalance_p || '' }</Text>
             </Box>
 
             <Box direction='row' gap='small'>
               <Text size='xsmall'>CHAI balance:</Text>
               {/* <Text size='xsmall'>{ chaiBalance && ethers.utils.formatEther(chaiBalance.toString()) }</Text> */}
-              <Text size='xsmall'>{ chaiBalance && chaiBalance.toString() }</Text>
+              <Text size='xsmall'>{ extBalances.chaiBalance_p || '' }</Text>
 
             </Box>
 
             <Box direction='row' gap='small'>
               <Text size='xsmall'>DAI balance:</Text>
               {/* <Text size='xsmall'>{ daiBalance && ethers.utils.formatEther(daiBalance.toString()) }</Text> */}
-              <Text size='xsmall'>{ daiBalance && daiBalance.toString() }</Text>
+              <Text size='xsmall'>{ extBalances.daiBalance_p || '' }</Text>
             </Box>
 
             <Box direction='column' gap='small'>
@@ -306,7 +316,17 @@ const TestLayer = (props:any) => {
               hoverIndicator='background'
             />
           </Box>
-          <Button alignSelf='end' label='refresh' onClick={()=>positionsActions.refreshPositions([yieldState.deployedSeries[0]])} />
+          <Button
+            alignSelf='end'
+            label='refresh' 
+            onClick={
+            ()=> {
+              positionsActions.refreshPositions([yieldState.deployedSeries[0]]);
+              yieldActions.updateYieldBalances(yieldState.deployedCore);
+              yieldActions.updateExtBalances(yieldState.deployedExternal);
+            }
+          }
+          />
 
         </Footer>
       </Box>
