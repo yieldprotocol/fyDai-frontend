@@ -9,11 +9,10 @@ import { YieldContext } from '../../contexts/YieldContext';
 import ProfileButton from '../../components/ProfileButton';
 
 const AccountLayer = (props:any) => {
-  const [ balance, setBalance ] = React.useState<string|null>('-');
   const { chainId } = useWeb3React();
   const { closeLayer, changeWallet } = props;
 
-  const [ state, actions ] = React.useContext(YieldContext);
+  const { state, actions } = React.useContext(YieldContext);
   const { extBalances } = state;
 
   React.useEffect(() => {
