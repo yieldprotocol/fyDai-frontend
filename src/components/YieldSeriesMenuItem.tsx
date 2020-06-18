@@ -8,7 +8,6 @@ import {
   FiStar as Star,
 } from 'react-icons/fi';
 
-
 import { IYieldSeries } from '../types';
 
 type YieldSeriesProps = {

@@ -12,7 +12,7 @@ const BorrowRepay = ({ active, activeSeries }:any) => {
   const [over, setOver] = React.useState<boolean>(false);
   const [inputValue, setInputValue] = React.useState<any>();
   const [taskView, setTaskView] = React.useState<string>('BORROW');
-  const { state, dispatch } = React.useContext(YieldContext);
+  const { state, actions } = React.useContext(YieldContext);
   const { deployedCore, yieldData } = state;
   const {
     post,
@@ -28,11 +28,15 @@ const BorrowRepay = ({ active, activeSeries }:any) => {
 
   const borrowSteps = async (value:number) => {
     await borrow(deployedCore.Dealer, 'WETH', activeSeries.maturity, value );
+    actions.updateExtBalances(state.deployedExternal);
+    actions.updateYieldBalances(state.deployedCore);
   };
 
   const repaySteps = async (value:number, collateral:string) => {
     console.log(activeSeries);
     await repay(deployedCore.Dealer, 'WETH', activeSeries.maturity, value, collateral );
+    actions.updateExtBalances(state.deployedExternal);
+    actions.updateYieldBalances(state.deployedCore);
   };
 
   return (

@@ -25,7 +25,7 @@ interface BorrowProps {
 
 const Borrow = ({ setActiveSeries, activeSeries, setShowSeriesLayer }:BorrowProps) => {
 
-  const { state: yieldState, dispatch: yieldDispatch } = React.useContext(YieldContext);
+  const { state: yieldState, actions: yieldActions } = React.useContext(YieldContext);
   const { state: positionsState, actions: positionsActions } = React.useContext(PositionsContext);
   // const [ nextColor, setNextColor ] = React.useState<string>('');
 
@@ -34,7 +34,7 @@ const Borrow = ({ setActiveSeries, activeSeries, setShowSeriesLayer }:BorrowProp
   const [ depositWithdrawActive, setDepositWithdrawActive ] = React.useState<boolean>(false);
 
   const { isLoading: positionsLoading, positionsData } = positionsState; 
-  const { isLoading: yieldLoading, deployedSeries, deployedCore, yieldData, makerData }  = yieldState;
+  const { isLoading: yieldLoading, extBalances, deployedSeries, deployedCore, yieldData, makerData }  = yieldState;
 
 
   React.useEffect( () => {

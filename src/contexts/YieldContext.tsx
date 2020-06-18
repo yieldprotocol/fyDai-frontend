@@ -79,7 +79,7 @@ const YieldProvider = ({ children }:any) => {
     deployedExternal: {},
     yieldData: {},
     makerData: {},
-    ExtBalances:{},
+    extBalances:{},
   };
   const [ state, dispatch ] = React.useReducer(reducer, initState);
   const { chainId, account } = useWeb3React();

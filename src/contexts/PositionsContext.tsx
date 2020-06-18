@@ -1,7 +1,6 @@
 import React from 'react';
 import { ethers } from 'ethers';
 import { useWeb3React } from '@web3-react/core';
-import moment from 'moment';
 
 import * as utils from '../utils';
 import { YieldContext } from './YieldContext';

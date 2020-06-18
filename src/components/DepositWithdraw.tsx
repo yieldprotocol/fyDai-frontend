@@ -15,7 +15,7 @@ const DepositWithdraw = ({ close }:any) => {
   const [taskView, setTaskView] = React.useState<string>('DEPOSIT');
   const [ wethBalance, setWethBalance ] = React.useState<number>(0);
   const [ wethPosted, setWethPosted ] = React.useState<number>(0);
-  const { state, dispatch } = React.useContext(YieldContext);
+  const { state, actions } = React.useContext(YieldContext);
 
   const { deployedCore, deployedExternal, yieldData } = state; 
 
@@ -41,10 +41,14 @@ const DepositWithdraw = ({ close }:any) => {
   const depositSteps = async (value:number) => {
     await approveDealer(deployedExternal.Weth, deployedCore.Dealer, value);
     await post(deployedCore.Dealer, 'WETH', value);
+    actions.updateExtBalances(state.deployedExternal);
+    actions.updateYieldBalances(state.deployedCore);
   };
 
   const withdrawSteps = async (value:number) => {
     await withdraw(deployedCore.Dealer, 'WETH', value);
+    actions.updateExtBalances(state.deployedExternal);
+    actions.updateYieldBalances(state.deployedCore);
   };
 
   return (

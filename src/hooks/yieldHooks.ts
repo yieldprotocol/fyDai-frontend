@@ -25,7 +25,7 @@ const contractMap = new Map<string, any>([
   ['WethJoin', GemJoin.abi],
   ['DaiJoin', DaiJoin.abi],
   ['Vat', Vat.abi],
-  ['Pot', Pot.abi], 
+  ['Pot', Pot.abi],
 ]);
 
 export function useGetBalance() {

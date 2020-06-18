@@ -1,12 +1,7 @@
 import React from 'react';
 import { Box, Button, Image, Heading, Text, Collapsible, Markdown, Layer, Drop, TextInput, Paragraph } from 'grommet';
 
-import { Range } from 'react-range';
-import DepositWithdraw from '../components/DepositWithdraw';
-import BorrowRepay from '../components/BorrowRepay';
-
 import logoLight from '../assets/images/logo_light.svg';
-
 
 const Landing = () => {
 
@@ -15,15 +10,12 @@ const Landing = () => {
       <Box justify='between'>
         <Box direction='row' justify='between'>
           <Box width='75%'>
-            <div className='pulsetext'> tester </div>
-            <Heading level='3'>Yield yDai</Heading>
+            <Heading level='3'>Yield yDai Landing Page</Heading>
             <Box pad={{ vertical:'small' }}>
               <Text
                 size='small'
               >
-                Interest is calculated on a yearly basis 
-                and paid out when the term matures: 
-                In this case 3 months, earning you 3.75% fixed-rate interest through yDai
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec quis est elit. Nunc vitae fringilla quam. Phasellus porta, purus in porta tincidunt, urna arcu imperdiet arcu, eget pulvinar velit nibh vel magna. Pellentesque egestas risus purus, vitae auctor arcu sagittis id. Nulla felis elit, condimentum in blandit nec, maximus eget mauris. Vivamus et condimentum velit, et euismod urna. In nec hendrerit nibh. Nunc eros elit, scelerisque bibendum dui ac, scelerisque posuere elit. Sed interdum massa non massa volutpat finibus. Vestibulum a felis in elit malesuada ullamcorper. Maecenas fermentum pulvinar odio.
               </Text>
             </Box>
           </Box>
