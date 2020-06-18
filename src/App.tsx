@@ -13,7 +13,6 @@ import {
 } from 'grommet';
 import { deepMerge } from 'grommet/utils';
 
-import { FaSeedling as YieldLeaf, FaLessThanEqual } from 'react-icons/fa';
 import { yieldTheme } from './themes';
 import { useEagerConnect }  from './hooks/connectionHooks';
 

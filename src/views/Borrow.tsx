@@ -3,8 +3,6 @@ import moment from 'moment';
 import { Box, Grid, Heading, Text, Collapsible, Markdown, Layer } from 'grommet';
 import RotateLoader from 'react-spinners/RotateLoader';
 
-import { FiCheckCircle, FiCircle, FiRefreshCw as Refresh } from 'react-icons/fi';
-
 import BorrowAction from '../components/BorrowAction';
 import RepayAction from '../components/RepayAction';
 
