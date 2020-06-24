@@ -11,6 +11,7 @@ import DaiJoin from '../contracts/DaiJoin.json';
 import Chai from '../contracts/Chai.json';
 import Vat from '../contracts/Vat.json';
 import Pot from '../contracts/Pot.json';
+import EthProxy from '../contracts/EthProxy.json';
 
 import { NotifyContext } from '../contexts/NotifyContext';
 
@@ -26,6 +27,7 @@ const contractMap = new Map<string, any>([
   ['DaiJoin', DaiJoin.abi],
   ['Vat', Vat.abi],
   ['Pot', Pot.abi],
+  ['EthProxy', EthProxy.abi],
 ]);
 
 export function useGetBalance() {
@@ -88,6 +90,74 @@ export const useCallTx = () => {
   return [ callTx, callTxActive ] as const;
 };
 
+export const useEthProxy = () => {
+  const { abi: ethProxyAbi } = EthProxy;
+  const { library, account } = useWeb3React();
+  const  { dispatch: notifyDispatch }  = React.useContext<any>(NotifyContext);
+  const [ postEthActive, setPostEthActive ] = React.useState<boolean>(false);
+  const [ withdrawEthActive, setWithdrawEthActive ] = React.useState<boolean>(false);
+  const signer = library?.getSigner();
+
+  const postEth = async (
+    ethProxyAddress:string,
+    amount:number
+  ) => {
+    let tx:any;
+    // Processing and sanitizing input
+    // console.log(ethers.utils.parseEther(amount.toString()));
+    const parsedAmount = ethers.utils.parseEther(amount.toString());
+    const fromAddr = account && ethers.utils.getAddress(account);
+    const toAddr = fromAddr;
+    const ethProxyAddr = ethers.utils.getAddress(ethProxyAddress);
+    // Contract interaction
+    setPostEthActive(true);
+    const contract = new ethers.Contract( ethProxyAddr, ethProxyAbi, signer );
+    try {
+      tx = await contract.post(fromAddr, toAddr, parsedAmount, { value: parsedAmount });
+    } catch (e) {
+      notifyDispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed.', type:'error' } } );
+      console.log(e.message);
+      setPostEthActive(false);
+      return;
+    }
+    // Transaction reporting & tracking
+    notifyDispatch({ type: 'notify', payload:{ message:`Deposit of ${amount} pending...`, type:'info' } } );
+    await tx.wait();
+    setPostEthActive(false);
+    notifyDispatch({ type: 'notify', payload:{ message: `Deposit of ${amount} complete.`, type:'success' } } );
+  };
+
+  const withdrawEth = async (
+    ethProxyAddress:string,
+    amount:number
+  ) => {
+    let tx:any;
+    const parsedAmount = ethers.utils.parseEther(amount.toString());
+    const fromAddr = account && ethers.utils.getAddress(account);
+    const toAddr = fromAddr;
+    const ethProxyAddr = ethers.utils.getAddress(ethProxyAddress);
+
+    setWithdrawEthActive(true);
+    const contract = new ethers.Contract( ethProxyAddr, ethProxyAbi, signer );
+    try {
+      tx = await contract.withdraw(fromAddr, toAddr, parsedAmount);
+    } catch (e) {
+      notifyDispatch({ type: 'notify', payload:{ message:'Error Withdrawing funds', type:'error' } } );
+      setWithdrawEthActive(false);
+      return;
+    }
+    notifyDispatch({ type: 'notify', payload:{ message: `Withdraw of ${amount} pending...`, type:'info' } } );
+    await tx.wait();
+    setWithdrawEthActive(false);
+    notifyDispatch({ type: 'notify', payload:{ message: `Withdrawal of ${amount} complete.`, type:'success' } } );
+  };
+
+  return {
+    postEth, postEthActive,
+    withdrawEth, withdrawEthActive,
+  } as const;
+};
+
 export const useDealer = () => {
   const { abi: dealerAbi } = Dealer;
   const { library, account } = useWeb3React();
@@ -118,7 +188,8 @@ export const useDealer = () => {
     try {
       tx = await contract.post(collateralBytes, fromAddr, toAddr, parsedAmount);
     } catch (e) {
-      notifyDispatch({ type: 'notify', payload:{ message:`${e.data.message}`, type:'error' } } );
+      notifyDispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed.', type:'error' } } );
+      console.log(e);
       setPostActive(false);
       return;
     }
@@ -147,6 +218,7 @@ export const useDealer = () => {
       tx = await contract.withdraw(collateralBytes, fromAddr, toAddr, parsedAmount);
     } catch (e) {
       notifyDispatch({ type: 'notify', payload:{ message:'Error Withdrawing funds', type:'error' } } );
+      console.log(e);
       setWithdrawActive(false);
       return;
     }
@@ -174,7 +246,8 @@ export const useDealer = () => {
     try {
       tx = await contract.borrow(collateralBytes, maturity, toAddr, parsedAmount);
     } catch (e) {
-      notifyDispatch({ type: 'notify', payload:{ message:`${e.data.message}`, type:'error' } } );
+      notifyDispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed.', type:'error' } } );
+      console.log(e);
       setBorrowActive(false);
       return;
     }
@@ -209,7 +282,8 @@ export const useDealer = () => {
         tx = await contract.repayDai(collateralBytes, maturity, fromAddr, parsedAmount);
       }
     } catch (e) {
-      notifyDispatch({ type: 'notify', payload:{ message:`${e.data.message}`, type:'error' } } );
+      notifyDispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed.', type:'error' } } );
+      console.log(e);
       setRepayActive(false);
       return;
     }
@@ -229,9 +303,7 @@ export const useDealer = () => {
     const parsedAmount = ethers.utils.parseEther(amount.toString());
     const dealerAddr = ethers.utils.getAddress(dealerAddress);
     const tokenAddr = ethers.utils.getAddress(tokenAddress);
-    
     setApproveActive(true);
-
     const contract = new ethers.Contract(
       tokenAddr,
       TestERC20.abi,
@@ -241,7 +313,8 @@ export const useDealer = () => {
     try {
       tx = await contract.approve(dealerAddr, parsedAmount);
     } catch (e) {
-      notifyDispatch({ type: 'notify', payload:{ message:`${e.data.message}`, type:'error' } } );
+      notifyDispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed.', type:'error' } } );
+      console.log(e);
       setApproveActive(false);
       return;
     }

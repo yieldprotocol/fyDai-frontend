@@ -15,13 +15,9 @@ const BorrowRepay = ({ active, activeSeries }:any) => {
   const { state, actions } = React.useContext(YieldContext);
   const { deployedCore, yieldData } = state;
   const {
-    post,
     approveDealer,
-    withdraw,
     borrow,
     repay,
-    postActive,
-    withdrawActive,
     repayActive,
     borrowActive,
   }  = useDealer();

@@ -3,7 +3,12 @@ import { Box, Button, Image, Heading, Text, Collapsible, Markdown, Layer, Drop, 
 
 import logoLight from '../assets/images/logo_light.svg';
 
+import { useMaker } from '../hooks/makerHooks';
+
+
 const Landing = () => {
+
+  const { getVault } = useMaker();
 
   return (
     <Box gap='small' pad={{ vertical:'small', horizontal:'large' }}>
@@ -40,13 +45,13 @@ const Landing = () => {
         <Box direction='row-responsive' gap='medium' justify='start'>
           
           <Box
-            onClick={()=>{}}
+            onClick={()=> getVault()}
             hoverIndicator='brandTransparent'
             round
             pad={{ horizontal:'small' }}
           >
             <Text color='brand'>
-              I am a Borrower
+              maker vault button
             </Text>
 
           </Box>

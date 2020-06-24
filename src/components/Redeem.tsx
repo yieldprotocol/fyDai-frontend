@@ -25,13 +25,9 @@ const Redeem = ({ activeSeries }:any) => {
 
   const { getWethBalance }  = useGetBalance();
   const {
-    post, 
     approveDealer,
-    withdraw,
     borrow,
     repay,
-    postActive,
-    withdrawActive,
     repayActive,
     borrowActive,
   }  = useDealer();
@@ -42,14 +38,14 @@ const Redeem = ({ activeSeries }:any) => {
     (async () => setWethPosted(yieldData.wethPosted_p) )();
   }, []);
 
-  const depositSteps = async (value:number) => {
-    await approveDealer(deployedExternal.Weth, deployedCore.Dealer, value);
-    await post(deployedCore.Dealer, 'WETH', value);
-  };
+  // const depositSteps = async (value:number) => {
+  //   await approveDealer(deployedExternal.Weth, deployedCore.Dealer, value);
+  //   await post(deployedCore.Dealer, 'WETH', value);
+  // };
 
-  const withdrawSteps = async (value:number) => {
-    await withdraw(deployedCore.Dealer, 'WETH', value);
-  };
+  // const withdrawSteps = async (value:number) => {
+  //   await withdraw(deployedCore.Dealer, 'WETH', value);
+  // };
 
   return (
     <Box 
