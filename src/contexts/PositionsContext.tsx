@@ -3,8 +3,10 @@ import { ethers } from 'ethers';
 import { useWeb3React } from '@web3-react/core';
 
 import * as utils from '../utils';
-import { YieldContext } from './YieldContext';
 import { useCallTx } from '../hooks/yieldHooks';
+
+import { YieldContext } from './YieldContext';
+import { Web3Context } from './Web3Context';
 
 const PositionsContext = React.createContext<any>({});
 
@@ -27,8 +29,8 @@ function reducer(state:any, action:any) {
 
 const PositionsProvider = ({ children }:any) => {
 
-  const { chainId, account } = useWeb3React();
-  
+  // const { chainId, account } = useWeb3React();
+  const { state: { chainId, account } } = React.useContext(Web3Context);
   const initState = { positionsIndicator: 0, positionsData : new Map(), positionSelected: '' };
   const [ state, dispatch ] = React.useReducer(reducer, initState);
   const { state: yieldState } = React.useContext(YieldContext);

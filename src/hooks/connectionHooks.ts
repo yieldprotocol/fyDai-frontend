@@ -16,6 +16,7 @@ import noConnectionImage from '../assets/images/providers/noconnection.png';
 
 // Eager connect is an attempt to 'auto connect' to injected connection eg. Metamask.
 export function useEagerConnect() {
+  console.log('eager connect fired');
   const { activate, active } = useWeb3React();
   const [tried, setTried] = React.useState(false);
 
@@ -89,37 +90,3 @@ export function getNetworkName(networkId: Number) {
     }
   }
 }
-
-// export const useMaker = () => {
-//   const { library, connector } = useWeb3React();
-//   const [ maker, setMaker] = React.useState();
-
-//   const makerBrowser = await Maker.create('browser');
-//   const web3Provider = library && new ProviderBridge(library.provider, library.getSigner());
-  
-//   React.useEffect(()=>{
-//     ( async () => {
-//       const newMaker = await Maker.create('browser');
-//       // await newMaker.authenticate();
-//       // console.log('authed - check');
-//       // setMaker(newMaker);
-//     }
-//     )();
-//   }, []);
-
-//   const connectMakerVault = async () => {
-//     // console.log( await connector?.getProvider() );
-//     // const newMaker = connector &&  await Maker.create('http', { web3 : { inject : await connector.getProvider()}, autoAuthenticate:false } );
-//     // const newMaker = web3Provider &&  await Maker.create('http', {} );
-//     // await newMaker.authenticate();
-//     // console.log('authed - check');
-//     // setMaker(newMaker);
-
-//     if (maker) {
-//       console.log( maker );
-//     }
-//   };
-
-//   return [ connectMakerVault ] as const;
-
-// };

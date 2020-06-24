@@ -4,10 +4,21 @@ import { Image, Text, Button, Box } from 'grommet';
 
 import { useConnectorImage } from '../hooks/connectionHooks';
 
+import { Web3Context } from '../contexts/Web3Context'; 
+
 const ProfileButton = (props: any) => {
-  const { account } = useWeb3React();
-  const { action } = props;
+  // const { account } = useWeb3React();
+  // const { account } = React.useContext(Web3Context);
+  const [ accLabel, setAccLabel ] = React.useState<string>('');
+  const { action, account } = props;
   const connectorImage = useConnectorImage();
+
+  React.useEffect(()=>{
+    (async () => {
+      setAccLabel(`${account?.substring(0, 4)}...${account?.substring(account.length - 4)}`);
+    })(); 
+  }, [account]);
+
   return (
     <>
       <Box 
@@ -23,26 +34,9 @@ const ProfileButton = (props: any) => {
         <Box height="15px" width="15px">
           <Image src={connectorImage} fit="contain" />
         </Box>
-        <Text> {account?.substring(0, 4)}...{account?.substring(
-        account.length - 4) }
+        <Text> {accLabel}
         </Text>
       </Box>
-      {/*     
-      <Button
-        color='border'
-        icon={
-          <Box height="15px" width="15px">
-            <Image src={connectorImage} fit="contain" />
-          </Box>
-      }
-        label={`${account?.substring(0, 4)}...${account?.substring(
-        account.length - 4
-      )}`}
-        onClick={() => action && action()}
-        focusIndicator={false}
-      // style={{ minWidth:'150px' }}
-        hoverIndicator='background-frontheader'
-      /> */}
     </>
   );
 };

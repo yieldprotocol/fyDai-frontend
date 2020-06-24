@@ -5,15 +5,17 @@ import { Anchor, Layer, Header, Footer, Button, Box, Text } from 'grommet';
 import { getNetworkName }  from '../../hooks/connectionHooks';
 
 import { YieldContext } from '../../contexts/YieldContext';
+import { Web3Context } from '../../contexts/Web3Context';
 
 import ProfileButton from '../../components/ProfileButton';
 
 const AccountLayer = (props:any) => {
-  const { chainId } = useWeb3React();
   const { closeLayer, changeWallet } = props;
 
-  const { state, actions } = React.useContext(YieldContext);
-  const { extBalances } = state;
+  const { chainId } = React.useContext(Web3Context);
+  const { state: { extBalances }, actions } = React.useContext(YieldContext);
+  
+  // const { extBalances } = state;
 
   const onClose = () => {
     closeLayer();

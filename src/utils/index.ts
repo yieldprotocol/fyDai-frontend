@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 
-const { bigNumberify } = ethers.utils;
+const { from: bigNumberify } = ethers.BigNumber;
 
 export const WETH = ethers.utils.formatBytes32String('WETH');
 export const CHAI = ethers.utils.formatBytes32String('CHAI');
@@ -41,14 +41,14 @@ export const subBN = (x:string, y:string) => {
 
 // / @dev Multiplies a number in any precision by a number in RAY precision, with the output in the first parameter's precision.
 // / I.e. mulRay(wad(x), ray(y)) = wad(x*y)
-export const mulRay = (x:ethers.utils.BigNumber, ray:ethers.utils.BigNumber) => {
+export const mulRay = (x:ethers.BigNumber, ray:ethers.BigNumber) => {
   const unit = bigNumberify('10').pow(bigNumberify('27'));
   return bigNumberify(x).mul(bigNumberify(ray)).div(unit);
 };
 
 // / @dev Divides a number in any precision by a number in RAY precision, with the output in the first parameter's precision.
 // / I.e. divRay(wad(x), ray(y)) = wad(x/y)
-export const divRay = (x:ethers.utils.BigNumber, ray:ethers.utils.BigNumber) => {
+export const divRay = (x:ethers.BigNumber, ray:ethers.BigNumber) => {
   const unit = bigNumberify('10').pow(bigNumberify('27'));
   return unit.mul(bigNumberify(x)).div(bigNumberify(ray));
 };

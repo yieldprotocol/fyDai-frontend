@@ -8,7 +8,7 @@ import { useMaker } from '../hooks/makerHooks';
 
 const Landing = () => {
 
-  const { getVault } = useMaker();
+  const { connectVault, openVault } = useMaker();
 
   return (
     <Box gap='small' pad={{ vertical:'small', horizontal:'large' }}>
@@ -45,25 +45,25 @@ const Landing = () => {
         <Box direction='row-responsive' gap='medium' justify='start'>
           
           <Box
-            onClick={()=> getVault()}
+            onClick={()=> connectVault()}
             hoverIndicator='brandTransparent'
             round
             pad={{ horizontal:'small' }}
           >
             <Text color='brand'>
-              maker vault button
+              maker vault connect
             </Text>
 
           </Box>
 
           <Box
-            onClick={()=>{}}
+            onClick={()=>openVault()}
             hoverIndicator='secondaryTransparent'
             round
             pad={{ horizontal:'small' }}
           >
             <Text color='secondary'>
-              I am a Lender
+              Open Vault
             </Text>
           </Box>
 

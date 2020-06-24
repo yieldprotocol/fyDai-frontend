@@ -2,15 +2,15 @@ import React from 'react';
 import firebase from 'firebase';
 
 import { ethers } from 'ethers';
-import { useWeb3React } from '@web3-react/core';
+// import { useWeb3React } from '@web3-react/core';
 
 import * as utils from '../utils';
 
 import { IYieldSeries } from '../types';
-
 import { useCallTx, useGetBalance } from '../hooks/yieldHooks';
 
 import { NotifyContext } from './NotifyContext';
+import { Web3Context } from './Web3Context';
 
 const YieldContext = React.createContext<any>({});
 
@@ -82,7 +82,11 @@ const YieldProvider = ({ children }:any) => {
     extBalances:{},
   };
   const [ state, dispatch ] = React.useReducer(reducer, initState);
-  const { chainId, account } = useWeb3React();
+
+  const { state: { account, chainId } } = React.useContext(Web3Context);
+
+  // const { chainId } = useWeb3React();
+
   const { dispatch: notifyDispatch } = React.useContext(NotifyContext);
   const [ callTx ] = useCallTx();
 
@@ -116,7 +120,6 @@ const YieldProvider = ({ children }:any) => {
   // Async add blockchain data for each series
   const fetchSeriesData = async (seriesAddrs:IYieldSeries[]): Promise<IYieldSeries[]> => {
     const _seriesData:any[] = [];
-    console.log(seriesAddrs);
     await Promise.all(
       seriesAddrs.map( async (x:any, i:number)=> {
         _seriesData.push(x);
@@ -225,7 +228,7 @@ const YieldProvider = ({ children }:any) => {
 
     // #4 Get Balance data
     const balances = await fetchExtBalances(deployedExternal);
-    console.log(balances)
+    console.log(balances);
     dispatch({ type:'updateExtBalances', payload: balances });
 
     // #4 Get MakerDao data
@@ -234,8 +237,6 @@ const YieldProvider = ({ children }:any) => {
 
     dispatch({ type:'isLoading', payload: false });
   };
-
-  
 
   React.useEffect( () => {
     ( async () => chainId && getAllData(chainId))();
