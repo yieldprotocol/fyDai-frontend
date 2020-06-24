@@ -6,47 +6,53 @@ import WithdrawAction from './WithdrawAction';
 import { YieldContext } from '../contexts/YieldContext';
 import { PositionsContext } from '../contexts/PositionsContext';
 
-import { useDealer, useGetBalance } from '../hooks/yieldHooks';
+import { useDealer, useEthProxy, useGetBalance } from '../hooks/yieldHooks';
 
 const DepositWithdraw = ({ close }:any) => {
 
   const [over, setOver] = React.useState<boolean>(false);
   const [inputValue, setInputValue] = React.useState<any>();
   const [taskView, setTaskView] = React.useState<string>('DEPOSIT');
-  const [ wethBalance, setWethBalance ] = React.useState<number>(0);
+  // const [ wethBalance, setWethBalance ] = React.useState<number>(0);
   const [ wethPosted, setWethPosted ] = React.useState<number>(0);
   const { state, actions } = React.useContext(YieldContext);
 
-  const { deployedCore, deployedExternal, yieldData } = state; 
+  const { deployedCore, deployedExternal, deployedPeripheral, yieldData, extBalances } = state; 
 
   const { getWethBalance }  = useGetBalance();
+
   const {
-    post, 
     approveDealer,
-    withdraw,
     borrow,
     repay,
-    postActive,
-    withdrawActive,
     repayActive,
     borrowActive,
   }  = useDealer();
 
+  const {
+    postEth, 
+    withdrawEth,
+    postEthActive,
+    withdrawEthActive,
+  }  = useEthProxy();
 
   React.useEffect(()=>{
-    (async () => setWethBalance( await getWethBalance(deployedExternal.Weth)) )();
+    // (async () => setWethBalance( await getWethBalance(deployedExternal.Weth)) )();
     (async () => setWethPosted(yieldData.wethPosted_p) )();
+
+    extBalances && console.log(extBalances);
+
   }, []);
 
   const depositSteps = async (value:number) => {
-    await approveDealer(deployedExternal.Weth, deployedCore.Dealer, value);
-    await post(deployedCore.Dealer, 'WETH', value);
+    // await approveDealer(deployedExternal.Weth, deployedCore.Dealer, value);
+    await postEth(deployedPeripheral.EthProxy, value);
     actions.updateExtBalances(state.deployedExternal);
     actions.updateYieldBalances(state.deployedCore);
   };
 
   const withdrawSteps = async (value:number) => {
-    await withdraw(deployedCore.Dealer, 'WETH', value);
+    await withdrawEth(deployedPeripheral.EthProxy, value);
     actions.updateExtBalances(state.deployedExternal);
     actions.updateYieldBalances(state.deployedCore);
   };
@@ -104,7 +110,7 @@ const DepositWithdraw = ({ close }:any) => {
       { taskView==='DEPOSIT' && 
         <DepositAction 
           deposit={(x:number) => depositSteps(x)}
-          maxValue={wethBalance}
+          maxValue={extBalances.ethBalance_p}
         />}
       { taskView==='WITHDRAW' && 
       <WithdrawAction 

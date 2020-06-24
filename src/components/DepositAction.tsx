@@ -32,7 +32,7 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
           </Box> */}
           <TextInput
             type="number"
-            placeholder="0"
+            // placeholder = '0'
             value={inputValue}
             disabled={depositDisabled}
             plain

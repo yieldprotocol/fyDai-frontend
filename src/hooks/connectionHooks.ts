@@ -41,7 +41,7 @@ export function useEagerConnect() {
 
 export function useConnectorImage() {
   const { connector } = useWeb3React();
-  const [image, setImage] = React.useState<any>();
+  const [ image, setImage ] = React.useState<any>();
   React.useEffect(() => {
     switch (connector) {
       case injected:
@@ -90,32 +90,36 @@ export function getNetworkName(networkId: Number) {
   }
 }
 
-export const useMakerVault = () => {
-  const { library, connector } = useWeb3React();
-  const [maker, setMaker] = React.useState();
-  const web3Provider = library && new ProviderBridge(library.provider, library.getSigner());
-  // React.useEffect(()=>{
-  //   ( async () => {
-  //     const newMaker = await Maker.create('browser', { web3 : { inject : library.provider } } );
-  //     await newMaker.authenticate();
-  //     console.log('authed - check');
-  //     setMaker(newMaker);
-  //   }
-  //   )();
-  // }, []);
-  const connectMakerVault = async () => {
-    // console.log( await connector?.getProvider() );
-    // const newMaker = connector &&  await Maker.create('http', { web3 : { inject : await connector.getProvider()}, autoAuthenticate:false } );
-    // const newMaker = web3Provider &&  await Maker.create('http', {} );
-    // await newMaker.authenticate();
-    // console.log('authed - check');
-    // setMaker(newMaker);
+// export const useMaker = () => {
+//   const { library, connector } = useWeb3React();
+//   const [ maker, setMaker] = React.useState();
 
-    if (maker) {
-      console.log( maker );
-    }
-  };
+//   const makerBrowser = await Maker.create('browser');
+//   const web3Provider = library && new ProviderBridge(library.provider, library.getSigner());
+  
+//   React.useEffect(()=>{
+//     ( async () => {
+//       const newMaker = await Maker.create('browser');
+//       // await newMaker.authenticate();
+//       // console.log('authed - check');
+//       // setMaker(newMaker);
+//     }
+//     )();
+//   }, []);
 
-  return [ connectMakerVault ] as const;
+//   const connectMakerVault = async () => {
+//     // console.log( await connector?.getProvider() );
+//     // const newMaker = connector &&  await Maker.create('http', { web3 : { inject : await connector.getProvider()}, autoAuthenticate:false } );
+//     // const newMaker = web3Provider &&  await Maker.create('http', {} );
+//     // await newMaker.authenticate();
+//     // console.log('authed - check');
+//     // setMaker(newMaker);
 
-};
+//     if (maker) {
+//       console.log( maker );
+//     }
+//   };
+
+//   return [ connectMakerVault ] as const;
+
+// };
