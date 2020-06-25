@@ -1,10 +1,12 @@
 import React from 'react';
 import { useWeb3React } from '@web3-react/core';
 
+
 import Maker from '@makerdao/dai';
 import { McdPlugin } from '@makerdao/dai-plugin-mcd';
 
 import ProviderBridge from 'ethers-web3-bridge';
+import { Web3Context } from '../contexts/Web3Context';
 
 import { injected, trezor, walletlink, torus } from '../connectors';
 
@@ -18,8 +20,8 @@ import noConnectionImage from '../assets/images/providers/noconnection.png';
 export function useEagerConnect() {
   console.log('eager connect fired');
   const { activate, active } = useWeb3React();
-  const [tried, setTried] = React.useState(false);
 
+  const [tried, setTried] = React.useState(false);
   React.useEffect(() => {
     injected.isAuthorized().then((isAuthorized: boolean) => {
       if (isAuthorized) {
@@ -42,6 +44,9 @@ export function useEagerConnect() {
 
 export function useConnectorImage() {
   const { connector } = useWeb3React();
+  const { state:{ provider } } = React.useContext(Web3Context);
+  console.log(provider);
+
   const [ image, setImage ] = React.useState<any>();
   React.useEffect(() => {
     switch (connector) {
