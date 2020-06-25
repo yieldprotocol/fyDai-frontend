@@ -35,6 +35,7 @@ function web3Reducer(state:any, action:any) {
 const Web3Provider = ({ children }:any) => {
 
   const [state, dispatch] = React.useReducer(web3Reducer, initState);
+  
   const updateProvider = async ()=>{
     dispatch({ type:'toggleLoading', payload: true });
     // @ts-ignore
@@ -46,12 +47,12 @@ const Web3Provider = ({ children }:any) => {
     const { chainId } = await provider.getNetwork();
     console.log(chainId);
     dispatch({ 
-      type:'update', 
-      payload:{ 
+      type:'update',
+      payload:{
         provider,
         signer,
         account,
-        chainId, 
+        chainId,
       } 
     });
     dispatch({ type:'toggleLoading', payload: false });

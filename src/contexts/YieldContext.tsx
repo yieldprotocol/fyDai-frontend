@@ -7,7 +7,7 @@ import { ethers } from 'ethers';
 import * as utils from '../utils';
 
 import { IYieldSeries } from '../types';
-import { useCallTx, useGetBalance } from '../hooks/yieldHooks';
+import { useCallTx, useBalances } from '../hooks/yieldHooks';
 
 import { NotifyContext } from './NotifyContext';
 import { Web3Context } from './Web3Context';
@@ -89,8 +89,7 @@ const YieldProvider = ({ children }:any) => {
 
   const { dispatch: notifyDispatch } = React.useContext(NotifyContext);
   const [ callTx ] = useCallTx();
-
-  const { getWeiBalance, getChaiBalance, getWethBalance, getDaiBalance }  = useGetBalance();
+  const { getEthBalance, getTokenBalance }  = useBalances();
 
   // async get all yield addresses from db 
   const getYieldAddrs = async (networkId:number|string): Promise<any[]> => {
@@ -146,10 +145,8 @@ const YieldProvider = ({ children }:any) => {
     const _yieldData:any = {};
     _yieldData.wethPosted = await callTx(deployedCore.Dealer, 'Dealer', 'posted', [utils.WETH, account]);
     _yieldData.chaiPosted = await callTx(deployedCore.Dealer, 'Dealer', 'posted', [utils.CHAI, account]);
-
     _yieldData.chaiTotalDebtDai = await callTx(deployedCore.Dealer, 'Dealer', 'totalDebtDai', [utils.CHAI, account]);
     _yieldData.chaiTotalDebtYDai = await callTx(deployedCore.Dealer, 'Dealer', 'totalDebtYDai', [utils.CHAI, account]);
-
     _yieldData.wethTotalDebtDai = await callTx(deployedCore.Dealer, 'Dealer', 'totalDebtDai', [utils.WETH, account]);
     _yieldData.wethTotalDebtYDai = await callTx(deployedCore.Dealer, 'Dealer', 'totalDebtYDai', [utils.WETH, account]);
     // parse and return maker data
@@ -166,10 +163,10 @@ const YieldProvider = ({ children }:any) => {
 
   const fetchExtBalances = async (deployedExternal:any): Promise<any> => {
     const _balanceData:any = {};
-    _balanceData.ethBalance = await getWeiBalance();
-    _balanceData.wethBalance = await getWethBalance(deployedExternal.Weth);
-    _balanceData.chaiBalance = await getChaiBalance(deployedExternal.Chai);
-    _balanceData.daiBalance = await getDaiBalance(deployedExternal.Dai);
+    _balanceData.ethBalance = await getEthBalance();
+    _balanceData.wethBalance = await getTokenBalance(deployedExternal.Weth, 'Weth');
+    _balanceData.chaiBalance = await getTokenBalance(deployedExternal.Chai, 'Chai');
+    _balanceData.daiBalance = await getTokenBalance(deployedExternal.Dai, 'Dai');
     
     // parse and return maker data
     return {

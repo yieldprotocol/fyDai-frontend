@@ -1,5 +1,6 @@
 import React from 'react';
-import { useWeb3React } from '@web3-react/core';
+// import { useWeb3React } from '@web3-react/core';
+
 import { 
   Anchor, 
   Grommet, 
@@ -24,10 +25,14 @@ import {
 
 // TODO: use theming context properly - no cheating :)
 import { yieldTheme } from '../themes';
+import { Web3Context } from '../contexts/Web3Context';
   
 const YieldFooter = (props: any) => {
+
+
   const { setShowTestLayer, showTestLayer, setDarkmode, darkmode, changeConnection } = props;
-  const { active } = useWeb3React();
+  const {state:{ account }} = React.useContext(Web3Context);
+  // const { active } = useWeb3React();
 
   return (
     <Footer
@@ -41,7 +46,7 @@ const YieldFooter = (props: any) => {
         <Anchor color='grey'><Info /></Anchor>
       </Box>
       <Box>
-        { !active && <Button style={{ minWidth:'160px' }} label='Connect to a wallet' onClick={()=>changeConnection()} />}
+        { !account && <Button style={{ minWidth:'160px' }} label='Connect to a wallet' onClick={()=>changeConnection()} />}
       </Box>
       <Box direction='row' gap='medium'>
         <Test onClick={()=>setShowTestLayer(!showTestLayer)} color={showTestLayer?yieldTheme.global.colors.brand.light:'grey'} /> 

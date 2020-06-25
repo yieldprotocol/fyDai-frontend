@@ -12,7 +12,7 @@ import { getNetworkName }  from '../../hooks/connectionHooks';
 import ProfileButton from '../../components/ProfileButton';
 import { NotifyContext } from '../../contexts/NotifyContext';
 
-import { useSendTx, useCallTx, useDealer, useGetBalance, useEthProxy } from '../../hooks/yieldHooks';
+import { useSendTx, useCallTx, useDealer, useBalances, useEthProxy } from '../../hooks/yieldHooks';
 
 import { YieldContext } from '../../contexts/YieldContext';
 import { PositionsContext } from '../../contexts/PositionsContext';
@@ -76,7 +76,7 @@ const TestLayer = (props:any) => {
     withdrawEthActive,
   }  = useEthProxy();
 
-  // const { getChaiBalance, getWethBalance, getDaiBalance }  = useGetBalance();
+  // const { getChaiBalance, getWethBalance, getDaiBalance }  = useBalances();
 
   // React.useEffect(()=>{
   //   (async () => setWethBalance( await getWethBalance(deployedExternal.Weth)) )();

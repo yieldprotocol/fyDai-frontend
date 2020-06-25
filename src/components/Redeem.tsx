@@ -9,7 +9,7 @@ import WithdrawAction from './WithdrawAction';
 import { YieldContext } from '../contexts/YieldContext';
 import { PositionsContext } from '../contexts/PositionsContext';
 
-import { useDealer, useGetBalance } from '../hooks/yieldHooks';
+import { useDealer, useBalances } from '../hooks/yieldHooks';
 import RedeemAction from './RedeemAction';
 
 const Redeem = ({ activeSeries }:any) => {
@@ -23,7 +23,6 @@ const Redeem = ({ activeSeries }:any) => {
 
   const { deployedCore, deployedExternal, yieldData } = state; 
 
-  const { getWethBalance }  = useGetBalance();
   const {
     approveDealer,
     borrow,
@@ -32,9 +31,8 @@ const Redeem = ({ activeSeries }:any) => {
     borrowActive,
   }  = useDealer();
 
-
   React.useEffect(()=>{
-    (async () => setWethBalance( await getWethBalance(deployedExternal.Weth)) )();
+    // (async () => setWethBalance( await getWethBalance(deployedExternal.Weth)) )();
     (async () => setWethPosted(yieldData.wethPosted_p) )();
   }, []);
 

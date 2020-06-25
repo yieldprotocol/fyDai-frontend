@@ -1,30 +1,95 @@
 import React from 'react';
 
 import Maker from '@makerdao/dai';
-import { McdPlugin, ETH, DAI } from '@makerdao/dai-plugin-mcd';
+import { McdPlugin, ETH, DAI, BAT } from '@makerdao/dai-plugin-mcd';
 
 import { ethers } from 'ethers';
 
 import { Web3Context } from '../contexts/Web3Context';
 
-const makerAddrs = {
+import rinkebyAddresses from '../contracts/testnetAddrs/rinkeby.json';
+import goerliAddresses from '../contracts/testnetAddrs/goerli.json';
+import ropstenAddresses from '../contracts/testnetAddrs/ropsten.json';
+import kovanAddresses from '../contracts/testnetAddrs/kovan.json';
 
+const networkOverrides = [
+  {
+    network: 'rinkeby',
+    contracts: rinkebyAddresses
+  },
+  { network: 'goerli', contracts: goerliAddresses },
+  { network: 'ropsten', contracts: ropstenAddresses }
+].reduce((acc, { network, contracts }) => {
+  for (const [contractName, contractAddress] of Object.entries(contracts)) {
+    // @ts-ignore
+    if (!acc[contractName]) acc[contractName] = {};
+    // @ts-ignore
+    acc[contractName][network] = contractAddress;
+  }
+  return acc;
+}, {});
 
-}
+const cdpTypes = [
+  { currency: ETH, ilk: 'ETH-A' },
+  // { currency: BAT, ilk: 'BAT-A' }
+];
+
+const defineNetwork = (_networkId:number) => {
+  const network = {
+    network: ''
+  };
+  switch (Number(_networkId)) {
+    case 3:
+      network.network = 'ropsten';
+      break;
+    case 4:
+      network.network = 'rinkeby';
+      break;
+    case 42:
+      network.network = 'kovan';
+      break;
+    case 5:
+      network.network = 'goerli';
+      break;
+    default:
+      return network;
+  }
+  return network;
+};
 
 export const useMaker = () => {
 
   const { state : { account, chainId, provider } } = React.useContext(Web3Context);
-
   const [openVaultActive, setOpenVaultActive] = React.useState<boolean>(false);
   const [convertVaultActive, setConvertVaultActive] = React.useState<boolean>(false);
   const [getVaultActive, setGetVaultActive] = React.useState<boolean>(false);
+
+  // const networkNumber = await chainId;
+  const network = defineNetwork(chainId);
+
+  const addressOverrides = ['rinkeby', 'ropsten', 'goerli'].some(
+    networkName => networkName === network.network
+  ) ? networkOverrides
+    : {};
+
+  const mcdPluginConfig = {
+    cdpTypes,
+    addressOverrides
+  };
+
+  const config = {
+    plugins: [
+      [McdPlugin, mcdPluginConfig]
+    ],
+    smartContract: {
+      addressOverrides
+    },
+  };
+
   
   const openVault = async (
   ) => {
-    const maker = await Maker.create('browser', {
-      plugins: [McdPlugin],
-    });
+    const maker = await Maker.create('browser', config);
     // verify that the private key was read correctly
     console.log(maker.currentAddress());
     
@@ -39,7 +104,7 @@ export const useMaker = () => {
     const vault = await manager.openLockAndDraw(
       'ETH-A',
       ETH(1),
-      DAI(20)
+      DAI(50)
     );
     console.log(vault.id);
     console.log(vault.debtValue);
@@ -50,6 +115,7 @@ export const useMaker = () => {
   ) => {
     const maker = await Maker.create('browser', {
       plugins: [McdPlugin],
+
     });
     const manager = maker.service('mcd:cdpManager');
     const proxyAddress = await maker.service('proxy').getProxyAddress(account);
@@ -74,14 +140,10 @@ export const useMaker = () => {
 
   const connectVault = async (
   ) => {
-    const maker = await Maker.create('browser', {
-      plugins: [McdPlugin],
-      web3:{
-        inject: provider
-      }
-    });
-    const manager = maker.service('mcd:cdpManager');
+    const maker = await Maker.create('browser', config );
+    const manager = await maker.service('mcd:cdpManager');
     const proxyAddress = await maker.service('proxy').getProxyAddress(account);
+
     const data = await manager.getCdpIds(proxyAddress); // returns list of { id, ilk } objects
     if (data.length > 0) {
       const vault = await manager.getCdp(data[0].id);
