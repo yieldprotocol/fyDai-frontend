@@ -45,7 +45,6 @@ function App() {
   const [activeSeries, setActiveSeries] = React.useState<IYieldSeries | null>(null);
   const [loading, setLoading] = React.useState(false);
 
-  // TODO move to layerContext
   const [showConnectLayer, setShowConnectLayer] = React.useState<boolean>(false);
   const [showAccountLayer, setShowAccountLayer] = React.useState<boolean>(false);
   const [showTestLayer, setShowTestLayer] = React.useState<boolean>(false);

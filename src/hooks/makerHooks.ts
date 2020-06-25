@@ -108,55 +108,29 @@ export const useMaker = () => {
 
   const getVaults = async (
   ) => {
+    console.log('Fetching your vaults vaults...');
+    let proxyAddress:string|null=null;
+    let vaults:Promise<any[]>|any[]=[];
+
     const maker = await Maker.create('browser', config );
     const manager = await maker.service('mcd:cdpManager');
-    const proxyAddress = await maker.service('proxy').getProxyAddress(account);
-    const data = await manager.getCdpIds(proxyAddress); // returns list of { id, ilk } objects
-    const vaults = Promise.all( data.map( async (x:any) => {
-      return manager.getCdp(data[0].id);
-    }));
-    console.log(await vaults);
+
+    proxyAddress = await maker.service('proxy').getProxyAddress(account);
+    if (proxyAddress) {
+      const data = await manager.getCdpIds(proxyAddress); // returns list of { id, ilk } objects
+      vaults = Promise.all( data.map( async (x:any) => {
+        return manager.getCdp(data[0].id);
+      }));
+      console.log(await vaults);
+      return vaults;
+    }
+    console.log(vaults);
     return vaults;
-    // if (data.length > 0) {
-    //   const vault = await manager.getCdp(data[0].id);
-    //   console.log([
-    //     vault.id,
-    //     vault.collateralAmount, // amount of collateral tokens
-    //     vault.collateralValue,  // value in USD, using current price feed values
-    //     vault.debtValue,        // amount of Dai debt
-    //     vault.collateralizationRatio, // collateralValue / debt
-    //     vault.liquidationPrice  // vault becomes unsafe at this price
-    //   ].map(x => x.toString()));
-    //   console.log(vault);
-    // } else console.log('No Vaults found');
-    // return data; 
   };
 
   const convertVault = async (
   ) => {
-    console.log('convertVault');
-
-  };
-
-  const connectVault = async (
-  ) => {
-    const maker = await Maker.create('browser', config );
-    const manager = await maker.service('mcd:cdpManager');
-    const proxyAddress = await maker.service('proxy').getProxyAddress(account);
-
-    const data = await manager.getCdpIds(proxyAddress); // returns list of { id, ilk } objects
-    if (data.length > 0) {
-      const vault = await manager.getCdp(data[0].id);
-      console.log([
-        vault.id,
-        vault.collateralAmount, // amount of collateral tokens
-        vault.collateralValue,  // value in USD, using current price feed values
-        vault.debtValue,        // amount of Dai debt
-        vault.collateralizationRatio, // collateralValue / debt
-        vault.liquidationPrice  // vault becomes unsafe at this price
-      ].map(x => x.toString()));
-      console.log(vault);
-    } else console.log('No Vaults found');
+    console.log('ConvertVault action required');
   };
 
   return {

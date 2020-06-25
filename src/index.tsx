@@ -21,7 +21,6 @@ import * as serviceWorker from './serviceWorker';
 
 import { NotifyProvider }  from './contexts/NotifyContext';
 // TODO: layers to context
-import { LayerProvider }  from './contexts/LayerContext';
 import { YieldProvider }  from './contexts/YieldContext';
 import { PositionsProvider }  from './contexts/PositionsContext';
 

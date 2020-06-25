@@ -7,11 +7,10 @@ import { useConnectorImage } from '../hooks/connectionHooks';
 import { Web3Context } from '../contexts/Web3Context'; 
 
 const ProfileButton = (props: any) => {
-  // const { account } = useWeb3React();
   // const { account } = React.useContext(Web3Context);
   const [ accLabel, setAccLabel ] = React.useState<string>('');
+  // const [ connectorImage, setConnectorImage ] = React.useState<string>('');
   const { action, account } = props;
-  const connectorImage = useConnectorImage();
 
   React.useEffect(()=>{
     (async () => {
@@ -31,9 +30,9 @@ const ProfileButton = (props: any) => {
         gap='small'
         align='center'
       >
-        <Box height="15px" width="15px">
+        {/* <Box height="15px" width="15px">
           <Image src={connectorImage} fit="contain" />
-        </Box>
+        </Box> */}
         <Text> {accLabel}
         </Text>
       </Box>

@@ -45,8 +45,6 @@ export function useEagerConnect() {
 export function useConnectorImage() {
   const { connector } = useWeb3React();
   const { state:{ provider } } = React.useContext(Web3Context);
-  console.log(provider);
-
   const [ image, setImage ] = React.useState<any>();
   React.useEffect(() => {
     switch (connector) {

@@ -42,9 +42,9 @@ export function useBalances() {
     } return ethers.BigNumber.from('0');
   };
 
-  const getTokenBalance = async (tokenAddr:string, abi:any) => {
+  const getTokenBalance = async (tokenAddr:string, abi:string) => {
     if (!!provider && !!account) {
-      const contract = new ethers.Contract(tokenAddr, contractMap.get('Weth'), provider);
+      const contract = new ethers.Contract(tokenAddr, contractMap.get(abi), provider);
       const balance = await contract.balanceOf(account);
       return balance;
     } return ethers.BigNumber.from('0');
@@ -144,7 +144,7 @@ export const useEthProxy = () => {
 
 export const useDealer = () => {
   const { abi: dealerAbi } = Dealer;
-  const { state: { signer, provider, account } } = React.useContext(Web3Context);
+  const { state: { signer, account } } = React.useContext(Web3Context);
 
   // const { library, account } = useWeb3React();
   const  { dispatch: notifyDispatch }  = React.useContext<any>(NotifyContext);
