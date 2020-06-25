@@ -57,9 +57,7 @@ ReactDOM.render(
         <NotifyProvider>
           <YieldProvider>
             <PositionsProvider>
-              <LayerProvider>
-                <App />
-              </LayerProvider>
+              <App />
             </PositionsProvider>
           </YieldProvider>
         </NotifyProvider>
