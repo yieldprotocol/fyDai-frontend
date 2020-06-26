@@ -19,6 +19,11 @@ export interface ISeriesPosition {
 
 }
 
+export interface IReducerAction {
+  type:string,
+  payload?:any,
+}
+
 export interface INotification {
   message: string;
   type?: string;
@@ -26,6 +31,10 @@ export interface INotification {
   callbackCancel?: any;
   showFor?: number;
   position?: string;
+  open?: boolean,
+  timerMs?: number,
+  fatalOpen?: boolean,
+  fatalMsg?: string,
 }
 
 export interface IYieldAccount {}

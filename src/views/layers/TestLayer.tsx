@@ -5,14 +5,14 @@ import { ethers } from 'ethers';
 import { useWeb3React } from '@web3-react/core';
 import { Anchor, Layer, Header, Heading, Footer, Button, Box, Text } from 'grommet';
 
-import { bigNumberify } from 'ethers/utils';
+// import { bigNumberify } from 'ethers';
 import * as utils from '../../utils';
 
 import { getNetworkName }  from '../../hooks/connectionHooks';
 import ProfileButton from '../../components/ProfileButton';
 import { NotifyContext } from '../../contexts/NotifyContext';
 
-import { useSendTx, useCallTx, useDealer, useGetBalance, useEthProxy } from '../../hooks/yieldHooks';
+import { useSendTx, useCallTx, useDealer, useBalances, useEthProxy } from '../../hooks/yieldHooks';
 
 import { YieldContext } from '../../contexts/YieldContext';
 import { PositionsContext } from '../../contexts/PositionsContext';
@@ -45,10 +45,10 @@ const TestLayer = (props:any) => {
   // const [ chaiBalance, setChaiBalance ] = React.useState<string|null|number>(0);
   // const [ daiBalance, setDaiBalance ] = React.useState<string|null|number>(0);
 
-  const [daiDebt, setDaiDebt] = React.useState<ethers.utils.BigNumber>();
-  const [daiTokens, setDaiTokens] = React.useState<ethers.utils.BigNumber>();
-  const [wethTokens, setWethTokens] = React.useState<ethers.utils.BigNumber>();
-  const [chaiTokens, setChaiTokens] = React.useState<ethers.utils.BigNumber>();
+  const [daiDebt, setDaiDebt] = React.useState<ethers.BigNumber>();
+  const [daiTokens, setDaiTokens] = React.useState<ethers.BigNumber>();
+  const [wethTokens, setWethTokens] = React.useState<ethers.BigNumber>();
+  const [chaiTokens, setChaiTokens] = React.useState<ethers.BigNumber>();
 
   const { closeLayer, changeWallet } = props;
   // const [ connectMakerVault ] = useMakerVault();
@@ -76,7 +76,7 @@ const TestLayer = (props:any) => {
     withdrawEthActive,
   }  = useEthProxy();
 
-  // const { getChaiBalance, getWethBalance, getDaiBalance }  = useGetBalance();
+  // const { getChaiBalance, getWethBalance, getDaiBalance }  = useBalances();
 
   // React.useEffect(()=>{
   //   (async () => setWethBalance( await getWethBalance(deployedExternal.Weth)) )();
@@ -147,9 +147,10 @@ const TestLayer = (props:any) => {
             gap='small'
           >
             <ProfileButton />
-            <Text size='xsmall'>Connected to:</Text> 
-            <Text weight="bold">{chainId && getNetworkName(chainId) }</Text>
-            <Text weight="bold">{chainId && chainId }</Text>
+            <Text size='xsmall'>Connected to:</Text>
+
+            {/* <Text weight="bold">{chainId && getNetworkName(chainId) }</Text>
+            <Text weight="bold">{chainId && chainId }</Text> */}
 
             <Box direction='row' gap='small'>
               <Text size='xsmall'>ETH balance:</Text>
@@ -229,12 +230,12 @@ const TestLayer = (props:any) => {
               
               Get Dai:
               
-              <Button label='1. Approve Wethjoin for 1weth' onClick={()=> sendTx(deployedExternal.Weth, 'Weth', 'approve', [deployedExternal.WethJoin, wethTokens], bigNumberify(0) )} />
+              <Button label='1. Approve Wethjoin for 1weth' onClick={()=> sendTx(deployedExternal.Weth, 'Weth', 'approve', [deployedExternal.WethJoin, wethTokens], ethers.BigNumber.from(0) )} />
               
               {/* <Button label='x. Vat > hope wethJoin' onClick={()=> sendTx(deployedExternal.Vat, 'Vat', 'hope', [deployedExternal.WethJoin], bigNumberify(0))} /> */}
               
-              <Button label='2. wethJoin join (take 1weth)' onClick={()=> sendTx(deployedExternal.WethJoin, 'WethJoin', 'join', [account, wethTokens], bigNumberify(0) )} />
-              <Button label='( x. wethJoin EXit 1weth)' onClick={()=> sendTx(deployedExternal.WethJoin, 'WethJoin', 'exit', [account, wethTokens ], bigNumberify(0) )} />
+              <Button label='2. wethJoin join (take 1weth)' onClick={()=> sendTx(deployedExternal.WethJoin, 'WethJoin', 'join', [account, wethTokens], ethers.BigNumber.from(0) )} />
+              <Button label='( x. wethJoin EXit 1weth)' onClick={()=> sendTx(deployedExternal.WethJoin, 'WethJoin', 'exit', [account, wethTokens ], ethers.BigNumber.from(0) )} />
 
               <Button
                 label='3. Vat frob (open vault?)'
@@ -247,16 +248,16 @@ const TestLayer = (props:any) => {
                     wethTokens,
                     daiDebt,
                   ],
-                  bigNumberify(0)
+                  ethers.BigNumber.from(0)
                 )}
               />
-              <Button label='(x. Vat hope daiJoin)' onClick={()=> sendTx(deployedExternal.Vat, 'Vat', 'hope', [deployedExternal.DaiJoin], bigNumberify(0))} />
+              <Button label='(x. Vat hope daiJoin)' onClick={()=> sendTx(deployedExternal.Vat, 'Vat', 'hope', [deployedExternal.DaiJoin], ethers.BigNumber.from(0))} />
              
-              <Button label='4. daiJoin EXit (daiDebt = 1)' onClick={()=> sendTx(deployedExternal.DaiJoin, 'DaiJoin', 'exit', [account, daiTokens ], bigNumberify(0) )} />
+              <Button label='4. daiJoin EXit (daiDebt = 1)' onClick={()=> sendTx(deployedExternal.DaiJoin, 'DaiJoin', 'exit', [account, daiTokens ], ethers.BigNumber.from(0) )} />
               
               Convert Dai to Chai:
-              <Button label='5. Approve chai (approx. 1)' onClick={()=> sendTx(deployedExternal.Dai, 'Dai', 'approve', [deployedExternal.Chai, daiTokens ], bigNumberify(0) )} />
-              <Button label='6. Chai join (approx. 1)' onClick={()=> sendTx(deployedExternal.Chai, 'Chai', 'join', [account, daiTokens ], bigNumberify(0) )} />
+              <Button label='5. Approve chai (approx. 1)' onClick={()=> sendTx(deployedExternal.Dai, 'Dai', 'approve', [deployedExternal.Chai, daiTokens ], ethers.BigNumber.from(0) )} />
+              <Button label='6. Chai join (approx. 1)' onClick={()=> sendTx(deployedExternal.Chai, 'Chai', 'join', [account, daiTokens ], ethers.BigNumber.from(0) )} />
 
   
               Chai deposit and borrow:

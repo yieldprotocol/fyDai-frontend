@@ -1,8 +1,7 @@
 import React from 'react';
-import { INotification } from '../types';
+import { INotification, IReducerAction } from '../types';
 
 const NotifyContext = React.createContext<any>({});
-
 const initState = {
   open: false,
   position: 'top-right',
@@ -12,10 +11,10 @@ const initState = {
   callbackAction: null,
   callbackCancel: null,
   fatalOpen: false,
-  fatalMsg: '', 
+  fatalMsg: '',
 };
 
-function notifyReducer(state:any, action:any) {
+function notifyReducer(state:INotification, action:IReducerAction) {
   switch (action.type) {
     case 'notify':
       return { 
@@ -45,19 +44,17 @@ function notifyReducer(state:any, action:any) {
 
 const NotifyProvider = ({ children }:any) => {
   const [state, dispatch] = React.useReducer(notifyReducer, initState);
-
   React.useEffect( () => {
-    state.open && ( async () => {
+    state.open && ( () => {
       if (state.timerMs === 0) {
         dispatch({ type: '_openNotify' });
       } else {
-        await setTimeout(() => {
+        setTimeout(() => {
           dispatch({ type: '_closeNotify' });
         }, state.timerMs);
       }
     })();
   }, [state.open]);
-
   return (
     <NotifyContext.Provider value={{ state, dispatch }}>
       {children}

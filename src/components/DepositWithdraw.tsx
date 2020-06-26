@@ -6,7 +6,7 @@ import WithdrawAction from './WithdrawAction';
 import { YieldContext } from '../contexts/YieldContext';
 import { PositionsContext } from '../contexts/PositionsContext';
 
-import { useDealer, useEthProxy, useGetBalance } from '../hooks/yieldHooks';
+import { useDealer, useEthProxy, useBalances } from '../hooks/yieldHooks';
 
 const DepositWithdraw = ({ close }:any) => {
 
@@ -18,8 +18,6 @@ const DepositWithdraw = ({ close }:any) => {
   const { state, actions } = React.useContext(YieldContext);
 
   const { deployedCore, deployedExternal, deployedPeripheral, yieldData, extBalances } = state; 
-
-  const { getWethBalance }  = useGetBalance();
 
   const {
     approveDealer,

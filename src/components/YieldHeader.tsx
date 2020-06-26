@@ -1,27 +1,33 @@
 import React, { useEffect } from 'react';
-import { useWeb3React } from '@web3-react/core';
+
+// import { useWeb3React } from '@web3-react/core';
+
 import { Text, Image, Header, Button, Box, ThemeContext } from 'grommet';
-
 import { FaSeedling as YieldLeaf } from 'react-icons/fa';
-
 import { FiSettings as Gear } from 'react-icons/fi';
 
 import logoDark from '../assets/images/logo.svg';
 import logoLight from '../assets/images/logo_light.svg';
 import ProfileButton from './ProfileButton';
 
+import { ConnectionContext } from '../contexts/ConnectionContext';
 
 const YieldHeader = (props: any) => {
+  
   const { 
     openConnectLayer,
     openAccountLayer,
     activeView,
     setActiveView
   } = props;
-  const { account } = useWeb3React();
+  
+
+  const { state: { account } } = React.useContext(ConnectionContext);
+
   const theme = React.useContext<any>(ThemeContext);
 
   useEffect(() => {
+
     // (async () => activate(injected, console.log))();
   }, []);
 
@@ -83,13 +89,12 @@ const YieldHeader = (props: any) => {
             Yield AMM
           </Text>
         </Box>
-
       </Box>
 
       <Box direction='row' align='baseline'>
         {account ? (
           <Box pad='small'>
-            <ProfileButton action={() => openAccountLayer()} />
+            <ProfileButton action={() => openAccountLayer()} account={account} />
           </Box>
         ) : (
           <Box pad='small'>

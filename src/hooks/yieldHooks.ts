@@ -2,6 +2,9 @@ import React from 'react';
 import { useWeb3React } from '@web3-react/core';
 import { ethers }  from 'ethers';
 
+import { NotifyContext } from '../contexts/NotifyContext';
+import { ConnectionContext } from '../contexts/ConnectionContext';
+
 import YDai from '../contracts/YDai.json';
 import Dealer from '../contracts/Dealer.json';
 import TestERC20 from '../contracts/TestERC20.json';
@@ -13,9 +16,9 @@ import Vat from '../contracts/Vat.json';
 import Pot from '../contracts/Pot.json';
 import EthProxy from '../contracts/EthProxy.json';
 
-import { NotifyContext } from '../contexts/NotifyContext';
 
-ethers.errors.setLogLevel('error');
+
+// ethers.errors.setLogLevel('error');
 
 const contractMap = new Map<string, any>([
   ['YDai', YDai.abi],
@@ -30,50 +33,30 @@ const contractMap = new Map<string, any>([
   ['EthProxy', EthProxy.abi],
 ]);
 
-export function useGetBalance() {
-  const { library, account } = useWeb3React();
-  // const getEthBalance = async () : Promise<string> => {
-  //   if (!!library && !!account) {
-  //     const bal = await library.getBalance(account);
-  //     return ethers.utils.formatEther(bal);
-  //   } return '0';
-  // };
-  const getWeiBalance = async () => {
-    if (!!library && !!account) {
-      const balance = await library.getBalance(account);
-      // return bal.toString();
+export function useBalances() {
+
+  const { state: { provider, account } } = React.useContext(ConnectionContext);
+
+  const getEthBalance = async () => {
+    if (!!provider && !!account) {
+      const balance = await provider.getBalance(account);
       return balance;
-    } return ethers.utils.bigNumberify('0');
+    } return ethers.BigNumber.from('0');
   };
-  const getWethBalance = async (tokenAddr:string) => {
-    if (!!library && !!account) {
-      const contract = new ethers.Contract(tokenAddr, contractMap.get('Weth'), library);
-      const balance = await contract.balanceOf(account);
-      // return ethers.utils.formatEther(balance.toString());
-      return balance;
-    } return ethers.utils.bigNumberify('0');
-  };
-  const getChaiBalance = async (tokenAddr:string) => {
-    if (!!library && !!account) {
-      const contract = new ethers.Contract(tokenAddr, contractMap.get('Chai'), library);
+
+  const getTokenBalance = async (tokenAddr:string, abi:string) => {
+    if (!!provider && !!account) {
+      const contract = new ethers.Contract(tokenAddr, contractMap.get(abi), provider);
       const balance = await contract.balanceOf(account);
       return balance;
-      // return ethers.utils.formatEther(balance.toString());
-    } return ethers.utils.bigNumberify('0');
+    } return ethers.BigNumber.from('0');
   };
-  const getDaiBalance = async (tokenAddr:string) => {
-    if (!!library && !!account) {
-      const contract = new ethers.Contract(tokenAddr, contractMap.get('Dai'), library);
-      const balance = await contract.balanceOf(account);
-      return balance;
-      // return ethers.utils.formatEther(balance.toString());
-    } return ethers.utils.bigNumberify('0');
-  };
-  return { getWeiBalance, getWethBalance, getChaiBalance, getDaiBalance } as const;
+  return { getEthBalance, getTokenBalance } as const;
 }
 
 export const useCallTx = () => {
-  const { library } = useWeb3React();
+
+  const { state: { provider } } = React.useContext(ConnectionContext);
   const [ callTxActive, setCallTxActive ] = React.useState<boolean>();
   const callTx = async (
     contractAddr:string,
@@ -81,8 +64,9 @@ export const useCallTx = () => {
     fn:string,
     data:any[]
   ) => {
+
     setCallTxActive(true);
-    const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), library);
+    const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), provider);
     const retVal = await contract[fn](...data);
     setCallTxActive(false);
     return retVal;
@@ -91,12 +75,14 @@ export const useCallTx = () => {
 };
 
 export const useEthProxy = () => {
+
+  const { state: { signer, account } } = React.useContext(ConnectionContext);
   const { abi: ethProxyAbi } = EthProxy;
-  const { library, account } = useWeb3React();
   const  { dispatch: notifyDispatch }  = React.useContext<any>(NotifyContext);
   const [ postEthActive, setPostEthActive ] = React.useState<boolean>(false);
   const [ withdrawEthActive, setWithdrawEthActive ] = React.useState<boolean>(false);
-  const signer = library?.getSigner();
+  // const { library, account } = useWeb3React();
+  // const signer = provider?.getSigner();
 
   const postEth = async (
     ethProxyAddress:string,
@@ -160,14 +146,16 @@ export const useEthProxy = () => {
 
 export const useDealer = () => {
   const { abi: dealerAbi } = Dealer;
-  const { library, account } = useWeb3React();
+  const { state: { signer, account } } = React.useContext(ConnectionContext);
+
+  // const { library, account } = useWeb3React();
   const  { dispatch: notifyDispatch }  = React.useContext<any>(NotifyContext);
   const [ postActive, setPostActive ] = React.useState<boolean>(false);
   const [ withdrawActive, setWithdrawActive ] = React.useState<boolean>(false);
   const [ borrowActive, setBorrowActive ] = React.useState<boolean>(false);
   const [ repayActive, setRepayActive ] = React.useState<boolean>(false);
   const [ approveActive, setApproveActive ] = React.useState<boolean>(false);
-  const signer = library?.getSigner();
+  // const signer = library?.getSigner();
 
   const post = async (
     dealerAddress:string,
@@ -309,7 +297,6 @@ export const useDealer = () => {
       TestERC20.abi,
       signer
     );
-
     try {
       tx = await contract.approve(dealerAddr, parsedAmount);
     } catch (e) {
@@ -335,10 +322,11 @@ export const useDealer = () => {
 
 // SendTx is a generic function to interact with any contract, primarily used for development/testing.
 export const useSendTx = () => {
-  const { library } = useWeb3React();
+  // const { library } = useWeb3React();
+  const { state: { signer, account } } = React.useContext(ConnectionContext);
   const [ sendTxActive, setSendTxActive ] = React.useState<boolean>();
-  const signer = library?.getSigner();
-  const sendTx = async (contractAddr:string, contractName:string, fn:string, data:any[], value:ethers.utils.BigNumber ) => {
+  
+  const sendTx = async (contractAddr:string, contractName:string, fn:string, data:any[], value:ethers.BigNumber ) => {
     let tx;
     console.log(contractAddr, contractMap.get(contractName), signer); 
     setSendTxActive(true);

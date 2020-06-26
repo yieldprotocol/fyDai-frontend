@@ -11,14 +11,13 @@ import {
   Drop,
 } from 'grommet';
 
-import logoDark from '../assets/images/yield.svg';
-import logoLight from '../assets/images/yield_light.svg';
-
-import { Spinner } from './LoadingSpinner';
+import PulseLoader from 'react-spinners/PulseLoader';
 
 import { IYieldSeries } from '../types';
 import { YieldContext } from '../contexts/YieldContext';
 import YieldSeriesMenuItem from './YieldSeriesMenuItem';
+
+
 
 // import YieldSeries from './YieldSeries';
 
@@ -55,7 +54,19 @@ const YieldSidebar = ({ activeSeries, setActiveSeries, setShowSeriesLayer }:{act
         <Text size='large'> Series Available </Text>
       </Box>
       
-      {state.isLoading && <Spinner />}
+      {state.isLoading && 
+      <Box
+        round='xlarge'
+        width='xsmall'
+        height='xsmall'
+                  // background={activePosition?.seriesColor}
+        justify='center'
+        align='center'
+        margin='small'
+      >
+        <PulseLoader size='5' margin='5' />
+      </Box>}
+
       {seriesList.map((x:any, i:number) => {
         return (
           <YieldSeriesMenuItem

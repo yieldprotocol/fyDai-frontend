@@ -6,7 +6,7 @@ import RepayAction from './RepayAction';
 import { YieldContext } from '../contexts/YieldContext';
 import { PositionsContext } from '../contexts/PositionsContext';
 
-import { useDealer, useGetBalance } from '../hooks/yieldHooks';
+import { useDealer, useBalances } from '../hooks/yieldHooks';
 
 const BorrowRepay = ({ active, activeSeries }:any) => {
   const [over, setOver] = React.useState<boolean>(false);

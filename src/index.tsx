@@ -1,14 +1,19 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { 
-  Web3ReactProvider, 
+  Web3ReactProvider,
+  createWeb3ReactRoot,
   UnsupportedChainIdError 
 } from '@web3-react/core';
+
 import {
   NoEthereumProviderError,
   UserRejectedRequestError as UserRejectedRequestErrorInjected
 } from '@web3-react/injected-connector';
+
 import { ethers } from 'ethers';
+
+import { ConnectionProvider } from './contexts/ConnectionContext';
 
 import './index.css';
 import App from './App';
@@ -16,7 +21,6 @@ import * as serviceWorker from './serviceWorker';
 
 import { NotifyProvider }  from './contexts/NotifyContext';
 // TODO: layers to context
-import { LayerProvider }  from './contexts/LayerContext';
 import { YieldProvider }  from './contexts/YieldContext';
 import { PositionsProvider }  from './contexts/PositionsContext';
 
@@ -40,23 +44,24 @@ function getErrorMessage(error: Error) {
 }
 
 // TODO: uncomment for production infura support.
-function getLibrary(provider : any) {
+function getLibrary(provider:any) {
   // return new ethers.providers.InfuraProvider([network = “homestead”][,apiAccessToken])
+  // @ts-ignore
   return new ethers.providers.Web3Provider(provider);
 }
 
 ReactDOM.render(
   <React.StrictMode>
     <Web3ReactProvider getLibrary={getLibrary}>
-      <NotifyProvider>
-        <YieldProvider>
-          <PositionsProvider>
-            <LayerProvider>
+      <ConnectionProvider>
+        <NotifyProvider>
+          <YieldProvider>
+            <PositionsProvider>
               <App />
-            </LayerProvider>
-          </PositionsProvider>
-        </YieldProvider>
-      </NotifyProvider>
+            </PositionsProvider>
+          </YieldProvider>
+        </NotifyProvider>
+      </ConnectionProvider>
     </Web3ReactProvider>
   </React.StrictMode>,
   document.getElementById('root')

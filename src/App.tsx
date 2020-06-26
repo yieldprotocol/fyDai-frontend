@@ -1,7 +1,6 @@
 import React from 'react';
-import { useWeb3React } from '@web3-react/core';
 import { 
-  Grommet, 
+  Grommet,
   base, 
   Tabs, 
   Tab, 
@@ -34,47 +33,23 @@ import SeriesLayer from './views/layers/SeriesLayer';
 import TestLayer from './views/layers/TestLayer';
 
 import { IYieldSeries } from './types';
-import { PositionsContext } from './contexts/PositionsContext';
 
 function App() {
-  const { active, library, chainId, account } = useWeb3React();
   const [darkmode, setDarkmode] = React.useState(false);
   const [activeView, setActiveView] = React.useState<string>('BORROW');
   const [activeSeries, setActiveSeries] = React.useState<IYieldSeries | null>(null);
 
   const [loading, setLoading] = React.useState(false);
 
-  const { state: posState } = React.useContext(PositionsContext);
-
-  // TODO move to layerContext
   const [showConnectLayer, setShowConnectLayer] = React.useState<boolean>(false);
   const [showAccountLayer, setShowAccountLayer] = React.useState<boolean>(false);
   const [showTestLayer, setShowTestLayer] = React.useState<boolean>(false);
   const [showSeriesLayer, setShowSeriesLayer] = React.useState<boolean>(false);
 
-  const eagerConnect = useEagerConnect();
-  // const makerVault = useMakerVault();
-
-  const manageConnection = async () => {
-    setLoading(true);
-    if ( !active && chainId && account ) {
-      await eagerConnect;
-      // const maker = await createMaker(library.providers);
-      // await maker.authenticate();
-      // maker && console.log(`makerConnection: ${maker.currentAddress()}`);
-    }
-    setLoading(false);
-  };
-
   const changeConnection = () => {
     setShowAccountLayer(false);
     setShowConnectLayer(true);
   };
-
-  React.useEffect(() => {
-    // (async () => activate(injected, console.log))();
-    manageConnection();
-  }, [ active, account, chainId ]);
 
   return (
     <div className="App">
