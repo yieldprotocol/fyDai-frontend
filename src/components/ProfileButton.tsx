@@ -4,10 +4,10 @@ import { Image, Text, Button, Box } from 'grommet';
 
 import { useConnectorImage } from '../hooks/connectionHooks';
 
-import { Web3Context } from '../contexts/Web3Context'; 
+import { ConnectionContext } from '../contexts/ConnectionContext'; 
 
 const ProfileButton = (props: any) => {
-  // const { account } = React.useContext(Web3Context);
+  // const { account } = React.useContext(ConnectionContext);
   const [ accLabel, setAccLabel ] = React.useState<string>('');
   // const [ connectorImage, setConnectorImage ] = React.useState<string>('');
   const { action, account } = props;

@@ -5,7 +5,7 @@ import { McdPlugin, ETH, DAI, BAT } from '@makerdao/dai-plugin-mcd';
 
 import { ethers } from 'ethers';
 
-import { Web3Context } from '../contexts/Web3Context';
+import { ConnectionContext } from '../contexts/ConnectionContext';
 
 import rinkebyAddresses from '../contracts/makerAddrs/rinkeby.json';
 import goerliAddresses from '../contracts/makerAddrs/goerli.json';
@@ -59,7 +59,7 @@ const defineNetwork = (_networkId:number) => {
 
 export const useMaker = () => {
 
-  const { state : { account, chainId, provider } } = React.useContext(Web3Context);
+  const { state : { account, chainId, provider } } = React.useContext(ConnectionContext);
   const [openVaultActive, setOpenVaultActive] = React.useState<boolean>(false);
   const [convertVaultActive, setConvertVaultActive] = React.useState<boolean>(false);
   const [getVaultActive, setGetVaultActive] = React.useState<boolean>(false);

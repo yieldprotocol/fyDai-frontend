@@ -2,6 +2,9 @@ import React from 'react';
 import { useWeb3React } from '@web3-react/core';
 import { ethers }  from 'ethers';
 
+import { NotifyContext } from '../contexts/NotifyContext';
+import { ConnectionContext } from '../contexts/ConnectionContext';
+
 import YDai from '../contracts/YDai.json';
 import Dealer from '../contracts/Dealer.json';
 import TestERC20 from '../contracts/TestERC20.json';
@@ -13,8 +16,7 @@ import Vat from '../contracts/Vat.json';
 import Pot from '../contracts/Pot.json';
 import EthProxy from '../contracts/EthProxy.json';
 
-import { NotifyContext } from '../contexts/NotifyContext';
-import { Web3Context } from '../contexts/Web3Context';
+
 
 // ethers.errors.setLogLevel('error');
 
@@ -33,7 +35,7 @@ const contractMap = new Map<string, any>([
 
 export function useBalances() {
 
-  const { state: { provider, account } } = React.useContext(Web3Context);
+  const { state: { provider, account } } = React.useContext(ConnectionContext);
 
   const getEthBalance = async () => {
     if (!!provider && !!account) {
@@ -54,7 +56,7 @@ export function useBalances() {
 
 export const useCallTx = () => {
 
-  const { state: { provider } } = React.useContext(Web3Context);
+  const { state: { provider } } = React.useContext(ConnectionContext);
   const [ callTxActive, setCallTxActive ] = React.useState<boolean>();
   const callTx = async (
     contractAddr:string,
@@ -74,7 +76,7 @@ export const useCallTx = () => {
 
 export const useEthProxy = () => {
 
-  const { state: { signer, account } } = React.useContext(Web3Context);
+  const { state: { signer, account } } = React.useContext(ConnectionContext);
   const { abi: ethProxyAbi } = EthProxy;
   const  { dispatch: notifyDispatch }  = React.useContext<any>(NotifyContext);
   const [ postEthActive, setPostEthActive ] = React.useState<boolean>(false);
@@ -144,7 +146,7 @@ export const useEthProxy = () => {
 
 export const useDealer = () => {
   const { abi: dealerAbi } = Dealer;
-  const { state: { signer, account } } = React.useContext(Web3Context);
+  const { state: { signer, account } } = React.useContext(ConnectionContext);
 
   // const { library, account } = useWeb3React();
   const  { dispatch: notifyDispatch }  = React.useContext<any>(NotifyContext);
@@ -321,7 +323,7 @@ export const useDealer = () => {
 // SendTx is a generic function to interact with any contract, primarily used for development/testing.
 export const useSendTx = () => {
   // const { library } = useWeb3React();
-  const { state: { signer, account } } = React.useContext(Web3Context);
+  const { state: { signer, account } } = React.useContext(ConnectionContext);
   const [ sendTxActive, setSendTxActive ] = React.useState<boolean>();
   
   const sendTx = async (contractAddr:string, contractName:string, fn:string, data:any[], value:ethers.BigNumber ) => {

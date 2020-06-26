@@ -6,7 +6,7 @@ import Maker from '@makerdao/dai';
 import { McdPlugin } from '@makerdao/dai-plugin-mcd';
 
 import ProviderBridge from 'ethers-web3-bridge';
-import { Web3Context } from '../contexts/Web3Context';
+import { ConnectionContext } from '../contexts/ConnectionContext';
 
 import { injected, trezor, walletlink, torus } from '../connectors';
 
@@ -44,7 +44,7 @@ export function useEagerConnect() {
 
 export function useConnectorImage() {
   const { connector } = useWeb3React();
-  const { state:{ provider } } = React.useContext(Web3Context);
+  const { state:{ provider } } = React.useContext(ConnectionContext);
   const [ image, setImage ] = React.useState<any>();
   React.useEffect(() => {
     switch (connector) {

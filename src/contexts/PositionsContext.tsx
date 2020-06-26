@@ -6,7 +6,7 @@ import * as utils from '../utils';
 import { useCallTx } from '../hooks/yieldHooks';
 
 import { YieldContext } from './YieldContext';
-import { Web3Context } from './Web3Context';
+import { ConnectionContext } from './ConnectionContext';
 
 const PositionsContext = React.createContext<any>({});
 
@@ -30,7 +30,7 @@ function reducer(state:any, action:any) {
 const PositionsProvider = ({ children }:any) => {
 
   // const { chainId, account } = useWeb3React();
-  const { state: { chainId, account } } = React.useContext(Web3Context);
+  const { state: { chainId, account } } = React.useContext(ConnectionContext);
   const initState = { positionsIndicator: 0, positionsData : new Map(), positionSelected: '' };
   const [ state, dispatch ] = React.useReducer(reducer, initState);
   const { state: yieldState } = React.useContext(YieldContext);

@@ -1,7 +1,6 @@
 import React from 'react';
-import { useWeb3React } from '@web3-react/core';
 import { 
-  Grommet, 
+  Grommet,
   base, 
   Tabs, 
   Tab, 
@@ -12,9 +11,6 @@ import {
   Text 
 } from 'grommet';
 import { deepMerge } from 'grommet/utils';
-
-import Maker from '@makerdao/dai';
-import { McdPlugin, ETH, DAI } from '@makerdao/dai-plugin-mcd';
 
 import { yieldTheme } from './themes';
 import { useEagerConnect }  from './hooks/connectionHooks';
@@ -39,10 +35,10 @@ import TestLayer from './views/layers/TestLayer';
 import { IYieldSeries } from './types';
 
 function App() {
-  // const { active, library, chainId, account } = useWeb3React();
   const [darkmode, setDarkmode] = React.useState(false);
   const [activeView, setActiveView] = React.useState<string>('BORROW');
   const [activeSeries, setActiveSeries] = React.useState<IYieldSeries | null>(null);
+
   const [loading, setLoading] = React.useState(false);
 
   const [showConnectLayer, setShowConnectLayer] = React.useState<boolean>(false);

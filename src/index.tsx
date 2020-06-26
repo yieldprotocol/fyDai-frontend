@@ -13,7 +13,7 @@ import {
 
 import { ethers } from 'ethers';
 
-import { Web3Provider } from './contexts/Web3Context';
+import { ConnectionProvider } from './contexts/ConnectionContext';
 
 import './index.css';
 import App from './App';
@@ -53,7 +53,7 @@ function getLibrary(provider:any) {
 ReactDOM.render(
   <React.StrictMode>
     <Web3ReactProvider getLibrary={getLibrary}>
-      <Web3Provider>
+      <ConnectionProvider>
         <NotifyProvider>
           <YieldProvider>
             <PositionsProvider>
@@ -61,7 +61,7 @@ ReactDOM.render(
             </PositionsProvider>
           </YieldProvider>
         </NotifyProvider>
-      </Web3Provider>
+      </ConnectionProvider>
     </Web3ReactProvider>
   </React.StrictMode>,
   document.getElementById('root')

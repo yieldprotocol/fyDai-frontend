@@ -25,13 +25,13 @@ import {
 
 // TODO: use theming context properly - no cheating :)
 import { yieldTheme } from '../themes';
-import { Web3Context } from '../contexts/Web3Context';
+import { ConnectionContext } from '../contexts/ConnectionContext';
   
 const YieldFooter = (props: any) => {
 
 
   const { setShowTestLayer, showTestLayer, setDarkmode, darkmode, changeConnection } = props;
-  const {state:{ account }} = React.useContext(Web3Context);
+  const {state:{ account }} = React.useContext(ConnectionContext);
   // const { active } = useWeb3React();
 
   return (

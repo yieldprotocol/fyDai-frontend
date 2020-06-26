@@ -10,7 +10,7 @@ import logoDark from '../assets/images/logo.svg';
 import logoLight from '../assets/images/logo_light.svg';
 import ProfileButton from './ProfileButton';
 
-import { Web3Context } from '../contexts/Web3Context';
+import { ConnectionContext } from '../contexts/ConnectionContext';
 
 const YieldHeader = (props: any) => {
   
@@ -21,8 +21,8 @@ const YieldHeader = (props: any) => {
     setActiveView
   } = props;
   
-  const web3Context = React.useContext(Web3Context);
-  const { state: { account } } = web3Context;
+
+  const { state: { account } } = React.useContext(ConnectionContext);
 
   const theme = React.useContext<any>(ThemeContext);
 

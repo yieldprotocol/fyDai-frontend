@@ -10,7 +10,7 @@ import { IYieldSeries } from '../types';
 import { useCallTx, useBalances } from '../hooks/yieldHooks';
 
 import { NotifyContext } from './NotifyContext';
-import { Web3Context } from './Web3Context';
+import { ConnectionContext } from './ConnectionContext';
 
 const YieldContext = React.createContext<any>({});
 
@@ -70,28 +70,52 @@ function reducer(state:any, action:any) {
 }
 
 const YieldProvider = ({ children }:any) => {
-
   const initState = {
     isLoading: true,
+    // cachable
     deployedSeries : [],
     deployedCore: {},
-    deployedPeripheral: {},
     deployedExternal: {},
+    deployedPeripheral: {},
+
+    // transient
     yieldData: {},
     makerData: {},
-    extBalances:{},
+    extBalances: {},
   };
   const [ state, dispatch ] = React.useReducer(reducer, initState);
 
-  const { state: { account, chainId } } = React.useContext(Web3Context);
-
+  const { state: { account, chainId, signer } } = React.useContext(ConnectionContext);
   // const { chainId } = useWeb3React();
-
   const { dispatch: notifyDispatch } = React.useContext(NotifyContext);
   const [ callTx ] = useCallTx();
   const { getEthBalance, getTokenBalance }  = useBalances();
 
-  // async get all yield addresses from db 
+  // async get all yield addresses from db
+  const getYieldAddrsFirebase = async (networkId:number|string): Promise<any[]> => {
+    const _deployedSeries:any[] = [];
+    let _deployedCore;
+    let _deployedExternal;
+    let _deployedPeripheral;
+    try {
+      _deployedCore = await firebase.firestore().collection(networkId.toString()).doc('deployedCore').get().then( doc => doc.data());
+      _deployedExternal = await firebase.firestore().collection(networkId.toString()).doc('deployedExternal').get().then( doc => doc.data());
+      _deployedPeripheral = await firebase.firestore().collection(networkId.toString()).doc('deployedPeripheral').get().then( doc => doc.data());
+      await firebase.firestore().collection(networkId.toString()).doc('deployedSeries').collection('deployedSeries')
+        .get()
+        .then( (querySnapshot:any) => {
+          querySnapshot.forEach((doc:any) => {
+            _deployedSeries.push(doc.data());
+          });
+        });
+    } catch (e) {
+      notifyDispatch({ type: 'fatal', payload:{ message: `${e} - try changing networks` } } );
+    }
+    console.log(_deployedSeries);
+    return [ _deployedSeries, _deployedCore, _deployedExternal, _deployedPeripheral ];
+  };
+
+  // async get all yield addresses from cache/chain
   const getYieldAddrs = async (networkId:number|string): Promise<any[]> => {
     const _deployedSeries:any[] = [];
     let _deployedCore;
@@ -167,7 +191,7 @@ const YieldProvider = ({ children }:any) => {
     _balanceData.wethBalance = await getTokenBalance(deployedExternal.Weth, 'Weth');
     _balanceData.chaiBalance = await getTokenBalance(deployedExternal.Chai, 'Chai');
     _balanceData.daiBalance = await getTokenBalance(deployedExternal.Dai, 'Dai');
-    
+
     // parse and return maker data
     return {
       ..._balanceData,
@@ -182,6 +206,7 @@ const YieldProvider = ({ children }:any) => {
     const _pot = await callTx(deployedExternal.Pot, 'Pot', 'chi', []);
     const _ilks = await callTx(deployedExternal.Vat, 'Vat', 'ilks', [ethers.utils.formatBytes32String('ETH-A')]);
     const _urns = await callTx(deployedExternal.Vat, 'Vat', 'urns', [ethers.utils.formatBytes32String('ETH-A'), account ]);
+    
     // parse and return maker data
     return { 
       ilks: {
@@ -228,7 +253,7 @@ const YieldProvider = ({ children }:any) => {
     console.log(balances);
     dispatch({ type:'updateExtBalances', payload: balances });
 
-    // #4 Get MakerDao data
+    // #5 Get MakerDao data
     const makerData = await fetchMakerData(deployedExternal);
     dispatch({ type:'updateMakerData', payload: makerData });
 
