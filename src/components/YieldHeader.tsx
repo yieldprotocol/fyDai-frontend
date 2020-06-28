@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-// import { useWeb3React } from '@web3-react/core';
+import { useWeb3React } from '@web3-react/core';
 
 import { Text, Image, Header, Button, Box, ThemeContext } from 'grommet';
 import { FaSeedling as YieldLeaf } from 'react-icons/fa';
@@ -23,6 +23,7 @@ const YieldHeader = (props: any) => {
   
 
   const { state: { account } } = React.useContext(ConnectionContext);
+  // const { account } = useWeb3React();
 
   const theme = React.useContext<any>(ThemeContext);
 

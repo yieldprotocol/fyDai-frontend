@@ -29,8 +29,9 @@ function reducer(state:any, action:any) {
 
 const PositionsProvider = ({ children }:any) => {
 
-  // const { chainId, account } = useWeb3React();
   const { state: { chainId, account } } = React.useContext(ConnectionContext);
+  // const { chainId, account } = useWeb3React();
+
   const initState = { positionsIndicator: 0, positionsData : new Map(), positionSelected: '' };
   const [ state, dispatch ] = React.useReducer(reducer, initState);
   const { state: yieldState } = React.useContext(YieldContext);
@@ -44,10 +45,10 @@ const PositionsProvider = ({ children }:any) => {
       deployedSeries.map( async (x:any, i:number) => {
         chainData.push(x);
         try {
-          chainData[i].wethDebtDai = await callTx(deployedCore.Dealer, 'Dealer', 'debtDai', [utils.WETH, x.maturity, account]);
-          chainData[i].wethDebtYDai = await callTx(deployedCore.Dealer, 'Dealer', 'debtYDai', [utils.WETH, x.maturity, account]);
-          chainData[i].chaiDebtDai = await callTx(deployedCore.Dealer, 'Dealer', 'debtDai', [utils.CHAI, x.maturity, account]);
-          chainData[i].chaiDebtYDai = await callTx(deployedCore.Dealer, 'Dealer', 'debtYDai', [utils.CHAI, x.maturity, account]);
+          // chainData[i].wethDebtDai = await callTx(deployedCore.Dealer, 'Dealer', 'debtDai', [utils.WETH, x.maturity, account]);
+          // chainData[i].wethDebtYDai = await callTx(deployedCore.Dealer, 'Dealer', 'debtYDai', [utils.WETH, x.maturity, account]);
+          // chainData[i].chaiDebtDai = await callTx(deployedCore.Dealer, 'Dealer', 'debtDai', [utils.CHAI, x.maturity, account]);
+          // chainData[i].chaiDebtYDai = await callTx(deployedCore.Dealer, 'Dealer', 'debtYDai', [utils.CHAI, x.maturity, account]);
         } catch (e) {
           console.log(`Could not load series blockchain data: ${e}`);
         }
@@ -63,10 +64,8 @@ const PositionsProvider = ({ children }:any) => {
       positions.set(
         x.symbol,
         { ...x,
-          wethDebtDai_p: parseFloat(ethers.utils.formatEther(x.wethDebtDai.toString())),
-          wethDebtYDai_p: parseFloat(ethers.utils.formatEther(x.wethDebtYDai.toString())),
-          chaiDebtDai_p: parseFloat(ethers.utils.formatEther(x.chaiDebtDai.toString())),
-          chaiDebtYDai_p: parseFloat(ethers.utils.formatEther(x.chaiDebtYDai.toString())),
+          // wethDebtYDai_: parseFloat(ethers.utils.formatEther(x.wethDebtYDai.toString())),
+          // chaiDebtYDai_: parseFloat(ethers.utils.formatEther(x.chaiDebtYDai.toString())),
         }
       );
     });
@@ -74,7 +73,7 @@ const PositionsProvider = ({ children }:any) => {
   };
 
   const getPositions = async (seriesArr:any[], force:boolean) => {
-
+    
     let filteredSeriesArr;
     if (force !== true) {
       filteredSeriesArr = seriesArr.filter(x => !state.positionsData.has(x.symbol));

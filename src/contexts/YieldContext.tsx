@@ -2,12 +2,13 @@ import React from 'react';
 import firebase from 'firebase';
 
 import { ethers } from 'ethers';
-// import { useWeb3React } from '@web3-react/core';
+import { useWeb3React } from '@web3-react/core';
 
 import * as utils from '../utils';
 
 import { IYieldSeries } from '../types';
 import { useCallTx, useBalances } from '../hooks/yieldHooks';
+import { useCachedState } from '../hooks/appHooks';
 
 import { NotifyContext } from './NotifyContext';
 import { ConnectionContext } from './ConnectionContext';
@@ -70,6 +71,7 @@ function reducer(state:any, action:any) {
 }
 
 const YieldProvider = ({ children }:any) => {
+
   const initState = {
     isLoading: true,
     // cachable
@@ -77,66 +79,85 @@ const YieldProvider = ({ children }:any) => {
     deployedCore: {},
     deployedExternal: {},
     deployedPeripheral: {},
-
     // transient
     yieldData: {},
     makerData: {},
+    // user
     extBalances: {},
   };
-  const [ state, dispatch ] = React.useReducer(reducer, initState);
 
-  const { state: { account, chainId, signer } } = React.useContext(ConnectionContext);
+  const [ state, dispatch ] = React.useReducer(reducer, initState);
+  const { state: { account, chainId } } = React.useContext(ConnectionContext);
+  // const { account, chainId } = useWeb3React();
+
+  const [ cachedCore, setCachedCore ] = useCachedState('deployedCore', null);
+  const [ cachedExternal, setCachedExternal ] = useCachedState('deployedExternal', null);
+  const [ cachedPeripheral, setCachedPeripheral ] = useCachedState('deployedPeripheral', null);
+  const [ cachedSeries, setCachedSeries ] = useCachedState('deployedSeries', null);
+
   // const { chainId } = useWeb3React();
   const { dispatch: notifyDispatch } = React.useContext(NotifyContext);
   const [ callTx ] = useCallTx();
   const { getEthBalance, getTokenBalance }  = useBalances();
 
-  // async get all yield addresses from db
-  const getYieldAddrsFirebase = async (networkId:number|string): Promise<any[]> => {
+  // async get all public yield addresses from cache/chain
+  const getYieldAddrs = async (networkId:number|string, forceUpdate:boolean): Promise<any[]> => {
+    
     const _deployedSeries:any[] = [];
     let _deployedCore;
     let _deployedExternal;
     let _deployedPeripheral;
-    try {
-      _deployedCore = await firebase.firestore().collection(networkId.toString()).doc('deployedCore').get().then( doc => doc.data());
-      _deployedExternal = await firebase.firestore().collection(networkId.toString()).doc('deployedExternal').get().then( doc => doc.data());
-      _deployedPeripheral = await firebase.firestore().collection(networkId.toString()).doc('deployedPeripheral').get().then( doc => doc.data());
-      await firebase.firestore().collection(networkId.toString()).doc('deployedSeries').collection('deployedSeries')
-        .get()
-        .then( (querySnapshot:any) => {
-          querySnapshot.forEach((doc:any) => {
-            _deployedSeries.push(doc.data());
-          });
-        });
-    } catch (e) {
-      notifyDispatch({ type: 'fatal', payload:{ message: `${e} - try changing networks` } } );
-    }
-    console.log(_deployedSeries);
-    return [ _deployedSeries, _deployedCore, _deployedExternal, _deployedPeripheral ];
-  };
 
-  // async get all yield addresses from cache/chain
-  const getYieldAddrs = async (networkId:number|string): Promise<any[]> => {
-    const _deployedSeries:any[] = [];
-    let _deployedCore;
-    let _deployedExternal;
-    let _deployedPeripheral;
     try {
-      _deployedCore = await firebase.firestore().collection(networkId.toString()).doc('deployedCore').get().then( doc => doc.data());
-      _deployedExternal = await firebase.firestore().collection(networkId.toString()).doc('deployedExternal').get().then( doc => doc.data());
-      _deployedPeripheral = await firebase.firestore().collection(networkId.toString()).doc('deployedPeripheral').get().then( doc => doc.data());
+      if (!cachedCore || forceUpdate) {
+        // TODO firebase > chain migration
+        _deployedCore = await firebase.firestore()
+          .collection(networkId.toString()).doc('deployedCore').get()
+          .then( doc => doc.data());
+        window.localStorage.removeItem(`${networkId}_deployedCore`);
+        setCachedCore(_deployedCore);
+        console.log('Core contract list updated');
+      } else {_deployedCore = cachedCore;}
 
-      await firebase.firestore().collection(networkId.toString()).doc('deployedSeries').collection('deployedSeries')
-        .get()
-        .then( (querySnapshot:any) => {
-          querySnapshot.forEach((doc:any) => {
-            _deployedSeries.push(doc.data());
+      if (!cachedExternal|| forceUpdate) {
+        // TODO firebase > chain migration
+        _deployedExternal = await firebase.firestore()
+          .collection(networkId.toString()).doc('deployedExternal').get()
+          .then( doc => doc.data());
+        window.localStorage.removeItem(`${networkId}_deployedExternal`);
+        setCachedExternal(_deployedExternal);
+        console.log('External contract list updated');
+      } else {_deployedExternal = cachedExternal;}
+
+      if (!cachedPeripheral || forceUpdate) {
+        // TODO firebase > chain migration
+        _deployedPeripheral = await firebase.firestore()
+          .collection(networkId.toString()).doc('deployedPeripheral').get()
+          .then( doc => doc.data());
+        window.localStorage.removeItem(`${networkId}_deployedPeripheral`);
+        setCachedPeripheral(_deployedPeripheral);
+        console.log('Peripheral contract list updated');
+      } else {_deployedPeripheral = cachedPeripheral;}
+
+      if (!cachedSeries || forceUpdate) {
+        // if cache empty or forced update > get series from blockchain (or firebase)
+        // TODO firebase > chain migration
+        await firebase.firestore().collection(networkId.toString()).doc('deployedSeries').collection('deployedSeries')
+          .get()
+          .then( (querySnapshot:any) => {
+            querySnapshot.forEach((doc:any) => {
+              _deployedSeries.push(doc.data());
+            });
           });
-        });
+        window.localStorage.removeItem(`${networkId}_deployedSeries`);
+        setCachedSeries(_deployedSeries);
+        console.log('Series contract list updated');
+      } else {_deployedSeries.push(...cachedSeries);}
+
     } catch (e) {
-      notifyDispatch({ type: 'fatal', payload:{ message: `${e} - try changing networks` } } );
+      console.log(e);
+      notifyDispatch({ type: 'fatal', payload:{ message: 'Error getting Yield system addresses - Try changing network.' } } );
     }
-    console.log(_deployedSeries);
     return [ _deployedSeries, _deployedCore, _deployedExternal, _deployedPeripheral ];
   };
 
@@ -147,7 +168,7 @@ const YieldProvider = ({ children }:any) => {
       seriesAddrs.map( async (x:any, i:number)=> {
         _seriesData.push(x);
         try {
-          _seriesData[i].yDaiBalance = await callTx(x.yDai, 'YDai', 'balanceOf', [account]);
+          // _seriesData[i].yDaiBalance = await callTx(x.yDai, 'YDai', 'balanceOf', [account]);
         } catch (e) {
           console.log(`Could not load series blockchain data: ${e}`);
         }
@@ -157,8 +178,8 @@ const YieldProvider = ({ children }:any) => {
     return _seriesData.map((x:any, i:number) => {
       return {
         ...x,
-        yDaiBalance_p: ethers.utils.formatEther(x.yDaiBalance.toString()),
-        maturity_p: new Date( (x.maturity) * 1000 ),
+        // yDaiBalance_: ethers.utils.formatEther(x.yDaiBalance.toString()),
+        maturity_: new Date( (x.maturity) * 1000 ),
         seriesColor: seriesColors[i],
       };
     });
@@ -167,38 +188,54 @@ const YieldProvider = ({ children }:any) => {
   // async yield data for the user address
   const fetchYieldData = async (deployedCore:any): Promise<any> => {
     const _yieldData:any = {};
+    // _yieldData.ethBalance = await getEthBalance();
     _yieldData.wethPosted = await callTx(deployedCore.Dealer, 'Dealer', 'posted', [utils.WETH, account]);
-    _yieldData.chaiPosted = await callTx(deployedCore.Dealer, 'Dealer', 'posted', [utils.CHAI, account]);
-    _yieldData.chaiTotalDebtDai = await callTx(deployedCore.Dealer, 'Dealer', 'totalDebtDai', [utils.CHAI, account]);
-    _yieldData.chaiTotalDebtYDai = await callTx(deployedCore.Dealer, 'Dealer', 'totalDebtYDai', [utils.CHAI, account]);
-    _yieldData.wethTotalDebtDai = await callTx(deployedCore.Dealer, 'Dealer', 'totalDebtDai', [utils.WETH, account]);
+    // _yieldData.chaiPosted = await callTx(deployedCore.Dealer, 'Dealer', 'posted', [utils.CHAI, account]);
+    // _yieldData.chaiTotalDebtYDai = await callTx(deployedCore.Dealer, 'Dealer', 'totalDebtYDai', [utils.CHAI, account]);
     _yieldData.wethTotalDebtYDai = await callTx(deployedCore.Dealer, 'Dealer', 'totalDebtYDai', [utils.WETH, account]);
+    // _yieldData.chaiTotalDebtDai = await callTx(deployedCore.Dealer, 'Dealer', 'totalDebtDai', [utils.CHAI, account]);
+    // _yieldData.wethTotalDebtDai = await callTx(deployedCore.Dealer, 'Dealer', 'totalDebtDai', [utils.WETH, account]);
+
+    console.log(_yieldData.wethPosted, _yieldData.wethTotalDebtYDai);
     // parse and return maker data
     return {
       ..._yieldData,
-      wethPosted_p: parseFloat(ethers.utils.formatEther(_yieldData.wethPosted.toString())),
-      chaiPosted_p: parseFloat(ethers.utils.formatEther(_yieldData.chaiPosted.toString())),
-      wethTotalDebtDai_p: parseFloat(ethers.utils.formatEther(_yieldData.wethTotalDebtDai.toString())),
-      wethTotalDebtYDai_p: parseFloat(ethers.utils.formatEther(_yieldData.wethTotalDebtYDai.toString())),
-      chaiTotalDebtDai_p: parseFloat(ethers.utils.formatEther(_yieldData.chaiTotalDebtDai.toString())),
-      chaiTotalDebtYDai_p: parseFloat(ethers.utils.formatEther(_yieldData.chaiTotalDebtYDai.toString())),
+      // ethBalance_: parseFloat(ethers.utils.formatEther(_yieldData.ethBalance.toString())),
+      wethPosted_: parseFloat(ethers.utils.formatEther(_yieldData.wethPosted.toString())),
+      // chaiPosted_: parseFloat(ethers.utils.formatEther(_yieldData.chaiPosted.toString())),
+      wethTotalDebtYDai_: parseFloat(ethers.utils.formatEther(_yieldData.wethTotalDebtYDai.toString())),
+      // chaiTotalDebtYDai_: parseFloat(ethers.utils.formatEther(_yieldData.chaiTotalDebtYDai.toString())),
+      // wethTotalDebtDai_p: parseFloat(ethers.utils.formatEther(_yieldData.wethTotalDebtDai.toString())),
+      // chaiTotalDebtDai_p: parseFloat(ethers.utils.formatEther(_yieldData.chaiTotalDebtDai.toString())),
     };
   };
 
   const fetchExtBalances = async (deployedExternal:any): Promise<any> => {
-    const _balanceData:any = {};
-    _balanceData.ethBalance = await getEthBalance();
-    _balanceData.wethBalance = await getTokenBalance(deployedExternal.Weth, 'Weth');
-    _balanceData.chaiBalance = await getTokenBalance(deployedExternal.Chai, 'Chai');
-    _balanceData.daiBalance = await getTokenBalance(deployedExternal.Dai, 'Dai');
+    const _balances:any = {};
+    _balances.ethBalance = await getEthBalance();
+    // _balances.daiBalance = await getTokenBalance(deployedExternal.Dai, 'Dai');
+    // _balanceData.wethBalance = await getTokenBalance(deployedExternal.Weth, 'Weth');
+    // _balanceData.chaiBalance = await getTokenBalance(deployedExternal.Chai, 'Chai');
 
     // parse and return maker data
     return {
-      ..._balanceData,
-      ethBalance_p: parseFloat(ethers.utils.formatEther(_balanceData.ethBalance.toString())),
-      wethBalance_p: parseFloat(ethers.utils.formatEther(_balanceData.wethBalance.toString())),
-      chaiBalance_p: parseFloat(ethers.utils.formatEther(_balanceData.chaiBalance.toString())),
-      daiBalance_p: parseFloat(ethers.utils.formatEther(_balanceData.daiBalance.toString())),
+      ..._balances,
+      ethBalance_: parseFloat(ethers.utils.formatEther(_balances.ethBalance.toString())),
+      //  daiBalance_: parseFloat(ethers.utils.formatEther(_balances.daiBalance.toString())),
+      //  wethBalance_: parseFloat(ethers.utils.formatEther(_balanceData.wethBalance.toString())),
+      //  chaiBalance_: parseFloat(ethers.utils.formatEther(_balanceData.chaiBalance.toString())),
+    };
+  };
+
+  const fetchUserData = async (): Promise<any> => {
+    const _balances:any = {};
+    _balances.ethBalance = await getEthBalance();
+    // parse and return maker data
+    return {
+      ..._balances,
+      ethBalance_: parseFloat(ethers.utils.formatEther(_balances.ethBalance.toString())),
+      // wethBalance_: parseFloat(ethers.utils.formatEther(_balanceData.wethBalance.toString())),
+      // chaiBalance_: parseFloat(ethers.utils.formatEther(_balanceData.chaiBalance.toString())),
     };
   };
 
@@ -206,25 +243,24 @@ const YieldProvider = ({ children }:any) => {
     const _pot = await callTx(deployedExternal.Pot, 'Pot', 'chi', []);
     const _ilks = await callTx(deployedExternal.Vat, 'Vat', 'ilks', [ethers.utils.formatBytes32String('ETH-A')]);
     const _urns = await callTx(deployedExternal.Vat, 'Vat', 'urns', [ethers.utils.formatBytes32String('ETH-A'), account ]);
-    
     // parse and return maker data
     return { 
       ilks: {
         ..._ilks,
-        Art_p: utils.rayToHuman(_ilks.Art),
-        spot_p: utils.rayToHuman(_ilks.spot),
-        rate_p: utils.rayToHuman(_ilks.rate),
-        line_p: utils.rayToHuman(_ilks.line),
-        dust_p: utils.rayToHuman(_ilks.dust),
+        Art_: utils.rayToHuman(_ilks.Art),
+        spot_: utils.rayToHuman(_ilks.spot),
+        rate_: utils.rayToHuman(_ilks.rate),
+        line_: utils.rayToHuman(_ilks.line),
+        dust_: utils.rayToHuman(_ilks.dust),
       },
       urns: {
         ..._urns,
-        art_p: utils.rayToHuman(_urns.art),
-        ink_p: utils.rayToHuman(_urns.ink),
+        art_: utils.rayToHuman(_urns.art),
+        ink_: utils.rayToHuman(_urns.ink),
       },
       pot: {
         ..._pot,
-        chi_p: _pot.chi,
+        chi_: _pot.chi,
       }
     };
   };
@@ -235,7 +271,12 @@ const YieldProvider = ({ children }:any) => {
     dispatch({ type:'isLoading', payload: true });
 
     // #1 Get yield addresses from db
-    const [ deployedSeries, deployedCore, deployedExternal, deployedPeripheral ] = await getYieldAddrs(networkId);
+    const [ 
+      deployedSeries,
+      deployedCore,
+      deployedExternal,
+      deployedPeripheral
+    ] = await getYieldAddrs(networkId, false);
     dispatch({ type:'updateDeployedCore', payload: deployedCore });
     dispatch({ type:'updateDeployedExternal', payload: deployedExternal });
     dispatch({ type:'updateDeployedPeripheral', payload: deployedPeripheral });
@@ -254,13 +295,14 @@ const YieldProvider = ({ children }:any) => {
     dispatch({ type:'updateExtBalances', payload: balances });
 
     // #5 Get MakerDao data
-    const makerData = await fetchMakerData(deployedExternal);
-    dispatch({ type:'updateMakerData', payload: makerData });
+    // const makerData = await fetchMakerData(deployedExternal);
+    // dispatch({ type:'updateMakerData', payload: makerData });
 
     dispatch({ type:'isLoading', payload: false });
   };
 
   React.useEffect( () => {
+
     ( async () => chainId && getAllData(chainId))();
   }, [chainId]);
 

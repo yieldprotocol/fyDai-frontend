@@ -91,8 +91,8 @@ const Borrow = ({ setActiveSeries, activeSeries, setShowSeriesLayer }:BorrowProp
               margin='small'
             >
               <Box align='center'>
-                <Text weight='bold'>{moment(activePosition?.maturity_p).format('MMM')}</Text>
-                <Text>{moment(activePosition?.maturity_p).format('Y')}</Text>
+                <Text weight='bold'>{moment(activePosition?.maturity_).format('MMM')}</Text>
+                <Text>{moment(activePosition?.maturity_).format('Y')}</Text>
               </Box>
             </Box>}
         </Box>
@@ -118,21 +118,21 @@ const Borrow = ({ setActiveSeries, activeSeries, setShowSeriesLayer }:BorrowProp
             round
             pad={{ horizontal:'small', vertical:'xsmall' }}
           >
-            <Text size='xsmall' color='brand'>{yieldData.wethPosted_p} ETH</Text>
+            <Text size='xsmall' color='brand'>{yieldData.wethPosted_} ETH</Text>
           </Box>
           <Box
             background='secondaryTransparent'
             round
             pad={{ horizontal:'small', vertical:'xsmall' }}
           >
-            <Text size='xsmall' color='secondary'>{yieldData.chaiPosted_p} DAI</Text>
+            <Text size='xsmall' color='secondary'>{yieldData.chaiPosted_} DAI</Text>
           </Box>
         </Box>
 
         <Box direction='row' gap='small' align='baseline'> 
           <Text weight='bold' size='xsmall'>Maturity: </Text>
           <Box round border='all' pad={{ horizontal:'small', vertical:'xsmall' }}>
-            <Text size='xsmall'>{moment(activePosition?.maturity_p).format('MMMM DD, YYYY')}</Text>
+            <Text size='xsmall'>{moment(activePosition?.maturity_).format('MMMM DD, YYYY')}</Text>
           </Box>
         </Box>
       </Box>
@@ -145,7 +145,7 @@ const Borrow = ({ setActiveSeries, activeSeries, setShowSeriesLayer }:BorrowProp
           />
           <BorrowRepay
             activeSeries={activeSeries}
-            active={yieldData.wethPosted_p > 0}
+            active={yieldData.wethPosted_ > 0}
           />
         </Box>
       </Box>

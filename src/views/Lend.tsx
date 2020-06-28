@@ -38,9 +38,10 @@ const Lend = ({ setActiveSeries, activeSeries, setShowSeriesLayer }:BorrowProps)
 
   const { isLoading: positionsLoading, positionsData } = positionsState; 
   const { isLoading: yieldLoading, deployedSeries, deployedCore, yieldData, makerData }  = yieldState;
+  
   const {
-    maturity_p,
-    yDaiBalance_p,
+    maturity_,
+    yDaiBalance_,
     // currentValue,
     seriesColor,
   }  = activeSeries;
@@ -53,14 +54,6 @@ const Lend = ({ setActiveSeries, activeSeries, setShowSeriesLayer }:BorrowProps)
     })();
     console.log(positionsState);
   }, [ activeSeries ]);
-
-  const {
-    name,
-    maturity,
-    rate,
-    symbol,
-    currentValue,
-  } = activeSeries;
 
   return (
 
@@ -101,8 +94,8 @@ const Lend = ({ setActiveSeries, activeSeries, setShowSeriesLayer }:BorrowProps)
               margin='small'
             >
               <Box align='center'>
-                <Text weight='bold'>{moment(activePosition?.maturity_p).format('MMM')}</Text>
-                <Text>{moment(activePosition?.maturity_p).format('Y')}</Text>
+                <Text weight='bold'>{moment(activePosition?.maturity_).format('MMM')}</Text>
+                <Text>{moment(activePosition?.maturity_).format('Y')}</Text>
               </Box>
             </Box>}
         </Box>
@@ -128,7 +121,7 @@ const Lend = ({ setActiveSeries, activeSeries, setShowSeriesLayer }:BorrowProps)
             round
             pad={{ horizontal:'small', vertical:'xsmall' }}
           >
-            <Text size='xsmall' color='brand'>{yDaiBalance_p} yDai ≈ {yDaiBalance_p*1.01} Dai</Text>
+            <Text size='xsmall' color='brand'>{yDaiBalance_} yDai ≈ {yDaiBalance_*1.01} Dai</Text>
           </Box>
         </Box>
 

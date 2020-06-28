@@ -1,13 +1,10 @@
 export interface IYieldSeries {
   name: string
   maturity: number;
-  maturity_p: Date;
+  maturity_: Date;
   YDai: string;
-  yDaiBalance_p: any;
+  yDaiBalance_: any;
   yDaiBalance: any;
-  ChaiDealer: string;
-  Mint: string;
-  WethDealer: string;
   symbol:string;
   id?: string;
   rate?: any;

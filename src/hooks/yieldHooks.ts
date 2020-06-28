@@ -16,8 +16,6 @@ import Vat from '../contracts/Vat.json';
 import Pot from '../contracts/Pot.json';
 import EthProxy from '../contracts/EthProxy.json';
 
-
-
 // ethers.errors.setLogLevel('error');
 
 const contractMap = new Map<string, any>([
@@ -36,10 +34,13 @@ const contractMap = new Map<string, any>([
 export function useBalances() {
 
   const { state: { provider, account } } = React.useContext(ConnectionContext);
+  // const { library: txProvider, account } = useWeb3React();
 
   const getEthBalance = async () => {
     if (!!provider && !!account) {
+      console.log(provider);
       const balance = await provider.getBalance(account);
+      console.log(balance);
       return balance;
     } return ethers.BigNumber.from('0');
   };
@@ -55,8 +56,9 @@ export function useBalances() {
 }
 
 export const useCallTx = () => {
+  const { state: { provider, altProvider } } = React.useContext(ConnectionContext);
+  // const { library: provider, account } = useWeb3React();
 
-  const { state: { provider } } = React.useContext(ConnectionContext);
   const [ callTxActive, setCallTxActive ] = React.useState<boolean>();
   const callTx = async (
     contractAddr:string,
@@ -64,9 +66,8 @@ export const useCallTx = () => {
     fn:string,
     data:any[]
   ) => {
-
     setCallTxActive(true);
-    const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), provider);
+    const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), provider||altProvider);
     const retVal = await contract[fn](...data);
     setCallTxActive(false);
     return retVal;
@@ -77,6 +78,9 @@ export const useCallTx = () => {
 export const useEthProxy = () => {
 
   const { state: { signer, account } } = React.useContext(ConnectionContext);
+  // const { library, account } = useWeb3React();
+  // const signer = library.getSigner();
+
   const { abi: ethProxyAbi } = EthProxy;
   const  { dispatch: notifyDispatch }  = React.useContext<any>(NotifyContext);
   const [ postEthActive, setPostEthActive ] = React.useState<boolean>(false);
@@ -146,7 +150,10 @@ export const useEthProxy = () => {
 
 export const useDealer = () => {
   const { abi: dealerAbi } = Dealer;
+  
   const { state: { signer, account } } = React.useContext(ConnectionContext);
+  // const { library, account } = useWeb3React();
+  // const signer = library.getSigner();
 
   // const { library, account } = useWeb3React();
   const  { dispatch: notifyDispatch }  = React.useContext<any>(NotifyContext);
@@ -322,8 +329,11 @@ export const useDealer = () => {
 
 // SendTx is a generic function to interact with any contract, primarily used for development/testing.
 export const useSendTx = () => {
-  // const { library } = useWeb3React();
+
   const { state: { signer, account } } = React.useContext(ConnectionContext);
+  // const { library, account } = useWeb3React();
+  // const signer = library.getSigner();
+
   const [ sendTxActive, setSendTxActive ] = React.useState<boolean>();
   
   const sendTx = async (contractAddr:string, contractName:string, fn:string, data:any[], value:ethers.BigNumber ) => {

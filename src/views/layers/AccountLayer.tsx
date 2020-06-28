@@ -12,10 +12,8 @@ import ProfileButton from '../../components/ProfileButton';
 const AccountLayer = (props:any) => {
   const { closeLayer, changeWallet } = props;
 
-  const { chainId } = React.useContext(ConnectionContext);
-  const { state: { extBalances }, actions } = React.useContext(YieldContext);
-  
-  // const { extBalances } = state;
+  const { state: { chainId }  } = React.useContext(ConnectionContext);
+  const { state: { extBalances } } = React.useContext(YieldContext);
 
   const onClose = () => {
     closeLayer();
@@ -58,7 +56,7 @@ const AccountLayer = (props:any) => {
           <Text weight="bold">{chainId && getNetworkName(chainId) }</Text>
           <Box direction='row' gap='small'>
             <Text size='xsmall'>ETH balance:</Text>
-            <Text>{ extBalances.ethBalance_p && extBalances.ethBalance_p || '' }</Text>
+            <Text>{ extBalances.ethBalance_ && extBalances.ethBalance_ || '' }</Text>
           </Box>
           {/* <Button fill='horizontal' label='Connect to another wallet' onClick={()=>setShowConnectLayer(true)} /> */}
         </Box>
@@ -69,10 +67,10 @@ const AccountLayer = (props:any) => {
           // gap='small'
           overflow='auto'
         >
-          <Text>Previous TX Info?</Text>
-          <Text>Previous TX Info?</Text>
-          <Text>Previous TX Info?</Text>
-          <Text>Previous TX Info? </Text>
+          <Text>Previous TX Info</Text>
+          <Text>Previous TX Info</Text>
+          <Text>Previous TX Info</Text>
+          <Text>Previous TX Info</Text>
 
         </Box>
         <Footer pad='medium' gap='xsmall' direction='row' justify='center' align='center'>

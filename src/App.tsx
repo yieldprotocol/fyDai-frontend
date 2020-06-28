@@ -12,8 +12,10 @@ import {
 } from 'grommet';
 import { deepMerge } from 'grommet/utils';
 
+// import { useWeb3React } from '@web3-react/core';
+
 import { yieldTheme } from './themes';
-import { useEagerConnect }  from './hooks/connectionHooks';
+import { useEagerConnect, useInactiveListener }  from './hooks/connectionHooks';
 
 import Landing from './views/Landing';
 import Borrow from './views/Borrow';
@@ -35,11 +37,12 @@ import TestLayer from './views/layers/TestLayer';
 import { IYieldSeries } from './types';
 
 function App() {
+
+  // const { connector, library, chainId, account, activate, deactivate, active, error } = useWeb3React();
+
   const [darkmode, setDarkmode] = React.useState(false);
   const [activeView, setActiveView] = React.useState<string>('BORROW');
   const [activeSeries, setActiveSeries] = React.useState<IYieldSeries | null>(null);
-
-  const [loading, setLoading] = React.useState(false);
 
   const [showConnectLayer, setShowConnectLayer] = React.useState<boolean>(false);
   const [showAccountLayer, setShowAccountLayer] = React.useState<boolean>(false);

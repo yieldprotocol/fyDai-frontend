@@ -25,8 +25,8 @@ const YieldSeriesMenuItem = ({
 
   const {
     name,
-    maturity_p,
-    yDaiBalance_p,
+    maturity_,
+    yDaiBalance_,
     currentValue,
     seriesColor,
   } = series;
@@ -86,19 +86,19 @@ const YieldSeriesMenuItem = ({
           </Box>
 
           <Box>
-            <Text size="small" weight={selected ? 'bold': 'normal'}>{moment(maturity_p).format('MMMM Y')}</Text>
+            <Text size="small" weight={selected ? 'bold': 'normal'}>{moment(maturity_).format('MMMM Y')}</Text>
             <Text 
               size="xsmall" 
-              color={getBalanceColor(yDaiBalance_p, !!selected)}
+              color={getBalanceColor(yDaiBalance_, !!selected)}
             >
-              Balance: {yDaiBalance_p} yDai
+              Balance: {yDaiBalance_} yDai
             </Text> 
           </Box>
         </Box>
 
         <Box direction='row'>
           <Box justify='end'>
-            <Text color={parseInt(yDaiBalance_p, 10) === 0 ? 'border': seriesColor}> 
+            <Text color={parseInt(yDaiBalance_, 10) === 0 ? 'border': seriesColor}> 
               <Star />
             </Text>
           </Box>
@@ -118,7 +118,7 @@ const YieldSeriesMenuItem = ({
               <Box direction="row" gap="xsmall">
                 <Text size="xsmall">Matures: </Text>
                 <Text size="xsmall" weight="bold">
-                  { moment(maturity_p).format('MMM YYYY') }
+                  { moment(maturity_).format('MMM YYYY') }
                 </Text>
               </Box>
               <Box direction="row" gap="xsmall">

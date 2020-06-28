@@ -1,5 +1,5 @@
 import React from 'react';
-// import { useWeb3React } from '@web3-react/core';
+import { useWeb3React } from '@web3-react/core';
 
 import { 
   Anchor, 
@@ -32,7 +32,7 @@ const YieldFooter = (props: any) => {
 
   const { setShowTestLayer, showTestLayer, setDarkmode, darkmode, changeConnection } = props;
   const {state:{ account }} = React.useContext(ConnectionContext);
-  // const { active } = useWeb3React();
+  // const { account } = useWeb3React();
 
   return (
     <Footer
