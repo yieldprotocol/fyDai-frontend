@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React from 'react';
 import { ConnectionContext } from '../contexts/ConnectionContext';
 
 export const useCachedState = (key:string, initialValue:any) => {
@@ -6,7 +6,6 @@ export const useCachedState = (key:string, initialValue:any) => {
   const { state:{ chainId } } = React.useContext(ConnectionContext);
   // const genKey = `${chainId}_${key}` || key;
   const genKey = key;
-
   const [storedValue, setStoredValue] = React.useState(
     () => {
       try {
@@ -20,7 +19,6 @@ export const useCachedState = (key:string, initialValue:any) => {
       }
     }
   );
-
   const setValue = (value:any) => {
     try {
       // For same API as useState

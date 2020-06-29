@@ -14,7 +14,7 @@ import { ConnectionProvider } from './contexts/ConnectionContext';
 import { Web3ReactProvider, createWeb3ReactRoot, UnsupportedChainIdError } from '@web3-react/core';
 import { NoEthereumProviderError, UserRejectedRequestError as UserRejectedRequestErrorInjected } from '@web3-react/injected-connector';
 
-// TODO: Production infura support
+// TODO: re-implement web3-react & Production infura support
 function getLibrary(provider:any) {
   // return new ethers.providers.InfuraProvider([network = “homestead”][,apiAccessToken])
   // @ts-ignore

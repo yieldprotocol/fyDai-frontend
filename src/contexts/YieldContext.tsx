@@ -4,17 +4,12 @@ import { ethers, BigNumber } from 'ethers';
 // import { useWeb3React } from '@web3-react/core';
 
 import * as utils from '../utils';
-
 import { IYieldSeries, IUser } from '../types';
-
-// import { useBalances } from '../hooks/yieldHooks';
-
-import { useCallTx, useCachedState, useBalances } from '../hooks';
-
-// import { useCachedState } from '../hooks/appHooks';
 
 import { NotifyContext } from './NotifyContext';
 import { ConnectionContext } from './ConnectionContext';
+
+import { useCallTx, useCachedState, useBalances } from '../hooks';
 
 const YieldContext = React.createContext<any>({});
 
@@ -48,8 +43,6 @@ function reducer(state:any, action:any) {
         ...state,
         deployedExternal: action.payload,
       };
-
-
     case 'updateYieldData':
       return {
         ...state,
@@ -59,11 +52,6 @@ function reducer(state:any, action:any) {
       return {
         ...state,
         userData: action.payload,
-      };
-    case 'updateExtBalances': 
-      return {
-        ...state,
-        extBalances: action.payload,
       };
     case 'updateMakerData': 
       return {
@@ -172,7 +160,7 @@ const YieldProvider = ({ children }:any) => {
     return [ _deployedSeries, _deployedCore, _deployedExternal, _deployedPeripheral ];
   };
 
-  // Async add extra non-cached blockchain data for each series AND PARSE data.
+  // Add extra non-cached blockchain data for each series AND PARSE data.
   const _getSeriesData = async (seriesAddrs:IYieldSeries[]): Promise<IYieldSeries[]> => {
     const _seriesData:any[] = [];
     await Promise.all(
@@ -186,9 +174,9 @@ const YieldProvider = ({ children }:any) => {
         }
       })
     );
+    
     // Parse and return data
     return _seriesData.map((x:any, i:number) => {
-      console.log(x);
       return {
         ...x,
         yDaiBalance_: ethers.utils.formatEther(x.yDaiBalance.toString()),
@@ -198,7 +186,7 @@ const YieldProvider = ({ children }:any) => {
     });
   };
 
-  // async  non-cached yield protocol general data
+  // Non-cached yield protocol general data
   const _getYieldData = async (deployedCore:any): Promise<any> => {
     const _yieldData:any = {};
     // parse data if required.
@@ -207,7 +195,7 @@ const YieldProvider = ({ children }:any) => {
     };
   };
 
-  // async yield data for the user address
+  // Yield data for the user address
   const _getUserData = async (deployedCore:any, deployedExternal:any): Promise<any> => {
     const _yieldData:any = {};
     _yieldData.ethBalance = await getEthBalance();
@@ -215,6 +203,7 @@ const YieldProvider = ({ children }:any) => {
     _yieldData.ethTotalDebtYDai = await callTx(deployedCore.Dealer, 'Dealer', 'totalDebtYDai', [utils.WETH, account]);
     // _yieldData.chaiPosted = await callTx(deployedCore.Dealer, 'Dealer', 'posted', [utils.CHAI, account]);
     // _yieldData.chaiTotalDebtYDai = await callTx(deployedCore.Dealer, 'Dealer', 'totalDebtYDai', [utils.CHAI, account]);
+    
     // parse and return user data
     return {
       ..._yieldData,
@@ -226,6 +215,7 @@ const YieldProvider = ({ children }:any) => {
     };
   };
 
+  // Get maker data if reqd.
   const _getMakerData = async (deployedExternal:any): Promise<any> => {
     const _pot = await callTx(deployedExternal.Pot, 'Pot', 'chi', []);
     const _ilks = await callTx(deployedExternal.Vat, 'Vat', 'ilks', [ethers.utils.formatBytes32String('ETH-A')]);

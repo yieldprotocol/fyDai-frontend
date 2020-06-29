@@ -105,7 +105,6 @@ const YieldHeader = (props: any) => {
           </Text>
         </Box>
       </Box>
-
       <Box direction='row' align='baseline'>
 
         {pendingTxs.length >0 && 

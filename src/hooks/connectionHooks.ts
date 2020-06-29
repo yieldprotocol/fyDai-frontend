@@ -1,11 +1,6 @@
 import React from 'react';
+
 import { useWeb3React } from '@web3-react/core';
-import Maker from '@makerdao/dai';
-import { McdPlugin } from '@makerdao/dai-plugin-mcd';
-
-import ProviderBridge from 'ethers-web3-bridge';
-import { ConnectionContext } from '../contexts/ConnectionContext';
-
 import { injected, trezor, walletlink, torus } from '../connectors';
 
 import injectedImage from '../assets/images/providers/metamask.png';
@@ -13,6 +8,8 @@ import trezorImage from '../assets/images/providers/trezor.png';
 import walletlinkImage from '../assets/images/providers/walletlink.png';
 import torusImage from '../assets/images/providers/torus.png';
 import noConnectionImage from '../assets/images/providers/noconnection.png';
+
+import { ConnectionContext } from '../contexts/ConnectionContext';
 
 // Eager connect is an attempt to 'auto connect' to injected connection eg. Metamask.
 export function useEagerConnect() {
