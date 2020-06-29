@@ -1,6 +1,6 @@
 import React from 'react';
-import { useWeb3React } from '@web3-react/core';
 import { ethers }  from 'ethers';
+// import { useWeb3React } from '@web3-react/core';
 
 import { NotifyContext } from '../contexts/NotifyContext';
 import { ConnectionContext } from '../contexts/ConnectionContext';
@@ -8,82 +8,19 @@ import { ConnectionContext } from '../contexts/ConnectionContext';
 import YDai from '../contracts/YDai.json';
 import Dealer from '../contracts/Dealer.json';
 import TestERC20 from '../contracts/TestERC20.json';
-import WETH9 from '../contracts/WETH9.json';
-import GemJoin from '../contracts/GemJoin.json';
-import DaiJoin from '../contracts/DaiJoin.json';
-import Chai from '../contracts/Chai.json';
-import Vat from '../contracts/Vat.json';
-import Pot from '../contracts/Pot.json';
 import EthProxy from '../contracts/EthProxy.json';
 
 // ethers.errors.setLogLevel('error');
 
-const contractMap = new Map<string, any>([
-  ['YDai', YDai.abi],
-  ['Dealer', Dealer.abi],
-  ['Dai', TestERC20.abi],
-  ['Weth', WETH9.abi],
-  ['Chai', Chai.abi],
-  ['WethJoin', GemJoin.abi],
-  ['DaiJoin', DaiJoin.abi],
-  ['Vat', Vat.abi],
-  ['Pot', Pot.abi],
-  ['EthProxy', EthProxy.abi],
-]);
-
-export function useBalances() {
-
-  const { state: { provider, account } } = React.useContext(ConnectionContext);
-  // const { library: txProvider, account } = useWeb3React();
-
-  const getEthBalance = async () => {
-    if (!!provider && !!account) {
-      const balance = await provider.getBalance(account);
-      return balance;
-    } return ethers.BigNumber.from('0');
-  };
-
-  const getTokenBalance = async (tokenAddr:string, abi:string) => {
-    if (!!provider && !!account) {
-      const contract = new ethers.Contract(tokenAddr, contractMap.get(abi), provider);
-      const balance = await contract.balanceOf(account);
-      return balance;
-    } return ethers.BigNumber.from('0');
-  };
-  return { getEthBalance, getTokenBalance } as const;
-}
-
-export const useCallTx = () => {
-  const { state: { provider, altProvider } } = React.useContext(ConnectionContext);
-  // const { library: provider, account } = useWeb3React();
-  const [ callTxActive, setCallTxActive ] = React.useState<boolean>();
-  const callTx = async (
-    contractAddr:string,
-    contractName:string,
-    fn:string,
-    data:any[]
-  ) => {
-    setCallTxActive(true);
-    const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), provider || altProvider);
-    const retVal = await contract[fn](...data);
-    setCallTxActive(false);
-    return retVal;
-  };
-  return [ callTx, callTxActive ] as const;
-};
-
 export const useEthProxy = () => {
-
   const { state: { signer, account } } = React.useContext(ConnectionContext);
   // const { library, account } = useWeb3React();
   // const signer = library.getSigner();
 
   const { abi: ethProxyAbi } = EthProxy;
-  const  { dispatch: notifyDispatch }  = React.useContext<any>(NotifyContext);
+  const  { dispatch }  = React.useContext<any>(NotifyContext);
   const [ postEthActive, setPostEthActive ] = React.useState<boolean>(false);
   const [ withdrawEthActive, setWithdrawEthActive ] = React.useState<boolean>(false);
-  // const { library, account } = useWeb3React();
-  // const signer = provider?.getSigner();
 
   const postEth = async (
     ethProxyAddress:string,
@@ -96,22 +33,23 @@ export const useEthProxy = () => {
     const fromAddr = account && ethers.utils.getAddress(account);
     const toAddr = fromAddr;
     const ethProxyAddr = ethers.utils.getAddress(ethProxyAddress);
+
     // Contract interaction
     setPostEthActive(true);
     const contract = new ethers.Contract( ethProxyAddr, ethProxyAbi, signer );
     try {
       tx = await contract.post(fromAddr, toAddr, parsedAmount, { value: parsedAmount });
     } catch (e) {
-      notifyDispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed.', type:'error' } } );
+      dispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed. See console.', type:'error' } } );
       console.log(e.message);
       setPostEthActive(false);
       return;
     }
     // Transaction reporting & tracking
-    notifyDispatch({ type: 'notify', payload:{ message:`Deposit of ${amount} pending...`, type:'info' } } );
+    dispatch({ type: 'txPending', payload:{ tx, message: `Deposit of ${amount} ETH pending...` } } );
     await tx.wait();
     setPostEthActive(false);
-    notifyDispatch({ type: 'notify', payload:{ message: `Deposit of ${amount} complete.`, type:'success' } } );
+    dispatch({ type: 'txComplete', payload:{ tx, message:`Deposit of ${amount} ETH complete` } } );
   };
 
   const withdrawEth = async (
@@ -129,14 +67,14 @@ export const useEthProxy = () => {
     try {
       tx = await contract.withdraw(fromAddr, toAddr, parsedAmount);
     } catch (e) {
-      notifyDispatch({ type: 'notify', payload:{ message:'Error Withdrawing funds', type:'error' } } );
+      dispatch({ type: 'notify', payload:{ message:'Error Withdrawing funds', type:'error' } } );
       setWithdrawEthActive(false);
       return;
     }
-    notifyDispatch({ type: 'notify', payload:{ message: `Withdraw of ${amount} pending...`, type:'info' } } );
+    dispatch({ type: 'txPending', payload:{ tx, message: `Withdraw of ${amount} pending...` } } );
     await tx.wait();
     setWithdrawEthActive(false);
-    notifyDispatch({ type: 'notify', payload:{ message: `Withdrawal of ${amount} complete.`, type:'success' } } );
+    dispatch({ type: 'txComplete', payload:{ tx, message:`Withdrawal of ${amount} complete.` } } );
   };
 
   return {
@@ -153,7 +91,7 @@ export const useDealer = () => {
   // const signer = library.getSigner();
 
   // const { library, account } = useWeb3React();
-  const  { dispatch: notifyDispatch }  = React.useContext<any>(NotifyContext);
+  const  { dispatch }  = React.useContext<any>(NotifyContext);
   const [ postActive, setPostActive ] = React.useState<boolean>(false);
   const [ withdrawActive, setWithdrawActive ] = React.useState<boolean>(false);
   const [ borrowActive, setBorrowActive ] = React.useState<boolean>(false);
@@ -174,22 +112,25 @@ export const useDealer = () => {
     const toAddr = fromAddr;
     const dealerAddr = ethers.utils.getAddress(dealerAddress);
     const collateralBytes = ethers.utils.formatBytes32String(collateral);
+
     // Contract interaction
     setPostActive(true);
     const contract = new ethers.Contract( dealerAddr, dealerAbi, signer );
     try {
       tx = await contract.post(collateralBytes, fromAddr, toAddr, parsedAmount);
     } catch (e) {
-      notifyDispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed.', type:'error' } } );
+      dispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed.', type:'error' } } );
       console.log(e);
       setPostActive(false);
       return;
     }
     // Transaction reporting & tracking
-    notifyDispatch({ type: 'notify', payload:{ message:`Deposit of ${amount} pending...`, type:'info' } } );
+    dispatch({ type: 'notify', payload:{ message:`Deposit of ${amount} pending...`, type:'info' } } );
+    dispatch({ type: 'txPending', payload:{ tx, message: `Withdraw of ${amount} pending...` } } );
     await tx.wait();
     setPostActive(false);
-    notifyDispatch({ type: 'notify', payload:{ message: `Deposit of ${amount} complete.`, type:'success' } } );
+    dispatch({ type: 'notify', payload:{ message: `Deposit of ${amount} complete.`, type:'success' } } );
+    dispatch({ type: 'txComplete', payload:{ tx, message:`Deposit of ${amount} ETH complete` } } );
   };
 
   const withdraw = async (
@@ -209,15 +150,15 @@ export const useDealer = () => {
     try {
       tx = await contract.withdraw(collateralBytes, fromAddr, toAddr, parsedAmount);
     } catch (e) {
-      notifyDispatch({ type: 'notify', payload:{ message:'Error Withdrawing funds', type:'error' } } );
+      dispatch({ type: 'notify', payload:{ message:'Error Withdrawing funds', type:'error' } } );
       console.log(e);
       setWithdrawActive(false);
       return;
     }
-    notifyDispatch({ type: 'notify', payload:{ message: `Withdraw of ${amount} pending...`, type:'info' } } );
+    dispatch({ type: 'txPending', payload:{ tx, message: `Withdraw of ${amount} pending...` } } );
     await tx.wait();
     setWithdrawActive(false);
-    notifyDispatch({ type: 'notify', payload:{ message: `Withdrawal of ${amount} complete.`, type:'success' } } );
+    dispatch({ type: 'txComplete', payload:{ tx, message:`Withdrawal of ${amount} complete.` } } );
   };
 
   const borrow = async (
@@ -238,15 +179,15 @@ export const useDealer = () => {
     try {
       tx = await contract.borrow(collateralBytes, maturity, toAddr, parsedAmount);
     } catch (e) {
-      notifyDispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed.', type:'error' } } );
+      dispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed.', type:'error' } } );
       console.log(e);
       setBorrowActive(false);
       return;
     }
-    notifyDispatch({ type: 'notify', payload:{ message: `Borrowing of ${amount} pending...`, type:'info' } } );
+    dispatch({ type: 'txPending', payload:{ tx, message: `Borrowing of ${amount} pending...` } } );
     await tx.wait();
     setBorrowActive(false);
-    notifyDispatch({ type: 'notify', payload:{ message: `Borrowing of ${amount} complete.`, type:'success' } } );
+    dispatch({ type: 'txComplete', payload:{ tx, message:`Borrowing of ${amount} complete.` } } );
   };
 
   const repay = async (
@@ -274,15 +215,15 @@ export const useDealer = () => {
         tx = await contract.repayDai(collateralBytes, maturity, fromAddr, parsedAmount);
       }
     } catch (e) {
-      notifyDispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed.', type:'error' } } );
+      dispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed.', type:'error' } } );
       console.log(e);
       setRepayActive(false);
       return;
     }
-    notifyDispatch({ type: 'notify', payload:{ message: `Repayment of ${amount} Dai pending...`, type:'info' } } );
+    dispatch({ type: 'txPending', payload:{ tx, message: `Repayment of ${amount} pending...` } } );
     await tx.wait();
     setRepayActive(false);
-    notifyDispatch({ type: 'notify', payload:{ message: `Repayment of ${amount} yDai complete.`, type:'success' } } );
+    dispatch({ type: 'txComplete', payload:{ tx, message:`Repayment of ${amount} complete.` } } );
   };
 
   // Not strictly a Dealer Contract function. But associated enough to keep in here. 
@@ -304,15 +245,15 @@ export const useDealer = () => {
     try {
       tx = await contract.approve(dealerAddr, parsedAmount);
     } catch (e) {
-      notifyDispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed.', type:'error' } } );
+      dispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed.', type:'error' } } );
       console.log(e);
       setApproveActive(false);
       return;
     }
-    notifyDispatch({ type: 'notify', payload:{ message: `Token approval of ${amount} pending...`, type:'info' } } );
+    dispatch({ type: 'txPending', payload:{ tx, message: `Token approval of ${amount} pending...` } } );
     await tx.wait();
     setApproveActive(false);
-    notifyDispatch({ type: 'notify', payload:{ message: `Token approval of ${amount} complete. ${tokenAddress} and ${dealerAddress}`, type:'success' } } );
+    dispatch({ type: 'txComplete', payload:{ tx, message:`Token approval of ${amount} complete. ${tokenAddress} and ${dealerAddress}` } } );
   };
 
   return {
@@ -331,7 +272,7 @@ export const useYDai = () => {
   // const signer = library.getSigner();
   
   const { abi: yDaiAbi } = YDai;
-  const  { dispatch: notifyDispatch }  = React.useContext<any>(NotifyContext);
+  const  { dispatch }  = React.useContext<any>(NotifyContext);
   const [ redeemActive, setRedeemActive ] = React.useState<boolean>(false);
 
   const redeem = async (
@@ -349,45 +290,17 @@ export const useYDai = () => {
     try {
       tx = await contract.withdraw(fromAddr, toAddr, parsedAmount);
     } catch (e) {
-      notifyDispatch({ type: 'notify', payload:{ message:'Error Redeeming funds.', type:'error' } } );
+      dispatch({ type: 'notify', payload:{ message:'Error Redeeming funds.', type:'error' } } );
       setRedeemActive(false);
       return;
     }
-    notifyDispatch({ type: 'notify', payload:{ message: `Redeeming ${amount} pending...`, type:'info' } } );
+    dispatch({ type: 'txPending', payload:{ tx, message: `Redeeming ${amount} pending...` } } );
     await tx.wait();
     setRedeemActive(false);
-    notifyDispatch({ type: 'notify', payload:{ message: `Redeeming ${amount} complete.`, type:'success' } } );
+    dispatch({ type: 'txComplete', payload:{ tx, message:`Redeeming ${amount} complete.` } } );
   };
 
   return {
     redeem, redeemActive
   } as const;
-};
-
-
-// SendTx is a generic function to interact with any contract, primarily used for development/testing.
-export const useSendTx = () => {
-  const { state: { signer, account } } = React.useContext(ConnectionContext);
-  // const { library, account } = useWeb3React();
-  // const signer = library.getSigner();
-
-  const [ sendTxActive, setSendTxActive ] = React.useState<boolean>();
-  const sendTx = async (contractAddr:string, contractName:string, fn:string, data:any[], value:ethers.BigNumber ) => {
-    let tx;
-    console.log(contractAddr, contractMap.get(contractName), signer); 
-    setSendTxActive(true);
-    const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), signer);
-    if (!value.isZero()) {
-      console.log(`Tx sends ETH: ${value.toString()} `);
-      tx = await contract[fn](...data, { value });
-    } else {
-      console.log('Tx has no ETH associated with it (except gas, obs)');
-      tx = await contract[fn](...data);
-    }
-    console.log(`${tx.hash} pending`);
-    await tx.wait();
-    setSendTxActive(false);
-    console.log(`${tx.hash} send tx complete`);
-  };
-  return [ sendTx, sendTxActive ] as const;
 };

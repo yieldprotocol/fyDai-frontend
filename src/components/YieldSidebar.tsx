@@ -16,9 +16,6 @@ import PulseLoader from 'react-spinners/PulseLoader';
 import { IYieldSeries } from '../types';
 import { YieldContext } from '../contexts/YieldContext';
 import YieldSeriesMenuItem from './YieldSeriesMenuItem';
-
-
-
 // import YieldSeries from './YieldSeries';
 
 const YieldSidebar = ({ activeSeries, setActiveSeries, setShowSeriesLayer }:{activeSeries:IYieldSeries|null, setActiveSeries:any, setShowSeriesLayer:any}) => {
@@ -27,6 +24,7 @@ const YieldSidebar = ({ activeSeries, setActiveSeries, setShowSeriesLayer }:{act
   const [showMore, setShowMore] = React.useState<boolean>(false);
   const [openIndex, setOpenIndex] = React.useState<number | null >(null);
 
+  const { deployedSeries } = state;
   // const handleSelectSeries = (ind: number | null) => {
   //   openIndex !== ind ?
   //     // setOpenIndex(ind) :
@@ -36,8 +34,8 @@ const YieldSidebar = ({ activeSeries, setActiveSeries, setShowSeriesLayer }:{act
   // };
 
   React.useEffect(() => {
-    !state.isLoading && setSeriesList(state.deployedSeries);
-  }, [ state.isLoading ]);
+    !state.isLoading && setSeriesList(deployedSeries);
+  }, [ state.isLoading, deployedSeries ]);
 
   return (
     

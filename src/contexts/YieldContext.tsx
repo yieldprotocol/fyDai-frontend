@@ -5,9 +5,13 @@ import { ethers, BigNumber } from 'ethers';
 
 import * as utils from '../utils';
 
-import { IYieldSeries } from '../types';
-import { useCallTx, useBalances } from '../hooks/yieldHooks';
-import { useCachedState } from '../hooks/appHooks';
+import { IYieldSeries, IUser } from '../types';
+
+// import { useBalances } from '../hooks/yieldHooks';
+
+import { useCallTx, useCachedState, useBalances } from '../hooks';
+
+// import { useCachedState } from '../hooks/appHooks';
 
 import { NotifyContext } from './NotifyContext';
 import { ConnectionContext } from './ConnectionContext';
@@ -89,7 +93,7 @@ const YieldProvider = ({ children }:any) => {
     yieldData: {},
     makerData: {},
     // user
-    userData: null,
+    userData: {},
   };
 
   const [ state, dispatch ] = React.useReducer(reducer, initState);
@@ -207,17 +211,16 @@ const YieldProvider = ({ children }:any) => {
   const _getUserData = async (deployedCore:any, deployedExternal:any): Promise<any> => {
     const _yieldData:any = {};
     _yieldData.ethBalance = await getEthBalance();
-    _yieldData.wethPosted = await callTx(deployedCore.Dealer, 'Dealer', 'posted', [utils.WETH, account]);
-    _yieldData.wethTotalDebtYDai = await callTx(deployedCore.Dealer, 'Dealer', 'totalDebtYDai', [utils.WETH, account]);
+    _yieldData.ethPosted = await callTx(deployedCore.Dealer, 'Dealer', 'posted', [utils.WETH, account]);
+    _yieldData.ethTotalDebtYDai = await callTx(deployedCore.Dealer, 'Dealer', 'totalDebtYDai', [utils.WETH, account]);
     // _yieldData.chaiPosted = await callTx(deployedCore.Dealer, 'Dealer', 'posted', [utils.CHAI, account]);
     // _yieldData.chaiTotalDebtYDai = await callTx(deployedCore.Dealer, 'Dealer', 'totalDebtYDai', [utils.CHAI, account]);
-
     // parse and return user data
     return {
       ..._yieldData,
       ethBalance_: parseFloat(ethers.utils.formatEther(_yieldData.ethBalance.toString())),
-      wethPosted_: parseFloat(ethers.utils.formatEther(_yieldData.wethPosted.toString())),
-      wethTotalDebtYDai_: parseFloat(ethers.utils.formatEther(_yieldData.wethTotalDebtYDai.toString())),
+      ethPosted_: parseFloat(ethers.utils.formatEther(_yieldData.ethPosted.toString())),
+      ethTotalDebtYDai_: parseFloat(ethers.utils.formatEther(_yieldData.ethTotalDebtYDai.toString())),
       // chaiPosted_: parseFloat(ethers.utils.formatEther(_yieldData.chaiPosted.toString())),
       // chaiTotalDebtYDai_: parseFloat(ethers.utils.formatEther(_yieldData.chaiTotalDebtYDai.toString())),
     };
@@ -275,7 +278,7 @@ const YieldProvider = ({ children }:any) => {
     dispatch({ type:'updateDeployedSeries', payload: extraSeriesData });
 
     // #4 Fetch any user account data based on address (if any), possibly cached.
-    const userData = account? await _getUserData(deployedCore, deployedExternal): { ethBalance_:0 };
+    const userData = account ? await _getUserData(deployedCore, deployedExternal): { ethBalance_: 0 };
     dispatch({ type:'updateUserData', payload: userData });
 
     // #5 Get maker data
@@ -290,6 +293,7 @@ const YieldProvider = ({ children }:any) => {
 
   const actions = {
     updateUserData: (x:any, y:any) => _getUserData(x, y).then((res:any)=> dispatch({ type:'updateUserData', payload: res })),
+    updateSeriesData: (x:IYieldSeries[]) => _getSeriesData(x).then((res:any) => dispatch({ type:'updateDeployedSeries', payload: res })),
     updateYieldBalances: (x:any) => _getYieldData(x).then((res:any)=> dispatch({ type:'updateYieldData', payload: res })),
     // refreshYieldAddrs: () => _getYieldAddrs(chainId, true),
   };

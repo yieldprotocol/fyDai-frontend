@@ -4,9 +4,8 @@ import BorrowAction from './BorrowAction';
 import RepayAction from './RepayAction';
 
 import { YieldContext } from '../contexts/YieldContext';
-import { SeriesContext } from '../contexts/SeriesContext';
 
-import { useDealer, useBalances } from '../hooks/yieldHooks';
+import { useDealer, useBalances } from '../hooks';
 
 const BorrowRepay = ({ active, activeSeries }:any) => {
   const [over, setOver] = React.useState<boolean>(false);
@@ -25,14 +24,15 @@ const BorrowRepay = ({ active, activeSeries }:any) => {
   const borrowSteps = async (value:number) => {
     await borrow(deployedCore.Dealer, 'WETH', activeSeries.maturity, value );
     actions.updateUserData(state.deployedCore, state.deployedExternal);
-    actions.updateYieldBalances(state.deployedCore);
+    actions.updateSeriesData(state.deployedSeries);
   };
 
   const repaySteps = async (value:number, collateral:string) => {
     console.log(activeSeries);
     await repay(deployedCore.Dealer, 'WETH', activeSeries.maturity, value, collateral );
     actions.updateUserData(state.deployedCore, state.deployedExternal);
-    actions.updateYieldBalances(state.deployedCore);
+    // actions.updateYieldBalances(state.deployedCore);
+    actions.updateSeriesData(state.deployedSeries);
   };
 
   return (

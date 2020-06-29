@@ -1,3 +1,5 @@
+import { BigNumber } from "ethers";
+
 export interface IYieldSeries {
   name: string
   maturity: number;
@@ -16,6 +18,19 @@ export interface ISeriesPosition {
 
 }
 
+export interface IUser {
+  appPrefs: any;
+  account?: string;
+  ethBalance?: BigNumber;
+  ethBalance_?: number;
+  ethPosted?: BigNumber;
+  ethPosted_?: number;
+  totalDebtYDai?: BigNumber;
+  totalDebtYDai_?: number;
+  ethAvailable?:BigNumber;
+  ethAvailable_?:BigNumber;
+}
+
 export interface IReducerAction {
   type:string,
   payload?:any,
@@ -32,6 +47,7 @@ export interface INotification {
   timerMs?: number,
   fatalOpen?: boolean,
   fatalMsg?: string,
+  pendingTxs?: any,
 }
 
 export interface IYieldAccount {}

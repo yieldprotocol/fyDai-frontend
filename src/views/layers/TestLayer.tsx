@@ -12,7 +12,7 @@ import { getNetworkName }  from '../../hooks/connectionHooks';
 import ProfileButton from '../../components/ProfileButton';
 import { NotifyContext } from '../../contexts/NotifyContext';
 
-import { useSendTx, useCallTx, useDealer, useBalances, useEthProxy } from '../../hooks/yieldHooks';
+import { useSendTx, useCallTx, useDealer, useBalances, useEthProxy } from '../../hooks';
 
 import { YieldContext } from '../../contexts/YieldContext';
 import { SeriesContext } from '../../contexts/SeriesContext';
@@ -281,20 +281,20 @@ const TestLayer = (props:any) => {
                 </Box>
                 <Box gap='small'>
                   <Text weight='bold'>Posted collateral:</Text>
-                  <Text>weth posted: { yieldData.wethPosted_ }</Text>
+                  <Text>weth posted: { userData.ethPosted_ }</Text>
                   {/* <Text>chai posted: { yieldData.chaiPosted_ }</Text> */}
                   <Text weight='bold'>yDai balance:</Text>
                   <Text>yDai Balance: { positionsData.get('yDai-2020-09-30').yDaiBalance_ }</Text>
                   <Text weight='bold'>Weth Dealer:</Text>
                   {/* <Text>weth Debt Dai: { positionsData.get('yDai-2020-09-30').wethDebtDai_ }</Text> */}
-                  <Text>weth Debt YDai: { positionsData.get('yDai-2020-09-30').wethDebtYDai_ }</Text>
+                  <Text>weth Debt YDai: { positionsData.get('yDai-2020-09-30').ethDebtYDai_ }</Text>
                   {/* <Text>weth Total Debt Dai { yieldData.wethTotalDebtDai_ }</Text> */}
-                  <Text> weth Total Debt YDai: { yieldData.wethTotalDebtYDai_ }</Text>
+                  <Text> weth Total Debt YDai: { userData.ethTotalDebtYDai_ }</Text>
                   <Text weight='bold'>ChaiDealer:</Text>
                   {/* <Text>chai Debt Dai : { positionsData.get('yDai-2020-09-30').chaiDebtDai_}</Text> */}
                   <Text>chai Debt yDai : { positionsData.get('yDai-2020-09-30').chaiDebtYDai_}</Text>
                   {/* <Text>chai Total Debt Dai: { yieldData.chaiTotalDebtDai_ }</Text> */}
-                  <Text>chai Total Debt YDai: { yieldData.chaiTotalDebtYDai_ }</Text>
+                  <Text>chai Total Debt YDai: { userData.chaiTotalDebtYDai_ }</Text>
                 </Box>
               </Box>
               :

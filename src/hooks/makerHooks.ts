@@ -3,10 +3,6 @@ import React from 'react';
 import Maker from '@makerdao/dai';
 import { McdPlugin, ETH, DAI, BAT } from '@makerdao/dai-plugin-mcd';
 
-import { ethers } from 'ethers';
-
-import { useWeb3React } from '@web3-react/core';
-
 import { ConnectionContext } from '../contexts/ConnectionContext';
 
 import rinkebyAddresses from '../contracts/makerAddrs/rinkeby.json';

@@ -27,7 +27,7 @@ const Borrow = ({ setActiveSeries, activeSeries, setShowSeriesLayer }:BorrowProp
   const [ depositWithdrawActive, setDepositWithdrawActive ] = React.useState<boolean>(false);
 
   const { isLoading: positionsLoading, positionsData } = seriesState; 
-  const { isLoading: yieldLoading, extBalances, deployedSeries, deployedCore, yieldData, makerData }  = yieldState;
+  const { isLoading: yieldLoading, userData, deployedSeries, deployedCore, yieldData, makerData }  = yieldState;
 
 
   React.useEffect( () => {
@@ -106,22 +106,22 @@ const Borrow = ({ setActiveSeries, activeSeries, setShowSeriesLayer }:BorrowProp
           align='baseline'
         >
           <Box>
-            <Text weight='bold' size='xsmall'> Collateral Balances </Text>
+            <Text weight='bold' size='xsmall'> Collateral Balance </Text>
           </Box>
           <Box
             background='brandTransparent'
             round
             pad={{ horizontal:'small', vertical:'xsmall' }}
           >
-            <Text size='xsmall' color='brand'>{yieldData.wethPosted_} ETH</Text>
+            <Text size='xsmall' color='brand'>{userData.ethPosted_} ETH</Text>
           </Box>
-          <Box
+          {/* <Box
             background='secondaryTransparent'
             round
             pad={{ horizontal:'small', vertical:'xsmall' }}
           >
-            <Text size='xsmall' color='secondary'>{yieldData.chaiPosted_} DAI</Text>
-          </Box>
+            <Text size='xsmall' color='secondary'>{userData.chaiPosted_} DAI</Text>
+          </Box> */}
         </Box>
 
         <Box direction='row' gap='small' align='baseline'> 
@@ -140,7 +140,7 @@ const Borrow = ({ setActiveSeries, activeSeries, setShowSeriesLayer }:BorrowProp
           />
           <BorrowRepay
             activeSeries={activeSeries}
-            active={yieldData.wethPosted_ > 0}
+            active={userData.ethPosted_ > 0}
           />
         </Box>
       </Box>

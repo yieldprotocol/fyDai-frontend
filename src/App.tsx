@@ -4,7 +4,7 @@ import { deepMerge } from 'grommet/utils';
 import { yieldTheme } from './themes';
 import { useEagerConnect, useInactiveListener }  from './hooks/connectionHooks';
 
-import Landing from './views/Dashboard';
+import Dashboard from './views/Dashboard';
 import Borrow from './views/Borrow';
 import Lend from './views/Lend';
 import Amm from './views/Amm';
@@ -26,7 +26,7 @@ import { IYieldSeries } from './types';
 function App() {
 
   const [darkmode, setDarkmode] = React.useState(false);
-  const [activeView, setActiveView] = React.useState<string>('BORROW');
+  const [activeView, setActiveView] = React.useState<string>('DASHBOARD');
   const [activeSeries, setActiveSeries] = React.useState<IYieldSeries | null>(null);
 
   const [showConnectLayer, setShowConnectLayer] = React.useState<boolean>(false);
@@ -64,7 +64,7 @@ function App() {
                 <Grid fill columns={['25%', 'auto', '15%']}>
                   <YieldSidebar setShowSeriesLayer={setShowSeriesLayer} activeSeries={activeSeries} setActiveSeries={setActiveSeries} />
                   <Box align='center'>
-                    {!activeSeries && <Landing />}
+                    {activeView === 'DASHBOARD' && <Dashboard /> }
                     {activeSeries && activeView === 'BORROW' && <Borrow activeSeries={activeSeries} setActiveSeries={setActiveSeries} setShowSeriesLayer={setShowSeriesLayer} />}
                     {activeSeries && activeView === 'LEND' && <Lend activeSeries={activeSeries} setActiveSeries={setActiveSeries} setShowSeriesLayer={setShowSeriesLayer} />}
                     {activeSeries && activeView === 'AMM' && <Amm />}
@@ -79,7 +79,7 @@ function App() {
                 darkmode={darkmode}
                 setDarkmode={setDarkmode}
                 changeConnection={changeConnection}
-              /> 
+              />
             </Grid>
           </Box>
         </Box>

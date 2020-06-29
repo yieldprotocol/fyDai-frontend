@@ -6,6 +6,8 @@ import { useConnectorImage } from '../hooks/connectionHooks';
 
 import { ConnectionContext } from '../contexts/ConnectionContext'; 
 
+import { NotifyContext} from '../contexts/NotifyContext';
+
 const ProfileButton = (props: any) => {
   // const { account } = React.useContext(ConnectionContext);
   const [ accLabel, setAccLabel ] = React.useState<string>('');

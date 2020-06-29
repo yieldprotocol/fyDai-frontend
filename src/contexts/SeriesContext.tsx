@@ -3,7 +3,7 @@ import { ethers } from 'ethers';
 import { useWeb3React } from '@web3-react/core';
 
 import * as utils from '../utils';
-import { useCallTx } from '../hooks/yieldHooks';
+import { useCallTx } from '../hooks';
 
 import { YieldContext } from './YieldContext';
 import { ConnectionContext } from './ConnectionContext';
