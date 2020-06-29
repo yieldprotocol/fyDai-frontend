@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Button, Image, Heading, Text, Collapsible, Markdown, Layer, Drop, TextInput, Paragraph } from 'grommet';
+import { Box, Image, Heading, Text } from 'grommet';
 
 import logoLight from '../assets/images/logo_light.svg';
 import { useMaker } from '../hooks/makerHooks';

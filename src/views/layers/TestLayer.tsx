@@ -29,20 +29,8 @@ const TestLayer = (props:any) => {
   const [ flow, setFlow ] = React.useState<string|null>('WETH');
 
   const { positionsData } = seriesState;
-  const { yieldData, deployedCore, deployedSeries, deployedExternal, deployedPeripheral, extBalances } = yieldState;
+  const { yieldData, deployedCore, deployedSeries, deployedExternal, deployedPeripheral, userData } = yieldState;
   
-  // const updateBalances = yieldActions.updateExtBalances(deployedExternal);
-  
-  const { 
-    wethBalance,
-    wethBalance_,
-    ethBalance_,
-    ethBalance,
-    daiBalance,
-    daiBalance_,
-    chaiBalance,
-    chaiBalance_
-  } = extBalances;
 
   // const [ wethBalance, setWethBalance ] = React.useState<string|null|number>(0);
   // const [ chaiBalance, setChaiBalance ] = React.useState<string|null|number>(0);
@@ -157,29 +145,27 @@ const TestLayer = (props:any) => {
 
             <Box direction='row' gap='small'>
               <Text size='xsmall'>ETH balance:</Text>
-              <Text size='xsmall'>{ extBalances.ethBalance_ || '' }</Text>
+              <Text size='xsmall'>{ userData.ethBalance_ || '' }</Text>
             </Box>
             {/* <Box direction='row' gap='small'>
             <Text size='xsmall'>WEI balance:</Text>
             <Text size='xsmall'>{ weiBalance }</Text>
           </Box> */}
-            <Box direction='row' gap='small'>
+            {/* <Box direction='row' gap='small'>
               <Text size='xsmall'>WETH balance:</Text>
               <Text size='xsmall'>{ extBalances.wethBalance_ || '' }</Text>
             </Box>
 
             <Box direction='row' gap='small'>
               <Text size='xsmall'>CHAI balance:</Text>
-              {/* <Text size='xsmall'>{ chaiBalance && ethers.utils.formatEther(chaiBalance.toString()) }</Text> */}
               <Text size='xsmall'>{ extBalances.chaiBalance_ || '' }</Text>
 
             </Box>
 
             <Box direction='row' gap='small'>
               <Text size='xsmall'>DAI balance:</Text>
-              {/* <Text size='xsmall'>{ daiBalance && ethers.utils.formatEther(daiBalance.toString()) }</Text> */}
               <Text size='xsmall'>{ extBalances.daiBalance_ || '' }</Text>
-            </Box>
+            </Box> */}
 
             <Box direction='column' gap='small'>
               <Text size='small'>Ilk: </Text>
@@ -296,18 +282,18 @@ const TestLayer = (props:any) => {
                 <Box gap='small'>
                   <Text weight='bold'>Posted collateral:</Text>
                   <Text>weth posted: { yieldData.wethPosted_ }</Text>
-                  <Text>chai posted: { yieldData.chaiPosted_ }</Text>
+                  {/* <Text>chai posted: { yieldData.chaiPosted_ }</Text> */}
                   <Text weight='bold'>yDai balance:</Text>
                   <Text>yDai Balance: { positionsData.get('yDai-2020-09-30').yDaiBalance_ }</Text>
                   <Text weight='bold'>Weth Dealer:</Text>
-                  <Text>weth Debt Dai: { positionsData.get('yDai-2020-09-30').wethDebtDai_ }</Text>
+                  {/* <Text>weth Debt Dai: { positionsData.get('yDai-2020-09-30').wethDebtDai_ }</Text> */}
                   <Text>weth Debt YDai: { positionsData.get('yDai-2020-09-30').wethDebtYDai_ }</Text>
-                  <Text>weth Total Debt Dai { yieldData.wethTotalDebtDai_ }</Text>
+                  {/* <Text>weth Total Debt Dai { yieldData.wethTotalDebtDai_ }</Text> */}
                   <Text> weth Total Debt YDai: { yieldData.wethTotalDebtYDai_ }</Text>
                   <Text weight='bold'>ChaiDealer:</Text>
-                  <Text>chai Debt Dai : { positionsData.get('yDai-2020-09-30').chaiDebtDai_}</Text>
+                  {/* <Text>chai Debt Dai : { positionsData.get('yDai-2020-09-30').chaiDebtDai_}</Text> */}
                   <Text>chai Debt yDai : { positionsData.get('yDai-2020-09-30').chaiDebtYDai_}</Text>
-                  <Text>chai Total Debt Dai: { yieldData.chaiTotalDebtDai_ }</Text>
+                  {/* <Text>chai Total Debt Dai: { yieldData.chaiTotalDebtDai_ }</Text> */}
                   <Text>chai Total Debt YDai: { yieldData.chaiTotalDebtYDai_ }</Text>
                 </Box>
               </Box>
@@ -336,7 +322,7 @@ const TestLayer = (props:any) => {
             ()=> {
               seriesActions.refreshPositions([yieldState.deployedSeries[0]]);
               yieldActions.updateYieldBalances(yieldState.deployedCore);
-              yieldActions.updateExtBalances(yieldState.deployedExternal);
+              yieldActions.updateUserData(yieldState.deployedExternal);
             }
           }
           />

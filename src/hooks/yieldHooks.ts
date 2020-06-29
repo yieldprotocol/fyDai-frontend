@@ -38,9 +38,7 @@ export function useBalances() {
 
   const getEthBalance = async () => {
     if (!!provider && !!account) {
-      console.log(provider);
       const balance = await provider.getBalance(account);
-      console.log(balance);
       return balance;
     } return ethers.BigNumber.from('0');
   };
@@ -58,7 +56,6 @@ export function useBalances() {
 export const useCallTx = () => {
   const { state: { provider, altProvider } } = React.useContext(ConnectionContext);
   // const { library: provider, account } = useWeb3React();
-
   const [ callTxActive, setCallTxActive ] = React.useState<boolean>();
   const callTx = async (
     contractAddr:string,
@@ -67,7 +64,7 @@ export const useCallTx = () => {
     data:any[]
   ) => {
     setCallTxActive(true);
-    const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), provider||altProvider);
+    const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), provider || altProvider);
     const retVal = await contract[fn](...data);
     setCallTxActive(false);
     return retVal;
@@ -327,15 +324,54 @@ export const useDealer = () => {
   } as const;
 };
 
+export const useYDai = () => {
+
+  const { state: { signer, account } } = React.useContext(ConnectionContext);
+  // const { library, account } = useWeb3React();
+  // const signer = library.getSigner();
+  
+  const { abi: yDaiAbi } = YDai;
+  const  { dispatch: notifyDispatch }  = React.useContext<any>(NotifyContext);
+  const [ redeemActive, setRedeemActive ] = React.useState<boolean>(false);
+
+  const redeem = async (
+    yDaiAddress:string,
+    amount: number
+  ) => {
+    let tx:any;
+    const parsedAmount = ethers.utils.parseEther(amount.toString());
+    const fromAddr = account && ethers.utils.getAddress(account);
+    const toAddr = fromAddr;
+    const yDaiAddr = ethers.utils.getAddress(yDaiAddress);
+
+    setRedeemActive(true);
+    const contract = new ethers.Contract( yDaiAddr, yDaiAbi, signer );
+    try {
+      tx = await contract.withdraw(fromAddr, toAddr, parsedAmount);
+    } catch (e) {
+      notifyDispatch({ type: 'notify', payload:{ message:'Error Redeeming funds.', type:'error' } } );
+      setRedeemActive(false);
+      return;
+    }
+    notifyDispatch({ type: 'notify', payload:{ message: `Redeeming ${amount} pending...`, type:'info' } } );
+    await tx.wait();
+    setRedeemActive(false);
+    notifyDispatch({ type: 'notify', payload:{ message: `Redeeming ${amount} complete.`, type:'success' } } );
+  };
+
+  return {
+    redeem, redeemActive
+  } as const;
+};
+
+
 // SendTx is a generic function to interact with any contract, primarily used for development/testing.
 export const useSendTx = () => {
-
   const { state: { signer, account } } = React.useContext(ConnectionContext);
   // const { library, account } = useWeb3React();
   // const signer = library.getSigner();
 
   const [ sendTxActive, setSendTxActive ] = React.useState<boolean>();
-  
   const sendTx = async (contractAddr:string, contractName:string, fn:string, data:any[], value:ethers.BigNumber ) => {
     let tx;
     console.log(contractAddr, contractMap.get(contractName), signer); 

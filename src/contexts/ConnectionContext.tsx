@@ -59,16 +59,16 @@ const ConnectionProvider = ({ children }:any) => {
     // @ts-ignore
     if (window.ethereum) {
       // @ts-ignore
-      provider= new ethers.providers.Web3Provider(window.ethereum);
-      signer = provider?.getSigner();
-      account=await signer?.getAddress();
-      network=await provider?.getNetwork();
+      provider = new ethers.providers.Web3Provider(window.ethereum);
+      signer = provider.getSigner(); 
+      account = await signer.getAddress();
+      network = provider? ( await provider.getNetwork()) : null;
     } else {
       console.log('No metamask installed');
       // setProvider(new ethers.providers.InfuraProvider(5, '9dbb21faf34448c9af1f3047c45b15df'));
       provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
-      signer = (null);
-      account=(null);
+      signer = null;
+      account= null;
       network={ chainId:1337 };
       // @ts-ignore
       // altProvider = new ethers.getDefaultProvider(5);

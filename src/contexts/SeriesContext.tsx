@@ -30,7 +30,6 @@ function reducer(state:any, action:any) {
 const SeriesProvider = ({ children }:any) => {
 
   const { state: { chainId, account } } = React.useContext(ConnectionContext);
-  // const { chainId, account } = useWeb3React();
 
   const initState = { positionsIndicator: 0, positionsData : new Map(), positionSelected: '' };
   const [ state, dispatch ] = React.useReducer(reducer, initState);
@@ -39,14 +38,14 @@ const SeriesProvider = ({ children }:any) => {
 
   const { deployedCore } = yieldState; 
 
-  const fetchChainData = async (deployedSeries:any) => {
+  const getSeriesData = async (deployedSeries:any) => {
     const chainData:any[] = [];
     await Promise.all(
       deployedSeries.map( async (x:any, i:number) => {
         chainData.push(x);
         try {
           // chainData[i].wethDebtDai = await callTx(deployedCore.Dealer, 'Dealer', 'debtDai', [utils.WETH, x.maturity, account]);
-          // chainData[i].wethDebtYDai = await callTx(deployedCore.Dealer, 'Dealer', 'debtYDai', [utils.WETH, x.maturity, account]);
+          chainData[i].wethDebtYDai = account? await callTx(deployedCore.Dealer, 'Dealer', 'debtYDai', [utils.WETH, x.maturity, account]): '0';
           // chainData[i].chaiDebtDai = await callTx(deployedCore.Dealer, 'Dealer', 'debtDai', [utils.CHAI, x.maturity, account]);
           // chainData[i].chaiDebtYDai = await callTx(deployedCore.Dealer, 'Dealer', 'debtYDai', [utils.CHAI, x.maturity, account]);
         } catch (e) {
@@ -58,13 +57,13 @@ const SeriesProvider = ({ children }:any) => {
   };
 
   // post fetching data processing
-  const parseChainData = (chainData:any) => {
+  const parseSeriesData = (chainData:any) => {
     const positions = state.positionsData;
     chainData.forEach((x:any)=>{
       positions.set(
         x.symbol,
         { ...x,
-          // wethDebtYDai_: parseFloat(ethers.utils.formatEther(x.wethDebtYDai.toString())),
+          wethDebtYDai_: parseFloat(ethers.utils.formatEther(x.wethDebtYDai.toString())),
           // chaiDebtYDai_: parseFloat(ethers.utils.formatEther(x.chaiDebtYDai.toString())),
         }
       );
@@ -72,33 +71,34 @@ const SeriesProvider = ({ children }:any) => {
     return positions;
   };
 
-  const getPositions = async (seriesArr:any[], force:boolean) => {
-    
+  const loadSeriesPositions = async (seriesArr:any[], force:boolean) => {
+
     let filteredSeriesArr;
+
     if (force !== true) {
       filteredSeriesArr = seriesArr.filter(x => !state.positionsData.has(x.symbol));
     } else { filteredSeriesArr = seriesArr; }
 
     if( !yieldState?.isLoading && filteredSeriesArr.length > 0) {
-      console.log('Get positions actioned');
       dispatch({ type:'isLoading', payload: true });
-      const chainData:any = await fetchChainData(filteredSeriesArr);
-      const parsedData:any = await parseChainData(chainData);
-      console.log(parsedData);
+      const chainData:any = await getSeriesData(filteredSeriesArr);
+      const parsedData:any = await parseSeriesData(chainData);
       dispatch( { type:'updatePositions', payload: parsedData });
       dispatch({ type:'isLoading', payload: false });
-    } else {console.log('Positions already exist... force fetch if required')}
+    } else {
+      console.log('Positions already exist... force fetch if required');
+    }
   };
 
   React.useEffect( () => {
-    ( async () => { 
-      chainId && !yieldState?.isLoading && getPositions([yieldState.deployedSeries[0]], false); 
+    ( async () => {
+      account && chainId && !yieldState?.isLoading && loadSeriesPositions([yieldState.deployedSeries[0]], false); 
     })();
-  }, [ chainId, yieldState ]);
+  }, [ account, chainId, yieldState ]);
 
   const actions = {
-    getPositions: (x:any[]) => getPositions(x, false),
-    refreshPositions: (x:any[]) => getPositions(x, true),
+    getPositions: (x:any[]) => loadSeriesPositions(x, false),
+    refreshPositions: (x:any[]) => loadSeriesPositions(x, true),
   };
 
   return (

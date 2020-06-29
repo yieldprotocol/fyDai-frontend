@@ -13,7 +13,7 @@ const AccountLayer = (props:any) => {
   const { closeLayer, changeWallet } = props;
 
   const { state: { chainId }  } = React.useContext(ConnectionContext);
-  const { state: { extBalances } } = React.useContext(YieldContext);
+  const { state: { userData } } = React.useContext(YieldContext);
   
   const onClose = () => {
     closeLayer();
@@ -56,7 +56,7 @@ const AccountLayer = (props:any) => {
           <Text weight="bold">{chainId && getNetworkName(chainId) }</Text>
           <Box direction='row' gap='small'>
             <Text size='xsmall'>ETH balance:</Text>
-            <Text>{ extBalances.ethBalance_ && extBalances.ethBalance_ || '' }</Text>
+            <Text>{ userData.ethBalance_ && userData.ethBalance_ || '' }</Text>
           </Box>
           {/* <Button fill='horizontal' label='Connect to another wallet' onClick={()=>setShowConnectLayer(true)} /> */}
         </Box>

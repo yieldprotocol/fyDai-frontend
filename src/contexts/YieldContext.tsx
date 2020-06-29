@@ -1,8 +1,7 @@
 import React from 'react';
 import firebase from 'firebase';
-
-import { ethers } from 'ethers';
-import { useWeb3React } from '@web3-react/core';
+import { ethers, BigNumber } from 'ethers';
+// import { useWeb3React } from '@web3-react/core';
 
 import * as utils from '../utils';
 
@@ -45,10 +44,17 @@ function reducer(state:any, action:any) {
         ...state,
         deployedExternal: action.payload,
       };
+
+
     case 'updateYieldData':
       return {
         ...state,
         yieldData: action.payload,
+      };
+    case 'updateUserData':
+      return {
+        ...state,
+        userData: action.payload,
       };
     case 'updateExtBalances': 
       return {
@@ -83,10 +89,11 @@ const YieldProvider = ({ children }:any) => {
     yieldData: {},
     makerData: {},
     // user
-    extBalances: {},
+    userData: null,
   };
 
   const [ state, dispatch ] = React.useReducer(reducer, initState);
+  const { dispatch: notifyDispatch } = React.useContext(NotifyContext);
   const { state: { account, chainId } } = React.useContext(ConnectionContext);
   // const { account, chainId } = useWeb3React();
 
@@ -95,13 +102,14 @@ const YieldProvider = ({ children }:any) => {
   const [ cachedPeripheral, setCachedPeripheral ] = useCachedState('deployedPeripheral', null);
   const [ cachedSeries, setCachedSeries ] = useCachedState('deployedSeries', null);
 
-  // const { chainId } = useWeb3React();
-  const { dispatch: notifyDispatch } = React.useContext(NotifyContext);
+  // TODO: maybe move this to a separate AppContrext?
+  const [ userPreferences, setUserPreferences ] = useCachedState('userPreferences', null);
+
   const [ callTx ] = useCallTx();
   const { getEthBalance, getTokenBalance }  = useBalances();
 
   // async get all public yield addresses from localStorage/chain
-  const getYieldAddrs = async (networkId:number|string, forceUpdate:boolean): Promise<any[]> => {
+  const _getYieldAddrs = async (networkId:number|string, forceUpdate:boolean): Promise<any[]> => {
     const _deployedSeries:any[] = [];
     let _deployedCore;
     let _deployedExternal;
@@ -113,7 +121,7 @@ const YieldProvider = ({ children }:any) => {
         _deployedCore = await firebase.firestore()
           .collection(networkId.toString()).doc('deployedCore').get()
           .then( doc => doc.data());
-        window.localStorage.removeItem(`${networkId}_deployedCore`);
+        window.localStorage.removeItem('deployedCore');
         setCachedCore(_deployedCore);
         console.log('Core contract list updated');
       } else {_deployedCore = cachedCore;}
@@ -123,7 +131,7 @@ const YieldProvider = ({ children }:any) => {
         _deployedExternal = await firebase.firestore()
           .collection(networkId.toString()).doc('deployedExternal').get()
           .then( doc => doc.data());
-        window.localStorage.removeItem(`${networkId}_deployedExternal`);
+        window.localStorage.removeItem('deployedExternal');
         setCachedExternal(_deployedExternal);
         console.log('External contract list updated');
       } else {_deployedExternal = cachedExternal;}
@@ -133,7 +141,7 @@ const YieldProvider = ({ children }:any) => {
         _deployedPeripheral = await firebase.firestore()
           .collection(networkId.toString()).doc('deployedPeripheral').get()
           .then( doc => doc.data());
-        window.localStorage.removeItem(`${networkId}_deployedPeripheral`);
+        window.localStorage.removeItem('deployedPeripheral');
         setCachedPeripheral(_deployedPeripheral);
         console.log('Peripheral contract list updated');
       } else {_deployedPeripheral = cachedPeripheral;}
@@ -148,7 +156,7 @@ const YieldProvider = ({ children }:any) => {
               _deployedSeries.push(doc.data());
             });
           });
-        window.localStorage.removeItem(`${networkId}_deployedSeries`);
+        window.localStorage.removeItem('deployedSeries');
         setCachedSeries(_deployedSeries);
         console.log('Series contract list updated');
       } else {_deployedSeries.push(...cachedSeries);}
@@ -160,14 +168,15 @@ const YieldProvider = ({ children }:any) => {
     return [ _deployedSeries, _deployedCore, _deployedExternal, _deployedPeripheral ];
   };
 
-  // Async add blockchain data for each series
-  const getSeriesData = async (seriesAddrs:IYieldSeries[]): Promise<IYieldSeries[]> => {
+  // Async add extra non-cached blockchain data for each series AND PARSE data.
+  const _getSeriesData = async (seriesAddrs:IYieldSeries[]): Promise<IYieldSeries[]> => {
     const _seriesData:any[] = [];
     await Promise.all(
       seriesAddrs.map( async (x:any, i:number)=> {
         _seriesData.push(x);
         try {
-          // _seriesData[i].yDaiBalance = await callTx(x.yDai, 'YDai', 'balanceOf', [account]);
+          _seriesData[i].yDaiBalance = account? await callTx(x.yDai, 'YDai', 'balanceOf', [account]): '0';
+          _seriesData[i].isMature = await callTx(x.yDai, 'YDai', 'isMature', []);
         } catch (e) {
           console.log(`Could not load series blockchain data: ${e}`);
         }
@@ -175,70 +184,46 @@ const YieldProvider = ({ children }:any) => {
     );
     // Parse and return data
     return _seriesData.map((x:any, i:number) => {
+      console.log(x);
       return {
         ...x,
-        // yDaiBalance_: ethers.utils.formatEther(x.yDaiBalance.toString()),
+        yDaiBalance_: ethers.utils.formatEther(x.yDaiBalance.toString()),
         maturity_: new Date( (x.maturity) * 1000 ),
         seriesColor: seriesColors[i],
       };
     });
   };
 
-  // async yield data for the user address
-  const getYieldData = async (deployedCore:any): Promise<any> => {
+  // async  non-cached yield protocol general data
+  const _getYieldData = async (deployedCore:any): Promise<any> => {
     const _yieldData:any = {};
-    // _yieldData.ethBalance = await getEthBalance();
-    _yieldData.wethPosted = await callTx(deployedCore.Dealer, 'Dealer', 'posted', [utils.WETH, account]);
-    // _yieldData.chaiPosted = await callTx(deployedCore.Dealer, 'Dealer', 'posted', [utils.CHAI, account]);
-    // _yieldData.chaiTotalDebtYDai = await callTx(deployedCore.Dealer, 'Dealer', 'totalDebtYDai', [utils.CHAI, account]);
-    _yieldData.wethTotalDebtYDai = await callTx(deployedCore.Dealer, 'Dealer', 'totalDebtYDai', [utils.WETH, account]);
-    // _yieldData.chaiTotalDebtDai = await callTx(deployedCore.Dealer, 'Dealer', 'totalDebtDai', [utils.CHAI, account]);
-    // _yieldData.wethTotalDebtDai = await callTx(deployedCore.Dealer, 'Dealer', 'totalDebtDai', [utils.WETH, account]);
-
-    console.log(_yieldData.wethPosted, _yieldData.wethTotalDebtYDai);
-    // parse and return maker data
+    // parse data if required.
     return {
       ..._yieldData,
-      // ethBalance_: parseFloat(ethers.utils.formatEther(_yieldData.ethBalance.toString())),
+    };
+  };
+
+  // async yield data for the user address
+  const _getUserData = async (deployedCore:any, deployedExternal:any): Promise<any> => {
+    const _yieldData:any = {};
+    _yieldData.ethBalance = await getEthBalance();
+    _yieldData.wethPosted = await callTx(deployedCore.Dealer, 'Dealer', 'posted', [utils.WETH, account]);
+    _yieldData.wethTotalDebtYDai = await callTx(deployedCore.Dealer, 'Dealer', 'totalDebtYDai', [utils.WETH, account]);
+    // _yieldData.chaiPosted = await callTx(deployedCore.Dealer, 'Dealer', 'posted', [utils.CHAI, account]);
+    // _yieldData.chaiTotalDebtYDai = await callTx(deployedCore.Dealer, 'Dealer', 'totalDebtYDai', [utils.CHAI, account]);
+
+    // parse and return user data
+    return {
+      ..._yieldData,
+      ethBalance_: parseFloat(ethers.utils.formatEther(_yieldData.ethBalance.toString())),
       wethPosted_: parseFloat(ethers.utils.formatEther(_yieldData.wethPosted.toString())),
-      // chaiPosted_: parseFloat(ethers.utils.formatEther(_yieldData.chaiPosted.toString())),
       wethTotalDebtYDai_: parseFloat(ethers.utils.formatEther(_yieldData.wethTotalDebtYDai.toString())),
+      // chaiPosted_: parseFloat(ethers.utils.formatEther(_yieldData.chaiPosted.toString())),
       // chaiTotalDebtYDai_: parseFloat(ethers.utils.formatEther(_yieldData.chaiTotalDebtYDai.toString())),
-      // wethTotalDebtDai_p: parseFloat(ethers.utils.formatEther(_yieldData.wethTotalDebtDai.toString())),
-      // chaiTotalDebtDai_p: parseFloat(ethers.utils.formatEther(_yieldData.chaiTotalDebtDai.toString())),
     };
   };
 
-  const getExtBalances = async (deployedExternal:any): Promise<any> => {
-    const _balances:any = {};
-    _balances.ethBalance = await getEthBalance();
-    // _balances.daiBalance = await getTokenBalance(deployedExternal.Dai, 'Dai');
-    // _balanceData.wethBalance = await getTokenBalance(deployedExternal.Weth, 'Weth');
-    // _balanceData.chaiBalance = await getTokenBalance(deployedExternal.Chai, 'Chai');
-
-    // parse and return maker data
-    return {
-      ..._balances,
-      ethBalance_: parseFloat(ethers.utils.formatEther(_balances.ethBalance.toString())),
-      //  daiBalance_: parseFloat(ethers.utils.formatEther(_balances.daiBalance.toString())),
-      //  wethBalance_: parseFloat(ethers.utils.formatEther(_balanceData.wethBalance.toString())),
-      //  chaiBalance_: parseFloat(ethers.utils.formatEther(_balanceData.chaiBalance.toString())),
-    };
-  };
-
-  const getUserData = async (): Promise<any> => {
-    const _balances:any = {};
-    _balances.ethBalance = await getEthBalance();
-    // parse and return maker data
-    return {
-      ..._balances,
-      ethBalance_: parseFloat(ethers.utils.formatEther(_balances.ethBalance.toString())),
-      // wethBalance_: parseFloat(ethers.utils.formatEther(_balanceData.wethBalance.toString())),
-      // chaiBalance_: parseFloat(ethers.utils.formatEther(_balanceData.chaiBalance.toString())),
-    };
-  };
-
-  const getMakerData = async (deployedExternal:any): Promise<any> => {
+  const _getMakerData = async (deployedExternal:any): Promise<any> => {
     const _pot = await callTx(deployedExternal.Pot, 'Pot', 'chi', []);
     const _ilks = await callTx(deployedExternal.Vat, 'Vat', 'ilks', [ethers.utils.formatBytes32String('ETH-A')]);
     const _urns = await callTx(deployedExternal.Vat, 'Vat', 'urns', [ethers.utils.formatBytes32String('ETH-A'), account ]);
@@ -264,50 +249,49 @@ const YieldProvider = ({ children }:any) => {
     };
   };
 
-  const getAllData = async (networkId:number|string) => {
+  const initApp = async (networkId:number|string) => {
 
-    // TODO: Maybe convert to a single dispatch call. See after app dust has settled.
     dispatch({ type:'isLoading', payload: true });
-
-    // #1 Get yield addresses from db
+    // #1 Fetch and update PUBLIC Yield protocol ADDRESSES from cache, chain, or db.
     const [ 
       deployedSeries,
       deployedCore,
       deployedExternal,
       deployedPeripheral
-    ] = await getYieldAddrs(networkId, false);
+    ] = await _getYieldAddrs(networkId, false);
     dispatch({ type:'updateDeployedCore', payload: deployedCore });
     dispatch({ type:'updateDeployedExternal', payload: deployedExternal });
     dispatch({ type:'updateDeployedPeripheral', payload: deployedPeripheral });
 
-    // #2 Get extra blockchain data for each series if reqd.
-    const extraSeriesData:any = await getSeriesData(deployedSeries);
+    let yieldCoreData:any={};
+    let extraSeriesData:any={};
+    [ yieldCoreData, extraSeriesData ] = await Promise.all([
+      // #2 fetch any PUBLIC Yield protocol system data from blockchain
+      _getYieldData(deployedCore),
+      // #3 fetch any extra PUBLIC non-cached info for each series and PARSE series data (maturity etc.)
+      _getSeriesData(deployedSeries),
+    ]);
+    dispatch({ type:'updateYieldData', payload: yieldCoreData });
     dispatch({ type:'updateDeployedSeries', payload: extraSeriesData });
 
-    // #3 Get yield core/system data for the user from blockchain
-    const yieldData = await getYieldData(deployedCore);
-    dispatch({ type:'updateYieldData', payload: yieldData });
+    // #4 Fetch any user account data based on address (if any), possibly cached.
+    const userData = account? await _getUserData(deployedCore, deployedExternal): { ethBalance_:0 };
+    dispatch({ type:'updateUserData', payload: userData });
 
-    // #4 Get Balance data
-    const balances = await getExtBalances(deployedExternal);
-    console.log(balances);
-    dispatch({ type:'updateExtBalances', payload: balances });
-
-    // #5 Get MakerDao data
-    // const makerData = await fetchMakerData(deployedExternal);
+    // #5 Get maker data
+    // const makerData = await _getMakerData(deployedSeries);
     // dispatch({ type:'updateMakerData', payload: makerData });
-
     dispatch({ type:'isLoading', payload: false });
   };
 
   React.useEffect( () => {
-    ( async () => chainId && getAllData(chainId))();
-  }, [chainId]);
+    ( async () => chainId && initApp(chainId))();
+  }, [chainId, account]);
 
   const actions = {
-    updateExtBalances: (x:any) => getExtBalances(x).then((res:any)=> dispatch({ type:'updateExtBalances', payload: res })),
-    updateYieldBalances: (x:any) => getYieldData(x).then((res:any)=> dispatch({ type:'updateYieldData', payload: res })),
-    refreshYieldAddrs: () => getYieldAddrs(chainId, true)
+    updateUserData: (x:any, y:any) => _getUserData(x, y).then((res:any)=> dispatch({ type:'updateUserData', payload: res })),
+    updateYieldBalances: (x:any) => _getYieldData(x).then((res:any)=> dispatch({ type:'updateYieldData', payload: res })),
+    // refreshYieldAddrs: () => _getYieldAddrs(chainId, true),
   };
 
   return (

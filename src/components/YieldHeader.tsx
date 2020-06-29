@@ -95,7 +95,7 @@ const YieldHeader = (props: any) => {
       <Box direction='row' align='baseline'>
         {account ? (
           <Box pad='small'>
-            <ProfileButton action={() => openAccountLayer()} account={account} />
+            <ProfileButton action={() => openAccountLayer()} account={account || ''} />
           </Box>
         ) : (
           <Box pad='small'>

@@ -3,7 +3,6 @@ import moment from 'moment';
 import { Box, Heading, Text } from 'grommet';
 import RotateLoader from 'react-spinners/RotateLoader';
 
-
 import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { IYieldSeries } from '../types';
@@ -14,7 +13,7 @@ import Redeem from '../components/Redeem';
 interface BorrowProps {
   setActiveSeries: any,
   activeSeries:IYieldSeries,
-  setShowSeriesLayer: any, 
+  setShowSeriesLayer: any,
 }
 
 const Lend = ({ activeSeries }:BorrowProps) => {
@@ -29,11 +28,9 @@ const Lend = ({ activeSeries }:BorrowProps) => {
   const [ depositWithdrawActive ] = React.useState<boolean>(true);
 
   const { isLoading: positionsLoading, positionsData } = seriesState; 
-  
   const {
     yDaiBalance_,
   }  = activeSeries;
-
 
   React.useEffect( () => {
     ( async () => {

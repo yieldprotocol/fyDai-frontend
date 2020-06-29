@@ -1,12 +1,7 @@
 import React from 'react';
 import moment from 'moment';
-import { Box, Grid, Heading, Text, Collapsible, Markdown, Layer } from 'grommet';
+import { Box, Heading, Text} from 'grommet';
 import RotateLoader from 'react-spinners/RotateLoader';
-
-import BorrowAction from '../components/BorrowAction';
-import RepayAction from '../components/RepayAction';
-
-import TransactionHistory from '../components/TransactionHistory';
 
 import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
