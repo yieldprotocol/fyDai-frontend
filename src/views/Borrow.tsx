@@ -9,7 +9,7 @@ import RepayAction from '../components/RepayAction';
 import TransactionHistory from '../components/TransactionHistory';
 
 import { YieldContext } from '../contexts/YieldContext';
-import { PositionsContext } from '../contexts/PositionsContext';
+import { SeriesContext } from '../contexts/SeriesContext';
 import { IYieldSeries } from '../types';
 
 import DepositWithdraw from '../components/DepositWithdraw';
@@ -24,23 +24,23 @@ interface BorrowProps {
 const Borrow = ({ setActiveSeries, activeSeries, setShowSeriesLayer }:BorrowProps) => {
 
   const { state: yieldState, actions: yieldActions } = React.useContext(YieldContext);
-  const { state: positionsState, actions: positionsActions } = React.useContext(PositionsContext);
+  const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
   // const [ nextColor, setNextColor ] = React.useState<string>('');
 
   const [ activePosition, setActivePosition ] = React.useState<any>(null);
   const [ borrowRepayActive, setBorrowRepayActive ] = React.useState<boolean>(true);
   const [ depositWithdrawActive, setDepositWithdrawActive ] = React.useState<boolean>(false);
 
-  const { isLoading: positionsLoading, positionsData } = positionsState; 
+  const { isLoading: positionsLoading, positionsData } = seriesState; 
   const { isLoading: yieldLoading, extBalances, deployedSeries, deployedCore, yieldData, makerData }  = yieldState;
 
 
   React.useEffect( () => {
     ( async () => {
-      !positionsLoading && await positionsActions.getPositions([activeSeries]);
+      !positionsLoading && await seriesActions.getPositions([activeSeries]);
       setActivePosition(positionsData.get(activeSeries.symbol));
     })();
-    console.log(positionsState);
+    console.log(seriesState);
   }, [ activeSeries ]);
 
   const {

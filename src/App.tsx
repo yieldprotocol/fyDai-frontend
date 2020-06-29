@@ -1,23 +1,10 @@
 import React from 'react';
-import { 
-  Grommet,
-  base, 
-  Tabs, 
-  Tab, 
-  Grid,
-  Main,
-  Heading,
-  Box,
-  Text 
-} from 'grommet';
+import { Grommet, base, Grid, Main, Box } from 'grommet';
 import { deepMerge } from 'grommet/utils';
-
-// import { useWeb3React } from '@web3-react/core';
-
 import { yieldTheme } from './themes';
 import { useEagerConnect, useInactiveListener }  from './hooks/connectionHooks';
 
-import Landing from './views/Landing';
+import Landing from './views/Dashboard';
 import Borrow from './views/Borrow';
 import Lend from './views/Lend';
 import Amm from './views/Amm';
@@ -37,8 +24,6 @@ import TestLayer from './views/layers/TestLayer';
 import { IYieldSeries } from './types';
 
 function App() {
-
-  // const { connector, library, chainId, account, activate, deactivate, active, error } = useWeb3React();
 
   const [darkmode, setDarkmode] = React.useState(false);
   const [activeView, setActiveView] = React.useState<string>('BORROW');
@@ -72,10 +57,7 @@ function App() {
                 setActiveView={setActiveView}
               />
               <Main
-                // align='center'
-                // pad={{ horizontal: 'none', vertical:'none' }}
                 pad='none'
-                // background='background-front'
                 direction='row'
                 flex
               >

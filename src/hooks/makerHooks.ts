@@ -61,8 +61,8 @@ const defineNetwork = (_networkId:number) => {
 
 export const useMaker = () => {
 
-  // const { state : { account, chainId, provider } } = React.useContext(ConnectionContext);
-  const { account, chainId, library } = useWeb3React();
+  const { state : { account, chainId, provider } } = React.useContext(ConnectionContext);
+  // const { account, chainId, library } = useWeb3React();
   
   const [openVaultActive, setOpenVaultActive] = React.useState<boolean>(false);
   const [convertVaultActive, setConvertVaultActive] = React.useState<boolean>(false);

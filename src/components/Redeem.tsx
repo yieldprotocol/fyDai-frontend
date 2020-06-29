@@ -7,7 +7,7 @@ import DepositAction from './DepositAction';
 import WithdrawAction from './WithdrawAction';
 
 import { YieldContext } from '../contexts/YieldContext';
-import { PositionsContext } from '../contexts/PositionsContext';
+import { SeriesContext } from '../contexts/SeriesContext';
 
 import { useDealer, useBalances } from '../hooks/yieldHooks';
 import RedeemAction from './RedeemAction';

@@ -1,19 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { ethers } from 'ethers';
-// TODO: re-implement web3-react
-import { Web3ReactProvider, createWeb3ReactRoot, UnsupportedChainIdError } from '@web3-react/core';
-import { NoEthereumProviderError, UserRejectedRequestError as UserRejectedRequestErrorInjected } from '@web3-react/injected-connector';
-
-
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 
 import { NotifyProvider }  from './contexts/NotifyContext';
 import { YieldProvider }  from './contexts/YieldContext';
-import { PositionsProvider }  from './contexts/PositionsContext';
+import { SeriesProvider }  from './contexts/SeriesContext';
 import { ConnectionProvider } from './contexts/ConnectionContext';
+
+// TODO: re-implement web3-react
+import { Web3ReactProvider, createWeb3ReactRoot, UnsupportedChainIdError } from '@web3-react/core';
+import { NoEthereumProviderError, UserRejectedRequestError as UserRejectedRequestErrorInjected } from '@web3-react/injected-connector';
 
 // TODO: Production infura support
 function getLibrary(provider:any) {
@@ -25,15 +24,15 @@ function getLibrary(provider:any) {
 ReactDOM.render(
   <React.StrictMode>
     {/* <Web3ReactProvider getLibrary={getLibrary}> */}
-      <ConnectionProvider>
-        <NotifyProvider>
-          <YieldProvider>
-            <PositionsProvider>
-              <App />
-            </PositionsProvider>
-          </YieldProvider>
-        </NotifyProvider>
-      </ConnectionProvider>
+    <ConnectionProvider>
+      <NotifyProvider>
+        <YieldProvider>
+          <SeriesProvider>
+            <App />
+          </SeriesProvider>
+        </YieldProvider>
+      </NotifyProvider>
+    </ConnectionProvider>
     {/* </Web3ReactProvider> */}
   </React.StrictMode>,
   document.getElementById('root')

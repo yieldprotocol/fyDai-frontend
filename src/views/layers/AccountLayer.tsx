@@ -14,7 +14,7 @@ const AccountLayer = (props:any) => {
 
   const { state: { chainId }  } = React.useContext(ConnectionContext);
   const { state: { extBalances } } = React.useContext(YieldContext);
-
+  
   const onClose = () => {
     closeLayer();
   };

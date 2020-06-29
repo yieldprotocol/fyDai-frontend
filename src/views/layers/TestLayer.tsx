@@ -5,7 +5,7 @@ import { ethers } from 'ethers';
 import { useWeb3React } from '@web3-react/core';
 import { Anchor, Layer, Header, Heading, Footer, Button, Box, Text } from 'grommet';
 
-// import { bigNumberify } from 'ethers';
+// import { BigNumber.from } from 'ethers';
 import * as utils from '../../utils';
 
 import { getNetworkName }  from '../../hooks/connectionHooks';
@@ -15,7 +15,7 @@ import { NotifyContext } from '../../contexts/NotifyContext';
 import { useSendTx, useCallTx, useDealer, useBalances, useEthProxy } from '../../hooks/yieldHooks';
 
 import { YieldContext } from '../../contexts/YieldContext';
-import { PositionsContext } from '../../contexts/PositionsContext';
+import { SeriesContext } from '../../contexts/SeriesContext';
 import { ConnectionContext } from '../../contexts/ConnectionContext';
 
 const TestLayer = (props:any) => {
@@ -25,10 +25,10 @@ const TestLayer = (props:any) => {
 
   // const web3 = useWeb3React();
   const { state: yieldState, actions: yieldActions } = React.useContext( YieldContext );
-  const { state: positionsState, actions: positionsActions } = React.useContext( PositionsContext );
+  const { state: seriesState, actions: seriesActions } = React.useContext( SeriesContext );
   const [ flow, setFlow ] = React.useState<string|null>('WETH');
 
-  const { positionsData } = positionsState;
+  const { positionsData } = seriesState;
   const { yieldData, deployedCore, deployedSeries, deployedExternal, deployedPeripheral, extBalances } = yieldState;
   
   // const updateBalances = yieldActions.updateExtBalances(deployedExternal);
@@ -234,9 +234,7 @@ const TestLayer = (props:any) => {
               Get Dai:
               
               <Button label='1. Approve Wethjoin for 1weth' onClick={()=> sendTx(deployedExternal.Weth, 'Weth', 'approve', [deployedExternal.WethJoin, wethTokens], ethers.BigNumber.from(0) )} />
-              
-              {/* <Button label='x. Vat > hope wethJoin' onClick={()=> sendTx(deployedExternal.Vat, 'Vat', 'hope', [deployedExternal.WethJoin], bigNumberify(0))} /> */}
-              
+                            
               <Button label='2. wethJoin join (take 1weth)' onClick={()=> sendTx(deployedExternal.WethJoin, 'WethJoin', 'join', [account, wethTokens], ethers.BigNumber.from(0) )} />
               <Button label='( x. wethJoin EXit 1weth)' onClick={()=> sendTx(deployedExternal.WethJoin, 'WethJoin', 'exit', [account, wethTokens ], ethers.BigNumber.from(0) )} />
 
@@ -290,7 +288,7 @@ const TestLayer = (props:any) => {
             gap='small'
             overflow='auto'
           > 
-            { positionsData.size > 0 && !positionsState.isLoading ? 
+            { positionsData.size > 0 && !seriesState.isLoading ? 
               <Box pad='small' gap='medium' fill>
                 <Box direction='row'>
                   <Text weight='bold'>yDai[0]: {positionsData.get('yDai-2020-09-30').symbol}</Text>
@@ -336,7 +334,7 @@ const TestLayer = (props:any) => {
             label='refresh' 
             onClick={
             ()=> {
-              positionsActions.refreshPositions([yieldState.deployedSeries[0]]);
+              seriesActions.refreshPositions([yieldState.deployedSeries[0]]);
               yieldActions.updateYieldBalances(yieldState.deployedCore);
               yieldActions.updateExtBalances(yieldState.deployedExternal);
             }

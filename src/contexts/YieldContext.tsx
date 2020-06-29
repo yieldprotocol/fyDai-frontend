@@ -100,9 +100,8 @@ const YieldProvider = ({ children }:any) => {
   const [ callTx ] = useCallTx();
   const { getEthBalance, getTokenBalance }  = useBalances();
 
-  // async get all public yield addresses from cache/chain
+  // async get all public yield addresses from localStorage/chain
   const getYieldAddrs = async (networkId:number|string, forceUpdate:boolean): Promise<any[]> => {
-    
     const _deployedSeries:any[] = [];
     let _deployedCore;
     let _deployedExternal;
@@ -119,7 +118,7 @@ const YieldProvider = ({ children }:any) => {
         console.log('Core contract list updated');
       } else {_deployedCore = cachedCore;}
 
-      if (!cachedExternal|| forceUpdate) {
+      if (!cachedExternal || forceUpdate) {
         // TODO firebase > chain migration
         _deployedExternal = await firebase.firestore()
           .collection(networkId.toString()).doc('deployedExternal').get()
@@ -162,7 +161,7 @@ const YieldProvider = ({ children }:any) => {
   };
 
   // Async add blockchain data for each series
-  const fetchSeriesData = async (seriesAddrs:IYieldSeries[]): Promise<IYieldSeries[]> => {
+  const getSeriesData = async (seriesAddrs:IYieldSeries[]): Promise<IYieldSeries[]> => {
     const _seriesData:any[] = [];
     await Promise.all(
       seriesAddrs.map( async (x:any, i:number)=> {
@@ -186,7 +185,7 @@ const YieldProvider = ({ children }:any) => {
   };
 
   // async yield data for the user address
-  const fetchYieldData = async (deployedCore:any): Promise<any> => {
+  const getYieldData = async (deployedCore:any): Promise<any> => {
     const _yieldData:any = {};
     // _yieldData.ethBalance = await getEthBalance();
     _yieldData.wethPosted = await callTx(deployedCore.Dealer, 'Dealer', 'posted', [utils.WETH, account]);
@@ -210,7 +209,7 @@ const YieldProvider = ({ children }:any) => {
     };
   };
 
-  const fetchExtBalances = async (deployedExternal:any): Promise<any> => {
+  const getExtBalances = async (deployedExternal:any): Promise<any> => {
     const _balances:any = {};
     _balances.ethBalance = await getEthBalance();
     // _balances.daiBalance = await getTokenBalance(deployedExternal.Dai, 'Dai');
@@ -227,7 +226,7 @@ const YieldProvider = ({ children }:any) => {
     };
   };
 
-  const fetchUserData = async (): Promise<any> => {
+  const getUserData = async (): Promise<any> => {
     const _balances:any = {};
     _balances.ethBalance = await getEthBalance();
     // parse and return maker data
@@ -239,7 +238,7 @@ const YieldProvider = ({ children }:any) => {
     };
   };
 
-  const fetchMakerData = async (deployedExternal:any): Promise<any> => {
+  const getMakerData = async (deployedExternal:any): Promise<any> => {
     const _pot = await callTx(deployedExternal.Pot, 'Pot', 'chi', []);
     const _ilks = await callTx(deployedExternal.Vat, 'Vat', 'ilks', [ethers.utils.formatBytes32String('ETH-A')]);
     const _urns = await callTx(deployedExternal.Vat, 'Vat', 'urns', [ethers.utils.formatBytes32String('ETH-A'), account ]);
@@ -282,15 +281,15 @@ const YieldProvider = ({ children }:any) => {
     dispatch({ type:'updateDeployedPeripheral', payload: deployedPeripheral });
 
     // #2 Get extra blockchain data for each series if reqd.
-    const extraSeriesData:any = await fetchSeriesData(deployedSeries);
+    const extraSeriesData:any = await getSeriesData(deployedSeries);
     dispatch({ type:'updateDeployedSeries', payload: extraSeriesData });
 
     // #3 Get yield core/system data for the user from blockchain
-    const yieldData = await fetchYieldData(deployedCore);
+    const yieldData = await getYieldData(deployedCore);
     dispatch({ type:'updateYieldData', payload: yieldData });
 
     // #4 Get Balance data
-    const balances = await fetchExtBalances(deployedExternal);
+    const balances = await getExtBalances(deployedExternal);
     console.log(balances);
     dispatch({ type:'updateExtBalances', payload: balances });
 
@@ -302,13 +301,13 @@ const YieldProvider = ({ children }:any) => {
   };
 
   React.useEffect( () => {
-
     ( async () => chainId && getAllData(chainId))();
   }, [chainId]);
 
   const actions = {
-    updateExtBalances: (x:any) => fetchExtBalances(x).then((res:any)=> dispatch({ type:'updateExtBalances', payload: res })),
-    updateYieldBalances: (x:any) => fetchYieldData(x).then((res:any)=> dispatch({ type:'updateYieldData', payload: res }))
+    updateExtBalances: (x:any) => getExtBalances(x).then((res:any)=> dispatch({ type:'updateExtBalances', payload: res })),
+    updateYieldBalances: (x:any) => getYieldData(x).then((res:any)=> dispatch({ type:'updateYieldData', payload: res })),
+    refreshYieldAddrs: () => getYieldAddrs(chainId, true)
   };
 
   return (

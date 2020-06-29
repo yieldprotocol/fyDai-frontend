@@ -2,11 +2,10 @@ import React from 'react';
 import { Box, Button, Image, Heading, Text, Collapsible, Markdown, Layer, Drop, TextInput, Paragraph } from 'grommet';
 
 import logoLight from '../assets/images/logo_light.svg';
-
 import { useMaker } from '../hooks/makerHooks';
 
 
-const Landing = () => {
+const Dashboard = () => {
 
   const { getVaults, openNewVault } = useMaker();
 
@@ -73,4 +72,4 @@ const Landing = () => {
   );
 };
 
-export default Landing;
+export default Dashboard;

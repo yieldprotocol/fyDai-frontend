@@ -4,7 +4,7 @@ import BorrowAction from './BorrowAction';
 import RepayAction from './RepayAction';
 
 import { YieldContext } from '../contexts/YieldContext';
-import { PositionsContext } from '../contexts/PositionsContext';
+import { SeriesContext } from '../contexts/SeriesContext';
 
 import { useDealer, useBalances } from '../hooks/yieldHooks';
 

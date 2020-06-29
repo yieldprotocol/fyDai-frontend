@@ -8,7 +8,7 @@ import { useCallTx } from '../hooks/yieldHooks';
 import { YieldContext } from './YieldContext';
 import { ConnectionContext } from './ConnectionContext';
 
-const PositionsContext = React.createContext<any>({});
+const SeriesContext = React.createContext<any>({});
 
 function reducer(state:any, action:any) {
   switch (action.type) {
@@ -27,7 +27,7 @@ function reducer(state:any, action:any) {
   }
 }
 
-const PositionsProvider = ({ children }:any) => {
+const SeriesProvider = ({ children }:any) => {
 
   const { state: { chainId, account } } = React.useContext(ConnectionContext);
   // const { chainId, account } = useWeb3React();
@@ -102,10 +102,10 @@ const PositionsProvider = ({ children }:any) => {
   };
 
   return (
-    <PositionsContext.Provider value={{ state, actions }}>
+    <SeriesContext.Provider value={{ state, actions }}>
       {children}
-    </PositionsContext.Provider>
+    </SeriesContext.Provider>
   );
 };
 
-export { PositionsContext, PositionsProvider };
+export { SeriesContext, SeriesProvider };
