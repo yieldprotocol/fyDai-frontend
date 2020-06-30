@@ -1,5 +1,7 @@
 import React from 'react';
-import firebase from 'firebase';
+import * as firebase from 'firebase/app';
+// import 'firebase/firestore';
+
 import { ethers, BigNumber } from 'ethers';
 // import { useWeb3React } from '@web3-react/core';
 
@@ -9,7 +11,7 @@ import { IYieldSeries, IUser } from '../types';
 import { NotifyContext } from './NotifyContext';
 import { ConnectionContext } from './ConnectionContext';
 
-import { useCallTx, useCachedState, useBalances } from '../hooks';
+import { useCallTx, useCachedState, useBalances, useEvents } from '../hooks';
 
 const YieldContext = React.createContext<any>({});
 
@@ -94,10 +96,12 @@ const YieldProvider = ({ children }:any) => {
   const [ cachedPeripheral, setCachedPeripheral ] = useCachedState('deployedPeripheral', null);
   const [ cachedSeries, setCachedSeries ] = useCachedState('deployedSeries', null);
 
-  // TODO: maybe move this to a separate AppContrext?
+  // TODO: maybe move this to a separate AppContext?
   const [ userPreferences, setUserPreferences ] = useCachedState('userPreferences', null);
+  const [ userTxHistory, setUserTxHistory] = useCachedState('userTxHistory', null);
 
   const [ callTx ] = useCallTx();
+  const { getEventHistory } = useEvents(); 
   const { getEthBalance, getTokenBalance }  = useBalances();
 
   // async get all public yield addresses from localStorage/chain
@@ -196,20 +200,22 @@ const YieldProvider = ({ children }:any) => {
   };
 
   // Yield data for the user address
-  const _getUserData = async (deployedCore:any, deployedExternal:any): Promise<any> => {
-    const _yieldData:any = {};
-    _yieldData.ethBalance = await getEthBalance();
-    _yieldData.ethPosted = await callTx(deployedCore.Dealer, 'Dealer', 'posted', [utils.WETH, account]);
-    _yieldData.ethTotalDebtYDai = await callTx(deployedCore.Dealer, 'Dealer', 'totalDebtYDai', [utils.WETH, account]);
+  const _getUserData = async (deployedCore:any, deployedPeripheral:any): Promise<any> => {
+    const _userData:any = {};
+    _userData.ethBalance = await getEthBalance();
+    _userData.ethPosted = await callTx(deployedCore.Dealer, 'Dealer', 'posted', [utils.WETH, account]);
+    _userData.ethTotalDebtYDai = await callTx(deployedCore.Dealer, 'Dealer', 'totalDebtYDai', [utils.WETH, account]);
+    _userData.collateralHistory = await getEventHistory(deployedCore.Dealer, 'Dealer', 'Proxy', [], 0 );
     // _yieldData.chaiPosted = await callTx(deployedCore.Dealer, 'Dealer', 'posted', [utils.CHAI, account]);
     // _yieldData.chaiTotalDebtYDai = await callTx(deployedCore.Dealer, 'Dealer', 'totalDebtYDai', [utils.CHAI, account]);
-    
+    console.log(_userData.collateralHistory);
+
     // parse and return user data
     return {
-      ..._yieldData,
-      ethBalance_: parseFloat(ethers.utils.formatEther(_yieldData.ethBalance.toString())),
-      ethPosted_: parseFloat(ethers.utils.formatEther(_yieldData.ethPosted.toString())),
-      ethTotalDebtYDai_: parseFloat(ethers.utils.formatEther(_yieldData.ethTotalDebtYDai.toString())),
+      ..._userData,
+      ethBalance_: parseFloat(ethers.utils.formatEther(_userData.ethBalance.toString())),
+      ethPosted_: parseFloat(ethers.utils.formatEther(_userData.ethPosted.toString())),
+      ethTotalDebtYDai_: parseFloat(ethers.utils.formatEther(_userData.ethTotalDebtYDai.toString())),
       // chaiPosted_: parseFloat(ethers.utils.formatEther(_yieldData.chaiPosted.toString())),
       // chaiTotalDebtYDai_: parseFloat(ethers.utils.formatEther(_yieldData.chaiTotalDebtYDai.toString())),
     };
@@ -268,7 +274,7 @@ const YieldProvider = ({ children }:any) => {
     dispatch({ type:'updateDeployedSeries', payload: extraSeriesData });
 
     // #4 Fetch any user account data based on address (if any), possibly cached.
-    const userData = account ? await _getUserData(deployedCore, deployedExternal): { ethBalance_: 0 };
+    const userData = account ? await _getUserData(deployedCore, deployedPeripheral): { ethBalance_: 0 };
     dispatch({ type:'updateUserData', payload: userData });
 
     // #5 Get maker data

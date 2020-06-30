@@ -38,15 +38,14 @@ const contractMap = new Map<string, any>([
  * @returns { function } sendTx
  * @returns { boolean } sendTxActive
  */
-// 
 export const useSendTx = () => {
   const { state: { signer, account } } = React.useContext(ConnectionContext);
   // const { library, account } = useWeb3React();
   // const signer = library.getSigner();
   const [ sendTxActive, setSendTxActive ] = React.useState<boolean>();
-  
+
   /**
-   * Sends a transaction
+   * Send a transaction ()
    * @param {string} contractAddress address of the contract to send to.
    * @param {string} contractName name of the contract to call (uses this to get the abi from a contract map)
    * @param {string} fn name of the function to call 
