@@ -13,7 +13,7 @@ import EthProxy from '../contracts/EthProxy.json';
 // ethers.errors.setLogLevel('error');
 
 /**
- * Hook for interacting with the yield 'Dealer' Contract.
+ * Hook for interacting with the Yield 'Dealer' Contract.
  * Used for direct ETH deposits and withdrawals via proxy.
  * @returns { function } post
  * @returns { boolean } postActive
@@ -351,7 +351,7 @@ export const useYDai = () => {
   const { state: { signer, account } } = React.useContext(ConnectionContext);
   // const { library, account } = useWeb3React();
   // const signer = library.getSigner();
-  
+
   const { abi: yDaiAbi } = YDai;
   const  { dispatch }  = React.useContext<any>(NotifyContext);
   const [ redeemActive, setRedeemActive ] = React.useState<boolean>(false);

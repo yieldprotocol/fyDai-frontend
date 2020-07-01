@@ -33,21 +33,19 @@ const contractMap = new Map<string, any>([
 
 /**
  * SendTx is a generic function to interact with any contract.
- * Primarily used for development/testing,
- * or for once off interactions with a contract.
+ * Primarily used for development/testing, or for once off interactions with a contract.
  * Currently, There are no notifications other than console logs.
  * @returns { function } sendTx
  * @returns { boolean } sendTxActive
  */
-// 
 export const useSendTx = () => {
   const { state: { signer, account } } = React.useContext(ConnectionContext);
   // const { library, account } = useWeb3React();
   // const signer = library.getSigner();
   const [ sendTxActive, setSendTxActive ] = React.useState<boolean>();
-  
+
   /**
-   * Sends a transaction
+   * Send a transaction ()
    * @param {string} contractAddress address of the contract to send to.
    * @param {string} contractName name of the contract to call (uses this to get the abi from a contract map)
    * @param {string} fn name of the function to call 
@@ -119,7 +117,7 @@ export function useBalances() {
   // const { library: txProvider, account } = useWeb3React();
 
   /**
-   * Simple account balance call (WEI)
+   * Native user account balance (WEI)
    * @returns balance in Wei! 
    */
   const getEthBalance = async () => {
@@ -130,7 +128,7 @@ export function useBalances() {
   };
 
   /**
-   * Get data from the blockchain via provider (no signer reqd)
+   * Get the user account balance of an ERC20token
    * @param {string} tokenAddr address of the Token
    * @param {string} abi abi of the token (probably ERC20 in this case)
    * @returns whatever token value

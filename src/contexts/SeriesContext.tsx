@@ -3,7 +3,7 @@ import { ethers } from 'ethers';
 import { useWeb3React } from '@web3-react/core';
 
 import * as utils from '../utils';
-import { useCallTx } from '../hooks';
+import { useCallTx, useEvents, useCachedState } from '../hooks';
 
 import { YieldContext } from './YieldContext';
 import { ConnectionContext } from './ConnectionContext';
@@ -34,7 +34,10 @@ const SeriesProvider = ({ children }:any) => {
   const initState = { positionsIndicator: 0, positionsData : new Map(), positionSelected: '' };
   const [ state, dispatch ] = React.useReducer(reducer, initState);
   const { state: yieldState } = React.useContext(YieldContext);
+  const [ seriesTxHistory, setSeriesTxHistory ] = useCachedState('seriesTxHistory', null);
+
   const [ callTx ] = useCallTx();
+  const { getEventHistory } = useEvents(); 
 
   const { deployedCore } = yieldState; 
 
@@ -89,6 +92,14 @@ const SeriesProvider = ({ children }:any) => {
       console.log('Positions already exist... force fetch if required');
     }
   };
+
+  const getSeriesHistory = async () => {
+    // getEventHistory(yieldState.deployedSeries[0].YDai, 'YDai', '*', [], 0);
+  };
+
+  React.useEffect( () => {
+  //  ( async () => yieldState?.deployedSeries[0]?.YDai && getEventHistory(yieldState.deployedSeries[0].YDai, 'YDai', '*', 0))();
+  }, [yieldState]);
 
   React.useEffect( () => {
     ( async () => {

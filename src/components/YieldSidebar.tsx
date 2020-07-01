@@ -59,7 +59,7 @@ const YieldSidebar = ({
         align='center'
         margin='small'
       >
-        <PulseLoader size='5px' margin='5' />
+        <PulseLoader size='5px' margin='5px' />
       </Box>}
 
       {seriesList.map((x:any, i:number) => {
