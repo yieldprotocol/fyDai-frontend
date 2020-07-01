@@ -198,7 +198,7 @@ const TestLayer = (props:any) => {
 
               New ETH direct deposit/withdraw: 
               <Button label='Post ETH Collateral direct 1.5' disabled={postActive} onClick={()=> postEth(deployedPeripheral.EthProxy, 1.5)} />
-              <Button label='(addProxy once-off) ' onClick={()=> sendTx(deployedCore.Dealer, 'Dealer', 'addProxy', [deployedPeripheral.EthProxy], utils.toWei('0'))} />
+              <Button label='(addProxy once-off) ' onClick={()=> sendTx(deployedCore.Dealer, 'Dealer', 'addDelegate', [deployedPeripheral.EthProxy], utils.toWei('0'))} />
               <Button label='(Withdraw ETH 1.5)' onClick={()=> withdrawEth(deployedPeripheral.EthProxy, 1.5 )} />
 
               get WETH: 

@@ -1891,12 +1891,12 @@
     "1337": {
       "events": {},
       "links": {},
-      "address": "0xe2f45c8319Ac48e4465fCA76410D6B2984302c13",
-      "transactionHash": "0xd945d998e04c90ad135efe086e6459973be8bcdd8a4a250c6d52d7f53060cc2b"
+      "address": "0x78C44a9aA7B0B2FB217d4EAeaddc720A9289Db6E",
+      "transactionHash": "0x39cf7041e9e6d3161b58fdefb4fd2ffd04ff5766e196201af50ce6ced163799c"
     }
   },
   "schemaVersion": "3.0.23",
-  "updatedAt": "2020-06-26T11:31:05.136Z",
+  "updatedAt": "2020-06-30T13:44:31.988Z",
   "networkType": "ethereum",
   "devdoc": {
     "details": "A splitter moves positions and weth collateral from Dealers (using the IDealer interface) to MakerDAO.",

@@ -15827,12 +15827,12 @@
     "1337": {
       "events": {},
       "links": {},
-      "address": "0x316050A81127241E9f2325C754d852Bccd91af93",
-      "transactionHash": "0xe7648f0352f9583852927e2bed4e5a2f5aa06e31d4247ad07901dffb7cc16fca"
+      "address": "0xb3eF63094B342CB4DAD672541D3356d182f0dA88",
+      "transactionHash": "0x209c01b9e0ea575085a4f632b897aa4e325cb520a74b02d0fc0b2eabe3006617"
     }
   },
   "schemaVersion": "3.0.23",
-  "updatedAt": "2020-06-26T11:31:05.149Z",
+  "updatedAt": "2020-06-30T13:44:32.001Z",
   "networkType": "ethereum",
   "devdoc": {
     "details": "Treasury manages the Dai, interacting with MakerDAO's vat and chai when needed.",

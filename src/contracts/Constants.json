@@ -67,25 +67,25 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.6.2+commit.bacdbe57\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"CHAI\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"RAD\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"RAY\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"WAD\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"WETH\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/Constants.sol\":\"Constants\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/Constants.sol\":{\"keccak256\":\"0x4fce3c7234c92373731036711aee9d29d9a00f71a8505d1280743819489f1b2a\",\"urls\":[\"bzz-raw://2b5d28b17d2a41bd07aad8f736e24e936cad972f99df96e5c5b8c19bd0723355\",\"dweb:/ipfs/QmU71Vjw6kTdSmofmRi7PxfB1EHTmeJLnmbhaavQc8vPxx\"]}},\"version\":1}",
-  "bytecode": "0x608060405234801561001057600080fd5b50610191806100206000396000f3fe608060405234801561001057600080fd5b50600436106100575760003560e01c806306f405fd1461005c578063552033c4146100805780636a146024146100a4578063ad5c4648146100c8578063b6dbf9ce146100e6575b600080fd5b610064610104565b604051808260ff1660ff16815260200191505060405180910390f35b610088610109565b604051808260ff1660ff16815260200191505060405180910390f35b6100ac61010e565b604051808260ff1660ff16815260200191505060405180910390f35b6100d0610113565b6040518082815260200191505060405180910390f35b6100ee610137565b6040518082815260200191505060405180910390f35b602d81565b601b81565b601281565b7f574554480000000000000000000000000000000000000000000000000000000081565b7f43484149000000000000000000000000000000000000000000000000000000008156fea26469706673582212208f1f0b39358d24b260ce0a8d3bbb0e0a1393a183f85c497185bb3e12b0fc1ad364736f6c63430006020033",
-  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100575760003560e01c806306f405fd1461005c578063552033c4146100805780636a146024146100a4578063ad5c4648146100c8578063b6dbf9ce146100e6575b600080fd5b610064610104565b604051808260ff1660ff16815260200191505060405180910390f35b610088610109565b604051808260ff1660ff16815260200191505060405180910390f35b6100ac61010e565b604051808260ff1660ff16815260200191505060405180910390f35b6100d0610113565b6040518082815260200191505060405180910390f35b6100ee610137565b6040518082815260200191505060405180910390f35b602d81565b601b81565b601281565b7f574554480000000000000000000000000000000000000000000000000000000081565b7f43484149000000000000000000000000000000000000000000000000000000008156fea26469706673582212208f1f0b39358d24b260ce0a8d3bbb0e0a1393a183f85c497185bb3e12b0fc1ad364736f6c63430006020033",
-  "sourceMap": "26:352:1:-:0;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;26:352:1;;;;;;;",
-  "deployedSourceMap": "26:352:1:-:0;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;26:352:1;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;170:30;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;134;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;98;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;207:37;;;:::i;:::-;;;;;;;;;;;;;;;;;;;294;;;:::i;:::-;;;;;;;;;;;;;;;;;;;170:30;198:2;170:30;:::o;134:::-;162:2;134:30;:::o;98:::-;126:2;98:30;:::o;207:37::-;;;:::o;294:::-;;;:::o",
+  "metadata": "{\"compiler\":{\"version\":\"0.6.2+commit.bacdbe57\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"CHAI\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"RAD\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"RAY\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"WAD\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"WETH\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/helpers/Constants.sol\":\"Constants\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/helpers/Constants.sol\":{\"keccak256\":\"0x4fce3c7234c92373731036711aee9d29d9a00f71a8505d1280743819489f1b2a\",\"urls\":[\"bzz-raw://2b5d28b17d2a41bd07aad8f736e24e936cad972f99df96e5c5b8c19bd0723355\",\"dweb:/ipfs/QmU71Vjw6kTdSmofmRi7PxfB1EHTmeJLnmbhaavQc8vPxx\"]}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b50610191806100206000396000f3fe608060405234801561001057600080fd5b50600436106100575760003560e01c806306f405fd1461005c578063552033c4146100805780636a146024146100a4578063ad5c4648146100c8578063b6dbf9ce146100e6575b600080fd5b610064610104565b604051808260ff1660ff16815260200191505060405180910390f35b610088610109565b604051808260ff1660ff16815260200191505060405180910390f35b6100ac61010e565b604051808260ff1660ff16815260200191505060405180910390f35b6100d0610113565b6040518082815260200191505060405180910390f35b6100ee610137565b6040518082815260200191505060405180910390f35b602d81565b601b81565b601281565b7f574554480000000000000000000000000000000000000000000000000000000081565b7f43484149000000000000000000000000000000000000000000000000000000008156fea2646970667358221220c165e11bcc54a63243b67af27773903208f7aa72c89947575d625cab0fd9400564736f6c63430006020033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100575760003560e01c806306f405fd1461005c578063552033c4146100805780636a146024146100a4578063ad5c4648146100c8578063b6dbf9ce146100e6575b600080fd5b610064610104565b604051808260ff1660ff16815260200191505060405180910390f35b610088610109565b604051808260ff1660ff16815260200191505060405180910390f35b6100ac61010e565b604051808260ff1660ff16815260200191505060405180910390f35b6100d0610113565b6040518082815260200191505060405180910390f35b6100ee610137565b6040518082815260200191505060405180910390f35b602d81565b601b81565b601281565b7f574554480000000000000000000000000000000000000000000000000000000081565b7f43484149000000000000000000000000000000000000000000000000000000008156fea2646970667358221220c165e11bcc54a63243b67af27773903208f7aa72c89947575d625cab0fd9400564736f6c63430006020033",
+  "sourceMap": "26:352:17:-:0;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;26:352:17;;;;;;;",
+  "deployedSourceMap": "26:352:17:-:0;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;26:352:17;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;170:30;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;134;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;98;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;207:37;;;:::i;:::-;;;;;;;;;;;;;;;;;;;294;;;:::i;:::-;;;;;;;;;;;;;;;;;;;170:30;198:2;170:30;:::o;134:::-;162:2;134:30;:::o;98:::-;126:2;98:30;:::o;207:37::-;;;:::o;294:::-;;;:::o",
   "source": "pragma solidity ^0.6.2;\n\n\ncontract Constants {\n    // Fixed point256 precisions from MakerDao\n    uint8 constant public WAD = 18;\n    uint8 constant public RAY = 27;\n    uint8 constant public RAD = 45;\n\n    bytes32 public constant WETH = \"WETH\"; // TODO: Upgrade to 0.6.9 and use immutable\n    bytes32 public constant CHAI = \"CHAI\"; // TODO: Upgrade to 0.6.9 and use immutable\n}",
-  "sourcePath": "/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/Constants.sol",
+  "sourcePath": "/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/helpers/Constants.sol",
   "ast": {
-    "absolutePath": "/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/Constants.sol",
+    "absolutePath": "/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/helpers/Constants.sol",
     "exportedSymbols": {
       "Constants": [
-        69
+        9984
       ]
     },
-    "id": 70,
+    "id": 9985,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 53,
+        "id": 9968,
         "literals": [
           "solidity",
           "^",
@@ -93,7 +93,7 @@
           ".2"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:23:1"
+        "src": "0:23:17"
       },
       {
         "abstract": false,
@@ -102,9 +102,9 @@
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 69,
+        "id": 9984,
         "linearizedBaseContracts": [
-          69
+          9984
         ],
         "name": "Constants",
         "nodeType": "ContractDefinition",
@@ -112,12 +112,12 @@
           {
             "constant": true,
             "functionSelector": "6a146024",
-            "id": 56,
+            "id": 9971,
             "name": "WAD",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 69,
-            "src": "98:30:1",
+            "scope": 9984,
+            "src": "98:30:17",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -125,10 +125,10 @@
               "typeString": "uint8"
             },
             "typeName": {
-              "id": 54,
+              "id": 9969,
               "name": "uint8",
               "nodeType": "ElementaryTypeName",
-              "src": "98:5:1",
+              "src": "98:5:17",
               "typeDescriptions": {
                 "typeIdentifier": "t_uint8",
                 "typeString": "uint8"
@@ -137,14 +137,14 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "3138",
-              "id": 55,
+              "id": 9970,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
               "kind": "number",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "126:2:1",
+              "src": "126:2:17",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_rational_18_by_1",
@@ -157,12 +157,12 @@
           {
             "constant": true,
             "functionSelector": "552033c4",
-            "id": 59,
+            "id": 9974,
             "name": "RAY",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 69,
-            "src": "134:30:1",
+            "scope": 9984,
+            "src": "134:30:17",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -170,10 +170,10 @@
               "typeString": "uint8"
             },
             "typeName": {
-              "id": 57,
+              "id": 9972,
               "name": "uint8",
               "nodeType": "ElementaryTypeName",
-              "src": "134:5:1",
+              "src": "134:5:17",
               "typeDescriptions": {
                 "typeIdentifier": "t_uint8",
                 "typeString": "uint8"
@@ -182,14 +182,14 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "3237",
-              "id": 58,
+              "id": 9973,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
               "kind": "number",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "162:2:1",
+              "src": "162:2:17",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_rational_27_by_1",
@@ -202,12 +202,12 @@
           {
             "constant": true,
             "functionSelector": "06f405fd",
-            "id": 62,
+            "id": 9977,
             "name": "RAD",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 69,
-            "src": "170:30:1",
+            "scope": 9984,
+            "src": "170:30:17",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -215,10 +215,10 @@
               "typeString": "uint8"
             },
             "typeName": {
-              "id": 60,
+              "id": 9975,
               "name": "uint8",
               "nodeType": "ElementaryTypeName",
-              "src": "170:5:1",
+              "src": "170:5:17",
               "typeDescriptions": {
                 "typeIdentifier": "t_uint8",
                 "typeString": "uint8"
@@ -227,14 +227,14 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "3435",
-              "id": 61,
+              "id": 9976,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
               "kind": "number",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "198:2:1",
+              "src": "198:2:17",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_rational_45_by_1",
@@ -247,12 +247,12 @@
           {
             "constant": true,
             "functionSelector": "ad5c4648",
-            "id": 65,
+            "id": 9980,
             "name": "WETH",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 69,
-            "src": "207:37:1",
+            "scope": 9984,
+            "src": "207:37:17",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -260,10 +260,10 @@
               "typeString": "bytes32"
             },
             "typeName": {
-              "id": 63,
+              "id": 9978,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "207:7:1",
+              "src": "207:7:17",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -272,14 +272,14 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "57455448",
-              "id": 64,
+              "id": 9979,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "238:6:1",
+              "src": "238:6:17",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_0f8a193ff464434486c0daf7db2a895884365d2bc84ba47a68fcf89c1b14b5b8",
@@ -292,12 +292,12 @@
           {
             "constant": true,
             "functionSelector": "b6dbf9ce",
-            "id": 68,
+            "id": 9983,
             "name": "CHAI",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 69,
-            "src": "294:37:1",
+            "scope": 9984,
+            "src": "294:37:17",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -305,10 +305,10 @@
               "typeString": "bytes32"
             },
             "typeName": {
-              "id": 66,
+              "id": 9981,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "294:7:1",
+              "src": "294:7:17",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -317,14 +317,14 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "43484149",
-              "id": 67,
+              "id": 9982,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "325:6:1",
+              "src": "325:6:17",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_90796d336f0c266eeef65e20197d6053742827f511f45449fde00b030094d925",
@@ -335,24 +335,24 @@
             "visibility": "public"
           }
         ],
-        "scope": 70,
-        "src": "26:352:1"
+        "scope": 9985,
+        "src": "26:352:17"
       }
     ],
-    "src": "0:378:1"
+    "src": "0:378:17"
   },
   "legacyAST": {
-    "absolutePath": "/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/Constants.sol",
+    "absolutePath": "/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/helpers/Constants.sol",
     "exportedSymbols": {
       "Constants": [
-        69
+        9984
       ]
     },
-    "id": 70,
+    "id": 9985,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 53,
+        "id": 9968,
         "literals": [
           "solidity",
           "^",
@@ -360,7 +360,7 @@
           ".2"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:23:1"
+        "src": "0:23:17"
       },
       {
         "abstract": false,
@@ -369,9 +369,9 @@
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 69,
+        "id": 9984,
         "linearizedBaseContracts": [
-          69
+          9984
         ],
         "name": "Constants",
         "nodeType": "ContractDefinition",
@@ -379,12 +379,12 @@
           {
             "constant": true,
             "functionSelector": "6a146024",
-            "id": 56,
+            "id": 9971,
             "name": "WAD",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 69,
-            "src": "98:30:1",
+            "scope": 9984,
+            "src": "98:30:17",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -392,10 +392,10 @@
               "typeString": "uint8"
             },
             "typeName": {
-              "id": 54,
+              "id": 9969,
               "name": "uint8",
               "nodeType": "ElementaryTypeName",
-              "src": "98:5:1",
+              "src": "98:5:17",
               "typeDescriptions": {
                 "typeIdentifier": "t_uint8",
                 "typeString": "uint8"
@@ -404,14 +404,14 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "3138",
-              "id": 55,
+              "id": 9970,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
               "kind": "number",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "126:2:1",
+              "src": "126:2:17",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_rational_18_by_1",
@@ -424,12 +424,12 @@
           {
             "constant": true,
             "functionSelector": "552033c4",
-            "id": 59,
+            "id": 9974,
             "name": "RAY",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 69,
-            "src": "134:30:1",
+            "scope": 9984,
+            "src": "134:30:17",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -437,10 +437,10 @@
               "typeString": "uint8"
             },
             "typeName": {
-              "id": 57,
+              "id": 9972,
               "name": "uint8",
               "nodeType": "ElementaryTypeName",
-              "src": "134:5:1",
+              "src": "134:5:17",
               "typeDescriptions": {
                 "typeIdentifier": "t_uint8",
                 "typeString": "uint8"
@@ -449,14 +449,14 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "3237",
-              "id": 58,
+              "id": 9973,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
               "kind": "number",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "162:2:1",
+              "src": "162:2:17",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_rational_27_by_1",
@@ -469,12 +469,12 @@
           {
             "constant": true,
             "functionSelector": "06f405fd",
-            "id": 62,
+            "id": 9977,
             "name": "RAD",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 69,
-            "src": "170:30:1",
+            "scope": 9984,
+            "src": "170:30:17",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -482,10 +482,10 @@
               "typeString": "uint8"
             },
             "typeName": {
-              "id": 60,
+              "id": 9975,
               "name": "uint8",
               "nodeType": "ElementaryTypeName",
-              "src": "170:5:1",
+              "src": "170:5:17",
               "typeDescriptions": {
                 "typeIdentifier": "t_uint8",
                 "typeString": "uint8"
@@ -494,14 +494,14 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "3435",
-              "id": 61,
+              "id": 9976,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
               "kind": "number",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "198:2:1",
+              "src": "198:2:17",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_rational_45_by_1",
@@ -514,12 +514,12 @@
           {
             "constant": true,
             "functionSelector": "ad5c4648",
-            "id": 65,
+            "id": 9980,
             "name": "WETH",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 69,
-            "src": "207:37:1",
+            "scope": 9984,
+            "src": "207:37:17",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -527,10 +527,10 @@
               "typeString": "bytes32"
             },
             "typeName": {
-              "id": 63,
+              "id": 9978,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "207:7:1",
+              "src": "207:7:17",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -539,14 +539,14 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "57455448",
-              "id": 64,
+              "id": 9979,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "238:6:1",
+              "src": "238:6:17",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_0f8a193ff464434486c0daf7db2a895884365d2bc84ba47a68fcf89c1b14b5b8",
@@ -559,12 +559,12 @@
           {
             "constant": true,
             "functionSelector": "b6dbf9ce",
-            "id": 68,
+            "id": 9983,
             "name": "CHAI",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 69,
-            "src": "294:37:1",
+            "scope": 9984,
+            "src": "294:37:17",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -572,10 +572,10 @@
               "typeString": "bytes32"
             },
             "typeName": {
-              "id": 66,
+              "id": 9981,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
-              "src": "294:7:1",
+              "src": "294:7:17",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes32",
                 "typeString": "bytes32"
@@ -584,14 +584,14 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "43484149",
-              "id": 67,
+              "id": 9982,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
               "kind": "string",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "325:6:1",
+              "src": "325:6:17",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_stringliteral_90796d336f0c266eeef65e20197d6053742827f511f45449fde00b030094d925",
@@ -602,11 +602,11 @@
             "visibility": "public"
           }
         ],
-        "scope": 70,
-        "src": "26:352:1"
+        "scope": 9985,
+        "src": "26:352:17"
       }
     ],
-    "src": "0:378:1"
+    "src": "0:378:17"
   },
   "compiler": {
     "name": "solc",
@@ -614,7 +614,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.23",
-  "updatedAt": "2020-06-26T10:57:53.713Z",
+  "updatedAt": "2020-07-01T06:23:49.309Z",
   "devdoc": {
     "methods": {}
   },
