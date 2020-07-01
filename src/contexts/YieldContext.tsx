@@ -164,7 +164,7 @@ const YieldProvider = ({ children }:any) => {
     return [ _deployedSeries, _deployedCore, _deployedExternal, _deployedPeripheral ];
   };
 
-  // Add extra non-cached blockchain data for each series AND PARSE data.
+  // Add extra non-cached blockchain data for each series AND PARSE data. (eg. )
   const _getSeriesData = async (seriesAddrs:IYieldSeries[]): Promise<IYieldSeries[]> => {
     const _seriesData:any[] = [];
     await Promise.all(
@@ -178,7 +178,7 @@ const YieldProvider = ({ children }:any) => {
         }
       })
     );
-    
+
     // Parse and return data
     return _seriesData.map((x:any, i:number) => {
       return {
@@ -190,14 +190,17 @@ const YieldProvider = ({ children }:any) => {
     });
   };
 
-  // Non-cached yield protocol general data
+  // Fetch non-cached yield protocol general data
   const _getYieldData = async (deployedCore:any): Promise<any> => {
     const _yieldData:any = {};
+
     // parse data if required.
     return {
       ..._yieldData,
     };
   };
+
+
 
   // Yield data for the user address
   const _getUserData = async (deployedCore:any, deployedPeripheral:any, forceUpdate:boolean): Promise<any> => {
@@ -206,42 +209,36 @@ const YieldProvider = ({ children }:any) => {
     _userData.ethBalance = await getEthBalance();
     _userData.ethPosted = await callTx(deployedCore.Dealer, 'Dealer', 'posted', [utils.WETH, account]);
     // _userData.ethTotalDebtYDai = await callTx(deployedCore.Dealer, 'Dealer', 'totalDebtYDai', [utils.WETH, account]);
-    // _userData.collateralHistory = await getEventHistory(deployedCore.Dealer, 'Dealer', 'Borrowed', [], 0 );
 
-    forceUpdate && window.localStorage.removeItem('txHistory') && console.log('Building txHistory...');
-
-    const _postedHistory = await getEventHistory(deployedCore.Dealer, 'Dealer', 'Posted', [], !txHistory?0:txHistory.lastBlock+1 );
+    forceUpdate && window.localStorage.removeItem('txHistory') && console.log('Re-building txHistory...');
+    const _postedHistory = await getEventHistory(deployedCore.Dealer, 'Dealer', 'Posted', [null, account, null], !txHistory?0:txHistory.lastBlock+1 );
     const _borrowedHistory = await getEventHistory(deployedCore.Dealer, 'Dealer', 'Borrowed', [], !txHistory?0:txHistory.lastBlock+1 );
     // TODO add in AMM history information
+    // TODO add in YDai information?
 
+    // TODO : get blocknumber at initialisation of yDaiProtocol instead of using first block(0).
     console.log('txHistory updated from block:', txHistory?.lastBlock+1||0, 'to block:', _lastBlock);
-
-    txHistory?
-      setTxHistory({ lastBlock: _lastBlock, items:[ ...txHistory.items, ..._postedHistory, ..._borrowedHistory ] })
-      :
-      setTxHistory({ lastBlock: _lastBlock, items:[ ..._postedHistory, ..._borrowedHistory ] });
+    setTxHistory({
+      lastBlock: _lastBlock, 
+      items: txHistory ? [ ...txHistory.items, ..._postedHistory, ..._borrowedHistory ]
+        : [ ..._postedHistory, ..._borrowedHistory ]
+    });
     console.log('txHistory updated');
-    // return { ..._userData, txHistory };
-    // console.log(txHistory);
-
-    // if (!txHistory || forceUpdate) {
-    //   // if cache empty or forced update > rebuild history
-    //   const _postedHistory = await getEventHistory(deployedCore.Dealer, 'Dealer', 'Posted', [], !txHistory?0:txHistory.lastBlock );
-    //   const _borrowedHistory = await getEventHistory(deployedCore.Dealer, 'Dealer', 'Borrowed', [], !txHistory?0:txHistory.lastBlock );
-    //   forceUpdate && window.localStorage.removeItem('txHistory');
-    //   setTxHistory({ lastBlock: _lastBlock, items:[ ..._postedHistory, ..._borrowedHistory ] });
-    //   console.log('User Tx history rebuilt');
-    // } else { return { ..._userData, txHistory };}
-    // _yieldData.chaiPosted = await callTx(deployedCore.Dealer, 'Dealer', 'posted', [utils.CHAI, account]);
-    // _yieldData.chaiTotalDebtYDai = await callTx(deployedCore.Dealer, 'Dealer', 'totalDebtYDai', [utils.CHAI, account]);
-    // console.log(_userData.collateralHistory);
 
     // parse and return user data
     return {
       ..._userData,
       ethBalance_: parseFloat(ethers.utils.formatEther(_userData.ethBalance.toString())),
       ethPosted_: parseFloat(ethers.utils.formatEther(_userData.ethPosted.toString())),
-      txHistory,
+      txHistory : { 
+        ...txHistory,
+        items: txHistory?.items,
+        collateralTxs: txHistory?.items.filter((x:any)=> x.event === 'Posted'),
+        seriesTxs: txHistory?.items.filter((x:any)=> x.event === 'Borrowed'),
+        redeemTxs: txHistory?.items.filter((x:any)=> x.event === 'Redeemed'),
+        adminTxs: txHistory?.items.map((x:any, i:number)=> i),
+      },
+      preferences: userPreferences,
       // ethTotalDebtYDai_: parseFloat(ethers.utils.formatEther(_userData.ethTotalDebtYDai.toString())),
       // chaiPosted_: parseFloat(ethers.utils.formatEther(_yieldData.chaiPosted.toString())),
       // chaiTotalDebtYDai_: parseFloat(ethers.utils.formatEther(_yieldData.chaiTotalDebtYDai.toString())),
@@ -303,6 +300,8 @@ const YieldProvider = ({ children }:any) => {
     // #4 Fetch any user account data based on address (if any), possibly cached.
     const userData = account ? await _getUserData(deployedCore, deployedPeripheral, false): { ethBalance_: 0 };
     dispatch({ type:'updateUserData', payload: userData });
+
+    console.log(userData);
 
     // #5 Get maker data
     // const makerData = await _getMakerData(deployedSeries);

@@ -66,7 +66,8 @@ const ConnectionProvider = ({ children }:any) => {
     } else {
       console.log('No metamask installed');
       // setProvider(new ethers.providers.InfuraProvider(5, '9dbb21faf34448c9af1f3047c45b15df'));
-      provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
+      
+      // provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
       signer = null;
       account= null;
       network={ chainId:1337 };
