@@ -1,21 +1,10 @@
 import React from 'react';
-import { 
-  Grommet,
-  base, 
-  Tabs, 
-  Tab, 
-  Grid,
-  Main,
-  Heading,
-  Box,
-  Text 
-} from 'grommet';
+import { Grommet, base, Grid, Main, Box } from 'grommet';
 import { deepMerge } from 'grommet/utils';
-
 import { yieldTheme } from './themes';
-import { useEagerConnect }  from './hooks/connectionHooks';
+import { useEagerConnect, useInactiveListener }  from './hooks/connectionHooks';
 
-import Landing from './views/Landing';
+import Dashboard from './views/Dashboard';
 import Borrow from './views/Borrow';
 import Lend from './views/Lend';
 import Amm from './views/Amm';
@@ -35,11 +24,10 @@ import TestLayer from './views/layers/TestLayer';
 import { IYieldSeries } from './types';
 
 function App() {
-  const [darkmode, setDarkmode] = React.useState(false);
-  const [activeView, setActiveView] = React.useState<string>('BORROW');
-  const [activeSeries, setActiveSeries] = React.useState<IYieldSeries | null>(null);
 
-  const [loading, setLoading] = React.useState(false);
+  const [darkmode, setDarkmode] = React.useState(false);
+  const [activeView, setActiveView] = React.useState<string>('DASHBOARD');
+  const [activeSeries, setActiveSeries] = React.useState<IYieldSeries | null>(null);
 
   const [showConnectLayer, setShowConnectLayer] = React.useState<boolean>(false);
   const [showAccountLayer, setShowAccountLayer] = React.useState<boolean>(false);
@@ -69,17 +57,14 @@ function App() {
                 setActiveView={setActiveView}
               />
               <Main
-                // align='center'
-                // pad={{ horizontal: 'none', vertical:'none' }}
                 pad='none'
-                // background='background-front'
                 direction='row'
                 flex
               >
                 <Grid fill columns={['25%', 'auto', '15%']}>
                   <YieldSidebar setShowSeriesLayer={setShowSeriesLayer} activeSeries={activeSeries} setActiveSeries={setActiveSeries} />
                   <Box align='center'>
-                    {!activeSeries && <Landing />}
+                    {activeView === 'DASHBOARD' && <Dashboard /> }
                     {activeSeries && activeView === 'BORROW' && <Borrow activeSeries={activeSeries} setActiveSeries={setActiveSeries} setShowSeriesLayer={setShowSeriesLayer} />}
                     {activeSeries && activeView === 'LEND' && <Lend activeSeries={activeSeries} setActiveSeries={setActiveSeries} setShowSeriesLayer={setShowSeriesLayer} />}
                     {activeSeries && activeView === 'AMM' && <Amm />}
@@ -94,7 +79,7 @@ function App() {
                 darkmode={darkmode}
                 setDarkmode={setDarkmode}
                 changeConnection={changeConnection}
-              /> 
+              />
             </Grid>
           </Box>
         </Box>

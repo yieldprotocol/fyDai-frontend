@@ -12,6 +12,7 @@ const initState = {
   callbackCancel: null,
   fatalOpen: false,
   fatalMsg: '',
+  pendingTxs: [],
 };
 
 function notifyReducer(state:INotification, action:IReducerAction) {
@@ -32,6 +33,16 @@ function notifyReducer(state:INotification, action:IReducerAction) {
         ...state, 
         fatalOpen: true,
         fatalMsg: action.payload.message,
+      };
+    case 'txPending':
+      return {
+        ...state,
+        pendingTxs: [ ...state.pendingTxs, action.payload],
+      };
+    case 'txComplete':
+      return {
+        ...state,
+        pendingTxs: state.pendingTxs.filter( (x:any) => x.tx.hash !== action.payload.tx.hash)
       };
     case '_closeNotify':
       return { ...state, open: false, timerMs: initState.timerMs };
@@ -55,6 +66,11 @@ const NotifyProvider = ({ children }:any) => {
       }
     })();
   }, [state.open]);
+
+  React.useEffect( () => {
+    console.log(state.pendingTxs);
+  }, [state.pendingTxs]);
+
   return (
     <NotifyContext.Provider value={{ state, dispatch }}>
       {children}

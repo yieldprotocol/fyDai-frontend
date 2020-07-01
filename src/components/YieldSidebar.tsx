@@ -1,14 +1,9 @@
 import React from 'react';
 import {
-  Anchor, 
   Button,
   Box,
-  Image,
   Sidebar,
   Text,
-  ThemeContext,
-  Nav,
-  Drop,
 } from 'grommet';
 
 import PulseLoader from 'react-spinners/PulseLoader';
@@ -16,17 +11,22 @@ import PulseLoader from 'react-spinners/PulseLoader';
 import { IYieldSeries } from '../types';
 import { YieldContext } from '../contexts/YieldContext';
 import YieldSeriesMenuItem from './YieldSeriesMenuItem';
-
-
-
 // import YieldSeries from './YieldSeries';
 
-const YieldSidebar = ({ activeSeries, setActiveSeries, setShowSeriesLayer }:{activeSeries:IYieldSeries|null, setActiveSeries:any, setShowSeriesLayer:any}) => {
+const YieldSidebar = ({
+  activeSeries,
+  setActiveSeries,
+  setShowSeriesLayer }
+: {
+  activeSeries:IYieldSeries|null,
+  setActiveSeries:any,
+  setShowSeriesLayer:any
+}) => {
+
   const { state } = React.useContext( YieldContext );
   const [seriesList, setSeriesList] = React.useState<IYieldSeries[]>([]);
-  const [showMore, setShowMore] = React.useState<boolean>(false);
-  const [openIndex, setOpenIndex] = React.useState<number | null >(null);
 
+  const { deployedSeries } = state;
   // const handleSelectSeries = (ind: number | null) => {
   //   openIndex !== ind ?
   //     // setOpenIndex(ind) :
@@ -36,19 +36,14 @@ const YieldSidebar = ({ activeSeries, setActiveSeries, setShowSeriesLayer }:{act
   // };
 
   React.useEffect(() => {
-    !state.isLoading && setSeriesList(state.deployedSeries);
-  }, [ state.isLoading ]);
+    !state.isLoading && setSeriesList(deployedSeries);
+  }, [ state.isLoading, deployedSeries ]);
 
   return (
-    
     <Sidebar
-      // overflow="auto"
       background="background"
-      // header={<SidebarHeader />}
-      // footer={<SidebarFooter />}
       pad="none"
       gap='small'
-      // align='center'
     >
       <Box margin={{ left: 'small', vertical:'none' }} pad='small'>
         <Text size='large'> Series Available </Text>
@@ -59,12 +54,12 @@ const YieldSidebar = ({ activeSeries, setActiveSeries, setShowSeriesLayer }:{act
         round='xlarge'
         width='xsmall'
         height='xsmall'
-                  // background={activePosition?.seriesColor}
+        // background={activePosition?.seriesColor}
         justify='center'
         align='center'
         margin='small'
       >
-        <PulseLoader size='5' margin='5' />
+        <PulseLoader size='5px' margin='5px' />
       </Box>}
 
       {seriesList.map((x:any, i:number) => {

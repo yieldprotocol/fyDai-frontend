@@ -1,15 +1,10 @@
 import React from 'react';
 import moment from 'moment';
-import { Box, Grid, Heading, Text, Collapsible, Markdown, Layer } from 'grommet';
+import { Box, Heading, Text} from 'grommet';
 import RotateLoader from 'react-spinners/RotateLoader';
 
-import BorrowAction from '../components/BorrowAction';
-import RepayAction from '../components/RepayAction';
-
-import TransactionHistory from '../components/TransactionHistory';
-
 import { YieldContext } from '../contexts/YieldContext';
-import { PositionsContext } from '../contexts/PositionsContext';
+import { SeriesContext } from '../contexts/SeriesContext';
 import { IYieldSeries } from '../types';
 
 import DepositWithdraw from '../components/DepositWithdraw';
@@ -24,23 +19,23 @@ interface BorrowProps {
 const Borrow = ({ setActiveSeries, activeSeries, setShowSeriesLayer }:BorrowProps) => {
 
   const { state: yieldState, actions: yieldActions } = React.useContext(YieldContext);
-  const { state: positionsState, actions: positionsActions } = React.useContext(PositionsContext);
+  const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
   // const [ nextColor, setNextColor ] = React.useState<string>('');
 
   const [ activePosition, setActivePosition ] = React.useState<any>(null);
   const [ borrowRepayActive, setBorrowRepayActive ] = React.useState<boolean>(true);
   const [ depositWithdrawActive, setDepositWithdrawActive ] = React.useState<boolean>(false);
 
-  const { isLoading: positionsLoading, positionsData } = positionsState; 
-  const { isLoading: yieldLoading, extBalances, deployedSeries, deployedCore, yieldData, makerData }  = yieldState;
+  const { isLoading: positionsLoading, positionsData } = seriesState; 
+  const { isLoading: yieldLoading, userData, deployedSeries, deployedCore, yieldData, makerData }  = yieldState;
 
 
   React.useEffect( () => {
     ( async () => {
-      !positionsLoading && await positionsActions.getPositions([activeSeries]);
+      !positionsLoading && await seriesActions.getPositions([activeSeries]);
       setActivePosition(positionsData.get(activeSeries.symbol));
     })();
-    console.log(positionsState);
+    console.log(seriesState);
   }, [ activeSeries ]);
 
   const {
@@ -91,8 +86,8 @@ const Borrow = ({ setActiveSeries, activeSeries, setShowSeriesLayer }:BorrowProp
               margin='small'
             >
               <Box align='center'>
-                <Text weight='bold'>{moment(activePosition?.maturity_p).format('MMM')}</Text>
-                <Text>{moment(activePosition?.maturity_p).format('Y')}</Text>
+                <Text weight='bold'>{moment(activePosition?.maturity_).format('MMM')}</Text>
+                <Text>{moment(activePosition?.maturity_).format('Y')}</Text>
               </Box>
             </Box>}
         </Box>
@@ -111,28 +106,28 @@ const Borrow = ({ setActiveSeries, activeSeries, setShowSeriesLayer }:BorrowProp
           align='baseline'
         >
           <Box>
-            <Text weight='bold' size='xsmall'> Collateral Balances </Text>
+            <Text weight='bold' size='xsmall'> Collateral Balance </Text>
           </Box>
           <Box
             background='brandTransparent'
             round
             pad={{ horizontal:'small', vertical:'xsmall' }}
           >
-            <Text size='xsmall' color='brand'>{yieldData.wethPosted_p} ETH</Text>
+            <Text size='xsmall' color='brand'>{userData.ethPosted_} ETH</Text>
           </Box>
-          <Box
+          {/* <Box
             background='secondaryTransparent'
             round
             pad={{ horizontal:'small', vertical:'xsmall' }}
           >
-            <Text size='xsmall' color='secondary'>{yieldData.chaiPosted_p} DAI</Text>
-          </Box>
+            <Text size='xsmall' color='secondary'>{userData.chaiPosted_} DAI</Text>
+          </Box> */}
         </Box>
 
         <Box direction='row' gap='small' align='baseline'> 
           <Text weight='bold' size='xsmall'>Maturity: </Text>
           <Box round border='all' pad={{ horizontal:'small', vertical:'xsmall' }}>
-            <Text size='xsmall'>{moment(activePosition?.maturity_p).format('MMMM DD, YYYY')}</Text>
+            <Text size='xsmall'>{moment(activePosition?.maturity_).format('MMMM DD, YYYY')}</Text>
           </Box>
         </Box>
       </Box>
@@ -145,7 +140,7 @@ const Borrow = ({ setActiveSeries, activeSeries, setShowSeriesLayer }:BorrowProp
           />
           <BorrowRepay
             activeSeries={activeSeries}
-            active={yieldData.wethPosted_p > 0}
+            active={userData.ethPosted_ > 0}
           />
         </Box>
       </Box>

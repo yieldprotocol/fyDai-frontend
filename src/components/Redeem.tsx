@@ -7,9 +7,9 @@ import DepositAction from './DepositAction';
 import WithdrawAction from './WithdrawAction';
 
 import { YieldContext } from '../contexts/YieldContext';
-import { PositionsContext } from '../contexts/PositionsContext';
+import { SeriesContext } from '../contexts/SeriesContext';
 
-import { useDealer, useBalances } from '../hooks/yieldHooks';
+import { useDealer, useBalances } from '../hooks';
 import RedeemAction from './RedeemAction';
 
 const Redeem = ({ activeSeries }:any) => {
@@ -17,11 +17,11 @@ const Redeem = ({ activeSeries }:any) => {
   const [over, setOver] = React.useState<boolean>(false);
   const [inputValue, setInputValue] = React.useState<any>();
   const [taskView, setTaskView] = React.useState<string>('TIMER');
-  const [ wethBalance, setWethBalance ] = React.useState<number>(0);
-  const [ wethPosted, setWethPosted ] = React.useState<number>(0);
+  const [ ethBalance, setEthBalance ] = React.useState<number>(0);
+  const [ ethPosted, setEthPosted ] = React.useState<number>(0);
   const { state, dispatch } = React.useContext(YieldContext);
 
-  const { deployedCore, deployedExternal, yieldData } = state; 
+  const { deployedCore, deployedExternal, yieldData, userData } = state; 
 
   const {
     approveDealer,
@@ -33,7 +33,7 @@ const Redeem = ({ activeSeries }:any) => {
 
   React.useEffect(()=>{
     // (async () => setWethBalance( await getWethBalance(deployedExternal.Weth)) )();
-    (async () => setWethPosted(yieldData.wethPosted_p) )();
+    (async () => setEthPosted(userData.ethPosted_) )();
   }, []);
 
   // const depositSteps = async (value:number) => {

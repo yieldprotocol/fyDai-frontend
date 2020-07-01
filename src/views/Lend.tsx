@@ -1,66 +1,44 @@
 import React from 'react';
 import moment from 'moment';
-import { Box, Grid, Heading, Text, Collapsible, Markdown, Layer } from 'grommet';
+import { Box, Heading, Text } from 'grommet';
 import RotateLoader from 'react-spinners/RotateLoader';
 
-import { FiCheckCircle, FiCircle, FiRefreshCw as Refresh } from 'react-icons/fi';
-
-import BorrowAction from '../components/BorrowAction';
-import RepayAction from '../components/RepayAction';
-
-import TransactionHistory from '../components/TransactionHistory';
-
 import { YieldContext } from '../contexts/YieldContext';
-import { PositionsContext } from '../contexts/PositionsContext';
+import { SeriesContext } from '../contexts/SeriesContext';
 import { IYieldSeries } from '../types';
 
-import DepositWithdraw from '../components/DepositWithdraw';
-import BorrowRepay from '../components/BorrowRepay';
 import BuySell from '../components/BuySell';
 import Redeem from '../components/Redeem';
 
 interface BorrowProps {
   setActiveSeries: any,
   activeSeries:IYieldSeries,
-  setShowSeriesLayer: any, 
+  setShowSeriesLayer: any,
 }
 
-const Lend = ({ setActiveSeries, activeSeries, setShowSeriesLayer }:BorrowProps) => {
+const Lend = ({ activeSeries }:BorrowProps) => {
 
-  const { state: yieldState, dispatch: yieldDispatch } = React.useContext(YieldContext);
-  const { state: positionsState, actions: positionsActions } = React.useContext(PositionsContext);
+  const { state: yieldState } = React.useContext(YieldContext);
+  const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
   // const [ nextColor, setNextColor ] = React.useState<string>('');
 
   const [ activePosition, setActivePosition ] = React.useState<any>(null);
   // const [ layerOpen, setLayerOpen ] = React.useState<String|null>(null);
-  const [ borrowRepayActive, setBorrowRepayActive ] = React.useState<boolean>(true);
-  const [ depositWithdrawActive, setDepositWithdrawActive ] = React.useState<boolean>(true);
+  // const [ ] = React.useState<boolean>(true);
+  const [ depositWithdrawActive ] = React.useState<boolean>(true);
 
-  const { isLoading: positionsLoading, positionsData } = positionsState; 
-  const { isLoading: yieldLoading, deployedSeries, deployedCore, yieldData, makerData }  = yieldState;
+  const { isLoading: positionsLoading, positionsData } = seriesState; 
   const {
-    maturity_p,
-    yDaiBalance_p,
-    // currentValue,
-    seriesColor,
+    yDaiBalance_,
   }  = activeSeries;
-
 
   React.useEffect( () => {
     ( async () => {
-      !positionsLoading && await positionsActions.getPositions([activeSeries]);
+      !positionsLoading && await seriesActions.getPositions([activeSeries]);
       setActivePosition(positionsData.get(activeSeries.symbol));
     })();
-    console.log(positionsState);
+    console.log(seriesState);
   }, [ activeSeries ]);
-
-  const {
-    name,
-    maturity,
-    rate,
-    symbol,
-    currentValue,
-  } = activeSeries;
 
   return (
 
@@ -101,8 +79,8 @@ const Lend = ({ setActiveSeries, activeSeries, setShowSeriesLayer }:BorrowProps)
               margin='small'
             >
               <Box align='center'>
-                <Text weight='bold'>{moment(activePosition?.maturity_p).format('MMM')}</Text>
-                <Text>{moment(activePosition?.maturity_p).format('Y')}</Text>
+                <Text weight='bold'>{moment(activePosition?.maturity_).format('MMM')}</Text>
+                <Text>{moment(activePosition?.maturity_).format('Y')}</Text>
               </Box>
             </Box>}
         </Box>
@@ -128,7 +106,7 @@ const Lend = ({ setActiveSeries, activeSeries, setShowSeriesLayer }:BorrowProps)
             round
             pad={{ horizontal:'small', vertical:'xsmall' }}
           >
-            <Text size='xsmall' color='brand'>{yDaiBalance_p} yDai ≈ {yDaiBalance_p*1.01} Dai</Text>
+            <Text size='xsmall' color='brand'>{yDaiBalance_} yDai ≈ {yDaiBalance_*1.01} Dai</Text>
           </Box>
         </Box>
 

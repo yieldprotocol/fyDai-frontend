@@ -3,8 +3,6 @@ import React from 'react';
 import Maker from '@makerdao/dai';
 import { McdPlugin, ETH, DAI, BAT } from '@makerdao/dai-plugin-mcd';
 
-import { ethers } from 'ethers';
-
 import { ConnectionContext } from '../contexts/ConnectionContext';
 
 import rinkebyAddresses from '../contracts/makerAddrs/rinkeby.json';
@@ -60,12 +58,14 @@ const defineNetwork = (_networkId:number) => {
 export const useMaker = () => {
 
   const { state : { account, chainId, provider } } = React.useContext(ConnectionContext);
+  // const { account, chainId, library } = useWeb3React();
+  
   const [openVaultActive, setOpenVaultActive] = React.useState<boolean>(false);
   const [convertVaultActive, setConvertVaultActive] = React.useState<boolean>(false);
   const [getVaultActive, setGetVaultActive] = React.useState<boolean>(false);
 
   // const networkNumber = await chainId;
-  const network = defineNetwork(chainId);
+  const network = defineNetwork(chainId || 0);
 
   const addressOverrides = ['rinkeby', 'ropsten', 'goerli'].some(
     networkName => networkName === network.network
@@ -83,6 +83,10 @@ export const useMaker = () => {
     ],
     smartContract: {
       addressOverrides
+    },
+    web3: {
+      // @ts-ignore
+      inject: window.ethereum || null
     },
   };
 

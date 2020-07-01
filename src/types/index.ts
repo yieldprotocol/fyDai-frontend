@@ -1,13 +1,12 @@
+import { BigNumber } from 'ethers';
+
 export interface IYieldSeries {
   name: string
   maturity: number;
-  maturity_p: Date;
+  maturity_: Date;
   YDai: string;
-  yDaiBalance_p: any;
+  yDaiBalance_: any;
   yDaiBalance: any;
-  ChaiDealer: string;
-  Mint: string;
-  WethDealer: string;
   symbol:string;
   id?: string;
   rate?: any;
@@ -17,6 +16,19 @@ export interface IYieldSeries {
 
 export interface ISeriesPosition {
 
+}
+
+export interface IUser {
+  appPrefs: any;
+  account?: string;
+  ethBalance?: BigNumber;
+  ethBalance_?: number;
+  ethPosted?: BigNumber;
+  ethPosted_?: number;
+  totalDebtYDai?: BigNumber;
+  totalDebtYDai_?: number;
+  ethAvailable?:BigNumber;
+  ethAvailable_?:BigNumber;
 }
 
 export interface IReducerAction {
@@ -35,6 +47,7 @@ export interface INotification {
   timerMs?: number,
   fatalOpen?: boolean,
   fatalMsg?: string,
+  pendingTxs?: any,
 }
 
 export interface IYieldAccount {}

@@ -5,41 +5,32 @@ import { ethers } from 'ethers';
 import { useWeb3React } from '@web3-react/core';
 import { Anchor, Layer, Header, Heading, Footer, Button, Box, Text } from 'grommet';
 
-// import { bigNumberify } from 'ethers';
+// import { BigNumber.from } from 'ethers';
 import * as utils from '../../utils';
 
 import { getNetworkName }  from '../../hooks/connectionHooks';
 import ProfileButton from '../../components/ProfileButton';
 import { NotifyContext } from '../../contexts/NotifyContext';
 
-import { useSendTx, useCallTx, useDealer, useBalances, useEthProxy } from '../../hooks/yieldHooks';
+import { useSendTx, useCallTx, useDealer, useBalances, useEthProxy } from '../../hooks';
 
 import { YieldContext } from '../../contexts/YieldContext';
-import { PositionsContext } from '../../contexts/PositionsContext';
+import { SeriesContext } from '../../contexts/SeriesContext';
+import { ConnectionContext } from '../../contexts/ConnectionContext';
 
 const TestLayer = (props:any) => {
-  const { chainId, account } = useWeb3React();
+  // const { chainId, account } = useWeb3React();
+  const { state: { chainId, account } } = React.useContext(ConnectionContext);
+
 
   // const web3 = useWeb3React();
   const { state: yieldState, actions: yieldActions } = React.useContext( YieldContext );
-  const { state: positionsState, actions: positionsActions } = React.useContext( PositionsContext );
+  const { state: seriesState, actions: seriesActions } = React.useContext( SeriesContext );
   const [ flow, setFlow ] = React.useState<string|null>('WETH');
 
-  const { positionsData } = positionsState;
-  const { yieldData, deployedCore, deployedSeries, deployedExternal, deployedPeripheral, extBalances } = yieldState;
+  const { positionsData } = seriesState;
+  const { yieldData, deployedCore, deployedSeries, deployedExternal, deployedPeripheral, userData } = yieldState;
   
-  // const updateBalances = yieldActions.updateExtBalances(deployedExternal);
-  
-  const { 
-    wethBalance,
-    wethBalance_p,
-    ethBalance_p,
-    ethBalance,
-    daiBalance,
-    daiBalance_p,
-    chaiBalance,
-    chaiBalance_p
-  } = extBalances;
 
   // const [ wethBalance, setWethBalance ] = React.useState<string|null|number>(0);
   // const [ chaiBalance, setChaiBalance ] = React.useState<string|null|number>(0);
@@ -154,41 +145,39 @@ const TestLayer = (props:any) => {
 
             <Box direction='row' gap='small'>
               <Text size='xsmall'>ETH balance:</Text>
-              <Text size='xsmall'>{ extBalances.ethBalance_p || '' }</Text>
+              <Text size='xsmall'>{ userData.ethBalance_ || '' }</Text>
             </Box>
             {/* <Box direction='row' gap='small'>
             <Text size='xsmall'>WEI balance:</Text>
             <Text size='xsmall'>{ weiBalance }</Text>
           </Box> */}
-            <Box direction='row' gap='small'>
+            {/* <Box direction='row' gap='small'>
               <Text size='xsmall'>WETH balance:</Text>
-              <Text size='xsmall'>{ extBalances.wethBalance_p || '' }</Text>
+              <Text size='xsmall'>{ extBalances.wethBalance_ || '' }</Text>
             </Box>
 
             <Box direction='row' gap='small'>
               <Text size='xsmall'>CHAI balance:</Text>
-              {/* <Text size='xsmall'>{ chaiBalance && ethers.utils.formatEther(chaiBalance.toString()) }</Text> */}
-              <Text size='xsmall'>{ extBalances.chaiBalance_p || '' }</Text>
+              <Text size='xsmall'>{ extBalances.chaiBalance_ || '' }</Text>
 
             </Box>
 
             <Box direction='row' gap='small'>
               <Text size='xsmall'>DAI balance:</Text>
-              {/* <Text size='xsmall'>{ daiBalance && ethers.utils.formatEther(daiBalance.toString()) }</Text> */}
-              <Text size='xsmall'>{ extBalances.daiBalance_p || '' }</Text>
-            </Box>
+              <Text size='xsmall'>{ extBalances.daiBalance_ || '' }</Text>
+            </Box> */}
 
             <Box direction='column' gap='small'>
               <Text size='small'>Ilk: </Text>
-              <Text size='xsmall'> spot: { yieldState.makerData?.ilks?.spot_p }</Text>
-              <Text size='xsmall'> rate: { yieldState.makerData?.ilks?.rate_p  }</Text>
-              <Text size='xsmall'> line: { yieldState.makerData?.ilks?.line_p }</Text>
+              <Text size='xsmall'> spot: { yieldState.makerData?.ilks?.spot_ }</Text>
+              <Text size='xsmall'> rate: { yieldState.makerData?.ilks?.rate_  }</Text>
+              <Text size='xsmall'> line: { yieldState.makerData?.ilks?.line_ }</Text>
             </Box>
 
             <Box direction='column' gap='small'>
               <Text size='small'>Urn: </Text>
-              <Text size='xsmall'>ink: { yieldState.makerData?.urns?.ink_p }</Text>
-              <Text size='xsmall'>art: { yieldState.makerData?.urns?.art_p }</Text>
+              <Text size='xsmall'>ink: { yieldState.makerData?.urns?.ink_ }</Text>
+              <Text size='xsmall'>art: { yieldState.makerData?.urns?.art_ }</Text>
             </Box>
 
           </Box>
@@ -231,9 +220,7 @@ const TestLayer = (props:any) => {
               Get Dai:
               
               <Button label='1. Approve Wethjoin for 1weth' onClick={()=> sendTx(deployedExternal.Weth, 'Weth', 'approve', [deployedExternal.WethJoin, wethTokens], ethers.BigNumber.from(0) )} />
-              
-              {/* <Button label='x. Vat > hope wethJoin' onClick={()=> sendTx(deployedExternal.Vat, 'Vat', 'hope', [deployedExternal.WethJoin], bigNumberify(0))} /> */}
-              
+                            
               <Button label='2. wethJoin join (take 1weth)' onClick={()=> sendTx(deployedExternal.WethJoin, 'WethJoin', 'join', [account, wethTokens], ethers.BigNumber.from(0) )} />
               <Button label='( x. wethJoin EXit 1weth)' onClick={()=> sendTx(deployedExternal.WethJoin, 'WethJoin', 'exit', [account, wethTokens ], ethers.BigNumber.from(0) )} />
 
@@ -287,27 +274,27 @@ const TestLayer = (props:any) => {
             gap='small'
             overflow='auto'
           > 
-            { positionsData.size > 0 && !positionsState.isLoading ? 
+            { positionsData.size > 0 && !seriesState.isLoading ? 
               <Box pad='small' gap='medium' fill>
                 <Box direction='row'>
                   <Text weight='bold'>yDai[0]: {positionsData.get('yDai-2020-09-30').symbol}</Text>
                 </Box>
                 <Box gap='small'>
                   <Text weight='bold'>Posted collateral:</Text>
-                  <Text>weth posted: { yieldData.wethPosted_p }</Text>
-                  <Text>chai posted: { yieldData.chaiPosted_p }</Text>
+                  <Text>weth posted: { userData.ethPosted_ }</Text>
+                  {/* <Text>chai posted: { yieldData.chaiPosted_ }</Text> */}
                   <Text weight='bold'>yDai balance:</Text>
-                  <Text>yDai Balance: { positionsData.get('yDai-2020-09-30').yDaiBalance_p }</Text>
+                  <Text>yDai Balance: { positionsData.get('yDai-2020-09-30').yDaiBalance_ }</Text>
                   <Text weight='bold'>Weth Dealer:</Text>
-                  <Text>weth Debt Dai: { positionsData.get('yDai-2020-09-30').wethDebtDai_p }</Text>
-                  <Text>weth Debt YDai: { positionsData.get('yDai-2020-09-30').wethDebtYDai_p }</Text>
-                  <Text>weth Total Debt Dai { yieldData.wethTotalDebtDai_p }</Text>
-                  <Text> weth Total Debt YDai: { yieldData.wethTotalDebtYDai_p }</Text>
+                  {/* <Text>weth Debt Dai: { positionsData.get('yDai-2020-09-30').wethDebtDai_ }</Text> */}
+                  <Text>weth Debt YDai: { positionsData.get('yDai-2020-09-30').ethDebtYDai_ }</Text>
+                  {/* <Text>weth Total Debt Dai { yieldData.wethTotalDebtDai_ }</Text> */}
+                  <Text> weth Total Debt YDai: { userData.ethTotalDebtYDai_ }</Text>
                   <Text weight='bold'>ChaiDealer:</Text>
-                  <Text>chai Debt Dai : { positionsData.get('yDai-2020-09-30').chaiDebtDai_p}</Text>
-                  <Text>chai Debt yDai : { positionsData.get('yDai-2020-09-30').chaiDebtYDai_p}</Text>
-                  <Text>chai Total Debt Dai: { yieldData.chaiTotalDebtDai_p }</Text>
-                  <Text>chai Total Debt YDai: { yieldData.chaiTotalDebtYDai_p }</Text>
+                  {/* <Text>chai Debt Dai : { positionsData.get('yDai-2020-09-30').chaiDebtDai_}</Text> */}
+                  <Text>chai Debt yDai : { positionsData.get('yDai-2020-09-30').chaiDebtYDai_}</Text>
+                  {/* <Text>chai Total Debt Dai: { yieldData.chaiTotalDebtDai_ }</Text> */}
+                  <Text>chai Total Debt YDai: { userData.chaiTotalDebtYDai_ }</Text>
                 </Box>
               </Box>
               :
@@ -333,9 +320,9 @@ const TestLayer = (props:any) => {
             label='refresh' 
             onClick={
             ()=> {
-              positionsActions.refreshPositions([yieldState.deployedSeries[0]]);
+              seriesActions.refreshPositions([yieldState.deployedSeries[0]]);
               yieldActions.updateYieldBalances(yieldState.deployedCore);
-              yieldActions.updateExtBalances(yieldState.deployedExternal);
+              yieldActions.updateUserData(yieldState.deployedExternal);
             }
           }
           />

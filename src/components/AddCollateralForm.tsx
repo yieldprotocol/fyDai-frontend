@@ -5,7 +5,7 @@ import { IYieldSeries } from '../types';
 import SlideConfirm from './SlideConfirm';
 
 import { NotifyContext } from '../contexts/NotifyContext';
-// import { PositionsContext } from '../contexts/PositionsContext';
+// import { SeriesContext } from '../contexts/SeriesContext';
 
 type BorrowConfirmLayerProps = {
   series: IYieldSeries,
