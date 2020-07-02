@@ -13,7 +13,7 @@ import EthProxy from '../contracts/EthProxy.json';
 // ethers.errors.setLogLevel('error');
 
 /**
- * Hook for interacting with the Yield 'Dealer' Contract.
+ * Hook for interacting with the Yield 'ETHPROXY' Contract.
  * Used for direct ETH deposits and withdrawals via proxy.
  * @returns { function } post
  * @returns { boolean } postActive
@@ -106,7 +106,7 @@ export const useEthProxy = () => {
 };
 
 /**
- * Hook for interacting with the yield 'Dealer' Contract
+ * Hook for interacting with the yield 'DEALER' Contract
  * @returns { function } post
  * @returns { boolean } postActive
  * @returns { function } withdraw
@@ -171,7 +171,7 @@ export const useDealer = () => {
   };
 
   /**
-   * Withdraws wrapped collateral (Weth or Chai).
+   * Withdraws wrapped collateral (Weth or Chai) - not ETH directly.
    * @param {string} dealerAddress address of the Dealer (remnant of older protocol)
    * @param {string} collateral 'WETH' || 'CHAI'
    * @param {number} amount to withdraw (in human understandable numbers)
@@ -342,7 +342,7 @@ export const useDealer = () => {
 };
 
 /**
- * Hook for interacting with the yield 'YDai' Contract
+ * Hook for interacting with the yield 'YDAI' Contract
  * @returns { function } redeem
  * @returns { boolean } redeemActive
  */

@@ -78,14 +78,14 @@
     "absolutePath": "/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/helpers/Constants.sol",
     "exportedSymbols": {
       "Constants": [
-        9984
+        10042
       ]
     },
-    "id": 9985,
+    "id": 10043,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 9968,
+        "id": 10026,
         "literals": [
           "solidity",
           "^",
@@ -102,9 +102,9 @@
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 9984,
+        "id": 10042,
         "linearizedBaseContracts": [
-          9984
+          10042
         ],
         "name": "Constants",
         "nodeType": "ContractDefinition",
@@ -112,11 +112,11 @@
           {
             "constant": true,
             "functionSelector": "6a146024",
-            "id": 9971,
+            "id": 10029,
             "name": "WAD",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 9984,
+            "scope": 10042,
             "src": "98:30:17",
             "stateVariable": true,
             "storageLocation": "default",
@@ -125,7 +125,7 @@
               "typeString": "uint8"
             },
             "typeName": {
-              "id": 9969,
+              "id": 10027,
               "name": "uint8",
               "nodeType": "ElementaryTypeName",
               "src": "98:5:17",
@@ -137,7 +137,7 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "3138",
-              "id": 9970,
+              "id": 10028,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -157,11 +157,11 @@
           {
             "constant": true,
             "functionSelector": "552033c4",
-            "id": 9974,
+            "id": 10032,
             "name": "RAY",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 9984,
+            "scope": 10042,
             "src": "134:30:17",
             "stateVariable": true,
             "storageLocation": "default",
@@ -170,7 +170,7 @@
               "typeString": "uint8"
             },
             "typeName": {
-              "id": 9972,
+              "id": 10030,
               "name": "uint8",
               "nodeType": "ElementaryTypeName",
               "src": "134:5:17",
@@ -182,7 +182,7 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "3237",
-              "id": 9973,
+              "id": 10031,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -202,11 +202,11 @@
           {
             "constant": true,
             "functionSelector": "06f405fd",
-            "id": 9977,
+            "id": 10035,
             "name": "RAD",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 9984,
+            "scope": 10042,
             "src": "170:30:17",
             "stateVariable": true,
             "storageLocation": "default",
@@ -215,7 +215,7 @@
               "typeString": "uint8"
             },
             "typeName": {
-              "id": 9975,
+              "id": 10033,
               "name": "uint8",
               "nodeType": "ElementaryTypeName",
               "src": "170:5:17",
@@ -227,7 +227,7 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "3435",
-              "id": 9976,
+              "id": 10034,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -247,11 +247,11 @@
           {
             "constant": true,
             "functionSelector": "ad5c4648",
-            "id": 9980,
+            "id": 10038,
             "name": "WETH",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 9984,
+            "scope": 10042,
             "src": "207:37:17",
             "stateVariable": true,
             "storageLocation": "default",
@@ -260,7 +260,7 @@
               "typeString": "bytes32"
             },
             "typeName": {
-              "id": 9978,
+              "id": 10036,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
               "src": "207:7:17",
@@ -272,7 +272,7 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "57455448",
-              "id": 9979,
+              "id": 10037,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -292,11 +292,11 @@
           {
             "constant": true,
             "functionSelector": "b6dbf9ce",
-            "id": 9983,
+            "id": 10041,
             "name": "CHAI",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 9984,
+            "scope": 10042,
             "src": "294:37:17",
             "stateVariable": true,
             "storageLocation": "default",
@@ -305,7 +305,7 @@
               "typeString": "bytes32"
             },
             "typeName": {
-              "id": 9981,
+              "id": 10039,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
               "src": "294:7:17",
@@ -317,7 +317,7 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "43484149",
-              "id": 9982,
+              "id": 10040,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -335,7 +335,7 @@
             "visibility": "public"
           }
         ],
-        "scope": 9985,
+        "scope": 10043,
         "src": "26:352:17"
       }
     ],
@@ -345,14 +345,14 @@
     "absolutePath": "/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/helpers/Constants.sol",
     "exportedSymbols": {
       "Constants": [
-        9984
+        10042
       ]
     },
-    "id": 9985,
+    "id": 10043,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 9968,
+        "id": 10026,
         "literals": [
           "solidity",
           "^",
@@ -369,9 +369,9 @@
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 9984,
+        "id": 10042,
         "linearizedBaseContracts": [
-          9984
+          10042
         ],
         "name": "Constants",
         "nodeType": "ContractDefinition",
@@ -379,11 +379,11 @@
           {
             "constant": true,
             "functionSelector": "6a146024",
-            "id": 9971,
+            "id": 10029,
             "name": "WAD",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 9984,
+            "scope": 10042,
             "src": "98:30:17",
             "stateVariable": true,
             "storageLocation": "default",
@@ -392,7 +392,7 @@
               "typeString": "uint8"
             },
             "typeName": {
-              "id": 9969,
+              "id": 10027,
               "name": "uint8",
               "nodeType": "ElementaryTypeName",
               "src": "98:5:17",
@@ -404,7 +404,7 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "3138",
-              "id": 9970,
+              "id": 10028,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -424,11 +424,11 @@
           {
             "constant": true,
             "functionSelector": "552033c4",
-            "id": 9974,
+            "id": 10032,
             "name": "RAY",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 9984,
+            "scope": 10042,
             "src": "134:30:17",
             "stateVariable": true,
             "storageLocation": "default",
@@ -437,7 +437,7 @@
               "typeString": "uint8"
             },
             "typeName": {
-              "id": 9972,
+              "id": 10030,
               "name": "uint8",
               "nodeType": "ElementaryTypeName",
               "src": "134:5:17",
@@ -449,7 +449,7 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "3237",
-              "id": 9973,
+              "id": 10031,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -469,11 +469,11 @@
           {
             "constant": true,
             "functionSelector": "06f405fd",
-            "id": 9977,
+            "id": 10035,
             "name": "RAD",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 9984,
+            "scope": 10042,
             "src": "170:30:17",
             "stateVariable": true,
             "storageLocation": "default",
@@ -482,7 +482,7 @@
               "typeString": "uint8"
             },
             "typeName": {
-              "id": 9975,
+              "id": 10033,
               "name": "uint8",
               "nodeType": "ElementaryTypeName",
               "src": "170:5:17",
@@ -494,7 +494,7 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "3435",
-              "id": 9976,
+              "id": 10034,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -514,11 +514,11 @@
           {
             "constant": true,
             "functionSelector": "ad5c4648",
-            "id": 9980,
+            "id": 10038,
             "name": "WETH",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 9984,
+            "scope": 10042,
             "src": "207:37:17",
             "stateVariable": true,
             "storageLocation": "default",
@@ -527,7 +527,7 @@
               "typeString": "bytes32"
             },
             "typeName": {
-              "id": 9978,
+              "id": 10036,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
               "src": "207:7:17",
@@ -539,7 +539,7 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "57455448",
-              "id": 9979,
+              "id": 10037,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -559,11 +559,11 @@
           {
             "constant": true,
             "functionSelector": "b6dbf9ce",
-            "id": 9983,
+            "id": 10041,
             "name": "CHAI",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 9984,
+            "scope": 10042,
             "src": "294:37:17",
             "stateVariable": true,
             "storageLocation": "default",
@@ -572,7 +572,7 @@
               "typeString": "bytes32"
             },
             "typeName": {
-              "id": 9981,
+              "id": 10039,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
               "src": "294:7:17",
@@ -584,7 +584,7 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "43484149",
-              "id": 9982,
+              "id": 10040,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -602,7 +602,7 @@
             "visibility": "public"
           }
         ],
-        "scope": 9985,
+        "scope": 10043,
         "src": "26:352:17"
       }
     ],
@@ -614,7 +614,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.23",
-  "updatedAt": "2020-07-01T06:23:49.309Z",
+  "updatedAt": "2020-07-02T10:00:26.018Z",
   "devdoc": {
     "methods": {}
   },

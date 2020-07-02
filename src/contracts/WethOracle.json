@@ -991,12 +991,12 @@
     "1337": {
       "events": {},
       "links": {},
-      "address": "0x2228f21D2F39829b0AD8793f6D5A0d69cA0A46BC",
-      "transactionHash": "0x8b86351bd5cbcdc6b31012c99a333df06dda7bc43a2baf898bfbefd0f56c49f9"
+      "address": "0x5a03fCA0e4ecaF6FF5CC8426936C8e7E0d747Ef4",
+      "transactionHash": "0xeccd70ec937cf722dcae0d6064817cce87c3773662e54759de40fc4dd242cb50"
     }
   },
   "schemaVersion": "3.0.23",
-  "updatedAt": "2020-07-01T06:27:42.160Z",
+  "updatedAt": "2020-07-02T10:01:06.529Z",
   "networkType": "ethereum",
   "devdoc": {
     "details": "WethOracle returns the price of Weth as retrieved from MakerDAO",

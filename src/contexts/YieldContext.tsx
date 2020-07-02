@@ -55,6 +55,11 @@ function reducer(state:any, action:any) {
         ...state,
         userData: action.payload,
       };
+    case 'updateTxHistory':
+      return {
+        ...state,
+        txHistory: action.payload,
+      };
     case 'updateMakerData': 
       return {
         ...state,
@@ -75,6 +80,7 @@ const YieldProvider = ({ children }:any) => {
   const initState = {
     isLoading: true,
     // cachable
+    migrationsAddr: '0xAC172aca69D11D28DFaadbdEa57B01f697b34158',
     deployedSeries : [],
     deployedCore: {},
     deployedExternal: {},
@@ -82,8 +88,9 @@ const YieldProvider = ({ children }:any) => {
     // transient
     yieldData: {},
     makerData: {},
-    // user
+    // user and tx
     userData: {},
+    txHistory:{},
   };
 
   const [ state, dispatch ] = React.useReducer(reducer, initState);
@@ -107,59 +114,92 @@ const YieldProvider = ({ children }:any) => {
   // async get all public yield addresses from localStorage/chain
   const _getYieldAddrs = async (networkId:number|string, forceUpdate:boolean): Promise<any[]> => {
     const _deployedSeries:any[] = [];
-    let _deployedCore;
-    let _deployedExternal;
-    let _deployedPeripheral;
+    let _deployedCore:any;
+    let _deployedExternal:any;
+    let _deployedPeripheral:any;
+
+    // TODO: combine in to a single group? possibly
+    const contractGroups = { 
+      coreList: ['Dealer', 'Treasury', 'WethOracle', 'ChaiOracle'],
+      externalList: ['Chai', 'Dai', 'WethJoin', 'Vat', 'Weth', 'Jug', 'Pot', 'GasToken', 'End', 'DaiJoin' ],
+      peripheralList: ['EthProxy', 'Liquidations', 'Unwind'],
+      // ContractList: ['Dealer', 'Treasury','Chai', 'Dai', 'WethJoin', 'Vat', 'Weth', 'EthProxy', 'Liquidations']
+    };
 
     try {
       if (!cachedCore || forceUpdate) {
-        // TODO firebase > chain migration
-        _deployedCore = await firebase.firestore()
-          .collection(networkId.toString()).doc('deployedCore').get()
-          .then( doc => doc.data());
+        /* // Depreciated - Firebase connection example for posterity >>
+        _deployedCore_firebase = await firebase.firestore()
+        .collection(networkId.toString()).doc('deployedCore').get()
+        .then( doc => doc.data()); */
+        const coreAddrs = await Promise.all(
+          contractGroups.coreList.map(async (x:string)=>{
+            return { [ x ] : await callTx(state.migrationsAddr, 'Migrations', 'contracts', [ethers.utils.formatBytes32String(x)]) };
+          })
+        );
+        _deployedCore = coreAddrs.reduce((prevObj, item) => ({ ...prevObj, ...item }), {});
         window.localStorage.removeItem('deployedCore');
         setCachedCore(_deployedCore);
-        console.log('Core contract list updated');
+        console.log('Core contract addresses updated:', _deployedCore);
       } else {_deployedCore = cachedCore;}
 
       if (!cachedExternal || forceUpdate) {
-        // TODO firebase > chain migration
-        _deployedExternal = await firebase.firestore()
-          .collection(networkId.toString()).doc('deployedExternal').get()
-          .then( doc => doc.data());
+        const extAddrs = await Promise.all(
+          contractGroups.externalList.map(async (x:string)=>{
+            return { [ x ] : await callTx(state.migrationsAddr, 'Migrations', 'contracts', [ethers.utils.formatBytes32String(x)]) };
+          })
+        );
+        _deployedExternal = extAddrs.reduce((prevObj, item) => ({ ...prevObj, ...item }), {});
         window.localStorage.removeItem('deployedExternal');
         setCachedExternal(_deployedExternal);
-        console.log('External contract list updated');
+        console.log('External contract addresses update:', _deployedExternal);
       } else {_deployedExternal = cachedExternal;}
 
       if (!cachedPeripheral || forceUpdate) {
-        // TODO firebase > chain migration
-        _deployedPeripheral = await firebase.firestore()
-          .collection(networkId.toString()).doc('deployedPeripheral').get()
-          .then( doc => doc.data());
+        const peripheralAddrs = await Promise.all(
+          contractGroups.peripheralList.map(async (x:string)=>{
+            return { [ x ] : await callTx(state.migrationsAddr, 'Migrations', 'contracts', [ethers.utils.formatBytes32String(x)]) };
+          })
+        );
+        _deployedPeripheral = peripheralAddrs.reduce((prevObj, item) => ({ ...prevObj, ...item }), {});
         window.localStorage.removeItem('deployedPeripheral');
         setCachedPeripheral(_deployedPeripheral);
-        console.log('Peripheral contract list updated');
+        console.log('Peripheral contract addresses updated:', _deployedPeripheral);
       } else {_deployedPeripheral = cachedPeripheral;}
 
       if (!cachedSeries || forceUpdate) {
-        // if cache empty or forced update > get series from blockchain (or firebase)
-        // TODO firebase > chain migration
+        /* // Depreciated - Firebase connection example for posterity >>
         await firebase.firestore().collection(networkId.toString()).doc('deployedSeries').collection('deployedSeries')
           .get()
           .then( (querySnapshot:any) => {
             querySnapshot.forEach((doc:any) => {
               _deployedSeries.push(doc.data());
             });
-          });
+          }); */
+        const _seriesList = await Promise.all(
+          [0, 1, 2, 3].map(async (x:number)=>{
+            return callTx(state.migrationsAddr, 'Migrations', 'contracts', [ethers.utils.formatBytes32String(`yDai${x}`)]);
+          })
+        );
+        await Promise.all(
+          _seriesList.map(async (x:string)=>{
+            return { 
+              yDai: x,
+              name: await callTx(x, 'YDai', 'name', []),
+              maturity: (await callTx(x, 'YDai', 'maturity', [])).toNumber(),
+              symbol: await callTx(x, 'YDai', 'symbol', []),
+            };
+          })
+        ).then((res:any) => _deployedSeries.push(...res));
+
         window.localStorage.removeItem('deployedSeries');
         setCachedSeries(_deployedSeries);
-        console.log('Series contract list updated');
+        console.log('Series contract addrs updated');
       } else {_deployedSeries.push(...cachedSeries);}
 
     } catch (e) {
       console.log(e);
-      notifyDispatch({ type: 'fatal', payload:{ message: 'Error getting Yield system addresses - Try changing network.' } } );
+      notifyDispatch({ type: 'fatal', payload:{ message: 'Error Getting Yield data (addresses etc.) - Try changing network.' } } );
     }
     return [ _deployedSeries, _deployedCore, _deployedExternal, _deployedPeripheral ];
   };
@@ -200,16 +240,17 @@ const YieldProvider = ({ children }:any) => {
     };
   };
 
-
-
   // Yield data for the user address
   const _getUserData = async (deployedCore:any, deployedPeripheral:any, forceUpdate:boolean): Promise<any> => {
     const _userData:any = {};
     const _lastBlock = await provider.getBlockNumber();
+
+    /* get balances and posted collateral */
     _userData.ethBalance = await getEthBalance();
     _userData.ethPosted = await callTx(deployedCore.Dealer, 'Dealer', 'posted', [utils.WETH, account]);
     // _userData.ethTotalDebtYDai = await callTx(deployedCore.Dealer, 'Dealer', 'totalDebtYDai', [utils.WETH, account]);
 
+    /* get transaction history (from cache first or rebuild if update forced) */
     forceUpdate && window.localStorage.removeItem('txHistory') && console.log('Re-building txHistory...');
     const _postedHistory = await getEventHistory(deployedCore.Dealer, 'Dealer', 'Posted', [null, account, null], !txHistory?0:txHistory.lastBlock+1 );
     const _borrowedHistory = await getEventHistory(deployedCore.Dealer, 'Dealer', 'Borrowed', [], !txHistory?0:txHistory.lastBlock+1 );
@@ -225,7 +266,7 @@ const YieldProvider = ({ children }:any) => {
     });
     console.log('txHistory updated');
 
-    // parse and return user data
+    /* parse and return user data */
     return {
       ..._userData,
       ethBalance_: parseFloat(ethers.utils.formatEther(_userData.ethBalance.toString())),

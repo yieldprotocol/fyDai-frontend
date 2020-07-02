@@ -42,7 +42,8 @@ export const useEvents = () => {
   const { state: { signer, account } } = React.useContext(ConnectionContext);
   // const { library, account } = useWeb3React();
   // const signer = library.getSigner();
-  const [ eventListnerList, setEventListenerList ] = React.useState<boolean>();
+  const [ eventListenerList, setEventListenerList ] = React.useState<boolean>();
+  const [ isLoading, setIsLoading ] = React.useState<boolean>();
 
   /**
    * Setup an event listener.
@@ -62,20 +63,23 @@ export const useEvents = () => {
    * @param {number} block the block to start looking from (searches from this block to latest).
    * 
    */
-  const getEventHistory = async (contractAddr:string, contractName:string, filterEvent:string, filterArgs:any[], block:number ) => {
+  const getEventHistory = async (
+    contractAddr:string,
+    contractName:string,
+    filterEvent:string,
+    filterArgs:any[],
+    block:number
+  ) => {
     const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), signer);
-    // Get the filter
     const filter = contract.filters[filterEvent](...filterArgs);
-    console.log(filter);
-    // Query the filter
     const logs = await contract.queryFilter( filter, block, 'latest');
-    // Console.log the values for now:
-    logs.forEach((log:any) => {
-      console.log(log);
-    });
+    // Console.log the values for testing:
+    // logs.forEach((log:any) => {
+    //   console.log(log);
+    // });
     return logs;
   };
 
-  return { getEventHistory, addEventListener, eventListnerList } as const;
+  return { getEventHistory, addEventListener, isLoading, eventListenerList } as const;
 
 };

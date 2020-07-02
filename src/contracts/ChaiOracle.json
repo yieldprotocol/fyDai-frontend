@@ -144,7 +144,7 @@
         "id": 2,
         "nodeType": "ImportDirective",
         "scope": 52,
-        "sourceUnit": 11745,
+        "sourceUnit": 11811,
         "src": "24:56:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -155,7 +155,7 @@
         "id": 3,
         "nodeType": "ImportDirective",
         "scope": 52,
-        "sourceUnit": 9985,
+        "sourceUnit": 10043,
         "src": "81:33:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -166,7 +166,7 @@
         "id": 4,
         "nodeType": "ImportDirective",
         "scope": 52,
-        "sourceUnit": 10509,
+        "sourceUnit": 10579,
         "src": "115:31:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -177,7 +177,7 @@
         "id": 5,
         "nodeType": "ImportDirective",
         "scope": 52,
-        "sourceUnit": 10474,
+        "sourceUnit": 10544,
         "src": "147:34:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -192,10 +192,10 @@
               "id": 6,
               "name": "IOracle",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 10473,
+              "referencedDeclaration": 10543,
               "src": "280:7:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_IOracle_$10473",
+                "typeIdentifier": "t_contract$_IOracle_$10543",
                 "typeString": "contract IOracle"
               }
             },
@@ -210,10 +210,10 @@
               "id": 8,
               "name": "Constants",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 9984,
+              "referencedDeclaration": 10042,
               "src": "289:9:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_Constants_$9984",
+                "typeIdentifier": "t_contract$_Constants_$10042",
                 "typeString": "contract Constants"
               }
             },
@@ -223,8 +223,8 @@
           }
         ],
         "contractDependencies": [
-          9984,
-          10473
+          10042,
+          10543
         ],
         "contractKind": "contract",
         "documentation": "@dev ChaiOracle retrieves the price for Chai as the DSR fee from Pot",
@@ -232,8 +232,8 @@
         "id": 51,
         "linearizedBaseContracts": [
           51,
-          9984,
-          10473
+          10042,
+          10543
         ],
         "name": "ChaiOracle",
         "nodeType": "ContractDefinition",
@@ -245,10 +245,10 @@
               "id": 10,
               "name": "DecimalMath",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 11744,
+              "referencedDeclaration": 11810,
               "src": "311:11:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_DecimalMath_$11744",
+                "typeIdentifier": "t_contract$_DecimalMath_$11810",
                 "typeString": "library DecimalMath"
               }
             },
@@ -272,10 +272,10 @@
               "id": 13,
               "name": "DecimalMath",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 11744,
+              "referencedDeclaration": 11810,
               "src": "346:11:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_DecimalMath_$11744",
+                "typeIdentifier": "t_contract$_DecimalMath_$11810",
                 "typeString": "library DecimalMath"
               }
             },
@@ -304,7 +304,7 @@
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_contract$_IPot_$10508",
+              "typeIdentifier": "t_contract$_IPot_$10578",
               "typeString": "contract IPot"
             },
             "typeName": {
@@ -312,10 +312,10 @@
               "id": 16,
               "name": "IPot",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 10508,
+              "referencedDeclaration": 10578,
               "src": "374:4:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_IPot_$10508",
+                "typeIdentifier": "t_contract$_IPot_$10578",
                 "typeString": "contract IPot"
               }
             },
@@ -345,7 +345,7 @@
                       "referencedDeclaration": 17,
                       "src": "481:4:0",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_IPot_$10508",
+                        "typeIdentifier": "t_contract$_IPot_$10578",
                         "typeString": "contract IPot"
                       }
                     },
@@ -379,10 +379,10 @@
                         "name": "IPot",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 10508,
+                        "referencedDeclaration": 10578,
                         "src": "488:4:0",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_IPot_$10508_$",
+                          "typeIdentifier": "t_type$_t_contract$_IPot_$10578_$",
                           "typeString": "type(contract IPot)"
                         }
                       },
@@ -397,13 +397,13 @@
                       "src": "488:10:0",
                       "tryCall": false,
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_IPot_$10508",
+                        "typeIdentifier": "t_contract$_IPot_$10578",
                         "typeString": "contract IPot"
                       }
                     },
                     "src": "481:17:0",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_IPot_$10508",
+                      "typeIdentifier": "t_contract$_IPot_$10578",
                       "typeString": "contract IPot"
                     }
                   },
@@ -470,7 +470,7 @@
           },
           {
             "baseFunctions": [
-              10472
+              10542
             ],
             "body": {
               "id": 49,
@@ -523,7 +523,7 @@
                                 "referencedDeclaration": 17,
                                 "src": "724:4:0",
                                 "typeDescriptions": {
-                                  "typeIdentifier": "t_contract$_IPot_$10508",
+                                  "typeIdentifier": "t_contract$_IPot_$10578",
                                   "typeString": "contract IPot"
                                 }
                               },
@@ -534,7 +534,7 @@
                               "lValueRequested": false,
                               "memberName": "rho",
                               "nodeType": "MemberAccess",
-                              "referencedDeclaration": 10492,
+                              "referencedDeclaration": 10562,
                               "src": "724:8:0",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_function_external_nonpayable$__$returns$_t_uint256_$",
@@ -590,7 +590,7 @@
                           "referencedDeclaration": 17,
                           "src": "752:4:0",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_contract$_IPot_$10508",
+                            "typeIdentifier": "t_contract$_IPot_$10578",
                             "typeString": "contract IPot"
                           }
                         },
@@ -601,7 +601,7 @@
                         "lValueRequested": false,
                         "memberName": "chi",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 10480,
+                        "referencedDeclaration": 10550,
                         "src": "752:8:0",
                         "typeDescriptions": {
                           "typeIdentifier": "t_function_external_view$__$returns$_t_uint256_$",
@@ -644,7 +644,7 @@
                           "referencedDeclaration": 17,
                           "src": "738:4:0",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_contract$_IPot_$10508",
+                            "typeIdentifier": "t_contract$_IPot_$10578",
                             "typeString": "contract IPot"
                           }
                         },
@@ -655,7 +655,7 @@
                         "lValueRequested": false,
                         "memberName": "drip",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 10497,
+                        "referencedDeclaration": 10567,
                         "src": "738:9:0",
                         "typeDescriptions": {
                           "typeIdentifier": "t_function_external_nonpayable$__$returns$_t_uint256_$",
@@ -783,7 +783,7 @@
         "id": 2,
         "nodeType": "ImportDirective",
         "scope": 52,
-        "sourceUnit": 11745,
+        "sourceUnit": 11811,
         "src": "24:56:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -794,7 +794,7 @@
         "id": 3,
         "nodeType": "ImportDirective",
         "scope": 52,
-        "sourceUnit": 9985,
+        "sourceUnit": 10043,
         "src": "81:33:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -805,7 +805,7 @@
         "id": 4,
         "nodeType": "ImportDirective",
         "scope": 52,
-        "sourceUnit": 10509,
+        "sourceUnit": 10579,
         "src": "115:31:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -816,7 +816,7 @@
         "id": 5,
         "nodeType": "ImportDirective",
         "scope": 52,
-        "sourceUnit": 10474,
+        "sourceUnit": 10544,
         "src": "147:34:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -831,10 +831,10 @@
               "id": 6,
               "name": "IOracle",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 10473,
+              "referencedDeclaration": 10543,
               "src": "280:7:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_IOracle_$10473",
+                "typeIdentifier": "t_contract$_IOracle_$10543",
                 "typeString": "contract IOracle"
               }
             },
@@ -849,10 +849,10 @@
               "id": 8,
               "name": "Constants",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 9984,
+              "referencedDeclaration": 10042,
               "src": "289:9:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_Constants_$9984",
+                "typeIdentifier": "t_contract$_Constants_$10042",
                 "typeString": "contract Constants"
               }
             },
@@ -862,8 +862,8 @@
           }
         ],
         "contractDependencies": [
-          9984,
-          10473
+          10042,
+          10543
         ],
         "contractKind": "contract",
         "documentation": "@dev ChaiOracle retrieves the price for Chai as the DSR fee from Pot",
@@ -871,8 +871,8 @@
         "id": 51,
         "linearizedBaseContracts": [
           51,
-          9984,
-          10473
+          10042,
+          10543
         ],
         "name": "ChaiOracle",
         "nodeType": "ContractDefinition",
@@ -884,10 +884,10 @@
               "id": 10,
               "name": "DecimalMath",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 11744,
+              "referencedDeclaration": 11810,
               "src": "311:11:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_DecimalMath_$11744",
+                "typeIdentifier": "t_contract$_DecimalMath_$11810",
                 "typeString": "library DecimalMath"
               }
             },
@@ -911,10 +911,10 @@
               "id": 13,
               "name": "DecimalMath",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 11744,
+              "referencedDeclaration": 11810,
               "src": "346:11:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_DecimalMath_$11744",
+                "typeIdentifier": "t_contract$_DecimalMath_$11810",
                 "typeString": "library DecimalMath"
               }
             },
@@ -943,7 +943,7 @@
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_contract$_IPot_$10508",
+              "typeIdentifier": "t_contract$_IPot_$10578",
               "typeString": "contract IPot"
             },
             "typeName": {
@@ -951,10 +951,10 @@
               "id": 16,
               "name": "IPot",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 10508,
+              "referencedDeclaration": 10578,
               "src": "374:4:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_IPot_$10508",
+                "typeIdentifier": "t_contract$_IPot_$10578",
                 "typeString": "contract IPot"
               }
             },
@@ -984,7 +984,7 @@
                       "referencedDeclaration": 17,
                       "src": "481:4:0",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_IPot_$10508",
+                        "typeIdentifier": "t_contract$_IPot_$10578",
                         "typeString": "contract IPot"
                       }
                     },
@@ -1018,10 +1018,10 @@
                         "name": "IPot",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 10508,
+                        "referencedDeclaration": 10578,
                         "src": "488:4:0",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_IPot_$10508_$",
+                          "typeIdentifier": "t_type$_t_contract$_IPot_$10578_$",
                           "typeString": "type(contract IPot)"
                         }
                       },
@@ -1036,13 +1036,13 @@
                       "src": "488:10:0",
                       "tryCall": false,
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_IPot_$10508",
+                        "typeIdentifier": "t_contract$_IPot_$10578",
                         "typeString": "contract IPot"
                       }
                     },
                     "src": "481:17:0",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_IPot_$10508",
+                      "typeIdentifier": "t_contract$_IPot_$10578",
                       "typeString": "contract IPot"
                     }
                   },
@@ -1109,7 +1109,7 @@
           },
           {
             "baseFunctions": [
-              10472
+              10542
             ],
             "body": {
               "id": 49,
@@ -1162,7 +1162,7 @@
                                 "referencedDeclaration": 17,
                                 "src": "724:4:0",
                                 "typeDescriptions": {
-                                  "typeIdentifier": "t_contract$_IPot_$10508",
+                                  "typeIdentifier": "t_contract$_IPot_$10578",
                                   "typeString": "contract IPot"
                                 }
                               },
@@ -1173,7 +1173,7 @@
                               "lValueRequested": false,
                               "memberName": "rho",
                               "nodeType": "MemberAccess",
-                              "referencedDeclaration": 10492,
+                              "referencedDeclaration": 10562,
                               "src": "724:8:0",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_function_external_nonpayable$__$returns$_t_uint256_$",
@@ -1229,7 +1229,7 @@
                           "referencedDeclaration": 17,
                           "src": "752:4:0",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_contract$_IPot_$10508",
+                            "typeIdentifier": "t_contract$_IPot_$10578",
                             "typeString": "contract IPot"
                           }
                         },
@@ -1240,7 +1240,7 @@
                         "lValueRequested": false,
                         "memberName": "chi",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 10480,
+                        "referencedDeclaration": 10550,
                         "src": "752:8:0",
                         "typeDescriptions": {
                           "typeIdentifier": "t_function_external_view$__$returns$_t_uint256_$",
@@ -1283,7 +1283,7 @@
                           "referencedDeclaration": 17,
                           "src": "738:4:0",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_contract$_IPot_$10508",
+                            "typeIdentifier": "t_contract$_IPot_$10578",
                             "typeString": "contract IPot"
                           }
                         },
@@ -1294,7 +1294,7 @@
                         "lValueRequested": false,
                         "memberName": "drip",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 10497,
+                        "referencedDeclaration": 10567,
                         "src": "738:9:0",
                         "typeDescriptions": {
                           "typeIdentifier": "t_function_external_nonpayable$__$returns$_t_uint256_$",
@@ -1403,12 +1403,12 @@
     "1337": {
       "events": {},
       "links": {},
-      "address": "0xA0dbC274f8ed0912C3c1013f8Fe2c721939C0b17",
-      "transactionHash": "0x0e9e055ee5a47cf91d783a51e66d8dc0092ff910fbe60f1b05788e47cc364047"
+      "address": "0x57b8B7347E467342B291E58Fd454Dbe2D48e3Edb",
+      "transactionHash": "0x5d4a7d6929f9596a054b1af7085c61e7d684ed13578c810b0954fbef9b0a6533"
     }
   },
   "schemaVersion": "3.0.23",
-  "updatedAt": "2020-07-01T06:27:42.159Z",
+  "updatedAt": "2020-07-02T10:01:06.528Z",
   "networkType": "ethereum",
   "devdoc": {
     "details": "ChaiOracle retrieves the price for Chai as the DSR fee from Pot",
