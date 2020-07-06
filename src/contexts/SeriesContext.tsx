@@ -1,5 +1,5 @@
 import React from 'react';
-import { ethers } from 'ethers';
+import { ethers, BigNumber } from 'ethers';
 import { useWeb3React } from '@web3-react/core';
 
 import * as utils from '../utils';
@@ -28,17 +28,22 @@ function reducer(state:any, action:any) {
 }
 
 const priceMock = new Map([ 
-  [1601510399, utils.toWei(0.99)],
-  [1609459199, utils.toWei(0.98)],
-  [1617235199, utils.toWei(0.96)],
-  [1625097599, utils.toWei(0.93)]
+  [1601510399, utils.toRay(0.99)],
+  [1609459199, utils.toRay(0.98)],
+  [1617235199, utils.toRay(0.96)],
+  [1625097599, utils.toRay(0.93)]
 ]);
 
 const SeriesProvider = ({ children }:any) => {
 
   const { state: { chainId, account } } = React.useContext(ConnectionContext);
 
-  const initState = { positionsIndicator: 0, positionsData : new Map(), positionSelected: '' };
+  const initState = { 
+    positionsIndicator: 0,
+    positionsData : new Map(),
+    positionSelected: ''
+  };
+
   const [ state, dispatch ] = React.useReducer(reducer, initState);
   const { state: yieldState } = React.useContext(YieldContext);
   const [ seriesTxHistory, setSeriesTxHistory ] = useCachedState('seriesTxHistory', null);
@@ -46,7 +51,7 @@ const SeriesProvider = ({ children }:any) => {
   const [ callTx ] = useCallTx();
   const { getEventHistory } = useEvents(); 
 
-  const { deployedCore, makerData, } = yieldState;
+  const { deployedContracts, makerData,  } = yieldState;
 
   const getSeriesData = async (deployedSeries:any) => {
     const chainData:any[] = [];
@@ -54,20 +59,20 @@ const SeriesProvider = ({ children }:any) => {
       deployedSeries.map( async (x:any, i:number) => {
         chainData.push(x);
         try {
-          // chainData[i].wethDebtDai = await callTx(deployedCore.Dealer, 'Dealer', 'debtDai', [utils.WETH, x.maturity, account]);
-          chainData[i].wethDebtYDai = account? await callTx(deployedCore.Dealer, 'Dealer', 'debtYDai', [utils.WETH, x.maturity, account]): '0';
-          console.log(priceMock.get(x.maturity)); 
-          chainData[i].wethDebtDai = chainData[i].wethDebtYDai.mul(priceMock.get(x.maturity));
- 
-          // chainData[i].chaiDebtDai = await callTx(deployedCore.Dealer, 'Dealer', 'debtDai', [utils.CHAI, x.maturity, account]);
-          // chainData[i].chaiDebtYDai = await callTx(deployedCore.Dealer, 'Dealer', 'debtYDai', [utils.CHAI, x.maturity, account]);
+          // chainData[i].wethDebtDai = await callTx(deployedContracts.Dealer, 'Dealer', 'debtDai', [utils.WETH, x.maturity, account]);
+          chainData[i].wethDebtYDai = account? await callTx(deployedContracts.Dealer, 'Dealer', 'debtYDai', [utils.WETH, x.maturity, account]): '0';
+          chainData[i].wethDebtDai = utils.mulRay( chainData[i].wethDebtYDai, priceMock.get(x.maturity) || BigNumber.from('0'));
+          // chainData[i].chaiDebtDai = await callTx(deployedContracts.Dealer, 'Dealer', 'debtDai', [utils.CHAI, x.maturity, account]);
+          // chainData[i].chaiDebtYDai = await callTx(deployedContracts.Dealer, 'Dealer', 'debtYDai', [utils.CHAI, x.maturity, account]);
+
+          chainData[i].yieldRate = utils.yieldRate(priceMock.get(x.maturity) || BigNumber.from('0'));
+          // chainData[i].yieldAnnual = utils.annualizedYieldRate(priceMock.get(x.maturity) || BigNumber.from('0'), x.maturity);
+
         } catch (e) {
           console.log(`Could not load series blockchain data: ${e}`);
         }
       })
     );
-
-    console.log(chainData);
     return chainData;
   };
 
@@ -79,15 +84,18 @@ const SeriesProvider = ({ children }:any) => {
         x.symbol,
         { ...x,
           wethDebtYDai_: parseFloat(ethers.utils.formatEther(x.wethDebtYDai.toString())),
+          wethDebtDai_: parseFloat(ethers.utils.formatEther(x.wethDebtDai.toString())),
+          yieldRate_: parseFloat(ethers.utils.formatEther(x.yieldRate.toString())),
+          yieldPercent_: parseFloat(ethers.utils.formatEther(x.yieldRate.toString()))*100,
           // chaiDebtYDai_: parseFloat(ethers.utils.formatEther(x.chaiDebtYDai.toString())),
         }
       );
     });
+    console.log(positions);
     return positions;
   };
 
   const loadSeriesPositions = async (seriesArr:any[], force:boolean) => {
-
     let filteredSeriesArr;
     if (force !== true) {
       filteredSeriesArr = seriesArr.filter(x => !state.positionsData.has(x.symbol));

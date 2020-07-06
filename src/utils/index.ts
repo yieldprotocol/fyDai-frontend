@@ -113,8 +113,14 @@ export function daiAvailable(_collateralValue:BigNumber, _debtValue:BigNumber, _
   // : DAI(0);
 }
 
-export function mockPrice( _expiryDate:number) {
-  
-  return BigNumber.from(0.97);
+export function annualizedYieldRate( _currentPrice: BigNumber, _expiryDate:number) {
+  const secsToMaturity =  _expiryDate - (Math.round(new Date().getTime() / 1000));
+  const propOfYear = secsToMaturity / SECONDS_PER_YEAR;
+  // const annualisedYield = (divRay(toWei(1), _currentPrice)).pow(toRay(parseFloat((1/propOfYear).toFixed(5)) )  ).sub(toWei(1));
+  // console.log(annualisedYield);
+  return null;
+}
 
+export function yieldRate( _currentPrice: BigNumber ) {
+  return (divRay(toWei(1), _currentPrice)).sub(toWei(1));
 }

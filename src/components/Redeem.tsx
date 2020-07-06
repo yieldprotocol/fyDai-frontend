@@ -21,7 +21,7 @@ const Redeem = ({ activeSeries }:any) => {
   const [ ethPosted, setEthPosted ] = React.useState<number>(0);
   const { state, dispatch } = React.useContext(YieldContext);
 
-  const { deployedCore, deployedExternal, yieldData, userData } = state; 
+  const { deployedContracts, yieldData, userData } = state; 
 
   const {
     approveDealer,
@@ -32,17 +32,17 @@ const Redeem = ({ activeSeries }:any) => {
   }  = useDealer();
 
   React.useEffect(()=>{
-    // (async () => setWethBalance( await getWethBalance(deployedExternal.Weth)) )();
+    // (async () => setWethBalance( await getWethBalance(deployedContracts.Weth)) )();
     (async () => setEthPosted(userData.ethPosted_) )();
   }, []);
 
   // const depositSteps = async (value:number) => {
-  //   await approveDealer(deployedExternal.Weth, deployedCore.Dealer, value);
-  //   await post(deployedCore.Dealer, 'WETH', value);
+  //   await approveDealer(deployedContracts.Weth, deployedContracts.Dealer, value);
+  //   await post(deployedContracts.Dealer, 'WETH', value);
   // };
 
   // const withdrawSteps = async (value:number) => {
-  //   await withdraw(deployedCore.Dealer, 'WETH', value);
+  //   await withdraw(deployedContracts.Dealer, 'WETH', value);
   // };
 
   return (

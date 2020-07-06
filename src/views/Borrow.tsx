@@ -27,7 +27,7 @@ const Borrow = ({ setActiveSeries, activeSeries, setShowSeriesLayer }:BorrowProp
   const [ depositWithdrawActive, setDepositWithdrawActive ] = React.useState<boolean>(false);
 
   const { isLoading: positionsLoading, positionsData } = seriesState; 
-  const { isLoading: yieldLoading, userData, deployedSeries, deployedCore, yieldData, makerData }  = yieldState;
+  const { isLoading: yieldLoading, userData, deployedSeries, deployedContracts, yieldData, makerData }  = yieldState;
 
 
   React.useEffect( () => {

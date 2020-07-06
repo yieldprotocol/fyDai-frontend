@@ -12,7 +12,7 @@ const BorrowRepay = ({ active, activeSeries }:any) => {
   const [inputValue, setInputValue] = React.useState<any>();
   const [taskView, setTaskView] = React.useState<string>('BORROW');
   const { state, actions } = React.useContext(YieldContext);
-  const { deployedCore, yieldData } = state;
+  const { deployedContracts, yieldData } = state;
   const {
     approveDealer,
     borrow,
@@ -22,16 +22,16 @@ const BorrowRepay = ({ active, activeSeries }:any) => {
   }  = useDealer();
 
   const borrowSteps = async (value:number) => {
-    await borrow(deployedCore.Dealer, 'WETH', activeSeries.maturity, value );
-    actions.updateUserData(state.deployedCore, state.deployedExternal);
+    await borrow(deployedContracts.Dealer, 'WETH', activeSeries.maturity, value );
+    actions.updateUserData(state.deployedContracts, state.deployedContracts);
     actions.updateSeriesData(state.deployedSeries);
   };
 
   const repaySteps = async (value:number, collateral:string) => {
     console.log(activeSeries);
-    await repay(deployedCore.Dealer, 'WETH', activeSeries.maturity, value, collateral );
-    actions.updateUserData(state.deployedCore, state.deployedExternal);
-    // actions.updateYieldBalances(state.deployedCore);
+    await repay(deployedContracts.Dealer, 'WETH', activeSeries.maturity, value, collateral );
+    actions.updateUserData(state.deployedContracts, state.deployedContracts);
+    // actions.updateYieldBalances(state.deployedContracts);
     actions.updateSeriesData(state.deployedSeries);
   };
 

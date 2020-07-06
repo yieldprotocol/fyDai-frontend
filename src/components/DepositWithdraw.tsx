@@ -17,7 +17,7 @@ const DepositWithdraw = ({ close }:any) => {
   const [ ethPosted, setEthPosted ] = React.useState<number>(0);
   const { state, actions } = React.useContext(YieldContext);
 
-  const { deployedCore, deployedExternal, deployedPeripheral, yieldData, userData } = state; 
+  const { deployedContracts, yieldData, userData } = state; 
 
   const {
     approveDealer,
@@ -35,21 +35,21 @@ const DepositWithdraw = ({ close }:any) => {
   }  = useEthProxy();
 
   React.useEffect(()=>{
-    // (async () => setWethBalance( await getWethBalance(deployedExternal.Weth)) )();
+    // (async () => setWethBalance( await getWethBalance(deployedContracts.Weth)) )();
     (async () => setEthPosted(yieldData.ethPosted_) )();
   }, []);
 
   const depositSteps = async (value:number) => {
-    // await approveDealer(deployedExternal.Weth, deployedCore.Dealer, value);
-    await postEth(deployedPeripheral.EthProxy, value);
-    actions.updateUserData(state.deployedCore, state.deployedExternal);
-    actions.updateYieldBalances(state.deployedCore);
+    // await approveDealer(deployedContracts.Weth, deployedContracts.Dealer, value);
+    await postEth(deployedContracts.EthProxy, value);
+    actions.updateUserData(state.deployedContracts, state.deployedContracts);
+    actions.updateYieldBalances(state.deployedContracts);
   };
 
   const withdrawSteps = async (value:number) => {
-    await withdrawEth(deployedPeripheral.EthProxy, value);
-    actions.updateUserData(state.deployedCore, state.deployedExternal);
-    actions.updateYieldBalances(state.deployedCore);
+    await withdrawEth(deployedContracts.EthProxy, value);
+    actions.updateUserData(state.deployedContracts, state.deployedContracts);
+    actions.updateYieldBalances(state.deployedContracts);
   };
 
   return (
