@@ -102,7 +102,7 @@ const Lend = ({ activeSeries }:BorrowProps) => {
             <Text weight='bold' size='xsmall'> yDai Balance </Text>
           </Box>
           <Box
-            background='brandTransparent'
+            background='brand-transparent'
             round
             pad={{ horizontal:'small', vertical:'xsmall' }}
           >

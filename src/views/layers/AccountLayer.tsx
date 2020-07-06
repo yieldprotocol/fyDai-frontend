@@ -39,7 +39,7 @@ const AccountLayer = (props:any) => {
         <Header 
           // round={{ corner:'bottom', size:'medium' }}
           fill='horizontal'
-          background='background-frontheader'
+          background='background-mid'
           pad={{ horizontal: 'medium', vertical:'large' }}
         >
           <ProfileButton />

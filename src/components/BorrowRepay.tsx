@@ -51,10 +51,10 @@ const BorrowRepay = ({ active, activeSeries }:any) => {
     >
       <Box direction='row-responsive' justify='start' gap='medium'>
         <Box 
-          background={taskView==='BORROW'? 'brandTransparent': 'none'}
+          background={taskView==='BORROW'? 'brand-transparent': 'none'}
           round
           pad={{ horizontal:'small', vertical:'xsmall' }}
-          hoverIndicator='brandTransparent'
+          hoverIndicator='brand-transparent'
           onClick={()=>{setTaskView('BORROW');}}
         >
           <Text 
@@ -68,10 +68,10 @@ const BorrowRepay = ({ active, activeSeries }:any) => {
           </Text>
         </Box>
         <Box 
-          background={taskView==='REPAY'? 'brandTransparent': 'none'}
+          background={taskView==='REPAY'? 'brand-transparent': 'none'}
           round 
           pad={{ horizontal:'small', vertical:'xsmall' }}
-          hoverIndicator='brandTransparent'
+          hoverIndicator='brand-transparent'
           onClick={()=>{setTaskView('REPAY');}}
         >
           <Text 

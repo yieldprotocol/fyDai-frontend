@@ -27,6 +27,13 @@ function reducer(state:any, action:any) {
   }
 }
 
+const priceMock = new Map([ 
+  [1601510399, utils.toWei(0.99)],
+  [1609459199, utils.toWei(0.98)],
+  [1617235199, utils.toWei(0.96)],
+  [1625097599, utils.toWei(0.93)]
+]);
+
 const SeriesProvider = ({ children }:any) => {
 
   const { state: { chainId, account } } = React.useContext(ConnectionContext);
@@ -39,7 +46,7 @@ const SeriesProvider = ({ children }:any) => {
   const [ callTx ] = useCallTx();
   const { getEventHistory } = useEvents(); 
 
-  const { deployedCore } = yieldState; 
+  const { deployedCore, makerData, } = yieldState;
 
   const getSeriesData = async (deployedSeries:any) => {
     const chainData:any[] = [];
@@ -49,6 +56,9 @@ const SeriesProvider = ({ children }:any) => {
         try {
           // chainData[i].wethDebtDai = await callTx(deployedCore.Dealer, 'Dealer', 'debtDai', [utils.WETH, x.maturity, account]);
           chainData[i].wethDebtYDai = account? await callTx(deployedCore.Dealer, 'Dealer', 'debtYDai', [utils.WETH, x.maturity, account]): '0';
+          console.log(priceMock.get(x.maturity)); 
+          chainData[i].wethDebtDai = chainData[i].wethDebtYDai.mul(priceMock.get(x.maturity));
+ 
           // chainData[i].chaiDebtDai = await callTx(deployedCore.Dealer, 'Dealer', 'debtDai', [utils.CHAI, x.maturity, account]);
           // chainData[i].chaiDebtYDai = await callTx(deployedCore.Dealer, 'Dealer', 'debtYDai', [utils.CHAI, x.maturity, account]);
         } catch (e) {
@@ -56,6 +66,8 @@ const SeriesProvider = ({ children }:any) => {
         }
       })
     );
+
+    console.log(chainData);
     return chainData;
   };
 
@@ -77,7 +89,6 @@ const SeriesProvider = ({ children }:any) => {
   const loadSeriesPositions = async (seriesArr:any[], force:boolean) => {
 
     let filteredSeriesArr;
-
     if (force !== true) {
       filteredSeriesArr = seriesArr.filter(x => !state.positionsData.has(x.symbol));
     } else { filteredSeriesArr = seriesArr; }
@@ -103,7 +114,9 @@ const SeriesProvider = ({ children }:any) => {
 
   React.useEffect( () => {
     ( async () => {
-      account && chainId && !yieldState?.isLoading && loadSeriesPositions([yieldState.deployedSeries[0]], false); 
+      // account && chainId && !yieldState?.isLoading && loadSeriesPositions([yieldState.deployedSeries[0]], false); 
+      account && chainId && !yieldState?.isLoading && loadSeriesPositions(yieldState.deployedSeries, false); 
+
     })();
   }, [ account, chainId, yieldState ]);
 

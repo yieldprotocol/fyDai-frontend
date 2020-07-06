@@ -42,7 +42,7 @@ const WithdrawAction = ({ withdraw, maxValue }:IWithDrawActionProps) => {
           round
           // onClick={()=>console.log('max button clicked')}
           onClick={()=>setInputValue(maxValue)}
-          hoverIndicator='secondaryTransparent'
+          hoverIndicator='secondary-transparent'
           border='all'
           pad={{ horizontal:'small', vertical:'none' }}
         >
@@ -53,7 +53,7 @@ const WithdrawAction = ({ withdraw, maxValue }:IWithDrawActionProps) => {
       {/* <Box
         round
         onClick={()=>console.log('max button clicked')}
-        hoverIndicator='secondaryTransparent'
+        hoverIndicator='secondary-transparent'
         border='all'
         fill='vertical'
         pad={{ horizontal:'small', vertical:'none' }}

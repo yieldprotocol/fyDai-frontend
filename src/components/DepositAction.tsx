@@ -44,7 +44,7 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
         <Box
           round
           onClick={()=>setInputValue(maxValue)}
-          hoverIndicator='secondaryTransparent'
+          hoverIndicator='secondary-transparent'
           border='all'
           pad={{ horizontal:'small', vertical:'none' }}
         >
@@ -55,7 +55,7 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
       <Box
         round='small'
         onClick={()=>console.log('maker vault clickced')}
-        hoverIndicator='secondaryTransparent'
+        hoverIndicator='secondary-transparent'
         border='all'
         fill='horizontal'
         pad={{ horizontal:'xsmall', vertical:'xsmall' }}

@@ -4,6 +4,7 @@ export const BN_RAY = BigNumber.from('1000000000000000000000000000');
 export const N_RAY = '1000000000000000000000000000';
 export const WAD = BigNumber.from('1000000000000000000');
 export const RAY = BigNumber.from('1000000000000000000000000000');
+
 export const RAD = BigNumber.from('10000000000000000000000000000000000000000');
 export const SECONDS_PER_YEAR = 365 * 24 * 60 * 60;
 
@@ -61,36 +62,10 @@ export const divRay = (x:BigNumber, ray:BigNumber) => {
 // @dev Takes a bignumber in RAY and converts it to a human accesible number string
 export const rayToHuman = (x:any) => {
   // const unit = BigNumber.from('10').pow(BigNumber.from('27'));
-  return x.toString();
+  return BigNumber.from(x).div(RAY).toString();
 };
 
-// Math type utils
-
-// export function debtCeiling(line:BigNumber) {
-//   return DAI.rad(line);
-// }
-
-// export function liquidationPenalty(chop:number|any) {
-//   return new ethers.BigNumber(chop.toString(), 10)
-//     .div(RAY)
-//     .sub(1)
-//     .toNumber();
-// }
-
-// export function liquidationRatio(mat:number|any) {
-//   const ratio = createCurrencyRatio(USD, DAI);
-//   return ratio(new BigNumber(mat.toString(), 10).div(RAY).toString());
-// }
-
-// export function price(currency, par, spot, liquidationRatio) {
-//   par = new BigNumber(par.toString()).dividedBy(RAY);
-//   spot = new BigNumber(spot.toString()).dividedBy(RAY);
-//   const ratio = createCurrencyRatio(USD, currency);
-//   const price = spot.times(par).times(liquidationRatio.toNumber());
-//   return ratio(price);
-// }
-
-// yield math
+// Yield Math type utils NB: EARLY STAGES
 
 export function collateralAmount(currency:any, ink:any) {
   return currency.wei(ink);
@@ -100,15 +75,15 @@ export function collateralValue(_collateralAmount:BigNumber, _price:any) {
   return _collateralAmount.mul(_price);
 }
 
-export function debtValue(art:any, rate:any) {
-  // art = DAI.wei(art);
-  return art.times(rate).shiftedBy(-27);
+export function debtValue(_yDaiAmount:BigNumber, _rate:BigNumber ) {
+  // ?? need Dai rate too ?
+  return mulRay(_yDaiAmount, _rate);
 }
 
 export function collateralizationRatio(_collateralValue:BigNumber, _debtValue:BigNumber) {
   if (_debtValue.eq(0)) {
-    // const ratio = createCurrencyRatio(USD, DAI);
-    // return ratio(Infinity);
+    // handle this case better
+    return BigNumber.from(0);
   }
   return _collateralValue.div(_debtValue);
 }
@@ -119,8 +94,10 @@ export function liquidationPrice(
   _liquidationRatio:any
 ) {
   if (_collateralAmount.eq(0)) {
+    // // Do something here to handle 0 collateral
     // const ratio = createCurrencyRatio(USD, _collateralAmount.type);
-    // return ratio(Infinity);
+    // handle this case better
+    return BigNumber.from(0);
   }
   return _debtValue.mul(_liquidationRatio).div(_collateralAmount);
 }
@@ -134,4 +111,10 @@ export function daiAvailable(_collateralValue:BigNumber, _debtValue:BigNumber, _
   return _debtValue.lt(maxSafeDebtValue);
   // ? DAI(maxSafeDebtValue.sub(_debtValue))
   // : DAI(0);
+}
+
+export function mockPrice( _expiryDate:number) {
+  
+  return BigNumber.from(0.97);
+
 }

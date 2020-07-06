@@ -12,7 +12,7 @@ const ActionMenu = ({ handleSelectAction }:any) => {
         align='center'
         fill='horizontal'
         pad='small' 
-        hoverIndicator='background-frontheader' 
+        hoverIndicator='background-mid' 
         round 
         onClick={()=> handleSelectAction('BORROW')}
       > Borrow yDai
@@ -22,7 +22,7 @@ const ActionMenu = ({ handleSelectAction }:any) => {
         align='center'
         fill='horizontal'
         pad='small' 
-        hoverIndicator='background-frontheader' 
+        hoverIndicator='background-mid' 
         round 
         onClick={()=> handleSelectAction('SELL')}
       > Sell yDai
@@ -33,7 +33,7 @@ const ActionMenu = ({ handleSelectAction }:any) => {
         align='center'
         fill='horizontal'
         pad='small' 
-        hoverIndicator='background-frontheader' 
+        hoverIndicator='background-mid' 
         round 
         onClick={()=> handleSelectAction('BUY')}
       > Buy yDai (Lend)
@@ -44,7 +44,7 @@ const ActionMenu = ({ handleSelectAction }:any) => {
         align='center'
         fill='horizontal'
         pad='small' 
-        hoverIndicator='background-frontheader' 
+        hoverIndicator='background-mid' 
         round 
         onClick={()=> handleSelectAction('PAYBACK')}
       > Payback debt
@@ -54,7 +54,7 @@ const ActionMenu = ({ handleSelectAction }:any) => {
         align='center'
         fill='horizontal'
         pad='small' 
-        hoverIndicator='background-frontheader' 
+        hoverIndicator='background-mid' 
         round 
         onClick={()=> handleSelectAction('WITHDRAW')}
       > Withdraw collateral
@@ -64,7 +64,7 @@ const ActionMenu = ({ handleSelectAction }:any) => {
         align='center'
         fill='horizontal'
         pad='small'
-        hoverIndicator='background-frontheader'
+        hoverIndicator='background-mid'
         round 
         onClick={()=> handleSelectAction('DEPOSIT')}
       > Add more collateral

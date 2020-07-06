@@ -123,7 +123,7 @@ const TestLayer = (props:any) => {
         <Header 
           round={{ corner:'bottom', size:'medium' }}
           fill='horizontal'
-          background='background-frontheader'
+          background='background-mid'
           pad={{ horizontal: 'small', vertical:'medium' }}
         >
           <Heading level='6'> FOR TESTING ONLY</Heading>

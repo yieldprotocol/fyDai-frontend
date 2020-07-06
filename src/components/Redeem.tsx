@@ -61,10 +61,10 @@ const Redeem = ({ activeSeries }:any) => {
     >
       <Box direction='row-responsive' justify='start' gap='medium'>
         <Box 
-          background={taskView==='REDEEM'? 'secondaryTransparent': 'none'}
+          background={taskView==='REDEEM'? 'secondary-transparent': 'none'}
           round
           pad={{ horizontal:'small', vertical:'xsmall' }}
-          hoverIndicator='secondaryTransparent'
+          hoverIndicator='secondary-transparent'
           onClick={()=>{setTaskView('REDEEM');}}
         >
           <Text 
@@ -78,10 +78,10 @@ const Redeem = ({ activeSeries }:any) => {
           </Text>
         </Box>
         {/* <Box
-          background={taskView==='WITHDRAW'? 'secondaryTransparent': 'none'}
+          background={taskView==='WITHDRAW'? 'secondary-transparent': 'none'}
           round 
           pad={{ horizontal:'small', vertical:'xsmall' }}
-          hoverIndicator='secondaryTransparent'
+          hoverIndicator='secondary-transparent'
           onClick={()=>{setTaskView('WITHDRAW');}}
         >
           <Text 

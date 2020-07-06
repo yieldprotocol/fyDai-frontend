@@ -78,7 +78,7 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
         <Box
           round
           onClick={()=>setInputValue(maxValue)}
-          hoverIndicator='brandTransparent'
+          hoverIndicator='brand-transparent'
           border='all'
           pad={{ horizontal:'small', vertical:'none' }}
         >

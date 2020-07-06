@@ -7,7 +7,6 @@ import { ethers, BigNumber } from 'ethers';
 
 import * as utils from '../utils';
 import { IYieldSeries, IUser } from '../types';
-
 import { NotifyContext } from './NotifyContext';
 import { ConnectionContext } from './ConnectionContext';
 
@@ -108,7 +107,7 @@ const YieldProvider = ({ children }:any) => {
   const [ txHistory, setTxHistory] = useCachedState('txHistory', null);
 
   const [ callTx ] = useCallTx();
-  const { getEventHistory } = useEvents(); 
+  const { getEventHistory, addEventListener } = useEvents(); 
   const { getEthBalance, getTokenBalance }  = useBalances();
 
   // async get all public yield addresses from localStorage/chain
@@ -120,7 +119,7 @@ const YieldProvider = ({ children }:any) => {
 
     // TODO: combine in to a single group? possibly
     const contractGroups = { 
-      coreList: ['Dealer', 'Treasury', 'WethOracle', 'ChaiOracle'],
+      coreList: ['Dealer', 'Treasury'],
       externalList: ['Chai', 'Dai', 'WethJoin', 'Vat', 'Weth', 'Jug', 'Pot', 'GasToken', 'End', 'DaiJoin' ],
       peripheralList: ['EthProxy', 'Liquidations', 'Unwind'],
       // ContractList: ['Dealer', 'Treasury','Chai', 'Dai', 'WethJoin', 'Vat', 'Weth', 'EthProxy', 'Liquidations']
@@ -230,13 +229,20 @@ const YieldProvider = ({ children }:any) => {
     });
   };
 
-  // Fetch non-cached yield protocol general data
+  // Fetch non-cached yield protocol general data  (eg. market data - dai/dyai prices)
   const _getYieldData = async (deployedCore:any): Promise<any> => {
-    const _yieldData:any = {};
+    
+    const _yieldData:any = {
+      liquidationPrice: BigNumber.from('100'),
+      collateralizationRatio: BigNumber.from('100'),
+    };
+    
 
     // parse data if required.
     return {
       ..._yieldData,
+      liquidationPrice_: _yieldData.liquidationPrice.toString(),
+      collateralizationRatio_: _yieldData.collateralizationRatio.toString(),
     };
   };
 
@@ -256,6 +262,9 @@ const YieldProvider = ({ children }:any) => {
     const _borrowedHistory = await getEventHistory(deployedCore.Dealer, 'Dealer', 'Borrowed', [], !txHistory?0:txHistory.lastBlock+1 );
     // TODO add in AMM history information
     // TODO add in YDai information?
+    
+    // Testing event listener:
+    // addEventListener(deployedCore.Dealer, 'Dealer', 'Posted', [null, null, null], ( x:any, y:any, z:any )=> console.log(ethers.utils.parseBytes32String(x), y) );
 
     // TODO : get blocknumber at initialisation of yDaiProtocol instead of using first block(0).
     console.log('txHistory updated from block:', txHistory?.lastBlock+1||0, 'to block:', _lastBlock);
@@ -286,30 +295,27 @@ const YieldProvider = ({ children }:any) => {
     };
   };
 
-  // Get maker data if reqd.
+  // Get maker data
   const _getMakerData = async (deployedExternal:any): Promise<any> => {
-    const _pot = await callTx(deployedExternal.Pot, 'Pot', 'chi', []);
+
     const _ilks = await callTx(deployedExternal.Vat, 'Vat', 'ilks', [ethers.utils.formatBytes32String('ETH-A')]);
     const _urns = await callTx(deployedExternal.Vat, 'Vat', 'urns', [ethers.utils.formatBytes32String('ETH-A'), account ]);
+
     // parse and return maker data
     return { 
       ilks: {
         ..._ilks,
-        Art_: utils.rayToHuman(_ilks.Art),
+        // Art_: utils.rayToHuman(_ilks.Art),
         spot_: utils.rayToHuman(_ilks.spot),
         rate_: utils.rayToHuman(_ilks.rate),
-        line_: utils.rayToHuman(_ilks.line),
-        dust_: utils.rayToHuman(_ilks.dust),
+        // line_: utils.rayToHuman(_ilks.line),
+        // dust_: utils.rayToHuman(_ilks.dust),
       },
       urns: {
         ..._urns,
         art_: utils.rayToHuman(_urns.art),
         ink_: utils.rayToHuman(_urns.ink),
       },
-      pot: {
-        ..._pot,
-        chi_: _pot.chi,
-      }
     };
   };
 
@@ -342,11 +348,21 @@ const YieldProvider = ({ children }:any) => {
     const userData = account ? await _getUserData(deployedCore, deployedPeripheral, false): { ethBalance_: 0 };
     dispatch({ type:'updateUserData', payload: userData });
 
-    console.log(userData);
-
     // #5 Get maker data
-    // const makerData = await _getMakerData(deployedSeries);
-    // dispatch({ type:'updateMakerData', payload: makerData });
+    const makerData = await _getMakerData(deployedExternal);
+    dispatch({ type:'updateMakerData', payload: makerData });
+    
+    // add listen to rate/spot changes on Maker
+    addEventListener(
+      deployedExternal.Vat,
+      'Vat',
+      'LogNote',
+      [],
+      (x:any, y:any, z:any)=> { 
+        console.log(x, y, z); // dispatch({ type:'updateMakerData', payload: {...makerData, makerData.ilks })
+      }
+    );
+
     dispatch({ type:'isLoading', payload: false });
   };
 
@@ -358,6 +374,7 @@ const YieldProvider = ({ children }:any) => {
     updateUserData: (x:any, y:any) => _getUserData(x, y, true).then((res:any)=> dispatch({ type:'updateUserData', payload: res })),
     updateSeriesData: (x:IYieldSeries[]) => _getSeriesData(x).then((res:any) => dispatch({ type:'updateDeployedSeries', payload: res })),
     updateYieldBalances: (x:any) => _getYieldData(x).then((res:any)=> dispatch({ type:'updateYieldData', payload: res })),
+    
     // refreshYieldAddrs: () => _getYieldAddrs(chainId, true),
   };
 

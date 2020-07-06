@@ -4420,12 +4420,12 @@
         }
       },
       "links": {},
-      "address": "0xDF237b0bb01b9411c3C4a688d2304a8729007e23",
-      "transactionHash": "0xeee4bc73108c42084ad63b7e1e3e1b436c68f30c10b738f2fa6949ef76f8eb52"
+      "address": "0x86c592C3c49eC06f89EcfD7D95B6313C7e65534F",
+      "transactionHash": "0xd88dc4cbb814d1692bab6bdaf5c2bd384bbad6c4433969c48bcefeb2799f60a3"
     }
   },
   "schemaVersion": "3.0.23",
-  "updatedAt": "2020-07-02T10:01:06.605Z",
+  "updatedAt": "2020-07-04T11:00:16.659Z",
   "networkType": "ethereum",
   "devdoc": {
     "details": "EthProxy allows users to post and withdraw Eth to the Dealer",

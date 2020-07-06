@@ -39,7 +39,7 @@ const contractMap = new Map<string, any>([
  * @returns { function } getEvents
  */
 export const useEvents = () => {
-  const { state: { signer, account } } = React.useContext(ConnectionContext);
+  const { state: { signer, account, provider } } = React.useContext(ConnectionContext);
   // const { library, account } = useWeb3React();
   // const signer = library.getSigner();
   const [ eventListenerList, setEventListenerList ] = React.useState<boolean>();
@@ -51,8 +51,16 @@ export const useEvents = () => {
    * @param {string} contractName name of the contract to call (uses this to get the abi from a contract map)
    * @param {string} event of the function to call 
    */
-  const addEventListener = async (contractAddr:string, contractName:string, event:string ) => {
-    console.log('eventlistner');
+  const addEventListener = async (
+    contractAddr:string,
+    contractName:string,
+    filterEvent:string,
+    filterArgs:any[],
+    callback:any
+  ) => {
+    const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), signer);
+    const filter = contract.filters[filterEvent](...filterArgs);
+    contract.on(filter, (x:any) => callback(x));
   };
 
   /**

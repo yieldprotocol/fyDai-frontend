@@ -68,10 +68,10 @@ const DepositWithdraw = ({ close }:any) => {
     >
       <Box direction='row-responsive' justify='start' gap='medium'>
         <Box 
-          background={taskView==='DEPOSIT'? 'secondaryTransparent': 'none'}
+          background={taskView==='DEPOSIT'? 'secondary-transparent': 'none'}
           round
           pad={{ horizontal:'small', vertical:'xsmall' }}
-          hoverIndicator='secondaryTransparent'
+          hoverIndicator='secondary-transparent'
           onClick={()=>{setTaskView('DEPOSIT');}}
         >
           <Text 
@@ -85,10 +85,10 @@ const DepositWithdraw = ({ close }:any) => {
           </Text>
         </Box>
         <Box
-          background={taskView==='WITHDRAW'? 'secondaryTransparent': 'none'}
+          background={taskView==='WITHDRAW'? 'secondary-transparent': 'none'}
           round 
           pad={{ horizontal:'small', vertical:'xsmall' }}
-          hoverIndicator='secondaryTransparent'
+          hoverIndicator='secondary-transparent'
           onClick={()=>{setTaskView('WITHDRAW');}}
         >
           <Text 

@@ -109,14 +109,14 @@ const Borrow = ({ setActiveSeries, activeSeries, setShowSeriesLayer }:BorrowProp
             <Text weight='bold' size='xsmall'> Collateral Balance </Text>
           </Box>
           <Box
-            background='brandTransparent'
+            background='brand-transparent'
             round
             pad={{ horizontal:'small', vertical:'xsmall' }}
           >
             <Text size='xsmall' color='brand'>{userData.ethPosted_} ETH</Text>
           </Box>
           {/* <Box
-            background='secondaryTransparent'
+            background='secondary-transparent'
             round
             pad={{ horizontal:'small', vertical:'xsmall' }}
           >

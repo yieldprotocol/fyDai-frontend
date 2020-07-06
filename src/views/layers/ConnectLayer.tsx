@@ -42,7 +42,7 @@ const ConnectLayer = (props:any) => {
         <Header 
           round={{ corner:'bottom', size:'medium' }}
           fill='horizontal'
-          background='background-frontheader'
+          background='background-mid'
           pad={{ horizontal: 'medium', vertical:'large' }}
         >
           {/* <Heading level='4' >Connect to a Wallet</Heading> */}

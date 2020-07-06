@@ -1,73 +1,66 @@
 import React from 'react';
-import { Box, Image, Heading, Text } from 'grommet';
+import { Box, Button, Image, Heading, Text } from 'grommet';
 
 import logoLight from '../assets/images/logo_light.svg';
 import { useMaker } from '../hooks/makerHooks';
 
+import DashBorrow from '../components/DashBorrow';
+import DashLend from '../components/DashLend';
 
 const Dashboard = () => {
 
   const { getVaults, openNewVault } = useMaker();
 
+  const [activeView, setActiveView] = React.useState<string>('borrow');
+
   return (
-    <Box gap='small' pad={{ vertical:'small', horizontal:'large' }}>
-      <Box justify='between'>
-        <Box direction='row' justify='between'>
-          <Box width='75%'>
-            <Heading level='3'>Yield yDai Landing Page</Heading>
-            <Box pad={{ vertical:'small' }}>
-              <Text
-                size='small'
-              >
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec quis est elit. Nunc vitae fringilla quam. Phasellus porta, purus in porta tincidunt, urna arcu imperdiet arcu, eget pulvinar velit nibh vel magna. Pellentesque egestas risus purus, vitae auctor arcu sagittis id. Nulla felis elit, condimentum in blandit nec, maximus eget mauris. Vivamus et condimentum velit, et euismod urna. In nec hendrerit nibh. Nunc eros elit, scelerisque bibendum dui ac, scelerisque posuere elit. Sed interdum massa non massa volutpat finibus. Vestibulum a felis in elit malesuada ullamcorper. Maecenas fermentum pulvinar odio.
-              </Text>
-            </Box>
+    <Box gap='small' pad={{ vertical:'large', horizontal:'small' }} fill='horizontal' justify='between'>
+      
+      <Box direction='row' fill='horizontal' pad={{ bottom:'large', horizontal:'none' }} justify='between' align='center'>
+        <Box>
+          <Box direction='row' gap='small'>
+            <Heading level='3' margin='none'>Your</Heading>
+            {/* <Heading level='3' margin='none' onClick={()=>(activeView==='borrow')? setActiveView('lend'):setActiveView('borrow')}><a>{activeView}</a></Heading> */}
+            <Heading level='3' margin='none'>dashboard</Heading>
           </Box>
+          <Box direction='row'> 
+            <Text size='xsmall' color='text-weak' >
+              Dashboard description · Learn more
+            </Text>
+          </Box>
+        </Box>
 
-          <Box
-            round='xlarge'
-            width='xsmall'
-            height='xsmall'
-            background='black'
-            justify='center'
-            align='center'
-            margin='small'
+        <Box direction='row' gap='small' pad='small'>
+          <Button primary label='Tip: Convert your Maker Vault' />
+          <Button label='View more tips' />
+        </Box>
+      </Box>
+
+      <Box direction='row' pad={{ bottom :'large' }}>
+        <Box round='xsmall' direction='row' background='brand-transparent' pad='xxsmall' gap='small'> 
+          <Box 
+            round='xsmall'
+            pad={{ horizontal:'large', vertical:'xxsmall' }}
+            background={(activeView === 'borrow')? 'background-front' : undefined}
+            elevation={(activeView === 'borrow')? 'small' : undefined}
+            onClick={()=>setActiveView('borrow')}
           >
-            <Box pad='xsmall'>
-              <Image src={logoLight} />
-            </Box>
+            <Text size='xsmall'> Borrow view </Text>
+          </Box>
+          <Box 
+            round='xsmall'
+            pad={{ horizontal:'large', vertical:'xxsmall' }}
+            background={(activeView === 'lend') ? 'background-front' : undefined}
+            elevation={(activeView === 'lend')? 'small' : undefined}
+            onClick={()=>setActiveView('lend')}
+          >
+            <Text size='xsmall'> Lend view </Text>
           </Box>
         </Box>
       </Box>
 
-      <Box flex='grow' direction='column'>
-        <Box direction='row-responsive' gap='medium' justify='start'>
-          
-          <Box
-            onClick={()=> getVaults()}
-            hoverIndicator='brandTransparent'
-            round
-            pad={{ horizontal:'small' }}
-          >
-            <Text color='brand'>
-              maker vaults connect
-            </Text>
-          </Box>
-
-          <Box
-            onClick={()=>openNewVault()}
-            hoverIndicator='secondaryTransparent'
-            round
-            pad={{ horizontal:'small' }}
-          >
-            <Text color='secondary'>
-              Open New Vault 
-            </Text>
-          </Box>
-
-        </Box>
-
-      </Box>
+      { activeView === 'borrow' && <DashBorrow /> }
+      { activeView === 'lend' && <DashLend /> }
     </Box>
   );
 };

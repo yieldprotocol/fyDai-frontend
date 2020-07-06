@@ -110,8 +110,6 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
         </Text>
       </Box>}
 
-
-
       <Box fill='horizontal' alignSelf='end'>
         <Button
           fill='horizontal'

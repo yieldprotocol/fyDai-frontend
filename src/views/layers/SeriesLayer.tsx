@@ -4,8 +4,6 @@ import { Anchor, Text, Box, Layer, Header } from 'grommet';
 import { IYieldSeries } from '../../types';
 import { YieldContext } from '../../contexts/YieldContext';
 
-import { Spinner } from '../../components/LoadingSpinner';
-
 import YieldSeriesSummary from '../../components/YieldSeriesSummary';
 // import YieldSeries from '../../components/YieldSeries';
 
@@ -51,7 +49,7 @@ const SeriesLayer = (props:any) => {
       <Header
         // round={{ corner:'bottom', size:'xsmall' }}
         fill='horizontal'
-        background='background-frontheader'
+        background='background-mid'
         pad={{ horizontal: 'medium', vertical:'large' }}
       >
         <Text>yDai Series:</Text>
@@ -59,7 +57,7 @@ const SeriesLayer = (props:any) => {
       </Header>
       <Box background='background' pad='medium'>
         <Box justify="between" gap='small'>
-          {state.isLoading && <Spinner />}
+          {state.isLoading && 'Loading'}
           {seriesList.map((x:any, i:number) => {
             return (
               <Box

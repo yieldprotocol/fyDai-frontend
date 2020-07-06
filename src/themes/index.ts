@@ -11,62 +11,65 @@ export const yieldTheme = {
     elevation: {
       dark: {
         none: 'none',
-        xsmall: '0px 2px 2px rgba(255, 255, 255, 0.10)',
-        small: '0px 4px 4px rgba(255, 255, 255, 0.10)',
-        medium: '0px 6px 8px rgba(255, 255, 255, 0.10)',
-        large: '0px 8px 16px rgba(255, 255, 255, 0.10)',
-        xlarge: '0px 12px 24px rgba(255, 255, 255, 0.10)',
+        xsmall: '0px 2px 2px rgba(255, 255, 255, 0.5)',
+        small: '0px 4px 4px rgba(255, 255, 255, 0.5)',
+        medium: '0px 6px 8px rgba(255, 255, 255, 0.5)',
+        large: '0px 8px 16px rgba(255, 255, 255, 0.5)',
+        xlarge: '0px 12px 24px rgba(255, 255, 255, 0.5)',
       },
     },
     colors: {
-      brand: {
-        // dark: '#78F029',
-        // light: '#49E303',
-        dark: '#009E83',
-        light:'#009E83',
+      'brand': {
+        dark: '#005792',
+        light: '#005792',
+        // dark: '#009E83',
+        // light:'#009E83',
       },
-      brandTransparent: {
-        dark: 'rgba(0, 158, 131, 0.1)',
-        light: 'rgba(0, 158, 131, 0.1)',
+      'brand-transparent': {
+        // dark: 'rgba(0, 158, 131, 0.1)',
+        // light: 'rgba(0, 158, 131, 0.1)',
+        dark: '#0057921A',
+        light: '#0057921A',
       },
-      secondary: {
+      'secondary': {
         dark: '#627EEA',
         light:'#627EEA'
       },
-      secondaryTransparent: {
-        dark: 'rgb(98, 126, 234, 0.1)',
-        light: 'rgb(98, 126, 234, 0.1)',
+      'secondary-transparent': {
+        dark: '#627EEA1A',
+        light:'#627EEA1A',
+        // dark: 'rgb(98, 126, 234, 0.1)',
+        // light: 'rgb(98, 126, 234, 0.1)',
       },
-      background: {
+      'background': {
+        // 'dark': '#111111',
+        // 'light': '#FFFFFF',
         'dark': '#111111',
-        'light': '#FFFFFF'
-        // dark:
-        //   'linear-gradient(135deg, rgba(138,5,12,1) 0%, rgba(17,17,17,1) 33%, rgba(17,17,17,1) 100%)',
-        // light:
-        //   'linear-gradient(45deg, rgba(120,240,41,0.30) 0%, rgba(255,255,255,0) 33%, rgba(255,255,255,0) 100%)',
+        'light': '#F1F5F9',
       },
+
       'background-back': {
         dark: '#111111',
         light: '#EEEEEE',
       },
-      'background-frontheader': {
-        // 'dark': 'linear-gradient(135deg, rgba(138,5,12,1) 0%, rgba(17,17,17,1) 33%, rgba(17,17,17,1) 100%)',
-        // 'light': 'linear-gradient(45deg, rgba(120,240,41,0.30) 0%, #EEEEEE 33%, #EEEEEE 100%)'
+      'background-mid': {
         dark: 'dark-1',
-        light: 'light-3',
+        light: '#F5FAFF',
+        // light: 'light-3',
       },
       'background-front': {
         dark: '#222222',
+        light:'#ffffff',
         // 'dark': 'dark-1',
-        light: 'light-1',
+        // light: 'light-1',
       },
       'background-contrast': {
         dark: '#FFFFFF11',
         light: '#11111111',
       },
-      text: {
+      'text': {
         dark: '#EEEEEE',
-        light: '#333333',
+        light: '#00204A',
       },
       'text-strong': {
         dark: '#FFFFFF',
@@ -74,7 +77,7 @@ export const yieldTheme = {
       },
       'text-weak': {
         dark: '#CCCCCC',
-        light: '#444444',
+        light: '#78859A',
       },
       'text-xweak': {
         dark: '#999999',
@@ -281,7 +284,7 @@ export const yieldTheme = {
     },
     padding: {
       vertical: '3px',
-      horizontal: '18px',
+      horizontal: '10px',
     },
   },
   checkBox: {
