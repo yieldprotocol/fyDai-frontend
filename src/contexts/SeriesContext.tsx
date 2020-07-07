@@ -27,12 +27,12 @@ function reducer(state:any, action:any) {
   }
 }
 
-const priceMock = new Map([ 
-  [1601510399, utils.toRay(0.99)],
-  [1609459199, utils.toRay(0.98)],
-  [1617235199, utils.toRay(0.96)],
-  [1625097599, utils.toRay(0.93)]
-]);
+// const priceMock = {
+//   1601510399: utils.toRay(0.99),
+//   1609459199: utils.toRay(0.98),
+//   1617235199: utils.toRay(0.96),
+//   1625097599: utils.toRay(0.93)
+// };
 
 const SeriesProvider = ({ children }:any) => {
 
@@ -51,7 +51,7 @@ const SeriesProvider = ({ children }:any) => {
   const [ callTx ] = useCallTx();
   const { getEventHistory } = useEvents(); 
 
-  const { deployedContracts, makerData,  } = yieldState;
+  const { deployedContracts, feedData } = yieldState;
 
   const getSeriesData = async (deployedSeries:any) => {
     const chainData:any[] = [];
@@ -61,13 +61,11 @@ const SeriesProvider = ({ children }:any) => {
         try {
           // chainData[i].wethDebtDai = await callTx(deployedContracts.Dealer, 'Dealer', 'debtDai', [utils.WETH, x.maturity, account]);
           chainData[i].wethDebtYDai = account? await callTx(deployedContracts.Dealer, 'Dealer', 'debtYDai', [utils.WETH, x.maturity, account]): '0';
-          chainData[i].wethDebtDai = utils.mulRay( chainData[i].wethDebtYDai, priceMock.get(x.maturity) || BigNumber.from('0'));
+          chainData[i].wethDebtDai = utils.mulRay( chainData[i].wethDebtYDai, feedData.amm.rates[x.maturity] || BigNumber.from('0'));
           // chainData[i].chaiDebtDai = await callTx(deployedContracts.Dealer, 'Dealer', 'debtDai', [utils.CHAI, x.maturity, account]);
           // chainData[i].chaiDebtYDai = await callTx(deployedContracts.Dealer, 'Dealer', 'debtYDai', [utils.CHAI, x.maturity, account]);
-
-          chainData[i].yieldRate = utils.yieldRate(priceMock.get(x.maturity) || BigNumber.from('0'));
+          chainData[i].yieldRate = utils.yieldRate(feedData.amm.rates[x.maturity] || BigNumber.from('0'));
           // chainData[i].yieldAnnual = utils.annualizedYieldRate(priceMock.get(x.maturity) || BigNumber.from('0'), x.maturity);
-
         } catch (e) {
           console.log(`Could not load series blockchain data: ${e}`);
         }
@@ -112,19 +110,10 @@ const SeriesProvider = ({ children }:any) => {
     }
   };
 
-  const getSeriesHistory = async () => {
-    // getEventHistory(yieldState.deployedSeries[0].YDai, 'YDai', '*', [], 0);
-  };
-
-  React.useEffect( () => {
-  //  ( async () => yieldState?.deployedSeries[0]?.YDai && getEventHistory(yieldState.deployedSeries[0].YDai, 'YDai', '*', 0))();
-  }, [yieldState]);
-
   React.useEffect( () => {
     ( async () => {
       // account && chainId && !yieldState?.isLoading && loadSeriesPositions([yieldState.deployedSeries[0]], false); 
       account && chainId && !yieldState?.isLoading && loadSeriesPositions(yieldState.deployedSeries, false); 
-
     })();
   }, [ account, chainId, yieldState ]);
 
