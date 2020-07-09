@@ -3,6 +3,7 @@ import { useMaker } from './makerHooks';
 import { useCachedState, useDebounce } from './appHooks';
 import { useEthProxy, useDealer, useYDai } from './contractHooks';
 import { useEvents } from './eventHooks';
+import { useMath } from './mathHooks';
 
 export {
   useCachedState,
@@ -15,4 +16,5 @@ export {
   useYDai,
   useMaker,
   useEvents,
+  useMath,
 };

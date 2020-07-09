@@ -100,7 +100,7 @@ const Redeem = ({ activeSeries }:any) => {
       { taskView==='TIMER' && 
       <Box>
 
-        Series matures { moment(activeSeries.maturity_p).fromNow() }
+        Series matures { moment(activeSeries.maturity_).fromNow() }
 
       </Box> }
     </Box>

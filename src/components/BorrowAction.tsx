@@ -22,106 +22,194 @@ interface BorrowActionProps {
 const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
 
   const [ inputValue, setInputValue ] = React.useState<any>();
+  const [borrowDisabled, setBorrowDisabled] = React.useState<boolean>(false);
+
   const [ borrowType, setBorrowType ] = React.useState<string>('yDai');
 
-  const TokenSelector = () => {
-    return (
-      <Box justify='center'>
-        <Box round background='border' justify='center' pad={{ horizontal:'small' }}>
-          <Select
-            id="select"
-            name="select"
-            plain
-            value={borrowType}
-            options={['yDai', 'Dai']}
-            valueLabel={
-              <Box width='xsmall' direction='row' align='baseline' justify='center' gap='xsmall'>
-                <Text color='brand' size='xsmall'>{ borrowType }</Text>
-                <Text color='brand' size='xsmall'><CaretDown /></Text>
-              </Box>
-          }
-            icon={false}
-            onChange={({ option }) => setBorrowType(option)}
-          />
-        </Box>
-      </Box>
-    );
-  };
-  
   return (
     <Box flex='grow' justify='between'>
-      <Box margin={{ top:'medium' }} gap='xsmall' align='center' fill='horizontal'>
-        <Text alignSelf='start' size='xsmall'> Amount to borrow </Text>
-        <Box 
-          round='small'
-          border={{ color:'brand' }}
-          direction='row'
+      <Box gap='medium' align='center' fill='horizontal'>
+        <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Choose a series</Text>
+        <Box
+          direction='row-responsive'
           fill='horizontal'
-          align='baseline'
-          pad={{ horizontal:'small' }}
+          gap='small'
+          align='center'
         >
-          {/* <Box width='60px' height='60px' margin='none'>
-            <Image src={ethLogo} fit='contain' />
-          </Box> */}
-
-          <TextInput
-            type="number"
-            placeholder="0"
-            value={inputValue}
-            plain
-            onChange={(event:any) => setInputValue(event.target.value)}
-            // icon={<TokenSelector />}
-            reverse
-          />
-          <TokenSelector />
-        </Box>
-
-        <Box direction='row' fill='horizontal' margin={{ top:'small' }}>
-          <Box pad='xsmall' width='50%'>
-            <Box direction='row' gap='small'>
-              <Text size='xsmall'>
-                Est. APR 
-              </Text>
-              <Help />
-            </Box>
-            <Text weight='bold' size='xsmall'>
-              3.45%
-            </Text>
+          <Box 
+            round='medium'
+            background='brand-transparent'
+            direction='row'
+            fill='horizontal'
+            pad='small'
+            flex
+          >
+            {/* <Box width='15px' height='15px'>
+              <Image src={ethLogo} fit='contain' />
+            </Box> */}
+            <TextInput
+              type="number"
+              placeholder='December 2000 @ 3.54%'
+              // value={inputValue}
+              // disabled={depositDisabled}
+              plain
+              // onChange={(event:any) => setInputValue(event.target.value)}
+            />
           </Box>
-          <Box pad='xsmall'>
-            <Box direction='row' gap='small'>
-              <Text size='xsmall'>
-                Expected Dai
-              </Text>
-              <Help />
+
+          <Box justify='center'>
+            <Box
+              round
+              onClick={()=>setInputValue(maxValue)}
+              hoverIndicator='brand-transparent'
+              border='all'
+              // border={{ color:'brand' }}
+              pad={{ horizontal:'small', vertical:'small' }}
+              justify='center'
+            >
+              <Text size='xsmall'>Change series</Text>
             </Box>
-            <Text weight='bold' size='xsmall'>
-              0 Dai
-            </Text>
           </Box>
         </Box>
-      </Box>
 
-      {inputValue > 150 &&
-      <Box direction='row' border={{ color:'red' }} pad='small' margin={{ vertical:'small' }}> 
-        <Text size='xsmall' color='red'>
-          <Warning /> 
-          {' Wooah. If you borrow that much there is a good chance you\'ll get liquidated soon. Proceed with caution!'}
-        </Text>
-      </Box>}
+        {/* <Box fill gap='small' pad={{ horizontal:'medium' }}>
+          <Box fill direction='row-responsive' justify='between'>
 
-      <Box fill='horizontal' alignSelf='end'>
-        <Button
+            <Box gap='small'>
+              <Box direction='row' gap='small'>
+                <Text color='text-weak' size='xsmall'>Estimated APR</Text>
+                <Help />
+              </Box>
+              <Text color='brand' weight='bold' size='large'> 3.5% </Text>
+              { false && 
+              <Box pad='xsmall'>
+                <Text alignSelf='start' size='xxsmall'>
+                  <Info /> You need to deposit collateral in order to Borrow Dai.
+                </Text>
+              </Box>}
+            </Box>
+
+            <Box gap='small'>
+              <Box direction='row' gap='small'>
+                <Text color='text-weak' size='xsmall'>Expected Dai at maturity</Text>
+                <Help />
+              </Box>
+              <Text color='brand' weight='bold' size='large'> 15 Dai on 23 December 2020</Text>
+              { false && 
+              <Box pad='xsmall'>
+                <Text alignSelf='start' size='xxsmall'>
+                  <Info /> Collateral value should be well above 150% to be safe from liquidation. Either increase your collateral amount or repay some existing debt. 
+                </Text>
+              </Box>}
+            </Box>
+          </Box>
+          <Box gap='small'>
+
+            <Box direction='row' gap='small'>
+              <Text color='text-weak' size='xsmall'>Borrowing Power</Text>
+              <Help />
+            </Box>
+            <Box direction='row' gap='small'>
+              <Text color={!inputValue? 'brand-transparent':'brand'} weight='bold' size='large'> 24 Dai </Text>
+            </Box>
+          </Box>
+        </Box> */}
+
+        <Box fill gap='medium' margin={{ vertical:'large' }}>
+          <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to borrow</Text>
+          <Box 
+            round='medium'
+            background='brand-transparent'
+            direction='row'
+            fill='horizontal'
+            pad='small'
+            flex
+          >
+            {/* <Box width='15px' height='15px'>
+              <Image src={ethLogo} fit='contain' />
+            </Box> */}
+            <TextInput
+              type="number"
+              placeholder='Enter the amount of Dai to borrow'
+              value={inputValue}
+            // disabled={depositDisabled}
+              plain
+              onChange={(event:any) => setInputValue(event.target.value)}
+            />
+          </Box>
+
+          <Box fill gap='small' pad={{ horizontal:'medium' }}>
+            <Box fill direction='row-responsive' justify='between'>
+            
+              <Box gap='small'>
+                <Box direction='row' gap='small'>
+                  <Text color='text-weak' size='xsmall'>Estimated APR</Text>
+                  <Help />
+                </Box>
+                <Text color='brand' weight='bold' size='large'> 3.5% </Text>
+                { false && 
+                <Box pad='xsmall'>
+                  <Text alignSelf='start' size='xxsmall'>
+                    <Info /> You need to deposit collateral in order to Borrow Dai.
+                  </Text>
+                </Box>}
+              </Box>
+
+              <Box gap='small'>
+                <Box direction='row' gap='small'>
+                  <Text color='text-weak' size='xsmall'>Expected Dai at maturity</Text>
+                  <Help />
+                </Box>
+                <Text color='brand' weight='bold' size='large'> 15 Dai on 23 December 2020</Text>
+                { false && 
+                <Box pad='xsmall'>
+                  <Text alignSelf='start' size='xxsmall'>
+                    <Info /> Collateral value should be well above 150% to be safe from liquidation. Either increase your collateral amount or repay some existing debt. 
+                  </Text>
+                </Box>}
+              </Box>
+            </Box>
+            <Box gap='small'>
+
+              <Box direction='row' gap='small'>
+                <Text color='text-weak' size='xsmall'>Borrowing Power</Text>
+                <Help />
+              </Box>
+              <Box direction='row' gap='small'>
+                <Text color={!inputValue? 'brand-transparent':'brand'} weight='bold' size='large'> 24 Dai </Text>
+              </Box>
+              {/* <Text color='text-weak' size='xxsmall'>if you deposit {inputValue||0} Eth</Text> */}
+            </Box>
+          </Box>
+
+          {inputValue > 150 &&
+            <Box direction='row' border={{ color:'red' }} pad='small' margin={{ vertical:'small' }}> 
+              <Text size='xsmall' color='red'>
+                <Warning /> 
+                {' Wooah. If you borrow that much there is a good chance you\'ll get liquidated soon. Proceed with caution!'}
+              </Text>
+            </Box>}
+
+        </Box>
+
+        <Box
           fill='horizontal'
-          primary
-          disabled={!(inputValue>0)}
-          color='brand'
-          onClick={()=>borrowFn(inputValue)}
-          label={`Borrow ${inputValue || ''} ${borrowType}`}
-        />
+          round='medium'
+          background={( !(inputValue>0) || borrowDisabled) ? 'brand-transparent' : 'brand'}
+          onClick={(!(inputValue>0) || borrowDisabled)? ()=>{}:()=>borrowFn(inputValue)}
+          align='center'
+          pad='medium'
+        >
+          <Text 
+            weight='bold'
+            size='large'
+            color={( !(inputValue>0) || borrowDisabled) ? 'text-xweak' : 'text'}
+          >
+            {`Borrow ${inputValue || ''} Dai`}
+          </Text>
+        </Box>
       </Box>
     </Box>
-
   );
 };
 

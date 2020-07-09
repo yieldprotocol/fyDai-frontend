@@ -1,4 +1,7 @@
 import React from 'react';
+import { ethers } from 'ethers';
+import moment from 'moment';
+
 import { Box, Button, Select, Image, TextInput, Text, CheckBox, Collapsible, RangeInput } from 'grommet';
 import { 
   FiPlusCircle as PlusCircle,
@@ -9,7 +12,8 @@ import {
 
 import { Chart } from 'react-charts';
 
-import { useMaker } from '../hooks/makerHooks';
+import { YieldContext } from '../contexts/YieldContext';
+import { SeriesContext } from '../contexts/SeriesContext';
 
 interface DashBorrowProps {
   // borrowFn:any
@@ -20,7 +24,20 @@ interface DashBorrowProps {
 const DashBorrow = ({ }:DashBorrowProps) => {
 
   const [ addCollateral, setAddCollateral ] = React.useState<boolean>(false);
-  const [ borrowType, setBorrowType ] = React.useState<string>('yDai');
+
+  const { state: { deployedSeries, deployedContracts, yieldData, userData }, actions } = React.useContext(YieldContext);
+
+  const txHistory = userData?.txHistory?.items || [];
+  const txHistory_ = txHistory.filter((x:any) => x.event==='Borrowed' ).map((x:any) => {
+
+    const eventType = x.args_[3]>0 ? 'Borrow' : 'Repay';
+    // const series = deployedSeries.get(x.args_[2]);
+    const eventName = `${eventType} `;
+    const date = moment(x.date_).format('D MMM YYYY');
+    const amount = ethers.utils.formatEther( x.args_[3] );
+
+    return { eventType, date, amount };
+  });
 
   // const data = React.useMemo(
   //   () => [
@@ -72,7 +89,7 @@ const DashBorrow = ({ }:DashBorrowProps) => {
         <Box
           background='background-front'
           fill='horizontal'
-          round='small'
+          round='medium'
           pad={{ vertical:'small', horizontal:'large' }}
           // elevation='medium'
           border
@@ -99,7 +116,7 @@ const DashBorrow = ({ }:DashBorrowProps) => {
           basis='1/3'
           background='background-front'
           fill='horizontal'
-          round='small'
+          round='medium'
           pad='large'
           // elevation='medium'
           border
@@ -112,11 +129,10 @@ const DashBorrow = ({ }:DashBorrowProps) => {
           basis='1/3'
           background='background-front'
           fill='horizontal'
-          round='small'
+          round='medium'
           pad='large'
           // elevation='medium'
           border
-
         >
           borrow column 3
           {/* <Chart data={data} axes={axes} /> */}
@@ -125,27 +141,12 @@ const DashBorrow = ({ }:DashBorrowProps) => {
       
       
       <Box direction='row-responsive' gap='small'>
-        <Box basis='1/3' fill gap='small'> 
+        <Box basis='1/3' flex gap='small'>
           <Text color='text-weak' size='xsmall'>Your Positions </Text>
           <Box
             background='background-front'
-            fill='horizontal'
-            round='small'
-            pad='large'
-            // elevation='medium'
-            border
-
-          >
-            box 1
-          </Box>
-
-        </Box>
-        <Box basis='2/3' fill gap='small'>
-          <Text color='text-weak' size='xsmall'>Your History</Text>
-          <Box
-            background='background-front'
-            fill='horizontal'
-            round='small'
+            fill
+            round='medium'
             pad='none'
             // elevation='medium'
             border
@@ -156,15 +157,44 @@ const DashBorrow = ({ }:DashBorrowProps) => {
               justify='between'
               background='background-mid'
               pad='small'
-              round={{ size:'small', corner:'top' }}
+              round={{ size:'medium', corner:'top' }}
+            >
+              <Box basis='1/2'><Text color='text-weak' size='xsmall'>SERIES</Text></Box>
+              <Box><Text color='text-weak' size='xsmall'>DEBT</Text></Box>
+              <Box><Text color='text-weak' size='xsmall'>ACTION</Text></Box>
+            </Box>
+            <Box>
+              sereis list here
+ 
+            </Box>
+            
+          </Box>
+
+        </Box>
+        <Box basis='2/3' fill gap='small'>
+          <Text color='text-weak' size='xsmall'>Your History</Text>
+          <Box
+            background='background-front'
+            fill='horizontal'
+            round='medium'
+            pad='none'
+            // elevation='medium'
+            border
+          >
+            <Box 
+              direction='row'
+              gap='xsmall'
+              justify='between'
+              background='background-mid'
+              pad='small'
+              round={{ size:'medium', corner:'top' }}
             >
               <Box basis='1/2'><Text color='text-weak' size='xsmall'>TRANSACTION</Text></Box>
               <Box><Text color='text-weak' size='xsmall'>AMOUNT</Text></Box>
               <Box><Text color='text-weak' size='xsmall'>DATE</Text></Box>
               <Box><Text color='text-weak' size='xsmall'>ACTION</Text></Box>
             </Box>
-
-            { [1, 2, 3, 4, 5].map((x:any, i:number)=>{
+            { txHistory_.length > 0 ? txHistory_.map((x:any, i:number)=>{
               const key_ = i;
               return (
                 <Box
@@ -173,15 +203,19 @@ const DashBorrow = ({ }:DashBorrowProps) => {
                   gap='xsmall'
                   key={key_}
                   justify='between'
+                  hoverIndicator='background-mid'
+                  onClick={()=>console.log('click')}
                 >
-                  <Box basis='1/2'> {x} </Box>
-                  <Box> {x} </Box>
-                  <Box> {x} </Box>
-                  <Box> {x}</Box>
+                  <Box basis='2/5'> {x.event} </Box>
+                  <Box> {x.amount} </Box>
+                  <Box> {x.date} </Box>
+                  <Box> ACTION A </Box>
                 </Box>
-
               );
-            })}
+            }):
+            <Box>
+              Loading history...
+            </Box>}
 
           </Box>
         </Box>

@@ -1,9 +1,9 @@
 import React from 'react';
 import { ethers, BigNumber } from 'ethers';
-import { useWeb3React } from '@web3-react/core';
+// import { useWeb3React } from '@web3-react/core';
 
 import * as utils from '../utils';
-import { useCallTx, useEvents, useCachedState } from '../hooks';
+import { useCallTx, useEvents, useCachedState, useMath } from '../hooks';
 
 import { YieldContext } from './YieldContext';
 import { ConnectionContext } from './ConnectionContext';
@@ -12,10 +12,20 @@ const SeriesContext = React.createContext<any>({});
 
 function reducer(state:any, action:any) {
   switch (action.type) {
-    case 'updatePositions':
+    case 'updateSeries':
       return {
         ...state,
-        positionsData: action.payload,
+        seriesData: action.payload,
+      };
+    case 'updateTotals':
+      return {
+        ...state,
+        seriesTotals: action.payload,
+      };
+    case 'setActiveSeries':
+      return {
+        ...state,
+        activeSeries: action.payload,
       };
     case 'isLoading':
       return { 
@@ -37,34 +47,72 @@ function reducer(state:any, action:any) {
 const SeriesProvider = ({ children }:any) => {
 
   const { state: { chainId, account } } = React.useContext(ConnectionContext);
-
   const initState = { 
-    positionsIndicator: 0,
-    positionsData : new Map(),
-    positionSelected: ''
+    seriesData : new Map(),
+    seriesTotals: {},
+    activeSeries: null,
   };
 
   const [ state, dispatch ] = React.useReducer(reducer, initState);
   const { state: yieldState } = React.useContext(YieldContext);
-  const [ seriesTxHistory, setSeriesTxHistory ] = useCachedState('seriesTxHistory', null);
 
   const [ callTx ] = useCallTx();
-  const { getEventHistory } = useEvents(); 
+  const { collAmount, collValue, debtVal, collRatio, yieldRate, estimateRatio, minSafeCollatAmount, maxDai } = useMath();
 
   const { deployedContracts, feedData } = yieldState;
 
-  const getSeriesData = async (deployedSeries:any) => {
+  const calculateSeriesTotals = () => {
+    const numberOfSeries = state.seriesData.size;
+    const collateralAmount = collAmount();
+    const collateralValue = collValue();
+    // TODO: rushed - this needs some attention to make it pretty/better
+    let debtYDai = BigNumber.from('0');
+    state.seriesData.forEach((x:any)=>{
+      debtYDai = x.wethDebtYDai.add(debtYDai);
+    });
+    const debtYDaiValue = null; // Not needed for now - possibly unknown see below
+    const totaldebtDai = null; // Unknown here - because each series has different Dai/yDai rates
+    
+    const debtValue = debtVal(debtYDai); // calculated as yDai at maturity. i.e. 1:1
+    const collateralRatio = collRatio(collateralValue, debtValue);
+
+    const minSafeCollateral = minSafeCollatAmount(debtValue, BigNumber.from('150'));
+    const daiAvailable = maxDai(collateralValue, debtValue, BigNumber.from('150'));
+
+    console.log(ethers.utils.formatEther(daiAvailable));
+
+    return {
+      numberOfSeries,
+      // TODO: fix this duplicate 'easy access' data below from yieldState
+      ethPosted: yieldState.userData.ethPosted, ethPosted_: yieldState.userData.ethPosted_,
+      ethBalance: yieldState.userData.ethBalance, ethBalance_: yieldState.userData.ethBalance_,
+
+      // calculated values
+      debtYDai, debtYDai_: parseFloat(ethers.utils.formatEther(debtYDai)),
+      debtValue, debtValue_ : parseFloat(ethers.utils.formatEther(debtValue)),
+      collateralAmount, collateralAmount_: parseFloat(ethers.utils.formatEther(collateralAmount)),
+      collateralValue, collateralValue_: parseFloat(ethers.utils.formatEther(collateralValue)),
+      collateralRatio, collateralRatio_: parseFloat(collateralRatio.toString()),
+
+      minSafeCollateral, minSafeCollateral_: parseFloat(ethers.utils.formatEther(minSafeCollateral)),
+
+      // useful functions exported
+      estimateRatio,
+
+    };
+  };
+
+  const getSeriesPosition = async (deployedSeries:any) => {
     const chainData:any[] = [];
     await Promise.all(
       deployedSeries.map( async (x:any, i:number) => {
         chainData.push(x);
         try {
-          // chainData[i].wethDebtDai = await callTx(deployedContracts.Dealer, 'Dealer', 'debtDai', [utils.WETH, x.maturity, account]);
-          chainData[i].wethDebtYDai = account? await callTx(deployedContracts.Dealer, 'Dealer', 'debtYDai', [utils.WETH, x.maturity, account]): '0';
+          chainData[i].wethDebtYDai = account ? await callTx(deployedContracts.Dealer, 'Dealer', 'debtYDai', [utils.WETH, x.maturity, account]): '0';
           chainData[i].wethDebtDai = utils.mulRay( chainData[i].wethDebtYDai, feedData.amm.rates[x.maturity] || BigNumber.from('0'));
           // chainData[i].chaiDebtDai = await callTx(deployedContracts.Dealer, 'Dealer', 'debtDai', [utils.CHAI, x.maturity, account]);
           // chainData[i].chaiDebtYDai = await callTx(deployedContracts.Dealer, 'Dealer', 'debtYDai', [utils.CHAI, x.maturity, account]);
-          chainData[i].yieldRate = utils.yieldRate(feedData.amm.rates[x.maturity] || BigNumber.from('0'));
+          chainData[i].yieldRate = yieldRate(feedData.amm.rates[x.maturity] || BigNumber.from('0'));
           // chainData[i].yieldAnnual = utils.annualizedYieldRate(priceMock.get(x.maturity) || BigNumber.from('0'), x.maturity);
         } catch (e) {
           console.log(`Could not load series blockchain data: ${e}`);
@@ -75,8 +123,8 @@ const SeriesProvider = ({ children }:any) => {
   };
 
   // post fetching data processing
-  const parseSeriesData = (chainData:any) => {
-    const positions = state.positionsData;
+  const parseSeriesPosition = (chainData:any) => {
+    const positions = state.seriesData;
     chainData.forEach((x:any)=>{
       positions.set(
         x.symbol,
@@ -96,15 +144,21 @@ const SeriesProvider = ({ children }:any) => {
   const loadSeriesPositions = async (seriesArr:any[], force:boolean) => {
     let filteredSeriesArr;
     if (force !== true) {
-      filteredSeriesArr = seriesArr.filter(x => !state.positionsData.has(x.symbol));
+      filteredSeriesArr = seriesArr.filter(x => !state.seriesData.has(x.symbol));
     } else { filteredSeriesArr = seriesArr; }
 
     if( !yieldState?.isLoading && filteredSeriesArr.length > 0) {
       dispatch({ type:'isLoading', payload: true });
-      const chainData:any = await getSeriesData(filteredSeriesArr);
-      const parsedData:any = await parseSeriesData(chainData);
+      const chainData:any = await getSeriesPosition(filteredSeriesArr);
+      const parsedData:any = await parseSeriesPosition(chainData);
       dispatch( { type:'updatePositions', payload: parsedData });
       dispatch({ type:'isLoading', payload: false });
+
+      const totals = calculateSeriesTotals();
+      dispatch( { type:'updateTotals', payload: totals });
+
+      /* if no active series, set it to the first entry of the map. */
+      !state.activeSeries && dispatch({ type:'setActiveSeries', payload: parsedData.entries().next().value });
     } else {
       console.log('Positions already exist... force fetch if required');
     }
@@ -113,13 +167,15 @@ const SeriesProvider = ({ children }:any) => {
   React.useEffect( () => {
     ( async () => {
       // account && chainId && !yieldState?.isLoading && loadSeriesPositions([yieldState.deployedSeries[0]], false); 
-      account && chainId && !yieldState?.isLoading && loadSeriesPositions(yieldState.deployedSeries, false); 
+      account && chainId && !yieldState?.isLoading && await loadSeriesPositions(yieldState.deployedSeries, false);
+
     })();
   }, [ account, chainId, yieldState ]);
 
   const actions = {
-    getPositions: (x:any[]) => loadSeriesPositions(x, false),
-    refreshPositions: (x:any[]) => loadSeriesPositions(x, true),
+    getSeriesPositions: (x:any[]) => loadSeriesPositions(x, false),
+    refreshSeriesPositions: (x:any[]) => loadSeriesPositions(x, true),
+    setActiveSeries: (x:any[]) => dispatch({ type:'setActiveSeries', payload: x }),
   };
 
   return (

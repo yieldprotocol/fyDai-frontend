@@ -2,7 +2,7 @@ import React from 'react';
 import { Anchor, Box, Button, TextInput, Menu, Text, Heading, Footer, Collapsible, ThemeContext } from 'grommet';
 
 import { IYieldSeries } from '../types';
-import SlideConfirm from './SlideConfirm';
+import SlideConfirm from './x_SlideConfirm';
 
 import { NotifyContext } from '../contexts/NotifyContext';
 // import { SeriesContext } from '../contexts/SeriesContext';

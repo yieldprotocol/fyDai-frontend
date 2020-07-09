@@ -1,6 +1,6 @@
 import React from 'react';
 import { useWeb3React } from '@web3-react/core';
-import { ethers }  from 'ethers';
+import { ethers, BigNumber }  from 'ethers';
 
 import { NotifyContext } from '../contexts/NotifyContext';
 import { ConnectionContext } from '../contexts/ConnectionContext';
@@ -88,6 +88,31 @@ export const useEvents = () => {
     return logs;
   };
 
-  return { getEventHistory, addEventListener, isLoading, eventListenerList } as const;
+  const parseEventList = async (eventList:any) => {
+    const parsedList = Promise.all( eventList.map(async (x:any)=>{
+      const { timestamp } = await provider.getBlock(x.blockNumber);
+      return {
+        ...x,
+        date_: new Date(timestamp*1000),
+        args_: x.args.map((y:any)=>{
+          if (ethers.BigNumber.isBigNumber(y)) {
+            return y.toString();
+          } if (ethers.utils.isAddress(y)) {
+            return ethers.utils.getAddress(y);
+          }
+          return ethers.utils.parseBytes32String(y) || y;
+          // TODO: deal with Hexstrings/ bytes
+        })
+      };
+    })
+    );
+
+    console.log( await parsedList);
+
+    return parsedList;
+
+  };
+
+  return { getEventHistory, addEventListener, parseEventList, isLoading, eventListenerList } as const;
 
 };

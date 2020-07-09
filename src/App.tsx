@@ -26,7 +26,7 @@ import { IYieldSeries } from './types';
 function App() {
 
   const [darkmode, setDarkmode] = React.useState(false);
-  const [activeView, setActiveView] = React.useState<string>('DASHBOARD');
+  const [activeView, setActiveView] = React.useState<string>('BORROW');
   const [activeSeries, setActiveSeries] = React.useState<IYieldSeries | null>(null);
 
   const [showConnectLayer, setShowConnectLayer] = React.useState<boolean>(false);
@@ -47,10 +47,9 @@ function App() {
         { showConnectLayer && <ConnectLayer closeLayer={()=>setShowConnectLayer(false)} />}
         { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
         { showSeriesLayer  && <SeriesLayer setActiveSeries={setActiveSeries} closeLayer={()=>setShowSeriesLayer(false)} /> }
-        
+
         <Box direction="row" height={{ min: '100%' }}>
           <Box flex>
-
             <Grid fill rows={['auto', 'flex', 'auto']}>
               <Grid fill columns={['10%', 'auto', '10%']}>
                 <Box background={{ color:'background-front' }} />
@@ -73,9 +72,9 @@ function App() {
                   <Box background='background' />
                   <Box align='center'>
                     {activeView === 'DASHBOARD' && <Dashboard /> }
-                    {activeSeries && activeView === 'BORROW' && <Borrow activeSeries={activeSeries} setActiveSeries={setActiveSeries} setShowSeriesLayer={setShowSeriesLayer} />}
-                    {activeSeries && activeView === 'LEND' && <Lend activeSeries={activeSeries} setActiveSeries={setActiveSeries} setShowSeriesLayer={setShowSeriesLayer} />}
-                    {activeSeries && activeView === 'AMM' && <Amm />}
+                    {activeView === 'BORROW' && <Borrow setShowSeriesLayer={setShowSeriesLayer} />}
+                    {activeView === 'LEND' && <Lend setShowSeriesLayer={setShowSeriesLayer} />}
+                    {activeView === 'AMM' && <Amm />}
                   </Box>
                   <Box background='background' />
                 </Grid>

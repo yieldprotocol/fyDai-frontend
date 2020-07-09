@@ -28,7 +28,7 @@ const TestLayer = (props:any) => {
   const { state: seriesState, actions: seriesActions } = React.useContext( SeriesContext );
   const [ flow, setFlow ] = React.useState<string|null>('WETH');
 
-  const { positionsData } = seriesState;
+  const { seriesData } = seriesState;
   const { yieldData, deployedContracts, deployedSeries, userData } = yieldState;
   
 
@@ -274,25 +274,25 @@ const TestLayer = (props:any) => {
             gap='small'
             overflow='auto'
           > 
-            { positionsData.size > 0 && !seriesState.isLoading ? 
+            { seriesData.size > 0 && !seriesState.isLoading ? 
               <Box pad='small' gap='medium' fill>
                 <Box direction='row'>
-                  <Text weight='bold'>yDai[0]: {positionsData.get('yDai-2020-09-30').symbol}</Text>
+                  <Text weight='bold'>yDai[0]: {seriesData.get('yDai-2020-09-30').symbol}</Text>
                 </Box>
                 <Box gap='small'>
                   <Text weight='bold'>Posted collateral:</Text>
                   <Text>weth posted: { userData.ethPosted_ }</Text>
                   {/* <Text>chai posted: { yieldData.chaiPosted_ }</Text> */}
                   <Text weight='bold'>yDai balance:</Text>
-                  <Text>yDai Balance: { positionsData.get('yDai-2020-09-30').yDaiBalance_ }</Text>
+                  <Text>yDai Balance: { seriesData.get('yDai-2020-09-30').yDaiBalance_ }</Text>
                   <Text weight='bold'>Weth Dealer:</Text>
-                  {/* <Text>weth Debt Dai: { positionsData.get('yDai-2020-09-30').wethDebtDai_ }</Text> */}
-                  <Text>weth Debt YDai: { positionsData.get('yDai-2020-09-30').ethDebtYDai_ }</Text>
+                  {/* <Text>weth Debt Dai: { seriesData.get('yDai-2020-09-30').wethDebtDai_ }</Text> */}
+                  <Text>weth Debt YDai: { seriesData.get('yDai-2020-09-30').ethDebtYDai_ }</Text>
                   {/* <Text>weth Total Debt Dai { yieldData.wethTotalDebtDai_ }</Text> */}
                   <Text> weth Total Debt YDai: { userData.ethTotalDebtYDai_ }</Text>
                   <Text weight='bold'>ChaiDealer:</Text>
-                  {/* <Text>chai Debt Dai : { positionsData.get('yDai-2020-09-30').chaiDebtDai_}</Text> */}
-                  <Text>chai Debt yDai : { positionsData.get('yDai-2020-09-30').chaiDebtYDai_}</Text>
+                  {/* <Text>chai Debt Dai : { seriesData.get('yDai-2020-09-30').chaiDebtDai_}</Text> */}
+                  <Text>chai Debt yDai : { seriesData.get('yDai-2020-09-30').chaiDebtYDai_}</Text>
                   {/* <Text>chai Total Debt Dai: { yieldData.chaiTotalDebtDai_ }</Text> */}
                   <Text>chai Total Debt YDai: { userData.chaiTotalDebtYDai_ }</Text>
                 </Box>
@@ -320,7 +320,7 @@ const TestLayer = (props:any) => {
             label='refresh' 
             onClick={
             ()=> {
-              seriesActions.refreshPositions([yieldState.deployedSeries[0]]);
+              seriesActions.refreshSeries([yieldState.deployedSeries[0]]);
               yieldActions.updateYieldBalances(yieldState.deployedContracts);
               yieldActions.updateUserData(yieldState.deployedContracts);
             }

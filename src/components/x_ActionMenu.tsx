@@ -18,7 +18,7 @@ const ActionMenu = ({ handleSelectAction }:any) => {
       > Borrow yDai
       </Box>
 
-      <Box 
+      <Box
         align='center'
         fill='horizontal'
         pad='small' 

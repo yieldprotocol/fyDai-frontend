@@ -11,7 +11,7 @@ const Dashboard = () => {
 
   const { getVaults, openNewVault } = useMaker();
 
-  const [activeView, setActiveView] = React.useState<string>('borrow');
+  const [activeView, setActiveView] = React.useState<string>('lend');
 
   return (
     <Box gap='small' pad={{ vertical:'large', horizontal:'small' }} fill='horizontal' justify='between'>

@@ -14,11 +14,6 @@ import { useCallTx, useCachedState, useBalances, useEvents } from '../hooks';
 
 const YieldContext = React.createContext<any>({});
 
-// firebase.initializeApp({
-//   apiKey: 'AIzaSyATOt3mpg8B512V-6Pl_2ZqjY1WjE5q49s',
-//   projectId: 'yield-ydai'
-// });
-
 const seriesColors = ['#726a95', '#709fb0', '#a0c1b8', '#f4ebc1', '#3f51b5', '#5677fc', '#03a9f4', '#00bcd4', '#009688', '#259b24', '#8bc34a', '#afb42b', '#ff9800', '#ff5722', '#795548', '#607d8b']; 
 
 // reducer
@@ -119,7 +114,7 @@ const YieldProvider = ({ children }:any) => {
   const [ txHistory, setTxHistory] = useCachedState('txHistory', null);
 
   const [ callTx ] = useCallTx();
-  const { getEventHistory, addEventListener } = useEvents();
+  const { getEventHistory, addEventListener, parseEventList } = useEvents();
   const { getEthBalance, getTokenBalance }  = useBalances();
 
   // async get all public yield addresses from localStorage/chain
@@ -227,7 +222,6 @@ const YieldProvider = ({ children }:any) => {
         }
       })
     );
-
     // Parse and return data
     return _seriesData.map((x:any, i:number) => {
       return {
@@ -258,26 +252,28 @@ const YieldProvider = ({ children }:any) => {
     /* get balances and posted collateral */
     _userData.ethBalance = await getEthBalance();
     _userData.ethPosted = await callTx(deployedContracts.Dealer, 'Dealer', 'posted', [utils.WETH, account]);
+
     // _userData.ethTotalDebtYDai = await callTx(deployedContracts.Dealer, 'Dealer', 'totalDebtYDai', [utils.WETH, account]);
     _userData.urn = await callTx(deployedContracts.Vat, 'Vat', 'urns', [ethers.utils.formatBytes32String('ETH-A'), account ]);
 
     /* get transaction history (from cache first or rebuild if update forced) */
     forceUpdate && window.localStorage.removeItem('txHistory') && console.log('Re-building txHistory...');
-    const _postedHistory = await getEventHistory(deployedContracts.Dealer, 'Dealer', 'Posted', [null, account, null], !txHistory?0:txHistory.lastBlock+1 );
-    const _borrowedHistory = await getEventHistory(deployedContracts.Dealer, 'Dealer', 'Borrowed', [], !txHistory?0:txHistory.lastBlock+1 );
+    const _postedHistory = await getEventHistory(deployedContracts.Dealer, 'Dealer', 'Posted', [null, account, null], !txHistory?0:txHistory.lastBlock+1 )
+      .then((res:any) => parseEventList(res) );
+    const _borrowedHistory = await getEventHistory(deployedContracts.Dealer, 'Dealer', 'Borrowed', [], !txHistory?0:txHistory.lastBlock+1 )
+      .then((res:any) => parseEventList(res) );
     // TODO add in AMM history information
     // TODO add in YDai information?
 
     // TODO : get blocknumber at initialisation of yDaiProtocol instead of using first block(0).
     console.log('txHistory updated from block:', txHistory?.lastBlock+1||0, 'to block:', _lastBlock);
     setTxHistory({
-      lastBlock: _lastBlock, 
-      items: txHistory ? [ ...txHistory.items, ..._postedHistory, ..._borrowedHistory ]
+      lastBlock: _lastBlock,
+      items: txHistory ?
+        [ ...txHistory.items, ..._postedHistory, ..._borrowedHistory ]
         : [ ..._postedHistory, ..._borrowedHistory ]
     });
     console.log('txHistory updated');
-
-    console.log(_userData.urn);
 
     /* parse and return user data */
     return {
@@ -287,10 +283,10 @@ const YieldProvider = ({ children }:any) => {
       txHistory : { 
         ...txHistory,
         items: txHistory?.items,
-        collateralTxs: txHistory?.items.filter((x:any)=> x.event === 'Posted'),
-        seriesTxs: txHistory?.items.filter((x:any)=> x.event === 'Borrowed'),
-        redeemTxs: txHistory?.items.filter((x:any)=> x.event === 'Redeemed'),
-        adminTxs: txHistory?.items.map((x:any, i:number)=> i),
+        // collateralTxs: txHistory?.items.filter((x:any)=> x.event === 'Posted'),
+        // seriesTxs: txHistory?.items.filter((x:any)=> x.event === 'Borrowed'),
+        // redeemTxs: txHistory?.items.filter((x:any)=> x.event === 'Redeemed'),
+        // adminTxs: txHistory?.items.map((x:any, i:number)=> i),
       },
       urn: {
         ..._userData.urn,
@@ -298,16 +294,12 @@ const YieldProvider = ({ children }:any) => {
         ink_: utils.rayToHuman(_userData.urn.ink),
       },
       preferences: userPreferences,
-      // ethTotalDebtYDai_: parseFloat(ethers.utils.formatEther(_userData.ethTotalDebtYDai.toString())),
-      // chaiPosted_: parseFloat(ethers.utils.formatEther(_yieldData.chaiPosted.toString())),
-      // chaiTotalDebtYDai_: parseFloat(ethers.utils.formatEther(_yieldData.chaiTotalDebtYDai.toString())),
     };
   };
 
   const initApp = async (networkId:number|string) => {
 
     dispatch({ type:'isLoading', payload: true });
-
     /* 1. Fetch PUBLIC Yield protocol ADDRESSES from cache or chain */
     const [ 
       deployedSeries,
@@ -330,6 +322,7 @@ const YieldProvider = ({ children }:any) => {
         // dispatch({ type:'updateFeedData', payload: {...feedData, feedData.ilks })
       }
     );
+    // // TODO: add event listener for AMM
     // // 2.3 Add listen for AMM changes
     // addEventListener(
     //   deployedContracts.Amm,
