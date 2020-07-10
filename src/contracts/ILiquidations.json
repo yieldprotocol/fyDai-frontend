@@ -9,33 +9,34 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.6.2+commit.bacdbe57\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"shutdown\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/ILiquidations.sol\":\"ILiquidations\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/ILiquidations.sol\":{\"keccak256\":\"0x0d116d55153787816db53e9e6bf69def12a2988988e2d710f520d2bdfe6ce6de\",\"urls\":[\"bzz-raw://63d7f373ca61af4fbc013f7649d368b0682b81f3992f9413b862e254690a4cee\",\"dweb:/ipfs/QmRfomYR8m9x4Qyj1fLVwPd887C7K2tWoWnuZ2GCpMSU1b\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.6.10+commit.00c0fcaf\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"shutdown\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/ILiquidations.sol\":\"ILiquidations\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":1000},\"remappings\":[]},\"sources\":{\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/ILiquidations.sol\":{\"keccak256\":\"0xdb257e81056b2619d660bec92a65278a25701ed5f309df0655615dab4c1a0e0e\",\"urls\":[\"bzz-raw://00642f7b6be80e91a1a2b2aba7ef1a571add88e6e1ef3f46056880fa7b76f09a\",\"dweb:/ipfs/QmXyD54HAd5KkrsNeg3A56W4G73CT34jKbevq1oLJp1cNN\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "pragma solidity ^0.6.2;\n\n\ninterface ILiquidations {\n    function shutdown() external;\n}",
+  "source": "pragma solidity ^0.6.10;\n\n\ninterface ILiquidations {\n    function shutdown() external;\n}",
   "sourcePath": "/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/ILiquidations.sol",
   "ast": {
     "absolutePath": "/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/ILiquidations.sol",
     "exportedSymbols": {
       "ILiquidations": [
-        5955
+        18213
       ]
     },
-    "id": 5956,
+    "id": 18214,
+    "license": null,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 5951,
+        "id": 18209,
         "literals": [
           "solidity",
           "^",
           "0.6",
-          ".2"
+          ".10"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:23:21"
+        "src": "0:24:28"
       },
       {
         "abstract": false,
@@ -44,9 +45,9 @@
         "contractKind": "interface",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 5955,
+        "id": 18213,
         "linearizedBaseContracts": [
-          5955
+          18213
         ],
         "name": "ILiquidations",
         "nodeType": "ContractDefinition",
@@ -55,7 +56,7 @@
             "body": null,
             "documentation": null,
             "functionSelector": "fc0e74d1",
-            "id": 5954,
+            "id": 18212,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -63,50 +64,51 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 5952,
+              "id": 18210,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "73:2:21"
+              "src": "74:2:28"
             },
             "returnParameters": {
-              "id": 5953,
+              "id": 18211,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "84:0:21"
+              "src": "85:0:28"
             },
-            "scope": 5955,
-            "src": "56:29:21",
+            "scope": 18213,
+            "src": "57:29:28",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 5956,
-        "src": "26:61:21"
+        "scope": 18214,
+        "src": "27:61:28"
       }
     ],
-    "src": "0:87:21"
+    "src": "0:88:28"
   },
   "legacyAST": {
     "absolutePath": "/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/ILiquidations.sol",
     "exportedSymbols": {
       "ILiquidations": [
-        5955
+        18213
       ]
     },
-    "id": 5956,
+    "id": 18214,
+    "license": null,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 5951,
+        "id": 18209,
         "literals": [
           "solidity",
           "^",
           "0.6",
-          ".2"
+          ".10"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:23:21"
+        "src": "0:24:28"
       },
       {
         "abstract": false,
@@ -115,9 +117,9 @@
         "contractKind": "interface",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 5955,
+        "id": 18213,
         "linearizedBaseContracts": [
-          5955
+          18213
         ],
         "name": "ILiquidations",
         "nodeType": "ContractDefinition",
@@ -126,7 +128,7 @@
             "body": null,
             "documentation": null,
             "functionSelector": "fc0e74d1",
-            "id": 5954,
+            "id": 18212,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -134,37 +136,37 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 5952,
+              "id": 18210,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "73:2:21"
+              "src": "74:2:28"
             },
             "returnParameters": {
-              "id": 5953,
+              "id": 18211,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "84:0:21"
+              "src": "85:0:28"
             },
-            "scope": 5955,
-            "src": "56:29:21",
+            "scope": 18213,
+            "src": "57:29:28",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 5956,
-        "src": "26:61:21"
+        "scope": 18214,
+        "src": "27:61:28"
       }
     ],
-    "src": "0:87:21"
+    "src": "0:88:28"
   },
   "compiler": {
     "name": "solc",
-    "version": "0.6.2+commit.bacdbe57.Emscripten.clang"
+    "version": "0.6.10+commit.00c0fcaf.Emscripten.clang"
   },
   "networks": {},
   "schemaVersion": "3.0.23",
-  "updatedAt": "2020-06-26T11:13:35.587Z",
+  "updatedAt": "2020-07-10T08:34:42.285Z",
   "devdoc": {
     "methods": {}
   },

@@ -32,14 +32,14 @@ const YieldSeriesMenuItem = ({
   } = series;
 
   const [over, setOver] = React.useState<boolean>();
-  const tooltipColor = { color: 'background-frontheader', opacity: 1 };
+  const tooltipColor = { color: 'background-mid', opacity: 1 };
   const ref = React.useRef<any>();
 
   const getBalanceColor = (_bal:string, _selected:boolean ):string => {
     if (parseInt(_bal, 10) > 0) {
-      return _selected? 'brand' : 'brandTransparent';
+      return _selected? 'brand' : 'brand-transparent';
     } if (parseInt(_bal, 10) > 0) {
-      return _selected? 'secondary': 'secondaryTransparent';
+      return _selected? 'secondary': 'secondary-transparent';
     } 
     return _selected? 'text': 'border';
   };
@@ -50,7 +50,7 @@ const YieldSeriesMenuItem = ({
       margin={{ left: 'small', vertical:'none' }}
       align="start"
       justify="between"
-      background={selected? ('background-frontheader'): {}}
+      background={selected? ('background-mid'): {}}
       // background={selected? ( seriesColor || 'background-front'): {}}
       ref={ref}
       onMouseOver={() => setOver(true)}

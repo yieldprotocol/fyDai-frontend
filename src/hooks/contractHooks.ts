@@ -135,7 +135,7 @@ export const useDealer = () => {
   /**
    * Posts wrapped collateral (Weth or Chai)
    * @param {string} dealerAddress address of the Dealer (remnant of older protocol)
-   * @param {string} collateral 'WETH' || 'CHAI'
+   * @param {string} collateral 'ETH-A' || 'CHAI'
    * @param {number} amount amount of collateral to post (in normal human numbers)
    */
   const post = async (
@@ -173,7 +173,7 @@ export const useDealer = () => {
   /**
    * Withdraws wrapped collateral (Weth or Chai) - not ETH directly.
    * @param {string} dealerAddress address of the Dealer (remnant of older protocol)
-   * @param {string} collateral 'WETH' || 'CHAI'
+   * @param {string} collateral 'ETH-A' || 'CHAI'
    * @param {number} amount to withdraw (in human understandable numbers)
    */
   const withdraw = async (
@@ -210,7 +210,7 @@ export const useDealer = () => {
   /**
    * Borrow yDai with available, posted collateral.
    * @param {string} dealerAddress address of the Dealer
-   * @param {string} collateral 'WETH' || 'CHAI' (use WETH for ETH collateral)
+   * @param {string} collateral 'ETH-A' || 'CHAI' (use ETH-A for ETH collateral)
    * @param {string} maturity UNIX timestamp as a string
    * @param {number} amount borrow amount (in human understandable numbers)
    */
@@ -249,7 +249,7 @@ export const useDealer = () => {
   /**
    * Repay yDai debt with either Dai or YDai.
    * @param {string} dealerAddress address of the Dealer
-   * @param {string} collateral 'WETH' || 'CHAI' (use WETH for ETH collateral pool)
+   * @param {string} collateral 'ETH-A' || 'CHAI' (use ETH-A for ETH collateral pool)
    * @param {string} maturity UNIX timestamp as a string
    * @param {number} amount to repay - either yDai or Dai (in human understandable numbers)
    * @param {string} type 'YDAI' || 'DAI' token used to pay back debt
@@ -293,7 +293,7 @@ export const useDealer = () => {
   };
 
   /**
-   * Approve the dealer to transact with WETH (or other) token.
+   * Approve the dealer to transact with ETH-A (or other) token.
    * (Not strictly a Dealer Contract function. But associated enough to keep in here.)
    * @param {string} tokenAddress address of the token to approve. 
    * @param {string} dealerAddress address of the dealer. 

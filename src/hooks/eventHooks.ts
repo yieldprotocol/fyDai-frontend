@@ -1,6 +1,6 @@
 import React from 'react';
 import { useWeb3React } from '@web3-react/core';
-import { ethers }  from 'ethers';
+import { ethers, BigNumber }  from 'ethers';
 
 import { NotifyContext } from '../contexts/NotifyContext';
 import { ConnectionContext } from '../contexts/ConnectionContext';
@@ -39,7 +39,7 @@ const contractMap = new Map<string, any>([
  * @returns { function } getEvents
  */
 export const useEvents = () => {
-  const { state: { signer, account } } = React.useContext(ConnectionContext);
+  const { state: { signer, account, provider } } = React.useContext(ConnectionContext);
   // const { library, account } = useWeb3React();
   // const signer = library.getSigner();
   const [ eventListenerList, setEventListenerList ] = React.useState<boolean>();
@@ -51,8 +51,16 @@ export const useEvents = () => {
    * @param {string} contractName name of the contract to call (uses this to get the abi from a contract map)
    * @param {string} event of the function to call 
    */
-  const addEventListener = async (contractAddr:string, contractName:string, event:string ) => {
-    console.log('eventlistner');
+  const addEventListener = async (
+    contractAddr:string,
+    contractName:string,
+    filterEvent:string,
+    filterArgs:any[],
+    callback:any
+  ) => {
+    const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), signer);
+    const filter = contract.filters[filterEvent](...filterArgs);
+    contract.on(filter, (x:any) => callback(x));
   };
 
   /**
@@ -80,6 +88,29 @@ export const useEvents = () => {
     return logs;
   };
 
-  return { getEventHistory, addEventListener, isLoading, eventListenerList } as const;
+  const parseEventList = async (eventList:any) => {
+    const parsedList = Promise.all( eventList.map(async (x:any)=>{
+      const { timestamp } = await provider.getBlock(x.blockNumber);
+      return {
+        ...x,
+        date_: new Date(timestamp*1000),
+        args_: x.args.map((y:any)=>{
+          if (ethers.BigNumber.isBigNumber(y)) {
+            return y.toString();
+          } if (ethers.utils.isAddress(y)) {
+            return ethers.utils.getAddress(y);
+          }
+          return ethers.utils.parseBytes32String(y) || y;
+          // TODO: deal with Hexstrings/ bytes
+        })
+      };
+    })
+    );
+
+    return parsedList;
+
+  };
+
+  return { getEventHistory, addEventListener, parseEventList, isLoading, eventListenerList } as const;
 
 };

@@ -74,8 +74,8 @@ const YieldSidebar = ({
       })}
       <Box pad='small'>
         <Button 
-          color='background-frontheader'
-          hoverIndicator='background-frontheader'
+          color='background-mid'
+          hoverIndicator='background-mid'
           onClick={()=>setShowSeriesLayer(true)}
           label={<Text size='xsmall'>Discover more</Text>}
         />

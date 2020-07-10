@@ -21,7 +21,7 @@ const Redeem = ({ activeSeries }:any) => {
   const [ ethPosted, setEthPosted ] = React.useState<number>(0);
   const { state, dispatch } = React.useContext(YieldContext);
 
-  const { deployedCore, deployedExternal, yieldData, userData } = state; 
+  const { deployedContracts, yieldData, userData } = state; 
 
   const {
     approveDealer,
@@ -32,17 +32,17 @@ const Redeem = ({ activeSeries }:any) => {
   }  = useDealer();
 
   React.useEffect(()=>{
-    // (async () => setWethBalance( await getWethBalance(deployedExternal.Weth)) )();
+    // (async () => setWethBalance( await getWethBalance(deployedContracts.Weth)) )();
     (async () => setEthPosted(userData.ethPosted_) )();
   }, []);
 
   // const depositSteps = async (value:number) => {
-  //   await approveDealer(deployedExternal.Weth, deployedCore.Dealer, value);
-  //   await post(deployedCore.Dealer, 'WETH', value);
+  //   await approveDealer(deployedContracts.Weth, deployedContracts.Dealer, value);
+  //   await post(deployedContracts.Dealer, 'ETH-A', value);
   // };
 
   // const withdrawSteps = async (value:number) => {
-  //   await withdraw(deployedCore.Dealer, 'WETH', value);
+  //   await withdraw(deployedContracts.Dealer, 'ETH-A', value);
   // };
 
   return (
@@ -61,10 +61,10 @@ const Redeem = ({ activeSeries }:any) => {
     >
       <Box direction='row-responsive' justify='start' gap='medium'>
         <Box 
-          background={taskView==='REDEEM'? 'secondaryTransparent': 'none'}
+          background={taskView==='REDEEM'? 'secondary-transparent': 'none'}
           round
           pad={{ horizontal:'small', vertical:'xsmall' }}
-          hoverIndicator='secondaryTransparent'
+          hoverIndicator='secondary-transparent'
           onClick={()=>{setTaskView('REDEEM');}}
         >
           <Text 
@@ -78,10 +78,10 @@ const Redeem = ({ activeSeries }:any) => {
           </Text>
         </Box>
         {/* <Box
-          background={taskView==='WITHDRAW'? 'secondaryTransparent': 'none'}
+          background={taskView==='WITHDRAW'? 'secondary-transparent': 'none'}
           round 
           pad={{ horizontal:'small', vertical:'xsmall' }}
-          hoverIndicator='secondaryTransparent'
+          hoverIndicator='secondary-transparent'
           onClick={()=>{setTaskView('WITHDRAW');}}
         >
           <Text 
@@ -100,7 +100,7 @@ const Redeem = ({ activeSeries }:any) => {
       { taskView==='TIMER' && 
       <Box>
 
-        Series matures { moment(activeSeries.maturity_p).fromNow() }
+        Series matures { moment(activeSeries.maturity_).fromNow() }
 
       </Box> }
     </Box>

@@ -59,7 +59,6 @@ export const useMaker = () => {
 
   const { state : { account, chainId, provider } } = React.useContext(ConnectionContext);
   // const { account, chainId, library } = useWeb3React();
-  
   const [openVaultActive, setOpenVaultActive] = React.useState<boolean>(false);
   const [convertVaultActive, setConvertVaultActive] = React.useState<boolean>(false);
   const [getVaultActive, setGetVaultActive] = React.useState<boolean>(false);
@@ -98,9 +97,7 @@ export const useMaker = () => {
     await maker.service('proxy').ensureProxy();
     // use the "vault manager" service to work with vaults
     const manager = maker.service('mcd:cdpManager');
-    // ETH-A is the name of the collateral type; in the future,
-    // there could be multiple collateral types for a token with
-    // different risk parameters
+    // ETH-A is the name of the collateral type;
     const vault = await manager.openLockAndDraw(
       'ETH-A',
       ETH(1),

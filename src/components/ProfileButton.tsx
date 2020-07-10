@@ -25,7 +25,7 @@ const ProfileButton = (props: any) => {
       <Box 
         round='small'
         onClick={() => action && action()}
-        hoverIndicator='brandTransparent'
+        hoverIndicator='brand-transparent'
         border='all'
         pad={{ vertical:'xsmall', horizontal:'small' }}
         direction='row'

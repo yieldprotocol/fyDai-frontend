@@ -1,11 +1,13 @@
 import { useCallTx, useSendTx, useBalances } from './transactionHooks';
 import { useMaker } from './makerHooks';
-import { useCachedState } from './appHooks';
+import { useCachedState, useDebounce } from './appHooks';
 import { useEthProxy, useDealer, useYDai } from './contractHooks';
 import { useEvents } from './eventHooks';
+import { useMath } from './mathHooks';
 
 export {
   useCachedState,
+  useDebounce,
   useSendTx,
   useCallTx,
   useBalances,
@@ -14,4 +16,5 @@ export {
   useYDai,
   useMaker,
   useEvents,
+  useMath,
 };

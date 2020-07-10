@@ -25,10 +25,10 @@ const BuySell = ({ activeSeries }:any) => {
     >
       <Box direction='row-responsive' justify='start' gap='medium'>
         <Box 
-          background={taskView==='BUY'? 'brandTransparent': 'none'}
+          background={taskView==='BUY'? 'brand-transparent': 'none'}
           round
           pad={{ horizontal:'small', vertical:'xsmall' }}
-          hoverIndicator='brandTransparent'
+          hoverIndicator='brand-transparent'
           onClick={()=>{setTaskView('BUY');}}
         >
           <Text 
@@ -42,10 +42,10 @@ const BuySell = ({ activeSeries }:any) => {
           </Text>
         </Box>
         <Box 
-          background={taskView==='SELL'? 'brandTransparent': 'none'}
+          background={taskView==='SELL'? 'brand-transparent': 'none'}
           round 
           pad={{ horizontal:'small', vertical:'xsmall' }}
-          hoverIndicator='brandTransparent'
+          hoverIndicator='brand-transparent'
           onClick={()=>{setTaskView('SELL');}}
         >
           <Text 

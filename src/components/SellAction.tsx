@@ -73,7 +73,7 @@ function PaybackAction({ close }:RepayActionProps) {
         <Box
           round
           onClick={()=>console.log('max button clicked')}
-          hoverIndicator='brandTransparent'
+          hoverIndicator='brand-transparent'
           border='all'
           pad={{ horizontal:'small', vertical:'none' }}
         >
