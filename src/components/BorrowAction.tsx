@@ -28,7 +28,7 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   const { state: yieldState, actions: yieldActions } = React.useContext(YieldContext);
   const { deployedContracts } = yieldState;
   const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
-  const { isLoading: positionsLoading, seriesTotals, activeSeries, setActiveSeries } = seriesState;
+  const { isLoading, seriesTotals, activeSeries } = seriesState;
   const {
     daiAvailable_,
     // estimateRatio,
@@ -41,9 +41,10 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
 
   const [ inputValue, setInputValue ] = React.useState<any>();
   const [ borrowDisabled, setBorrowDisabled ] = React.useState<boolean>(false);
-  const [ selectorOpen, setSelectorOpen ] = React.useState<boolean>(true);
+  const [ selectorOpen, setSelectorOpen ] = React.useState<boolean>(false);
   const [ estRatio, setEstRatio ] = React.useState<any>(0);
   const [ estChange, setEstChange ] = React.useState<any>(0);
+  const [ estAtMaturity, setEstAtMaturity ] = React.useState<number>(0);
 
 
   const [ indicatorColor, setIndicatorColor ] = React.useState<string>('brand');
@@ -82,6 +83,11 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
       setEstChange(change.toFixed(2));
     }
 
+    if (inputValue && activeSeries) {
+      const newEst = ( activeSeries.yieldPercent_ * parseFloat(inputValue));
+      setEstAtMaturity(newEst);
+    }
+
     if ( inputValue && ( inputValue > daiAvailable_ ) ) {
       // setDepositDisabled(true);
       setWarningMsg(null);
@@ -115,6 +121,8 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
             <Box 
               round='medium'
               background='brand-transparent'
+              onClick={()=>setSelectorOpen(true)}
+              hoverIndicator='brand'
               direction='row'
               fill
               pad='small'
@@ -168,7 +176,7 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
                     <Text color='text-weak' size='xsmall'>Estimated APR</Text>
                     <Help />
                   </Box>
-                  <Text color={!inputValue? 'brand-transparent':'brand'} weight='bold' size='large'> 3.5% </Text>
+                  <Text color={!inputValue? 'brand-transparent':'brand'} weight='bold' size='large'> {activeSeries && activeSeries.yieldPercent_.toFixed(2) || ''}% </Text>
                   { false && 
                   <Box pad='xsmall'>
                     <Text alignSelf='start' size='xxsmall'>
@@ -179,20 +187,16 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
 
                 <Box gap='small'>
                   <Box direction='row' gap='small'>
-                    <Text color='text-weak' size='xsmall'>Dai owed at maturity</Text>
+                    <Text color='text-weak' size='xsmall'>Approx. Dai owed at maturity</Text>
                     <Help />
                   </Box>
-                  <Text color='brand' weight='bold' size='large'> 15 Dai on 23 December 2020</Text>
-                  { false && 
-                  <Box pad='xsmall'>
-                    <Text alignSelf='start' size='xxsmall'>
-                      <Info /> Collateral value should be well above 150% to be safe from liquidation. Either increase your collateral amount or repay some existing debt. 
-                    </Text>
-                  </Box>}
+
+                  <Text color={!inputValue? 'brand-transparent':'brand'} weight='bold' size='large'> 
+                    {estAtMaturity.toFixed(2)} Dai on {activeSeries && Moment(activeSeries.maturity_).format('DD MMMM YYYY')}
+                  </Text>
                 </Box>
               </Box>
               <Box gap='small'>
-
                 <Box direction='row' gap='small'>
                   <Text color='text-weak' size='xsmall'>Maximum Borrowing Power</Text>
                   <Help />
