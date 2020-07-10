@@ -41,9 +41,10 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
 
   const [ inputValue, setInputValue ] = React.useState<any>();
   const [ borrowDisabled, setBorrowDisabled ] = React.useState<boolean>(false);
-  const [ selectorOpen, setSelectorOpen ] = React.useState<boolean>(false);
+  const [ selectorOpen, setSelectorOpen ] = React.useState<boolean>(true);
   const [ estRatio, setEstRatio ] = React.useState<any>(0);
   const [ estChange, setEstChange ] = React.useState<any>(0);
+
 
   const [ indicatorColor, setIndicatorColor ] = React.useState<string>('brand');
   const [ warningMsg, setWarningMsg] = React.useState<string|null>(null);
