@@ -9,7 +9,7 @@ import { Anchor, Layer, Header, Heading, Footer, Button, Box, Text } from 'gromm
 import * as utils from '../../utils';
 
 import { getNetworkName }  from '../../hooks/connectionHooks';
-import ProfileButton from '../../components/ProfileButton';
+import ProfileButton from '../ProfileButton';
 import { NotifyContext } from '../../contexts/NotifyContext';
 
 import { useSendTx, useCallTx, useDealer, useBalances, useEthProxy } from '../../hooks';

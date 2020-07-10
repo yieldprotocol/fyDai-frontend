@@ -1,19 +1,13 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { Box, Layer, Button, Image, TextInput, Text } from 'grommet';
-
 import { 
   FiInfo as Info,
   FiArrowLeft as ArrowLeft,
 } from 'react-icons/fi';
-
 import { FaEthereum as Ethereum } from 'react-icons/fa';
-
-
 import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
-
 import { useEthProxy } from '../hooks';
-
 
 interface IWithDrawActionProps {
   close?: any;
@@ -21,13 +15,11 @@ interface IWithDrawActionProps {
   maxValue?: number;
 }
 
-
 const WithdrawAction = ({ close }:IWithDrawActionProps) => {
-
 
   const [ estRatio, setEstRatio ] = useState<any>();
   const [ estDecrease, setEstDecrease ] = useState<any>();
-  
+
   const [ maxWithdraw, setMaxWithdraw ] = useState<number>(0);
   const [ inputValue, setInputValue ] = useState<any>();
 
@@ -91,10 +83,10 @@ const WithdrawAction = ({ close }:IWithDrawActionProps) => {
       const newDecrease = collateralRatio_ - newRatio ;
       setEstDecrease(newDecrease.toFixed(2));
     }
-  }, [inputValue]);
+  }, [ inputValue ]);
 
   return (
-    <Layer onClickOutside={()=>close()} >
+    <Layer onClickOutside={()=>close()}>
       <Box 
         width={{ max:'750px' }}
         alignSelf='center'

@@ -1,8 +1,6 @@
 import React from 'react';
-// import * as firebase from 'firebase/app';
-// import 'firebase/firestore';
-
 import { ethers, BigNumber } from 'ethers';
+import Moment from 'moment';
 // import { useWeb3React } from '@web3-react/core';
 
 import * as utils from '../utils';
@@ -83,7 +81,7 @@ const YieldProvider = ({ children }:any) => {
         },
       },
       urns: {},
-      // AMM prices mocked for now.
+      // AMM rates mocked for now.
       amm:{
         rates: {
           1601510399: utils.toRay(0.99),
@@ -228,6 +226,7 @@ const YieldProvider = ({ children }:any) => {
         ...x,
         yDaiBalance_: ethers.utils.formatEther(x.yDaiBalance.toString()),
         maturity_: new Date( (x.maturity) * 1000 ),
+        displayName: Moment(x.maturity*1000).format('MMMM YYYY'),
         seriesColor: seriesColors[i],
       };
     });

@@ -25,7 +25,7 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
 
   const [ estRatio, setEstRatio ] = useState<any>(0);
   const [ estIncrease, setEstIncrease ] = useState<any>(0); 
-  const [inputValue, setInputValue] = useState<any>();
+  const [ inputValue, setInputValue ] = useState<any>();
   const [ depositDisabled, setDepositDisabled ] = useState<boolean>(false);
   const [ withdrawOpen, setWithdrawOpen ] = useState<boolean>(false);
 

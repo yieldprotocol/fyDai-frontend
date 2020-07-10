@@ -13,13 +13,13 @@ import YieldHeader from './components/YieldHeader';
 import YieldFooter from './components/YieldFooter';
 import YieldSidebar from './components/YieldSidebar';
 
-import ConnectLayer from './views/layers/ConnectLayer';
-import AccountLayer from './views/layers/AccountLayer';
-import NotifyLayer from './views/layers/NotifyLayer';
-import SeriesLayer from './views/layers/SeriesLayer';
+import ConnectLayer from './components/layers/ConnectLayer';
+import AccountLayer from './components/layers/AccountLayer';
+import NotifyLayer from './components/layers/NotifyLayer';
+import SeriesSelector from './components/SeriesSelector';
 
 // TODO: remove testLayer for prod
-import TestLayer from './views/layers/TestLayer';
+import TestLayer from './components/layers/TestLayer';
 
 import { IYieldSeries } from './types';
 
@@ -46,7 +46,7 @@ function App() {
         { showAccountLayer && <AccountLayer closeLayer={()=>setShowAccountLayer(false)} changeWallet={()=>changeConnection()} /> }
         { showConnectLayer && <ConnectLayer closeLayer={()=>setShowConnectLayer(false)} />}
         { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
-        { showSeriesLayer  && <SeriesLayer setActiveSeries={setActiveSeries} closeLayer={()=>setShowSeriesLayer(false)} /> }
+        { showSeriesLayer  && <SeriesSelector setActiveSeries={setActiveSeries} closeLayer={()=>setShowSeriesLayer(false)} /> }
 
         <Box direction="row" height={{ min: '100%' }}>
           <Box flex>

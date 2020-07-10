@@ -11,8 +11,8 @@ import { SeriesContext } from '../contexts/SeriesContext';
 import { IYieldSeries } from '../types';
 
 import DepositAction from '../components/DepositAction';
-import RepayAction from '../components/RepayAction';
 import BorrowAction from '../components/BorrowAction';
+import RepayAction from '../components/RepayAction';
 
 interface BorrowProps {
   setShowSeriesLayer? : any,
@@ -23,24 +23,16 @@ const Borrow = ({ setShowSeriesLayer, activeView: viewFromProp }:BorrowProps) =>
 
   const { state: yieldState, actions: yieldActions } = React.useContext(YieldContext);
   const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
-  // const [ nextColor, setNextColor ] = React.useState<string>('');
 
-  const [ activeView, setActiveView ] = React.useState<string>(viewFromProp || 'collateral');
+  const [ activeView, setActiveView ] = React.useState<string>(viewFromProp || 'borrow');
 
   const [ activePosition, setActivePosition ] = React.useState<any>(null);
   const [ borrowRepayActive, setBorrowRepayActive ] = React.useState<boolean>(true);
   const [ depositWithdrawActive, setDepositWithdrawActive ] = React.useState<boolean>(false);
 
-  const { isLoading: positionsLoading, seriesData, activeSeries } = seriesState; 
-  const { isLoading: yieldLoading, userData, deployedSeries, deployedContracts, yieldData, makerData }  = yieldState;
+  const { isLoading: positionsLoading, seriesData, activeSeries } = seriesState;
 
-  // React.useEffect( () => {
-  //   ( async () => {
-  //     !positionsLoading && await seriesActions.getSeriesPositions([activeSeries]);
-  //     seriesActions.setActivePosition(seriesData.get(activeSeries.symbol));
-  //   })();
-  //   console.log(seriesState);
-  // }, [ activeSeries ]);
+  const { isLoading: yieldLoading, userData, deployedSeries, deployedContracts, yieldData, makerData }  = yieldState;
 
   return (
 

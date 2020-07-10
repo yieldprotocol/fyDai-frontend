@@ -79,8 +79,6 @@ const SeriesProvider = ({ children }:any) => {
     const minSafeCollateral = minSafeCollatAmount(debtValue, BigNumber.from('150'));
     const daiAvailable = maxDai(collateralValue, debtValue, BigNumber.from('150'));
 
-    console.log(ethers.utils.formatEther(daiAvailable));
-
     return {
       numberOfSeries,
       // TODO: fix this duplicate 'easy access' data below from yieldState
@@ -95,10 +93,9 @@ const SeriesProvider = ({ children }:any) => {
       collateralRatio, collateralRatio_: parseFloat(collateralRatio.toString()),
 
       minSafeCollateral, minSafeCollateral_: parseFloat(ethers.utils.formatEther(minSafeCollateral)),
-
+      daiAvailable, daiAvailable_: parseFloat(ethers.utils.formatEther(daiAvailable)),
       // useful functions exported
       estimateRatio,
-
     };
   };
 
@@ -137,7 +134,7 @@ const SeriesProvider = ({ children }:any) => {
         }
       );
     });
-    console.log(positions);
+    // console.log(positions);
     return positions;
   };
 
@@ -158,7 +155,7 @@ const SeriesProvider = ({ children }:any) => {
       dispatch( { type:'updateTotals', payload: totals });
 
       /* if no active series, set it to the first entry of the map. */
-      !state.activeSeries && dispatch({ type:'setActiveSeries', payload: parsedData.entries().next().value });
+      !state.activeSeries && dispatch({ type:'setActiveSeries', payload: parsedData.entries().next().value[1] });
     } else {
       console.log('Positions already exist... force fetch if required');
     }
@@ -175,7 +172,7 @@ const SeriesProvider = ({ children }:any) => {
   const actions = {
     getSeriesPositions: (x:any[]) => loadSeriesPositions(x, false),
     refreshSeriesPositions: (x:any[]) => loadSeriesPositions(x, true),
-    setActiveSeries: (x:any[]) => dispatch({ type:'setActiveSeries', payload: x }),
+    setActiveSeries: (x:string) => dispatch({ type:'setActiveSeries', payload: x }),
   };
 
   return (

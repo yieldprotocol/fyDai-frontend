@@ -7,7 +7,7 @@ import { getNetworkName }  from '../../hooks/connectionHooks';
 import { YieldContext } from '../../contexts/YieldContext';
 import { ConnectionContext } from '../../contexts/ConnectionContext';
 
-import ProfileButton from '../../components/ProfileButton';
+import ProfileButton from '../ProfileButton';
 
 const AccountLayer = (props:any) => {
   const { closeLayer, changeWallet } = props;

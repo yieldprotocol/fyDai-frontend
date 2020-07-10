@@ -8,8 +8,12 @@ import {
   FiSettings as SettingsGear,
 } from 'react-icons/fi';
 
-import { IYieldSeries } from '../types';
-import ethLogo from '../assets/images/tokens/eth.svg';
+import SeriesSelector from './SeriesSelector';
+
+import { SeriesContext } from '../contexts/SeriesContext';
+import { YieldContext } from '../contexts/YieldContext';
+
+import { useDealer } from '../hooks';
 
 interface RepayActionProps {
   repayFn:any
@@ -22,71 +26,39 @@ interface RepayActionProps {
 
 function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
 
+  const { state: yieldState, actions: yieldActions } = React.useContext(YieldContext);
+  const { deployedContracts } = yieldState;
+  const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
+  const { isLoading: positionsLoading, seriesTotals, activeSeries, setActiveSeries } = seriesState;
+  const {
+    collateralAmount_,
+    collateralRatio_,
+    debtValue_,
+    estimateRatio, // TODO << this is a function (basically just passed from hooks via context) >> 
+  } = seriesTotals;
+
+  const { repay, repayActive }  = useDealer();
   const [inputValue, setInputValue] = React.useState<any>();
   const [repayDisabled, setRepayDisabled] = React.useState<boolean>(false);
+  const [ selectorOpen, setSelectorOpen ] = React.useState<boolean>(false);
 
-  const [repayType, setRepayType] = React.useState<string>('yDai');
+  const [ warningMsg, setWarningMsg] = React.useState<string|null>(null);
+  const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
+
+  const repayProcedure = async (value:number) => {
+    console.log(activeSeries);
+    await repay(deployedContracts.Dealer, 'WETH', activeSeries.maturity, value, 'yDai' );
+    // actions.updateUserData(state.deployedContracts, state.deployedContracts);
+    // actions.updateYieldBalances(state.deployedContracts);
+    // actions.updateSeriesData(state.deployedSeries);
+  };
 
   return (
-
-    <Box flex='grow' justify='between'>
-      <Box gap='medium' align='center' fill='horizontal'>
-        <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Choose a series</Text>
-        <Box
-          direction='row-responsive'
-          fill='horizontal'
-          gap='small'
-          align='center'
-        >
-          <Box 
-            round='medium'
-            background='brand-transparent'
-            direction='row'
-            fill='horizontal'
-            pad='small'
-            flex
-          >
-            {/* <Box width='15px' height='15px'>
-            <Image src={ethLogo} fit='contain' />
-          </Box> */}
-            <TextInput
-              type="number"
-              placeholder='December 2000 @ 3.54%'
-            // value={inputValue}
-            // disabled={depositDisabled}
-              plain
-            />
-          </Box>
-
-          <Box justify='center'>
-            <Box
-              round
-              onClick={()=>setInputValue(maxValue)}
-              hoverIndicator='brand-transparent'
-              border='all'
-            // border={{ color:'brand' }}
-              pad={{ horizontal:'small', vertical:'small' }}
-              justify='center'
-            >
-              <Text size='xsmall'>Change series</Text>
-            </Box>
-          </Box>
-        </Box>
-
-        <Box fill gap='small' pad={{ horizontal:'medium' }}>
-          <Box fill direction='row-responsive' justify='between'>
-            <Box gap='small'>
-              <Box direction='row' gap='small'>
-                <Text color='text-weak' size='xsmall'>Current Debt</Text>
-                <Help />
-              </Box>
-              <Text color='brand' weight='bold' size='large'> 12 Dai </Text>
-            </Box>
-          </Box>
-        </Box>
-
-        <Box fill gap='medium' margin={{ vertical:'large' }}>
-          <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to Repay</Text>
+    <>
+      {selectorOpen && <SeriesSelector close={()=>setSelectorOpen(false)} /> }
+      <Box flex='grow' justify='between'>
+        <Box gap='medium' align='center' fill='horizontal'>
+          <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Choose a series</Text>
           <Box
             direction='row-responsive'
             fill='horizontal'
@@ -97,55 +69,102 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
               round='medium'
               background='brand-transparent'
               direction='row'
-              fill='horizontal'
+              fill
               pad='small'
               flex
             >
-              <TextInput
-                type="number"
-                placeholder='Enter the amount of Dai to Repay'
-                value={inputValue}
-                disabled={repayDisabled}
-                plain
-                onChange={(event:any) => setInputValue(event.target.value)}
-              />
+              { activeSeries? activeSeries.displayName : 'Loading...' }
             </Box>
 
             <Box justify='center'>
               <Box
                 round
-                onClick={()=>setInputValue(maxValue)}
+                onClick={()=>setSelectorOpen(true)}
                 hoverIndicator='brand-transparent'
                 border='all'
-              // border={{ color:'brand' }}
+            // border={{ color:'brand' }}
                 pad={{ horizontal:'small', vertical:'small' }}
                 justify='center'
               >
-                <Text size='xsmall'>Use max</Text>
+                <Text size='xsmall'>Change series</Text>
               </Box>
             </Box>
           </Box>
 
-        </Box>
+          <Box fill gap='small' pad={{ horizontal:'medium' }}>
+            <Box fill direction='row-responsive' justify='between'>
+              <Box gap='small'>
+                <Box direction='row' gap='small'>
+                  <Text color='text-weak' size='xsmall'>Current Debt</Text>
+                  <Help />
+                </Box>
+                <Text color='brand' weight='bold' size='large'> 12 Dai </Text>
+              </Box>
+            </Box>
+          </Box>
 
-        <Box
-          fill='horizontal'
-          round='medium'
-          background={( !(inputValue>0) || repayDisabled) ? 'brand-transparent' : 'brand'}
-          onClick={(!(inputValue>0) || repayDisabled)? ()=>{}:()=>repayFn(inputValue, repayType)}
-          align='center'
-          pad='medium'
-        >
-          <Text 
-            weight='bold'
-            size='large'
-            color={( !(inputValue>0) || repayDisabled) ? 'text-weak' : 'text'}
+          <Box fill gap='medium' margin={{ vertical:'large' }}>
+            <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to Repay</Text>
+            <Box
+              direction='row-responsive'
+              fill='horizontal'
+              gap='small'
+              align='center'
+            >
+              <Box 
+                round='medium'
+                background='brand-transparent'
+                direction='row'
+                fill='horizontal'
+                pad='small'
+                flex
+              >
+                <TextInput
+                  type="number"
+                  placeholder='Enter the amount of Dai to Repay'
+                  value={inputValue}
+                  disabled={repayDisabled}
+                  plain
+                  onChange={(event:any) => setInputValue(event.target.value)}
+                />
+              </Box>
+
+              <Box justify='center'>
+                <Box
+                  round
+                  onClick={()=>setInputValue(maxValue)}
+                  hoverIndicator='brand-transparent'
+                  border='all'
+              // border={{ color:'brand' }}
+                  pad={{ horizontal:'small', vertical:'small' }}
+                  justify='center'
+                >
+                  <Text size='xsmall'>Use max</Text>
+                </Box>
+              </Box>
+            </Box>
+
+          </Box>
+
+          <Box
+            fill='horizontal'
+            round='medium'
+            background={( !(inputValue>0) || repayDisabled) ? 'brand-transparent' : 'brand'}
+            onClick={(!(inputValue>0) || repayDisabled)? ()=>{}:()=>repayProcedure(inputValue)}
+            align='center'
+            pad='medium'
           >
-            {`Repay ${inputValue || ''} ${repayType}`}
-          </Text>
+            <Text 
+              weight='bold'
+              size='large'
+              color={( !(inputValue>0) || repayDisabled) ? 'text-weak' : 'text'}
+            >
+              {`Repay ${inputValue || ''} Dai`}
+            </Text>
+          </Box>
         </Box>
       </Box>
-    </Box>
+    </>
   );
 }
 
