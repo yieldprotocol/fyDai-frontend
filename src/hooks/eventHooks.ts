@@ -107,8 +107,6 @@ export const useEvents = () => {
     })
     );
 
-    console.log( await parsedList);
-
     return parsedList;
 
   };

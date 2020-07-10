@@ -250,10 +250,10 @@ const YieldProvider = ({ children }:any) => {
 
     /* get balances and posted collateral */
     _userData.ethBalance = await getEthBalance();
-    _userData.ethPosted = await callTx(deployedContracts.Dealer, 'Dealer', 'posted', [utils.WETH, account]);
+    _userData.ethPosted = await callTx(deployedContracts.Dealer, 'Dealer', 'posted', [utils.ETH, account]);
 
-    // _userData.ethTotalDebtYDai = await callTx(deployedContracts.Dealer, 'Dealer', 'totalDebtYDai', [utils.WETH, account]);
-    _userData.urn = await callTx(deployedContracts.Vat, 'Vat', 'urns', [ethers.utils.formatBytes32String('ETH-A'), account ]);
+    // _userData.ethTotalDebtYDai = await callTx(deployedContracts.Dealer, 'Dealer', 'totalDebtYDai', [utils.ETH-A, account]);
+    _userData.urn = await callTx(deployedContracts.Vat, 'Vat', 'urns', [utils.ETH, account ]);
 
     /* get transaction history (from cache first or rebuild if update forced) */
     forceUpdate && window.localStorage.removeItem('txHistory') && console.log('Re-building txHistory...');
@@ -349,6 +349,8 @@ const YieldProvider = ({ children }:any) => {
     /* 4. Fetch any user account data based on address (if any), possibly cached. */
     const userData = account ? await _getUserData(deployedContracts, false): { ethBalance_: 0 };
     dispatch({ type:'updateUserData', payload: userData });
+
+    console.log(userData);
 
     dispatch({ type:'isLoading', payload: false });
   };

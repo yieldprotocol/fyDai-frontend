@@ -47,7 +47,7 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
 
   const repayProcedure = async (value:number) => {
     console.log(activeSeries);
-    await repay(deployedContracts.Dealer, 'WETH', activeSeries.maturity, value, 'yDai' );
+    await repay(deployedContracts.Dealer, 'ETH-A', activeSeries.maturity, value, 'yDai' );
     // actions.updateUserData(state.deployedContracts, state.deployedContracts);
     // actions.updateYieldBalances(state.deployedContracts);
     // actions.updateSeriesData(state.deployedSeries);

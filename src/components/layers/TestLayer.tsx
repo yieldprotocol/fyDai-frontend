@@ -26,7 +26,7 @@ const TestLayer = (props:any) => {
   // const web3 = useWeb3React();
   const { state: yieldState, actions: yieldActions } = React.useContext( YieldContext );
   const { state: seriesState, actions: seriesActions } = React.useContext( SeriesContext );
-  const [ flow, setFlow ] = React.useState<string|null>('WETH');
+  const [ flow, setFlow ] = React.useState<string|null>('ETH-A');
 
   const { seriesData } = seriesState;
   const { yieldData, deployedContracts, deployedSeries, userData } = yieldState;
@@ -152,7 +152,7 @@ const TestLayer = (props:any) => {
             <Text size='xsmall'>{ weiBalance }</Text>
           </Box> */}
             {/* <Box direction='row' gap='small'>
-              <Text size='xsmall'>WETH balance:</Text>
+              <Text size='xsmall'>ETH-A balance:</Text>
               <Text size='xsmall'>{ extBalances.wethBalance_ || '' }</Text>
             </Box>
 
@@ -188,12 +188,12 @@ const TestLayer = (props:any) => {
             margin='small'
           >
             <Box direction='row'>
-              <Button primary={flow==='WETH'} label='WETH flow' onClick={()=>setFlow('WETH')} style={{ borderRadius:'24px 0px 0px 24px' }} />
+              <Button primary={flow==='ETH-A'} label='ETH-A flow' onClick={()=>setFlow('ETH-A')} style={{ borderRadius:'24px 0px 0px 24px' }} />
               <Button primary={flow==='CHAI'} label='CHAI flow' onClick={()=>setFlow('CHAI')} style={{ borderRadius:'0px 0px 0px 0px' }} />
               <Button primary={flow==='MATURITY'} label='Maturity' onClick={()=>setFlow('MATURITY')} style={{ borderRadius:'0px 24px 24px 0px' }} />
             </Box>
 
-            { flow === 'WETH' && 
+            { flow === 'ETH-A' && 
             <Box gap='small'>
 
               New ETH direct deposit/withdraw: 
@@ -201,17 +201,17 @@ const TestLayer = (props:any) => {
               <Button label='(addProxy once-off) ' onClick={()=> sendTx(deployedContracts.Dealer, 'Dealer', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />
               <Button label='(Withdraw ETH 1.5)' onClick={()=> withdrawEth(deployedContracts.EthProxy, 1.5 )} />
 
-              get WETH: 
+              get ETH-A: 
               {/* <Button label='useNotify_info' onClick={()=>dispatch( { type: 'notify', payload: { message:'Something is happening!.. ', type:'info', showFor:500 } } )} /> */}
               <Button label='1. wrap 10 eth to weth' onClick={()=> sendTx(deployedContracts.Weth, 'Weth', 'deposit', [], utils.toWei('10'))} />
-              WETH deposit and borrow: 
+              ETH-A deposit and borrow: 
               <Button label='2. Weth approve YieldDealer for 1.5' onClick={()=> approveDealer(deployedContracts.Weth, deployedContracts.Dealer, 1.5 )} />
-              <Button label='3. Post Collateral 1.5' disabled={postActive} onClick={()=> post(deployedContracts.Dealer, 'WETH', 1.5)} />
-              <Button label='(4. Withdraw 1.5)' onClick={()=> withdraw(deployedContracts.Dealer, 'WETH', 1.5 )} />
-              <Button label='5.Borrow 0.5' onClick={()=> borrow(deployedContracts.Dealer, 'WETH', yieldState.deployedSeries[0].maturity, 0.5 )} />
-              WETH repay:
-              <Button label='6.1 Repay 0.5 eth/weth debt in yDai' onClick={()=> repay(deployedContracts.Dealer, 'WETH', yieldState.deployedSeries[0].maturity, 0.5, 'YDAI' )} />
-              <Button label='( 6.2 Repay 0.5 eth/weth debt in Dai) ' onClick={()=> repay(deployedContracts.Dealer, 'WETH', yieldState.deployedSeries[0].maturity, 0.5, 'DAI' )} />
+              <Button label='3. Post Collateral 1.5' disabled={postActive} onClick={()=> post(deployedContracts.Dealer, 'ETH-A', 1.5)} />
+              <Button label='(4. Withdraw 1.5)' onClick={()=> withdraw(deployedContracts.Dealer, 'ETH-A', 1.5 )} />
+              <Button label='5.Borrow 0.5' onClick={()=> borrow(deployedContracts.Dealer, 'ETH-A', yieldState.deployedSeries[0].maturity, 0.5 )} />
+              ETH-A repay:
+              <Button label='6.1 Repay 0.5 eth/weth debt in yDai' onClick={()=> repay(deployedContracts.Dealer, 'ETH-A', yieldState.deployedSeries[0].maturity, 0.5, 'YDAI' )} />
+              <Button label='( 6.2 Repay 0.5 eth/weth debt in Dai) ' onClick={()=> repay(deployedContracts.Dealer, 'ETH-A', yieldState.deployedSeries[0].maturity, 0.5, 'DAI' )} />
             </Box>}
 
             { flow === 'CHAI' && 

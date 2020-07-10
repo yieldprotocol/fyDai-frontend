@@ -22,14 +22,14 @@ const BorrowRepay = ({ active, activeSeries }:any) => {
   }  = useDealer();
 
   const borrowSteps = async (value:number) => {
-    await borrow(deployedContracts.Dealer, 'WETH', activeSeries.maturity, value );
+    await borrow(deployedContracts.Dealer, 'ETH-A', activeSeries.maturity, value );
     actions.updateUserData(state.deployedContracts, state.deployedContracts);
     actions.updateSeriesData(state.deployedSeries);
   };
 
   const repaySteps = async (value:number, collateral:string) => {
     console.log(activeSeries);
-    await repay(deployedContracts.Dealer, 'WETH', activeSeries.maturity, value, collateral );
+    await repay(deployedContracts.Dealer, 'ETH-A', activeSeries.maturity, value, collateral );
     actions.updateUserData(state.deployedContracts, state.deployedContracts);
     // actions.updateYieldBalances(state.deployedContracts);
     actions.updateSeriesData(state.deployedSeries);

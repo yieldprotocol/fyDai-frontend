@@ -4,11 +4,10 @@ export const BN_RAY = BigNumber.from('1000000000000000000000000000');
 export const N_RAY = '1000000000000000000000000000';
 export const WAD = BigNumber.from('1000000000000000000');
 export const RAY = BigNumber.from('1000000000000000000000000000');
-
 export const RAD = BigNumber.from('10000000000000000000000000000000000000000');
 export const SECONDS_PER_YEAR = 365 * 24 * 60 * 60;
 
-export const WETH = ethers.utils.formatBytes32String('WETH');
+export const ETH = ethers.utils.formatBytes32String('ETH-A');
 export const CHAI = ethers.utils.formatBytes32String('CHAI');
 
 // / @dev Converts a number to WAD precision, for number up to 10 decimal places
@@ -64,5 +63,3 @@ export const rayToHuman = (x:any) => {
   // const unit = BigNumber.from('10').pow(BigNumber.from('27'));
   return BigNumber.from(x).div(RAY).toString();
 };
-
-// Yield Math type utils NB: EARLY STAGES

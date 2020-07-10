@@ -50,13 +50,13 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
 
   const borrowProcedure = async (value:number) => {
-    await borrow(deployedContracts.Dealer, 'WETH', activeSeries.maturity, value );
+    await borrow(deployedContracts.Dealer, 'ETH-A', activeSeries.maturity, value );
     // actions.updateUserData(state.deployedContracts, state.deployedContracts);
     // actions.updateSeriesData(state.deployedSeries);
   };
 
   useEffect(()=>{
-    if (estRatio <= 150) {
+    if (estRatio && estRatio <= 150) {
       setBorrowDisabled(true);
       setIndicatorColor('red');
       setWarningMsg(null);

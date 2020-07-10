@@ -105,7 +105,7 @@ const SeriesProvider = ({ children }:any) => {
       deployedSeries.map( async (x:any, i:number) => {
         chainData.push(x);
         try {
-          chainData[i].wethDebtYDai = account ? await callTx(deployedContracts.Dealer, 'Dealer', 'debtYDai', [utils.WETH, x.maturity, account]): '0';
+          chainData[i].wethDebtYDai = account ? await callTx(deployedContracts.Dealer, 'Dealer', 'debtYDai', [utils.ETH, x.maturity, account]): '0';
           chainData[i].wethDebtDai = utils.mulRay( chainData[i].wethDebtYDai, feedData.amm.rates[x.maturity] || BigNumber.from('0'));
           // chainData[i].chaiDebtDai = await callTx(deployedContracts.Dealer, 'Dealer', 'debtDai', [utils.CHAI, x.maturity, account]);
           // chainData[i].chaiDebtYDai = await callTx(deployedContracts.Dealer, 'Dealer', 'debtYDai', [utils.CHAI, x.maturity, account]);

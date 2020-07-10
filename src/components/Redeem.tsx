@@ -38,11 +38,11 @@ const Redeem = ({ activeSeries }:any) => {
 
   // const depositSteps = async (value:number) => {
   //   await approveDealer(deployedContracts.Weth, deployedContracts.Dealer, value);
-  //   await post(deployedContracts.Dealer, 'WETH', value);
+  //   await post(deployedContracts.Dealer, 'ETH-A', value);
   // };
 
   // const withdrawSteps = async (value:number) => {
-  //   await withdraw(deployedContracts.Dealer, 'WETH', value);
+  //   await withdraw(deployedContracts.Dealer, 'ETH-A', value);
   // };
 
   return (
