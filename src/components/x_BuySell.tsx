@@ -1,8 +1,8 @@
 import React from 'react';
 import { Box, Button, Heading, TextInput, Text } from 'grommet';
 
-import SellAction from './SellAction';
-import BuyAction from './BuyAction';
+import SellAction from './x_SellAction';
+import BuyAction from './x_BuyAction';
 
 const BuySell = ({ activeSeries }:any) => {
   

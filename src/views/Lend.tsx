@@ -7,8 +7,9 @@ import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { IYieldSeries } from '../types';
 
-import BuySell from '../components/BuySell';
+import BuySell from '../components/x_BuySell';
 import Redeem from '../components/Redeem';
+import LendAction from '../components/LendAction';
 
 interface LendProps {
   setShowSeriesLayer: any,
@@ -63,41 +64,6 @@ const Lend = ({ setShowSeriesLayer, activeView: viewFromProp  }:LendProps) => {
         </Box>
       </Box>
 
-      <Box direction='row' pad={{ bottom :'large' }} alignSelf='center' width={{ max:'640px' }}>
-        <Box round='xsmall' direction='row' background='brand-transparent' pad='xxsmall' gap='small'>
-          <Box 
-            round='xsmall'
-            pad={{ horizontal:'large', vertical:'xxsmall' }}
-            background={(activeView === 'collateral')? 'background-front' : undefined}
-            elevation={(activeView === 'collateral')? 'small' : undefined}
-            onClick={()=>setActiveView('collateral')}
-            direction='row'
-            justify='between'
-            gap='small'
-          >
-            <Text size='xsmall' weight='bold'> 1. Add Collateral </Text>
-          </Box>
-          <Box 
-            round='xsmall'
-            pad={{ horizontal:'large', vertical:'xxsmall' }}
-            background={(activeView === 'borrow')? 'background-front' : undefined}
-            elevation={(activeView === 'borrow')? 'small' : undefined}
-            onClick={()=>setActiveView('borrow')}
-          >
-            <Text size='xsmall' weight='bold'> 2. Borrow </Text>
-          </Box>
-          <Box 
-            round='xsmall'
-            pad={{ horizontal:'large', vertical:'xxsmall' }}
-            background={(activeView === 'repay') ? 'background-front' : undefined}
-            elevation={(activeView === 'repay')? 'small' : undefined}
-            onClick={()=>setActiveView('repay')}
-          >
-            <Text size='xsmall' weight='bold'> Repay </Text>
-          </Box>
-        </Box>
-      </Box>
-
       <Box 
         width={{ max:'750px' }}
         alignSelf='center'
@@ -106,8 +72,7 @@ const Lend = ({ setShowSeriesLayer, activeView: viewFromProp  }:LendProps) => {
         round='small'
         pad='large'
       >
-        { activeView === 'collateral' && <BuySell activeSeries={activeSeries} active={depositWithdrawActive} /> }
-        { activeView === 'borrow' && <Redeem activeSeries={activeSeries} /> }
+        <LendAction maxValue={12} borrowFn={(x:any)=>console.log(x) } />
       </Box>
     </Box>
 
