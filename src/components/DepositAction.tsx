@@ -32,10 +32,10 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
 
-  const { state: yieldState } = useContext(YieldContext);
+  const { state: yieldState, actions: yieldActions } = useContext(YieldContext);
   const { deployedContracts } = yieldState;
 
-  const { state: seriesState } = useContext(SeriesContext);
+  const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { userData: { ethBalance_ } } = yieldState;
   const { seriesTotals } = seriesState;
   const {
@@ -49,8 +49,9 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
 
   const depositProcedure = async (value:number) => {
     await postEth(deployedContracts.EthProxy, value);
-    // actions.updateUserData(state.deployedContracts, state.deployedContracts);
-    // actions.updateYieldBalances(state.deployedContracts);
+    yieldActions.updateUserData(yieldState.deployedContracts, yieldState.deployedContracts);
+    yieldActions.updateYieldBalances(yieldState.deployedContracts);
+    seriesActions.updateCalculations();
   };
 
   useEffect(()=>{

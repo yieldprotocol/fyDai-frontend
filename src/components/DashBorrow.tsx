@@ -27,59 +27,25 @@ const DashBorrow = ({ }:DashBorrowProps) => {
 
   const { state: { deployedSeries, deployedContracts, yieldData, userData }, actions } = React.useContext(YieldContext);
 
+  const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
+  const { isLoading, seriesTotals, activeSeries } = seriesState;
+  const {
+    daiAvailable_,
+    // estimateRatio,
+    debtValue_,
+    collateralValue_,
+    collateralAmount_,
+    collateralRatio_,
+  } = seriesTotals;
+
   const txHistory = userData?.txHistory?.items || [];
   const txHistory_ = txHistory.filter((x:any) => x.event==='Borrowed' ).map((x:any) => {
-
-    const eventType = x.args_[3]>0 ? 'Borrow' : 'Repay';
-    // const series = deployedSeries.get(x.args_[2]);
-    const eventName = `${eventType} `;
-    const date = moment(x.date_).format('D MMM YYYY');
-    const amount = ethers.utils.formatEther( x.args_[3] );
-
-    return { eventType, date, amount };
+    return {
+      event: x.args_[3]>0 ? 'Borrow' : 'Repay',
+      date: moment(x.date_).format('D MMM YYYY'),
+      amount: ethers.utils.formatEther( x.args_[3] ),
+    };
   });
-
-  // const data = React.useMemo(
-  //   () => [
-  //     {
-  //       label: 'Series 1',
-  //       data: [
-  //         [0, 0.95],
-  //         [1, 0.96],
-  //         [2, 0.97],
-  //         [3, 0.98],
-  //         [4, 0.99],
-  //         [5, 1],
-  //       ],
-  //     },
-  //     {
-  //       label: 'Series 2',
-  //       data: [
-  //         [0, 0.89],
-  //         [1, 0.90],
-  //         [2, 0.91],
-  //         [3, 0.92],
-  //         [4, 0.93],
-  //         [5, 0.94],
-  //         [6, 0.95],
-  //         [7, 0.96],
-  //         [8, 0.97],
-  //         [9, 0.98],
-  //         [10, 0.99],
-  //         [11, 1],
-  //       ],
-  //     },
-  //   ],
-  //   []
-  // );
-
-  // const axes = React.useMemo(
-  //   () => [
-  //     { primary: true, type: 'time', position: 'bottom' },
-  //     { type: 'linear', position: 'left' },
-  //   ],
-  //   []
-  // );
 
   return (
     <Box gap='small'>
@@ -100,12 +66,12 @@ const DashBorrow = ({ }:DashBorrowProps) => {
         >
           <Box gap='small'>
             <Text color='text-weak' size='xxsmall'> Collateral </Text>
-            <Text color='brand' weight='bold' size='large'> 23 Eth </Text>
+            <Text color='brand' weight='bold' size='large'> { collateralAmount_? `${collateralAmount_} Eth`: '' }</Text>
           </Box>
 
           <Box gap='small'>
             <Text color='text-weak' size='xxsmall'> Collateralisation </Text>
-            <Text color='brand' weight='bold' size='large'> 123% </Text>
+            <Text color='brand' weight='bold' size='large'> { collateralRatio_? `${collateralRatio_} %`: '' } </Text>
           </Box>
           {!addCollateral? <PlusCircle size='25' color='brand' onClick={()=>setAddCollateral(!addCollateral)} />
             :
@@ -122,7 +88,11 @@ const DashBorrow = ({ }:DashBorrowProps) => {
           border
 
         >
-          BORROW col2
+          <Box gap='small'>
+            <Text color='text-weak' size='xxsmall'> Current Total Debt Value </Text>
+            <Text color='brand' weight='bold' size='large'> { debtValue_? ` approx. ${debtValue_.toFixed(2)}`: '' }</Text>
+          </Box>
+
         </Box>
         {!addCollateral &&
         <Box
@@ -212,6 +182,7 @@ const DashBorrow = ({ }:DashBorrowProps) => {
                   <Box> ACTION A </Box>
                 </Box>
               );
+              
             }):
             <Box>
               Loading history...

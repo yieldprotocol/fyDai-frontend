@@ -24,7 +24,7 @@ const Borrow = ({ setShowSeriesLayer, activeView: viewFromProp }:BorrowProps) =>
   const { state: yieldState, actions: yieldActions } = React.useContext(YieldContext);
   const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
 
-  const [ activeView, setActiveView ] = React.useState<string>(viewFromProp || 'borrow');
+  const [ activeView, setActiveView ] = React.useState<string>(viewFromProp || 'collateral');
 
   const [ activePosition, setActivePosition ] = React.useState<any>(null);
   const [ borrowRepayActive, setBorrowRepayActive ] = React.useState<boolean>(true);

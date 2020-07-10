@@ -31,7 +31,7 @@ const WithdrawAction = ({ close }:IWithDrawActionProps) => {
   const { state: yieldState } = useContext(YieldContext);
   const { deployedContracts } = yieldState;
 
-  const { state: seriesState } = useContext(SeriesContext);
+  const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { userData: { ethBalance_ } } = yieldState;
   const { seriesTotals } = seriesState;
   const {
@@ -46,6 +46,7 @@ const WithdrawAction = ({ close }:IWithDrawActionProps) => {
 
   const withdrawProcedure = async (value:number) => {
     await withdrawEth(deployedContracts.EthProxy, value);
+    seriesActions.updateCalculations();
     // actions.updateUserData(state.deployedContracts, state.deployedContracts);
     // actions.updateYieldBalances(state.deployedContracts);
   };

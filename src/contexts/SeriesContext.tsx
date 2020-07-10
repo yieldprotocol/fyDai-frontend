@@ -62,6 +62,7 @@ const SeriesProvider = ({ children }:any) => {
   const { deployedContracts, feedData } = yieldState;
 
   const calculateSeriesTotals = () => {
+
     const numberOfSeries = state.seriesData.size;
     const collateralAmount = collAmount();
     const collateralValue = collValue();
@@ -165,14 +166,15 @@ const SeriesProvider = ({ children }:any) => {
     ( async () => {
       // account && chainId && !yieldState?.isLoading && loadSeriesPositions([yieldState.deployedSeries[0]], false); 
       account && chainId && !yieldState?.isLoading && await loadSeriesPositions(yieldState.deployedSeries, false);
-
     })();
+
   }, [ account, chainId, yieldState ]);
 
   const actions = {
     getSeriesPositions: (x:any[]) => loadSeriesPositions(x, false),
     refreshSeriesPositions: (x:any[]) => loadSeriesPositions(x, true),
     setActiveSeries: (x:string) => dispatch({ type:'setActiveSeries', payload: x }),
+    updateCalculations: () => dispatch( { type:'updateTotals', payload: calculateSeriesTotals() }),
   };
 
   return (

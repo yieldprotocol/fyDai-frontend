@@ -48,9 +48,10 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
   const repayProcedure = async (value:number) => {
     console.log(activeSeries);
     await repay(deployedContracts.Dealer, 'ETH-A', activeSeries.maturity, value, 'yDai' );
-    // actions.updateUserData(state.deployedContracts, state.deployedContracts);
-    // actions.updateYieldBalances(state.deployedContracts);
-    // actions.updateSeriesData(state.deployedSeries);
+    yieldActions.updateUserData(seriesState.deployedContracts, seriesState.deployedContracts);
+    yieldActions.updateYieldBalances(seriesState.deployedContracts);
+    yieldActions.updateSeriesData(seriesState.deployedSeries);
+    seriesActions.updateCalculations();
   };
 
   return (
@@ -98,7 +99,7 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
                   <Text color='text-weak' size='xsmall'>Current Debt</Text>
                   <Help />
                 </Box>
-                <Text color='brand' weight='bold' size='large'> 12 Dai </Text>
+                <Text color='brand' weight='bold' size='large'> {activeSeries && `${activeSeries.wethDebtDai_.toFixed(2)} Dai`}  </Text>
               </Box>
             </Box>
           </Box>
@@ -132,14 +133,14 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
               <Box justify='center'>
                 <Box
                   round
-                  onClick={()=>setInputValue(maxValue)}
+                  onClick={()=>setInputValue(activeSeries.wethDebtDai_)}
                   hoverIndicator='brand-transparent'
                   border='all'
               // border={{ color:'brand' }}
                   pad={{ horizontal:'small', vertical:'small' }}
                   justify='center'
                 >
-                  <Text size='xsmall'>Use max</Text>
+                  <Text size='xsmall'>Repay max</Text>
                 </Box>
               </Box>
             </Box>

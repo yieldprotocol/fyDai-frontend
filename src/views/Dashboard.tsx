@@ -1,17 +1,12 @@
 import React from 'react';
 import { Box, Button, Image, Heading, Text } from 'grommet';
 
-import logoLight from '../assets/images/logo_light.svg';
-import { useMaker } from '../hooks/makerHooks';
-
 import DashBorrow from '../components/DashBorrow';
 import DashLend from '../components/DashLend';
 
 const Dashboard = () => {
 
-  const { getVaults, openNewVault } = useMaker();
-
-  const [activeView, setActiveView] = React.useState<string>('lend');
+  const [activeView, setActiveView] = React.useState<string>('borrow');
 
   return (
     <Box gap='small' pad={{ vertical:'large', horizontal:'small' }} fill='horizontal' justify='between'>

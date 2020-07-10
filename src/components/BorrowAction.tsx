@@ -46,15 +46,15 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   const [ estChange, setEstChange ] = React.useState<any>(0);
   const [ estAtMaturity, setEstAtMaturity ] = React.useState<number>(0);
 
-
   const [ indicatorColor, setIndicatorColor ] = React.useState<string>('brand');
   const [ warningMsg, setWarningMsg] = React.useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
 
   const borrowProcedure = async (value:number) => {
     await borrow(deployedContracts.Dealer, 'ETH-A', activeSeries.maturity, value );
-    // actions.updateUserData(state.deployedContracts, state.deployedContracts);
-    // actions.updateSeriesData(state.deployedSeries);
+    yieldActions.updateUserData(yieldState.deployedContracts, yieldState.deployedContracts);
+    yieldActions.updateSeriesData(yieldState.deployedSeries);
+    seriesActions.updateCalculations();
   };
 
   useEffect(()=>{
