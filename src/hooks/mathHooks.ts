@@ -15,7 +15,7 @@ export const useMath = () => {
 
   const { state: { feedData, userData } } = React.useContext(YieldContext);
   const { ilks, amm } = feedData;
-  const { ethPosted }= userData;
+  const ethPosted = userData?.ethPosted || BigNumber.from('0');
 
   /**
    * Calculates the amount of collateral posted
@@ -33,7 +33,7 @@ export const useMath = () => {
     // TODO: update this to use ETH-A Oracle - not ilks.spot for market price USD
     // return collatAmount().mul(ilks.spot);
     // return collatAmount().mul(utils.toRay(200));
-    return BigNumber.from('216');
+    return BigNumber.from('214');
   };
 
   /**
@@ -80,7 +80,7 @@ export const useMath = () => {
    * @param {number} _debtValue value of dai debt (in USD)
    * @returns {number}
    */
-  const estimateRatio = (_collateralAmount:Number, _debtValue:Number) => {
+  const estimateCollRatio = (_collateralAmount:Number, _debtValue:Number) => {
     if (!_collateralAmount || _debtValue === 0 ) {
       // TODO handle this better
       return undefined;
@@ -165,6 +165,6 @@ export const useMath = () => {
     return (utils.divRay(utils.toWei(1), _currentPrice)).sub(utils.toWei(1));
   };
 
-  return { collAmount, collValue, yieldRate, debtVal, collRatio, estimateRatio, minSafeCollatAmount, maxDai } as const;
+  return { collAmount, collValue, yieldRate, debtVal, collRatio, estimateCollRatio, minSafeCollatAmount, maxDai } as const;
 
 };

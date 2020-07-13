@@ -4,6 +4,7 @@ import Moment from 'moment';
 // import { useWeb3React } from '@web3-react/core';
 
 import * as utils from '../utils';
+
 import { IYieldSeries, IUser } from '../types';
 import { NotifyContext } from './NotifyContext';
 import { ConnectionContext } from './ConnectionContext';
@@ -47,11 +48,6 @@ function reducer(state:any, action:any) {
         ...state,
         txHistory: action.payload,
       };
-    case 'updateMakerData': 
-      return {
-        ...state,
-        makerData: action.payload,
-      };
     case 'isLoading':
       return { 
         ...state,
@@ -62,69 +58,73 @@ function reducer(state:any, action:any) {
   }
 }
 
+const initState = {
+  isLoading: true,
+  // cachable
+  migrationsAddr: '0xAC172aca69D11D28DFaadbdEa57B01f697b34158', // testnets: '0x5632d2e2AEdf760F13d0531B18A39782ce9c814F'
+  deployedSeries : [],
+  deployedContracts: {},
+  // transient
+  feedData: { 
+    ilks:{
+      EthA: {
+        rate: null, // localStorage.getItem(feedData.ilks.EthA.rate)
+        spot: null, // localStorage.getItem(feedData.ilks.EthA.spot)
+      },
+    },
+    urns: {},
+    // AMM rates mocked for now.
+    amm:{
+      rates: {
+        1601510399: utils.toRay(0.98),
+        1609459199: utils.toRay(0.96),
+        1617235199: utils.toRay(0.93),
+        1625097599: utils.toRay(0.89)
+      },
+    }
+  },
+  yieldData: {},
+  // user centric
+  userData: {},
+  txHistory:{},
+};
+
 const YieldProvider = ({ children }:any) => {
 
-  const initState = {
-    isLoading: true,
-
-    // cachable
-    migrationsAddr: '0xAC172aca69D11D28DFaadbdEa57B01f697b34158',
-    deployedSeries : [],
-    deployedContracts: {},
-
-    // transient
-    feedData: { 
-      ilks:{
-        EthA: {
-          rate: null, // localStorage.getItem(feedData.ilks.EthA.rate)
-          spot: null, // localStorage.getItem(feedData.ilks.EthA.spot)
-        },
-      },
-      urns: {},
-      // AMM rates mocked for now.
-      amm:{
-        rates: {
-          1601510399: utils.toRay(0.99),
-          1609459199: utils.toRay(0.98),
-          1617235199: utils.toRay(0.96),
-          1625097599: utils.toRay(0.93)
-        },
-      }
-    },
-    yieldData: {},
-
-    // user and tx
-    userData: {},
-    txHistory:{},
-  };
-
   const [ state, dispatch ] = React.useReducer(reducer, initState);
-  const { dispatch: notifyDispatch } = React.useContext(NotifyContext);
   const { state: { account, chainId, provider } } = React.useContext(ConnectionContext);
-  // const { account, chainId } = useWeb3React();
+  const { dispatch: notifyDispatch } = React.useContext(NotifyContext);
 
   /* cache|localStorage declarations */
   const [ cachedContracts, setCachedContracts ] = useCachedState('deployedContracts', null);
   const [ cachedSeries, setCachedSeries ] = useCachedState('deployedSeries', null);
   const [ cachedFeed, setCachedFeed ] = useCachedState('lastFeed', null);
-  // TODO: maybe move this to a separate AppContext?
-  const [ userPreferences, setUserPreferences ] = useCachedState('userPreferences', null);
-  const [ txHistory, setTxHistory] = useCachedState('txHistory', null);
 
+  const [ txHistory, setTxHistory] = useCachedState('txHistory', null);
+  const [ userPreferences, setUserPreferences ] = useCachedState('userPreferences', null);
+
+  /* hook declarations */
   const [ callTx ] = useCallTx();
   const { getEventHistory, addEventListener, parseEventList } = useEvents();
   const { getEthBalance, getTokenBalance }  = useBalances();
 
-  // async get all public yield addresses from localStorage/chain
-  const _getYieldAddrs = async (networkId:number|string, forceUpdate:boolean): Promise<any[]> => {
+  /* internal fn: async get all public Yield addresses from localStorage (or chain if no cache) */
+  const _getProtocolAddrs = async (networkId:number|string, forceUpdate:boolean): Promise<any[]> => {
+
     const _deployedSeries:any[] = [];
     let _deployedContracts:any;
-
-    const contractGroups = { 
-      // coreList: ['Dealer', 'Treasury'],
-      // externalList: ['Chai', 'Dai', 'WethJoin', 'Vat', 'Weth', 'Jug', 'Pot', 'GasToken', 'End', 'DaiJoin' ],
-      // peripheralList: ['EthProxy', 'Liquidations', 'Unwind'],
-      contractList: ['Dealer', 'Treasury', 'Chai', 'Dai', 'WethJoin', 'Vat', 'Weth', 'EthProxy', 'Liquidations']
+    const contractGroups = {
+      contractList: [
+        'Dealer',
+        'Treasury',
+        'Chai',
+        'Dai',
+        'WethJoin',
+        'Vat',
+        'Weth',
+        'EthProxy',
+        'Liquidations'
+      ]
     };
 
     try {
@@ -149,6 +149,7 @@ const YieldProvider = ({ children }:any) => {
               _deployedSeries.push(doc.data());
             });
           }); */
+
         // TODO: better implementation of iterating through series (possibly a list length from contracts function?)
         const _seriesList = await Promise.all(
           [0, 1, 2, 3].map(async (x:number)=>{
@@ -156,12 +157,17 @@ const YieldProvider = ({ children }:any) => {
           })
         );
         await Promise.all(
-          _seriesList.map(async (x:string)=>{
+          _seriesList.map(async (x:string, i:number)=>{
+            const name = await callTx(x, 'YDai', 'name', []);
+            const maturity = (await callTx(x, 'YDai', 'maturity', [])).toNumber();
             return { 
               yDai: x,
-              name: await callTx(x, 'YDai', 'name', []),
-              maturity: (await callTx(x, 'YDai', 'maturity', [])).toNumber(),
-              symbol: await callTx(x, 'YDai', 'symbol', []),
+              name,
+              maturity,
+              // symbol: await callTx(x, 'YDai', 'symbol', []),
+              maturity_: new Date( (maturity) * 1000 ),
+              displayName: Moment(maturity*1000).format('MMMM YYYY'),
+              seriesColor: seriesColors[i],
             };
           })
         ).then((res:any) => _deployedSeries.push(...res));
@@ -173,12 +179,12 @@ const YieldProvider = ({ children }:any) => {
 
     } catch (e) {
       console.log(e);
-      notifyDispatch({ type: 'fatal', payload:{ message: 'Error Getting Yield data (addresses etc.) - Try changing network.' } } );
+      notifyDispatch({ type: 'fatal', payload:{ message: 'Error finding Yield Protocol addresses' } } );
     }
     return [ _deployedSeries, _deployedContracts ];
   };
 
-  // Get feed data
+  /* Get feed data from cache first (for offline support) */
   const _getFeedData = async (deployedContracts:any): Promise<any> => {
     let _state:any={};
     /* For for initial loading and offline support */
@@ -189,54 +195,23 @@ const YieldProvider = ({ children }:any) => {
     }
     const _ilks = await callTx(deployedContracts.Vat, 'Vat', 'ilks', [ethers.utils.formatBytes32String('ETH-A')]);
 
-    // parse and return feed data
+    /* parse and return feed data if reqd. */
     const _feedData = { 
       ..._state,
       ilks: {
         ..._ilks,
-        // Art_: utils.rayToHuman(_ilks.Art),
-        spot_: utils.rayToHuman(_ilks.spot),
-        rate_: utils.rayToHuman(_ilks.rate),
-        // line_: utils.rayToHuman(_ilks.line),
-        // dust_: utils.rayToHuman(_ilks.dust),
+        // spot_: utils.rayToHuman(_ilks.spot),
+        // rate_: utils.rayToHuman(_ilks.rate),
       },
     };
-
     setCachedFeed(_feedData);
     return _feedData;
   };
 
-  // Fetch extra non-cached blockchain data for each series AND PARSE data.
-  const _getSeriesData = async (seriesAddrs:IYieldSeries[]): Promise<IYieldSeries[]> => {
-    const _seriesData:any[] = [];
-    await Promise.all(
-      seriesAddrs.map( async (x:any, i:number)=> {
-        _seriesData.push(x);
-        try {
-          _seriesData[i].yDaiBalance = account? await callTx(x.yDai, 'YDai', 'balanceOf', [account]): '0';
-          _seriesData[i].isMature = await callTx(x.yDai, 'YDai', 'isMature', []);
-        } catch (e) {
-          console.log(`Could not load series blockchain data: ${e}`);
-        }
-      })
-    );
-    // Parse and return data
-    return _seriesData.map((x:any, i:number) => {
-      return {
-        ...x,
-        yDaiBalance_: ethers.utils.formatEther(x.yDaiBalance.toString()),
-        maturity_: new Date( (x.maturity) * 1000 ),
-        displayName: Moment(x.maturity*1000).format('MMMM YYYY'),
-        seriesColor: seriesColors[i],
-      };
-    });
-  };
-
-  // Fetch non-cached. non-user specific yield protocol general data  (eg. market data . prices)
-  const _getYieldData = async (deployedContracts:any, feedData:any): Promise<any> => {
+  /* Fetch non-cached. non-user specific yield protocol general data  (eg. market data . prices) */
+  const _getYieldData = async (deployedContracts:any): Promise<any> => {
     const _yieldData:any = {
     };
-
     // parse data if required.
     return {
       ..._yieldData,
@@ -261,18 +236,18 @@ const YieldProvider = ({ children }:any) => {
       .then((res:any) => parseEventList(res) );
     const _borrowedHistory = await getEventHistory(deployedContracts.Dealer, 'Dealer', 'Borrowed', [], !txHistory?0:txHistory.lastBlock+1 )
       .then((res:any) => parseEventList(res) );
-    // TODO add in AMM history information
+    // TODO add in AMM history collection
     // TODO add in YDai information?
 
     // TODO : get blocknumber at initialisation of yDaiProtocol instead of using first block(0).
     console.log('txHistory updated from block:', txHistory?.lastBlock+1||0, 'to block:', _lastBlock);
+
     setTxHistory({
       lastBlock: _lastBlock,
       items: txHistory ?
         [ ...txHistory.items, ..._postedHistory, ..._borrowedHistory ]
         : [ ..._postedHistory, ..._borrowedHistory ]
     });
-    console.log('txHistory updated');
 
     /* parse and return user data */
     return {
@@ -282,15 +257,11 @@ const YieldProvider = ({ children }:any) => {
       txHistory : { 
         ...txHistory,
         items: txHistory?.items,
-        // collateralTxs: txHistory?.items.filter((x:any)=> x.event === 'Posted'),
-        // seriesTxs: txHistory?.items.filter((x:any)=> x.event === 'Borrowed'),
-        // redeemTxs: txHistory?.items.filter((x:any)=> x.event === 'Redeemed'),
-        // adminTxs: txHistory?.items.map((x:any, i:number)=> i),
       },
       urn: {
         ..._userData.urn,
-        art_: utils.rayToHuman(_userData.urn.art),
-        ink_: utils.rayToHuman(_userData.urn.ink),
+        // art_: utils.rayToHuman(_userData.urn.art),
+        // ink_: utils.rayToHuman(_userData.urn.ink),
       },
       preferences: userPreferences,
     };
@@ -303,15 +274,14 @@ const YieldProvider = ({ children }:any) => {
     const [ 
       deployedSeries,
       deployedContracts
-    ] = await _getYieldAddrs(networkId, false);
+    ] = await _getProtocolAddrs(networkId, false);
     dispatch({ type:'updateDeployedContracts', payload: deployedContracts });
+    dispatch({ type:'updateDeployedSeries', payload: deployedSeries });
 
     /* 2. Fetch feed/stream data (from cache initially if available) and init event listeners */
-    const feedData = await _getFeedData(deployedContracts);
-    dispatch({ type:'updateFeedData', payload: feedData });
-
-    // 2.2 Add listen to Maker rate/spot changes
-    addEventListener(
+    dispatch({ type:'updateFeedData', payload: await _getFeedData(deployedContracts) });
+    // 2.1 Add listen to Maker rate/spot changes
+    provider && addEventListener(
       deployedContracts.Vat,
       'Vat',
       'LogNote',
@@ -321,48 +291,27 @@ const YieldProvider = ({ children }:any) => {
         // dispatch({ type:'updateFeedData', payload: {...feedData, feedData.ilks })
       }
     );
-    // // TODO: add event listener for AMM
-    // // 2.3 Add listen for AMM changes
-    // addEventListener(
-    //   deployedContracts.Amm,
-    //   'Amm',
-    //   'RateChange',
-    //   [],
-    //   (x:any, y:any, z:any)=> {
-    // dispatch({ type:'updateFeedData', payload: {...feedData, feedData.amm })
-    //   }
-    // );
+    // TODO: add event listener for AMM
 
     /* 3. Fetch auxilliary (PUBLIC non-cached, non-user specific) yield and series data */
-    let yieldData:any={};
-    let extraSeriesData:any={};
-    [ yieldData, extraSeriesData ] = await Promise.all([
-      /* 3.1 Fetch any PUBLIC Yield protocol system data from blockchain */
-      _getYieldData(deployedContracts, feedData),
-      /* 3.2 Fetch any extra PUBLIC non-cached info for each series and PARSE series data
-      (mostly for pre-load display...maturity etc.) */
-      _getSeriesData(deployedSeries),
-    ]);
-    dispatch({ type:'updateYieldData', payload: yieldData });
-    dispatch({ type:'updateDeployedSeries', payload: extraSeriesData });
+    dispatch({ type:'updateYieldData', payload: await _getYieldData(deployedContracts) });
 
-    /* 4. Fetch any user account data based on address (if any), possibly cached. */
-    const userData = account ? await _getUserData(deployedContracts, false): { ethBalance_: 0 };
+    /* 4. Fetch any user data based on address (if any), possibly cached. */
+    const userData = account ? await _getUserData(deployedContracts, false): null;
     dispatch({ type:'updateUserData', payload: userData });
-
-    console.log(userData);
 
     dispatch({ type:'isLoading', payload: false });
   };
 
+  /* Init app and re-init app on change of user and/or network  */
   React.useEffect( () => {
     ( async () => chainId && initApp(chainId))();
   }, [chainId, account]);
 
   const actions = {
-    updateUserData: (x:any) => _getUserData(x, true).then((res:any)=> dispatch({ type:'updateUserData', payload: res })),
-    updateSeriesData: (x:IYieldSeries[]) => _getSeriesData(x).then((res:any) => dispatch({ type:'updateDeployedSeries', payload: res })),
-    updateYieldBalances: (x:any) => _getYieldData(state.deployedContracts, state.feedData).then((res:any)=> dispatch({ type:'updateYieldData', payload: res })),
+    updateUserData: () => _getUserData(state.deployedContracts, true).then((res:any)=> dispatch({ type:'updateUserData', payload: res })),
+    // updateSeriesData: (x:IYieldSeries[]) => _getSeriesData(x).then((res:any) => dispatch({ type:'updateDeployedSeries', payload: res })),
+    // updateYieldBalances: (x:any) => _getYieldData(state.deployedContracts, state.feedData).then((res:any)=> dispatch({ type:'updateYieldData', payload: res })),
     // refreshYieldAddrs: () => _getYieldAddrs(chainId, true),
   };
 

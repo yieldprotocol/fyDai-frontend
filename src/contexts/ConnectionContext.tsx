@@ -15,7 +15,7 @@ const initState = {
 
 function connectionReducer(state:any, action:any) {
   switch (action.type) {
-    case 'init':
+    case 'updateConnection':
       return { 
         ...state,
         account: action.payload.account,
@@ -30,10 +30,6 @@ function connectionReducer(state:any, action:any) {
         ...state,
         isLoading: action.payload,
       };
-    case 'closeNotify':
-      return { ...state, open: false };
-    case 'openNotify':
-      return { ...state, open: true };
     default:
       return state;
   }
@@ -60,14 +56,14 @@ const ConnectionProvider = ({ children }:any) => {
     if (window.ethereum) {
       // @ts-ignore
       provider = new ethers.providers.Web3Provider(window.ethereum);
-      signer = provider.getSigner(); 
-      account = await signer.getAddress();
-      network = provider? ( await provider.getNetwork()) : null;
+      signer = provider.getSigner();
+      // @ts-ignore
+      account = window.ethereum.selectedAddress;
+      network = provider ? await provider.getNetwork() : null;
     } else {
       console.log('No metamask installed');
       // setProvider(new ethers.providers.InfuraProvider(5, '9dbb21faf34448c9af1f3047c45b15df'));
-      
-      // provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
+      provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
       signer = null;
       account= null;
       network={ chainId:1337 };
@@ -75,12 +71,10 @@ const ConnectionProvider = ({ children }:any) => {
       // altProvider = new ethers.getDefaultProvider(5);
       // @ts-ignore
       // altProvider = new ethers.providers.InfuraProvider('9dbb21faf34448c9af1f3047c45b15df');
-      // altProvider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
-      // console.log(await altProvider.getSigner());
     }
 
     dispatch({
-      type:'init',
+      type:'updateConnection',
       payload:{
         provider,
         altProvider,
@@ -104,9 +98,8 @@ const ConnectionProvider = ({ children }:any) => {
         // @ts-ignore
         window.ethereum.on('networkChanged', async () => {
           updateConnection();
-
         });
-      } catch (e) { console.log(e); }
+      } catch (e) { console.log(e);}
     })();
   }, []);
 

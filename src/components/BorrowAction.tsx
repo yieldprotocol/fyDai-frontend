@@ -28,14 +28,14 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   const { state: yieldState, actions: yieldActions } = React.useContext(YieldContext);
   const { deployedContracts } = yieldState;
   const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
-  const { isLoading, seriesTotals, activeSeries } = seriesState;
+  const { isLoading, seriesAggregates, activeSeries } = seriesState;
   const {
     daiAvailable_,
     // estimateRatio,
     debtValue_,
     collateralValue_,
     collateralRatio_,
-  } = seriesTotals;
+  } = seriesAggregates;
 
   const { borrow, borrowActive }  = useDealer();
 
@@ -52,9 +52,8 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
 
   const borrowProcedure = async (value:number) => {
     await borrow(deployedContracts.Dealer, 'ETH-A', activeSeries.maturity, value );
-    yieldActions.updateUserData(yieldState.deployedContracts, yieldState.deployedContracts);
-    yieldActions.updateSeriesData(yieldState.deployedSeries);
-    seriesActions.updateCalculations();
+    yieldActions.updateUserData();
+    seriesActions.refreshPositions([activeSeries]);
   };
 
   useEffect(()=>{
@@ -84,7 +83,7 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
     }
 
     if (inputValue && activeSeries) {
-      const newEst = ( activeSeries.yieldPercent_ * parseFloat(inputValue));
+      const newEst = ( activeSeries.yieldRate_ * parseFloat(inputValue) + parseFloat(inputValue));
       setEstAtMaturity(newEst);
     }
 
@@ -104,6 +103,7 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
 
   useEffect(() => {
     console.log(activeSeries);
+
   }, [ activeSeries ]);
 
   return (

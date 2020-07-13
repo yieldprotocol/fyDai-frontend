@@ -28,7 +28,7 @@ const DashBorrow = ({ }:DashBorrowProps) => {
   const { state: { deployedSeries, deployedContracts, yieldData, userData }, actions } = React.useContext(YieldContext);
 
   const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
-  const { isLoading, seriesTotals, activeSeries } = seriesState;
+  const { isLoading, seriesAggregates, activeSeries } = seriesState;
   const {
     daiAvailable_,
     // estimateRatio,
@@ -36,7 +36,7 @@ const DashBorrow = ({ }:DashBorrowProps) => {
     collateralValue_,
     collateralAmount_,
     collateralRatio_,
-  } = seriesTotals;
+  } = seriesAggregates;
 
   const txHistory = userData?.txHistory?.items || [];
   const txHistory_ = txHistory.filter((x:any) => x.event==='Borrowed' ).map((x:any) => {

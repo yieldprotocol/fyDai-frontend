@@ -140,47 +140,13 @@ const TestLayer = (props:any) => {
             <ProfileButton />
             <Text size='xsmall'>Connected to:</Text>
 
-            {/* <Text weight="bold">{chainId && getNetworkName(chainId) }</Text>
-            <Text weight="bold">{chainId && chainId }</Text> */}
 
             <Box direction='row' gap='small'>
               <Text size='xsmall'>ETH balance:</Text>
               <Text size='xsmall'>{ userData.ethBalance_ || '' }</Text>
             </Box>
-            {/* <Box direction='row' gap='small'>
-            <Text size='xsmall'>WEI balance:</Text>
-            <Text size='xsmall'>{ weiBalance }</Text>
-          </Box> */}
-            {/* <Box direction='row' gap='small'>
-              <Text size='xsmall'>ETH-A balance:</Text>
-              <Text size='xsmall'>{ extBalances.wethBalance_ || '' }</Text>
-            </Box>
-
-            <Box direction='row' gap='small'>
-              <Text size='xsmall'>CHAI balance:</Text>
-              <Text size='xsmall'>{ extBalances.chaiBalance_ || '' }</Text>
-
-            </Box>
-
-            <Box direction='row' gap='small'>
-              <Text size='xsmall'>DAI balance:</Text>
-              <Text size='xsmall'>{ extBalances.daiBalance_ || '' }</Text>
-            </Box> */}
-
-            <Box direction='column' gap='small'>
-              <Text size='small'>Ilk: </Text>
-              <Text size='xsmall'> spot: { yieldState.makerData?.ilks?.spot_ }</Text>
-              <Text size='xsmall'> rate: { yieldState.makerData?.ilks?.rate_  }</Text>
-              <Text size='xsmall'> line: { yieldState.makerData?.ilks?.line_ }</Text>
-            </Box>
-
-            <Box direction='column' gap='small'>
-              <Text size='small'>Urn: </Text>
-              <Text size='xsmall'>ink: { yieldState.makerData?.urns?.ink_ }</Text>
-              <Text size='xsmall'>art: { yieldState.makerData?.urns?.art_ }</Text>
-            </Box>
-
           </Box>
+
           <Box 
             align='center'
             gap='small'
@@ -198,17 +164,16 @@ const TestLayer = (props:any) => {
 
               New ETH direct deposit/withdraw: 
               <Button label='Post ETH Collateral direct 1.5' disabled={postActive} onClick={()=> postEth(deployedContracts.EthProxy, 1.5)} />
-              <Button label='(addProxy once-off) ' onClick={()=> sendTx(deployedContracts.Dealer, 'Dealer', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />
+              <Button primary label='DO THIS (addProxy once-off) ' onClick={()=> sendTx(deployedContracts.Dealer, 'Dealer', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />
               <Button label='(Withdraw ETH 1.5)' onClick={()=> withdrawEth(deployedContracts.EthProxy, 1.5 )} />
-
-              get ETH-A: 
-              {/* <Button label='useNotify_info' onClick={()=>dispatch( { type: 'notify', payload: { message:'Something is happening!.. ', type:'info', showFor:500 } } )} /> */}
+              {/* 
+              get ETH-A:
               <Button label='1. wrap 10 eth to weth' onClick={()=> sendTx(deployedContracts.Weth, 'Weth', 'deposit', [], utils.toWei('10'))} />
               ETH-A deposit and borrow: 
               <Button label='2. Weth approve YieldDealer for 1.5' onClick={()=> approveDealer(deployedContracts.Weth, deployedContracts.Dealer, 1.5 )} />
               <Button label='3. Post Collateral 1.5' disabled={postActive} onClick={()=> post(deployedContracts.Dealer, 'ETH-A', 1.5)} />
               <Button label='(4. Withdraw 1.5)' onClick={()=> withdraw(deployedContracts.Dealer, 'ETH-A', 1.5 )} />
-              <Button label='5.Borrow 0.5' onClick={()=> borrow(deployedContracts.Dealer, 'ETH-A', yieldState.deployedSeries[0].maturity, 0.5 )} />
+              <Button label='5.Borrow 0.5' onClick={()=> borrow(deployedContracts.Dealer, 'ETH-A', yieldState.deployedSeries[0].maturity, 0.5 )} /> */}
               ETH-A repay:
               <Button label='6.1 Repay 0.5 eth/weth debt in yDai' onClick={()=> repay(deployedContracts.Dealer, 'ETH-A', yieldState.deployedSeries[0].maturity, 0.5, 'YDAI' )} />
               <Button label='( 6.2 Repay 0.5 eth/weth debt in Dai) ' onClick={()=> repay(deployedContracts.Dealer, 'ETH-A', yieldState.deployedSeries[0].maturity, 0.5, 'DAI' )} />
@@ -248,7 +213,6 @@ const TestLayer = (props:any) => {
 
   
               Chai deposit and borrow:
-              {/* <Button label='5. Chai approve chaiDealer Alt' onClick={()=> sendTx(deployedContracts.Dealer, 'Chai', 'approve', [deployedContracts.DealerDealer, utils.divRay(daiTokens, chi) ] )} /> */}
               <Button label='2. Chai approve chaiDealer 0.5' onClick={()=> approveDealer(deployedContracts.Chai, deployedContracts.Dealer, 0.5 )} />
               <Button label='3. Post Chai Collateral 0.5' disabled={postActive} onClick={()=> post(deployedContracts.Dealer, 'CHAI', 0.5 )} />
               <Button label='(4. Withdraw 0.5 chai)' onClick={()=> withdraw(deployedContracts.Dealer, 'CHAI', 0.5 )} />
@@ -261,7 +225,6 @@ const TestLayer = (props:any) => {
 
             { flow === 'MATURITY' && 
             <Box gap='small'>
-              {/* <Button label='useNotify_info' onClick={()=>dispatch( { type: 'notify', payload: { message:'Something is happening!.. ', type:'info', showFor:500 } } )} /> */}
               <Button label='Mature yDai' onClick={()=> account && console.log('not mature')} />
               <Button label='Redeem Dai' onClick={()=> account && console.log('not mature')} />
             </Box>}
@@ -277,22 +240,23 @@ const TestLayer = (props:any) => {
             { seriesData.size > 0 && !seriesState.isLoading ? 
               <Box pad='small' gap='medium' fill>
                 <Box direction='row'>
-                  <Text weight='bold'>yDai[0]: {seriesData.get('yDai-2020-09-30').symbol}</Text>
+                  s
+                  {/* <Text weight='bold'>yDai[0]: {seriesData.get('yDai-2020-09-30').name}</Text> */}
                 </Box>
                 <Box gap='small'>
                   <Text weight='bold'>Posted collateral:</Text>
                   <Text>weth posted: { userData.ethPosted_ }</Text>
                   {/* <Text>chai posted: { yieldData.chaiPosted_ }</Text> */}
                   <Text weight='bold'>yDai balance:</Text>
-                  <Text>yDai Balance: { seriesData.get('yDai-2020-09-30').yDaiBalance_ }</Text>
+                  {/* <Text>yDai Balance: { seriesData.get('yDai-2020-09-30').yDaiBalance_ }</Text> */}
                   <Text weight='bold'>Weth Dealer:</Text>
                   {/* <Text>weth Debt Dai: { seriesData.get('yDai-2020-09-30').wethDebtDai_ }</Text> */}
-                  <Text>weth Debt YDai: { seriesData.get('yDai-2020-09-30').ethDebtYDai_ }</Text>
+                  {/* <Text>weth Debt YDai: { seriesData.get('yDai-2020-09-30').ethDebtYDai_ }</Text> */}
                   {/* <Text>weth Total Debt Dai { yieldData.wethTotalDebtDai_ }</Text> */}
                   <Text> weth Total Debt YDai: { userData.ethTotalDebtYDai_ }</Text>
                   <Text weight='bold'>ChaiDealer:</Text>
                   {/* <Text>chai Debt Dai : { seriesData.get('yDai-2020-09-30').chaiDebtDai_}</Text> */}
-                  <Text>chai Debt yDai : { seriesData.get('yDai-2020-09-30').chaiDebtYDai_}</Text>
+                  {/* <Text>chai Debt yDai : { seriesData.get('yDai-2020-09-30').chaiDebtYDai_}</Text> */}
                   {/* <Text>chai Total Debt Dai: { yieldData.chaiTotalDebtDai_ }</Text> */}
                   <Text>chai Total Debt YDai: { userData.chaiTotalDebtYDai_ }</Text>
                 </Box>

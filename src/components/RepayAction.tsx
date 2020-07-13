@@ -29,13 +29,14 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
   const { state: yieldState, actions: yieldActions } = React.useContext(YieldContext);
   const { deployedContracts } = yieldState;
   const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
-  const { isLoading: positionsLoading, seriesTotals, activeSeries, setActiveSeries } = seriesState;
+  
+  const { isLoading: positionsLoading, seriesAggregates, activeSeries, setActiveSeries } = seriesState;
   const {
     collateralAmount_,
     collateralRatio_,
     debtValue_,
     estimateRatio, // TODO << this is a function (basically just passed from hooks via context) >> 
-  } = seriesTotals;
+  } = seriesAggregates;
 
   const { repay, repayActive }  = useDealer();
   const [inputValue, setInputValue] = React.useState<any>();
@@ -46,12 +47,9 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
   const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
 
   const repayProcedure = async (value:number) => {
-    console.log(activeSeries);
     await repay(deployedContracts.Dealer, 'ETH-A', activeSeries.maturity, value, 'yDai' );
-    yieldActions.updateUserData(seriesState.deployedContracts, seriesState.deployedContracts);
-    yieldActions.updateYieldBalances(seriesState.deployedContracts);
-    yieldActions.updateSeriesData(seriesState.deployedSeries);
-    seriesActions.updateCalculations();
+    // yieldActions.updateUserData();
+    seriesActions.refreshPositions([activeSeries]);
   };
 
   return (

@@ -58,7 +58,7 @@ export const useEvents = () => {
     filterArgs:any[],
     callback:any
   ) => {
-    const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), signer);
+    const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), provider);
     const filter = contract.filters[filterEvent](...filterArgs);
     contract.on(filter, (x:any) => callback(x));
   };
@@ -78,7 +78,7 @@ export const useEvents = () => {
     filterArgs:any[],
     block:number
   ) => {
-    const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), signer);
+    const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), provider);
     const filter = contract.filters[filterEvent](...filterArgs);
     const logs = await contract.queryFilter( filter, block, 'latest');
     // Console.log the values for testing:
@@ -106,9 +106,7 @@ export const useEvents = () => {
       };
     })
     );
-
     return parsedList;
-
   };
 
   return { getEventHistory, addEventListener, parseEventList, isLoading, eventListenerList } as const;

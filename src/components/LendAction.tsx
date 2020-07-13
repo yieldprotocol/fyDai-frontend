@@ -31,14 +31,14 @@ const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   const { state: yieldState, actions: yieldActions } = React.useContext(YieldContext);
   const { deployedContracts } = yieldState;
   const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
-  const { isLoading, seriesTotals, activeSeries } = seriesState;
+  const { isLoading, seriesAggregates, activeSeries } = seriesState;
   const {
     daiAvailable_,
     // estimateRatio,
     debtValue_,
     ethBalance_,
 
-  } = seriesTotals;
+  } = seriesAggregates;
   
   const { borrow, borrowActive }  = useDealer();
   
@@ -55,11 +55,12 @@ const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   const [ warningMsg, setWarningMsg] = React.useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
   
-  const borrowProcedure = async (value:number) => {
-    await borrow(deployedContracts.Dealer, 'ETH-A', activeSeries.maturity, value );
-    yieldActions.updateUserData(yieldState.deployedContracts, yieldState.deployedContracts);
-    yieldActions.updateSeriesData(yieldState.deployedSeries);
-    seriesActions.updateCalculations();
+  const lendProcedure = async (value:number) => {
+    // await lend(deployedContracts.Dealer, 'ETH-A', activeSeries.maturity, value );
+    // yieldActions.updateUserData(yieldState.deployedContracts, yieldState.deployedContracts);
+    // yieldActions.updateSeriesData(yieldState.deployedSeries);
+    // seriesActions.updateMetrics();
+    seriesActions.refreshPositions([activeSeries]);
   };
   
   useEffect(()=>{
@@ -235,7 +236,7 @@ const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
             fill='horizontal'
             round='medium'
             background={( !(inputValue>0) || borrowDisabled) ? 'brand-transparent' : 'brand'}
-            onClick={(!(inputValue>0) || borrowDisabled)? ()=>{}:()=>borrowProcedure(inputValue)}
+            onClick={(!(inputValue>0) || borrowDisabled)? ()=>{}:()=>lendProcedure(inputValue)}
             align='center'
             pad='medium'
           >

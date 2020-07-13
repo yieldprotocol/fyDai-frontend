@@ -33,20 +33,20 @@ const WithDrawDaiAction = ({ close }:IWithDrawActionProps) => {
 
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { userData: { ethBalance_ } } = yieldState;
-  const { seriesTotals } = seriesState;
+  const { seriesAggregates } = seriesState;
   const {
     collateralAmount_,
     minSafeCollateral_,
     collateralRatio_,
     debtValue_,
     estimateRatio, // TODO << this is a function (basically just passed from hooks via context) >> 
-  } = seriesTotals;
+  } = seriesAggregates;
 
   const { withdrawEth, withdrawEthActive }  = useEthProxy();
 
   const withdrawProcedure = async (value:number) => {
     await withdrawEth(deployedContracts.EthProxy, value);
-    seriesActions.updateCalculations();
+    seriesActions.updateMetrics();
     // actions.updateUserData(state.deployedContracts, state.deployedContracts);
     // actions.updateYieldBalances(state.deployedContracts);
   };

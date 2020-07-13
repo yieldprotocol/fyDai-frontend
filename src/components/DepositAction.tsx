@@ -36,22 +36,22 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
   const { deployedContracts } = yieldState;
 
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
-  const { userData: { ethBalance_ } } = yieldState;
-  const { seriesTotals } = seriesState;
+  
+  const { seriesAggregates } = seriesState;
   const {
+    ethBalance_,
     collateralAmount_,
     collateralRatio_,
     debtValue_,
     estimateRatio, // TODO << this is a function (basically just passed from hooks via context) >> 
-  } = seriesTotals;
+  } = seriesAggregates || {};
 
   const { postEth, postEthActive }  = useEthProxy();
 
   const depositProcedure = async (value:number) => {
     await postEth(deployedContracts.EthProxy, value);
-    yieldActions.updateUserData(yieldState.deployedContracts, yieldState.deployedContracts);
-    yieldActions.updateYieldBalances(yieldState.deployedContracts);
-    seriesActions.updateCalculations();
+    yieldActions.updateUserData();
+    setInputValue(0);
   };
 
   useEffect(()=>{
@@ -174,7 +174,6 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
             </Box>
             {/* <Text color='text-weak' size='xxsmall'>if you deposit {inputValue||0} Eth</Text> */}
           </Box>
-
         </Box>
 
         { warningMsg &&
