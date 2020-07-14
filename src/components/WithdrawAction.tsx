@@ -9,6 +9,8 @@ import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
 import { useEthProxy } from '../hooks';
 
+import { NotifyContext } from '../contexts/NotifyContext';
+
 interface IWithDrawActionProps {
   close?: any;
   withdraw?: any;
@@ -47,8 +49,15 @@ const WithdrawAction = ({ close }:IWithDrawActionProps) => {
   const withdrawProcedure = async (value:number) => {
     await withdrawEth(deployedContracts.EthProxy, value);
     yieldActions.updateUserData();
-    setInputValue(0);
+    close();
   };
+
+  // TODO: maybe split into a custom hook
+  const { state: { pendingTxs } } = React.useContext(NotifyContext);
+  const [txActive, setTxActive] = React.useState<any>(null);
+  useEffect(()=>{
+    setTxActive(pendingTxs.find((x:any)=> x.type === 'WITHDRAW'));
+  }, [ pendingTxs ]);
 
   useEffect(()=>{
     setMaxWithdraw(collateralAmount_- minSafeCollateral_);
@@ -95,6 +104,7 @@ const WithdrawAction = ({ close }:IWithDrawActionProps) => {
         round='medium'
         pad='large'
       >
+        { !txActive && !withdrawEthActive && 
         <Box align='center' flex='grow' justify='between' gap='large'>
           <Box gap='medium' align='center' fill='horizontal'>
             <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to withdraw</Text>
@@ -115,6 +125,7 @@ const WithdrawAction = ({ close }:IWithDrawActionProps) => {
                 <TextInput
                   type="number"
                   placeholder='Enter the amount to deposit in Eth'
+                  disabled={withdrawEthActive}
                   value={inputValue}
                   plain
                   onChange={(event:any) => setInputValue(event.target.value)}
@@ -134,44 +145,33 @@ const WithdrawAction = ({ close }:IWithDrawActionProps) => {
                   <Text size='xsmall'>Use max</Text>
                 </Box>
               </Box>
+
             </Box>
           </Box>
 
           <Box fill direction='row-responsive' justify='between'>
+
             <Box gap='small'>
               <Text color='text-weak' size='xsmall'>Max withdraw</Text>
               <Text color='brand' weight='bold' size='large'> {collateralAmount_? `~${maxWithdraw.toFixed(2)} Eth` : '-' }</Text>
-              { false && 
-              <Box pad='xsmall'>
-                <Text alignSelf='start' size='xxsmall'>
-                  <Info /> You need to deposit collateral in order to Borrow Dai.
+            </Box>
+
+            <Box gap='small' alignSelf='start'>
+              <Text color='text-weak' size='xsmall'>Collateralization Ratio after withdraw</Text>
+              <Box direction='row' gap='small'>
+                <Text color={!inputValue? 'brand-transparent': indicatorColor} weight='bold' size='large'> 
+                  {(estRatio && estRatio !== 0)? ` approx. ${estRatio}%`: collateralRatio_ || '-' }
                 </Text>
-              </Box>}
-            </Box>
-
-            <Box gap='small'>
-              <Text color='text-weak' size='xsmall'>Current Collateralisation Ratio</Text>
-              <Text color='brand' weight='bold' size='large'> 
-                { collateralRatio_? `${collateralRatio_}%` : '-' }
-              </Text>
-            </Box>
-          </Box>
-
-          <Box gap='small' alignSelf='start'>
-            <Text color='text-weak' size='xsmall'>Collateralization Ratio after withdraw</Text>
-            <Box direction='row' gap='small'>
-              <Text color={!inputValue? 'brand-transparent': indicatorColor} weight='bold' size='large'> 
-                {(estRatio && estRatio !== 0)? ` approx. ${estRatio}%`: collateralRatio_ || '-' }
-              </Text>
-              { true &&
+                { true &&
                 <Text color='red' size='large'> 
                   { inputValue && (estDecrease !== 0) && `(- ${estDecrease}%)` }
                 </Text>}
+              </Box>
             </Box>
-            {/* <Text color='text-weak' size='xxsmall'>if you deposit {inputValue||0} Eth</Text> */}
+
           </Box>
 
-          { warningMsg &&
+          { warningMsg && !errorMsg &&
           <Box 
             border={{ color:'orange' }} 
             fill
@@ -189,7 +189,7 @@ const WithdrawAction = ({ close }:IWithDrawActionProps) => {
             round='small'
             pad='small'
           >
-            <Text weight='bold' color='red'>Wooah, Hang on</Text>  
+            <Text weight='bold' color='red'>Hang on...</Text>  
             <Text color='red'>{errorMsg}</Text>
           </Box> }
 
@@ -225,7 +225,41 @@ const WithdrawAction = ({ close }:IWithDrawActionProps) => {
               </Box>
             </Box>
           </Box>
-        </Box>
+        </Box>}
+        { withdrawEthActive && !txActive &&
+        <Box>Awaiting transaction approval</Box>}
+
+        { txActive &&
+        <Box align='center' flex='grow' justify='between' gap='large'>
+          <Box gap='medium' align='center' fill='horizontal'>
+            <Text size='xlarge' color='brand' weight='bold'>Good One!</Text>
+            <Box
+            // direction='row-responsive'
+              fill='horizontal'
+              gap='large'
+              align='center'
+            >
+              <Text>You made a withdrawal of {inputValue} Eth</Text>
+              <Text>Transaction Pending: </Text>
+              <Box
+                fill='horizontal'
+                round='medium'
+                background='brand'
+                onClick={()=>console.log('Going to etherscan')}
+                align='center'
+                pad='medium'
+              >
+                <Text
+                  weight='bold'
+                  size='large'
+                >
+                  View on Etherscan
+                </Text>
+              </Box>
+            </Box>
+          </Box>
+        </Box>}
+
       </Box>
     </Layer>
   );

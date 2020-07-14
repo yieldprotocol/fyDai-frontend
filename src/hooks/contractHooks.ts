@@ -29,7 +29,6 @@ export const useEthProxy = () => {
   const  { dispatch }  = React.useContext<any>(NotifyContext);
   const [ postEthActive, setPostEthActive ] = React.useState<boolean>(false);
   const [ withdrawEthActive, setWithdrawEthActive ] = React.useState<boolean>(false);
-
   /**
    * Posts collateral (ETH) via ethProxy
    * @param {string} ethProxyAddress address of the proxy
@@ -59,7 +58,7 @@ export const useEthProxy = () => {
       return;
     }
     /* Transaction reporting & tracking */
-    dispatch({ type: 'txPending', payload:{ tx, message: `Deposit of ${amount} ETH pending...` } } );
+    dispatch({ type: 'txPending', payload:{ tx, message: `Deposit of ${amount} ETH pending...`, type:'DEPOSIT' } } );
     await tx.wait();
     setPostEthActive(false);
     dispatch({ type: 'txComplete', payload:{ tx, message:`Deposit of ${amount} ETH complete` } } );
@@ -93,7 +92,7 @@ export const useEthProxy = () => {
       return;
     }
     /* Transaction reporting & tracking */
-    dispatch({ type: 'txPending', payload:{ tx, message: `Withdraw of ${amount} pending...` } } );
+    dispatch({ type: 'txPending', payload:{ tx, message: `Withdraw of ${amount} pending...`, type:'WITHDRAW' } } );
     await tx.wait();
     setWithdrawEthActive(false);
     dispatch({ type: 'txComplete', payload:{ tx, message:`Withdrawal of ${amount} complete.` } } );
@@ -164,7 +163,7 @@ export const useDealer = () => {
       return;
     }
     /* Transaction reporting & tracking */
-    dispatch({ type: 'txPending', payload:{ tx, message: `Deposit of ${amount} pending...`} } );
+    dispatch({ type: 'txPending', payload:{ tx, message: `Deposit of ${amount} pending...`, type:'DEPOSIT' } } );
     await tx.wait();
     setPostActive(false);
     dispatch({ type: 'txComplete', payload:{ tx, message:`Deposit of ${amount} complete` } } );
@@ -201,7 +200,7 @@ export const useDealer = () => {
       return;
     }
     /* Transaction reporting & tracking */
-    dispatch({ type: 'txPending', payload:{ tx, message: `Withdraw of ${amount} pending...` } } );
+    dispatch({ type: 'txPending', payload:{ tx, message: `Withdraw of ${amount} pending...`, type:'WITHDRAW' } } );
     await tx.wait();
     setWithdrawActive(false);
     dispatch({ type: 'txComplete', payload:{ tx, message:`Withdrawal of ${amount} complete.` } } );
@@ -240,7 +239,7 @@ export const useDealer = () => {
       return;
     }
     /* Transaction reporting & tracking */
-    dispatch({ type: 'txPending', payload:{ tx, message: `Borrowing of ${amount} pending...` } } );
+    dispatch({ type: 'txPending', payload:{ tx, message: `Borrowing of ${amount} pending...`, type:'BORROW' } } );
     await tx.wait();
     setBorrowActive(false);
     dispatch({ type: 'txComplete', payload:{ tx, message:`Borrowing of ${amount} complete.` } } );
@@ -286,7 +285,7 @@ export const useDealer = () => {
       return;
     }
     /* Transaction reporting & tracking */
-    dispatch({ type: 'txPending', payload:{ tx, message: `Repayment of ${amount} pending...` } } );
+    dispatch({ type: 'txPending', payload:{ tx, message: `Repayment of ${amount} pending...`, type:'REPAY' } } );
     await tx.wait();
     setRepayActive(false);
     dispatch({ type: 'txComplete', payload:{ tx, message:`Repayment of ${amount} complete.` } } );
@@ -380,7 +379,7 @@ export const useYDai = () => {
       setRedeemActive(false);
       return;
     }
-    dispatch({ type: 'txPending', payload:{ tx, message: `Redeeming ${amount} pending...` } } );
+    dispatch({ type: 'txPending', payload:{ tx, message: `Redeeming ${amount} pending...`, type:'REDEEM' } } );
     await tx.wait();
     setRedeemActive(false);
     dispatch({ type: 'txComplete', payload:{ tx, message:`Redeeming ${amount} complete.` } } );

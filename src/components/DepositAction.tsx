@@ -6,9 +6,9 @@ import {
 } from 'react-icons/fi';
 
 import { FaEthereum as Ethereum } from 'react-icons/fa';
-
 import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
+import { NotifyContext } from '../contexts/NotifyContext';
 
 import WithdrawAction from './WithdrawAction';
 
@@ -36,6 +36,8 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
   const { deployedContracts } = yieldState;
 
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
+
+  const inputRef = React.useRef(null);
   
   const { seriesAggregates } = seriesState;
   const {
@@ -47,12 +49,17 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
   } = seriesAggregates || {};
 
   const { postEth, postEthActive }  = useEthProxy();
-
   const depositProcedure = async (value:number) => {
     await postEth(deployedContracts.EthProxy, value);
     yieldActions.updateUserData();
-    setInputValue(0);
   };
+
+  // TODO: maybe split into a custom hook
+  const { state: { pendingTxs } } = React.useContext(NotifyContext);
+  const [txActive, setTxActive] = React.useState<any>(null);
+  React.useEffect(()=>{
+    setTxActive(pendingTxs.find((x:any)=> x.type === 'DEPOSIT'));
+  }, [ pendingTxs ]);
 
   useEffect(()=>{
     if (inputValue && collateralAmount_ && debtValue_) {
@@ -78,6 +85,7 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
   return (
     <>
       { withdrawOpen && <WithdrawAction close={()=>setWithdrawOpen(false)} /> }
+      { !txActive && !postEthActive &&
       <Box align='center' flex='grow' justify='between' gap='large'>
         <Box gap='medium' align='center' fill='horizontal'>
           <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to deposit</Text>
@@ -96,9 +104,11 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
               flex
             >
               <TextInput
+                ref={inputRef}
                 type="number"
                 placeholder='Enter the amount to deposit in Eth'
                 value={inputValue}
+                disabled={postEthActive}
                 plain
                 onChange={(event:any) => setInputValue(event.target.value)}
               // icon={<Text alignSelf='start' size='xsmall'>Eth</Text>}
@@ -121,18 +131,6 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
             </Box>
           </Box>
         </Box>
-
-        {/* <Box
-        round='small'
-        onClick={()=>console.log('maker vault clickced')}
-        hoverIndicator='secondary-transparent'
-        border='all'
-        fill='horizontal'
-        pad={{ horizontal:'xsmall', vertical:'xsmall' }}
-        align='center'
-      >
-        <Text size='xsmall'>Convert a Maker vault</Text>
-      </Box> */}
 
         <Box fill direction='row-responsive' justify='evenly'>
 
@@ -230,7 +228,41 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
             </Box>
           </Box>
         </Box>
-      </Box>
+      </Box>}
+
+      { postEthActive && !txActive &&
+        <Box>Awaiting transaction approval</Box>}
+
+      { txActive &&
+      <Box align='center' flex='grow' justify='between' gap='large'>
+        <Box gap='medium' align='center' fill='horizontal'>
+          <Text size='xlarge' color='brand' weight='bold'>Good One!</Text>
+          <Box
+            // direction='row-responsive'
+            fill='horizontal'
+            gap='large'
+            align='center'
+          >
+            <Text>You deposited {inputValue} Eth.</Text>
+            <Text>Transaction Pending: </Text>
+            <Box
+              fill='horizontal'
+              round='medium'
+              background='brand'
+              onClick={()=>console.log('Going to etherscan')}
+              align='center'
+              pad='medium'
+            >
+              <Text
+                weight='bold'
+                size='large'
+              >
+                View on Etherscan
+              </Text>
+            </Box>
+          </Box>
+        </Box>
+      </Box>}
     </>
   );
 };
