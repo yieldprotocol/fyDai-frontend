@@ -1,6 +1,7 @@
 import React from 'react';
 import { ethers, BigNumber } from 'ethers';
 
+import { AnyARecord } from 'dns';
 import * as utils from '../utils';
 import { useCallTx, useMath } from '../hooks';
 
@@ -42,7 +43,8 @@ const SeriesProvider = ({ children }:any) => {
 
   const initState = { 
     seriesData : new Map(),
-    seriesAggregates: {},
+    seriesAggregates: {}, // TODO convert to Map
+    seriesRates: new Map(),
     activeSeries: null,
   };
 
@@ -105,12 +107,50 @@ const SeriesProvider = ({ children }:any) => {
     };
   };
 
-  const _getAuxData = async (_seriesList:any) => {
+  /* Get the yield market rates for a particular set of series */
+  const _getRates = async (_seriesArr:any[]) => {
+    const _rates = state.seriesRates;
+    const _ratesData = await Promise.all(
+      _seriesArr.map(async (x:any, i:number) => {
+        const sellYDai = await callTx(_seriesArr[0].market, 'Market', 'sellYDaiPreview', [ethers.utils.parseEther('1')]);
+        const buyYDai = await callTx(_seriesArr[0].market, 'Market', 'buyYDaiPreview', [ethers.utils.parseEther('1')]);
+        const sellDai = await callTx(_seriesArr[0].market, 'Market', 'sellChaiPreview', [ethers.utils.parseEther('1')]);
+        const buyDai = await callTx(_seriesArr[0].market, 'Market', 'buyChaiPreview', [ethers.utils.parseEther('1')]);
+        return {
+          name: x.name,
+          sellYDai,
+          buyYDai,
+          sellDai,
+          buyDai,
+        };
+      })
+    );
+
+    _ratesData.forEach((x:any)=>{
+      _rates.set(
+        x.name,
+        { ...x,
+          // wethDebtYDai_: parseFloat(ethers.utils.formatEther(x.wethDebtYDai.toString())),
+          // wethDebtDai_: parseFloat(ethers.utils.formatEther(x.wethDebtDai.toString())),
+          // yieldRate_: parseFloat(ethers.utils.formatEther(x.yieldRate.toString())),
+          // yieldPercent_: parseFloat(ethers.utils.formatEther(x.yieldRate.toString()))*100,
+        }
+      );
+    });
+    console.log(_rates);
+    return _rates;
+  };
+
+  /* Get the data for a particular series, or set of series */
+  const _getSeriesData = async (_seriesArr:any[], _rates:Map<string, any>) => {
     const _seriesData:any[] = [];
-    const positions = state.seriesData;
+    const _positions = state.seriesData;
 
     await Promise.all(
-      _seriesList.map( async (x:any, i:number) => {
+      _seriesArr.map( async (x:any, i:number) => {
+
+        const r = _rates.get(x.name);
+        console.log(r.sellYDai);
         _seriesData.push(x);
         try {
           _seriesData[i].yDaiBalance = account? await callTx(x.yDai, 'YDai', 'balanceOf', [account]): BigNumber.from('0') ;
@@ -125,7 +165,7 @@ const SeriesProvider = ({ children }:any) => {
     );
 
     _seriesData.forEach((x:any)=>{
-      positions.set(
+      _positions.set(
         x.name,
         { ...x,
           wethDebtYDai_: parseFloat(ethers.utils.formatEther(x.wethDebtYDai.toString())),
@@ -135,12 +175,13 @@ const SeriesProvider = ({ children }:any) => {
         }
       );
     });
-
-    return positions;
+    console.log(_positions);
+    return _positions;
   };
 
   // TODO  add typings for a series
-  // Get the Positional data for a series list
+
+  // Get the Positions data for a series list
   const getPositions = async (seriesArr:any[], force:boolean) => {
     let filteredSeriesArr;
 
@@ -152,22 +193,28 @@ const SeriesProvider = ({ children }:any) => {
 
     if( !yieldState?.isLoading && filteredSeriesArr.length > 0) {
       dispatch({ type:'isLoading', payload: true });
-      const parsedData:any = await _getAuxData(filteredSeriesArr);
-      dispatch( { type:'updateSeries', payload: parsedData });
+
+      const rates = await _getRates(filteredSeriesArr);
+      dispatch( { type:'updateSeries', payload: rates });
+
+      const seriesMap:any = await _getSeriesData(filteredSeriesArr, rates);
+      dispatch( { type:'updateSeries', payload: seriesMap });
 
       if (!state.activeSeries) {
         /* if no active series, set it to the first entry of the map. */
-        dispatch({ type:'setActiveSeries', payload: parsedData.entries().next().value[1] });
+        dispatch({ type:'setActiveSeries', payload: seriesMap.entries().next().value[1] });
       } else if (seriesArr.length===1 ){
         /* or, if there was only one series updated set that one as the active series */
-        dispatch({ type:'setActiveSeries', payload: parsedData.get(seriesArr[0].name) });
+        dispatch({ type:'setActiveSeries', payload: seriesMap.get(seriesArr[0].name) });
       }
-
       /* if there is an account associated, run aggregation */
       account && dispatch({ type:'updateAggregates', payload: _runAggregation() });
       dispatch({ type:'isLoading', payload: false });
+
     } else {
+
       console.log('Positions exist... force fetch if required');
+
     }
   };
 

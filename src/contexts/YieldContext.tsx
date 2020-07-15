@@ -80,6 +80,7 @@ const initState = {
       },
     },
     urns: {},
+    marketRates: {},
     // AMM rates mocked for now.
     amm:{
       rates: {
@@ -183,7 +184,7 @@ const YieldProvider = ({ children }:any) => {
   };
 
   /* Get feed data from cache first (for offline support) */
-  const _getFeedData = async (deployedContracts:any): Promise<any> => {
+  const _getFeedData = async (deployedContracts:any, deployedSeries:any): Promise<any> => {
     let _state:any={};
     /* For for initial loading and offline support */
     if (cachedFeed) {
@@ -202,6 +203,8 @@ const YieldProvider = ({ children }:any) => {
         // rate_: utils.rayToHuman(_ilks.rate),
       },
     };
+
+    console.log(_feedData);
     setCachedFeed(_feedData);
     return _feedData;
   };
@@ -211,6 +214,7 @@ const YieldProvider = ({ children }:any) => {
    * @dev get PUBLIC, non-cached, non-user specific yield protocol general data
   */
   const _getYieldData = async (deployedContracts:any): Promise<any> => {
+
     const _yieldData:any = {
     };
     // parse data if required.
@@ -301,14 +305,22 @@ const YieldProvider = ({ children }:any) => {
     dispatch({ type:'updateDeployedContracts', payload: deployedContracts });
     dispatch({ type:'updateDeployedSeries', payload: deployedSeries });
 
-    await Promise.all([
-      /* 2. Fetch feed/stream data (from cache initially if available) */
-      dispatch({ type:'updateFeedData', payload: await _getFeedData(deployedContracts) }),
-      /* 3. Initiate event listeners */
-      _addListeners(deployedContracts),
-      /* 4. Fetch auxilliary (PUBLIC non-cached, non-user specific) yield and series data */
-      dispatch({ type:'updateYieldData', payload: await _getYieldData(deployedContracts) }),
-    ]);
+    /* 2. Fetch feed/stream data (from cache initially if available) and init event listeners */
+    dispatch({ type:'updateFeedData', payload: await _getFeedData(deployedContracts, deployedSeries) });
+    // 2.1 Add listen to Maker rate/spot changes
+    provider && addEventListener(
+      deployedContracts.Vat,
+      'Vat',
+      'LogNote',
+      [],
+      (x:any, y:any, z:any)=> { 
+        console.log(x, y, z); 
+        // dispatch({ type:'updateFeedData', payload: {...feedData, feedData.ilks })
+      }
+    );
+    // TODO: add event listener for AMM
+    /* 3. Fetch auxilliary (PUBLIC non-cached, non-user specific) yield and series data */
+    dispatch({ type:'updateYieldData', payload: await _getYieldData(deployedContracts) });
 
     /* 4. Fetch any user data based on address (if any), possibly cached. */
     const userData = account ? await _getUserData(deployedContracts, deployedSeries, false): null;
