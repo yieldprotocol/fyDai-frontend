@@ -1,6 +1,5 @@
 import React from 'react';
 import { ethers }  from 'ethers';
-// import { useWeb3React } from '@web3-react/core';
 
 import { NotifyContext } from '../contexts/NotifyContext';
 import { ConnectionContext } from '../contexts/ConnectionContext';
@@ -22,8 +21,6 @@ import EthProxy from '../contracts/EthProxy.json';
  */
 export const useEthProxy = () => {
   const { state: { signer, account } } = React.useContext(ConnectionContext);
-  // const { library, account } = useWeb3React();
-  // const signer = library.getSigner();
 
   const { abi: ethProxyAbi } = EthProxy;
   const  { dispatch }  = React.useContext<any>(NotifyContext);
@@ -121,8 +118,7 @@ export const useController = () => {
 
   const { abi: controllerAbi } = Controller;
   const { state: { signer, account } } = React.useContext(ConnectionContext);
-  // const { library, account } = useWeb3React();
-  // const signer = library.getSigner();
+
 
   const  { dispatch }  = React.useContext<any>(NotifyContext);
   const [ postActive, setPostActive ] = React.useState<boolean>(false);

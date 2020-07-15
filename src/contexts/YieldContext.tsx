@@ -61,7 +61,14 @@ function reducer(state:any, action:any) {
 const initState = {
   isLoading: true,
   // cachable
-  migrationsAddr: '0xAC172aca69D11D28DFaadbdEa57B01f697b34158', // testnets: '0x5632d2e2AEdf760F13d0531B18A39782ce9c814F'
+  migrationsAddr: new Map([
+    [1337, '0xAC172aca69D11D28DFaadbdEa57B01f697b34158'],
+    [1, '0x5632d2e2AEdf760F13d0531B18A39782ce9c814F'],
+    [3, '0x5632d2e2AEdf760F13d0531B18A39782ce9c814F'],
+    [4, '0x5632d2e2AEdf760F13d0531B18A39782ce9c814F'],
+    [5, '0x5632d2e2AEdf760F13d0531B18A39782ce9c814F'],
+    [42, '0x5632d2e2AEdf760F13d0531B18A39782ce9c814F'],
+  ]),
   deployedSeries : [],
   deployedContracts: {},
   // transient
@@ -99,7 +106,6 @@ const YieldProvider = ({ children }:any) => {
   const [ cachedContracts, setCachedContracts ] = useCachedState('deployedContracts', null);
   const [ cachedSeries, setCachedSeries ] = useCachedState('deployedSeries', null);
   const [ cachedFeed, setCachedFeed ] = useCachedState('lastFeed', null);
-
   const [ txHistory, setTxHistory] = useCachedState('txHistory', null);
   const [ userPreferences, setUserPreferences ] = useCachedState('userPreferences', null);
 
@@ -131,7 +137,7 @@ const YieldProvider = ({ children }:any) => {
       if (!cachedContracts || forceUpdate) {
         const contractAddrs = await Promise.all(
           contractGroups.contractList.map(async (x:string)=>{
-            return { [ x ] : await callTx(state.migrationsAddr, 'Migrations', 'contracts', [ethers.utils.formatBytes32String(x)]) };
+            return { [ x ] : await callTx(state.migrationsAddr.get(networkId), 'Migrations', 'contracts', [ethers.utils.formatBytes32String(x)]) };
           })
         );
         _deployedContracts = contractAddrs.reduce((prevObj, item) => ({ ...prevObj, ...item }), {});
@@ -141,24 +147,15 @@ const YieldProvider = ({ children }:any) => {
       } else {_deployedContracts = cachedContracts;}
 
       if (!cachedSeries || forceUpdate) {
-        /* // Depreciated - Firebase connection example, here for posterity >>
-        await firebase.firestore().collection(networkId.toString()).doc('deployedSeries').collection('deployedSeries')
-          .get()
-          .then( (querySnapshot:any) => {
-            querySnapshot.forEach((doc:any) => {
-              _deployedSeries.push(doc.data());
-            });
-          }); */
-
         // TODO: better implementation of iterating through series (possibly a list length from contracts function?)
         const _seriesList = await Promise.all(
           [0, 1, 2, 3].map(async (x:number)=>{
-            return callTx(state.migrationsAddr, 'Migrations', 'contracts', [ethers.utils.formatBytes32String(`yDai${x}`)]);
+            return callTx(state.migrationsAddr.get(networkId), 'Migrations', 'contracts', [ethers.utils.formatBytes32String(`yDai${x}`)]);
           })
         );
         await Promise.all(
           _seriesList.map(async (x:string, i:number)=>{
-            const market = await callTx(state.migrationsAddr, 'Migrations', 'contracts', [ethers.utils.formatBytes32String(`Market-yDai${i+1}`)]);
+            const market = await callTx(state.migrationsAddr.get(networkId), 'Migrations', 'contracts', [ethers.utils.formatBytes32String(`Market-yDai${i+1}`)]);
             const name = await callTx(x, 'YDai', 'name', []);
             const maturity = (await callTx(x, 'YDai', 'maturity', [])).toNumber();
             return {
@@ -166,7 +163,6 @@ const YieldProvider = ({ children }:any) => {
               name,
               maturity,
               market,
-              // symbol: await callTx(x, 'YDai', 'symbol', []),
               maturity_: new Date( (maturity) * 1000 ),
               displayName: Moment(maturity*1000).format('MMMM YYYY'),
               seriesColor: seriesColors[i],
@@ -181,7 +177,7 @@ const YieldProvider = ({ children }:any) => {
 
     } catch (e) {
       console.log(e);
-      notifyDispatch({ type: 'fatal', payload:{ message: 'Error finding Yield Protocol addresses' } } );
+      notifyDispatch({ type: 'fatal', payload:{ message: 'Error getting Yield Protocol addresses' } } );
     }
     return [ _deployedSeries, _deployedContracts ];
   };
@@ -210,7 +206,10 @@ const YieldProvider = ({ children }:any) => {
     return _feedData;
   };
 
-  /* Fetch non-cached. non-user specific yield protocol general data  (eg. market data . prices) */
+
+  /**
+   * @dev get PUBLIC, non-cached, non-user specific yield protocol general data
+  */
   const _getYieldData = async (deployedContracts:any): Promise<any> => {
     const _yieldData:any = {
     };
@@ -220,38 +219,42 @@ const YieldProvider = ({ children }:any) => {
     };
   };
 
-  // Yield Data for the User Address
-  const _getUserData = async (deployedContracts:any, forceUpdate:boolean): Promise<any> => {
+  /**
+   * @dev gets private, user specific Yield data
+  */
+  const _getUserData = async (_deployedContracts:any, _deployedSeries:any, forceUpdate:boolean): Promise<any> => {
     const _userData:any = {};
     const _lastBlock = await provider.getBlockNumber();
 
-    /* get balances and posted collateral */
+    /* Get balances, posted collateral and makerData? */
     _userData.ethBalance = await getEthBalance();
-    _userData.ethPosted = await callTx(deployedContracts.Controller, 'Controller', 'posted', [utils.ETH, account]);
+    _userData.ethPosted = await callTx(_deployedContracts.Controller, 'Controller', 'posted', [utils.ETH, account]);
+    _userData.urn = await callTx(_deployedContracts.Vat, 'Vat', 'urns', [utils.ETH, account ]);
 
-    // _userData.ethTotalDebtYDai = await callTx(deployedContracts.Controller, 'Controller', 'totalDebtYDai', [utils.ETH-A, account]);
-    _userData.urn = await callTx(deployedContracts.Vat, 'Vat', 'urns', [utils.ETH, account ]);
-
-    /* get transaction history (from cache first or rebuild if update forced) */
+    /* Get transaction history (from cache first or rebuild if an update is forced) */
     forceUpdate && window.localStorage.removeItem('txHistory') && console.log('Re-building txHistory...');
-    const _postedHistory = await getEventHistory(deployedContracts.Controller, 'Controller', 'Posted', [null, account, null], !txHistory?0:txHistory.lastBlock+1 )
+
+    const postedHistory = await getEventHistory(_deployedContracts.Controller, 'Controller', 'Posted', [null, account, null], !txHistory?0:txHistory.lastBlock+1 )
       .then((res:any) => parseEventList(res) );
-    const _borrowedHistory = await getEventHistory(deployedContracts.Controller, 'Controller', 'Borrowed', [], !txHistory?0:txHistory.lastBlock+1 )
+    const borrowedHistory = await getEventHistory(_deployedContracts.Controller, 'Controller', 'Borrowed', [], !txHistory?0:txHistory.lastBlock+1 )
+      .then((res:any) => parseEventList(res));
+    const adminHistory = await getEventHistory(_deployedContracts.Controller, 'Controller', 'Delegate', [account, null], !txHistory?0:txHistory.lastBlock+1 )
       .then((res:any) => parseEventList(res) );
 
     // TODO add in AMM history collection
-    // TODO add in YDai information?
-    const _adminHistory = await getEventHistory(deployedContracts.Controller, 'Controller', 'Delegate', [account, null], !txHistory?0:txHistory.lastBlock+1 )
-      .then((res:any) => parseEventList(res) );
+    // _deployedSeries.forEach(async (x:any)=>{
+    //   const _marketHistory = await getEventHistory(x.market, 'Market', 'Borrowed', [], !txHistory?0:txHistory.lastBlock+1 )
+    //   .then((res:any) => parseEventList(res));
+    // });
 
     // TODO : get blocknumber at initialisation of yDaiProtocol instead of using first block(0).
     console.log('txHistory updated from block:', txHistory?.lastBlock+1 || 0, 'to block:', _lastBlock);
 
+    const updatedHistory = [...postedHistory, ...borrowedHistory, ...adminHistory];
+
     setTxHistory({
       lastBlock: _lastBlock,
-      items: txHistory ?
-        [ ...txHistory.items, ..._postedHistory, ..._borrowedHistory, ..._adminHistory ]
-        : [ ..._postedHistory, ..._borrowedHistory, ..._adminHistory ]
+      items: txHistory ? [ ...txHistory.items, ...updatedHistory ] : [...updatedHistory]
     });
 
     /* parse and return user data */
@@ -272,6 +275,21 @@ const YieldProvider = ({ children }:any) => {
     };
   };
 
+  const _addListeners = async (_deployedContracts:any) => {
+    // Add Maker rate/spot changes
+    provider && addEventListener(
+      _deployedContracts.Vat,
+      'Vat',
+      'LogNote',
+      [],
+      (x:any, y:any, z:any)=> { 
+        console.log('MAKER listener', x, y, z);
+        // dispatch({ type:'updateFeedData', payload: {...feedData, feedData.ilks })
+      }
+    );
+    // TODO: add event listener for AMM
+  };
+
   const initApp = async (networkId:number|string) => {
 
     dispatch({ type:'isLoading', payload: true });
@@ -283,26 +301,22 @@ const YieldProvider = ({ children }:any) => {
     dispatch({ type:'updateDeployedContracts', payload: deployedContracts });
     dispatch({ type:'updateDeployedSeries', payload: deployedSeries });
 
-    /* 2. Fetch feed/stream data (from cache initially if available) and init event listeners */
-    dispatch({ type:'updateFeedData', payload: await _getFeedData(deployedContracts) });
-    // 2.1 Add listen to Maker rate/spot changes
-    provider && addEventListener(
-      deployedContracts.Vat,
-      'Vat',
-      'LogNote',
-      [],
-      (x:any, y:any, z:any)=> { 
-        console.log(x, y, z); 
-        // dispatch({ type:'updateFeedData', payload: {...feedData, feedData.ilks })
-      }
-    );
-    // TODO: add event listener for AMM
-    /* 3. Fetch auxilliary (PUBLIC non-cached, non-user specific) yield and series data */
-    dispatch({ type:'updateYieldData', payload: await _getYieldData(deployedContracts) });
+    await Promise.all([
+      /* 2. Fetch feed/stream data (from cache initially if available) */
+      dispatch({ type:'updateFeedData', payload: await _getFeedData(deployedContracts) }),
+      /* 3. Initiate event listeners */
+      _addListeners(deployedContracts),
+      /* 4. Fetch auxilliary (PUBLIC non-cached, non-user specific) yield and series data */
+      dispatch({ type:'updateYieldData', payload: await _getYieldData(deployedContracts) }),
+    ]);
 
     /* 4. Fetch any user data based on address (if any), possibly cached. */
-    const userData = account ? await _getUserData(deployedContracts, false): null;
+    const userData = account ? await _getUserData(deployedContracts, deployedSeries, false): null;
     dispatch({ type:'updateUserData', payload: userData });
+
+    // TODO: split history from _getUserData
+    /* 5. Fetch user history */
+
     dispatch({ type:'isLoading', payload: false });
   };
 
@@ -311,10 +325,8 @@ const YieldProvider = ({ children }:any) => {
     ( async () => chainId && initApp(chainId))();
   }, [chainId, account]);
 
-
-
   const actions = {
-    updateUserData: () => _getUserData(state.deployedContracts, false).then((res:any)=> dispatch({ type:'updateUserData', payload: res })),
+    updateUserData: () => _getUserData(state.deployedContracts, state.deployedSeries, false).then((res:any)=> dispatch({ type:'updateUserData', payload: res })),
     // updateSeriesData: (x:IYieldSeries[]) => _getSeriesData(x).then((res:any) => dispatch({ type:'updateDeployedSeries', payload: res })),
     // updateYieldBalances: (x:any) => _getYieldData(state.deployedContracts, state.feedData).then((res:any)=> dispatch({ type:'updateYieldData', payload: res })),
     // refreshYieldAddrs: () => _getYieldAddrs(chainId, true),

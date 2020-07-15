@@ -1,8 +1,5 @@
 import React from 'react';
-import { useWeb3React } from '@web3-react/core';
-import { ethers, BigNumber }  from 'ethers';
-
-import { NotifyContext } from '../contexts/NotifyContext';
+import { ethers }  from 'ethers';
 import { ConnectionContext } from '../contexts/ConnectionContext';
 
 import YDai from '../contracts/YDai.json';
@@ -15,8 +12,6 @@ import Chai from '../contracts/Chai.json';
 import Vat from '../contracts/Vat.json';
 import Pot from '../contracts/Pot.json';
 import EthProxy from '../contracts/EthProxy.json';
-
-// ethers.errors.setLogLevel('error');
 
 const contractMap = new Map<string, any>([
   ['YDai', YDai.abi],
@@ -32,16 +27,14 @@ const contractMap = new Map<string, any>([
 ]);
 
 /**
- * Hooks for subscribing to and getting events from any contract.
+ * Hooks for subscribing to and getting events from any of the protocol contracts.
  * 
  * @returns { function } addEventListner
  * @returns { function } removeEventListener
  * @returns { function } getEvents
  */
 export const useEvents = () => {
-  const { state: { signer, account, provider } } = React.useContext(ConnectionContext);
-  // const { library, account } = useWeb3React();
-  // const signer = library.getSigner();
+  const { state: { provider } } = React.useContext(ConnectionContext);
   const [ eventListenerList, setEventListenerList ] = React.useState<boolean>();
   const [ isLoading, setIsLoading ] = React.useState<boolean>();
 
@@ -103,7 +96,7 @@ export const useEvents = () => {
             return y;
           }
           return ethers.utils.parseBytes32String(y) || y;
-          // TODO: deal with Hexstrings/ bytes
+          // TODO: deal with Hexstrings/bytes
         })
       };
     })
