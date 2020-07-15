@@ -5,7 +5,7 @@ import RepayAction from './RepayAction';
 
 import { YieldContext } from '../contexts/YieldContext';
 
-import { useDealer, useBalances } from '../hooks';
+import { useController, useBalances } from '../hooks';
 
 const BorrowRepay = ({ active, activeSeries }:any) => {
   const [over, setOver] = React.useState<boolean>(false);
@@ -14,22 +14,22 @@ const BorrowRepay = ({ active, activeSeries }:any) => {
   const { state, actions } = React.useContext(YieldContext);
   const { deployedContracts, yieldData } = state;
   const {
-    approveDealer,
+    approveController,
     borrow,
     repay,
     repayActive,
     borrowActive,
-  }  = useDealer();
+  }  = useController();
 
   const borrowSteps = async (value:number) => {
-    await borrow(deployedContracts.Dealer, 'ETH-A', activeSeries.maturity, value );
+    await borrow(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value );
     actions.updateUserData(state.deployedContracts, state.deployedContracts);
     actions.updateSeriesData(state.deployedSeries);
   };
 
   const repaySteps = async (value:number, collateral:string) => {
     console.log(activeSeries);
-    await repay(deployedContracts.Dealer, 'ETH-A', activeSeries.maturity, value, collateral );
+    await repay(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value, collateral );
     actions.updateUserData(state.deployedContracts, state.deployedContracts);
     // actions.updateYieldBalances(state.deployedContracts);
     actions.updateSeriesData(state.deployedSeries);

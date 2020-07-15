@@ -13,9 +13,11 @@ import {
 import SeriesSelector from './SeriesSelector';
 
 import { YieldContext } from '../contexts/YieldContext';
-import { SeriesContext } from '../contexts/SeriesContext';
 
-import { useDealer } from '../hooks';
+import { SeriesContext } from '../contexts/SeriesContext';
+import { NotifyContext } from '../contexts/NotifyContext';
+
+import { useController } from '../hooks';
 
 interface BorrowActionProps {
   borrowFn?:any
@@ -37,7 +39,7 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
     collateralRatio_,
   } = seriesAggregates;
 
-  const { borrow, borrowActive }  = useDealer();
+  const { borrow, borrowActive }  = useController();
 
   const [ inputValue, setInputValue ] = React.useState<any>();
   const [ borrowDisabled, setBorrowDisabled ] = React.useState<boolean>(false);
@@ -51,10 +53,17 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
 
   const borrowProcedure = async (value:number) => {
-    await borrow(deployedContracts.Dealer, 'ETH-A', activeSeries.maturity, value );
+    await borrow(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value );
     yieldActions.updateUserData();
     seriesActions.refreshPositions([activeSeries]);
   };
+
+  // TODO: maybe split into a custom hook
+  const { state: { pendingTxs } } = React.useContext(NotifyContext);
+  const [txActive, setTxActive] = useState<any>(null);
+  useEffect(()=>{
+    setTxActive(pendingTxs.find((x:any)=> x.type === 'BORROW'));
+  }, [ pendingTxs ]);
 
   useEffect(()=>{
     if (estRatio && estRatio <= 150) {
@@ -103,12 +112,12 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
 
   useEffect(() => {
     console.log(activeSeries);
-
   }, [ activeSeries ]);
 
   return (
     <>
       {selectorOpen && <SeriesSelector close={()=>setSelectorOpen(false)} /> }
+      { !txActive && !borrowActive &&
       <Box flex='grow' justify='between'>
         <Box gap='medium' align='center' fill='horizontal'>
           <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Choose a series</Text>
@@ -256,7 +265,41 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
             </Text>
           </Box>
         </Box>
-      </Box>
+      </Box> }
+
+      { borrowActive && !txActive &&
+        <Box>Awaiting transaction approval</Box>}
+
+      { txActive &&
+      <Box align='center' flex='grow' justify='between' gap='large'>
+        <Box gap='medium' align='center' fill='horizontal'>
+          <Text size='xlarge' color='brand' weight='bold'>Good One!</Text>
+          <Box
+            // direction='row-responsive'
+            fill='horizontal'
+            gap='large'
+            align='center'
+          >
+            <Text>You borrowed {inputValue} Dai</Text>
+            <Text>Transaction Pending: </Text>
+            <Box
+              fill='horizontal'
+              round='medium'
+              background='brand'
+              onClick={()=>console.log('Going to etherscan')}
+              align='center'
+              pad='medium'
+            >
+              <Text
+                weight='bold'
+                size='large'
+              >
+                View on Etherscan
+              </Text>
+            </Box>
+          </Box>
+        </Box>
+      </Box>}
     </>
   );
 };

@@ -65,7 +65,7 @@ const initState = {
   deployedSeries : [],
   deployedContracts: {},
   // transient
-  feedData: { 
+  feedData: {
     ilks:{
       EthA: {
         rate: null, // localStorage.getItem(feedData.ilks.EthA.rate)
@@ -115,7 +115,7 @@ const YieldProvider = ({ children }:any) => {
     let _deployedContracts:any;
     const contractGroups = {
       contractList: [
-        'Dealer',
+        'Controller',
         'Treasury',
         'Chai',
         'Dai',
@@ -158,12 +158,14 @@ const YieldProvider = ({ children }:any) => {
         );
         await Promise.all(
           _seriesList.map(async (x:string, i:number)=>{
+            const market = await callTx(state.migrationsAddr, 'Migrations', 'contracts', [ethers.utils.formatBytes32String(`Market-yDai${i+1}`)]);
             const name = await callTx(x, 'YDai', 'name', []);
             const maturity = (await callTx(x, 'YDai', 'maturity', [])).toNumber();
-            return { 
+            return {
               yDai: x,
               name,
               maturity,
+              market,
               // symbol: await callTx(x, 'YDai', 'symbol', []),
               maturity_: new Date( (maturity) * 1000 ),
               displayName: Moment(maturity*1000).format('MMMM YYYY'),
@@ -225,28 +227,31 @@ const YieldProvider = ({ children }:any) => {
 
     /* get balances and posted collateral */
     _userData.ethBalance = await getEthBalance();
-    _userData.ethPosted = await callTx(deployedContracts.Dealer, 'Dealer', 'posted', [utils.ETH, account]);
+    _userData.ethPosted = await callTx(deployedContracts.Controller, 'Controller', 'posted', [utils.ETH, account]);
 
-    // _userData.ethTotalDebtYDai = await callTx(deployedContracts.Dealer, 'Dealer', 'totalDebtYDai', [utils.ETH-A, account]);
+    // _userData.ethTotalDebtYDai = await callTx(deployedContracts.Controller, 'Controller', 'totalDebtYDai', [utils.ETH-A, account]);
     _userData.urn = await callTx(deployedContracts.Vat, 'Vat', 'urns', [utils.ETH, account ]);
 
     /* get transaction history (from cache first or rebuild if update forced) */
     forceUpdate && window.localStorage.removeItem('txHistory') && console.log('Re-building txHistory...');
-    const _postedHistory = await getEventHistory(deployedContracts.Dealer, 'Dealer', 'Posted', [null, account, null], !txHistory?0:txHistory.lastBlock+1 )
+    const _postedHistory = await getEventHistory(deployedContracts.Controller, 'Controller', 'Posted', [null, account, null], !txHistory?0:txHistory.lastBlock+1 )
       .then((res:any) => parseEventList(res) );
-    const _borrowedHistory = await getEventHistory(deployedContracts.Dealer, 'Dealer', 'Borrowed', [], !txHistory?0:txHistory.lastBlock+1 )
+    const _borrowedHistory = await getEventHistory(deployedContracts.Controller, 'Controller', 'Borrowed', [], !txHistory?0:txHistory.lastBlock+1 )
       .then((res:any) => parseEventList(res) );
+
     // TODO add in AMM history collection
     // TODO add in YDai information?
+    const _adminHistory = await getEventHistory(deployedContracts.Controller, 'Controller', 'Delegate', [account, null], !txHistory?0:txHistory.lastBlock+1 )
+      .then((res:any) => parseEventList(res) );
 
     // TODO : get blocknumber at initialisation of yDaiProtocol instead of using first block(0).
-    console.log('txHistory updated from block:', txHistory?.lastBlock+1||0, 'to block:', _lastBlock);
+    console.log('txHistory updated from block:', txHistory?.lastBlock+1 || 0, 'to block:', _lastBlock);
 
     setTxHistory({
       lastBlock: _lastBlock,
       items: txHistory ?
-        [ ...txHistory.items, ..._postedHistory, ..._borrowedHistory ]
-        : [ ..._postedHistory, ..._borrowedHistory ]
+        [ ...txHistory.items, ..._postedHistory, ..._borrowedHistory, ..._adminHistory ]
+        : [ ..._postedHistory, ..._borrowedHistory, ..._adminHistory ]
     });
 
     /* parse and return user data */
@@ -254,7 +259,7 @@ const YieldProvider = ({ children }:any) => {
       ..._userData,
       ethBalance_: parseFloat(ethers.utils.formatEther(_userData.ethBalance.toString())),
       ethPosted_: parseFloat(ethers.utils.formatEther(_userData.ethPosted.toString())),
-      txHistory : { 
+      txHistory : {
         ...txHistory,
         items: txHistory?.items,
       },
@@ -292,14 +297,12 @@ const YieldProvider = ({ children }:any) => {
       }
     );
     // TODO: add event listener for AMM
-
     /* 3. Fetch auxilliary (PUBLIC non-cached, non-user specific) yield and series data */
     dispatch({ type:'updateYieldData', payload: await _getYieldData(deployedContracts) });
 
     /* 4. Fetch any user data based on address (if any), possibly cached. */
     const userData = account ? await _getUserData(deployedContracts, false): null;
     dispatch({ type:'updateUserData', payload: userData });
-
     dispatch({ type:'isLoading', payload: false });
   };
 
@@ -308,8 +311,10 @@ const YieldProvider = ({ children }:any) => {
     ( async () => chainId && initApp(chainId))();
   }, [chainId, account]);
 
+
+
   const actions = {
-    updateUserData: () => _getUserData(state.deployedContracts, true).then((res:any)=> dispatch({ type:'updateUserData', payload: res })),
+    updateUserData: () => _getUserData(state.deployedContracts, false).then((res:any)=> dispatch({ type:'updateUserData', payload: res })),
     // updateSeriesData: (x:IYieldSeries[]) => _getSeriesData(x).then((res:any) => dispatch({ type:'updateDeployedSeries', payload: res })),
     // updateYieldBalances: (x:any) => _getYieldData(state.deployedContracts, state.feedData).then((res:any)=> dispatch({ type:'updateYieldData', payload: res })),
     // refreshYieldAddrs: () => _getYieldAddrs(chainId, true),

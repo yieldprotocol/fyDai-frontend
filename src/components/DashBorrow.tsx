@@ -25,6 +25,8 @@ const DashBorrow = ({ }:DashBorrowProps) => {
 
   const [ addCollateral, setAddCollateral ] = React.useState<boolean>(false);
 
+  const [ txHistory, setTxHistory] = React.useState<any>([]);
+
   const { state: { deployedSeries, deployedContracts, yieldData, userData }, actions } = React.useContext(YieldContext);
 
   const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
@@ -38,14 +40,17 @@ const DashBorrow = ({ }:DashBorrowProps) => {
     collateralRatio_,
   } = seriesAggregates;
 
-  const txHistory = userData?.txHistory?.items || [];
-  const txHistory_ = txHistory.filter((x:any) => x.event==='Borrowed' ).map((x:any) => {
-    return {
-      event: x.args_[3]>0 ? 'Borrow' : 'Repay',
-      date: moment(x.date_).format('D MMM YYYY'),
-      amount: ethers.utils.formatEther( x.args_[3] ),
-    };
-  });
+  React.useEffect(()=> {
+    const _txHist = userData?.txHistory?.items || [];
+    const txHist = _txHist.filter((x:any) => x.event==='Borrowed' ).map((x:any) => {
+      return {
+        event: x.args_[3]>0 ? 'Borrow' : 'Repay',
+        date: moment(x.date_).format('D MMM YYYY'),
+        amount: ethers.utils.formatEther( x.args_[3] ),
+      };
+    });
+    setTxHistory(txHist);
+  }, [ userData ]);
 
   return (
     <Box gap='small'>
@@ -121,7 +126,7 @@ const DashBorrow = ({ }:DashBorrowProps) => {
             // elevation='medium'
             border
           >
-            <Box 
+            <Box
               direction='row'
               gap='xsmall'
               justify='between'
@@ -134,10 +139,8 @@ const DashBorrow = ({ }:DashBorrowProps) => {
               <Box><Text color='text-weak' size='xsmall'>ACTION</Text></Box>
             </Box>
             <Box>
-              sereis list here
- 
+              Series List here
             </Box>
-            
           </Box>
 
         </Box>
@@ -164,7 +167,7 @@ const DashBorrow = ({ }:DashBorrowProps) => {
               <Box><Text color='text-weak' size='xsmall'>DATE</Text></Box>
               <Box><Text color='text-weak' size='xsmall'>ACTION</Text></Box>
             </Box>
-            { txHistory_.length > 0 ? txHistory_.map((x:any, i:number)=>{
+            { txHistory.length > 0 ? txHistory.map((x:any, i:number)=>{
               const key_ = i;
               return (
                 <Box
@@ -182,16 +185,13 @@ const DashBorrow = ({ }:DashBorrowProps) => {
                   <Box> ACTION A </Box>
                 </Box>
               );
-              
             }):
             <Box>
               Loading history...
             </Box>}
-
           </Box>
         </Box>
       </Box>
-
     </Box>
 
   );

@@ -6,7 +6,7 @@ import { NotifyContext } from '../contexts/NotifyContext';
 import { ConnectionContext } from '../contexts/ConnectionContext';
 
 import YDai from '../contracts/YDai.json';
-import Dealer from '../contracts/Dealer.json';
+import Controller from '../contracts/Controller.json';
 import TestERC20 from '../contracts/TestERC20.json';
 import WETH9 from '../contracts/WETH9.json';
 import GemJoin from '../contracts/GemJoin.json';
@@ -20,7 +20,7 @@ import EthProxy from '../contracts/EthProxy.json';
 
 const contractMap = new Map<string, any>([
   ['YDai', YDai.abi],
-  ['Dealer', Dealer.abi],
+  ['Controller', Controller.abi],
   ['Dai', TestERC20.abi],
   ['Weth', WETH9.abi],
   ['Chai', Chai.abi],
@@ -99,6 +99,8 @@ export const useEvents = () => {
             return y.toString();
           } if (ethers.utils.isAddress(y)) {
             return ethers.utils.getAddress(y);
+          } if (typeof y) {
+            return y;
           }
           return ethers.utils.parseBytes32String(y) || y;
           // TODO: deal with Hexstrings/ bytes

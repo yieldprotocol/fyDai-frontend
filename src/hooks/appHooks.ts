@@ -1,5 +1,14 @@
 import React from 'react';
 import { ConnectionContext } from '../contexts/ConnectionContext';
+import { NotifyContext } from '../contexts/NotifyContext';
+
+
+
+export const useTxActive = (type:string) => {
+
+ // TODO create the useTxActive hook
+
+};
 
 export const useCachedState = (key:string, initialValue:any) => {
 

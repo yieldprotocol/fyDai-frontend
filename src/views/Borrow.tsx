@@ -23,15 +23,11 @@ const Borrow = ({ setShowSeriesLayer, activeView: viewFromProp }:BorrowProps) =>
 
   const { state: yieldState, actions: yieldActions } = React.useContext(YieldContext);
   const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
-
   const [ activeView, setActiveView ] = React.useState<string>(viewFromProp || 'collateral');
-
   const [ activePosition, setActivePosition ] = React.useState<any>(null);
   const [ borrowRepayActive, setBorrowRepayActive ] = React.useState<boolean>(true);
   const [ depositWithdrawActive, setDepositWithdrawActive ] = React.useState<boolean>(false);
-
   const { isLoading: positionsLoading, seriesData, activeSeries } = seriesState;
-
   const { isLoading: yieldLoading, userData, deployedSeries, deployedContracts, yieldData, makerData }  = yieldState;
 
   return (
@@ -94,7 +90,7 @@ const Borrow = ({ setShowSeriesLayer, activeView: viewFromProp }:BorrowProps) =>
         </Box>
       </Box>
 
-      <Box 
+      <Box
         width={{ max:'750px' }}
         alignSelf='center'
         fill='horizontal'
@@ -107,7 +103,6 @@ const Borrow = ({ setShowSeriesLayer, activeView: viewFromProp }:BorrowProps) =>
         { activeView === 'repay' && <RepayAction maxValue={12} repayFn={(x:any)=>console.log(x)} /> }
       </Box>
     </Box>
-
   );
 };
 

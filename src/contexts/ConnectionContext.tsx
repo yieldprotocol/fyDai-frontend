@@ -94,12 +94,13 @@ const ConnectionProvider = ({ children }:any) => {
       // @ts-ignore
         window.ethereum.on('accountsChanged', async () => {
           updateConnection();
+          
         });
         // @ts-ignore
         window.ethereum.on('networkChanged', async () => {
           updateConnection();
         });
-      } catch (e) { console.log(e);}
+      } catch (e) {console.log(e);}
     })();
   }, []);
 

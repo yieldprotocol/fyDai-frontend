@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Box, Button, Image, Select, TextInput, Text, Heading, Collapsible } from 'grommet';
 import { 
   FiCheckCircle, 
@@ -9,19 +9,15 @@ import {
 } from 'react-icons/fi';
 
 import SeriesSelector from './SeriesSelector';
-
 import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
+import { NotifyContext } from '../contexts/NotifyContext';
 
-import { useDealer } from '../hooks';
+import { useController } from '../hooks';
 
 interface RepayActionProps {
   repayFn:any
   maxValue:number
-
-  // activeSeries?:IYieldSeries,
-  // fixedOpen?:boolean,
-  // close?:any,
 }
 
 function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
@@ -38,7 +34,7 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
     estimateRatio, // TODO << this is a function (basically just passed from hooks via context) >> 
   } = seriesAggregates;
 
-  const { repay, repayActive }  = useDealer();
+  const { repay, repayActive }  = useController();
   const [inputValue, setInputValue] = React.useState<any>();
   const [repayDisabled, setRepayDisabled] = React.useState<boolean>(false);
   const [ selectorOpen, setSelectorOpen ] = React.useState<boolean>(false);
@@ -46,15 +42,22 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
   const [ warningMsg, setWarningMsg] = React.useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
 
+  // TODO: maybe split into a custom hook
+  const { state: { pendingTxs } } = React.useContext(NotifyContext);
+  const [txActive, setTxActive] = React.useState<any>(null);
+  useEffect(()=>{
+    setTxActive(pendingTxs.find((x:any)=> x.type === 'REPAY'));
+  }, [ pendingTxs ]);
+
   const repayProcedure = async (value:number) => {
-    await repay(deployedContracts.Dealer, 'ETH-A', activeSeries.maturity, value, 'yDai' );
-    // yieldActions.updateUserData();
+    await repay(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value, 'yDai' );
     seriesActions.refreshPositions([activeSeries]);
   };
 
   return (
     <>
       {selectorOpen && <SeriesSelector close={()=>setSelectorOpen(false)} /> }
+      { !repayActive && !txActive &&
       <Box flex='grow' justify='between'>
         <Box gap='medium' align='center' fill='horizontal'>
           <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Choose a series</Text>
@@ -64,7 +67,7 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
             gap='small'
             align='center'
           >
-            <Box 
+            <Box
               round='medium'
               background='brand-transparent'
               direction='row'
@@ -162,7 +165,41 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
             </Text>
           </Box>
         </Box>
-      </Box>
+      </Box>}
+
+      { repayActive && !txActive &&
+        <Box>Awaiting transaction approval</Box>}
+
+      { txActive &&
+        <Box align='center' flex='grow' justify='between' gap='large'>
+          <Box gap='medium' align='center' fill='horizontal'>
+            <Text size='xlarge' color='brand' weight='bold'>Good One!</Text>
+            <Box
+            // direction='row-responsive'
+              fill='horizontal'
+              gap='large'
+              align='center'
+            >
+              <Text>Repayment of  {inputValue} Dai</Text>
+              <Text>Transaction Pending: </Text>
+              <Box
+                fill='horizontal'
+                round='medium'
+                background='brand'
+                onClick={()=>console.log('Going to etherscan')}
+                align='center'
+                pad='medium'
+              >
+                <Text
+                  weight='bold'
+                  size='large'
+                >
+                  View on Etherscan
+                </Text>
+              </Box>
+            </Box>
+          </Box>
+        </Box>}
     </>
   );
 }

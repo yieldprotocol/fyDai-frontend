@@ -6,7 +6,7 @@ import WithdrawAction from './WithdrawAction';
 import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 
-import { useDealer, useEthProxy, useBalances } from '../hooks';
+import { useController, useEthProxy, useBalances } from '../hooks';
 
 const DepositWithdraw = ({ close }:any) => {
 
@@ -20,12 +20,12 @@ const DepositWithdraw = ({ close }:any) => {
   const { deployedContracts, yieldData, userData } = state; 
 
   const {
-    approveDealer,
+    approveController,
     borrow,
     repay,
     repayActive,
     borrowActive,
-  }  = useDealer();
+  }  = useController();
 
   const {
     postEth, 
@@ -40,7 +40,7 @@ const DepositWithdraw = ({ close }:any) => {
   }, []);
 
   const depositSteps = async (value:number) => {
-    // await approveDealer(deployedContracts.Weth, deployedContracts.Dealer, value);
+    // await approveController(deployedContracts.Weth, deployedContracts.Controller, value);
     await postEth(deployedContracts.EthProxy, value);
     actions.updateUserData(state.deployedContracts, state.deployedContracts);
     actions.updateYieldBalances(state.deployedContracts);

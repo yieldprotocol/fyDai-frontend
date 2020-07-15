@@ -18,7 +18,7 @@ import WithDrawDaiAction from './WithDrawDaiAction';
 import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
   
-import { useDealer } from '../hooks';
+import { useController } from '../hooks';
   
 interface BorrowActionProps {
   borrowFn?:any
@@ -40,7 +40,7 @@ const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
 
   } = seriesAggregates;
   
-  const { borrow, borrowActive }  = useDealer();
+  const { borrow, borrowActive }  = useController();
   
   const [ inputValue, setInputValue ] = React.useState<any>();
   const [ borrowDisabled, setBorrowDisabled ] = React.useState<boolean>(false);
@@ -56,7 +56,7 @@ const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
   
   const lendProcedure = async (value:number) => {
-    // await lend(deployedContracts.Dealer, 'ETH-A', activeSeries.maturity, value );
+    // await lend(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value );
     // yieldActions.updateUserData(yieldState.deployedContracts, yieldState.deployedContracts);
     // yieldActions.updateSeriesData(yieldState.deployedSeries);
     // seriesActions.updateMetrics();

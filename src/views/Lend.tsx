@@ -23,13 +23,11 @@ const Lend = ({ setShowSeriesLayer, activeView: viewFromProp  }:LendProps) => {
   // const [ nextColor, setNextColor ] = React.useState<string>('');
 
   const [ activeView, setActiveView ] = React.useState<string>(viewFromProp || 'collateral');
-
-
   const [ activePosition, setActivePosition ] = React.useState<any>(null);
+
   // const [ layerOpen, setLayerOpen ] = React.useState<String|null>(null);
   // const [ ] = React.useState<boolean>(true);
   const [ depositWithdrawActive ] = React.useState<boolean>(true);
-
   const { isLoading: positionsLoading, seriesData, activeSeries } = seriesState; 
 
   // React.useEffect( () => {
@@ -75,7 +73,6 @@ const Lend = ({ setShowSeriesLayer, activeView: viewFromProp  }:LendProps) => {
         <LendAction maxValue={12} borrowFn={(x:any)=>console.log(x) } />
       </Box>
     </Box>
-
 
   // <Box gap='small' pad={{ vertical:'small', horizontal:'large' }}>
   //   <Box justify='between'>
