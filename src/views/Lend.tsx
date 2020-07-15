@@ -10,6 +10,7 @@ import { IYieldSeries } from '../types';
 import BuySell from '../components/x_BuySell';
 import Redeem from '../components/Redeem';
 import LendAction from '../components/LendAction';
+import TipButtons from '../components/TipButtons';
 
 interface LendProps {
   setShowSeriesLayer: any,
@@ -47,7 +48,7 @@ const Lend = ({ setShowSeriesLayer, activeView: viewFromProp  }:LendProps) => {
       <Box direction='row' fill='horizontal' pad={{ bottom:'large', horizontal:'none' }} justify='between' align='center'>
         <Box>
           <Box direction='row' gap='small'>
-            <Heading level='3' margin='none'>Lend</Heading>
+            <Heading level='3' margin='none' color='text-strong'>Lend</Heading>
             {/* <Heading level='3' margin='none' onClick={()=>(activeView==='borrow')? setActiveView('lend'):setActiveView('borrow')}><a>{activeView}</a></Heading> */}
             {/* <Heading level='3' margin='none'>yDai</Heading> */}
           </Box>
@@ -59,8 +60,7 @@ const Lend = ({ setShowSeriesLayer, activeView: viewFromProp  }:LendProps) => {
         </Box>
 
         <Box direction='row' gap='small' pad='small'>
-          <Button primary label='Tip: Convert your Maker Vault' />
-          <Button label='View more tips' />
+          <TipButtons text="Tip: Convert your Maker Vault" />
         </Box>
       </Box>
 

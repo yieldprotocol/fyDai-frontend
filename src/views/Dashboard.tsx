@@ -3,6 +3,7 @@ import { Box, Button, Image, Heading, Text } from 'grommet';
 
 import DashBorrow from '../components/DashBorrow';
 import DashLend from '../components/DashLend';
+import TipButton from '../components/TipButtons';
 
 const Dashboard = () => {
 
@@ -14,9 +15,8 @@ const Dashboard = () => {
       <Box direction='row' fill='horizontal' pad={{ bottom:'large', horizontal:'none' }} justify='between' align='center'>
         <Box>
           <Box direction='row' gap='small'>
-            <Heading level='3' margin='none'>Your</Heading>
+            <Heading level='3' margin='none' color='text-strong'>Your dashboard</Heading>
             {/* <Heading level='3' margin='none' onClick={()=>(activeView==='borrow')? setActiveView('lend'):setActiveView('borrow')}><a>{activeView}</a></Heading> */}
-            <Heading level='3' margin='none'>dashboard</Heading>
           </Box>
           <Box direction='row'> 
             <Text size='xsmall' color='text-weak' >
@@ -26,8 +26,7 @@ const Dashboard = () => {
         </Box>
 
         <Box direction='row' gap='small' pad='small'>
-          <Button primary label='Tip: Convert your Maker Vault' />
-          <Button label='View more tips' />
+          <TipButton text="Tip: Convert your Maker vault" />
         </Box>
       </Box>
 

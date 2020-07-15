@@ -77,7 +77,15 @@ const YieldHeader = (props: any) => {
       responsive={true}
       gap="small"
     >
-      <Text color={activeView === link ? 'brand' : 'text'}>{text}</Text>
+      <Text
+        weight={600}
+        color={activeView === link ? 'brand' : 'text'}
+        style={{
+          textDecoration: activeView === link ? 'underline' : 'none',
+        }}
+      >
+        {text}
+      </Text>
     </Box>
   );
 
@@ -148,10 +156,10 @@ const YieldHeader = (props: any) => {
           ) : (
             <Box>
               <Button
-                color="border"
-                style={{ minWidth: '160px' }}
-                label="Connect to a wallet"
                 onClick={() => openConnectLayer()}
+                label="Connect to a wallet"
+                color="border"
+                style={{ minWidth: '160px', fontWeight: 600 }}
               />
             </Box>
           )}
