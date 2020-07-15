@@ -156,18 +156,19 @@ const WithdrawAction = ({ close }:IWithDrawActionProps) => {
               <Text color='brand' weight='bold' size='large'> {collateralAmount_? `~${maxWithdraw.toFixed(2)} Eth` : '-' }</Text>
             </Box>
 
+            { (collateralRatio_ > 0) &&
             <Box gap='small' alignSelf='start'>
               <Text color='text-weak' size='xsmall'>Collateralization Ratio after withdraw</Text>
               <Box direction='row' gap='small'>
                 <Text color={!inputValue? 'brand-transparent': indicatorColor} weight='bold' size='large'> 
-                  {(estRatio && estRatio !== 0)? ` approx. ${estRatio}%`: collateralRatio_ || '-' }
+                  {(estRatio && estRatio !== 0)? ` approx. ${estRatio}%`: collateralRatio_ || '' }
                 </Text>
-                { true &&
+                { false &&
                 <Text color='red' size='large'> 
                   { inputValue && (estDecrease !== 0) && `(- ${estDecrease}%)` }
                 </Text>}
               </Box>
-            </Box>
+            </Box>}
 
           </Box>
 

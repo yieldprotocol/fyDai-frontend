@@ -6,7 +6,7 @@ import { NotifyContext } from '../contexts/NotifyContext';
 import { ConnectionContext } from '../contexts/ConnectionContext';
 
 import YDai from '../contracts/YDai.json';
-import Dealer from '../contracts/Dealer.json';
+import Controller from '../contracts/Controller.json';
 import TestERC20 from '../contracts/TestERC20.json';
 import WETH9 from '../contracts/WETH9.json';
 import GemJoin from '../contracts/GemJoin.json';
@@ -21,7 +21,7 @@ import Migrations from '../contracts/Migrations.json';
 
 const contractMap = new Map<string, any>([
   ['YDai', YDai.abi],
-  ['Dealer', Dealer.abi],
+  ['Controller', Controller.abi],
   ['Dai', TestERC20.abi],
   ['Weth', WETH9.abi],
   ['Chai', Chai.abi],

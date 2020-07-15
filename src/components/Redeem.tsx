@@ -9,7 +9,7 @@ import WithdrawAction from './WithdrawAction';
 import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 
-import { useDealer, useBalances } from '../hooks';
+import { useController, useBalances } from '../hooks';
 import RedeemAction from './RedeemAction';
 
 const Redeem = ({ activeSeries }:any) => {
@@ -24,12 +24,12 @@ const Redeem = ({ activeSeries }:any) => {
   const { deployedContracts, yieldData, userData } = state; 
 
   const {
-    approveDealer,
+    approveController,
     borrow,
     repay,
     repayActive,
     borrowActive,
-  }  = useDealer();
+  }  = useController();
 
   React.useEffect(()=>{
     // (async () => setWethBalance( await getWethBalance(deployedContracts.Weth)) )();
@@ -37,12 +37,12 @@ const Redeem = ({ activeSeries }:any) => {
   }, []);
 
   // const depositSteps = async (value:number) => {
-  //   await approveDealer(deployedContracts.Weth, deployedContracts.Dealer, value);
-  //   await post(deployedContracts.Dealer, 'ETH-A', value);
+  //   await approveController(deployedContracts.Weth, deployedContracts.Controller, value);
+  //   await post(deployedContracts.Controller, 'ETH-A', value);
   // };
 
   // const withdrawSteps = async (value:number) => {
-  //   await withdraw(deployedContracts.Dealer, 'ETH-A', value);
+  //   await withdraw(deployedContracts.Controller, 'ETH-A', value);
   // };
 
   return (

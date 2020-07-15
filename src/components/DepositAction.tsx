@@ -11,7 +11,6 @@ import { YieldContext } from '../contexts/YieldContext';
 import { NotifyContext } from '../contexts/NotifyContext';
 
 import WithdrawAction from './WithdrawAction';
-
 import { useEthProxy } from '../hooks';
 
 interface DepositProps {
@@ -28,15 +27,12 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
   const [ inputValue, setInputValue ] = useState<any>();
   const [ depositDisabled, setDepositDisabled ] = useState<boolean>(false);
   const [ withdrawOpen, setWithdrawOpen ] = useState<boolean>(false);
-
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
 
   const { state: yieldState, actions: yieldActions } = useContext(YieldContext);
   const { deployedContracts } = yieldState;
-
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
-
   const inputRef = React.useRef(null);
   
   const { seriesAggregates } = seriesState;
@@ -54,6 +50,7 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
     yieldActions.updateUserData();
   };
 
+  // Handle active transactions
   // TODO: maybe split into a custom hook
   const { state: { pendingTxs } } = React.useContext(NotifyContext);
   const [txActive, setTxActive] = React.useState<any>(null);
@@ -61,6 +58,7 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
     setTxActive(pendingTxs.find((x:any)=> x.type === 'DEPOSIT'));
   }, [ pendingTxs ]);
 
+  // Handle input values (warnings errors etc.)
   useEffect(()=>{
     if (inputValue && collateralAmount_ && debtValue_) {
       const newRatio = estimateRatio((collateralAmount_+ parseFloat(inputValue)), debtValue_); 
@@ -148,9 +146,8 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
           <Box gap='small'>
             <Text color='text-weak' size='xsmall'>Collateralisation Ratio</Text>
             <Text color='brand' weight='bold' size='large'> 
-              { collateralRatio_? `${collateralRatio_}%` : '-' }
+              { (collateralRatio_ && (collateralRatio_ !== 0))? `${collateralRatio_}%`: '-' }
             </Text>
-          
             { false && 
             <Box pad='xsmall'>
               <Text alignSelf='start' size='xxsmall'>
@@ -163,7 +160,7 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
             <Text color='text-weak' size='xsmall'>Ratio after deposit</Text>
             <Box direction='row' gap='small'>
               <Text color={!inputValue? 'brand-transparent': 'brand'} weight='bold' size='large'> 
-                {(estRatio && estRatio !== 0)? `~${estRatio}%`: collateralRatio_ || '-' }
+                {(estRatio && estRatio !== 0)? `~${estRatio}%`: collateralRatio_ || '' }
               </Text>
               { true &&
               <Text color='green' size='large'> 
@@ -172,6 +169,7 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
             </Box>
             {/* <Text color='text-weak' size='xxsmall'>if you deposit {inputValue||0} Eth</Text> */}
           </Box>
+
         </Box>
 
         { warningMsg &&

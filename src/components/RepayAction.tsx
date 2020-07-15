@@ -13,7 +13,7 @@ import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
 import { NotifyContext } from '../contexts/NotifyContext';
 
-import { useDealer } from '../hooks';
+import { useController } from '../hooks';
 
 interface RepayActionProps {
   repayFn:any
@@ -34,7 +34,7 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
     estimateRatio, // TODO << this is a function (basically just passed from hooks via context) >> 
   } = seriesAggregates;
 
-  const { repay, repayActive }  = useDealer();
+  const { repay, repayActive }  = useController();
   const [inputValue, setInputValue] = React.useState<any>();
   const [repayDisabled, setRepayDisabled] = React.useState<boolean>(false);
   const [ selectorOpen, setSelectorOpen ] = React.useState<boolean>(false);
@@ -50,8 +50,7 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
   }, [ pendingTxs ]);
 
   const repayProcedure = async (value:number) => {
-    await repay(deployedContracts.Dealer, 'ETH-A', activeSeries.maturity, value, 'yDai' );
-    // yieldActions.updateUserData();
+    await repay(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value, 'yDai' );
     seriesActions.refreshPositions([activeSeries]);
   };
 
@@ -68,7 +67,7 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
             gap='small'
             align='center'
           >
-            <Box 
+            <Box
               round='medium'
               background='brand-transparent'
               direction='row'

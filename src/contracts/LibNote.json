@@ -39,25 +39,26 @@
       "type": "event"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.6.2+commit.bacdbe57\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":true,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes4\",\"name\":\"sig\",\"type\":\"bytes4\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"usr\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"arg1\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"arg2\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"LogNote\",\"type\":\"event\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/external/maker/lib.sol\":\"LibNote\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/external/maker/lib.sol\":{\"keccak256\":\"0x84f2ca7bf121643ea7527b65cfab5c5e3d3742ec7dcba05929290b0370765338\",\"urls\":[\"bzz-raw://7b9a2d9bec71f99e4540e2dcdfa94498b86719b5a7a2349ae1bb2a5a84e81ec1\",\"dweb:/ipfs/QmV5LrQMiuCqZwgFfrvCH72tDk6s8ZsEtwGFwQbXn282b8\"]}},\"version\":1}",
-  "bytecode": "0x6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea26469706673582212205c7c9adf720ed77e4194022764caa31bfcb2a0993a8c2a3ffbaf298f9f6c169164736f6c63430006020033",
-  "deployedBytecode": "0x6080604052600080fdfea26469706673582212205c7c9adf720ed77e4194022764caa31bfcb2a0993a8c2a3ffbaf298f9f6c169164736f6c63430006020033",
-  "sourceMap": "668:251:13:-:0;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;668:251:13;;;;;;;",
-  "deployedSourceMap": "668:251:13:-:0;;;;;",
-  "source": "// This program is free software: you can redistribute it and/or modify\n// it under the terms of the GNU General Public License as published by\n// the Free Software Foundation, either version 3 of the License, or\n// (at your option) any later version.\n\n// This program is distributed in the hope that it will be useful,\n// but WITHOUT ANY WARRANTY; without even the implied warranty of\n// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n// GNU General Public License for more details.\n\n// You should have received a copy of the GNU General Public License\n// along with this program.  If not, see <http://www.gnu.org/licenses/>.\n\npragma solidity ^0.6.0;\n\ncontract LibNote {\n    event LogNote(\n        bytes4   indexed  sig,\n        address  indexed  usr,\n        bytes32  indexed  arg1,\n        bytes32  indexed  arg2,\n        bytes             data\n    ) anonymous;\n\n    modifier note {\n        _;\n    }\n}",
+  "metadata": "{\"compiler\":{\"version\":\"0.6.10+commit.00c0fcaf\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":true,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes4\",\"name\":\"sig\",\"type\":\"bytes4\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"usr\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"arg1\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"arg2\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"LogNote\",\"type\":\"event\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/external/maker/lib.sol\":\"LibNote\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/external/maker/lib.sol\":{\"keccak256\":\"0x58ffb7d4659d6024f9bcd18c15b442ffd592558606b95b45b2edd0d4fa0093e2\",\"license\":\"GPL-3.0-or-later\",\"urls\":[\"bzz-raw://22e6c97d667f6f72ea9d26f13ac7ccc8682b20cfa1ba1245aa02f2db419ff924\",\"dweb:/ipfs/QmS2beZrkXfUXJZm9v4XmRm5ieUe4HcqdmbSyP4eqgQokq\"]}},\"version\":1}",
+  "bytecode": "0x6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea2646970667358221220c0062564892622d326f1b4b848789c8db6708998ec3335fa3d09a9b1c42cfcff64736f6c634300060a0033",
+  "deployedBytecode": "0x6080604052600080fdfea2646970667358221220c0062564892622d326f1b4b848789c8db6708998ec3335fa3d09a9b1c42cfcff64736f6c634300060a0033",
+  "sourceMap": "714:251:11:-:0;;;;;;;;;;;;;;;;;;;",
+  "deployedSourceMap": "714:251:11:-:0;;;;;",
+  "source": "// SPDX-License-Identifier: GPL-3.0-or-later\n\n// This program is free software: you can redistribute it and/or modify\n// it under the terms of the GNU General Public License as published by\n// the Free Software Foundation, either version 3 of the License, or\n// (at your option) any later version.\n\n// This program is distributed in the hope that it will be useful,\n// but WITHOUT ANY WARRANTY; without even the implied warranty of\n// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n// GNU General Public License for more details.\n\n// You should have received a copy of the GNU General Public License\n// along with this program.  If not, see <http://www.gnu.org/licenses/>.\n\npragma solidity ^0.6.0;\n\ncontract LibNote {\n    event LogNote(\n        bytes4   indexed  sig,\n        address  indexed  usr,\n        bytes32  indexed  arg1,\n        bytes32  indexed  arg2,\n        bytes             data\n    ) anonymous;\n\n    modifier note {\n        _;\n    }\n}",
   "sourcePath": "/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/external/maker/lib.sol",
   "ast": {
     "absolutePath": "/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/external/maker/lib.sol",
     "exportedSymbols": {
       "LibNote": [
-        7894
+        7723
       ]
     },
-    "id": 7895,
+    "id": 7724,
+    "license": "GPL-3.0-or-later",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 7877,
+        "id": 7706,
         "literals": [
           "solidity",
           "^",
@@ -65,7 +66,7 @@
           ".0"
         ],
         "nodeType": "PragmaDirective",
-        "src": "643:23:13"
+        "src": "689:23:11"
       },
       {
         "abstract": false,
@@ -74,9 +75,9 @@
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 7894,
+        "id": 7723,
         "linearizedBaseContracts": [
-          7894
+          7723
         ],
         "name": "LibNote",
         "nodeType": "ContractDefinition",
@@ -84,22 +85,23 @@
           {
             "anonymous": true,
             "documentation": null,
-            "id": 7889,
+            "id": 7718,
             "name": "LogNote",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 7888,
+              "id": 7717,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 7879,
+                  "id": 7708,
                   "indexed": true,
+                  "mutability": "mutable",
                   "name": "sig",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 7889,
-                  "src": "714:21:13",
+                  "scope": 7718,
+                  "src": "760:21:11",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -107,10 +109,10 @@
                     "typeString": "bytes4"
                   },
                   "typeName": {
-                    "id": 7878,
+                    "id": 7707,
                     "name": "bytes4",
                     "nodeType": "ElementaryTypeName",
-                    "src": "714:6:13",
+                    "src": "760:6:11",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes4",
                       "typeString": "bytes4"
@@ -121,13 +123,14 @@
                 },
                 {
                   "constant": false,
-                  "id": 7881,
+                  "id": 7710,
                   "indexed": true,
+                  "mutability": "mutable",
                   "name": "usr",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 7889,
-                  "src": "745:21:13",
+                  "scope": 7718,
+                  "src": "791:21:11",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -135,10 +138,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 7880,
+                    "id": 7709,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "745:7:13",
+                    "src": "791:7:11",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -150,13 +153,14 @@
                 },
                 {
                   "constant": false,
-                  "id": 7883,
+                  "id": 7712,
                   "indexed": true,
+                  "mutability": "mutable",
                   "name": "arg1",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 7889,
-                  "src": "776:22:13",
+                  "scope": 7718,
+                  "src": "822:22:11",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -164,10 +168,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 7882,
+                    "id": 7711,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "776:7:13",
+                    "src": "822:7:11",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -178,13 +182,14 @@
                 },
                 {
                   "constant": false,
-                  "id": 7885,
+                  "id": 7714,
                   "indexed": true,
+                  "mutability": "mutable",
                   "name": "arg2",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 7889,
-                  "src": "808:22:13",
+                  "scope": 7718,
+                  "src": "854:22:11",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -192,10 +197,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 7884,
+                    "id": 7713,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "808:7:13",
+                    "src": "854:7:11",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -206,13 +211,14 @@
                 },
                 {
                   "constant": false,
-                  "id": 7887,
+                  "id": 7716,
                   "indexed": false,
+                  "mutability": "mutable",
                   "name": "data",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 7889,
-                  "src": "840:22:13",
+                  "scope": 7718,
+                  "src": "886:22:11",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -220,10 +226,10 @@
                     "typeString": "bytes"
                   },
                   "typeName": {
-                    "id": 7886,
+                    "id": 7715,
                     "name": "bytes",
                     "nodeType": "ElementaryTypeName",
-                    "src": "840:5:13",
+                    "src": "886:5:11",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes_storage_ptr",
                       "typeString": "bytes"
@@ -233,57 +239,58 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "704:164:13"
+              "src": "750:164:11"
             },
-            "src": "691:188:13"
+            "src": "737:188:11"
           },
           {
             "body": {
-              "id": 7892,
+              "id": 7721,
               "nodeType": "Block",
-              "src": "899:18:13",
+              "src": "945:18:11",
               "statements": [
                 {
-                  "id": 7891,
+                  "id": 7720,
                   "nodeType": "PlaceholderStatement",
-                  "src": "909:1:13"
+                  "src": "955:1:11"
                 }
               ]
             },
             "documentation": null,
-            "id": 7893,
+            "id": 7722,
             "name": "note",
             "nodeType": "ModifierDefinition",
             "overrides": null,
             "parameters": {
-              "id": 7890,
+              "id": 7719,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "899:0:13"
+              "src": "945:0:11"
             },
-            "src": "885:32:13",
+            "src": "931:32:11",
             "virtual": false,
             "visibility": "internal"
           }
         ],
-        "scope": 7895,
-        "src": "668:251:13"
+        "scope": 7724,
+        "src": "714:251:11"
       }
     ],
-    "src": "643:276:13"
+    "src": "689:276:11"
   },
   "legacyAST": {
     "absolutePath": "/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/external/maker/lib.sol",
     "exportedSymbols": {
       "LibNote": [
-        7894
+        7723
       ]
     },
-    "id": 7895,
+    "id": 7724,
+    "license": "GPL-3.0-or-later",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 7877,
+        "id": 7706,
         "literals": [
           "solidity",
           "^",
@@ -291,7 +298,7 @@
           ".0"
         ],
         "nodeType": "PragmaDirective",
-        "src": "643:23:13"
+        "src": "689:23:11"
       },
       {
         "abstract": false,
@@ -300,9 +307,9 @@
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 7894,
+        "id": 7723,
         "linearizedBaseContracts": [
-          7894
+          7723
         ],
         "name": "LibNote",
         "nodeType": "ContractDefinition",
@@ -310,22 +317,23 @@
           {
             "anonymous": true,
             "documentation": null,
-            "id": 7889,
+            "id": 7718,
             "name": "LogNote",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 7888,
+              "id": 7717,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 7879,
+                  "id": 7708,
                   "indexed": true,
+                  "mutability": "mutable",
                   "name": "sig",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 7889,
-                  "src": "714:21:13",
+                  "scope": 7718,
+                  "src": "760:21:11",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -333,10 +341,10 @@
                     "typeString": "bytes4"
                   },
                   "typeName": {
-                    "id": 7878,
+                    "id": 7707,
                     "name": "bytes4",
                     "nodeType": "ElementaryTypeName",
-                    "src": "714:6:13",
+                    "src": "760:6:11",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes4",
                       "typeString": "bytes4"
@@ -347,13 +355,14 @@
                 },
                 {
                   "constant": false,
-                  "id": 7881,
+                  "id": 7710,
                   "indexed": true,
+                  "mutability": "mutable",
                   "name": "usr",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 7889,
-                  "src": "745:21:13",
+                  "scope": 7718,
+                  "src": "791:21:11",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -361,10 +370,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 7880,
+                    "id": 7709,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "745:7:13",
+                    "src": "791:7:11",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -376,13 +385,14 @@
                 },
                 {
                   "constant": false,
-                  "id": 7883,
+                  "id": 7712,
                   "indexed": true,
+                  "mutability": "mutable",
                   "name": "arg1",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 7889,
-                  "src": "776:22:13",
+                  "scope": 7718,
+                  "src": "822:22:11",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -390,10 +400,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 7882,
+                    "id": 7711,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "776:7:13",
+                    "src": "822:7:11",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -404,13 +414,14 @@
                 },
                 {
                   "constant": false,
-                  "id": 7885,
+                  "id": 7714,
                   "indexed": true,
+                  "mutability": "mutable",
                   "name": "arg2",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 7889,
-                  "src": "808:22:13",
+                  "scope": 7718,
+                  "src": "854:22:11",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -418,10 +429,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 7884,
+                    "id": 7713,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "808:7:13",
+                    "src": "854:7:11",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -432,13 +443,14 @@
                 },
                 {
                   "constant": false,
-                  "id": 7887,
+                  "id": 7716,
                   "indexed": false,
+                  "mutability": "mutable",
                   "name": "data",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 7889,
-                  "src": "840:22:13",
+                  "scope": 7718,
+                  "src": "886:22:11",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -446,10 +458,10 @@
                     "typeString": "bytes"
                   },
                   "typeName": {
-                    "id": 7886,
+                    "id": 7715,
                     "name": "bytes",
                     "nodeType": "ElementaryTypeName",
-                    "src": "840:5:13",
+                    "src": "886:5:11",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes_storage_ptr",
                       "typeString": "bytes"
@@ -459,52 +471,52 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "704:164:13"
+              "src": "750:164:11"
             },
-            "src": "691:188:13"
+            "src": "737:188:11"
           },
           {
             "body": {
-              "id": 7892,
+              "id": 7721,
               "nodeType": "Block",
-              "src": "899:18:13",
+              "src": "945:18:11",
               "statements": [
                 {
-                  "id": 7891,
+                  "id": 7720,
                   "nodeType": "PlaceholderStatement",
-                  "src": "909:1:13"
+                  "src": "955:1:11"
                 }
               ]
             },
             "documentation": null,
-            "id": 7893,
+            "id": 7722,
             "name": "note",
             "nodeType": "ModifierDefinition",
             "overrides": null,
             "parameters": {
-              "id": 7890,
+              "id": 7719,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "899:0:13"
+              "src": "945:0:11"
             },
-            "src": "885:32:13",
+            "src": "931:32:11",
             "virtual": false,
             "visibility": "internal"
           }
         ],
-        "scope": 7895,
-        "src": "668:251:13"
+        "scope": 7724,
+        "src": "714:251:11"
       }
     ],
-    "src": "643:276:13"
+    "src": "689:276:11"
   },
   "compiler": {
     "name": "solc",
-    "version": "0.6.2+commit.bacdbe57.Emscripten.clang"
+    "version": "0.6.10+commit.00c0fcaf.Emscripten.clang"
   },
   "networks": {},
   "schemaVersion": "3.0.23",
-  "updatedAt": "2020-07-02T10:00:25.946Z",
+  "updatedAt": "2020-07-15T08:08:37.187Z",
   "devdoc": {
     "methods": {}
   },

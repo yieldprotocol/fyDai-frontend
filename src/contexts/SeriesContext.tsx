@@ -36,13 +36,6 @@ function reducer(state:any, action:any) {
   }
 }
 
-// const priceMock = {
-//   1601510399: utils.toRay(0.99),
-//   1609459199: utils.toRay(0.98),
-//   1617235199: utils.toRay(0.96),
-//   1625097599: utils.toRay(0.93)
-// };
-
 const SeriesProvider = ({ children }:any) => {
 
   const { state: { chainId, account } } = React.useContext(ConnectionContext);
@@ -55,7 +48,6 @@ const SeriesProvider = ({ children }:any) => {
 
   const [ state, dispatch ] = React.useReducer(reducer, initState);
   const { state: yieldState } = React.useContext(YieldContext);
-
   const { userData, feedData, deployedContracts } = yieldState;
 
   const [ callTx ] = useCallTx();
@@ -123,7 +115,7 @@ const SeriesProvider = ({ children }:any) => {
         try {
           _seriesData[i].yDaiBalance = account? await callTx(x.yDai, 'YDai', 'balanceOf', [account]): BigNumber.from('0') ;
           _seriesData[i].isMature = await callTx(x.yDai, 'YDai', 'isMature', []);
-          _seriesData[i].wethDebtYDai = account? await callTx(deployedContracts.Dealer, 'Dealer', 'debtYDai', [utils.ETH, x.maturity, account]): BigNumber.from('0');
+          _seriesData[i].wethDebtYDai = account? await callTx(deployedContracts.Controller, 'Controller', 'debtYDai', [utils.ETH, x.maturity, account]): BigNumber.from('0');
           _seriesData[i].wethDebtDai = account? utils.mulRay( _seriesData[i].wethDebtYDai, feedData.amm.rates[x.maturity]): BigNumber.from('0');
           _seriesData[i].yieldRate = yieldRate(feedData.amm.rates[x.maturity]);
         } catch (e) {

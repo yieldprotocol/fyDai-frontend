@@ -71,7 +71,7 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.6.10+commit.00c0fcaf\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"cage\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"usr\",\"type\":\"address\"}],\"name\":\"deny\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"usr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"WAD\",\"type\":\"uint256\"}],\"name\":\"exit\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"usr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"WAD\",\"type\":\"uint256\"}],\"name\":\"join\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"usr\",\"type\":\"address\"}],\"name\":\"rely\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"Interface to interact with the `Join.sol` contract from MakerDAO using ERC20\",\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/IGemJoin.sol\":\"IGemJoin\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":1000},\"remappings\":[]},\"sources\":{\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/IGemJoin.sol\":{\"keccak256\":\"0xd5fee98861ad357f21644fae58ab65cd5b444e4708ca525b0d827b184f64616d\",\"urls\":[\"bzz-raw://cd59287599489be5957d4b7e83efc1edc743933a39d17a7fca9153ee65d6b6d9\",\"dweb:/ipfs/QmPmNendYS1GBGt8FJ3sB8UC73CKABiHF4SQSj2gKomwYV\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.6.10+commit.00c0fcaf\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"cage\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"usr\",\"type\":\"address\"}],\"name\":\"deny\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"usr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"WAD\",\"type\":\"uint256\"}],\"name\":\"exit\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"usr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"WAD\",\"type\":\"uint256\"}],\"name\":\"join\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"usr\",\"type\":\"address\"}],\"name\":\"rely\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"Interface to interact with the `Join.sol` contract from MakerDAO using ERC20\",\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/IGemJoin.sol\":\"IGemJoin\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/IGemJoin.sol\":{\"keccak256\":\"0xd5fee98861ad357f21644fae58ab65cd5b444e4708ca525b0d827b184f64616d\",\"urls\":[\"bzz-raw://cd59287599489be5957d4b7e83efc1edc743933a39d17a7fca9153ee65d6b6d9\",\"dweb:/ipfs/QmPmNendYS1GBGt8FJ3sB8UC73CKABiHF4SQSj2gKomwYV\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "sourceMap": "",
@@ -82,15 +82,15 @@
     "absolutePath": "/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/IGemJoin.sol",
     "exportedSymbols": {
       "IGemJoin": [
-        18187
+        10470
       ]
     },
-    "id": 18188,
+    "id": 10471,
     "license": null,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 18158,
+        "id": 10441,
         "literals": [
           "solidity",
           "^",
@@ -98,7 +98,7 @@
           ".10"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:24:26"
+        "src": "0:24:24"
       },
       {
         "abstract": false,
@@ -106,15 +106,15 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "documentation": {
-          "id": 18159,
+          "id": 10442,
           "nodeType": "StructuredDocumentation",
-          "src": "27:86:26",
+          "src": "27:86:24",
           "text": "@dev Interface to interact with the `Join.sol` contract from MakerDAO using ERC20"
         },
         "fullyImplemented": false,
-        "id": 18187,
+        "id": 10470,
         "linearizedBaseContracts": [
-          18187
+          10470
         ],
         "name": "IGemJoin",
         "nodeType": "ContractDefinition",
@@ -123,7 +123,7 @@
             "body": null,
             "documentation": null,
             "functionSelector": "65fae35e",
-            "id": 18164,
+            "id": 10447,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -131,18 +131,18 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 18162,
+              "id": 10445,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 18161,
+                  "id": 10444,
                   "mutability": "mutable",
                   "name": "usr",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 18164,
-                  "src": "152:11:26",
+                  "scope": 10447,
+                  "src": "152:11:24",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -150,10 +150,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 18160,
+                    "id": 10443,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "152:7:26",
+                    "src": "152:7:24",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -164,16 +164,16 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "151:13:26"
+              "src": "151:13:24"
             },
             "returnParameters": {
-              "id": 18163,
+              "id": 10446,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "173:0:26"
+              "src": "173:0:24"
             },
-            "scope": 18187,
-            "src": "138:36:26",
+            "scope": 10470,
+            "src": "138:36:24",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
@@ -182,7 +182,7 @@
             "body": null,
             "documentation": null,
             "functionSelector": "9c52a7f1",
-            "id": 18169,
+            "id": 10452,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -190,18 +190,18 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 18167,
+              "id": 10450,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 18166,
+                  "id": 10449,
                   "mutability": "mutable",
                   "name": "usr",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 18169,
-                  "src": "193:11:26",
+                  "scope": 10452,
+                  "src": "193:11:24",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -209,10 +209,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 18165,
+                    "id": 10448,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "193:7:26",
+                    "src": "193:7:24",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -223,16 +223,16 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "192:13:26"
+              "src": "192:13:24"
             },
             "returnParameters": {
-              "id": 18168,
+              "id": 10451,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "214:0:26"
+              "src": "214:0:24"
             },
-            "scope": 18187,
-            "src": "179:36:26",
+            "scope": 10470,
+            "src": "179:36:24",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
@@ -241,7 +241,7 @@
             "body": null,
             "documentation": null,
             "functionSelector": "69245009",
-            "id": 18172,
+            "id": 10455,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -249,19 +249,19 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 18170,
+              "id": 10453,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "233:2:26"
+              "src": "233:2:24"
             },
             "returnParameters": {
-              "id": 18171,
+              "id": 10454,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "244:0:26"
+              "src": "244:0:24"
             },
-            "scope": 18187,
-            "src": "220:25:26",
+            "scope": 10470,
+            "src": "220:25:24",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
@@ -270,7 +270,7 @@
             "body": null,
             "documentation": null,
             "functionSelector": "3b4da69f",
-            "id": 18179,
+            "id": 10462,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -278,18 +278,18 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 18177,
+              "id": 10460,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 18174,
+                  "id": 10457,
                   "mutability": "mutable",
                   "name": "usr",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 18179,
-                  "src": "264:11:26",
+                  "scope": 10462,
+                  "src": "264:11:24",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -297,10 +297,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 18173,
+                    "id": 10456,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "264:7:26",
+                    "src": "264:7:24",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -312,13 +312,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 18176,
+                  "id": 10459,
                   "mutability": "mutable",
                   "name": "WAD",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 18179,
-                  "src": "277:8:26",
+                  "scope": 10462,
+                  "src": "277:8:24",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -326,10 +326,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 18175,
+                    "id": 10458,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "277:4:26",
+                    "src": "277:4:24",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -339,16 +339,16 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "263:23:26"
+              "src": "263:23:24"
             },
             "returnParameters": {
-              "id": 18178,
+              "id": 10461,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "295:0:26"
+              "src": "295:0:24"
             },
-            "scope": 18187,
-            "src": "250:46:26",
+            "scope": 10470,
+            "src": "250:46:24",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
@@ -357,7 +357,7 @@
             "body": null,
             "documentation": null,
             "functionSelector": "ef693bed",
-            "id": 18186,
+            "id": 10469,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -365,18 +365,18 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 18184,
+              "id": 10467,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 18181,
+                  "id": 10464,
                   "mutability": "mutable",
                   "name": "usr",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 18186,
-                  "src": "315:11:26",
+                  "scope": 10469,
+                  "src": "315:11:24",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -384,10 +384,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 18180,
+                    "id": 10463,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "315:7:26",
+                    "src": "315:7:24",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -399,13 +399,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 18183,
+                  "id": 10466,
                   "mutability": "mutable",
                   "name": "WAD",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 18186,
-                  "src": "328:8:26",
+                  "scope": 10469,
+                  "src": "328:8:24",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -413,10 +413,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 18182,
+                    "id": 10465,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "328:4:26",
+                    "src": "328:4:24",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -426,40 +426,40 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "314:23:26"
+              "src": "314:23:24"
             },
             "returnParameters": {
-              "id": 18185,
+              "id": 10468,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "346:0:26"
+              "src": "346:0:24"
             },
-            "scope": 18187,
-            "src": "301:46:26",
+            "scope": 10470,
+            "src": "301:46:24",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 18188,
-        "src": "113:236:26"
+        "scope": 10471,
+        "src": "113:236:24"
       }
     ],
-    "src": "0:349:26"
+    "src": "0:349:24"
   },
   "legacyAST": {
     "absolutePath": "/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/IGemJoin.sol",
     "exportedSymbols": {
       "IGemJoin": [
-        18187
+        10470
       ]
     },
-    "id": 18188,
+    "id": 10471,
     "license": null,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 18158,
+        "id": 10441,
         "literals": [
           "solidity",
           "^",
@@ -467,7 +467,7 @@
           ".10"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:24:26"
+        "src": "0:24:24"
       },
       {
         "abstract": false,
@@ -475,15 +475,15 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "documentation": {
-          "id": 18159,
+          "id": 10442,
           "nodeType": "StructuredDocumentation",
-          "src": "27:86:26",
+          "src": "27:86:24",
           "text": "@dev Interface to interact with the `Join.sol` contract from MakerDAO using ERC20"
         },
         "fullyImplemented": false,
-        "id": 18187,
+        "id": 10470,
         "linearizedBaseContracts": [
-          18187
+          10470
         ],
         "name": "IGemJoin",
         "nodeType": "ContractDefinition",
@@ -492,7 +492,7 @@
             "body": null,
             "documentation": null,
             "functionSelector": "65fae35e",
-            "id": 18164,
+            "id": 10447,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -500,18 +500,18 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 18162,
+              "id": 10445,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 18161,
+                  "id": 10444,
                   "mutability": "mutable",
                   "name": "usr",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 18164,
-                  "src": "152:11:26",
+                  "scope": 10447,
+                  "src": "152:11:24",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -519,10 +519,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 18160,
+                    "id": 10443,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "152:7:26",
+                    "src": "152:7:24",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -533,16 +533,16 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "151:13:26"
+              "src": "151:13:24"
             },
             "returnParameters": {
-              "id": 18163,
+              "id": 10446,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "173:0:26"
+              "src": "173:0:24"
             },
-            "scope": 18187,
-            "src": "138:36:26",
+            "scope": 10470,
+            "src": "138:36:24",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
@@ -551,7 +551,7 @@
             "body": null,
             "documentation": null,
             "functionSelector": "9c52a7f1",
-            "id": 18169,
+            "id": 10452,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -559,18 +559,18 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 18167,
+              "id": 10450,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 18166,
+                  "id": 10449,
                   "mutability": "mutable",
                   "name": "usr",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 18169,
-                  "src": "193:11:26",
+                  "scope": 10452,
+                  "src": "193:11:24",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -578,10 +578,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 18165,
+                    "id": 10448,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "193:7:26",
+                    "src": "193:7:24",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -592,16 +592,16 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "192:13:26"
+              "src": "192:13:24"
             },
             "returnParameters": {
-              "id": 18168,
+              "id": 10451,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "214:0:26"
+              "src": "214:0:24"
             },
-            "scope": 18187,
-            "src": "179:36:26",
+            "scope": 10470,
+            "src": "179:36:24",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
@@ -610,7 +610,7 @@
             "body": null,
             "documentation": null,
             "functionSelector": "69245009",
-            "id": 18172,
+            "id": 10455,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -618,19 +618,19 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 18170,
+              "id": 10453,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "233:2:26"
+              "src": "233:2:24"
             },
             "returnParameters": {
-              "id": 18171,
+              "id": 10454,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "244:0:26"
+              "src": "244:0:24"
             },
-            "scope": 18187,
-            "src": "220:25:26",
+            "scope": 10470,
+            "src": "220:25:24",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
@@ -639,7 +639,7 @@
             "body": null,
             "documentation": null,
             "functionSelector": "3b4da69f",
-            "id": 18179,
+            "id": 10462,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -647,18 +647,18 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 18177,
+              "id": 10460,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 18174,
+                  "id": 10457,
                   "mutability": "mutable",
                   "name": "usr",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 18179,
-                  "src": "264:11:26",
+                  "scope": 10462,
+                  "src": "264:11:24",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -666,10 +666,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 18173,
+                    "id": 10456,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "264:7:26",
+                    "src": "264:7:24",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -681,13 +681,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 18176,
+                  "id": 10459,
                   "mutability": "mutable",
                   "name": "WAD",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 18179,
-                  "src": "277:8:26",
+                  "scope": 10462,
+                  "src": "277:8:24",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -695,10 +695,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 18175,
+                    "id": 10458,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "277:4:26",
+                    "src": "277:4:24",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -708,16 +708,16 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "263:23:26"
+              "src": "263:23:24"
             },
             "returnParameters": {
-              "id": 18178,
+              "id": 10461,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "295:0:26"
+              "src": "295:0:24"
             },
-            "scope": 18187,
-            "src": "250:46:26",
+            "scope": 10470,
+            "src": "250:46:24",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
@@ -726,7 +726,7 @@
             "body": null,
             "documentation": null,
             "functionSelector": "ef693bed",
-            "id": 18186,
+            "id": 10469,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -734,18 +734,18 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 18184,
+              "id": 10467,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 18181,
+                  "id": 10464,
                   "mutability": "mutable",
                   "name": "usr",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 18186,
-                  "src": "315:11:26",
+                  "scope": 10469,
+                  "src": "315:11:24",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -753,10 +753,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 18180,
+                    "id": 10463,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "315:7:26",
+                    "src": "315:7:24",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -768,13 +768,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 18183,
+                  "id": 10466,
                   "mutability": "mutable",
                   "name": "WAD",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 18186,
-                  "src": "328:8:26",
+                  "scope": 10469,
+                  "src": "328:8:24",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -782,10 +782,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 18182,
+                    "id": 10465,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "328:4:26",
+                    "src": "328:4:24",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -795,26 +795,26 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "314:23:26"
+              "src": "314:23:24"
             },
             "returnParameters": {
-              "id": 18185,
+              "id": 10468,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "346:0:26"
+              "src": "346:0:24"
             },
-            "scope": 18187,
-            "src": "301:46:26",
+            "scope": 10470,
+            "src": "301:46:24",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 18188,
-        "src": "113:236:26"
+        "scope": 10471,
+        "src": "113:236:24"
       }
     ],
-    "src": "0:349:26"
+    "src": "0:349:24"
   },
   "compiler": {
     "name": "solc",
@@ -822,7 +822,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.23",
-  "updatedAt": "2020-07-10T08:34:42.277Z",
+  "updatedAt": "2020-07-15T08:08:37.292Z",
   "devdoc": {
     "details": "Interface to interact with the `Join.sol` contract from MakerDAO using ERC20",
     "methods": {}

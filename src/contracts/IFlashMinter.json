@@ -25,7 +25,7 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.6.10+commit.00c0fcaf\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"yDaiAmount\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"executeOnFlashMint\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/IFlashMinter.sol\":\"IFlashMinter\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":1000},\"remappings\":[]},\"sources\":{\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/IFlashMinter.sol\":{\"keccak256\":\"0xef870a39d166ea311d70915a7e00f3d6ea0361d059107c8eaee971a5c50454d6\",\"urls\":[\"bzz-raw://979d4f17ffbaa7db9a07f9b1dbb651e2e9ed336e9247dd34595f95a929ad2498\",\"dweb:/ipfs/QmQ4Aqps32jdfsH2g2UqEZdTvjUjpMGjo6FKPv4VWna86t\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.6.10+commit.00c0fcaf\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"yDaiAmount\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"executeOnFlashMint\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/IFlashMinter.sol\":\"IFlashMinter\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/IFlashMinter.sol\":{\"keccak256\":\"0xef870a39d166ea311d70915a7e00f3d6ea0361d059107c8eaee971a5c50454d6\",\"urls\":[\"bzz-raw://979d4f17ffbaa7db9a07f9b1dbb651e2e9ed336e9247dd34595f95a929ad2498\",\"dweb:/ipfs/QmQ4Aqps32jdfsH2g2UqEZdTvjUjpMGjo6FKPv4VWna86t\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "sourceMap": "",
@@ -36,15 +36,15 @@
     "absolutePath": "/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/IFlashMinter.sol",
     "exportedSymbols": {
       "IFlashMinter": [
-        18104
+        10387
       ]
     },
-    "id": 18105,
+    "id": 10388,
     "license": null,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 18094,
+        "id": 10377,
         "literals": [
           "solidity",
           "^",
@@ -52,7 +52,7 @@
           ".10"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:24:24"
+        "src": "0:24:22"
       },
       {
         "abstract": false,
@@ -61,9 +61,9 @@
         "contractKind": "interface",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 18104,
+        "id": 10387,
         "linearizedBaseContracts": [
-          18104
+          10387
         ],
         "name": "IFlashMinter",
         "nodeType": "ContractDefinition",
@@ -72,7 +72,7 @@
             "body": null,
             "documentation": null,
             "functionSelector": "bdd26b31",
-            "id": 18103,
+            "id": 10386,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -80,18 +80,18 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 18101,
+              "id": 10384,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 18096,
+                  "id": 10379,
                   "mutability": "mutable",
                   "name": "to",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 18103,
-                  "src": "84:10:24",
+                  "scope": 10386,
+                  "src": "84:10:22",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -99,10 +99,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 18095,
+                    "id": 10378,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "84:7:24",
+                    "src": "84:7:22",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -114,13 +114,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 18098,
+                  "id": 10381,
                   "mutability": "mutable",
                   "name": "yDaiAmount",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 18103,
-                  "src": "96:18:24",
+                  "scope": 10386,
+                  "src": "96:18:22",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -128,10 +128,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 18097,
+                    "id": 10380,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "96:7:24",
+                    "src": "96:7:22",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -142,13 +142,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 18100,
+                  "id": 10383,
                   "mutability": "mutable",
                   "name": "data",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 18103,
-                  "src": "116:19:24",
+                  "scope": 10386,
+                  "src": "116:19:22",
                   "stateVariable": false,
                   "storageLocation": "calldata",
                   "typeDescriptions": {
@@ -156,10 +156,10 @@
                     "typeString": "bytes"
                   },
                   "typeName": {
-                    "id": 18099,
+                    "id": 10382,
                     "name": "bytes",
                     "nodeType": "ElementaryTypeName",
-                    "src": "116:5:24",
+                    "src": "116:5:22",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes_storage_ptr",
                       "typeString": "bytes"
@@ -169,40 +169,40 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "83:53:24"
+              "src": "83:53:22"
             },
             "returnParameters": {
-              "id": 18102,
+              "id": 10385,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "145:0:24"
+              "src": "145:0:22"
             },
-            "scope": 18104,
-            "src": "56:90:24",
+            "scope": 10387,
+            "src": "56:90:22",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 18105,
-        "src": "27:121:24"
+        "scope": 10388,
+        "src": "27:121:22"
       }
     ],
-    "src": "0:148:24"
+    "src": "0:148:22"
   },
   "legacyAST": {
     "absolutePath": "/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/IFlashMinter.sol",
     "exportedSymbols": {
       "IFlashMinter": [
-        18104
+        10387
       ]
     },
-    "id": 18105,
+    "id": 10388,
     "license": null,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 18094,
+        "id": 10377,
         "literals": [
           "solidity",
           "^",
@@ -210,7 +210,7 @@
           ".10"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:24:24"
+        "src": "0:24:22"
       },
       {
         "abstract": false,
@@ -219,9 +219,9 @@
         "contractKind": "interface",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 18104,
+        "id": 10387,
         "linearizedBaseContracts": [
-          18104
+          10387
         ],
         "name": "IFlashMinter",
         "nodeType": "ContractDefinition",
@@ -230,7 +230,7 @@
             "body": null,
             "documentation": null,
             "functionSelector": "bdd26b31",
-            "id": 18103,
+            "id": 10386,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -238,18 +238,18 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 18101,
+              "id": 10384,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 18096,
+                  "id": 10379,
                   "mutability": "mutable",
                   "name": "to",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 18103,
-                  "src": "84:10:24",
+                  "scope": 10386,
+                  "src": "84:10:22",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -257,10 +257,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 18095,
+                    "id": 10378,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "84:7:24",
+                    "src": "84:7:22",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -272,13 +272,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 18098,
+                  "id": 10381,
                   "mutability": "mutable",
                   "name": "yDaiAmount",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 18103,
-                  "src": "96:18:24",
+                  "scope": 10386,
+                  "src": "96:18:22",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -286,10 +286,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 18097,
+                    "id": 10380,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "96:7:24",
+                    "src": "96:7:22",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -300,13 +300,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 18100,
+                  "id": 10383,
                   "mutability": "mutable",
                   "name": "data",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 18103,
-                  "src": "116:19:24",
+                  "scope": 10386,
+                  "src": "116:19:22",
                   "stateVariable": false,
                   "storageLocation": "calldata",
                   "typeDescriptions": {
@@ -314,10 +314,10 @@
                     "typeString": "bytes"
                   },
                   "typeName": {
-                    "id": 18099,
+                    "id": 10382,
                     "name": "bytes",
                     "nodeType": "ElementaryTypeName",
-                    "src": "116:5:24",
+                    "src": "116:5:22",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes_storage_ptr",
                       "typeString": "bytes"
@@ -327,26 +327,26 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "83:53:24"
+              "src": "83:53:22"
             },
             "returnParameters": {
-              "id": 18102,
+              "id": 10385,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "145:0:24"
+              "src": "145:0:22"
             },
-            "scope": 18104,
-            "src": "56:90:24",
+            "scope": 10387,
+            "src": "56:90:22",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 18105,
-        "src": "27:121:24"
+        "scope": 10388,
+        "src": "27:121:22"
       }
     ],
-    "src": "0:148:24"
+    "src": "0:148:22"
   },
   "compiler": {
     "name": "solc",
@@ -354,7 +354,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.23",
-  "updatedAt": "2020-07-10T08:34:42.269Z",
+  "updatedAt": "2020-07-15T08:08:37.287Z",
   "devdoc": {
     "methods": {}
   },

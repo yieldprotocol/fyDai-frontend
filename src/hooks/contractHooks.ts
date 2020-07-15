@@ -6,7 +6,7 @@ import { NotifyContext } from '../contexts/NotifyContext';
 import { ConnectionContext } from '../contexts/ConnectionContext';
 
 import YDai from '../contracts/YDai.json';
-import Dealer from '../contracts/Dealer.json';
+import Controller from '../contracts/Controller.json';
 import TestERC20 from '../contracts/TestERC20.json';
 import EthProxy from '../contracts/EthProxy.json';
 
@@ -114,12 +114,12 @@ export const useEthProxy = () => {
  * @returns { boolean } borrowActive
  * @returns { function } repay
  * @returns { boolean } repayActive
- * @returns { function } approveDealer
+ * @returns { function } approveController
  * @returns { boolean } approveActive
  */
-export const useDealer = () => {
+export const useController = () => {
 
-  const { abi: dealerAbi } = Dealer;
+  const { abi: controllerAbi } = Controller;
   const { state: { signer, account } } = React.useContext(ConnectionContext);
   // const { library, account } = useWeb3React();
   // const signer = library.getSigner();
@@ -133,12 +133,12 @@ export const useDealer = () => {
 
   /**
    * Posts wrapped collateral (Weth or Chai)
-   * @param {string} dealerAddress address of the Dealer (remnant of older protocol)
+   * @param {string} controllerAddress address of the Controller (remnant of older protocol)
    * @param {string} collateral 'ETH-A' || 'CHAI'
    * @param {number} amount amount of collateral to post (in normal human numbers)
    */
   const post = async (
-    dealerAddress:string,
+    controllerAddress:string,
     collateral:string,
     amount:number
   ) => {
@@ -148,12 +148,12 @@ export const useDealer = () => {
     const parsedAmount = ethers.utils.parseEther(amount.toString());
     const fromAddr = account && ethers.utils.getAddress(account);
     const toAddr = fromAddr;
-    const dealerAddr = ethers.utils.getAddress(dealerAddress);
+    const controllerAddr = ethers.utils.getAddress(controllerAddress);
     const collateralBytes = ethers.utils.formatBytes32String(collateral);
 
     /* Contract interaction */
     setPostActive(true);
-    const contract = new ethers.Contract( dealerAddr, dealerAbi, signer );
+    const contract = new ethers.Contract( controllerAddr, controllerAbi, signer );
     try {
       tx = await contract.post(collateralBytes, fromAddr, toAddr, parsedAmount);
     } catch (e) {
@@ -171,12 +171,12 @@ export const useDealer = () => {
 
   /**
    * Withdraws wrapped collateral (Weth or Chai) - not ETH directly.
-   * @param {string} dealerAddress address of the Dealer (remnant of older protocol)
+   * @param {string} controllerAddress address of the Controller (remnant of older protocol)
    * @param {string} collateral 'ETH-A' || 'CHAI'
    * @param {number} amount to withdraw (in human understandable numbers)
    */
   const withdraw = async (
-    dealerAddress:string,
+    controllerAddress:string,
     collateral:string,
     amount:number
   ) => {
@@ -185,12 +185,12 @@ export const useDealer = () => {
     const parsedAmount = ethers.utils.parseEther(amount.toString());
     const fromAddr = account && ethers.utils.getAddress(account);
     const toAddr = fromAddr;
-    const dealerAddr = ethers.utils.getAddress(dealerAddress);
+    const controllerAddr = ethers.utils.getAddress(controllerAddress);
     const collateralBytes = ethers.utils.formatBytes32String(collateral);
 
     /* Contract interaction */
     setWithdrawActive(true);
-    const contract = new ethers.Contract( dealerAddr, dealerAbi, signer );
+    const contract = new ethers.Contract( controllerAddr, controllerAbi, signer );
     try {
       tx = await contract.withdraw(collateralBytes, fromAddr, toAddr, parsedAmount);
     } catch (e) {
@@ -208,13 +208,13 @@ export const useDealer = () => {
 
   /**
    * Borrow yDai with available, posted collateral.
-   * @param {string} dealerAddress address of the Dealer
+   * @param {string} controllerAddress address of the Controller
    * @param {string} collateral 'ETH-A' || 'CHAI' (use ETH-A for ETH collateral)
    * @param {string} maturity UNIX timestamp as a string
    * @param {number} amount borrow amount (in human understandable numbers)
    */
   const borrow = async (
-    dealerAddress:string,
+    controllerAddress:string,
     collateral:string,
     maturity:string,
     // to:string,
@@ -224,14 +224,15 @@ export const useDealer = () => {
     /* Processing and sanitizing input */
     const parsedAmount = ethers.utils.parseEther(amount.toString());
     const toAddr = account && ethers.utils.getAddress(account);
-    const dealerAddr = ethers.utils.getAddress(dealerAddress);
+    const fromAddr = account && ethers.utils.getAddress(account);
+    const controllerAddr = ethers.utils.getAddress(controllerAddress);
     const collateralBytes = ethers.utils.formatBytes32String(collateral);
 
     /* Contract interaction */
     setBorrowActive(true);
-    const contract = new ethers.Contract( dealerAddr, dealerAbi, signer );
+    const contract = new ethers.Contract( controllerAddr, controllerAbi, signer );
     try {
-      tx = await contract.borrow(collateralBytes, maturity, toAddr, parsedAmount);
+      tx = await contract.borrow(collateralBytes, maturity, fromAddr, toAddr, parsedAmount);
     } catch (e) {
       dispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed.', type:'error' } } );
       console.log(e);
@@ -247,14 +248,14 @@ export const useDealer = () => {
 
   /**
    * Repay yDai debt with either Dai or YDai.
-   * @param {string} dealerAddress address of the Dealer
+   * @param {string} controllerAddress address of the Controller
    * @param {string} collateral 'ETH-A' || 'CHAI' (use ETH-A for ETH collateral pool)
    * @param {string} maturity UNIX timestamp as a string
    * @param {number} amount to repay - either yDai or Dai (in human understandable numbers)
    * @param {string} type 'YDAI' || 'DAI' token used to pay back debt
    */
   const repay = async (
-    dealerAddress:string,
+    controllerAddress:string,
     collateral:string,
     maturity:string,
     // from:string,
@@ -265,18 +266,19 @@ export const useDealer = () => {
     /* Processing and sanitizing input */
     const parsedAmount = ethers.utils.parseEther(amount.toString());
     const fromAddr = account && ethers.utils.getAddress(account);
-    const dealerAddr = ethers.utils.getAddress(dealerAddress);
+    const toAddr = account && ethers.utils.getAddress(account);
+    const controllerAddr = ethers.utils.getAddress(controllerAddress);
     const typeCaps = type.toUpperCase();
     const collateralBytes = ethers.utils.formatBytes32String(collateral);
 
     /* Contract interaction */
     setRepayActive(true);
-    const contract = new ethers.Contract( dealerAddr, dealerAbi, signer );
+    const contract = new ethers.Contract( controllerAddr, controllerAbi, signer );
     try {
       if (typeCaps === 'YDAI') {
-        tx = await contract.repayYDai(collateralBytes, maturity, fromAddr, parsedAmount);
+        tx = await contract.repayYDai(collateralBytes, maturity, fromAddr, toAddr, parsedAmount);
       } else if (typeCaps === 'DAI') {
-        tx = await contract.repayDai(collateralBytes, maturity, fromAddr, parsedAmount);
+        tx = await contract.repayDai(collateralBytes, maturity, fromAddr, toAddr, parsedAmount);
       }
     } catch (e) {
       dispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed.', type:'error' } } );
@@ -292,21 +294,21 @@ export const useDealer = () => {
   };
 
   /**
-   * Approve the dealer to transact with ETH-A (or other) token.
-   * (Not strictly a Dealer Contract function. But associated enough to keep in here.)
+   * Approve the controller to transact with ETH-A (or other) token.
+   * (Not strictly a Controller Contract function. But associated enough to keep in here.)
    * @param {string} tokenAddress address of the token to approve. 
-   * @param {string} dealerAddress address of the dealer. 
+   * @param {string} controllerAddress address of the controller. 
    * @param {number} amount to approve (in human understandable numbers)
    */
-  const approveDealer = async (
+  const approveController = async (
     tokenAddress:string,
-    dealerAddress:string,
+    controllerAddress:string,
     amount:number
   ) => {
     let tx:any;
     /* Processing and sanitizing input */
     const parsedAmount = ethers.utils.parseEther(amount.toString());
-    const dealerAddr = ethers.utils.getAddress(dealerAddress);
+    const controllerAddr = ethers.utils.getAddress(controllerAddress);
     const tokenAddr = ethers.utils.getAddress(tokenAddress);
     
     /* Contract interaction */
@@ -317,7 +319,7 @@ export const useDealer = () => {
       signer
     );
     try {
-      tx = await contract.approve(dealerAddr, parsedAmount);
+      tx = await contract.approve(controllerAddr, parsedAmount);
     } catch (e) {
       dispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed.', type:'error' } } );
       console.log(e);
@@ -328,7 +330,7 @@ export const useDealer = () => {
     dispatch({ type: 'txPending', payload:{ tx, message: `Token approval of ${amount} pending...` } } );
     await tx.wait();
     setApproveActive(false);
-    dispatch({ type: 'txComplete', payload:{ tx, message:`Token approval of ${amount} complete. ${tokenAddress} and ${dealerAddress}` } } );
+    dispatch({ type: 'txComplete', payload:{ tx, message:`Token approval of ${amount} complete. ${tokenAddress} and ${controllerAddress}` } } );
   };
 
   return {
@@ -336,7 +338,7 @@ export const useDealer = () => {
     withdraw, withdrawActive,
     borrow, borrowActive,
     repay, repayActive,
-    approveDealer, approveActive,
+    approveController, approveActive,
   } as const;
 };
 

@@ -17,7 +17,7 @@ import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { NotifyContext } from '../contexts/NotifyContext';
 
-import { useDealer } from '../hooks';
+import { useController } from '../hooks';
 
 interface BorrowActionProps {
   borrowFn?:any
@@ -39,7 +39,7 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
     collateralRatio_,
   } = seriesAggregates;
 
-  const { borrow, borrowActive }  = useDealer();
+  const { borrow, borrowActive }  = useController();
 
   const [ inputValue, setInputValue ] = React.useState<any>();
   const [ borrowDisabled, setBorrowDisabled ] = React.useState<boolean>(false);
@@ -53,7 +53,7 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
 
   const borrowProcedure = async (value:number) => {
-    await borrow(deployedContracts.Dealer, 'ETH-A', activeSeries.maturity, value );
+    await borrow(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value );
     yieldActions.updateUserData();
     seriesActions.refreshPositions([activeSeries]);
   };
