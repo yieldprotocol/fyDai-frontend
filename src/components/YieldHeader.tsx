@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { useWeb3React } from '@web3-react/core';
 
@@ -13,109 +13,156 @@ import ProfileButton from './ProfileButton';
 import { ConnectionContext } from '../contexts/ConnectionContext';
 import { NotifyContext } from '../contexts/NotifyContext';
 
+interface LinkProps {
+  link: string;
+  text: string;
+}
+
 const YieldHeader = (props: any) => {
-  
-  const { 
+  const {
     openConnectLayer,
     openAccountLayer,
     activeView,
-    setActiveView
+    setActiveView,
   } = props;
-  
 
-  const { state: { account } } = React.useContext(ConnectionContext);
-  const { state: { pendingTxs } } = React.useContext(NotifyContext);
+  const {
+    state: { account },
+  } = React.useContext(ConnectionContext);
+  const {
+    state: { pendingTxs },
+  } = React.useContext(NotifyContext);
+
+  // Menu state for mobile later
+  // const [menuOpen] = useState<any>(false);
+
+  const [navLinks] = useState([
+    {
+      link: 'DASHBOARD',
+      text: 'Dashboard',
+      id: 0,
+    },
+    {
+      link: 'BORROW',
+      text: 'Borrow',
+      id: 1,
+    },
+    {
+      link: 'LEND',
+      text: 'Lend',
+      id: 2,
+    },
+    {
+      link: 'AMM',
+      text: 'Market',
+      id: 3,
+    },
+  ]);
 
   // const { account } = useWeb3React();
 
   const theme = React.useContext<any>(ThemeContext);
 
   useEffect(() => {
-
     // (async () => activate(injected, console.log))();
   }, []);
 
+  const NavLink = ({ link, text }: LinkProps) => (
+    <Box
+      onClick={() => setActiveView(link)}
+      pad={{
+        horizontal: 'xsmall',
+        vertical: 'xsmall',
+      }}
+      responsive={true}
+      gap="small"
+    >
+      <Text color={activeView === link ? 'brand' : 'text'}>{text}</Text>
+    </Box>
+  );
+
   return (
     <Header
-      // elevation="xsmall"
-      fill="horizontal"
-      // pad={{ horizontal: 'small', vertical: 'xsmall' }}
-      background={{ color:'background-front' }}
-      justify='between'
-      pad={{ vertical:'none', horizontal:'small' }}
+      background={{
+        color: 'background-front',
+      }}
+      justify="between"
+      pad={{
+        horizontal: 'small',
+        vertical: 'none',
+      }}
     >
-      <Box direction='row' align='center' gap='small'>
-        <Box align="start" direction='row' gap='small' margin='none' pad='none'>
-          <Box height="xsmall" width="xsmall" margin='none' pad='xsmall'>
-            <Image src={theme.dark ? logoLight : logoDark} fit="contain" />
-          </Box>
-        </Box>
-
-        <Box justify='start' direction='row' gap='none'>
-          <Box 
-            justify='end'
-            pad='small' 
-            border={activeView === 'DASHBOARD' && { size: 'xsmall', side: 'bottom', color:'brand' }}
-            onClick={()=>setActiveView('DASHBOARD')}
-          > 
-            <Text color={activeView === 'DASHBOARD'? 'brand':'text'}>
-              Dashboard
-            </Text>
-          </Box>
-          <Box 
-            justify='end'
-            pad='small' 
-            border={activeView === 'BORROW' && { size: 'xsmall', side: 'bottom', color:'brand' }}
-            onClick={()=>setActiveView('BORROW')}
-          > 
-            <Text color={activeView === 'BORROW'? 'brand':'text'}>
-              Borrow
-            </Text>
-          </Box>
-          <Box 
-            pad='small' 
-            border={activeView === 'LEND' && { size: 'xsmall', side: 'bottom', color:'brand' }}
-            onClick={()=>setActiveView('LEND')}
-          >
-            <Text color={activeView === 'LEND'? 'brand':'text'}>
-              Lend
-            </Text>
-          </Box>
+      <Box
+        direction="row"
+        justify="between"
+        align="center"
+        flex={true}
+        gap="small"
+        pad={{
+          vertical: 'small',
+        }}
+      >
+        {/* Logo and nav */}
+        <Box direction="row" align="center" gap="small">
+          {/* Logo */}
           <Box
-            pad='small'
-            border={activeView === 'AMM' && { size: 'xsmall', side: 'bottom', color:'brand' }}
-            direction='row'
-            gap='small'
+            onClick={() => setActiveView('DASHBOARD')}
+            direction="row"
+            margin={{
+              right: 'xsmall',
+            }}
+            responsive
           >
-            <Text color={activeView === 'AMM'? 'brand':'lightgrey'}>
-              Yield AMM
-            </Text>
-          </Box>
-        </Box>
-      </Box>
-
-
-      <Box direction='row' align='baseline'>
-        {pendingTxs.length >0 && 
-          <Box>
-            {pendingTxs.length} transaction pending...
-          </Box>}
-        {account ? (
-          <Box pad='small'>
-            <ProfileButton action={() => openAccountLayer()} account={account || ''} />
-          </Box>
-        ) : (
-          <Box pad='small'>
-            <Button
-              color='border'
-              style={{ minWidth: '160px' }}
-              label="Connect to a wallet"
-              onClick={() => openConnectLayer()}
+            <Image
+              style={{
+                height: '1.5rem',
+              }}
+              src={theme.dark ? logoLight : logoDark}
+              fit="contain"
             />
           </Box>
-        )}
-        <Box>
-          <Gear />
+          {/* Left nav */}
+          <Box direction="row">
+            {navLinks &&
+              navLinks.map((item) => (
+                <NavLink
+                  link={item.link}
+                  text={item.text}
+                  key={`nav-${item.id}`}
+                />
+              ))}
+          </Box>
+        </Box>
+        {/* Right nav */}
+        <Box direction="row" align="center" gap="small">
+          {pendingTxs && pendingTxs.length > 0 && (
+            <Box>{pendingTxs.length} transaction pending...</Box>
+          )}
+          {account ? (
+            <Box>
+              <ProfileButton
+                action={() => openAccountLayer()}
+                account={account || ''}
+              />
+            </Box>
+          ) : (
+            <Box>
+              <Button
+                color="border"
+                style={{ minWidth: '160px' }}
+                label="Connect to a wallet"
+                onClick={() => openConnectLayer()}
+              />
+            </Box>
+          )}
+          <Box
+            direction="row"
+            margin={{
+              left: 'xsmall',
+            }}
+          >
+            <Gear />
+          </Box>
         </Box>
       </Box>
     </Header>
