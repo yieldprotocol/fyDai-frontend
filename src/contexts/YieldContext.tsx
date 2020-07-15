@@ -73,6 +73,7 @@ const initState = {
       },
     },
     urns: {},
+    marketRates: {},
     // AMM rates mocked for now.
     amm:{
       rates: {
@@ -187,7 +188,7 @@ const YieldProvider = ({ children }:any) => {
   };
 
   /* Get feed data from cache first (for offline support) */
-  const _getFeedData = async (deployedContracts:any): Promise<any> => {
+  const _getFeedData = async (deployedContracts:any, deployedSeries:any): Promise<any> => {
     let _state:any={};
     /* For for initial loading and offline support */
     if (cachedFeed) {
@@ -206,12 +207,15 @@ const YieldProvider = ({ children }:any) => {
         // rate_: utils.rayToHuman(_ilks.rate),
       },
     };
+
+    console.log(_feedData);
     setCachedFeed(_feedData);
     return _feedData;
   };
 
   /* Fetch non-cached. non-user specific yield protocol general data  (eg. market data . prices) */
   const _getYieldData = async (deployedContracts:any): Promise<any> => {
+
     const _yieldData:any = {
     };
     // parse data if required.
@@ -284,7 +288,7 @@ const YieldProvider = ({ children }:any) => {
     dispatch({ type:'updateDeployedSeries', payload: deployedSeries });
 
     /* 2. Fetch feed/stream data (from cache initially if available) and init event listeners */
-    dispatch({ type:'updateFeedData', payload: await _getFeedData(deployedContracts) });
+    dispatch({ type:'updateFeedData', payload: await _getFeedData(deployedContracts, deployedSeries) });
     // 2.1 Add listen to Maker rate/spot changes
     provider && addEventListener(
       deployedContracts.Vat,
@@ -310,8 +314,6 @@ const YieldProvider = ({ children }:any) => {
   React.useEffect( () => {
     ( async () => chainId && initApp(chainId))();
   }, [chainId, account]);
-
-
 
   const actions = {
     updateUserData: () => _getUserData(state.deployedContracts, false).then((res:any)=> dispatch({ type:'updateUserData', payload: res })),
