@@ -4,6 +4,15 @@ html {
     /* -ms-overflow-style: none;
     scrollbar-width: none; */
 }
+
+body {
+    -webkit-overflow-scrolling: touch;
+    -webkit-font-smoothing: auto;
+    text-rendering: optimizeLegibility;
+    letter-spacing: -0.5px;
+    transition: all 0.2s ease-in-out;
+}
+
 /* ::-webkit-scrollbar { display:none; } */
 @media screen and (prefers-reduced-motion: reduce) {
 	html {
