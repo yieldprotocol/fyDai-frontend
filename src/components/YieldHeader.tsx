@@ -86,9 +86,32 @@ const YieldHeader = (props: any) => {
     setMenu(false);
   }
 
-  const CloseButton = () => <Button onClick={closeMenu}>Close</Button>;
+  const CloseButton = () => (
+    <Box direction="row" fill="horizontal">
+      <Button
+        onClick={closeMenu}
+        alignSelf="center"
+        fill="horizontal"
+        style={{
+          textAlign: 'center',
+        }}
+      >
+        Close
+      </Button>
+    </Box>
+  );
 
-  const MenuButton = () => <Button onClick={toggleMenu}>Menu</Button>;
+  const MenuButton = () => (
+    <Button
+      onClick={toggleMenu}
+      fill="horizontal"
+      style={{
+        textAlign: 'right',
+      }}
+    >
+      Menu
+    </Button>
+  );
 
   const Logo = () => (
     <Box
@@ -97,15 +120,11 @@ const YieldHeader = (props: any) => {
       margin={{
         right: 'xsmall',
       }}
-      responsive
+      style={{
+        height: '1.5rem',
+      }}
     >
-      <Image
-        style={{
-          height: '1.5rem',
-        }}
-        src={theme.dark ? logoLight : logoDark}
-        fit="contain"
-      />
+      <Image src={theme.dark ? logoLight : logoDark} fit="contain" />
     </Box>
   );
 
@@ -127,6 +146,10 @@ const YieldHeader = (props: any) => {
         left: 0,
         top: 0,
       }}
+      pad={{
+        horizontal: 'large',
+        vertical: 'large',
+      }}
       fill
       wrap
     >
@@ -135,6 +158,9 @@ const YieldHeader = (props: any) => {
         color={theme.global.colors.text}
         margin="large"
         size="xlarge"
+        style={{
+          width: screenSize === 'small' ? '100%' : 'auto',
+        }}
       >
         Menu
       </Text>
@@ -178,7 +204,7 @@ const YieldHeader = (props: any) => {
   const Nav = () => (
     <Box
       direction={screenSize === 'small' ? 'column' : 'row'}
-      fill="horizontal"
+      fill={screenSize === 'small' ? 'horizontal' : false}
     >
       {navLinks &&
         navLinks.map((item) => (
@@ -206,26 +232,30 @@ const YieldHeader = (props: any) => {
       );
     }
     return (
-      <Box>
+      <Box direction="row" fill="horizontal">
         <Button
           onClick={() => openConnectLayer()}
           label="Connect to a wallet"
           color="border"
-          style={{ minWidth: '160px', fontWeight: 600 }}
+          fill="horizontal"
+          style={{
+            minWidth: '160px',
+            fontWeight: 600,
+            height: screenSize === 'small' ? '2.25rem' : 'auto',
+          }}
         />
       </Box>
     );
   };
 
   const Settings = () => (
-    <Box
-      direction="row"
-      margin={{
-        left: 'xsmall',
+    <Button
+      style={{
+        textAlign: 'center',
       }}
-    >
-      <Gear />
-    </Box>
+      fill={screenSize === 'small' ? 'horizontal' : false}
+      icon={<Gear />}
+    />
   );
 
   return (
@@ -243,7 +273,7 @@ const YieldHeader = (props: any) => {
         direction="row"
         justify="between"
         align="center"
-        flex={true}
+        flex
         gap="small"
         pad={{
           vertical: 'small',
@@ -255,15 +285,15 @@ const YieldHeader = (props: any) => {
           {screenSize === 'small' ? <MobileNav /> : <Nav />}
         </Box>
         {/* Right nav */}
-        <Box direction="row" align="center" gap="small">
+        <Box direction="row" align="center" gap="small" justify="end" flex>
           {screenSize === 'small' ? (
             <MenuButton />
           ) : (
-            <>
+            <Box direction="row" align="center" gap="small">
               <PendingTxs />
               <Account />
               <Settings />
-            </>
+            </Box>
           )}
         </Box>
       </Box>
