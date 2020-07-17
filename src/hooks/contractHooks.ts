@@ -211,7 +211,7 @@ export const useController = () => {
    * @param {string} controllerAddress address of the Controller
    * @param {string} collateral 'ETH-A' || 'CHAI' (use ETH-A for ETH collateral)
    * @param {string} maturity UNIX timestamp as a string
-   * @param {number} amount borrow amount (in human understandable numbers)
+   * @param { number } amount borrow amount (in human understandable numbers)
    */
   const borrow = async (
     controllerAddress:string,
@@ -222,6 +222,7 @@ export const useController = () => {
   ) => {
     let tx:any;
     /* Processing and sanitizing input */
+    console.log(amount);
     const parsedAmount = ethers.utils.parseEther(amount.toString());
     const toAddr = account && ethers.utils.getAddress(account);
     const fromAddr = account && ethers.utils.getAddress(account);
@@ -452,7 +453,6 @@ export const useMarket = () => {
     marketAddress:string,
     amount: number
   ) => {
-
   };
 
   /**
@@ -467,7 +467,6 @@ export const useMarket = () => {
     marketAddress:string,
     amount: number
   ) => {
-
   };
 
   /**
@@ -482,7 +481,6 @@ export const useMarket = () => {
     marketAddress:string,
     amount: number
   ) => {
-
   };
 
   return {

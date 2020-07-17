@@ -62,8 +62,10 @@ const SeriesProvider = ({ children }:any) => {
   const {
     collAmount,
     collValue,
-    debtVal,
+    collPrice,
+    debtValAdj,
     collRatio,
+    collPercent,
     yieldAPR,
     estCollRatio: estimateRatio,
     minSafeColl,
@@ -74,19 +76,22 @@ const SeriesProvider = ({ children }:any) => {
   const _runAggregation = () => {
     const numberOfSeries = state.seriesData.size;
     const collateralAmount = collAmount();
+    const collateralPrice = collPrice();
     const collateralValue = collValue();
 
     let debtYDai = BigNumber.from('0');
     state.seriesData.forEach((x:any)=>{
-      // console.log(x);
       debtYDai = x.wethDebtYDai.add(debtYDai);
     });
     const debtYDaiValue = null; // Not needed for now - possibly unknown see below
     const totaldebtDai = null; // Unknown here - because each series has different Dai/yDai rates
-    const debtValue = debtVal(debtYDai); // calculated as yDai at maturity. i.e. 1:1
+    const debtValue = debtValAdj(debtYDai); // calculated as yDai at maturity. i.e. 1:1 
+    
     const collateralRatio = collRatio(collateralValue, debtValue);
-    const minSafeCollateral = minSafeColl(debtValue, BigNumber.from('150'));
-    const maxDaiAvailable = daiAvailable(collateralValue, debtValue, BigNumber.from('150'));
+    const collateralPercent = collPercent(collateralRatio);
+
+    const minSafeCollateral = minSafeColl(debtValue, 1.5, collateralPrice);
+    const maxDaiAvailable = daiAvailable(collateralValue, debtValue, 1.5);
 
     return {
       numberOfSeries,
@@ -106,6 +111,8 @@ const SeriesProvider = ({ children }:any) => {
       collateralValue_: parseFloat(ethers.utils.formatEther(collateralValue)),
       collateralRatio,
       collateralRatio_: parseFloat(collateralRatio.toString()),
+      collateralPercent,
+      collateralPercent_ : parseFloat(collateralPercent.toString()),
       minSafeCollateral,
       minSafeCollateral_: parseFloat(ethers.utils.formatEther(minSafeCollateral)),
       maxDaiAvailable,

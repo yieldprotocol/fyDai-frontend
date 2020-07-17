@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import {ethers} from 'ethers';
 import Moment from 'moment';
 import { Box, Button, Select, Image, TextInput, Text, CheckBox, Collapsible, RangeInput } from 'grommet';
 
@@ -17,7 +18,7 @@ import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { NotifyContext } from '../contexts/NotifyContext';
 
-import { useController } from '../hooks';
+import { useController, useCallTx } from '../hooks';
 
 interface BorrowActionProps {
   borrowFn?:any
@@ -30,10 +31,9 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   const { state: yieldState, actions: yieldActions } = React.useContext(YieldContext);
   const { deployedContracts } = yieldState;
   const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
-  const { isLoading, seriesAggregates, activeSeries } = seriesState;
+  const { isLoading, seriesAggregates, seriesRates, activeSeries } = seriesState;
   const {
     maxDaiAvailable_,
-    // estimateRatio,
     debtValue_,
     collateralValue_,
     collateralRatio_,
@@ -46,12 +46,14 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   const [ selectorOpen, setSelectorOpen ] = React.useState<boolean>(false);
   const [ estRatio, setEstRatio ] = React.useState<any>(0);
   const [ estChange, setEstChange ] = React.useState<any>(0);
-  const [ estAtMaturity, setEstAtMaturity ] = React.useState<number>(0);
+  const [ yDaiValue, setYDaiValue ] = React.useState<number>(0);
 
   const [ indicatorColor, setIndicatorColor ] = React.useState<string>('brand');
   const [ warningMsg, setWarningMsg] = React.useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
 
+  const [ callTx ] = useCallTx();
+ 
   const borrowProcedure = async (value:number) => {
     await borrow(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value );
     yieldActions.updateUserData();
@@ -66,12 +68,12 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   }, [ pendingTxs ]);
 
   useEffect(()=>{
-    if (estRatio && estRatio <= 150) {
+    if (estRatio && estRatio <= 1.5) {
       setBorrowDisabled(true);
       setIndicatorColor('red');
       setWarningMsg(null);
       setErrorMsg('That amount exceeds the amount of yDai you can borrow based on your collateral'); 
-    } else if (estRatio > 150 && estRatio < 200 ) {
+    } else if (estRatio > 1.5 && estRatio < 2.0 ) {
       setIndicatorColor('orange');
       setErrorMsg(null);
       setWarningMsg('Borrowing that much will put you at risk of liquidation');
@@ -84,20 +86,25 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   }, [ estRatio ]);
 
   useEffect(() => {
-    if (inputValue && collateralValue_ && debtValue_) {
-      const newRatio = collateralValue_ / ( debtValue_ + parseFloat(inputValue));
-      setEstRatio(newRatio.toFixed(2));
-      const change = (collateralRatio_ - newRatio);
-      setEstChange(change.toFixed(2));
-    }
+    activeSeries && inputValue && ( async () => {
+      const res = await callTx(activeSeries.marketAddress, 'Market', 'sellChaiPreview', [ethers.utils.parseEther(inputValue.toString())]);
+      setYDaiValue( parseFloat(ethers.utils.formatEther(res)) );
+    })();
+  }, [inputValue]);
+
+  useEffect(() => {
 
     if (inputValue && activeSeries) {
-      const newEst = ( activeSeries.yieldAPR/100 * parseFloat(inputValue) + parseFloat(inputValue));
-      setEstAtMaturity(newEst);
+      // console.log(seriesRates.get(activeSeries.maturity).sellYDai_);
+      // const estValue = seriesRates.get(activeSeries.maturity).sellYDai_;
+      // const newEst = ( activeSeries.yieldAPR/100 * parseFloat(inputValue) + parseFloat(inputValue));
+      // setEstAtMaturity(newEst);
+      // setYDaiValue( await getYDaiValue(activeSeries.market, inputValue));
     }
 
     if ( inputValue && ( inputValue > maxDaiAvailable_ ) ) {
       // setDepositDisabled(true);
+      console.log(inputValue, maxDaiAvailable_);
       setWarningMsg(null);
       setErrorMsg('That amount exceeds the amount of yDai you can borrow based on your collateral'); 
     } else if (inputValue && ( inputValue > Math.round(maxDaiAvailable_-1) ) ) {
@@ -108,10 +115,14 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
       setWarningMsg(null);
       setErrorMsg(null);
     }
+
   }, [ inputValue ]);
 
+  
+
   useEffect(() => {
-    console.log(activeSeries);
+    console.log(seriesAggregates);
+
   }, [ activeSeries ]);
 
   return (
@@ -201,7 +212,7 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
                   </Box>
 
                   <Text color={!inputValue? 'brand-transparent':'brand'} weight='bold' size='large'> 
-                    {estAtMaturity.toFixed(2)} Dai on {activeSeries && Moment(activeSeries.maturity_).format('DD MMMM YYYY')}
+                    {yDaiValue.toFixed(2)} Dai on {activeSeries && Moment(activeSeries.maturity_).format('DD MMMM YYYY')}
                   </Text>
                 </Box>
               </Box>
@@ -216,14 +227,6 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
                 {/* <Text color='text-weak' size='xxsmall'>if you deposit {inputValue||0} Eth</Text> */}
               </Box>
             </Box>
-
-            {inputValue > 150 &&
-            <Box direction='row' border={{ color:'red' }} pad='small' margin={{ vertical:'small' }}> 
-              <Text size='xsmall' color='red'>
-                <Warning /> 
-                {' Wooah. If you borrow that much there is a good chance you\'ll get liquidated soon. Proceed with caution!'}
-              </Text>
-            </Box>}
           </Box>
 
           { warningMsg &&

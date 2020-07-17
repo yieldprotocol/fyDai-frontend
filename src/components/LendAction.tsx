@@ -196,7 +196,7 @@ const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
                     <Text color='text-weak' size='xsmall'>Estimated APR</Text>
                     <Help />
                   </Box>
-                  <Text color={!inputValue? 'brand-transparent':'brand'} weight='bold' size='large'> {activeSeries && activeSeries.yieldPercent_.toFixed(2) || ''}% </Text>
+                  <Text color={!inputValue? 'brand-transparent':'brand'} weight='bold' size='large'> {activeSeries && activeSeries.yieldAPR_ || ''}% </Text>
                 </Box>
               </Box>
             </Box>

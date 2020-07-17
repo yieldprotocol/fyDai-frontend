@@ -23,7 +23,8 @@ interface DepositProps {
 const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) => {
 
   const [ estRatio, setEstRatio ] = useState<any>(0);
-  const [ estIncrease, setEstIncrease ] = useState<any>(0); 
+  const [ estIncrease, setEstIncrease ] = useState<any>(0);
+  
   const [ inputValue, setInputValue ] = useState<any>();
   const [ depositDisabled, setDepositDisabled ] = useState<boolean>(false);
   const [ withdrawOpen, setWithdrawOpen ] = useState<boolean>(false);
@@ -40,6 +41,7 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
     ethBalance_,
     collateralAmount_,
     collateralRatio_,
+    collateralPercent_,
     debtValue_,
     estimateRatio, // TODO << this is a function (basically just passed from hooks via context) >> 
   } = seriesAggregates || {};
@@ -63,7 +65,7 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
     if (inputValue && collateralAmount_ && debtValue_) {
       const newRatio = estimateRatio((collateralAmount_+ parseFloat(inputValue)), debtValue_); 
       setEstRatio(newRatio.toFixed(0));
-      const newIncrease = newRatio - collateralRatio_ ;
+      const newIncrease = newRatio - collateralPercent_ ;
       setEstIncrease(newIncrease.toFixed(0));
     }
     if ( inputValue && ( inputValue > ethBalance_) ) {
@@ -146,7 +148,7 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
           <Box gap='small'>
             <Text color='text-weak' size='xsmall'>Collateralisation Ratio</Text>
             <Text color='brand' weight='bold' size='large'> 
-              { (collateralRatio_ && (collateralRatio_ !== 0))? `${collateralRatio_}%`: '-' }
+              { (collateralPercent_ && (collateralPercent_ !== 0))? `${collateralPercent_}%`: '-' }
             </Text>
             { false && 
             <Box pad='xsmall'>
@@ -160,7 +162,7 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
             <Text color='text-weak' size='xsmall'>Ratio after deposit</Text>
             <Box direction='row' gap='small'>
               <Text color={!inputValue? 'brand-transparent': 'brand'} weight='bold' size='large'> 
-                {(estRatio && estRatio !== 0)? `~${estRatio}%`: collateralRatio_ || '' }
+                {(estRatio && estRatio !== 0)? `~${estRatio}%`: collateralPercent_|| '' }
               </Text>
               { true &&
               <Text color='green' size='large'> 
