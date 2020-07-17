@@ -32,7 +32,7 @@ const DashBorrow = ({ }:DashBorrowProps) => {
   const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
   const { isLoading, seriesAggregates, activeSeries } = seriesState;
   const {
-    daiAvailable_,
+    maxDaiAvailable_,
     // estimateRatio,
     debtValue_,
     collateralValue_,

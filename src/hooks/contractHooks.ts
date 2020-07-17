@@ -1,8 +1,10 @@
 import React from 'react';
-import { ethers }  from 'ethers';
+import { ethers, BigNumber }  from 'ethers';
 
 import { NotifyContext } from '../contexts/NotifyContext';
 import { ConnectionContext } from '../contexts/ConnectionContext';
+
+// import { YieldContext } from '../contexts/YieldContext';
 
 import YDai from '../contracts/YDai.json';
 import Controller from '../contracts/Controller.json';
@@ -22,24 +24,24 @@ import Market from '../contracts/Market.json';
  */
 export const useEthProxy = () => {
   const { state: { signer, account } } = React.useContext(ConnectionContext);
-
   const { abi: ethProxyAbi } = EthProxy;
   const  { dispatch }  = React.useContext<any>(NotifyContext);
   const [ postEthActive, setPostEthActive ] = React.useState<boolean>(false);
   const [ withdrawEthActive, setWithdrawEthActive ] = React.useState<boolean>(false);
+
   /**
    * Posts collateral (ETH) via ethProxy
    * @param {string} ethProxyAddress address of the proxy
-   * @param {number} amount amount of ETH to post (in normal human numbers)
+   * @param {number | BigNumber} amount amount of ETH to post (in normal human numbers or in Wei as a BigNumber)
+   * @note if BigNumber is used make sure it is in WEI
    */
   const postEth = async (
     ethProxyAddress:string,
-    amount:number
+    amount:number | BigNumber,
   ) => {
     let tx:any;
     /* Processing and sanitizing input */
-    // console.log(ethers.utils.parseEther(amount.toString()));
-    const parsedAmount = ethers.utils.parseEther(amount.toString());
+    const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(amount.toString());
     const fromAddr = account && ethers.utils.getAddress(account);
     const toAddr = fromAddr;
     const ethProxyAddr = ethers.utils.getAddress(ethProxyAddress);
@@ -51,6 +53,7 @@ export const useEthProxy = () => {
       tx = await contract.post(fromAddr, toAddr, parsedAmount, { value: parsedAmount });
     } catch (e) {
       dispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed. See console.', type:'error' } } );
+      // eslint-disable-next-line no-console
       console.log(e.message);
       setPostEthActive(false);
       return;
@@ -66,15 +69,16 @@ export const useEthProxy = () => {
    * Withdraws ETH collateral directly (no wrapping).
    * (May require authorization once.  )
    * @param {string} ethProxyAddress address of the proxy
-   * @param {number} amount amount of ETH to withdraw (in normal human numbers)
+   * @param {number|BigNumber} amount amount of ETH to withdraw (in normal human numbers or in Wei as a BigNumber)
+   * @note if BigNumber is used make sure it is in WEI
    */
   const withdrawEth = async (
     ethProxyAddress:string,
-    amount:number
+    amount:number|BigNumber
   ) => {
     let tx:any;
     /* Processing and sanitizing input */
-    const parsedAmount = ethers.utils.parseEther(amount.toString());
+    const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(amount.toString());
     const fromAddr = account && ethers.utils.getAddress(account);
     const toAddr = fromAddr;
     const ethProxyAddr = ethers.utils.getAddress(ethProxyAddress);
@@ -119,7 +123,6 @@ export const useController = () => {
 
   const { abi: controllerAbi } = Controller;
   const { state: { signer, account } } = React.useContext(ConnectionContext);
-
 
   const  { dispatch }  = React.useContext<any>(NotifyContext);
   const [ postActive, setPostActive ] = React.useState<boolean>(false);

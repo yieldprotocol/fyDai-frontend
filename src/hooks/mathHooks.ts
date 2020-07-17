@@ -3,6 +3,7 @@ import { ethers, BigNumber }  from 'ethers';
 import * as utils from '../utils';
 
 import { YieldContext } from '../contexts/YieldContext';
+// import { SeriesContext } from '../contexts/SeriesContext';
 
 /**
  * Hooks for yeild maths functions
@@ -14,11 +15,12 @@ import { YieldContext } from '../contexts/YieldContext';
 export const useMath = () => {
 
   const { state: { feedData, userData } } = React.useContext(YieldContext);
-  const { ilks, amm } = feedData;
+  const { ilks } = feedData;
   const ethPosted = userData?.ethPosted || BigNumber.from('0');
+  // const { seriesRates, seriesData } = React.useContext(SeriesContext);
 
   /**
-   * Calculates the amount of collateral posted
+   * Gets the amount of collateral posted
    * @returns {BigNumber}
    */
   const collAmount = (): BigNumber => {
@@ -29,19 +31,17 @@ export const useMath = () => {
    * Calculates the USD value per unit collateral
    * @returns {BigNumber} in RAY
    */
-  const collUSDValue = (): BigNumber => {
-    // TODO: update this to use ETH-A Oracle - not ilks.spot for market price USD
-    // return collatAmount().mul(ilks.spot);
-    // return collatAmount().mul(utils.toRay(200));
-    return BigNumber.from('214');
+  const collUnitValue = (): BigNumber => {
+    // TODO: Update this to use ETH-A Oracle - not ilks.spot for market price USD
+    return utils.mulRay(BigNumber.from(150), (ilks.spot));
   };
 
   /**
-   * Calculates the value of collateral at the current price
+   * Calculates the total value of collateral at the current unit price
    * @returns {BigNumber}
    */
   const collValue = (): BigNumber => {
-    return collAmount().mul(collUSDValue());
+    return collAmount().mul(collUnitValue());
     // return utils.mulRay(collatAmount(), CollatUSDValue());
   };
 
@@ -80,14 +80,14 @@ export const useMath = () => {
    * @param {number} _debtValue value of dai debt (in USD)
    * @returns {number}
    */
-  const estimateCollRatio = (_collateralAmount:Number, _debtValue:Number) => {
+  const estCollRatio = (_collateralAmount:Number, _debtValue:Number) => {
     if (!_collateralAmount || _debtValue === 0 ) {
       // TODO handle this better
       return undefined;
     }
     const _colAmnt = ethers.utils.parseEther(_collateralAmount.toString());
     const _debtVal = ethers.utils.parseEther(_debtValue.toString());
-    const _colVal = _colAmnt.mul(collUSDValue());
+    const _colVal = _colAmnt.mul(collUnitValue());
     const _ratio = _colVal.div(_debtVal);
     return parseFloat(_ratio.toString());
   };
@@ -100,8 +100,8 @@ export const useMath = () => {
    * @param {*} _price
    * @returns
    */
-  const minSafeCollatAmount=(_debtValue:BigNumber, _liquidationRatio:BigNumber)=> {
-    return _debtValue.mul(_liquidationRatio).div(collUSDValue());
+  const minSafeColl=(_debtValue:BigNumber, _liquidationRatio:BigNumber)=> {
+    return _debtValue.mul(_liquidationRatio).div(collUnitValue());
   };
 
   /**
@@ -134,37 +134,38 @@ export const useMath = () => {
    * @param {*} _liquidationRatio
    * @returns {BigNumber} 
    */
-  const maxDai =(_collateralValue:BigNumber, _debtValue:BigNumber, _liquidationRatio:BigNumber) =>{
+  const daiAvailable =(_collateralValue:BigNumber, _debtValue:BigNumber, _liquidationRatio:BigNumber) =>{
     const maxSafeDebtValue = _collateralValue.div(_liquidationRatio);
-    const _max = _debtValue.lt(maxSafeDebtValue)? maxSafeDebtValue.sub(_debtValue) : 0;
+    const _max = _debtValue.lt(maxSafeDebtValue) ? maxSafeDebtValue.sub(_debtValue) : 0;
     return _max;
   };
 
   /**
    * Annualised Yield Rate
    *
-   * @param {BigNumber} _currentPrice
-   * @param {number} _expiryDate
-   * @returns
+   * @param { BigNumber } _rate // current [Dai] price per unit y[Dai]
+   * @param { number } _maturity  // date of maturity 
+   * @returns { number }
    */
-  const annualizedYieldRate=( _currentPrice: BigNumber, _expiryDate:number)=> {
-    const secsToMaturity = _expiryDate - (Math.round(new Date().getTime() / 1000));
-    const propOfYear = secsToMaturity / utils.SECONDS_PER_YEAR;
-    // const annualisedYield = (divRay(toWei(1), _currentPrice)).pow(toRay(parseFloat((1/propOfYear).toFixed(5)) )  ).sub(toWei(1));
-    // console.log(annualisedYield);
-    return null;
-  };
-  
-  /**
-   * Instantaneous Yield Rate
-   *
-   * @param {BigNumber} _currentPrice of Ydai (on AMM)
-   * @returns
-   */
-  const yieldRate=( _currentPrice: BigNumber )=> {
-    return (utils.divRay(utils.toWei(1), _currentPrice)).sub(utils.toWei(1));
+  const yieldAPR =(_rate: BigNumber, _maturity:number)=> {
+    const secsToMaturity = _maturity - (Math.round(new Date().getTime() / 1000));
+    const propOfYear = secsToMaturity/utils.SECONDS_PER_YEAR;
+    const priceRatio = 1 / parseFloat(ethers.utils.formatEther(_rate));
+    const powRatio = 1 / propOfYear;
+    const apr = Math.pow(priceRatio, powRatio) - 1;
+    // console.log('series:', _maturity, 'APR:', apr);
+    return apr;
   };
 
-  return { collAmount, collValue, yieldRate, debtVal, collRatio, estimateCollRatio, minSafeCollatAmount, maxDai } as const;
+  return {
+    yieldAPR,
+    collAmount,
+    collValue,
+    debtVal,
+    collRatio,
+    estCollRatio,
+    minSafeColl,
+    daiAvailable
+  } as const;
 
 };

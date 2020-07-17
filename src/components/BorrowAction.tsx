@@ -32,7 +32,7 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
   const { isLoading, seriesAggregates, activeSeries } = seriesState;
   const {
-    daiAvailable_,
+    maxDaiAvailable_,
     // estimateRatio,
     debtValue_,
     collateralValue_,
@@ -55,7 +55,7 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   const borrowProcedure = async (value:number) => {
     await borrow(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value );
     yieldActions.updateUserData();
-    seriesActions.refreshPositions([activeSeries]);
+    seriesActions.refreshPositions([ activeSeries ]);
   };
 
   // TODO: maybe split into a custom hook
@@ -92,15 +92,15 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
     }
 
     if (inputValue && activeSeries) {
-      const newEst = ( activeSeries.yieldRate_ * parseFloat(inputValue) + parseFloat(inputValue));
+      const newEst = ( activeSeries.yieldAPR/100 * parseFloat(inputValue) + parseFloat(inputValue));
       setEstAtMaturity(newEst);
     }
 
-    if ( inputValue && ( inputValue > daiAvailable_ ) ) {
+    if ( inputValue && ( inputValue > maxDaiAvailable_ ) ) {
       // setDepositDisabled(true);
       setWarningMsg(null);
       setErrorMsg('That amount exceeds the amount of yDai you can borrow based on your collateral'); 
-    } else if (inputValue && ( inputValue > Math.round(daiAvailable_-1) ) ) {
+    } else if (inputValue && ( inputValue > Math.round(maxDaiAvailable_-1) ) ) {
       setErrorMsg(null);
       setWarningMsg('If you borrow right up to your maximum allowance, there is high probability you will be liquidated soon!');
     } else {
@@ -185,7 +185,7 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
                     <Text color='text-weak' size='xsmall'>Estimated APR</Text>
                     <Help />
                   </Box>
-                  <Text color={!inputValue? 'brand-transparent':'brand'} weight='bold' size='large'> {activeSeries && activeSeries.yieldPercent_.toFixed(2) || ''}% </Text>
+                  <Text color={!inputValue? 'brand-transparent':'brand'} weight='bold' size='large'> {activeSeries && activeSeries.yieldAPR_ || ''}% </Text>
                   { false && 
                   <Box pad='xsmall'>
                     <Text alignSelf='start' size='xxsmall'>
@@ -211,7 +211,7 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
                   <Help />
                 </Box>
                 <Box direction='row' gap='small'>
-                  <Text color='brand' weight='bold' size='large'> {daiAvailable_? `approx. ${daiAvailable_.toFixed(2)} Dai`: ''}  </Text>
+                  <Text color='brand' weight='bold' size='large'> {maxDaiAvailable_? `approx. ${maxDaiAvailable_.toFixed(2)} Dai`: ''}  </Text>
                 </Box>
                 {/* <Text color='text-weak' size='xxsmall'>if you deposit {inputValue||0} Eth</Text> */}
               </Box>

@@ -33,7 +33,7 @@ const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
   const { isLoading, seriesAggregates, activeSeries } = seriesState;
   const {
-    daiAvailable_,
+    maxDaiAvailable_,
     // estimateRatio,
     debtValue_,
     ethBalance_,
@@ -88,11 +88,11 @@ const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
     //   setEstAtMaturity(newEst);
     // }
   
-    // if ( inputValue && ( inputValue > daiAvailable_ ) ) {
+    // if ( inputValue && ( inputValue > maxDaiAvailable_ ) ) {
     //   // setDepositDisabled(true);
     //   setWarningMsg(null);
     //   setErrorMsg('That amount exceeds the amount of Dai you have'); 
-    // } else if (inputValue && ( inputValue > Math.round(daiAvailable_-1) ) ) {
+    // } else if (inputValue && ( inputValue > Math.round(maxDaiAvailable_-1) ) ) {
     //   setErrorMsg(null);
     //   setWarningMsg('If you borrow right up to your maximum allowance, there is high probability you will be liquidated soon!');
     // } else {

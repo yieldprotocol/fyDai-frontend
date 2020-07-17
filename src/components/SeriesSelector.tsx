@@ -3,6 +3,7 @@ import { Anchor, Text, Box, Layer, Header } from 'grommet';
 import { 
   FiInfo as Info,
   FiArrowLeft as ArrowLeft,
+  FiCheck as Check,
 } from 'react-icons/fi';
 
 import { IYieldSeries } from '../types';
@@ -11,11 +12,11 @@ import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 
 import YieldSeriesSummary from './YieldSeriesSummary';
-import { FaCheckCircle } from 'react-icons/fa';
+
 // import YieldSeries from '../../components/YieldSeries';
 
 
-const SeriesLayer = (props:any) => {
+const SeriesSelector = (props:any) => {
 
   const [showMore, setShowMore] = React.useState<boolean>(false);
   const [openIndex, setOpenIndex] = React.useState<number | null >(null);
@@ -32,6 +33,7 @@ const SeriesLayer = (props:any) => {
   // const { state } = React.useContext( YieldContext );
 
   const { state: seriesState, actions: seriesActions } = React.useContext( SeriesContext );
+
   const { isLoading, activeSeries, seriesData } = seriesState; 
   const { setActiveSeries } = seriesActions;
 
@@ -121,7 +123,7 @@ const SeriesLayer = (props:any) => {
                 align='center'
               >
                 <Text> Selected </Text>
-                <FaCheckCircle />
+                <Check />
               </Box>
             </Box>
           </Box>}
@@ -171,4 +173,4 @@ const SeriesLayer = (props:any) => {
   );
 };
 
-export default SeriesLayer;
+export default SeriesSelector;

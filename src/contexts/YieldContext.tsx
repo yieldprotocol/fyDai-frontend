@@ -156,14 +156,14 @@ const YieldProvider = ({ children }:any) => {
         );
         await Promise.all(
           _seriesList.map(async (x:string, i:number)=>{
-            const market = await callTx(state.migrationsAddr.get(networkId), 'Migrations', 'contracts', [ethers.utils.formatBytes32String(`Market-yDai${i+1}`)]);
+            const marketAddress = await callTx(state.migrationsAddr.get(networkId), 'Migrations', 'contracts', [ethers.utils.formatBytes32String(`Market-yDai${i+1}`)]);
             const name = await callTx(x, 'YDai', 'name', []);
             const maturity = (await callTx(x, 'YDai', 'maturity', [])).toNumber();
             return {
-              yDai: x,
+              yDaiAddress: x,
               name,
               maturity,
-              market,
+              marketAddress,
               maturity_: new Date( (maturity) * 1000 ),
               displayName: Moment(maturity*1000).format('MMMM YYYY'),
               seriesColor: seriesColors[i],
@@ -192,6 +192,7 @@ const YieldProvider = ({ children }:any) => {
     } else {
       _state = state.feedData;
     }
+
     const _ilks = await callTx(deployedContracts.Vat, 'Vat', 'ilks', [ethers.utils.formatBytes32String('ETH-A')]);
 
     /* parse and return feed data if reqd. */
@@ -199,14 +200,15 @@ const YieldProvider = ({ children }:any) => {
       ..._state,
       ilks: {
         ..._ilks,
-        // spot_: utils.rayToHuman(_ilks.spot),
-        // rate_: utils.rayToHuman(_ilks.rate),
+        spot_: utils.rayToHuman(_ilks.spot),
+        rate_: utils.rayToHuman(_ilks.rate),
       },
     };
-
     console.log(_feedData);
     setCachedFeed(_feedData);
+    
     return _feedData;
+
   };
 
 
@@ -307,17 +309,19 @@ const YieldProvider = ({ children }:any) => {
 
     /* 2. Fetch feed/stream data (from cache initially if available) and init event listeners */
     dispatch({ type:'updateFeedData', payload: await _getFeedData(deployedContracts, deployedSeries) });
+    
     // 2.1 Add listen to Maker rate/spot changes
     provider && addEventListener(
       deployedContracts.Vat,
       'Vat',
       'LogNote',
       [],
-      (x:any, y:any, z:any)=> { 
-        console.log(x, y, z); 
+      (x:any)=> {
+        console.log(x);
         // dispatch({ type:'updateFeedData', payload: {...feedData, feedData.ilks })
       }
     );
+
     // TODO: add event listener for AMM
     /* 3. Fetch auxilliary (PUBLIC non-cached, non-user specific) yield and series data */
     dispatch({ type:'updateYieldData', payload: await _getYieldData(deployedContracts) });

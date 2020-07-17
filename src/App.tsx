@@ -27,7 +27,7 @@ function App() {
 
   const [darkmode, setDarkmode] = React.useState(false);
   const [activeView, setActiveView] = React.useState<string>('BORROW');
-  const [activeSeries, setActiveSeries] = React.useState<IYieldSeries | null>(null);
+  // const [activeSeries, setActiveSeries] = React.useState<IYieldSeries | null>(null);
 
   const [showConnectLayer, setShowConnectLayer] = React.useState<boolean>(false);
   const [showAccountLayer, setShowAccountLayer] = React.useState<boolean>(false);
@@ -46,7 +46,7 @@ function App() {
         { showAccountLayer && <AccountLayer closeLayer={()=>setShowAccountLayer(false)} changeWallet={()=>changeConnection()} /> }
         { showConnectLayer && <ConnectLayer closeLayer={()=>setShowConnectLayer(false)} />}
         { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
-        { showSeriesLayer  && <SeriesSelector setActiveSeries={setActiveSeries} closeLayer={()=>setShowSeriesLayer(false)} /> }
+        { showSeriesLayer  && <SeriesSelector closeLayer={()=>setShowSeriesLayer(false)} /> }
 
         <Box direction="row" height={{ min: '100%' }}>
           <Box flex>
