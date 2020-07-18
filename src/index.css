@@ -10,7 +10,13 @@ body {
     -webkit-font-smoothing: auto;
     text-rendering: optimizeLegibility;
     letter-spacing: -0.5px;
-    transition: all 0.2s ease-in-out;
+}
+
+a,
+a:hover,
+a:active,
+a:visited {
+    transition: all 0.15s ease-in-out;
 }
 
 /* ::-webkit-scrollbar { display:none; } */

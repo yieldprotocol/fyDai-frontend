@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
-import { useWeb3React } from '@web3-react/core';
+// import { useWeb3React } from '@web3-react/core';
 
 import {
-  Grid,
   Text,
   Image,
   Header,
@@ -12,7 +11,6 @@ import {
   ThemeContext,
   ResponsiveContext,
 } from 'grommet';
-import { FaSeedling as YieldLeaf } from 'react-icons/fa';
 import { FiSettings as Gear } from 'react-icons/fi';
 
 import logoDark from '../assets/images/logo.svg';
@@ -121,7 +119,7 @@ const YieldHeader = (props: any) => {
         right: 'xsmall',
       }}
       style={{
-        height: '1.5rem',
+        width: '4.5rem',
       }}
     >
       <Image src={theme.dark ? logoLight : logoDark} fit="contain" />
@@ -155,7 +153,7 @@ const YieldHeader = (props: any) => {
     >
       <Text
         textAlign="center"
-        color={theme.global.colors.text}
+        color="text-weak"
         margin="large"
         size="xlarge"
         style={{
@@ -189,7 +187,7 @@ const YieldHeader = (props: any) => {
       <Text
         textAlign="center"
         weight={600}
-        color={activeView === link ? 'brand' : 'text'}
+        color={activeView === link ? 'brand' : 'text-weak'}
         size={screenSize === 'small' ? 'xxlarge' : 'medium'}
         style={{
           textDecoration: activeView === link ? 'underline' : 'none',
@@ -263,7 +261,6 @@ const YieldHeader = (props: any) => {
       background={{
         color: 'background-front',
       }}
-      justify="between"
       pad={{
         horizontal: 'small',
         vertical: 'none',
