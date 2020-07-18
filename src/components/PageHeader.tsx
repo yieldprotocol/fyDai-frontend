@@ -56,7 +56,7 @@ const PageHeader = (props: PageHeaderProps) => {
           min: screenSize === 'small' ? '100%' : '0',
         }}
       >
-        <TipsButton text={tipPrimary} secondary={tipSecondary} />
+        <TipsButton primary={tipPrimary} secondary={tipSecondary} />
       </Box>
     </Box>
   );

@@ -3,11 +3,11 @@ import { Box, Button, ResponsiveContext } from 'grommet';
 
 interface TipProps {
   secondary?: string;
-  text?: string;
+  primary?: string;
 }
 
 const TipButtons = (props: TipProps) => {
-  const { secondary, text } = props;
+  const { secondary, primary } = props;
   const screenSize = React.useContext(ResponsiveContext);
 
   return (
@@ -18,10 +18,10 @@ const TipButtons = (props: TipProps) => {
       }}
       gap={screenSize === 'small' ? 'medium' : 'small'}
     >
-      {text ? (
+      {primary ? (
         <Button
           primary
-          label={text}
+          label={primary}
           style={{
             fontWeight: 600,
           }}
@@ -34,7 +34,7 @@ const TipButtons = (props: TipProps) => {
 
 TipButtons.defaultProps = {
   secondary: null,
-  text: null,
+  primary: null,
 };
 
 export default TipButtons;
