@@ -63,7 +63,7 @@ function App() {
         {showConnectLayer && (
           <ConnectLayer closeLayer={() => setShowConnectLayer(false)} />
         )}
-        {/* { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> } */}
+        { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
         {showSeriesLayer && (
           <SeriesSelector
             setActiveSeries={setActiveSeries}
