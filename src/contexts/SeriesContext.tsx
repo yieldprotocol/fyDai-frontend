@@ -207,8 +207,6 @@ const SeriesProvider = ({ children }:any) => {
     }
 
     if ( !yieldState?.isLoading && filteredSeriesArr.length > 0) {
-      
-      console.log(seriesArr);
 
       dispatch({ type:'isLoading', payload: true });
 

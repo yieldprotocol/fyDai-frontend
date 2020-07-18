@@ -102,8 +102,10 @@ export const useMath = () => {
     const _colAmnt = ethers.utils.parseEther(_collateralAmount.toString());
     const _debtVal = ethers.utils.parseEther(_debtValue.toString());
     const _colVal = utils.mulRay(_colAmnt, collPrice());
-    const _ratio = _colVal.div(_debtVal);
-    return parseFloat(_ratio.toString());
+    const _ratio = utils.divRay(_colVal, _debtVal);
+    
+    console.log( parseFloat(utils.mulRay(BigNumber.from('100'), _ratio).toString()) );
+    return parseFloat(utils.mulRay(BigNumber.from('100'), _ratio).toString());
   };
 
   /**

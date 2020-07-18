@@ -23,8 +23,7 @@ interface DepositProps {
 const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) => {
 
   const [ estRatio, setEstRatio ] = useState<any>(0);
-  const [ estIncrease, setEstIncrease ] = useState<any>(0);
-  
+  const [ estIncrease, setEstIncrease ] = useState<any>(0); 
   const [ inputValue, setInputValue ] = useState<any>();
   const [ depositDisabled, setDepositDisabled ] = useState<boolean>(false);
   const [ withdrawOpen, setWithdrawOpen ] = useState<boolean>(false);
@@ -162,7 +161,7 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
             <Text color='text-weak' size='xsmall'>Ratio after deposit</Text>
             <Box direction='row' gap='small'>
               <Text color={!inputValue? 'brand-transparent': 'brand'} weight='bold' size='large'> 
-                {(estRatio && estRatio !== 0)? `~${estRatio}%`: collateralPercent_|| '' }
+                {(estRatio && estRatio !== 0)? `~${estRatio}%`: collateralPercent_ || '' }
               </Text>
               { true &&
               <Text color='green' size='large'> 
