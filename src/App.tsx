@@ -31,7 +31,7 @@ function App() {
 
   const [showConnectLayer, setShowConnectLayer] = React.useState<boolean>(false);
   const [showAccountLayer, setShowAccountLayer] = React.useState<boolean>(false);
-  const [showTestLayer, setShowTestLayer] = React.useState<boolean>(true);
+  const [showTestLayer, setShowTestLayer] = React.useState<boolean>(false);
   const [showSeriesLayer, setShowSeriesLayer] = React.useState<boolean>(false);
 
   const changeConnection = () => {

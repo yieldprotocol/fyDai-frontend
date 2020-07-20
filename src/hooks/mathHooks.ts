@@ -94,6 +94,7 @@ export const useMath = () => {
    * @param {number} _debtValue value of dai debt (in USD)
    * @returns {number}
    */
+  // TODO merge this in to the 'collateralization ratio function' above.
   const estCollRatio = (_collateralAmount:Number, _debtValue:Number) => {
     if (!_collateralAmount || _debtValue === 0 ) {
       // TODO handle this better
@@ -103,7 +104,6 @@ export const useMath = () => {
     const _debtVal = ethers.utils.parseEther(_debtValue.toString());
     const _colVal = utils.mulRay(_colAmnt, collPrice());
     const _ratio = utils.divRay(_colVal, _debtVal);
-    
     console.log( parseFloat(utils.mulRay(BigNumber.from('100'), _ratio).toString()) );
     return parseFloat(utils.mulRay(BigNumber.from('100'), _ratio).toString());
   };

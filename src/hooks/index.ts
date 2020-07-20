@@ -1,9 +1,10 @@
 import { useCallTx, useSendTx, useBalances } from './transactionHooks';
 import { useMaker } from './makerHooks';
 import { useCachedState, useDebounce, useTxActive } from './appHooks';
-import { useEthProxy, useController, useYDai, useMarket } from './contractHooks';
+import { useEthProxy, useController, useYDai} from './contractHooks';
 import { useEvents } from './eventHooks';
 import { useMath } from './mathHooks';
+import { useMarket } from './marketHooks';
 
 export {
   useMarket,

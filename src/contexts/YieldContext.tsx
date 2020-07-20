@@ -115,7 +115,10 @@ const YieldProvider = ({ children }:any) => {
   const { getEventHistory, addEventListener, parseEventList } = useEvents();
   const { getEthBalance, getTokenBalance }  = useBalances();
 
-  /* internal fn: async get all public Yield addresses from localStorage (or chain if no cache) */
+  /** 
+   * @dev internal fn: Get all public Yield addresses from localStorage (or chain if no cache) 
+   * 
+   * */
   const _getProtocolAddrs = async (networkId:number|string, forceUpdate:boolean): Promise<any[]> => {
 
     const _deployedSeries:any[] = [];
@@ -194,7 +197,6 @@ const YieldProvider = ({ children }:any) => {
     }
 
     const _ilks = await callTx(deployedContracts.Vat, 'Vat', 'ilks', [ethers.utils.formatBytes32String('ETH-A')]);
-
     /* parse and return feed data if reqd. */
     const _feedData = { 
       ..._state,
@@ -204,6 +206,7 @@ const YieldProvider = ({ children }:any) => {
         rate_: utils.rayToHuman(_ilks.rate),
       },
     };
+
     console.log(_feedData);
     setCachedFeed(_feedData);
     
@@ -216,7 +219,6 @@ const YieldProvider = ({ children }:any) => {
    * @dev get PUBLIC, non-cached, non-user specific yield protocol general data
   */
   const _getYieldData = async (deployedContracts:any): Promise<any> => {
-
     const _yieldData:any = {
     };
     // parse data if required.
@@ -224,6 +226,7 @@ const YieldProvider = ({ children }:any) => {
       ..._yieldData,
     };
   };
+
 
   /**
    * @dev gets private, user specific Yield data
@@ -321,8 +324,8 @@ const YieldProvider = ({ children }:any) => {
         // dispatch({ type:'updateFeedData', payload: {...feedData, feedData.ilks })
       }
     );
-
     // TODO: add event listener for AMM
+
     /* 3. Fetch auxilliary (PUBLIC non-cached, non-user specific) yield and series data */
     dispatch({ type:'updateYieldData', payload: await _getYieldData(deployedContracts) });
 
@@ -330,9 +333,8 @@ const YieldProvider = ({ children }:any) => {
     const userData = account ? await _getUserData(deployedContracts, deployedSeries, false): null;
     dispatch({ type:'updateUserData', payload: userData });
 
-    // TODO: split history from _getUserData
+    // TODO: maybe split history from _getUserData
     /* 5. Fetch user history */
-
     dispatch({ type:'isLoading', payload: false });
   };
 

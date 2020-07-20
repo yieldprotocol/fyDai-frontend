@@ -86,10 +86,8 @@ const SeriesProvider = ({ children }:any) => {
     const debtYDaiValue = null; // Not needed for now - possibly unknown see below
     const totaldebtDai = null; // Unknown here - because each series has different Dai/yDai rates
     const debtValue = debtValAdj(debtYDai); // calculated as yDai at maturity. i.e. 1:1 
-    
     const collateralRatio = collRatio(collateralValue, debtValue);
     const collateralPercent = collPercent(collateralRatio);
-
     const minSafeCollateral = minSafeColl(debtValue, 1.5, collateralPrice);
     const maxDaiAvailable = daiAvailable(collateralValue, debtValue, 1.5);
 
@@ -171,6 +169,7 @@ const SeriesProvider = ({ children }:any) => {
         console.log(_rates.sellYDai.toString());
         _seriesData.push(x);
         try {
+
           _seriesData[i].yDaiBalance = account? await callTx(x.yDaiAddress, 'YDai', 'balanceOf', [account]): BigNumber.from('0') ;
           _seriesData[i].isMature = await callTx(x.yDaiAddress, 'YDai', 'isMature', []);
 
@@ -210,19 +209,23 @@ const SeriesProvider = ({ children }:any) => {
 
       dispatch({ type:'isLoading', payload: true });
 
-      /* get series rates */
+      /* Get series rates */
       const rates = await _getRates(filteredSeriesArr);
       dispatch( { type:'updateRates', payload: rates });
 
-      /* build series map */
+      /* Build/re-build series map */
       const seriesMap:any = await _getSeriesData(filteredSeriesArr, rates);
       dispatch( { type:'updateSeries', payload: seriesMap });
 
-      if (seriesArr.length===1 ){
+      /* set the active series */
+      if (!state.activeSeries) {
+        /* if no active series or , set it to the first entry of the map. */
+        dispatch({ type:'setActiveSeries', payload: seriesMap.entries().next().value[1] });
+      } else if (seriesArr.length===1 ){
         /* if there was only one series updated set that one as the active series */
         dispatch({ type:'setActiveSeries', payload: seriesMap.get(seriesArr[0].maturity) });
       } else {
-        /* if no active series, set it to the first entry of the map. */
+        // other situation catch
         dispatch({ type:'setActiveSeries', payload: seriesMap.entries().next().value[1] });
       }
 
@@ -237,10 +240,8 @@ const SeriesProvider = ({ children }:any) => {
   };
 
   React.useEffect( () => {
-
     !yieldState?.isLoading && dispatch({ type:'updateAggregates', payload: _runAggregation() });
   }, [ userData, feedData ]);
-
 
   React.useEffect( () => {
     ( async () => {

@@ -18,7 +18,7 @@ import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { NotifyContext } from '../contexts/NotifyContext';
 
-import { useController, useCallTx } from '../hooks';
+import { useController, useCallTx, useMarket } from '../hooks';
 
 interface BorrowActionProps {
   borrowFn?:any
@@ -40,6 +40,9 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   } = seriesAggregates;
 
   const { borrow, borrowActive }  = useController();
+  const { sellYDai, buyDai, approveToken }  = useMarket();
+
+  const [ callTx ] = useCallTx();
 
   const [ inputValue, setInputValue ] = React.useState<any>();
   const [ borrowDisabled, setBorrowDisabled ] = React.useState<boolean>(false);
@@ -52,10 +55,12 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   const [ warningMsg, setWarningMsg] = React.useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
 
-  const [ callTx ] = useCallTx();
- 
   const borrowProcedure = async (value:number) => {
-    await borrow(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value );
+
+    console.log(activeSeries);
+    await borrow(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value);
+    await approveToken(activeSeries.yDaiAddress, activeSeries.marketAddress, inputValue);
+    await sellYDai(activeSeries.marketAddress, inputValue );
     yieldActions.updateUserData();
     seriesActions.refreshPositions([ activeSeries ]);
   };
@@ -87,8 +92,8 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
 
   useEffect(() => {
     activeSeries && inputValue && ( async () => {
-      const res = await callTx(activeSeries.marketAddress, 'Market', 'sellChaiPreview', [ethers.utils.parseEther(inputValue.toString())]);
-      setYDaiValue( parseFloat(ethers.utils.formatEther(res)) );
+      const preview = await callTx(activeSeries.marketAddress, 'Market', 'buyChaiPreview', [ethers.utils.parseEther(inputValue.toString())]);
+      setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
     })();
   }, [inputValue]);
 
@@ -115,14 +120,10 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
       setWarningMsg(null);
       setErrorMsg(null);
     }
-
   }, [ inputValue ]);
-
-  
 
   useEffect(() => {
     console.log(seriesAggregates);
-
   }, [ activeSeries ]);
 
   return (
