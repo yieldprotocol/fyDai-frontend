@@ -50,7 +50,9 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
   }, [ pendingTxs ]);
 
   const repayProcedure = async (value:number) => {
-    await repay(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value, 'yDai' );
+
+    await repay(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value, 'Dai' );
+
     seriesActions.refreshPositions([activeSeries]);
   };
 

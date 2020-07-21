@@ -1,12 +1,12 @@
 import React from 'react';
 import { ethers, BigNumber }  from 'ethers';
 import * as utils from '../utils';
-
-import { YieldContext } from '../contexts/YieldContext';
-// import { SeriesContext } from '../contexts/SeriesContext';
+import { YieldContext } from '../contexts/YieldContext'; // TODO sort out this cyclic ref (not critical)
 
 /**
- * Hooks for yeild maths functions
+ * Hook for Yield maths functions
+ * 
+ * ( not really 'hooks' - but beneficial to keep app logic together.)
  * 
  * @returns { function } addEventListner
  * @returns { function } removeEventListener

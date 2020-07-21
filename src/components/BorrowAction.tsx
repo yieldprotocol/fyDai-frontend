@@ -59,8 +59,12 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
 
     console.log(activeSeries);
     await borrow(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value);
-    await approveToken(activeSeries.yDaiAddress, activeSeries.marketAddress, inputValue);
-    await sellYDai(activeSeries.marketAddress, inputValue );
+    await approveToken(activeSeries.yDaiAddress, activeSeries.marketAddress, inputValue+1);
+    await buyDai(
+      activeSeries.yDaiAddress,
+      activeSeries.marketAddress,
+      inputValue
+    );
     yieldActions.updateUserData();
     seriesActions.refreshPositions([ activeSeries ]);
   };
@@ -92,7 +96,8 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
 
   useEffect(() => {
     activeSeries && inputValue && ( async () => {
-      const preview = await callTx(activeSeries.marketAddress, 'Market', 'buyChaiPreview', [ethers.utils.parseEther(inputValue.toString())]);
+      const preview = await callTx(activeSeries.marketAddress, 'Market', 'buyDaiPreview', [ethers.utils.parseEther(inputValue.toString())]);
+      console.log(activeSeries);
       setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
     })();
   }, [inputValue]);

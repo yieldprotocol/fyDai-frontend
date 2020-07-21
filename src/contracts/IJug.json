@@ -45,26 +45,26 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.6.10+commit.00c0fcaf\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"drip\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"ilks\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"interface for the pot contract from MakerDao Taken from https://github.com/makerdao/developerguides/blob/master/dai/dsr-integration-guide/dsr.sol\",\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/IJug.sol\":\"IJug\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/IJug.sol\":{\"keccak256\":\"0xa64abc3265596454f20b4e66f5b4c971a2d607a85c65d0b6f80d6690580a6aa4\",\"urls\":[\"bzz-raw://e8b32671136f424859f2c2bf7a852b84d2045a6c591afbb15e19aafd1a14414a\",\"dweb:/ipfs/QmWgwd4H5H6eFgPV37CG33v96ftjDr8QtFsVxwZ4JqtBDc\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.6.10+commit.00c0fcaf\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"drip\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"ilks\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"interface for the pot contract from MakerDao Taken from https://github.com/makerdao/developerguides/blob/master/dai/dsr-integration-guide/dsr.sol\",\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/IJug.sol\":\"IJug\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/IJug.sol\":{\"keccak256\":\"0x0dd672d0252b7b584ed8e101db0d737a2e30db6e02ca3a1898ed0e7e4c3205cb\",\"license\":\"GPL-3.0-or-later\",\"urls\":[\"bzz-raw://65be2a0b98a2a43e152a044c1c5ce47b091c26a0864aae4c6b35956296b5c243\",\"dweb:/ipfs/QmQQyQt5tQKFK9BxkZaWuX9ay5V7Y8MJFQMeqoubAAFvB6\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "pragma solidity ^0.6.10;\n\n\n/// @dev interface for the pot contract from MakerDao\n/// Taken from https://github.com/makerdao/developerguides/blob/master/dai/dsr-integration-guide/dsr.sol\ninterface IJug {\n    function ilks(bytes32) external returns (uint256, uint256);\n    function drip(bytes32) external returns (uint256);\n}",
+  "source": "// SPDX-License-Identifier: GPL-3.0-or-later\npragma solidity ^0.6.10;\n\n\n/// @dev interface for the pot contract from MakerDao\n/// Taken from https://github.com/makerdao/developerguides/blob/master/dai/dsr-integration-guide/dsr.sol\ninterface IJug {\n    function ilks(bytes32) external returns (uint256, uint256);\n    function drip(bytes32) external returns (uint256);\n}",
   "sourcePath": "/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/IJug.sol",
   "ast": {
     "absolutePath": "/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/IJug.sol",
     "exportedSymbols": {
       "IJug": [
-        10490
+        9897
       ]
     },
-    "id": 10491,
-    "license": null,
+    "id": 9898,
+    "license": "GPL-3.0-or-later",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 10472,
+        "id": 9879,
         "literals": [
           "solidity",
           "^",
@@ -72,7 +72,7 @@
           ".10"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:24:25"
+        "src": "45:24:25"
       },
       {
         "abstract": false,
@@ -80,15 +80,15 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "documentation": {
-          "id": 10473,
+          "id": 9880,
           "nodeType": "StructuredDocumentation",
-          "src": "27:159:25",
+          "src": "72:159:25",
           "text": "@dev interface for the pot contract from MakerDao\n Taken from https://github.com/makerdao/developerguides/blob/master/dai/dsr-integration-guide/dsr.sol"
         },
         "fullyImplemented": false,
-        "id": 10490,
+        "id": 9897,
         "linearizedBaseContracts": [
-          10490
+          9897
         ],
         "name": "IJug",
         "nodeType": "ContractDefinition",
@@ -97,7 +97,7 @@
             "body": null,
             "documentation": null,
             "functionSelector": "d9638d36",
-            "id": 10482,
+            "id": 9889,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -105,18 +105,18 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 10476,
+              "id": 9883,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 10475,
+                  "id": 9882,
                   "mutability": "mutable",
                   "name": "",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 10482,
-                  "src": "221:7:25",
+                  "scope": 9889,
+                  "src": "266:7:25",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -124,10 +124,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 10474,
+                    "id": 9881,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "221:7:25",
+                    "src": "266:7:25",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -137,21 +137,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "220:9:25"
+              "src": "265:9:25"
             },
             "returnParameters": {
-              "id": 10481,
+              "id": 9888,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 10478,
+                  "id": 9885,
                   "mutability": "mutable",
                   "name": "",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 10482,
-                  "src": "248:7:25",
+                  "scope": 9889,
+                  "src": "293:7:25",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -159,10 +159,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 10477,
+                    "id": 9884,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "248:7:25",
+                    "src": "293:7:25",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -173,13 +173,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 10480,
+                  "id": 9887,
                   "mutability": "mutable",
                   "name": "",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 10482,
-                  "src": "257:7:25",
+                  "scope": 9889,
+                  "src": "302:7:25",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -187,10 +187,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 10479,
+                    "id": 9886,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "257:7:25",
+                    "src": "302:7:25",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -200,10 +200,10 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "247:18:25"
+              "src": "292:18:25"
             },
-            "scope": 10490,
-            "src": "207:59:25",
+            "scope": 9897,
+            "src": "252:59:25",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
@@ -212,7 +212,7 @@
             "body": null,
             "documentation": null,
             "functionSelector": "44e2a5a8",
-            "id": 10489,
+            "id": 9896,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -220,18 +220,18 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 10485,
+              "id": 9892,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 10484,
+                  "id": 9891,
                   "mutability": "mutable",
                   "name": "",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 10489,
-                  "src": "285:7:25",
+                  "scope": 9896,
+                  "src": "330:7:25",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -239,10 +239,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 10483,
+                    "id": 9890,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "285:7:25",
+                    "src": "330:7:25",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -252,21 +252,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "284:9:25"
+              "src": "329:9:25"
             },
             "returnParameters": {
-              "id": 10488,
+              "id": 9895,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 10487,
+                  "id": 9894,
                   "mutability": "mutable",
                   "name": "",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 10489,
-                  "src": "312:7:25",
+                  "scope": 9896,
+                  "src": "357:7:25",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -274,10 +274,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 10486,
+                    "id": 9893,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "312:7:25",
+                    "src": "357:7:25",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -287,34 +287,34 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "311:9:25"
+              "src": "356:9:25"
             },
-            "scope": 10490,
-            "src": "271:50:25",
+            "scope": 9897,
+            "src": "316:50:25",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 10491,
-        "src": "186:137:25"
+        "scope": 9898,
+        "src": "231:137:25"
       }
     ],
-    "src": "0:323:25"
+    "src": "45:323:25"
   },
   "legacyAST": {
     "absolutePath": "/Users/bruce/dev/yieldprotocol/ytoken-mvp/contracts/interfaces/IJug.sol",
     "exportedSymbols": {
       "IJug": [
-        10490
+        9897
       ]
     },
-    "id": 10491,
-    "license": null,
+    "id": 9898,
+    "license": "GPL-3.0-or-later",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 10472,
+        "id": 9879,
         "literals": [
           "solidity",
           "^",
@@ -322,7 +322,7 @@
           ".10"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:24:25"
+        "src": "45:24:25"
       },
       {
         "abstract": false,
@@ -330,15 +330,15 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "documentation": {
-          "id": 10473,
+          "id": 9880,
           "nodeType": "StructuredDocumentation",
-          "src": "27:159:25",
+          "src": "72:159:25",
           "text": "@dev interface for the pot contract from MakerDao\n Taken from https://github.com/makerdao/developerguides/blob/master/dai/dsr-integration-guide/dsr.sol"
         },
         "fullyImplemented": false,
-        "id": 10490,
+        "id": 9897,
         "linearizedBaseContracts": [
-          10490
+          9897
         ],
         "name": "IJug",
         "nodeType": "ContractDefinition",
@@ -347,7 +347,7 @@
             "body": null,
             "documentation": null,
             "functionSelector": "d9638d36",
-            "id": 10482,
+            "id": 9889,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -355,18 +355,18 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 10476,
+              "id": 9883,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 10475,
+                  "id": 9882,
                   "mutability": "mutable",
                   "name": "",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 10482,
-                  "src": "221:7:25",
+                  "scope": 9889,
+                  "src": "266:7:25",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -374,10 +374,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 10474,
+                    "id": 9881,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "221:7:25",
+                    "src": "266:7:25",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -387,21 +387,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "220:9:25"
+              "src": "265:9:25"
             },
             "returnParameters": {
-              "id": 10481,
+              "id": 9888,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 10478,
+                  "id": 9885,
                   "mutability": "mutable",
                   "name": "",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 10482,
-                  "src": "248:7:25",
+                  "scope": 9889,
+                  "src": "293:7:25",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -409,10 +409,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 10477,
+                    "id": 9884,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "248:7:25",
+                    "src": "293:7:25",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -423,13 +423,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 10480,
+                  "id": 9887,
                   "mutability": "mutable",
                   "name": "",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 10482,
-                  "src": "257:7:25",
+                  "scope": 9889,
+                  "src": "302:7:25",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -437,10 +437,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 10479,
+                    "id": 9886,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "257:7:25",
+                    "src": "302:7:25",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -450,10 +450,10 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "247:18:25"
+              "src": "292:18:25"
             },
-            "scope": 10490,
-            "src": "207:59:25",
+            "scope": 9897,
+            "src": "252:59:25",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
@@ -462,7 +462,7 @@
             "body": null,
             "documentation": null,
             "functionSelector": "44e2a5a8",
-            "id": 10489,
+            "id": 9896,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -470,18 +470,18 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 10485,
+              "id": 9892,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 10484,
+                  "id": 9891,
                   "mutability": "mutable",
                   "name": "",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 10489,
-                  "src": "285:7:25",
+                  "scope": 9896,
+                  "src": "330:7:25",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -489,10 +489,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 10483,
+                    "id": 9890,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "285:7:25",
+                    "src": "330:7:25",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -502,21 +502,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "284:9:25"
+              "src": "329:9:25"
             },
             "returnParameters": {
-              "id": 10488,
+              "id": 9895,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 10487,
+                  "id": 9894,
                   "mutability": "mutable",
                   "name": "",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 10489,
-                  "src": "312:7:25",
+                  "scope": 9896,
+                  "src": "357:7:25",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -524,10 +524,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 10486,
+                    "id": 9893,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "312:7:25",
+                    "src": "357:7:25",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -537,20 +537,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "311:9:25"
+              "src": "356:9:25"
             },
-            "scope": 10490,
-            "src": "271:50:25",
+            "scope": 9897,
+            "src": "316:50:25",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 10491,
-        "src": "186:137:25"
+        "scope": 9898,
+        "src": "231:137:25"
       }
     ],
-    "src": "0:323:25"
+    "src": "45:323:25"
   },
   "compiler": {
     "name": "solc",
@@ -558,7 +558,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.23",
-  "updatedAt": "2020-07-15T08:08:37.293Z",
+  "updatedAt": "2020-07-20T10:58:14.748Z",
   "devdoc": {
     "details": "interface for the pot contract from MakerDao Taken from https://github.com/makerdao/developerguides/blob/master/dai/dsr-integration-guide/dsr.sol",
     "methods": {}

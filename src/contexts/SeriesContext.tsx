@@ -49,7 +49,7 @@ const SeriesProvider = ({ children }:any) => {
 
   const initState = { 
     seriesData : new Map(),
-    seriesAggregates: {}, // TODO convert to Map
+    seriesAggregates: {}, // TODO convert to Map 
     seriesRates: new Map(),
     activeSeries: null,
   };
@@ -98,7 +98,7 @@ const SeriesProvider = ({ children }:any) => {
       ethPosted_: yieldState?.userData?.ethPosted_,
       ethBalance: yieldState?.userData?.ethBalance,
       ethBalance_: yieldState?.userData?.ethBalance_,
-      // calculated values
+      // Calculated values
       debtYDai,
       debtYDai_: parseFloat(ethers.utils.formatEther(debtYDai)),
       debtValue,
@@ -134,8 +134,8 @@ const SeriesProvider = ({ children }:any) => {
         // TODO fix this when all markets are operational => x.market (not seriesArr[0].market )
         const sellYDai = await callTx(seriesArr[0].marketAddress, 'Market', 'sellYDaiPreview', [ethers.utils.parseEther('1')]);
         const buyYDai = await callTx(seriesArr[0].marketAddress, 'Market', 'buyYDaiPreview', [ethers.utils.parseEther('1')]);
-        const sellDai = await callTx(seriesArr[0].marketAddress, 'Market', 'sellChaiPreview', [ethers.utils.parseEther('1')]);
-        const buyDai = await callTx(seriesArr[0].marketAddress, 'Market', 'buyChaiPreview', [ethers.utils.parseEther('1')]);
+        const sellDai = await callTx(seriesArr[0].marketAddress, 'Market', 'sellDaiPreview', [ethers.utils.parseEther('1')]);
+        const buyDai = await callTx(seriesArr[0].marketAddress, 'Market', 'buyDaiPreview', [ethers.utils.parseEther('1')]);
         return {
           maturity: x.maturity,
           sellYDai,

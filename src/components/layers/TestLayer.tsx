@@ -168,8 +168,8 @@ const TestLayer = (props:any) => {
               <Box gap='small'>
                 Approvals required:
                 <Button primary label='EthProxy (once-off)' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />
-                <Button primary label='Market1 (for each market)' onClick={()=> sendTx(deployedContracts.Market, 'Market', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />
-                <Button primary label='Market2 (for each market)' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />
+                <Button primary label='Market1 (for each market)' onClick={()=> sendTx(deployedSeries[0].marketAddress, 'Market', 'addDelegate', [deployedSeries[0].yDaiAddress], utils.toWei('0'))} />
+                <Button primary label='Market2 (for each market)' onClick={()=> sendTx(deployedContracts.Market, 'Market', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />
               </Box>
             }
 
@@ -214,7 +214,6 @@ const TestLayer = (props:any) => {
               Get Dai:
               
               <Button label='1. Approve Wethjoin for 1weth' onClick={()=> sendTx(deployedContracts.Weth, 'Weth', 'approve', [deployedContracts.WethJoin, wethTokens], ethers.BigNumber.from(0) )} />
-                            
               <Button label='2. wethJoin join (take 1weth)' onClick={()=> sendTx(deployedContracts.WethJoin, 'WethJoin', 'join', [account, wethTokens], ethers.BigNumber.from(0) )} />
               <Button label='( x. wethJoin EXit 1weth)' onClick={()=> sendTx(deployedContracts.WethJoin, 'WethJoin', 'exit', [account, wethTokens ], ethers.BigNumber.from(0) )} />
 

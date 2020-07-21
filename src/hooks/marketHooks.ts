@@ -34,7 +34,6 @@ export const useMarket = () => {
    * @param {string} marketAddress address of the market.
    * @param {number} amount to approve (in human understandable numbers)
    */
-
   const approveToken = async (
     tokenAddress:string,
     marketAddress:string,
@@ -42,7 +41,7 @@ export const useMarket = () => {
   ) => {
     let tx:any;
     /* Processing and sanitizing input */
-    const parsedAmount = ethers.utils.parseEther('1000000');
+    const parsedAmount = ethers.utils.parseEther(amount.toString());
     const marketAddr = ethers.utils.getAddress(marketAddress);
     const tokenAddr = ethers.utils.getAddress(tokenAddress);
     
@@ -67,8 +66,6 @@ export const useMarket = () => {
     setApproveActive(false);
     dispatch({ type: 'txComplete', payload:{ tx, message:`Token approval of ${amount} complete. ${tokenAddress} and ${marketAddress}` } } );
   };
-
-
 
   /**
    * Sell yDai for Dai ( Chai )
@@ -115,13 +112,14 @@ export const useMarket = () => {
    * @return Amount of chai/Dai that will be taken from `from` wallet
    */
   const buyYDai = async (
+    yDaiAddress:string,
     marketAddress:string,
     yDaiOut: number
   ) => {
     let tx:any;
     const parsedAmount = ethers.utils.parseEther(yDaiOut.toString());
-    const fromAddr = account && ethers.utils.getAddress(account);
-    const toAddr = fromAddr;
+    const fromAddr = ethers.utils.getAddress(yDaiAddress);
+    const toAddr = account && ethers.utils.getAddress(account);
     const marketAddr = ethers.utils.getAddress(marketAddress);
     setSellActive(true);
     /// @param from Wallet providing the chai being sold. Must have approved the operator with `market.addDelegate(operator)`.
@@ -177,6 +175,7 @@ export const useMarket = () => {
     dispatch({ type: 'txComplete', payload:{ tx, message:`Selling yDai ${daiIn} complete.` } } );
   };
 
+
   /**
    * @dev Buy Dai/Chai for yDai
    * 
@@ -187,13 +186,15 @@ export const useMarket = () => {
    *
    */
   const buyDai = async (
+    yDaiAddress:string,
     marketAddress:string,
     daiOut: number
   ) => {
-    let tx:any;
+    let buyTx:any;
     const parsedAmount = ethers.utils.parseEther(daiOut.toString());
+    // const parsedAmount = daiOut;
     const fromAddr = account && ethers.utils.getAddress(account);
-    const toAddr = fromAddr;
+    const toAddr = account && ethers.utils.getAddress(account);
     const marketAddr = ethers.utils.getAddress(marketAddress);
     setBuyActive(true);
     /// @param from Wallet providing the yDai being sold. Must have approved the operator with `market.addDelegate(operator)`.
@@ -201,19 +202,20 @@ export const useMarket = () => {
     /// @param chaiOut Amount of chai being bought that will be deposited in `to` wallet
     const contract = new ethers.Contract( marketAddr, marketAbi, signer );
     try {
-      console.log(parsedAmount.toString());
-      console.log(marketAddr);
-      tx = await contract.buyChai(fromAddr, toAddr, parsedAmount);
+      // console.log(parsedAmount);
+      // console.log(ethers.utils.parseEther('1'));
+      buyTx = await contract.buyDai(fromAddr, toAddr, parsedAmount);
+      console.log(buyTx);
     } catch (e) {
       console.log(e);
-      dispatch({ type: 'notify', payload:{ message:'Error Buying yDai!', type:'error' } } );
+      dispatch({ type: 'notify', payload:{ message:'Error Buying Dai!', type:'error' } } );
       setBuyActive(false);
       return;
     }
-    dispatch({ type: 'txPending', payload:{ tx, message: `Selling yDai ${daiOut} pending...`, type:'SELL' } } );
-    await tx.wait();
+    dispatch({ type: 'txPending', payload:{ tx: buyTx, message: `Buying ${daiOut} Dai pending...`, type:'BUYDAI' } } );
+    await buyTx.wait();
     setBuyActive(false);
-    dispatch({ type: 'txComplete', payload:{ tx, message:`Selling yDai ${daiOut} complete.` } } );
+    dispatch({ type: 'txComplete', payload:{ tx: buyTx, message:`Buying ${daiOut} Dai complete.` } } );
   };
 
   return {
