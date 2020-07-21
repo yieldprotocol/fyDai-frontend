@@ -126,7 +126,7 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
                 <TextInput
                   type="number"
                   placeholder='Enter the amount of Dai to Repay'
-                  value={inputValue}
+                  value={inputValue || ''}
                   disabled={repayDisabled}
                   plain
                   onChange={(event:any) => setInputValue(event.target.value)}

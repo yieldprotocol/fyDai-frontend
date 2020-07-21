@@ -136,7 +136,7 @@ export function useBalances() {
   /**
    * Get the user account balance of an ERC20token
    * @param {string} tokenAddr address of the Token
-   * @param {string} abi abi of the token (probably ERC20 in this case)
+   * @param {string} abi abi of the token (probably ERC20 in most cases)
    * @returns whatever token value
    */
   const getTokenBalance = async (tokenAddr:string, abi:string) => {

@@ -166,7 +166,7 @@ const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
                 <TextInput
                   type="number"
                   placeholder='Enter the amount of Dai to lend'
-                  value={inputValue}
+                  value={inputValue || ''}
                   plain
                   onChange={(event:any) => setInputValue(event.target.value)}
               // icon={<Text alignSelf='start' size='xsmall'>Eth</Text>}
@@ -200,7 +200,7 @@ const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
                 </Box>
               </Box>
             </Box>
-  
+
             {inputValue > 150 &&
               <Box direction='row' border={{ color:'red' }} pad='small' margin={{ vertical:'small' }}> 
                 <Text size='xsmall' color='red'>

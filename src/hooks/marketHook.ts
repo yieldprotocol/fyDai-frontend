@@ -17,7 +17,7 @@ import YDai from '../contracts/YDai.json';
  * @returns { boolean } redeemActive
  */
 export const useMarket = () => {
-  const { state: { signer, account } } = React.useContext(ConnectionContext);
+  const { state: { provider, signer, account } } = React.useContext(ConnectionContext);
   // const { library, account } = useWeb3React();
   // const signer = library.getSigner();
 
@@ -179,18 +179,24 @@ export const useMarket = () => {
   /**
    * @dev Buy Dai/Chai for yDai
    * 
+   * @param {string} yDaiAddress address of the yDai contract.
    * @param {string} marketAddress address of the yDai series market.
    * @param {number} daiOut Amount of dai/chai being bought that will be deposited in `to` wallet
+   * @param {number} queue The number that this transaction is in the queue. // TODO extend the queue system globally
    * 
    * @return Amount of yDai that will be taken from `from` wallet
    *
    */
   const buyDai = async (
-    yDaiAddress:string,
     marketAddress:string,
-    daiOut: number
+    daiOut: number,
+    queue: number,
   ) => {
     let buyTx:any;
+
+    const noncePromise = signer.getTransactionCount();
+    const overrides = { nonce: noncePromise.then((nonce:any) => nonce + queue) };
+
     const parsedAmount = ethers.utils.parseEther(daiOut.toString());
     // const parsedAmount = daiOut;
     const fromAddr = account && ethers.utils.getAddress(account);
@@ -204,7 +210,7 @@ export const useMarket = () => {
     try {
       // console.log(parsedAmount);
       // console.log(ethers.utils.parseEther('1'));
-      buyTx = await contract.buyDai(fromAddr, toAddr, parsedAmount);
+      buyTx = await contract.buyDai(fromAddr, toAddr, parsedAmount, await overrides );
       console.log(buyTx);
     } catch (e) {
       console.log(e);
@@ -218,7 +224,51 @@ export const useMarket = () => {
     dispatch({ type: 'txComplete', payload:{ tx: buyTx, message:`Buying ${daiOut} Dai complete.` } } );
   };
 
+  /**
+   * Preview transactions
+   * 
+   * Call function
+   * 
+   * sellYDai -> Returns how much Dai would be obtained by selling x yDai
+   * buyDai -> Returns how much yDai would be required to buy x Dai
+   * buyYDai -> Returns how much Dai would be required to buy x yDai
+   * sellDai -> Returns how much yDai would be obtained by selling x Dai
+   * 
+   * @param {string} txType string represnting transaction type //TODO tyescript it out
+   * @param {string} marketAddress address of the yDai series to redeem from.
+   * @param {number} amount input to preview
+   *  
+   * @returns {BigNumber} BigNumber in WEI/WAD precision - Dai or yDai (call dependent)
+   */
+  const previewMarketTx = async (
+    txType: string,
+    marketAddress: string,
+    amount: number
+  ) => {
+    const parsedAmount = ethers.utils.parseEther(amount.toString());
+    const marketAddr = ethers.utils.getAddress(marketAddress);
+    const contract = new ethers.Contract( marketAddr, marketAbi, provider);
+    let result;
+    try {
+      switch (txType.toUpperCase()) {
+        case 'BUYDAI':
+          result = await contract.buyDaiPreview(parsedAmount); break;
+        case 'SELLDAI': 
+          result = await contract.sellDaiPreview(parsedAmount); break;
+        case 'BUYYDAI':
+          result = await contract.buyYDaiPreview(parsedAmount); break;
+        case 'SELLYDAI':
+          result = await contract.sellYDaiPreview(parsedAmount); break;
+        default : result = BigNumber.from('0'); break;
+      }
+    } catch (e) {
+      console.log(e);
+      result = BigNumber.from('0');
+    }
+    return result;
+  };
+
   return {
-    approveToken, sellYDai, buyYDai, sellDai, buyDai, sellActive, buyActive, approveActive
+    approveToken, previewMarketTx, sellYDai, buyYDai, sellDai, buyDai, sellActive, buyActive, approveActive
   } as const;
 };

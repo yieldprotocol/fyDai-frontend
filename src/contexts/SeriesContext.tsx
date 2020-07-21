@@ -2,7 +2,7 @@ import React from 'react';
 import { ethers, BigNumber } from 'ethers';
 
 import * as utils from '../utils';
-import { useCallTx, useMath } from '../hooks';
+import { useCallTx, useMath, useMarket } from '../hooks';
 
 import { YieldContext } from './YieldContext';
 import { ConnectionContext } from './ConnectionContext';
@@ -58,6 +58,7 @@ const SeriesProvider = ({ children }:any) => {
   const { state: yieldState } = React.useContext(YieldContext);
   const { userData, feedData, deployedContracts } = yieldState;
 
+  const { previewMarketTx }  = useMarket();
   const [ callTx ] = useCallTx();
   const {
     collAmount,
@@ -132,10 +133,10 @@ const SeriesProvider = ({ children }:any) => {
     const _ratesData = await Promise.all(
       seriesArr.map( async (x:any, i:number) => {
         // TODO fix this when all markets are operational => x.market (not seriesArr[0].market )
-        const sellYDai = await callTx(seriesArr[0].marketAddress, 'Market', 'sellYDaiPreview', [ethers.utils.parseEther('1')]);
-        const buyYDai = await callTx(seriesArr[0].marketAddress, 'Market', 'buyYDaiPreview', [ethers.utils.parseEther('1')]);
-        const sellDai = await callTx(seriesArr[0].marketAddress, 'Market', 'sellDaiPreview', [ethers.utils.parseEther('1')]);
-        const buyDai = await callTx(seriesArr[0].marketAddress, 'Market', 'buyDaiPreview', [ethers.utils.parseEther('1')]);
+        const sellYDai = await previewMarketTx('sellYDai', seriesArr[0].marketAddress, 1);
+        const buyYDai = await previewMarketTx('buyYDai', seriesArr[0].marketAddress, 1);
+        const sellDai = await previewMarketTx('sellDai', seriesArr[0].marketAddress, 1);
+        const buyDai = await previewMarketTx('buyDai', seriesArr[0].marketAddress, 1);
         return {
           maturity: x.maturity,
           sellYDai,

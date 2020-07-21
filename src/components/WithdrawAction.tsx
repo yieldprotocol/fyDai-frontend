@@ -39,7 +39,8 @@ const WithdrawAction = ({ close }:IWithDrawActionProps) => {
   const {
     collateralAmount_,
     minSafeCollateral_,
-    collateralRatio_,
+    // collateralRatio_,
+    collateralPercent_,
     debtValue_,
     estimateRatio, // TODO << this is a function (basically just passed from hooks via context) >> 
   } = seriesAggregates;
@@ -89,9 +90,10 @@ const WithdrawAction = ({ close }:IWithDrawActionProps) => {
     if ( (collateralAmount_ > inputValue) && inputValue  && debtValue_) {
       const newRatio = estimateRatio((collateralAmount_- parseFloat(inputValue)), debtValue_); 
       setEstRatio(newRatio.toFixed(2));
-      const newDecrease = collateralRatio_ - newRatio ;
+      const newDecrease = collateralPercent_ - newRatio ;
       setEstDecrease(newDecrease.toFixed(2));
     }
+
   }, [ inputValue ]);
 
   return (
@@ -124,9 +126,9 @@ const WithdrawAction = ({ close }:IWithDrawActionProps) => {
               >
                 <TextInput
                   type="number"
-                  placeholder='Enter the amount to deposit in Eth'
+                  placeholder='ETH'
                   disabled={withdrawEthActive}
-                  value={inputValue}
+                  value={inputValue || ''}
                   plain
                   onChange={(event:any) => setInputValue(event.target.value)}
                   icon={<Ethereum />}
@@ -156,12 +158,12 @@ const WithdrawAction = ({ close }:IWithDrawActionProps) => {
               <Text color='brand' weight='bold' size='large'> {collateralAmount_? `~${maxWithdraw.toFixed(2)} Eth` : '-' }</Text>
             </Box>
 
-            { (collateralRatio_ > 0) &&
+            { (collateralPercent_ > 0) &&
             <Box gap='small' alignSelf='start'>
               <Text color='text-weak' size='xsmall'>Collateralization Ratio after withdraw</Text>
               <Box direction='row' gap='small'>
                 <Text color={!inputValue? 'brand-transparent': indicatorColor} weight='bold' size='large'> 
-                  {(estRatio && estRatio !== 0)? ` approx. ${estRatio}%`: collateralRatio_ || '' }
+                  {(estRatio && estRatio !== 0)? ` approx. ${estRatio}%`: collateralPercent_ || '' }
                 </Text>
                 { false &&
                 <Text color='red' size='large'> 

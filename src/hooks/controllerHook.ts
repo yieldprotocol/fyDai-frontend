@@ -146,6 +146,7 @@ export const useController = () => {
     await tx.wait();
     setBorrowActive(false);
     dispatch({ type: 'txComplete', payload:{ tx, message:`Borrowing of ${amount} complete.` } } );
+    
   };
 
   /**

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {ethers} from 'ethers';
+import { ethers } from 'ethers';
 import Moment from 'moment';
 import { Box, Button, Select, Image, TextInput, Text, CheckBox, Collapsible, RangeInput } from 'grommet';
 
@@ -18,7 +18,7 @@ import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { NotifyContext } from '../contexts/NotifyContext';
 
-import { useController, useCallTx, useMarket } from '../hooks';
+import { useController, useCallTx, useMarket, useYDai } from '../hooks';
 
 interface BorrowActionProps {
   borrowFn?:any
@@ -40,15 +40,15 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   } = seriesAggregates;
 
   const { borrow, borrowActive }  = useController();
-  const { sellYDai, buyDai, approveToken }  = useMarket();
-
-  const [ callTx ] = useCallTx();
+  const { buyDai, previewMarketTx, approveToken }  = useMarket();
+  const { userAllowance } = useYDai();
 
   const [ inputValue, setInputValue ] = React.useState<any>();
   const [ borrowDisabled, setBorrowDisabled ] = React.useState<boolean>(false);
   const [ selectorOpen, setSelectorOpen ] = React.useState<boolean>(false);
   const [ estRatio, setEstRatio ] = React.useState<any>(0);
-  const [ estChange, setEstChange ] = React.useState<any>(0);
+
+  const [ approved, setApproved ] = React.useState<any>(0);
   const [ yDaiValue, setYDaiValue ] = React.useState<number>(0);
 
   const [ indicatorColor, setIndicatorColor ] = React.useState<string>('brand');
@@ -57,21 +57,24 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
 
   const borrowProcedure = async (value:number) => {
 
-    console.log(activeSeries);
     await borrow(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value);
-    await approveToken(activeSeries.yDaiAddress, activeSeries.marketAddress, inputValue+1);
     await buyDai(
-      activeSeries.yDaiAddress,
       activeSeries.marketAddress,
-      inputValue
+      inputValue,
+      1 // transaction queue value
     );
     yieldActions.updateUserData();
     seriesActions.refreshPositions([ activeSeries ]);
   };
 
+  const approveProcedure = async (value:number) => {
+    await approveToken(activeSeries.yDaiAddress, activeSeries.marketAddress, value);
+  };
+
   // TODO: maybe split into a custom hook
   const { state: { pendingTxs } } = React.useContext(NotifyContext);
   const [txActive, setTxActive] = useState<any>(null);
+
   useEffect(()=>{
     setTxActive(pendingTxs.find((x:any)=> x.type === 'BORROW'));
   }, [ pendingTxs ]);
@@ -96,24 +99,13 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
 
   useEffect(() => {
     activeSeries && inputValue && ( async () => {
-      const preview = await callTx(activeSeries.marketAddress, 'Market', 'buyDaiPreview', [ethers.utils.parseEther(inputValue.toString())]);
-      console.log(activeSeries);
+      const preview = await previewMarketTx('buyDai', activeSeries.marketAddress, inputValue);
       setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
     })();
   }, [inputValue]);
 
   useEffect(() => {
-
-    if (inputValue && activeSeries) {
-      // console.log(seriesRates.get(activeSeries.maturity).sellYDai_);
-      // const estValue = seriesRates.get(activeSeries.maturity).sellYDai_;
-      // const newEst = ( activeSeries.yieldAPR/100 * parseFloat(inputValue) + parseFloat(inputValue));
-      // setEstAtMaturity(newEst);
-      // setYDaiValue( await getYDaiValue(activeSeries.market, inputValue));
-    }
-
     if ( inputValue && ( inputValue > maxDaiAvailable_ ) ) {
-      // setDepositDisabled(true);
       console.log(inputValue, maxDaiAvailable_);
       setWarningMsg(null);
       setErrorMsg('That amount exceeds the amount of yDai you can borrow based on your collateral'); 
@@ -121,7 +113,6 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
       setErrorMsg(null);
       setWarningMsg('If you borrow right up to your maximum allowance, there is high probability you will be liquidated soon!');
     } else {
-      // setDepositDisabled(false);
       setWarningMsg(null);
       setErrorMsg(null);
     }
@@ -129,6 +120,9 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
 
   useEffect(() => {
     console.log(seriesAggregates);
+    ( async ()=>{
+      activeSeries && setApproved(await userAllowance(activeSeries.yDaiAddress, activeSeries.marketAddress));
+    })();
   }, [ activeSeries ]);
 
   return (
@@ -188,7 +182,7 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
               <TextInput
                 type="number"
                 placeholder='Enter the amount of Dai to borrow'
-                value={inputValue}
+                value={inputValue || ''}
                 // disabled={depositDisabled}
                 plain
                 onChange={(event:any) => setInputValue(event.target.value)}
@@ -233,6 +227,19 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
                 {/* <Text color='text-weak' size='xxsmall'>if you deposit {inputValue||0} Eth</Text> */}
               </Box>
             </Box>
+          </Box>
+
+          <Box>
+            <CheckBox 
+              reverse
+                // value={true}
+              checked={!inputValue || ( approved >= inputValue )}
+              disabled={!inputValue || ( approved >= inputValue )}
+              onChange={()=>approveProcedure(inputValue)}
+              label={(approved >= inputValue) ? 
+                `Trading unlocked for up to ${approved.toFixed(2) || '' } Dai` 
+                : `Unlock trading for ${inputValue || ''} Dai`}
+            />
           </Box>
 
           { warningMsg &&

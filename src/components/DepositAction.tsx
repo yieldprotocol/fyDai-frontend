@@ -104,9 +104,9 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
             >
               <TextInput
                 ref={inputRef}
-                type="number"
+                type='number'
                 placeholder='Enter the amount to deposit in Eth'
-                value={inputValue}
+                value={inputValue || ''}
                 disabled={postEthActive}
                 plain
                 onChange={(event:any) => setInputValue(event.target.value)}
@@ -143,34 +143,24 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
               </Text>
             </Box>}
           </Box>
-
           <Box gap='small'>
             <Text color='text-weak' size='xsmall'>Collateralisation Ratio</Text>
             <Text color='brand' weight='bold' size='large'> 
               { (collateralPercent_ && (collateralPercent_ !== 0))? `${collateralPercent_}%`: '-' }
             </Text>
-            { false && 
-            <Box pad='xsmall'>
-              <Text alignSelf='start' size='xxsmall'>
-                <Info /> Collateral value should be well above 150% to be safe from liquidation. Either increase your collateral amount or repay some existing debt. 
-              </Text>
-            </Box>}
           </Box>
-
           <Box gap='small'>
             <Text color='text-weak' size='xsmall'>Ratio after deposit</Text>
             <Box direction='row' gap='small'>
               <Text color={!inputValue? 'brand-transparent': 'brand'} weight='bold' size='large'> 
-                {(estRatio && estRatio !== 0)? `~${estRatio}%`: collateralPercent_ || '' }
+                {(estRatio && estRatio !== 0)? `~${estRatio}%`: collateralPercent_ || '-' }
               </Text>
               { true &&
-              <Text color='green' size='large'> 
-                { inputValue && (estIncrease !== 0) && `(+ ${estIncrease}%)` }
-              </Text>}
+                <Text color='green' size='large'> 
+                  { inputValue && (estIncrease !== 0) && `(+ ${estIncrease}%)` }
+                </Text>}
             </Box>
-            {/* <Text color='text-weak' size='xxsmall'>if you deposit {inputValue||0} Eth</Text> */}
           </Box>
-
         </Box>
 
         { warningMsg &&

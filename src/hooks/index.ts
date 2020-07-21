@@ -13,7 +13,7 @@ import { useMath } from './mathHooks'; // TODO work out this cyclic reference (n
 import { useYDai} from './yDaiHook';
 import { useController } from './controllerHook';
 import { useEthProxy } from './ethProxyHook';
-import { useMarket } from './marketHooks';
+import { useMarket } from './marketHook';
 
 export {
   useMarket,

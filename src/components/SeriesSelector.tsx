@@ -12,20 +12,15 @@ import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 
 import YieldSeriesSummary from './YieldSeriesSummary';
-
 // import YieldSeries from '../../components/YieldSeries';
-
 
 const SeriesSelector = (props:any) => {
 
+  const { close } = props;
   const [showMore, setShowMore] = React.useState<boolean>(false);
   const [openIndex, setOpenIndex] = React.useState<number | null >(null);
   const [seriesList, setSeriesList] = React.useState<IYieldSeries[]>([]);
-
-  const refs = React.useRef<Array<HTMLDivElement | null>>([]);
-
-  const { close } = props;
-
+  
   // const refsArray = React.useRef([]);
   // const elementsRef = React.useRef(seriesList.map(() => createRef()));
   // TODO: convert to reducer if get more
@@ -37,8 +32,8 @@ const SeriesSelector = (props:any) => {
   const { isLoading, activeSeries, seriesData } = seriesState; 
   const { setActiveSeries } = seriesActions;
 
-  const handleSelectSeries = (series: any) => {
-    setActiveSeries(series);
+  const handleSelectSeries = (seriesMaturity: number) => {
+    setActiveSeries(seriesMaturity);
     close();
   };
 
@@ -92,7 +87,7 @@ const SeriesSelector = (props:any) => {
           <Box
             direction='row' 
             justify='between'
-            onClick={()=>handleSelectSeries(activeSeries)}
+            onClick={()=>handleSelectSeries(activeSeries.maturity)}
             hoverIndicator='background-mid'
             border='top'
             fill
@@ -100,7 +95,7 @@ const SeriesSelector = (props:any) => {
           >
             <Box>
               <Text alignSelf='start' size='medium' color='brand'>
-                {activeSeries.yieldPercent_.toFixed(2)}%
+                {activeSeries.yieldAPR_}%
               </Text>
             </Box>
             <Box>

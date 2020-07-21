@@ -1,5 +1,5 @@
 import React from 'react';
-import { ethers }  from 'ethers';
+import { ethers, BigNumber }  from 'ethers';
 import { NotifyContext } from '../contexts/NotifyContext';
 import { ConnectionContext } from '../contexts/ConnectionContext';
 import YDai from '../contracts/YDai.json';
@@ -51,7 +51,34 @@ export const useYDai = () => {
     dispatch({ type: 'txComplete', payload:{ tx, message:`Redeeming ${amount} complete.` } } );
   };
 
+  /**
+   * Redeems yDai for dai after maturity
+   * @param {string} yDaiAddress address of the yDai series to redeem from.
+   * @param {string} marketAddress address of the yDai series to redeem from.
+   * 
+   * @returns {number} allowance amount
+   */
+  const userAllowance = async (
+    yDaiAddress:string,
+    marketAddress: string
+  ) => {
+    const fromAddr = account && ethers.utils.getAddress(account);
+    const yDaiAddr = ethers.utils.getAddress(yDaiAddress);
+    const marketAddr = ethers.utils.getAddress(marketAddress);
+    const contract = new ethers.Contract( yDaiAddr, yDaiAbi, signer );
+
+    let res;
+    try {
+      res = await contract.allowance(fromAddr, marketAddr);
+    }  catch (e) {
+      // dispatch({ type: 'notify', payload:{ message:'Error Redeeming funds.', type:'error' } } );
+      console.log(e);
+      res = BigNumber.from('0');
+    }
+    return parseFloat(ethers.utils.formatEther(res));
+  };
+
   return {
-    redeem, redeemActive
+    redeem, redeemActive, userAllowance
   } as const;
 };
