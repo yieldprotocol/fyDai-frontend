@@ -1,27 +1,40 @@
 import React from 'react';
-import { Box, Button } from 'grommet';
+import { Box, Button, ResponsiveContext } from 'grommet';
 
 interface TipProps {
-  text: string;
+  secondary?: string;
+  primary?: string;
 }
 
-const TipButton = (props: TipProps) => {
-  const { text } = props;
+const TipButtons = (props: TipProps) => {
+  const { secondary, primary } = props;
+  const screenSize = React.useContext(ResponsiveContext);
+
   return (
-    <Box direction="row">
-      <Button
-        primary
-        label={text}
-        margin={{
-          right: 'small',
-        }}
-        style={{
-          fontWeight: 600,
-        }}
-      />
-      <Button label="View more tips" />
+    <Box
+      direction={screenSize === 'small' ? 'column' : 'row'}
+      width={{
+        min: screenSize === 'small' ? '100%' : '0',
+      }}
+      gap={screenSize === 'small' ? 'medium' : 'small'}
+    >
+      {primary ? (
+        <Button
+          primary
+          label={primary}
+          style={{
+            fontWeight: 600,
+          }}
+        />
+      ) : null}
+      {secondary ? <Button label={secondary} /> : null}
     </Box>
   );
 };
 
-export default TipButton;
+TipButtons.defaultProps = {
+  secondary: null,
+  primary: null,
+};
+
+export default TipButtons;

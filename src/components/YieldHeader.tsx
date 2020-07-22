@@ -1,9 +1,16 @@
 import React, { useState, useEffect } from 'react';
 
-import { useWeb3React } from '@web3-react/core';
+// import { useWeb3React } from '@web3-react/core';
 
-import { Grid, Text, Image, Header, Button, Box, ThemeContext } from 'grommet';
-import { FaSeedling as YieldLeaf } from 'react-icons/fa';
+import {
+  Text,
+  Image,
+  Header,
+  Button,
+  Box,
+  ThemeContext,
+  ResponsiveContext,
+} from 'grommet';
 import { FiSettings as Gear } from 'react-icons/fi';
 
 import logoDark from '../assets/images/logo.svg';
@@ -33,8 +40,10 @@ const YieldHeader = (props: any) => {
     state: { pendingTxs },
   } = React.useContext(NotifyContext);
 
+  const screenSize = React.useContext(ResponsiveContext);
+
   // Menu state for mobile later
-  // const [menuOpen] = useState<any>(false);
+  const [menuOpen, setMenu] = useState(false);
 
   const [navLinks] = useState([
     {
@@ -67,21 +76,122 @@ const YieldHeader = (props: any) => {
     // (async () => activate(injected, console.log))();
   }, []);
 
+  function toggleMenu() {
+    setMenu((prevMenu) => !prevMenu);
+  }
+
+  function closeMenu() {
+    setMenu(false);
+  }
+
+  const CloseButton = () => (
+    <Box direction="row" fill="horizontal">
+      <Button
+        onClick={closeMenu}
+        alignSelf="center"
+        fill="horizontal"
+        style={{
+          textAlign: 'center',
+        }}
+      >
+        Close
+      </Button>
+    </Box>
+  );
+
+  const MenuButton = () => (
+    <Button
+      onClick={toggleMenu}
+      fill="horizontal"
+      style={{
+        textAlign: 'right',
+      }}
+    >
+      Menu
+    </Button>
+  );
+
+  const Logo = () => (
+    <Box
+      onClick={() => setActiveView('DASHBOARD')}
+      direction="row"
+      margin={{
+        right: 'xsmall',
+      }}
+      style={{
+        width: '4.5rem',
+      }}
+    >
+      <Image src={theme.dark ? logoLight : logoDark} fit="contain" />
+    </Box>
+  );
+
+  const MobileNav = () => (
+    <Box
+      direction="row"
+      style={{
+        backgroundColor: 'white',
+        transition: 'all 0.15s cubic-bezier(0.075, 0.82, 0.165, 1)',
+        transform: menuOpen
+          ? 'translate3d(0, 0, 0)'
+          : 'translate3d(0, -110%, 0)',
+        overflowX: 'hidden',
+        overflowY: 'auto',
+        position: 'fixed',
+        zIndex: 999,
+        height: '100vh',
+        width: '100%',
+        left: 0,
+        top: 0,
+      }}
+      pad={{
+        horizontal: 'large',
+        vertical: 'large',
+      }}
+      fill
+      wrap
+    >
+      <Text
+        textAlign="center"
+        color="text-weak"
+        margin="large"
+        size="xlarge"
+        style={{
+          width: screenSize === 'small' ? '100%' : 'auto',
+        }}
+      >
+        Menu
+      </Text>
+      <Nav />
+      <PendingTxs />
+      <Account />
+      <Settings />
+      <CloseButton />
+    </Box>
+  );
+
   const NavLink = ({ link, text }: LinkProps) => (
     <Box
-      onClick={() => setActiveView(link)}
+      direction="row"
+      onClick={() => {
+        setActiveView(link);
+        closeMenu();
+      }}
       pad={{
-        horizontal: 'xsmall',
-        vertical: 'xsmall',
+        horizontal: screenSize === 'small' ? 'medium' : 'xsmall',
+        vertical: screenSize === 'small' ? 'medium' : 'xsmall',
       }}
       responsive={true}
       gap="small"
     >
       <Text
+        textAlign="center"
         weight={600}
-        color={activeView === link ? 'brand' : 'text'}
+        color={activeView === link ? 'brand' : 'text-weak'}
+        size={screenSize === 'small' ? 'xxlarge' : 'medium'}
         style={{
           textDecoration: activeView === link ? 'underline' : 'none',
+          width: screenSize === 'small' ? '100%' : 'auto',
         }}
       >
         {text}
@@ -89,12 +199,68 @@ const YieldHeader = (props: any) => {
     </Box>
   );
 
+  const Nav = () => (
+    <Box
+      direction={screenSize === 'small' ? 'column' : 'row'}
+      fill={screenSize === 'small' ? 'horizontal' : false}
+    >
+      {navLinks &&
+        navLinks.map((item) => (
+          <NavLink link={item.link} text={item.text} key={`nav-${item.id}`} />
+        ))}
+    </Box>
+  );
+
+  const PendingTxs = () => {
+    if (pendingTxs && pendingTxs.length > 0) {
+      return <Box>{pendingTxs.length} transaction pending...</Box>;
+    }
+    return null;
+  };
+
+  const Account = () => {
+    if (account) {
+      return (
+        <Box>
+          <ProfileButton
+            action={() => openAccountLayer()}
+            account={account || ''}
+          />
+        </Box>
+      );
+    }
+    return (
+      <Box direction="row" fill="horizontal">
+        <Button
+          onClick={() => openConnectLayer()}
+          label="Connect to a wallet"
+          color="border"
+          fill="horizontal"
+          style={{
+            minWidth: '160px',
+            fontWeight: 600,
+            height: screenSize === 'small' ? '2.25rem' : 'auto',
+          }}
+        />
+      </Box>
+    );
+  };
+
+  const Settings = () => (
+    <Button
+      style={{
+        textAlign: 'center',
+      }}
+      fill={screenSize === 'small' ? 'horizontal' : false}
+      icon={<Gear />}
+    />
+  );
+
   return (
     <Header
       background={{
         color: 'background-front',
       }}
-      justify="between"
       pad={{
         horizontal: 'small',
         vertical: 'none',
@@ -104,7 +270,7 @@ const YieldHeader = (props: any) => {
         direction="row"
         justify="between"
         align="center"
-        flex={true}
+        flex
         gap="small"
         pad={{
           vertical: 'small',
@@ -112,65 +278,20 @@ const YieldHeader = (props: any) => {
       >
         {/* Logo and nav */}
         <Box direction="row" align="center" gap="small">
-          {/* Logo */}
-          <Box
-            onClick={() => setActiveView('DASHBOARD')}
-            direction="row"
-            margin={{
-              right: 'xsmall',
-            }}
-            responsive
-          >
-            <Image
-              style={{
-                height: '1.5rem',
-              }}
-              src={theme.dark ? logoLight : logoDark}
-              fit="contain"
-            />
-          </Box>
-          {/* Left nav */}
-          <Box direction="row">
-            {navLinks &&
-              navLinks.map((item) => (
-                <NavLink
-                  link={item.link}
-                  text={item.text}
-                  key={`nav-${item.id}`}
-                />
-              ))}
-          </Box>
+          <Logo />
+          {screenSize === 'small' ? <MobileNav /> : <Nav />}
         </Box>
         {/* Right nav */}
-        <Box direction="row" align="center" gap="small">
-          {pendingTxs && pendingTxs.length > 0 && (
-            <Box>{pendingTxs.length} transaction pending...</Box>
-          )}
-          {account ? (
-            <Box>
-              <ProfileButton
-                action={() => openAccountLayer()}
-                account={account || ''}
-              />
-            </Box>
+        <Box direction="row" align="center" gap="small" justify="end" flex>
+          {screenSize === 'small' ? (
+            <MenuButton />
           ) : (
-            <Box>
-              <Button
-                onClick={() => openConnectLayer()}
-                label="Connect to a wallet"
-                color="border"
-                style={{ minWidth: '160px', fontWeight: 600 }}
-              />
+            <Box direction="row" align="center" gap="small">
+              <PendingTxs />
+              <Account />
+              <Settings />
             </Box>
           )}
-          <Box
-            direction="row"
-            margin={{
-              left: 'xsmall',
-            }}
-          >
-            <Gear />
-          </Box>
         </Box>
       </Box>
     </Header>
