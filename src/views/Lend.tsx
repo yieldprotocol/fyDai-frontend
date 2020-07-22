@@ -9,6 +9,7 @@ import { IYieldSeries } from '../types';
 
 import LendAction from '../components/LendAction';
 import PageHeader from '../components/PageHeader';
+
 import BuySell from '../components/x_BuySell';
 import Redeem from '../components/Redeem';
 
@@ -29,25 +30,22 @@ const Lend = ({ setShowSeriesLayer, activeView: viewFromProp  }:LendProps) => {
   return (
 
     <Box gap='small' pad={{ vertical:'large', horizontal:'small' }} fill='horizontal' justify='between'>
-      <Box direction='row' fill='horizontal' pad={{ bottom:'large', horizontal:'none' }} justify='between' align='center'>
-        <Box>
-          <Box direction='row' gap='small'>
-            <Heading level='3' margin='none' color='text-strong'>Lend</Heading>
-            {/* <Heading level='3' margin='none' onClick={()=>(activeView==='borrow')? setActiveView('lend'):setActiveView('borrow')}><a>{activeView}</a></Heading> */}
-            {/* <Heading level='3' margin='none'>yDai</Heading> */}
-          </Box>
-          <Box direction='row'> 
-            <Text size='xsmall' color='text-weak'>
-              Description of Lend · Learn more
-            </Text>
-          </Box>
-        </Box>
 
-        <Box direction='row' gap='small' pad='small'>
-          <TipButtons text="Tip: Convert your Maker Vault" />
-        </Box>
+      <Box
+        direction="row"
+        fill="horizontal"
+        pad={{ bottom: 'large', horizontal: 'none' }}
+        justify="between"
+        align="center"
+      >
+        <PageHeader
+          title="Lend"
+          subtitle="Description of lending"
+          tipPrimary="Tip: Convert your Maker vault"
+          tipSecondary="View more tips"
+        />
       </Box>
-
+      
       <Box
         width={{ max:'750px' }}
         alignSelf='center'

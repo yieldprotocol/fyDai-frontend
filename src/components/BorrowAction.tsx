@@ -57,11 +57,13 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
 
   const borrowProcedure = async (value:number) => {
     borrow(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value);
+    await new Promise(resolve => setTimeout(resolve, 500));
     await buyDai(
       activeSeries.marketAddress,
       inputValue,
-      1 // transaction queue value
+      0 // transaction queue value
     );
+    setInputValue('');
     yieldActions.updateUserData();
     seriesActions.refreshPositions([ activeSeries ]);
   };
@@ -276,6 +278,7 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
               {`Borrow ${inputValue || ''} Dai`}
             </Text>
           </Box>
+          Note, the borrowing process involves two transactions that both require authorization.
         </Box>
       </Box> }
 

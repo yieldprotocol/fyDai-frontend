@@ -49,6 +49,7 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
   const depositProcedure = async (value:number) => {
     await postEth(deployedContracts.EthProxy, value);
     yieldActions.updateUserData();
+    setInputValue('');
   };
 
   // Handle active transactions

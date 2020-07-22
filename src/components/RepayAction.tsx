@@ -56,6 +56,7 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
   const repayProcedure = async (value:number) => {
     await repay(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value, 'Dai' );
     setApproved(await getTokenAllowance(deployedContracts.Dai, deployedContracts.Treasury, 'Dai'));
+    setInputValue('');
     seriesActions.refreshPositions([activeSeries]);
     yieldActions.updateUserData();
   };

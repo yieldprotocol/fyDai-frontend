@@ -55,6 +55,7 @@ const DaiWithDrawAction = ({ close }:IWithDrawActionProps) => {
     );
     yieldActions.updateUserData();
     seriesActions.refreshPositions([activeSeries]);
+    close();
   };
 
   const approveProcedure = async (value:number) => {

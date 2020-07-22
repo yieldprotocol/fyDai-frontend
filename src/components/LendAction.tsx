@@ -58,12 +58,12 @@ const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
   
   const lendProcedure = async (value:number) => {
-    // await lend(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value );
     await sellDai(
       activeSeries.marketAddress,
       inputValue,
       0 // transaction queue value
     );
+    setInputValue('');
     yieldActions.updateUserData();
     seriesActions.refreshPositions([activeSeries]);
   };
