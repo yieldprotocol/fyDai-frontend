@@ -23,7 +23,7 @@ import TestERC20 from '../contracts/TestERC20.json';
 export const useController = () => {
 
   const { abi: controllerAbi } = Controller;
-  const { state: { signer, account } } = React.useContext(ConnectionContext);
+  const { state: { provider, signer, account } } = React.useContext(ConnectionContext);
 
   const  { dispatch }  = React.useContext<any>(NotifyContext);
   const [ postActive, setPostActive ] = React.useState<boolean>(false);
@@ -203,6 +203,7 @@ export const useController = () => {
    * @param {string} controllerAddress address of the controller. 
    * @param {number} amount to approve (in human understandable numbers)
    */
+  // TODO remove this if not used
   const approveController = async (
     tokenAddress:string,
     controllerAddress:string,
@@ -236,11 +237,76 @@ export const useController = () => {
     dispatch({ type: 'txComplete', payload:{ tx, message:`Token approval of ${amount} complete. ${tokenAddress} and ${controllerAddress}` } } );
   };
 
+  /**
+   * Approve the controller to ethProxy for ETH withdrawals.
+   * @param {string} controllerAddress address of the controller.
+   * @param {string} ethProxyAddress address of the ethProxy (contract getting approved). 
+   * @param {number} amount to approve (in human understandable numbers)
+   */
+  const approveEthWithdraws = async (
+    controllerAddress:string,
+    ethProxyAddress:string,
+  ) => {
+    let tx:any;
+    /* Processing and sanitizing input */
+    const controllerAddr = ethers.utils.getAddress(controllerAddress);
+    const ethProxyAddr = ethers.utils.getAddress(ethProxyAddress);
+    /* Contract interaction */
+    const contract = new ethers.Contract(
+      controllerAddr,
+      controllerAbi,
+      signer
+    );
+    try {
+      tx = await contract.addDelegate(ethProxyAddr);
+    } catch (e) {
+      dispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed.', type:'error' } } );
+      console.log(e);
+      return;
+    }
+    /* Transaction reporting & tracking */
+    dispatch({ type: 'txPending', payload:{ tx, message: 'Pending once-off approval of Eth withdrawals ...' } } );
+    await tx.wait();
+    dispatch({ type: 'txComplete', payload:{ tx, message:'Eth withdrawals permanently approved' } } );
+  };
+
+  /**
+   * Check to see if Eth withdrawals have been approved or not
+   * 
+   * Call function no gas
+   * 
+   * @param {string} controllerAddress address of the controller.
+   * @param {string} ethProxyAddress address of the ethProxy (contract getting approved). 
+   * 
+   * @returns {boolean} approved ?
+   */
+  const checkWithdrawApproval = async (
+    controllerAddress:string,
+    ethProxyAddress:string
+  ) => {
+    const fromAddr = account && ethers.utils.getAddress(account);
+    const ethProxyAddr = ethers.utils.getAddress(ethProxyAddress);
+    const controllerAddr = ethers.utils.getAddress(controllerAddress);
+    const contract = new ethers.Contract( controllerAddr, controllerAbi, provider);
+    let res;
+    try {
+      // res = await contract.allowance(fromAddr, marketAddr);
+      console.log('checking withdrawal approval..')
+      res= false;
+    }  catch (e) {
+      console.log(e);
+      res = false;
+    }
+    return res;
+  };
+
   return {
     post, postActive,
     withdraw, withdrawActive,
     borrow, borrowActive,
     repay, repayActive,
-    approveController, approveActive,
+    approveController, approveActive, //TODO remove this if not used
+    approveEthWithdraws,
+    checkWithdrawApproval,
   } as const;
 };

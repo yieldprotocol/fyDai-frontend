@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Box, Button, Image, Select, TextInput, Text, Heading, Collapsible } from 'grommet';
+import { Box, Button, Image, Select, TextInput, Text, Heading, Collapsible, CheckBox } from 'grommet';
 import { 
   FiCheckCircle, 
   FiInfo as Info,
@@ -13,7 +13,7 @@ import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
 import { NotifyContext } from '../contexts/NotifyContext';
 
-import { useController } from '../hooks';
+import { useController, useMarket, useBalances } from '../hooks';
 
 interface RepayActionProps {
   repayFn:any
@@ -23,9 +23,12 @@ interface RepayActionProps {
 function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
 
   const { state: yieldState, actions: yieldActions } = React.useContext(YieldContext);
-  const { deployedContracts } = yieldState;
+  const { deployedContracts, userData } = yieldState;
   const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
-  
+
+  const { buyDai, previewMarketTx, approveToken }  = useMarket();
+  const { getTokenAllowance }  = useBalances();
+
   const { isLoading: positionsLoading, seriesAggregates, activeSeries, setActiveSeries } = seriesState;
   const {
     collateralAmount_,
@@ -35,9 +38,10 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
   } = seriesAggregates;
 
   const { repay, repayActive }  = useController();
-  const [inputValue, setInputValue] = React.useState<any>();
+  const [ inputValue, setInputValue ] = React.useState<any>();
   const [repayDisabled, setRepayDisabled] = React.useState<boolean>(false);
   const [ selectorOpen, setSelectorOpen ] = React.useState<boolean>(false);
+  const [ approved, setApproved ] = React.useState<any>(0);
 
   const [ warningMsg, setWarningMsg] = React.useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
@@ -50,11 +54,23 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
   }, [ pendingTxs ]);
 
   const repayProcedure = async (value:number) => {
-
     await repay(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value, 'Dai' );
-
+    setApproved(await getTokenAllowance(deployedContracts.Dai, deployedContracts.Treasury, 'Dai'));
     seriesActions.refreshPositions([activeSeries]);
+    yieldActions.updateUserData();
   };
+
+  const approveProcedure = async (value:number) => {
+    await approveToken(deployedContracts.Dai, deployedContracts.Treasury, value);
+    setApproved(await getTokenAllowance(deployedContracts.Dai, deployedContracts.Treasury, 'Dai'));
+  };
+
+  useEffect(() => {
+    console.log(seriesAggregates);
+    ( async ()=>{
+      activeSeries && setApproved(await getTokenAllowance(deployedContracts.Dai, deployedContracts.Treasury, 'Dai'));
+    })();
+  }, [ activeSeries ]);
 
   return (
     <>
@@ -95,18 +111,6 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
             </Box>
           </Box>
 
-          <Box fill gap='small' pad={{ horizontal:'medium' }}>
-            <Box fill direction='row-responsive' justify='between'>
-              <Box gap='small'>
-                <Box direction='row' gap='small'>
-                  <Text color='text-weak' size='xsmall'>Current Debt</Text>
-                  <Help />
-                </Box>
-                <Text color='brand' weight='bold' size='large'> {activeSeries && `${activeSeries.wethDebtDai_.toFixed(2)} Dai`}  </Text>
-              </Box>
-            </Box>
-          </Box>
-
           <Box fill gap='medium' margin={{ vertical:'large' }}>
             <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to Repay</Text>
             <Box
@@ -136,7 +140,7 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
               <Box justify='center'>
                 <Box
                   round
-                  onClick={()=>setInputValue(activeSeries.wethDebtDai_)}
+                  onClick={()=>setInputValue(userData.daiBalance_)}
                   hoverIndicator='brand-transparent'
                   border='all'
               // border={{ color:'brand' }}
@@ -148,6 +152,46 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
               </Box>
             </Box>
 
+            <Box fill='horizontal' direction='row-responsive' justify='between'>
+
+              <Box fill gap='small' pad={{ horizontal:'medium' }}>
+                <Box fill direction='row-responsive' justify='between'>
+                  <Box gap='small'>
+                    <Box direction='row' gap='small'>
+                      <Text color='text-weak' size='xsmall'>Current Debt</Text>
+                      <Help />
+                    </Box>
+                    <Text color='brand' weight='bold' size='large'> {activeSeries && `${activeSeries.wethDebtDai_.toFixed(2)} Dai`}  </Text>
+                  </Box>
+                </Box>
+              </Box>
+
+              <Box fill gap='small' pad={{ horizontal:'medium' }}>
+                <Box fill direction='row-responsive' justify='between'>
+                  <Box gap='small'>
+                    <Box direction='row' gap='small'>
+                      <Text color='text-weak' size='xsmall'>Wallet Dai balance</Text>
+                      <Help />
+                    </Box>
+                    <Text color='brand' weight='bold' size='large'> {userData? `${userData.daiBalance_} Dai`:'-'} </Text>
+                  </Box>
+                </Box>
+              </Box>
+            </Box>
+
+          </Box>
+          
+          <Box>
+            <CheckBox 
+              reverse
+                // value={true}
+              checked={!inputValue || ( approved >= inputValue )}
+              disabled={!inputValue || ( approved >= inputValue )}
+              onChange={()=>approveProcedure(inputValue)}
+              label={(approved >= inputValue) ? 
+                `Trading unlocked for up to ${approved.toFixed(2) || '' } Dai` 
+                : `Unlock trading for ${inputValue || ''} Dai`}
+            />
           </Box>
 
           <Box

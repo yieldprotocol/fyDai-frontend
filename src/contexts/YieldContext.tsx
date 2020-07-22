@@ -232,6 +232,7 @@ const YieldProvider = ({ children }:any) => {
 
     /* Get balances, posted collateral and makerData? */
     _userData.ethBalance = await getEthBalance();
+    _userData.daiBalance = await getTokenBalance(_deployedContracts.Dai, 'Dai');
     _userData.ethPosted = await callTx(_deployedContracts.Controller, 'Controller', 'posted', [utils.ETH, account]);
     _userData.urn = await callTx(_deployedContracts.Vat, 'Vat', 'urns', [utils.ETH, account ]);
 
@@ -265,6 +266,7 @@ const YieldProvider = ({ children }:any) => {
     return {
       ..._userData,
       ethBalance_: parseFloat(ethers.utils.formatEther(_userData.ethBalance.toString())),
+      daiBalance_: parseFloat(ethers.utils.formatEther(_userData.daiBalance.toString())),
       ethPosted_: parseFloat(ethers.utils.formatEther(_userData.ethPosted.toString())),
       txHistory : {
         ...txHistory,
@@ -333,7 +335,7 @@ const YieldProvider = ({ children }:any) => {
   }, [chainId, account]);
 
   const actions = {
-    updateUserData: () => _getUserData(state.deployedContracts, state.deployedSeries, false).then((res:any)=> dispatch({ type:'updateUserData', payload: res })),
+    updateUserData: () => _getUserData(state.deployedContracts, state.deployedSeries, true).then((res:any)=> dispatch({ type:'updateUserData', payload: res })),
   };
 
   return (

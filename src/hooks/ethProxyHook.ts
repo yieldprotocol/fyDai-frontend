@@ -15,6 +15,7 @@ import EthProxy from '../contracts/EthProxy.json';
  * @returns { boolean } withdrawActive
  */
 export const useEthProxy = () => {
+
   const { state: { signer, account } } = React.useContext(ConnectionContext);
   const { abi: ethProxyAbi } = EthProxy;
   const  { dispatch }  = React.useContext<any>(NotifyContext);

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useWeb3React } from '@web3-react/core';
-import { ethers }  from 'ethers';
+import { ethers, BigNumber}  from 'ethers';
 
 import { NotifyContext } from '../contexts/NotifyContext';
 import { ConnectionContext } from '../contexts/ConnectionContext';
@@ -139,13 +139,42 @@ export function useBalances() {
    * @param {string} abi abi of the token (probably ERC20 in most cases)
    * @returns whatever token value
    */
-  const getTokenBalance = async (tokenAddr:string, abi:string) => {
+  const getTokenBalance = async (tokenAddr:string, contractName:string) => {
     if (!!provider && !!account) {
-      const contract = new ethers.Contract(tokenAddr, contractMap.get(abi), provider);
+      const contract = new ethers.Contract(tokenAddr, contractMap.get(contractName), provider);
       const balance = await contract.balanceOf(account);
       return balance;
     } return ethers.BigNumber.from('0');
   };
-  return { getEthBalance, getTokenBalance } as const;
-}
+
+  /**
+   * Get the transaction allowance of a user for an ERC20token
+   * @param {string} tokenAddr address of the Token
+   * @param {string} operatorAddr address of the operator whose allowance you are checking
+   * @param {string} tokenName name of the token (probably ERC20 in most cases)
+   * @prarm 
+   * @returns whatever token value
+   */
+  const getTokenAllowance = async (
+    tokenAddress:string,
+    operatorAddress:string,
+    tokenName: string
+  ) => {
+    const fromAddr = account && ethers.utils.getAddress(account);
+    const tokenAddr = ethers.utils.getAddress(tokenAddress);
+    const operatorAddr = ethers.utils.getAddress(operatorAddress);
+    const contract = new ethers.Contract( tokenAddr, contractMap.get(tokenName), provider );
+    let res;
+    try {
+      res = await contract.allowance(fromAddr, operatorAddr);
+    }  catch (e) {
+      // dispatch({ type: 'notify', payload:{ message:'Error Redeeming funds.', type:'error' } } );
+      console.log(e);
+      res = ethers.BigNumber.from('0');
+    }
+    return parseFloat(ethers.utils.formatEther(res));
+  };
+
+  return { getTokenAllowance, getEthBalance, getTokenBalance } as const;
+};
 

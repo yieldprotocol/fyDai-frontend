@@ -164,7 +164,7 @@ const TestLayer = (props:any) => {
             </Box>
 
             {
-              flow === 'APPROVALS' && 
+              flow === 'APPROVALS' &&
               <Box gap='small'>
                 Approvals required:
                 <Button primary label='EthProxy (once-off)' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />

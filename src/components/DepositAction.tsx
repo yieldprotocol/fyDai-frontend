@@ -10,7 +10,7 @@ import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
 import { NotifyContext } from '../contexts/NotifyContext';
 
-import WithdrawAction from './WithdrawAction';
+import EthWithdrawAction from './EthWithdrawAction';
 import { useEthProxy } from '../hooks';
 
 interface DepositProps {
@@ -83,7 +83,7 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
 
   return (
     <>
-      { withdrawOpen && <WithdrawAction close={()=>setWithdrawOpen(false)} /> }
+      { withdrawOpen && <EthWithdrawAction close={()=>setWithdrawOpen(false)} /> }
       { !txActive && !postEthActive &&
       <Box align='center' flex='grow' justify='between' gap='large'>
         <Box gap='medium' align='center' fill='horizontal'>
@@ -135,7 +135,7 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
 
           <Box gap='small'>
             <Text color='text-weak' size='xsmall'>Current Collateral</Text>
-            <Text color='brand' weight='bold' size='large'> {collateralAmount_? `${collateralAmount_} Eth` : '-' }</Text>
+            <Text color='brand' weight='bold' size='large'> {collateralAmount_? `${collateralAmount_.toFixed(4)} Eth` : '-' }</Text>
             { false && 
             <Box pad='xsmall'>
               <Text alignSelf='start' size='xxsmall'>

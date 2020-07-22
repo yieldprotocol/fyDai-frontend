@@ -5,10 +5,8 @@ import { Box, Button, Heading, Text } from 'grommet';
 import RotateLoader from 'react-spinners/RotateLoader';
 
 import { FiCheckCircle as CheckCircle } from 'react-icons/fi';
-
 import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
-import { IYieldSeries } from '../types';
 
 import DepositAction from '../components/DepositAction';
 import BorrowAction from '../components/BorrowAction';
@@ -34,7 +32,6 @@ const Borrow = ({ setShowSeriesLayer, activeView: viewFromProp }:BorrowProps) =>
   return (
 
     <Box gap='small' pad={{ vertical:'large', horizontal:'small' }} fill='horizontal' justify='between'>
-      
       <Box direction='row' fill='horizontal' pad={{ bottom:'large', horizontal:'none' }} justify='between' align='center'>
         <Box>
           <Box direction='row' gap='small'>

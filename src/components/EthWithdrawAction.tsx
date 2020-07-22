@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Box, Layer, Button, Image, TextInput, Text } from 'grommet';
+import { Box, Layer, Button, Image, TextInput, Text, CheckBox } from 'grommet';
 import { 
   FiInfo as Info,
   FiArrowLeft as ArrowLeft,
@@ -7,7 +7,8 @@ import {
 import { FaEthereum as Ethereum } from 'react-icons/fa';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
-import { useEthProxy } from '../hooks';
+
+import { useEthProxy, useController } from '../hooks';
 
 import { NotifyContext } from '../contexts/NotifyContext';
 
@@ -17,13 +18,14 @@ interface IWithDrawActionProps {
   maxValue?: number;
 }
 
-const WithdrawAction = ({ close }:IWithDrawActionProps) => {
+const EthWithdrawAction = ({ close }:IWithDrawActionProps) => {
 
   const [ estRatio, setEstRatio ] = useState<any>();
   const [ estDecrease, setEstDecrease ] = useState<any>();
 
   const [ maxWithdraw, setMaxWithdraw ] = useState<number>(0);
   const [ inputValue, setInputValue ] = useState<any>();
+  const [ hasApproved, setHasApproved ] = useState<boolean>(false);
 
   const [ withdrawDisabled, setWithdrawDisabled ] = useState<boolean>(false);
   const [ indicatorColor, setIndicatorColor ] = useState<string>('brand');
@@ -46,11 +48,17 @@ const WithdrawAction = ({ close }:IWithDrawActionProps) => {
   } = seriesAggregates;
 
   const { withdrawEth, withdrawEthActive }  = useEthProxy();
+  const { approveEthWithdraws, checkWithdrawApproval }  = useController();
 
   const withdrawProcedure = async (value:number) => {
     await withdrawEth(deployedContracts.EthProxy, value);
     yieldActions.updateUserData();
     close();
+  };
+
+  const approveProcedure = async (value:number) => {
+    await approveEthWithdraws(deployedContracts.Controller, deployedContracts.EthProxy);
+    setHasApproved(await checkWithdrawApproval(deployedContracts.Controller, deployedContracts.EthProxy));
   };
 
   // TODO: maybe split into a custom hook
@@ -93,8 +101,11 @@ const WithdrawAction = ({ close }:IWithDrawActionProps) => {
       const newDecrease = collateralPercent_ - newRatio ;
       setEstDecrease(newDecrease.toFixed(2));
     }
-
   }, [ inputValue ]);
+
+  useEffect(()=>{
+    (async () => {setHasApproved(await checkWithdrawApproval(deployedContracts.Controller, deployedContracts.EthProxy));})();
+  }, []);
 
   return (
     <Layer onClickOutside={()=>close()}>
@@ -212,6 +223,24 @@ const WithdrawAction = ({ close }:IWithDrawActionProps) => {
               {`Withdraw ${inputValue || ''} Eth`}
             </Text>
           </Box>
+          
+          {!hasApproved && 
+          <Box
+            round
+            onClick={()=>approveProcedure(inputValue)}
+            hoverIndicator='brand-transparent'
+            // border='all'
+            pad={{ horizontal:'small', vertical:'small' }}
+            align='center'
+          >
+            <Text
+              weight='bold'
+              size='xxsmall'
+              color='text'
+            >
+              Approve Eth withdrawals (once-off)
+            </Text>
+          </Box>}
 
           <Box alignSelf='start'>
             <Box
@@ -268,4 +297,4 @@ const WithdrawAction = ({ close }:IWithDrawActionProps) => {
   );
 };
 
-export default WithdrawAction;
+export default EthWithdrawAction;

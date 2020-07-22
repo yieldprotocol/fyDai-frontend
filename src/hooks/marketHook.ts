@@ -145,14 +145,20 @@ export const useMarket = () => {
    * 
    * @param {string} marketAddress address of the yDai series market.
    * @param {number} daiIn Amount of yDai being bought that will be deposited in `to` wallet
+   * @param {number} queue The number that this transaction is in the queue. // TODO extend the queue system globally
    * @return Amount of yDai that will be deposited on `to` wallet
-   *
+   * 
    */
   const sellDai = async (
     marketAddress:string,
-    daiIn: number
+    daiIn: number,
+    queue: number,
   ) => {
     let tx:any;
+
+    const noncePromise = signer.getTransactionCount();
+    const overrides = { nonce: noncePromise.then((nonce:any) => nonce + queue) };
+
     const parsedAmount = ethers.utils.parseEther(daiIn.toString());
     const fromAddr = account && ethers.utils.getAddress(account);
     const toAddr = fromAddr;
@@ -163,7 +169,7 @@ export const useMarket = () => {
     /// @param chaiIn Amount of chai being sold that will be taken from the user's wallet
     const contract = new ethers.Contract( marketAddr, marketAbi, signer );
     try {
-      tx = await contract.sellDai(fromAddr, toAddr, parsedAmount);
+      tx = await contract.sellDai(fromAddr, toAddr, parsedAmount, await overrides);
     } catch (e) {
       dispatch({ type: 'notify', payload:{ message:'Error Buying yDai!', type:'error' } } );
       setSellActive(false);

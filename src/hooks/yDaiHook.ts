@@ -52,7 +52,7 @@ export const useYDai = () => {
   };
 
   /**
-   * Redeems yDai for dai after maturity
+   * User yDai token alloance 
    * @param {string} yDaiAddress address of the yDai series to redeem from.
    * @param {string} marketAddress address of the yDai series to redeem from.
    * 
@@ -66,7 +66,6 @@ export const useYDai = () => {
     const yDaiAddr = ethers.utils.getAddress(yDaiAddress);
     const marketAddr = ethers.utils.getAddress(marketAddress);
     const contract = new ethers.Contract( yDaiAddr, yDaiAbi, signer );
-
     let res;
     try {
       res = await contract.allowance(fromAddr, marketAddr);

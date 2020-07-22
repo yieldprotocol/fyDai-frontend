@@ -56,8 +56,7 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
 
   const borrowProcedure = async (value:number) => {
-
-    await borrow(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value);
+    borrow(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value);
     await buyDai(
       activeSeries.marketAddress,
       inputValue,
@@ -69,6 +68,8 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
 
   const approveProcedure = async (value:number) => {
     await approveToken(activeSeries.yDaiAddress, activeSeries.marketAddress, value);
+    const approvedYDai = await userAllowance(activeSeries.yDaiAddress, activeSeries.marketAddress);
+    setApproved( approvedYDai ); // TODO convert to Dai somehow
   };
 
   // TODO: maybe split into a custom hook
@@ -197,12 +198,6 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
                     <Help />
                   </Box>
                   <Text color={!inputValue? 'brand-transparent':'brand'} weight='bold' size='large'> {activeSeries && activeSeries.yieldAPR_ || ''}% </Text>
-                  { false && 
-                  <Box pad='xsmall'>
-                    <Text alignSelf='start' size='xxsmall'>
-                      <Info /> You need to deposit collateral in order to Borrow Dai.
-                    </Text>
-                  </Box>}
                 </Box>
 
                 <Box gap='small'>
@@ -210,7 +205,6 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
                     <Text color='text-weak' size='xsmall'>Approx. Dai owed at maturity</Text>
                     <Help />
                   </Box>
-
                   <Text color={!inputValue? 'brand-transparent':'brand'} weight='bold' size='large'> 
                     {yDaiValue.toFixed(2)} Dai on {activeSeries && Moment(activeSeries.maturity_).format('DD MMMM YYYY')}
                   </Text>
@@ -237,10 +231,12 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
               disabled={!inputValue || ( approved >= inputValue )}
               onChange={()=>approveProcedure(inputValue)}
               label={(approved >= inputValue) ? 
-                `Trading unlocked for up to ${approved.toFixed(2) || '' } Dai` 
-                : `Unlock trading for ${inputValue || ''} Dai`}
+                `Borrowing unlocked for up to ${approved.toFixed(2) || '' } Dai` 
+                : `Unlock borrowing of ${inputValue || ''} Dai`}
             />
           </Box>
+
+          
 
           { warningMsg &&
           <Box 

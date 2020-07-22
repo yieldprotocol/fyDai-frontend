@@ -11,7 +11,6 @@ const Dashboard = () => {
 
   return (
     <Box gap='small' pad={{ vertical:'large', horizontal:'small' }} fill='horizontal' justify='between'>
-      
       <Box direction='row' fill='horizontal' pad={{ bottom:'large', horizontal:'none' }} justify='between' align='center'>
         <Box>
           <Box direction='row' gap='small'>

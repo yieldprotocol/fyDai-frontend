@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Box, Layer, Button, Image, TextInput, Text } from 'grommet';
+import {ethers} from 'ethers';
+import { Box, Layer, CheckBox, TextInput, Text } from 'grommet';
 import { 
   FiInfo as Info,
   FiArrowLeft as ArrowLeft,
@@ -7,7 +8,7 @@ import {
 import { FaEthereum as Ethereum } from 'react-icons/fa';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
-import { useEthProxy } from '../hooks';
+import { useMarket, useYDai } from '../hooks';
 
 interface IWithDrawActionProps {
   close?: any;
@@ -15,25 +16,26 @@ interface IWithDrawActionProps {
   maxValue?: number;
 }
 
-const WithDrawDaiAction = ({ close }:IWithDrawActionProps) => {
-
-  const [ estRatio, setEstRatio ] = useState<any>();
-  const [ estDecrease, setEstDecrease ] = useState<any>();
+const DaiWithDrawAction = ({ close }:IWithDrawActionProps) => {
 
   const [ maxWithdraw, setMaxWithdraw ] = useState<number>(0);
   const [ inputValue, setInputValue ] = useState<any>();
+
+  const [ approved, setApproved ] = React.useState<any>(0);
+  const [ yDaiValue, setYDaiValue ] = React.useState<number>(0);
 
   const [ withdrawDisabled, setWithdrawDisabled ] = useState<boolean>(false);
   const [ indicatorColor, setIndicatorColor ] = useState<string>('brand');
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
 
-  const { state: yieldState } = useContext(YieldContext);
+  const { state: yieldState, actions: yieldActions } = useContext(YieldContext);
   const { deployedContracts } = yieldState;
 
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
+
   const { userData: { ethBalance_ } } = yieldState;
-  const { seriesAggregates } = seriesState;
+  const { seriesAggregates, activeSeries  } = seriesState;
   const {
     collateralAmount_,
     minSafeCollateral_,
@@ -42,49 +44,35 @@ const WithDrawDaiAction = ({ close }:IWithDrawActionProps) => {
     estimateRatio, // TODO << this is a function (basically just passed from hooks via context) >> 
   } = seriesAggregates;
 
-  const { withdrawEth, withdrawEthActive }  = useEthProxy();
+  const { buyDai, previewMarketTx, approveToken }  = useMarket();
+  const { userAllowance } = useYDai();
 
   const withdrawProcedure = async (value:number) => {
-    await withdrawEth(deployedContracts.EthProxy, value);
-    seriesActions.updateMetrics();
-    // actions.updateUserData(state.deployedContracts, state.deployedContracts);
-    // actions.updateYieldBalances(state.deployedContracts);
+    await buyDai(
+      activeSeries.marketAddress,
+      inputValue,
+      0 // transaction queue value
+    );
+    yieldActions.updateUserData();
+    seriesActions.refreshPositions([activeSeries]);
+  };
+
+  const approveProcedure = async (value:number) => {
+    await approveToken(activeSeries.yDaiAddress, activeSeries.marketAddress, value);
+    const approvedYDai = await userAllowance(activeSeries.yDaiAddress, activeSeries.marketAddress);
+    setApproved( approvedYDai ); // TODO convert to Dai somehow
   };
 
   useEffect(()=>{
     setMaxWithdraw(collateralAmount_- minSafeCollateral_);
   }, [collateralAmount_, minSafeCollateral_]);
 
-  useEffect(()=>{
-    if (estRatio < 150) {
-      setWithdrawDisabled(true);
-      setIndicatorColor('red');
-      setWarningMsg(null);
-      setErrorMsg('You are not allowed to withdraw below the collateralization ratio'); 
-    } else if (estRatio >= 150 && estRatio < 250 ) {
-      setIndicatorColor('orange');
-      setErrorMsg(null);
-      setWarningMsg('Your collateralisation ration will put you at risk of liquidation');
-    } else {
-      setWithdrawDisabled(false);
-      setIndicatorColor('brand');
-      setWarningMsg(null);
-      setErrorMsg(null);
-    }
-  }, [ estRatio ]);
-
-  useEffect(()=>{
-    if (collateralAmount_ < inputValue ){
-      setWithdrawDisabled(true);
-    } else { setWithdrawDisabled(false); }
-
-    if ( (collateralAmount_ > inputValue) && inputValue  && debtValue_) {
-      const newRatio = estimateRatio((collateralAmount_- parseFloat(inputValue)), debtValue_); 
-      setEstRatio(newRatio.toFixed(2));
-      const newDecrease = collateralRatio_ - newRatio ;
-      setEstDecrease(newDecrease.toFixed(2));
-    }
-  }, [ inputValue ]);
+  useEffect(() => {
+    activeSeries && inputValue && ( async () => {
+      const preview = await previewMarketTx('buyDai', activeSeries.marketAddress, inputValue);
+      setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
+    })();
+  }, [inputValue]);
 
   return (
     <Layer onClickOutside={()=>close()}>
@@ -108,40 +96,6 @@ const WithDrawDaiAction = ({ close }:IWithDrawActionProps) => {
               <Box 
                 round='medium'
                 background='brand-transparent'
-                // onClick={()=>setSelectorOpen(true)}
-                hoverIndicator='brand'
-                direction='row'
-                fill
-                pad='small'
-                flex
-              >
-                {/* { activeSeries? activeSeries.displayName : 'Loading...' } */}
-              </Box>
-  
-              <Box justify='center'>
-                <Box
-                  round
-                  // onClick={()=>setSelectorOpen(true)}
-                  hoverIndicator='brand-transparent'
-                  border='all'
-                // border={{ color:'brand' }}
-                  pad={{ horizontal:'small', vertical:'small' }}
-                  justify='center'
-                >
-                  <Text size='xsmall'>Change series</Text>
-                </Box>
-              </Box>
-            </Box>
-          
-            <Box
-              direction='row-responsive'
-              fill='horizontal'
-              gap='small'
-              align='center'
-            >
-              <Box 
-                round='medium'
-                background='brand-transparent'
                 direction='row'
                 fill='horizontal'
                 pad='small'
@@ -149,8 +103,8 @@ const WithDrawDaiAction = ({ close }:IWithDrawActionProps) => {
               >
                 <TextInput
                   type="number"
-                  placeholder='Enter the amount dai to withdraw'
-                  value={inputValue}
+                  placeholder='Dai'
+                  value={inputValue || ''}
                   plain
                   onChange={(event:any) => setInputValue(event.target.value)}
                   icon={<Ethereum />}
@@ -194,6 +148,19 @@ const WithDrawDaiAction = ({ close }:IWithDrawActionProps) => {
             <Text color='red'>{errorMsg}</Text>
           </Box> }
 
+          <Box>
+            <CheckBox 
+              reverse
+                // value={true}
+              checked={!inputValue || ( approved >= inputValue )}
+              disabled={!inputValue || ( approved >= inputValue )}
+              onChange={()=>approveProcedure(yDaiValue)}
+              label={(approved >= inputValue) ? 
+                `Withdrawals unlocked for up to ${approved.toFixed(2) || '' } Dai` 
+                : `Unlock withdrawals of ${inputValue || ''} Dai`}
+            />
+          </Box>
+
           <Box
             fill='horizontal'
             round='medium'
@@ -207,7 +174,7 @@ const WithDrawDaiAction = ({ close }:IWithDrawActionProps) => {
               size='large'
               color={( !(inputValue>0) || withdrawDisabled) ? 'text-xweak' : 'text'}
             >
-              {`Withdraw ${inputValue || ''} Eth`}
+              {`Withdraw ${inputValue || ''} Dai`}
             </Text>
           </Box>
 
@@ -222,7 +189,7 @@ const WithDrawDaiAction = ({ close }:IWithDrawActionProps) => {
             >
               <Box direction='row' gap='small' align='center'>
                 <ArrowLeft color='text-weak' />
-                <Text size='xsmall' color='text-weak'> { !withdrawEthActive? 'cancel, and go back.': 'go back'}  </Text>
+                <Text size='xsmall' color='text-weak'> go back </Text>
               </Box>
             </Box>
           </Box>
@@ -232,4 +199,4 @@ const WithDrawDaiAction = ({ close }:IWithDrawActionProps) => {
   );
 };
 
-export default WithDrawDaiAction;
+export default DaiWithDrawAction;
