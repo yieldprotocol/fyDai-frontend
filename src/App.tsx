@@ -2,7 +2,7 @@ import React from 'react';
 import { Grommet, base, Grid, Main, Box } from 'grommet';
 import { deepMerge } from 'grommet/utils';
 import { yieldTheme } from './themes';
-import { useEagerConnect, useInactiveListener }  from './hooks/connectionHooks';
+import { useEagerConnect, useInactiveListener } from './hooks/connectionHooks';
 
 import Dashboard from './views/Dashboard';
 import Borrow from './views/Borrow';
@@ -24,7 +24,6 @@ import TestLayer from './components/layers/TestLayer';
 import { IYieldSeries } from './types';
 
 function App() {
-
   const [darkmode, setDarkmode] = React.useState(false);
   const [activeView, setActiveView] = React.useState<string>('LEND');
   // const [activeSeries, setActiveSeries] = React.useState<IYieldSeries | null>(null);
@@ -39,56 +38,69 @@ function App() {
     setShowConnectLayer(true);
   };
 
+  const columnsWidth = ['5%', 'auto', '5%'];
+
   return (
     <div className="App">
-      <Grommet theme={deepMerge(base, yieldTheme)} themeMode={darkmode?'dark':'light'} full>
+      <Grommet
+        theme={deepMerge(base, yieldTheme)}
+        themeMode={darkmode ? 'dark' : 'light'}
+        full
+      >
         <NotifyLayer />
-        { showAccountLayer && <AccountLayer closeLayer={()=>setShowAccountLayer(false)} changeWallet={()=>changeConnection()} /> }
-        { showConnectLayer && <ConnectLayer closeLayer={()=>setShowConnectLayer(false)} />}
+        {showAccountLayer && (
+          <AccountLayer
+            closeLayer={() => setShowAccountLayer(false)}
+            changeWallet={() => changeConnection()}
+          />
+        )}
+        {showConnectLayer && (
+          <ConnectLayer closeLayer={() => setShowConnectLayer(false)} />
+        )}
         { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
         { showSeriesLayer  && <SeriesSelector closeLayer={()=>setShowSeriesLayer(false)} /> }
 
         <Box direction="row" height={{ min: '100%' }}>
           <Box flex>
             <Grid fill rows={['auto', 'flex', 'auto']}>
-              <Grid fill columns={['10%', 'auto', '10%']}>
-                <Box background={{ color:'background-front' }} />
-                <YieldHeader 
-                  openConnectLayer={()=>setShowConnectLayer(true)} 
-                  openAccountLayer={()=>setShowAccountLayer(true)}
+              <Grid fill columns={columnsWidth}>
+                <Box background={{ color: 'background-front' }} />
+                <YieldHeader
+                  openConnectLayer={() => setShowConnectLayer(true)}
+                  openAccountLayer={() => setShowAccountLayer(true)}
                   activeView={activeView}
                   setActiveView={setActiveView}
                 />
-                <Box background={{ color:'background-front' }} />
+                <Box background={{ color: 'background-front' }} />
               </Grid>
 
-              <Main
-                pad='none'
-                direction='row'
-                flex
-              >
-                <Grid fill columns={['10%', 'auto', '10%']}>
+              <Main pad="none" direction="row" flex>
+                <Grid fill columns={columnsWidth}>
                   {/* <YieldSidebar setShowSeriesLayer={setShowSeriesLayer} activeSeries={activeSeries} setActiveSeries={setActiveSeries} /> */}
-                  <Box background='background' />
-                  <Box align='center'>
-                    {activeView === 'DASHBOARD' && <Dashboard /> }
-                    {activeView === 'BORROW' && <Borrow setShowSeriesLayer={setShowSeriesLayer} />}
-                    {activeView === 'LEND' && <Lend setShowSeriesLayer={setShowSeriesLayer} />}
+                  <Box background="background" />
+                  <Box align="center">
+                    {activeView === 'DASHBOARD' && <Dashboard />}
+                    {activeView === 'BORROW' && (
+                      <Borrow setShowSeriesLayer={setShowSeriesLayer} />
+                    )}
+                    {activeView === 'LEND' && (
+                      <Lend setShowSeriesLayer={setShowSeriesLayer} />
+                    )}
                     {activeView === 'AMM' && <Amm />}
                   </Box>
-                  <Box background='background' />
+                  <Box background="background" />
                 </Grid>
               </Main>
-              <Grid fill columns={['10%', 'auto', '10%']}>
-                <Box background='background' />
-                <YieldFooter 
+              <Grid fill columns={columnsWidth}>
+                <Box background="background" />
+                <YieldFooter
                   showTestLayer={showTestLayer}
                   setShowTestLayer={setShowTestLayer}
                   darkmode={darkmode}
                   setDarkmode={setDarkmode}
                   changeConnection={changeConnection}
                 />
-                <Box background='background' />
+                <Box background="background" />
               </Grid>
             </Grid>
           </Box>

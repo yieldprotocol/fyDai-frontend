@@ -7,14 +7,14 @@ import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { IYieldSeries } from '../types';
 
+import LendAction from '../components/LendAction';
+import PageHeader from '../components/PageHeader';
 import BuySell from '../components/x_BuySell';
 import Redeem from '../components/Redeem';
-import LendAction from '../components/LendAction';
-import TipButtons from '../components/TipButtons';
 
 interface LendProps {
-  setShowSeriesLayer: any,
-  activeView?:string,
+  setShowSeriesLayer: any;
+  activeView?: string;
 }
 
 const Lend = ({ setShowSeriesLayer, activeView: viewFromProp  }:LendProps) => {
