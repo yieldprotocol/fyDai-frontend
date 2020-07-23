@@ -25939,7 +25939,7 @@
     }
   },
   "schemaVersion": "3.0.23",
-  "updatedAt": "2020-07-23T06:32:18.856Z",
+  "updatedAt": "2020-07-23T14:16:24.059Z",
   "networkType": "ethereum",
   "devdoc": {
     "details": "The Market contract exchanges Dai for yDai at a price defined by a specific formula.",

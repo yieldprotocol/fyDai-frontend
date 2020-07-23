@@ -2364,7 +2364,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.23",
-  "updatedAt": "2020-07-23T06:25:37.355Z",
+  "updatedAt": "2020-07-23T14:14:53.680Z",
   "devdoc": {
     "details": "Delegable enables users to delegate their account management to other users",
     "methods": {

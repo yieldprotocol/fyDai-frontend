@@ -31344,7 +31344,7 @@
     }
   },
   "schemaVersion": "3.0.23",
-  "updatedAt": "2020-07-23T06:31:18.462Z",
+  "updatedAt": "2020-07-23T14:16:09.900Z",
   "networkType": "ethereum",
   "devdoc": {
     "details": "The Controller manages collateral and debt levels for all users, and it is a major user entry point for the Yield protocol. Controller keeps track of a number of yDai contracts. Controller allows users to post and withdraw Chai and Weth collateral. Any transactions resulting in a user weth collateral below dust are reverted. Controller allows users to borrow yDai against their Chai and Weth collateral. Controller allows users to repay their yDai debt with yDai or with Dai. Controller integrates with yDai contracts for minting yDai on borrowing, and burning yDai on repaying debt with yDai. Controller relies on Treasury for all other asset transfers. Controller allows orchestrated contracts to erase any amount of debt or collateral for an user. This is to be used during liquidations or during unwind. Users can delegate the control of their accounts in Controllers to any address.",
