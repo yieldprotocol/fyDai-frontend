@@ -142,7 +142,7 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
     }
   }, [ inputValue ]);
 
-  /* borrow button disabling */
+  /* Borrow button disabling logic */
   useEffect(()=>{
     if (!hasDelegated) {
       setBorrowDisabled(true);
@@ -156,7 +156,6 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   }, [ approved, inputValue, yDaiValue, hasDelegated ]);
 
   useEffect(() => {
-
     approved && ( async () => {
       const preview = await previewMarketTx('SellYDai', activeSeries.marketAddress, approved);
       setDaiApproved( parseFloat(ethers.utils.formatEther(preview)) );

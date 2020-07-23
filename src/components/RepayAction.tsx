@@ -38,6 +38,7 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
   } = seriesAggregates;
 
   const { repay, repayActive }  = useController();
+
   const [ inputValue, setInputValue ] = React.useState<any>();
   const [repayDisabled, setRepayDisabled] = React.useState<boolean>(false);
   const [ selectorOpen, setSelectorOpen ] = React.useState<boolean>(false);
@@ -65,6 +66,30 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
     await approveToken(deployedContracts.Dai, deployedContracts.Treasury, value);
     setApproved(await getTokenAllowance(deployedContracts.Dai, deployedContracts.Treasury, 'Dai'));
   };
+
+  useEffect(() => {
+    if ( inputValue  && userData?.daiBalance_ && ( inputValue > userData?.daiBalance_ ) ) {
+      setWarningMsg(null);
+      setErrorMsg('That amount exceeds the amount of Dai in your wallet'); 
+    } else if ( false ) {
+      setErrorMsg(null);
+      setWarningMsg('If you borrow right up to your maximum allowance, there is high probability you will be liquidated soon!');
+    } else {
+      setWarningMsg(null);
+      setErrorMsg(null);
+    }
+  }, [ inputValue ]);
+
+  /* Repay button disabling logic */
+  useEffect(()=>{
+    if (approved < inputValue) {
+      setRepayDisabled(true);
+    } else if (!(inputValue) || inputValue===0) {
+      setRepayDisabled(true);
+    } else {
+      setRepayDisabled(false);
+    }
+  }, [ approved, inputValue ]);
 
   useEffect(() => {
     console.log(seriesAggregates);
@@ -133,7 +158,7 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
                 <Text color='text-weak' size='xsmall'>Wallet Dai balance</Text>
                 <Help />
               </Box>
-              <Text color='brand' weight='bold' size='large'> {userData? `${userData.daiBalance_} Dai`:'-'} </Text>
+              <Text color='brand' weight='bold' size='medium'> {userData?.daiBalance_? `${userData.daiBalance_.toFixed(2)} Dai`:'-'} </Text>
             </Box>
 
           </Box>
@@ -160,7 +185,7 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
                   type="number"
                   placeholder='Enter the amount of Dai to Repay'
                   value={inputValue || ''}
-                  disabled={repayDisabled}
+                  // disabled={repayDisabled}
                   plain
                   onChange={(event:any) => setInputValue(event.target.value)}
                 />
@@ -180,22 +205,30 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
                 </Box>
               </Box>
             </Box>
-
-            {/* <Box fill='horizontal' direction='row-responsive' justify='between'>
-              <Box fill gap='small' pad={{ horizontal:'medium' }}>
-                <Box fill direction='row-responsive' justify='between'>
-                  <Box gap='small'>
-                    <Box direction='row' gap='small'>
-                      <Text color='text-weak' size='xsmall'>Current Debt</Text>
-                      <Help />
-                    </Box>
-                    <Text color='brand' weight='bold' size='large'> {activeSeries && `${activeSeries.wethDebtDai_.toFixed(2)} Dai`}  </Text>
-                  </Box>
-                </Box>
-              </Box>
-            </Box> */}
-
           </Box>
+
+          { warningMsg &&
+          <Box 
+            border={{ color:'orange' }} 
+            fill
+            round='small'
+            pad='small'
+          >
+            <Text weight='bold' color='orange'>Procced with Caution:</Text>  
+            <Text color='orange'>{warningMsg}</Text>
+          </Box> }
+
+          { errorMsg &&
+          <Box
+            border={{ color:'red' }}
+            fill
+            round='small'
+            pad='small'
+          >
+            <Text weight='bold' color='red'>Wooah!</Text>  
+            <Text color='red'>{errorMsg}</Text>
+          </Box> }
+
           
           <Box>
             <CheckBox 
@@ -213,15 +246,15 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
           <Box
             fill='horizontal'
             round='medium'
-            background={( !(inputValue>0) || repayDisabled) ? 'brand-transparent' : 'brand'}
-            onClick={(!(inputValue>0) || repayDisabled)? ()=>{}:()=>repayProcedure(inputValue)}
+            background={repayDisabled ? 'brand-transparent' : 'brand'}
+            onClick={repayDisabled ? ()=>{}:()=>repayProcedure(inputValue)}
             align='center'
             pad='small'
           >
             <Text 
               weight='bold'
               size='large'
-              color={( !(inputValue>0) || repayDisabled) ? 'text-weak' : 'text'}
+              color={repayDisabled ? 'text-xweak' : 'text'}
             >
               {`Repay ${inputValue || ''} Dai`}
             </Text>
@@ -247,14 +280,14 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
               <Box
                 fill='horizontal'
                 round='medium'
-                background='brand'
+                border='all'
                 onClick={()=>console.log('Going to etherscan')}
                 align='center'
-                pad='medium'
+                pad='small'
               >
                 <Text
                   weight='bold'
-                  size='large'
+                  size='small'
                 >
                   View on Etherscan
                 </Text>
