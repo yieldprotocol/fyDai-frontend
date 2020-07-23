@@ -40,13 +40,21 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   } = seriesAggregates;
 
   const { borrow, borrowActive }  = useController();
-  const { buyDai, previewMarketTx, approveToken }  = useMarket();
+  const { 
+    buyDai,
+    previewMarketTx,
+    approveToken,
+    addMarketDelegate,
+    checkMarketDelegate
+  }  = useMarket();
   const { userAllowance } = useYDai();
 
   const [ inputValue, setInputValue ] = React.useState<any>();
   const [ borrowDisabled, setBorrowDisabled ] = React.useState<boolean>(false);
   const [ selectorOpen, setSelectorOpen ] = React.useState<boolean>(false);
   const [ estRatio, setEstRatio ] = React.useState<any>(0);
+
+  const [ hasDelegated, setHasDelegated] = React.useState<boolean>(activeSeries?.hasDelegated || true);
 
   const [ approved, setApproved ] = React.useState<any>(0);
   const [ yDaiValue, setYDaiValue ] = React.useState<number>(0);
@@ -73,12 +81,18 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
     setApproved( approvedYDai ); // TODO convert to Dai somehow
   };
 
+  const delegateProcedure = async () => {
+    await addMarketDelegate(activeSeries.marketAddress, activeSeries.yDaiAddress);
+    const res = await checkMarketDelegate(activeSeries.marketAddress, activeSeries.yDaiAddress);
+    setHasDelegated(res);
+  };
+
   // TODO: maybe split into a custom hook
   const { state: { pendingTxs } } = React.useContext(NotifyContext);
   const [txActive, setTxActive] = useState<any>(null);
 
   useEffect(()=>{
-    setTxActive(pendingTxs.find((x:any)=> x.type === 'BORROW' || x.type === 'BUY'));
+    setTxActive(pendingTxs.find((x:any)=> x.type === 'BORROW' || x.type === 'BUY' || x.type === 'DELEGATION'));
   }, [ pendingTxs ]);
 
   useEffect(()=>{
@@ -133,13 +147,14 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
     console.log(seriesAggregates);
     ( async ()=>{
       activeSeries && setApproved(await userAllowance(activeSeries.yDaiAddress, activeSeries.marketAddress));
+      activeSeries && setHasDelegated(activeSeries.hasDelegated);
     })();
   }, [ activeSeries ]);
 
   return (
     <>
       {selectorOpen && <SeriesSelector close={()=>setSelectorOpen(false)} /> }
-      { !txActive && !borrowActive &&
+      { txActive?.type !== 'BORROW' && txActive?.type !== 'BUY' && !borrowActive &&
       <Box flex='grow' justify='between'>
         <Box gap='medium' align='center' fill='horizontal'>
           <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Selected series</Text>
@@ -178,6 +193,33 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
               </Box>
             </Box>
           </Box>
+
+          {!hasDelegated &&
+            <Box round pad='small' gap='small' border='all' elevation='small' align='center' fill>
+              <Text weight='bold' size='medium' color='brand'>Once-off Action required: </Text>
+              <CheckBox 
+                reverse
+                onChange={()=>delegateProcedure()}
+                label={( txActive?.type === 'DELEGATION')? 'Approval pending...' : 'Approve Transactions for this series'}
+              />
+              {/* <Box
+                round
+                onClick={()=>delegateProcedure()}
+                hoverIndicator='brand-transparent'
+                border='all'
+                pad={{ horizontal:'small', vertical:'small' }}
+                align='center'
+              >
+                <Text
+                  weight='bold'
+                // size='xxsmall'
+                  color='text'
+                >
+                  Approve Transactions for this series
+                </Text>
+              </Box> */}
+            </Box>}
+
           
           <Box direction='row-responsive' pad={{ horizontal:'medium' }} justify='start' gap='large' fill>
             
@@ -294,15 +336,15 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
           <Box
             fill='horizontal'
             round='medium'
-            background={( !(inputValue>0) || borrowDisabled) ? 'brand-transparent' : 'brand'}
-            onClick={(!(inputValue>0) || borrowDisabled)? ()=>{}:()=>borrowProcedure(inputValue)}
+            background={( !(inputValue>0) || borrowDisabled && hasDelegated) ? 'brand-transparent' : 'brand'}
+            onClick={(!(inputValue>0) || borrowDisabled && hasDelegated)? ()=>{}:()=>borrowProcedure(inputValue)}
             align='center'
             pad='small'
           >
             <Text 
               weight='bold'
               size='large'
-              color={( !(inputValue>0) || borrowDisabled) ? 'text-xweak' : 'text'}
+              color={( !(inputValue>0) || borrowDisabled && hasDelegated) ? 'text-xweak' : 'text'}
             >
               {`Borrow ${inputValue || ''} Dai`}
             </Text>
@@ -314,7 +356,39 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
       { borrowActive && !txActive &&
         <Box>Awaiting transaction approval</Box>}
 
-      { txActive &&
+      { (txActive?.type === 'BORROW') &&
+      <Box align='center' flex='grow' justify='between' gap='large'>
+        <Box gap='medium' align='center' fill='horizontal'>
+          <Text size='xlarge' color='brand' weight='bold'>Thank you.</Text>
+          <Box
+            // direction='row-responsive'
+            fill='horizontal'
+            gap='large'
+            align='center'
+          >
+            <Text>You are in the process of borrowing {inputValue} Dai</Text>
+            <Text>The transaction is pending. </Text>
+            <Box
+              fill='horizontal'
+              round='medium'
+              // background='brand'
+              border='all'
+              onClick={()=>console.log('Going to etherscan')}
+              align='center'
+              pad='xsmall'
+            >
+              <Text
+                weight='bold'
+                size='small'
+              >
+                View on Etherscan
+              </Text>
+            </Box>
+          </Box>
+        </Box>
+      </Box>}
+
+      { (txActive?.type === 'BUY') &&
       <Box align='center' flex='grow' justify='between' gap='large'>
         <Box gap='medium' align='center' fill='horizontal'>
           <Text size='xlarge' color='brand' weight='bold'>Good One!</Text>
@@ -325,18 +399,35 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
             align='center'
           >
             <Text>You borrowed {inputValue} Dai</Text>
-            <Text>Transaction Pending: </Text>
+            <Text>We are now putting the Dai in your wallet.</Text>
             <Box
               fill='horizontal'
               round='medium'
-              background='brand'
-              onClick={()=>console.log('Going to etherscan')}
+              // background='brand'
+              border='all'
+              onClick={()=>console.log('Cancelling Dai buying')}
               align='center'
-              pad='medium'
+              pad='xsmall'
             >
               <Text
                 weight='bold'
-                size='large'
+                size='small'
+              >
+                Cancel automatic Dai conversion to keep your yDai.
+              </Text>
+            </Box>
+            <Box
+              fill='horizontal'
+              round='medium'
+              // background='brand'
+              border='all'
+              onClick={()=>console.log('Going to etherscan')}
+              align='center'
+              pad='xsmall'
+            >
+              <Text
+                weight='bold'
+                size='small'
               >
                 View on Etherscan
               </Text>
@@ -344,6 +435,7 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
           </Box>
         </Box>
       </Box>}
+
     </>
   );
 };

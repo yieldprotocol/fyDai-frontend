@@ -244,19 +244,18 @@ export const useController = () => {
     dispatch({ type: 'txComplete', payload:{ tx } } );  };
 
   /**
-   * Approve the controller to ethProxy for ETH withdrawals.
-   * @param {string} controllerAddress address of the controller.
-   * @param {string} ethProxyAddress address of the ethProxy (contract getting approved). 
-   * @param {number} amount to approve (in human understandable numbers)
+   * Delegate a 3rd party to act on behalf of the user in the Controller
+   * @param {string} controllerAddress address of the market in question.
+   * @param {string} delegatedAddress address of the contract/entity getting delegated (in this case: ethproxy)
    */
-  const approveEthWithdraws = async (
+  const addControllerDelegate = async (
     controllerAddress:string,
-    ethProxyAddress:string,
+    delegatedAddress:string,
   ) => {
     let tx:any;
     /* Processing and sanitizing input */
     const controllerAddr = ethers.utils.getAddress(controllerAddress);
-    const ethProxyAddr = ethers.utils.getAddress(ethProxyAddress);
+    const delegatedAddr = ethers.utils.getAddress(delegatedAddress);
     /* Contract interaction */
     const contract = new ethers.Contract(
       controllerAddr,
@@ -264,7 +263,7 @@ export const useController = () => {
       signer
     );
     try {
-      tx = await contract.addDelegate(ethProxyAddr);
+      tx = await contract.addDelegate(delegatedAddr);
     } catch (e) {
       dispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed.', type:'error' } } );
       dispatch({ type: 'txComplete', payload:{ tx } } );
@@ -272,32 +271,32 @@ export const useController = () => {
       return;
     }
     /* Transaction reporting & tracking */
-    dispatch({ type: 'txPending', payload:{ tx, message: 'Pending once-off approval of Eth withdrawals ...', type:'APPROVAL' } } );
+    dispatch({ type: 'txPending', payload:{ tx, message: 'Pending once-off approval of Eth withdrawals ...', type:'DELEGATION' } } );
     await tx.wait();
     dispatch({ type: 'txComplete', payload:{ tx } } );
   };
 
   /**
-   * Check to see if Eth withdrawals have been approved or not
+   * Check to see if an account (user) has delegated a contract/3rd Party for the controller.
    * 
    * Call function no gas
    * 
    * @param {string} controllerAddress address of the controller.
-   * @param {string} ethProxyAddress address of the ethProxy (contract getting approved). 
+   * @param {string} delegateAddress address of the delegate to be checked (ethProxy contract getting approved). 
    * 
    * @returns {Promise<boolean>} approved ?
    */
-  const checkWithdrawApproval = async (
+  const checkControllerDelegate = async (
     controllerAddress:string,
-    ethProxyAddress:string
+    delegateAddress:string
   ): Promise<boolean> => {
     const fromAddr = account && ethers.utils.getAddress(account);
-    const ethProxyAddr = ethers.utils.getAddress(ethProxyAddress);
+    const delegateAddr = ethers.utils.getAddress(delegateAddress);
     const controllerAddr = ethers.utils.getAddress(controllerAddress);
     const contract = new ethers.Contract( controllerAddr, controllerAbi, provider);
     let res;
     try {
-      res = await contract.delegated(fromAddr, ethProxyAddr);
+      res = await contract.delegated(fromAddr, delegateAddr);
     }  catch (e) {
       console.log(e);
       res = false;
@@ -311,7 +310,7 @@ export const useController = () => {
     borrow, borrowActive,
     repay, repayActive,
     approveController, approveActive, // TODO remove this if not used
-    approveEthWithdraws,
-    checkWithdrawApproval,
+    addControllerDelegate,
+    checkControllerDelegate,
   } as const;
 };

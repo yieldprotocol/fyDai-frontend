@@ -28,7 +28,7 @@ const EthWithdrawAction = ({ close }:IWithDrawActionProps) => {
 
   const [ maxWithdraw, setMaxWithdraw ] = useState<number>(0);
   const [ inputValue, setInputValue ] = useState<any>();
-  const [ hasApproved, setHasApproved ] = useState<boolean>( userData.isEthProxyApproved || false);
+  const [ hasDelegated, setHasDelegated ] = useState<boolean>( userData.isEthProxyApproved || false);
 
   const [ withdrawDisabled, setWithdrawDisabled ] = useState<boolean>(false);
   const [ indicatorColor, setIndicatorColor ] = useState<string>('brand');
@@ -48,7 +48,7 @@ const EthWithdrawAction = ({ close }:IWithDrawActionProps) => {
   } = seriesAggregates;
 
   const { withdrawEth, withdrawEthActive }  = useEthProxy();
-  const { approveEthWithdraws, checkWithdrawApproval }  = useController();
+  const { addControllerDelegate, checkControllerDelegate }  = useController();
 
   const withdrawProcedure = async (value:number) => {
     await withdrawEth(deployedContracts.EthProxy, value);
@@ -56,10 +56,10 @@ const EthWithdrawAction = ({ close }:IWithDrawActionProps) => {
     close();
   };
 
-  const approveProcedure = async (value:number) => {
-    await approveEthWithdraws(deployedContracts.Controller, deployedContracts.EthProxy);
-    const res = await checkWithdrawApproval(deployedContracts.Controller, deployedContracts.EthProxy);
-    setHasApproved(res);
+  const delegateProcedure = async () => {
+    await addControllerDelegate(deployedContracts.Controller, deployedContracts.EthProxy);
+    const res = await checkControllerDelegate(deployedContracts.Controller, deployedContracts.EthProxy);
+    setHasDelegated(res);
   };
 
   // TODO: maybe split into a custom hook
@@ -131,12 +131,12 @@ const EthWithdrawAction = ({ close }:IWithDrawActionProps) => {
           <Box gap='medium' align='center' fill='horizontal'>
             <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to withdraw</Text>
 
-            {!hasApproved &&
-            <Box pad='small' gap='small' border='all' elevation='small' fill>
+            {!hasDelegated &&
+            <Box round pad='small' gap='small' border='all' elevation='small' align='center' fill>
               Once-off Action required: 
               <Box
                 round
-                onClick={()=>approveProcedure(inputValue)}
+                onClick={()=>delegateProcedure()}
                 hoverIndicator='brand-transparent'
                 border='all'
                 pad={{ horizontal:'small', vertical:'small' }}
@@ -250,15 +250,15 @@ const EthWithdrawAction = ({ close }:IWithDrawActionProps) => {
           <Box
             fill='horizontal'
             round='medium'
-            background={( !(inputValue>0) || withdrawDisabled && hasApproved ) ? 'brand-transparent' : 'brand'}
-            onClick={( !(inputValue>0) || withdrawDisabled && hasApproved )? ()=>{}:()=> withdrawProcedure(inputValue)}
+            background={( !(inputValue>0) || withdrawDisabled && hasDelegated ) ? 'brand-transparent' : 'brand'}
+            onClick={( !(inputValue>0) || withdrawDisabled && hasDelegated )? ()=>{}:()=> withdrawProcedure(inputValue)}
             align='center'
             pad='small'
           >
             <Text
               weight='bold'
               size='large'
-              color={( !(inputValue>0) || withdrawDisabled && hasApproved ) ? 'text-xweak' : 'text'}
+              color={( !(inputValue>0) || withdrawDisabled && hasDelegated ) ? 'text-xweak' : 'text'}
             >
               {`Withdraw ${inputValue || ''} Eth`}
             </Text>

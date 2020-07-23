@@ -58,7 +58,7 @@ const SeriesProvider = ({ children }:any) => {
   const { state: yieldState } = React.useContext(YieldContext);
   const { userData, feedData, deployedContracts } = yieldState;
 
-  const { previewMarketTx }  = useMarket();
+  const { previewMarketTx, checkMarketDelegate }  = useMarket();
   const [ callTx ] = useCallTx();
   const {
     collAmount,
@@ -171,12 +171,11 @@ const SeriesProvider = ({ children }:any) => {
         _seriesData.push(x);
         try {
 
+          _seriesData[i].hasDelegated = await checkMarketDelegate(x.marketAddress, x.yDaiAddress);
           _seriesData[i].yDaiBalance = account? await callTx(x.yDaiAddress, 'YDai', 'balanceOf', [account]): BigNumber.from('0') ;
           _seriesData[i].isMature = await callTx(x.yDaiAddress, 'YDai', 'isMature', []);
-
           _seriesData[i].wethDebtYDai = account? await callTx(deployedContracts.Controller, 'Controller', 'debtYDai', [utils.ETH, x.maturity, account]): BigNumber.from('0');
           _seriesData[i].wethDebtDai = account? utils.mulRay( _seriesData[i].wethDebtYDai, feedData.amm.rates[x.maturity]): BigNumber.from('0');
-
           _seriesData[i].yieldAPR = yieldAPR(_rates.sellYDai, x.maturity);
         } catch (e) {
           console.log(`Could not load account positions data: ${e}`);
@@ -199,13 +198,11 @@ const SeriesProvider = ({ children }:any) => {
   // Get the Positions data for a series list
   const getPositions = async (seriesArr:IYieldSeries[], force:boolean) => {
     let filteredSeriesArr;
-
     if (force !== true) {
       filteredSeriesArr = seriesArr.filter(x => !state.seriesData.has(x.maturity));
     } else {
       filteredSeriesArr = seriesArr;
     }
-
     if ( !yieldState?.isLoading && filteredSeriesArr.length > 0) {
 
       dispatch({ type:'isLoading', payload: true });

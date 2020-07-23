@@ -223,7 +223,7 @@ export const useMarket = () => {
 
     const overrides = { 
       // nonce: signer.getTransactionCount().then( (nonce:any) => nonce + queue) 
-      gasLimit: BigNumber.from('250000')
+      gasLimit: BigNumber.from('300000')
     };
 
     const parsedAmount = ethers.utils.parseEther(daiOut.toString());
@@ -297,7 +297,70 @@ export const useMarket = () => {
     return result;
   };
 
+  /**
+   * Delegate a 3rd party to act on behalf of the user in the Market contracts
+   * @param {string} marketAddress address of the market in question.
+   * @param {string} delegatedAddress address of the contract/entity getting delegated. 
+   */
+  const addMarketDelegate = async (
+    marketAddress:string,
+    delegatedAddress:string,
+  ) => {
+    let tx:any;
+    /* Processing and sanitizing input */
+    const marketAddr = ethers.utils.getAddress(marketAddress);
+    const delegatedAddr = ethers.utils.getAddress(delegatedAddress);
+    /* Contract interaction */
+    const contract = new ethers.Contract(
+      marketAddr,
+      marketAbi,
+      signer
+    );
+    try {
+      tx = await contract.addDelegate(delegatedAddr);
+    } catch (e) {
+      dispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed.', type:'error' } } );
+      dispatch({ type: 'txComplete', payload:{ tx } } );
+      console.log(e);
+      return;
+    }
+    /* Transaction reporting & tracking */
+    dispatch({ type: 'txPending', payload:{ tx, message: 'Pending once-off delegation ...', type:'DELEGATION' } } );
+    await tx.wait();
+    dispatch({ type: 'txComplete', payload:{ tx } } );
+  };
+
+  /**
+   * Check to see if an account (user) has delegated a contract/3rd Party for a particular market. 
+   * 
+   * Call function no gas
+   * 
+   * @param {string} marketAddress address of the market in question.
+   * @param {string} delegateAddress address of the ethProxy (contract getting approved). 
+   * 
+   * @returns {Promise<boolean>} approved ?
+   */
+  const checkMarketDelegate = async (
+    marketAddress:string,
+    delegateAddress:string
+  ): Promise<boolean> => {
+    const fromAddr = account && ethers.utils.getAddress(account);
+    const delegateAddr = ethers.utils.getAddress(delegateAddress);
+    const marketAddr = ethers.utils.getAddress(marketAddress);
+
+    const contract = new ethers.Contract( marketAddr, marketAbi, provider);
+    let res;
+    try {
+      res = await contract.delegated(fromAddr, delegateAddr);
+    }  catch (e) {
+      console.log(e);
+      res = false;
+    }
+    return res;
+  };
+
+
   return {
-    approveToken, previewMarketTx, sellYDai, buyYDai, sellDai, buyDai, sellActive, buyActive, approveActive
+    checkMarketDelegate, addMarketDelegate, approveToken, previewMarketTx, sellYDai, buyYDai, sellDai, buyDai, sellActive, buyActive, approveActive
   } as const;
 };

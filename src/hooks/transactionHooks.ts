@@ -176,4 +176,3 @@ export function useBalances() {
 
   return { getTokenAllowance, getEthBalance, getTokenBalance } as const;
 };
-
