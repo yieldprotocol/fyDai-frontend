@@ -140,10 +140,9 @@ const TestLayer = (props:any) => {
             <ProfileButton />
             <Text size='xsmall'>Connected to:</Text>
 
-
             <Box direction='row' gap='small'>
               <Text size='xsmall'>ETH balance:</Text>
-              <Text size='xsmall'>{ userData.ethBalance_ || '' }</Text>
+              <Text size='xsmall'>{ userData?.ethBalance_ || '' }</Text>
             </Box>
           </Box>
 
@@ -165,12 +164,12 @@ const TestLayer = (props:any) => {
             </Box>
 
             {
-              flow === 'APPROVALS' && 
+              flow === 'APPROVALS' &&
               <Box gap='small'>
                 Approvals required:
                 <Button primary label='EthProxy (once-off)' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />
-                <Button primary label='Market1 (for each market)' onClick={()=> sendTx(deployedContracts.Market, 'Market', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />
-                <Button primary label='Market2 (for each market)' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />
+                <Button primary label='Market1 (for each market)' onClick={()=> sendTx(deployedSeries[0].marketAddress, 'Market', 'addDelegate', [deployedSeries[0].yDaiAddress], utils.toWei('0'))} />
+                <Button primary label='Market2 (for each market)' onClick={()=> sendTx(deployedContracts.Market, 'Market', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />
               </Box>
             }
 
@@ -215,7 +214,6 @@ const TestLayer = (props:any) => {
               Get Dai:
               
               <Button label='1. Approve Wethjoin for 1weth' onClick={()=> sendTx(deployedContracts.Weth, 'Weth', 'approve', [deployedContracts.WethJoin, wethTokens], ethers.BigNumber.from(0) )} />
-                            
               <Button label='2. wethJoin join (take 1weth)' onClick={()=> sendTx(deployedContracts.WethJoin, 'WethJoin', 'join', [account, wethTokens], ethers.BigNumber.from(0) )} />
               <Button label='( x. wethJoin EXit 1weth)' onClick={()=> sendTx(deployedContracts.WethJoin, 'WethJoin', 'exit', [account, wethTokens ], ethers.BigNumber.from(0) )} />
 
@@ -275,7 +273,7 @@ const TestLayer = (props:any) => {
                 </Box>
                 <Box gap='small'>
                   <Text weight='bold'>Posted collateral:</Text>
-                  <Text>weth posted: { userData.ethPosted_ }</Text>
+                  <Text>weth posted: { userData?.ethPosted_ || '' }</Text>
                   {/* <Text>chai posted: { yieldData.chaiPosted_ }</Text> */}
                   <Text weight='bold'>yDai balance:</Text>
                   {/* <Text>yDai Balance: { seriesData.get('yDai-2020-09-30').yDaiBalance_ }</Text> */}
@@ -283,12 +281,12 @@ const TestLayer = (props:any) => {
                   {/* <Text>weth Debt Dai: { seriesData.get('yDai-2020-09-30').wethDebtDai_ }</Text> */}
                   {/* <Text>weth Debt YDai: { seriesData.get('yDai-2020-09-30').ethDebtYDai_ }</Text> */}
                   {/* <Text>weth Total Debt Dai { yieldData.wethTotalDebtDai_ }</Text> */}
-                  <Text> weth Total Debt YDai: { userData.ethTotalDebtYDai_ }</Text>
+                  <Text> weth Total Debt YDai: { userData?.ethTotalDebtYDai_ }</Text>
                   <Text weight='bold'>ChaiController:</Text>
                   {/* <Text>chai Debt Dai : { seriesData.get('yDai-2020-09-30').chaiDebtDai_}</Text> */}
                   {/* <Text>chai Debt yDai : { seriesData.get('yDai-2020-09-30').chaiDebtYDai_}</Text> */}
                   {/* <Text>chai Total Debt Dai: { yieldData.chaiTotalDebtDai_ }</Text> */}
-                  <Text>chai Total Debt YDai: { userData.chaiTotalDebtYDai_ }</Text>
+                  <Text>chai Total Debt YDai: { userData?.chaiTotalDebtYDai_ }</Text>
                 </Box>
               </Box>
               :

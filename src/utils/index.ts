@@ -58,8 +58,8 @@ export const divRay = (x:BigNumber, ray:BigNumber) => {
   return unit.mul(BigNumber.from(x)).div(BigNumber.from(ray));
 };
 
-// @dev Takes a bignumber in RAY and converts it to a human accesible number string
-export const rayToHuman = (x:any) => {
+// @dev Takes a bignumber in RAY and converts it to a human understandalble number
+export const rayToHuman = (x:BigNumber) => {
   // const unit = BigNumber.from('10').pow(BigNumber.from('27'));
-  return BigNumber.from(x).div(RAY).toString();
+  return divRay(x, RAY).toString();
 };

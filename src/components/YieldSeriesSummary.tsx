@@ -17,7 +17,7 @@ import {
 import { IYieldSeries } from '../types';
 
 type YieldSeriesProps = {
-  series: IYieldSeries;
+  series: any;
   seriesAction: any;
   children?: any;
   highlighted?: boolean;
@@ -32,7 +32,7 @@ const YieldSeriesSummary = ({
   const {
     name,
     maturity,
-    rate,
+    // rate,
     currentValue,
   } = series;
 
@@ -59,8 +59,7 @@ const YieldSeriesSummary = ({
           pad={{ horizontal: 'small', vertical: 'none' }}
           background="brand"
         >
-          {/* <Text size="xsmall"> {rate}%</Text> */}
-          <Text size="xsmall"> {rate?.toString()} %</Text>
+          <Text size="xsmall"> apr %</Text>
         </Box>
       </Box>
       <Box direction="column" align='end'>

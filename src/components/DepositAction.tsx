@@ -10,7 +10,7 @@ import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
 import { NotifyContext } from '../contexts/NotifyContext';
 
-import WithdrawAction from './WithdrawAction';
+import EthWithdrawAction from './EthWithdrawAction';
 import { useEthProxy } from '../hooks';
 
 interface DepositProps {
@@ -40,6 +40,7 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
     ethBalance_,
     collateralAmount_,
     collateralRatio_,
+    collateralPercent_,
     debtValue_,
     estimateRatio, // TODO << this is a function (basically just passed from hooks via context) >> 
   } = seriesAggregates || {};
@@ -48,12 +49,14 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
   const depositProcedure = async (value:number) => {
     await postEth(deployedContracts.EthProxy, value);
     yieldActions.updateUserData();
+    setInputValue('');
   };
 
   // Handle active transactions
   // TODO: maybe split into a custom hook
   const { state: { pendingTxs } } = React.useContext(NotifyContext);
   const [txActive, setTxActive] = React.useState<any>(null);
+  
   React.useEffect(()=>{
     setTxActive(pendingTxs.find((x:any)=> x.type === 'DEPOSIT'));
   }, [ pendingTxs ]);
@@ -63,7 +66,7 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
     if (inputValue && collateralAmount_ && debtValue_) {
       const newRatio = estimateRatio((collateralAmount_+ parseFloat(inputValue)), debtValue_); 
       setEstRatio(newRatio.toFixed(0));
-      const newIncrease = newRatio - collateralRatio_ ;
+      const newIncrease = newRatio - collateralPercent_ ;
       setEstIncrease(newIncrease.toFixed(0));
     }
     if ( inputValue && ( inputValue > ethBalance_) ) {
@@ -82,7 +85,7 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
 
   return (
     <>
-      { withdrawOpen && <WithdrawAction close={()=>setWithdrawOpen(false)} /> }
+      { withdrawOpen && <EthWithdrawAction close={()=>setWithdrawOpen(false)} /> }
       { !txActive && !postEthActive &&
       <Box align='center' flex='grow' justify='between' gap='large'>
         <Box gap='medium' align='center' fill='horizontal'>
@@ -95,7 +98,8 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
           >
             <Box 
               round='medium'
-              background='brand-transparent'
+              // background='brand-transparent'
+              border='all'
               direction='row'
               fill='horizontal'
               pad='small'
@@ -103,17 +107,17 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
             >
               <TextInput
                 ref={inputRef}
-                type="number"
+                type='number'
                 placeholder='Enter the amount to deposit in Eth'
-                value={inputValue}
+                value={inputValue || ''}
                 disabled={postEthActive}
                 plain
                 onChange={(event:any) => setInputValue(event.target.value)}
               // icon={<Text alignSelf='start' size='xsmall'>Eth</Text>}
                 icon={<Ethereum />}
               />
+              
             </Box>
-
             <Box justify='center'>
               <Box
                 round
@@ -134,7 +138,7 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
 
           <Box gap='small'>
             <Text color='text-weak' size='xsmall'>Current Collateral</Text>
-            <Text color='brand' weight='bold' size='large'> {collateralAmount_? `${collateralAmount_} Eth` : '-' }</Text>
+            <Text color='brand' weight='bold' size='medium'> {collateralAmount_? `${collateralAmount_.toFixed(4)} Eth` : '-' }</Text>
             { false && 
             <Box pad='xsmall'>
               <Text alignSelf='start' size='xxsmall'>
@@ -142,34 +146,27 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
               </Text>
             </Box>}
           </Box>
-
           <Box gap='small'>
             <Text color='text-weak' size='xsmall'>Collateralisation Ratio</Text>
-            <Text color='brand' weight='bold' size='large'> 
-              { (collateralRatio_ && (collateralRatio_ !== 0))? `${collateralRatio_}%`: '-' }
+            <Text color='brand' weight='bold' size='medium'> 
+              { (collateralPercent_ && (collateralPercent_ !== 0))? `${collateralPercent_}%`: '-' }
             </Text>
-            { false && 
-            <Box pad='xsmall'>
-              <Text alignSelf='start' size='xxsmall'>
-                <Info /> Collateral value should be well above 150% to be safe from liquidation. Either increase your collateral amount or repay some existing debt. 
-              </Text>
-            </Box>}
           </Box>
 
-          <Box gap='small'>
-            <Text color='text-weak' size='xsmall'>Ratio after deposit</Text>
+          <Box gap='small' alignSelf='start' align='center'>
+            <Text color='text-weak' size='xsmall'>Collateralization Ratio after withdraw</Text>
             <Box direction='row' gap='small'>
-              <Text color={!inputValue? 'brand-transparent': 'brand'} weight='bold' size='large'> 
-                {(estRatio && estRatio !== 0)? `~${estRatio}%`: collateralRatio_ || '' }
+              <Text color={!inputValue? 'brand-transparent': 'brand'} size='xxsmall'>approx.</Text> 
+              <Text color={!inputValue? 'brand-transparent': 'brand'} weight='bold' size='medium'> 
+                {(estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '' }
               </Text>
               { true &&
-              <Text color='green' size='large'> 
-                { inputValue && (estIncrease !== 0) && `(+ ${estIncrease}%)` }
-              </Text>}
+                <Text color='green' size='medium'> 
+                  { inputValue && (estIncrease !== 0) && `(+ ${estIncrease}%)` }
+                </Text>}
             </Box>
-            {/* <Text color='text-weak' size='xxsmall'>if you deposit {inputValue||0} Eth</Text> */}
           </Box>
-
+            
         </Box>
 
         { warningMsg &&
@@ -200,7 +197,7 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
           background={( !(inputValue>0) || depositDisabled) ? 'brand-transparent' : 'brand'}
           onClick={(!(inputValue>0) || depositDisabled)? ()=>{}:()=>depositProcedure(inputValue)}
           align='center'
-          pad='medium'
+          pad='small'
         >
           <Text
             weight='bold'

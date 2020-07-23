@@ -1,12 +1,13 @@
 import React from 'react';
 import { ethers, BigNumber } from 'ethers';
 
-import { AnyARecord } from 'dns';
 import * as utils from '../utils';
-import { useCallTx, useMath } from '../hooks';
+import { useCallTx, useMath, useMarket } from '../hooks';
 
 import { YieldContext } from './YieldContext';
 import { ConnectionContext } from './ConnectionContext';
+
+import { IYieldSeries } from '../types';
 
 const SeriesContext = React.createContext<any>({});
 
@@ -16,6 +17,11 @@ function reducer(state:any, action:any) {
       return {
         ...state,
         seriesData: action.payload,
+      };
+    case 'updateRates':
+      return {
+        ...state,
+        seriesRates: action.payload,
       };
     case 'updateAggregates':
       return {
@@ -43,7 +49,7 @@ const SeriesProvider = ({ children }:any) => {
 
   const initState = { 
     seriesData : new Map(),
-    seriesAggregates: {}, // TODO convert to Map
+    seriesAggregates: {}, // TODO convert to Map 
     seriesRates: new Map(),
     activeSeries: null,
   };
@@ -52,33 +58,39 @@ const SeriesProvider = ({ children }:any) => {
   const { state: yieldState } = React.useContext(YieldContext);
   const { userData, feedData, deployedContracts } = yieldState;
 
+  const { previewMarketTx, checkMarketDelegate }  = useMarket();
   const [ callTx ] = useCallTx();
   const {
     collAmount,
     collValue,
-    debtVal,
+    collPrice,
+    debtValAdj,
     collRatio,
-    yieldRate,
-    estimateCollRatio: estimateRatio,
-    minSafeCollatAmount,
-    maxDai 
+    collPercent,
+    yieldAPR,
+    estCollRatio: estimateRatio,
+    minSafeColl,
+    daiAvailable,
   } = useMath();
 
   /*  Runs through all the metric calculations  - no async */
   const _runAggregation = () => {
     const numberOfSeries = state.seriesData.size;
     const collateralAmount = collAmount();
+    const collateralPrice = collPrice();
     const collateralValue = collValue();
+
     let debtYDai = BigNumber.from('0');
     state.seriesData.forEach((x:any)=>{
       debtYDai = x.wethDebtYDai.add(debtYDai);
     });
     const debtYDaiValue = null; // Not needed for now - possibly unknown see below
     const totaldebtDai = null; // Unknown here - because each series has different Dai/yDai rates
-    const debtValue = debtVal(debtYDai); // calculated as yDai at maturity. i.e. 1:1
+    const debtValue = debtValAdj(debtYDai); // calculated as yDai at maturity. i.e. 1:1 
     const collateralRatio = collRatio(collateralValue, debtValue);
-    const minSafeCollateral = minSafeCollatAmount(debtValue, BigNumber.from('150'));
-    const daiAvailable = maxDai(collateralValue, debtValue, BigNumber.from('150'));
+    const collateralPercent = collPercent(collateralRatio);
+    const minSafeCollateral = minSafeColl(debtValue, 1.5, collateralPrice);
+    const maxDaiAvailable = daiAvailable(collateralValue, debtValue, 1.5);
 
     return {
       numberOfSeries,
@@ -87,7 +99,7 @@ const SeriesProvider = ({ children }:any) => {
       ethPosted_: yieldState?.userData?.ethPosted_,
       ethBalance: yieldState?.userData?.ethBalance,
       ethBalance_: yieldState?.userData?.ethBalance_,
-      // calculated values
+      // Calculated values
       debtYDai,
       debtYDai_: parseFloat(ethers.utils.formatEther(debtYDai)),
       debtValue,
@@ -98,26 +110,35 @@ const SeriesProvider = ({ children }:any) => {
       collateralValue_: parseFloat(ethers.utils.formatEther(collateralValue)),
       collateralRatio,
       collateralRatio_: parseFloat(collateralRatio.toString()),
+      collateralPercent,
+      collateralPercent_ : parseFloat(collateralPercent.toString()),
       minSafeCollateral,
       minSafeCollateral_: parseFloat(ethers.utils.formatEther(minSafeCollateral)),
-      daiAvailable,
-      daiAvailable_: parseFloat(ethers.utils.formatEther(daiAvailable)),
+      maxDaiAvailable,
+      maxDaiAvailable_: parseFloat(ethers.utils.formatEther(maxDaiAvailable)),
       // useful functions exported
       estimateRatio,
     };
   };
 
   /* Get the yield market rates for a particular set of series */
-  const _getRates = async (_seriesArr:any[]) => {
-    const _rates = state.seriesRates;
+  const _getRates = async (seriesArr:IYieldSeries[]) => {
+    /* 
+      Rates:
+        sellYDai -> Returns how much Dai would be obtained by selling 1 yDai
+        buyDai -> Returns how much yDai would be required to buy 1 Dai
+        buyYDai -> Returns how much Dai would be required to buy 1 yDai
+        sellDai -> Returns how much yDai would be obtained by selling 1 Dai
+    */
     const _ratesData = await Promise.all(
-      _seriesArr.map(async (x:any, i:number) => {
-        const sellYDai = await callTx(_seriesArr[0].market, 'Market', 'sellYDaiPreview', [ethers.utils.parseEther('1')]);
-        const buyYDai = await callTx(_seriesArr[0].market, 'Market', 'buyYDaiPreview', [ethers.utils.parseEther('1')]);
-        const sellDai = await callTx(_seriesArr[0].market, 'Market', 'sellChaiPreview', [ethers.utils.parseEther('1')]);
-        const buyDai = await callTx(_seriesArr[0].market, 'Market', 'buyChaiPreview', [ethers.utils.parseEther('1')]);
+      seriesArr.map( async (x:any, i:number) => {
+        // TODO fix this when all markets are operational => x.market (not seriesArr[0].market )
+        const sellYDai = await previewMarketTx('sellYDai', seriesArr[0].marketAddress, 1);
+        const buyYDai = await previewMarketTx('buyYDai', seriesArr[0].marketAddress, 1);
+        const sellDai = await previewMarketTx('sellDai', seriesArr[0].marketAddress, 1);
+        const buyDai = await previewMarketTx('buyDai', seriesArr[0].marketAddress, 1);
         return {
-          name: x.name,
+          maturity: x.maturity,
           sellYDai,
           buyYDai,
           sellDai,
@@ -126,95 +147,93 @@ const SeriesProvider = ({ children }:any) => {
       })
     );
 
-    _ratesData.forEach((x:any)=>{
-      _rates.set(
-        x.name,
+    return _ratesData.reduce((acc: any, x:any) => {
+      return acc.set(
+        x.maturity,
         { ...x,
-          // wethDebtYDai_: parseFloat(ethers.utils.formatEther(x.wethDebtYDai.toString())),
-          // wethDebtDai_: parseFloat(ethers.utils.formatEther(x.wethDebtDai.toString())),
-          // yieldRate_: parseFloat(ethers.utils.formatEther(x.yieldRate.toString())),
-          // yieldPercent_: parseFloat(ethers.utils.formatEther(x.yieldRate.toString()))*100,
+          sellYDai_: parseFloat(ethers.utils.formatEther(x.sellYDai.toString())),
+          buyYDai_: parseFloat(ethers.utils.formatEther(x.buyYDai.toString())),
+          sellDai_: parseFloat(ethers.utils.formatEther(x.sellDai.toString())),
+          buyDai_: parseFloat(ethers.utils.formatEther(x.buyDai.toString())),
         }
       );
-    });
-    console.log(_rates);
-    return _rates;
+    }, state.seriesRates);
   };
 
   /* Get the data for a particular series, or set of series */
-  const _getSeriesData = async (_seriesArr:any[], _rates:Map<string, any>) => {
+  const _getSeriesData = async (seriesArr:IYieldSeries[], rates:Map<string, any>) => {
     const _seriesData:any[] = [];
-    const _positions = state.seriesData;
 
     await Promise.all(
-      _seriesArr.map( async (x:any, i:number) => {
-
-        const r = _rates.get(x.name);
-        console.log(r.sellYDai);
+      seriesArr.map( async (x:any, i:number) => {
+        const _rates = rates.get(x.maturity);
+        console.log(_rates.sellYDai.toString());
         _seriesData.push(x);
         try {
-          _seriesData[i].yDaiBalance = account? await callTx(x.yDai, 'YDai', 'balanceOf', [account]): BigNumber.from('0') ;
-          _seriesData[i].isMature = await callTx(x.yDai, 'YDai', 'isMature', []);
+          _seriesData[i].hasDelegated = await checkMarketDelegate(x.marketAddress, x.yDaiAddress);
+          _seriesData[i].yDaiBalance = account? await callTx(x.yDaiAddress, 'YDai', 'balanceOf', [account]): BigNumber.from('0') ;
+          _seriesData[i].isMature = await callTx(x.yDaiAddress, 'YDai', 'isMature', []);
           _seriesData[i].wethDebtYDai = account? await callTx(deployedContracts.Controller, 'Controller', 'debtYDai', [utils.ETH, x.maturity, account]): BigNumber.from('0');
           _seriesData[i].wethDebtDai = account? utils.mulRay( _seriesData[i].wethDebtYDai, feedData.amm.rates[x.maturity]): BigNumber.from('0');
-          _seriesData[i].yieldRate = yieldRate(feedData.amm.rates[x.maturity]);
+          _seriesData[i].yieldAPR = yieldAPR(_rates.sellYDai, x.maturity);
         } catch (e) {
           console.log(`Could not load account positions data: ${e}`);
         }
       })
     );
 
-    _seriesData.forEach((x:any)=>{
-      _positions.set(
-        x.name,
+    return _seriesData.reduce((acc: Map<string, any>, x:any) => {
+      return acc.set(
+        x.maturity,
         { ...x,
+          yDaiBalance_: parseFloat(ethers.utils.formatEther(x.yDaiBalance.toString())),
           wethDebtYDai_: parseFloat(ethers.utils.formatEther(x.wethDebtYDai.toString())),
           wethDebtDai_: parseFloat(ethers.utils.formatEther(x.wethDebtDai.toString())),
-          yieldRate_: parseFloat(ethers.utils.formatEther(x.yieldRate.toString())),
-          yieldPercent_: parseFloat(ethers.utils.formatEther(x.yieldRate.toString()))*100,
+          yieldAPR_: x.yieldAPR.toFixed(2),
         }
       );
-    });
-    console.log(_positions);
-    return _positions;
+    }, state.seriesData);
   };
 
-  // TODO  add typings for a series
-
   // Get the Positions data for a series list
-  const getPositions = async (seriesArr:any[], force:boolean) => {
+  const getPositions = async (seriesArr:IYieldSeries[], force:boolean) => {
     let filteredSeriesArr;
-
     if (force !== true) {
-      filteredSeriesArr = seriesArr.filter(x => !state.seriesData.has(x.name));
+      filteredSeriesArr = seriesArr.filter(x => !state.seriesData.has(x.maturity));
     } else {
       filteredSeriesArr = seriesArr;
     }
+    if ( !yieldState?.isLoading && filteredSeriesArr.length > 0) {
 
-    if( !yieldState?.isLoading && filteredSeriesArr.length > 0) {
       dispatch({ type:'isLoading', payload: true });
 
+      /* Get series rates */
       const rates = await _getRates(filteredSeriesArr);
-      dispatch( { type:'updateSeries', payload: rates });
+      dispatch( { type:'updateRates', payload: rates });
 
+      /* Build/re-build series map */
       const seriesMap:any = await _getSeriesData(filteredSeriesArr, rates);
       dispatch( { type:'updateSeries', payload: seriesMap });
 
+      /* set the active series */
       if (!state.activeSeries) {
-        /* if no active series, set it to the first entry of the map. */
+        /* if no active series or , set it to the first entry of the map. */
         dispatch({ type:'setActiveSeries', payload: seriesMap.entries().next().value[1] });
       } else if (seriesArr.length===1 ){
-        /* or, if there was only one series updated set that one as the active series */
-        dispatch({ type:'setActiveSeries', payload: seriesMap.get(seriesArr[0].name) });
+        /* if there was only one series updated set that one as the active series */
+        dispatch({ type:'setActiveSeries', payload: seriesMap.get(seriesArr[0].maturity) });
+      } else {
+        // other situation catch
+        dispatch({ type:'setActiveSeries', payload: seriesMap.entries().next().value[1] });
       }
+
       /* if there is an account associated, run aggregation */
       account && dispatch({ type:'updateAggregates', payload: _runAggregation() });
+
       dispatch({ type:'isLoading', payload: false });
 
     } else {
-
       console.log('Positions exist... force fetch if required');
-
     }
   };
 
@@ -229,9 +248,8 @@ const SeriesProvider = ({ children }:any) => {
   }, [ account, chainId, yieldState ]);
 
   const actions = {
-    // getPositions: (x:any[]) => getPositions(x, false),
-    refreshPositions: (x:any[]) => getPositions(x, true),
-    setActiveSeries: (x:string) => dispatch({ type:'setActiveSeries', payload: x }),
+    refreshPositions: (series:IYieldSeries[]) => getPositions(series, true),
+    setActiveSeries: (seriesMaturity:string) => dispatch({ type:'setActiveSeries', payload: state.seriesData.get(seriesMaturity) }),
   };
 
   return (

@@ -35,10 +35,10 @@ const YieldSeriesMenuItem = ({
   const tooltipColor = { color: 'background-mid', opacity: 1 };
   const ref = React.useRef<any>();
 
-  const getBalanceColor = (_bal:string, _selected:boolean ):string => {
-    if (parseInt(_bal, 10) > 0) {
+  const getBalanceColor = (_bal:number, _selected:boolean ):string => {
+    if (_bal > 0) {
       return _selected? 'brand' : 'brand-transparent';
-    } if (parseInt(_bal, 10) > 0) {
+    } if (_bal > 0) {
       return _selected? 'secondary': 'secondary-transparent';
     } 
     return _selected? 'text': 'border';
@@ -89,7 +89,7 @@ const YieldSeriesMenuItem = ({
             <Text size="small" weight={selected ? 'bold': 'normal'}>{moment(maturity_).format('MMMM Y')}</Text>
             <Text 
               size="xsmall" 
-              color={getBalanceColor(yDaiBalance_, !!selected)}
+              // color={getBalanceColor(yDaiBalance_, !!selected)}
             >
               Balance: {yDaiBalance_} yDai
             </Text> 
@@ -98,7 +98,7 @@ const YieldSeriesMenuItem = ({
 
         <Box direction='row'>
           <Box justify='end'>
-            <Text color={parseInt(yDaiBalance_, 10) === 0 ? 'border': seriesColor}> 
+            <Text color={yDaiBalance_ === 0 ? 'border': seriesColor}> 
               <Star />
             </Text>
           </Box>

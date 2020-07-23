@@ -29,6 +29,9 @@ const DashLend = () => {
 
   const { state: { deployedContracts, yieldData, userData }, actions } = React.useContext(YieldContext);
 
+  const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
+  const { isLoading, seriesAggregates, activeSeries } = seriesState;
+
   const txHistory = userData?.txHistory?.items || [];
   const txHistory_ = txHistory.filter((x:any) => x.event==='Borrowed' ).map((x:any) => {
     return {
@@ -62,10 +65,37 @@ const DashLend = () => {
           >
             <Box basis='1/2'><Text color='text-weak' size='xsmall'>SERIES</Text></Box>
             <Box><Text color='text-weak' size='xsmall'>VALUE AT MATURITY</Text></Box>
-            <Box><Text color='text-weak' size='xsmall'>ACTION</Text></Box>
+            {/* <Box><Text color='text-weak' size='xsmall'>ACTION</Text></Box> */}
             {/* <Box /> */}
           </Box>
-          series list here.
+          
+          {activeSeries && 
+          <Box
+            direction='row' 
+            justify='between'
+            onClick={()=>console.log(activeSeries.maturity)}
+            hoverIndicator='background-mid'
+            border='top'
+            fill
+            pad='medium'
+          >
+            <Box>
+              <Text alignSelf='start' size='medium' color='brand'>
+                {activeSeries.yieldAPR_}%
+              </Text>
+            </Box>
+            <Box>
+              <Text alignSelf='start' size='medium' color='brand'>
+                {activeSeries.displayName}
+              </Text>
+            </Box>
+            <Box>
+              <Text alignSelf='start' size='medium' color='brand'>
+                {activeSeries.wethDebtDai_}
+              </Text>
+            </Box>
+          </Box>}
+              
         </Box>
 
 
@@ -148,15 +178,18 @@ const DashLend = () => {
                 hoverIndicator='background-mid'
                 onClick={()=>console.log('click')}
               >
-                <Box basis='2/5'> {x.event} </Box>
-                <Box> {x.amount} </Box>
-                <Box> {x.date} </Box>
-                <Box> ACTION A </Box>
+                <Box basis='2/5'><Text>{x.event}</Text> </Box>
+                <Box><Text> {x.amount} </Text></Box>
+                <Box><Text> {x.date} </Text></Box>
+                <Box><Text> : </Text></Box>
               </Box>
             );
           }):
-          <Box>
-            Loading history...
+          <Box align='center'>
+            { !isLoading ? 
+              <Text>Loading...</Text> 
+              : 
+              <Text> No history</Text> } 
           </Box>}
         </Box>
       </Box>

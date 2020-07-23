@@ -2,20 +2,29 @@ import { BigNumber } from 'ethers';
 
 export interface IYieldSeries {
   name: string
+  displayName: string;
   maturity: number;
   maturity_: Date;
-  YDai: string;
-  yDaiBalance_: any;
-  yDaiBalance: any;
-  symbol:string;
+  isMature: boolean;
+  marketAddress: string;
+  yDaiAddress: string;
+
+  yDaiBalance_: number;
+  yDaiBalance: BigNumber;
+
+  symbol?:string;
   id?: string;
-  rate?: any;
   currentValue?: any;
   seriesColor?: string;
+  wethDebtDai?: BigNumber;
+  wethDebtDai_?: number;
+  wethDebtYDai?: BigNumber;
+  wethDebtYDai_?: number;
+  yieldAPR?: number;
+  yieldAPR_?: string;
 }
 
 export interface ISeriesPosition {
-
 }
 
 export interface IUser {

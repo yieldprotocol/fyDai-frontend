@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Button, Heading, TextInput, Text } from 'grommet';
 import DepositAction from './DepositAction';
-import WithdrawAction from './WithdrawAction';
+import WithdrawAction from './EthWithdrawAction';
 
 import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';

@@ -2,16 +2,11 @@ import React from 'react';
 import { ConnectionContext } from '../contexts/ConnectionContext';
 import { NotifyContext } from '../contexts/NotifyContext';
 
-
-
 export const useTxActive = (type:string) => {
-
- // TODO create the useTxActive hook
-
+  // TODO create the useTxActive hook
 };
 
 export const useCachedState = (key:string, initialValue:any) => {
-
   const { state:{ chainId } } = React.useContext(ConnectionContext);
   // const genKey = `${chainId}_${key}` || key;
   const genKey = key;
@@ -19,7 +14,7 @@ export const useCachedState = (key:string, initialValue:any) => {
     () => {
       try {
         const item = window.localStorage.getItem(genKey);
-        // Parse stored json or if none, return initialValue
+        /* Parse stored json or if none, return initialValue */
         return item ? JSON.parse(item) : initialValue;
       } catch (error) {
         // If error also return initialValue and handle error - needs work
@@ -43,9 +38,7 @@ export const useCachedState = (key:string, initialValue:any) => {
 };
 
 export const useDebounce = () => {
-
   console.log('unBoing,..Debounc\'d');
-
 };
 
 export const useAsync = (asyncFunction:any, immediate = true) => {
