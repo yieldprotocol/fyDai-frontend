@@ -44,7 +44,7 @@ export const useMarket = () => {
     const parsedAmount = ethers.utils.parseEther(amount.toString());
     const marketAddr = ethers.utils.getAddress(marketAddress);
     const tokenAddr = ethers.utils.getAddress(tokenAddress);
-    
+
     /* Contract interaction */
     setApproveActive(true);
     const contract = new ethers.Contract(
@@ -56,7 +56,7 @@ export const useMarket = () => {
       tx = await contract.approve(marketAddr, parsedAmount);
     } catch (e) {
       dispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed.', type:'error' } } );
-      console.log(e);
+      dispatch({ type: 'txComplete', payload:{ tx } } );
       setApproveActive(false);
       return;
     }
@@ -64,7 +64,7 @@ export const useMarket = () => {
     dispatch({ type: 'txPending', payload:{ tx, message: `Token approval of ${amount} pending...` } } );
     await tx.wait();
     setApproveActive(false);
-    dispatch({ type: 'txComplete', payload:{ tx, message:`Token approval of ${amount} complete. ${tokenAddress} and ${marketAddress}` } } );
+    dispatch({ type: 'txComplete', payload:{ tx } } );
   };
 
   /**
@@ -80,6 +80,10 @@ export const useMarket = () => {
     yDaiIn: number
   ) => {
     let tx:any;
+    const overrides = { 
+      // nonce: signer.getTransactionCount().then( (nonce:any) => nonce + queue) 
+      gasLimit: BigNumber.from('250000')
+    };
     const parsedAmount = ethers.utils.parseEther(yDaiIn.toString());
     const fromAddr = account && ethers.utils.getAddress(account);
     const toAddr = fromAddr;
@@ -90,16 +94,19 @@ export const useMarket = () => {
     /// @param yDaiIn Amount of yDai being sold that will be taken from the user's wallet
     const contract = new ethers.Contract( marketAddr, marketAbi, signer );
     try {
-      tx = await contract.sellYDai(fromAddr, toAddr, parsedAmount);
+      tx = await contract.sellYDai(fromAddr, toAddr, parsedAmount, overrides);
     } catch (e) {
       dispatch({ type: 'notify', payload:{ message:'Error Selling yDai!', type:'error' } } );
+      dispatch({ type: 'txComplete', payload:{ tx } } );
       setSellActive(false);
       return;
     }
     dispatch({ type: 'txPending', payload:{ tx, message: `Sell yDai ${yDaiIn} pending...`, type:'SELL' } } );
     await tx.wait();
     setSellActive(false);
-    dispatch({ type: 'txComplete', payload:{ tx, message:`Sell yDai ${yDaiIn} complete.` } } );
+    dispatch({ type: 'txComplete', payload:{ tx } } );
+    // eslint-disable-next-line consistent-return
+    return tx;
   };
 
 
@@ -117,6 +124,12 @@ export const useMarket = () => {
     yDaiOut: number
   ) => {
     let tx:any;
+
+    const overrides = { 
+      // nonce: signer.getTransactionCount().then( (nonce:any) => nonce + queue) 
+      gasLimit: BigNumber.from('250000')
+    };
+
     const parsedAmount = ethers.utils.parseEther(yDaiOut.toString());
     const fromAddr = ethers.utils.getAddress(yDaiAddress);
     const toAddr = account && ethers.utils.getAddress(account);
@@ -127,18 +140,20 @@ export const useMarket = () => {
     /// @param yDaiOut Amount of yDai being bought that will be deposited in `to` wallet
     const contract = new ethers.Contract( marketAddr, marketAbi, signer );
     try {
-      tx = await contract.buyYDai(fromAddr, toAddr, parsedAmount);
+      tx = await contract.buyYDai(fromAddr, toAddr, parsedAmount, overrides);
     } catch (e) {
       dispatch({ type: 'notify', payload:{ message:'Error Buying yDai!', type:'error' } } );
+      dispatch({ type: 'txComplete', payload:{ tx } } );
       setSellActive(false);
       return;
     }
-    dispatch({ type: 'txPending', payload:{ tx, message: `Buying yDai ${yDaiOut} pending...`, type:'SELL' } } );
+    dispatch({ type: 'txPending', payload:{ tx, message: `Buying yDai ${yDaiOut} pending...`, type:'BUY' } } );
     await tx.wait();
     setSellActive(false);
-    dispatch({ type: 'txComplete', payload:{ tx, message:`Buying yDai ${yDaiOut} complete.` } } );
+    dispatch({ type: 'txComplete', payload:{ tx } } );
+    // eslint-disable-next-line consistent-return
+    return tx;
   };
-
 
   /**
    * @dev Sell Dai/Chai for yDai
@@ -156,8 +171,10 @@ export const useMarket = () => {
   ) => {
     let tx:any;
 
-    const noncePromise = signer.getTransactionCount();
-    const overrides = { nonce: noncePromise.then((nonce:any) => nonce + queue) };
+    const overrides = { 
+      // nonce: signer.getTransactionCount().then( (nonce:any) => nonce + queue) 
+      gasLimit: BigNumber.from('250000')
+    };
 
     const parsedAmount = ethers.utils.parseEther(daiIn.toString());
     const fromAddr = account && ethers.utils.getAddress(account);
@@ -169,16 +186,20 @@ export const useMarket = () => {
     /// @param chaiIn Amount of chai being sold that will be taken from the user's wallet
     const contract = new ethers.Contract( marketAddr, marketAbi, signer );
     try {
-      tx = await contract.sellDai(fromAddr, toAddr, parsedAmount, await overrides);
+      // tx = await contract.sellDai(fromAddr, toAddr, parsedAmount, await overrides);
+      tx = await contract.sellDai(fromAddr, toAddr, parsedAmount, overrides);
     } catch (e) {
-      dispatch({ type: 'notify', payload:{ message:'Error Buying yDai!', type:'error' } } );
+      dispatch({ type: 'notify', payload:{ message:'Error Selling Dai!', type:'error' } } );
+      dispatch({ type: 'txComplete', payload:{ tx } } );
       setSellActive(false);
       return;
     }
-    dispatch({ type: 'txPending', payload:{ tx, message: `Selling yDai ${daiIn} pending...`, type:'SELL' } } );
+    dispatch({ type: 'txPending', payload:{ tx, message: `Selling Dai ${daiIn} pending...`, type:'SELL' } } );
     await tx.wait();
     setSellActive(false);
-    dispatch({ type: 'txComplete', payload:{ tx, message:`Selling yDai ${daiIn} complete.` } } );
+    dispatch({ type: 'txComplete', payload:{ tx } } );
+    // eslint-disable-next-line consistent-return
+    return tx;
   };
 
 
@@ -198,10 +219,12 @@ export const useMarket = () => {
     daiOut: number,
     queue: number,
   ) => {
-    let buyTx:any;
+    let tx:any;
 
-    const noncePromise = signer.getTransactionCount();
-    const overrides = { nonce: noncePromise.then((nonce:any) => nonce + queue) };
+    const overrides = { 
+      // nonce: signer.getTransactionCount().then( (nonce:any) => nonce + queue) 
+      gasLimit: BigNumber.from('250000')
+    };
 
     const parsedAmount = ethers.utils.parseEther(daiOut.toString());
     // const parsedAmount = daiOut;
@@ -214,20 +237,20 @@ export const useMarket = () => {
     /// @param chaiOut Amount of chai being bought that will be deposited in `to` wallet
     const contract = new ethers.Contract( marketAddr, marketAbi, signer );
     try {
-      // console.log(parsedAmount);
-      // console.log(ethers.utils.parseEther('1'));
-      buyTx = await contract.buyDai(fromAddr, toAddr, parsedAmount, await overrides );
-      console.log(buyTx);
+      tx = await contract.buyDai(fromAddr, toAddr, parsedAmount, overrides );
     } catch (e) {
       console.log(e);
       dispatch({ type: 'notify', payload:{ message:'Error Buying Dai!', type:'error' } } );
+      dispatch({ type: 'txComplete', payload:{ tx } } );
       setBuyActive(false);
       return;
     }
-    dispatch({ type: 'txPending', payload:{ tx: buyTx, message: `Buying ${daiOut} Dai pending...`, type:'BUYDAI' } } );
-    await buyTx.wait();
+    dispatch({ type: 'txPending', payload:{ tx, message: `Buying ${daiOut} Dai pending...`, type:'BUY' } } );
+    await tx.wait();
     setBuyActive(false);
-    dispatch({ type: 'txComplete', payload:{ tx: buyTx, message:`Buying ${daiOut} Dai complete.` } } );
+    dispatch({ type: 'txComplete', payload:{ tx } } );
+    // eslint-disable-next-line consistent-return
+    return tx;
   };
 
   /**
@@ -250,10 +273,10 @@ export const useMarket = () => {
     txType: string,
     marketAddress: string,
     amount: number
-  ) => {
+  ): Promise<BigNumber> => {
     const parsedAmount = ethers.utils.parseEther(amount.toString());
     const marketAddr = ethers.utils.getAddress(marketAddress);
-    const contract = new ethers.Contract( marketAddr, marketAbi, provider);
+    const contract = new ethers.Contract( marketAddr, marketAbi, provider );
     let result;
     try {
       switch (txType.toUpperCase()) {

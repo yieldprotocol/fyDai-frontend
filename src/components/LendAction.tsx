@@ -44,7 +44,7 @@ const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   const { getTokenAllowance } = useBalances();
   
   const [ inputValue, setInputValue ] = React.useState<any>();
-  const [ borrowDisabled, setBorrowDisabled ] = React.useState<boolean>(false);
+  const [ lendDisabled, setLendDisabled ] = React.useState<boolean>(false);
   const [ selectorOpen, setSelectorOpen ] = React.useState<boolean>(false);
 
   const [ approved, setApproved ] = React.useState<any>(0);
@@ -81,23 +81,16 @@ const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   }, [inputValue]);
   
   useEffect(() => {
-    // if (inputValue && activeSeries) {
-    //   const newEst = ( activeSeries.yieldPercent_ * parseFloat(inputValue));
-    //   setEstAtMaturity(newEst);
-    // }
-  
-    // if ( inputValue && ( inputValue > maxDaiAvailable_ ) ) {
-    //   // setDepositDisabled(true);
-    //   setWarningMsg(null);
-    //   setErrorMsg('That amount exceeds the amount of Dai you have'); 
-    // } else if (inputValue && ( inputValue > Math.round(maxDaiAvailable_-1) ) ) {
-    //   setErrorMsg(null);
-    //   setWarningMsg('If you borrow right up to your maximum allowance, there is high probability you will be liquidated soon!');
-    // } else {
-    //   // setDepositDisabled(false);
-    //   setWarningMsg(null);
-    //   setErrorMsg(null);
-    // }
+
+    if ( inputValue && ( inputValue > userData.daiBalance_ ) ) {
+      setLendDisabled(true);
+      setWarningMsg(null);
+      setErrorMsg('That amount exceeds the amount of Dai you have'); 
+    } else {
+      setLendDisabled(false);
+      setWarningMsg(null);
+      setErrorMsg(null);
+    }
   }, [ inputValue ]);
   
   useEffect(() => {
@@ -112,7 +105,7 @@ const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
       { sellOpen && <DaiWithDrawAction close={()=>setSellOpen(false)} /> }
       <Box flex='grow' justify='between'>
         <Box gap='medium' align='center' fill='horizontal'>
-          <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Choose a series</Text>
+          <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Selected series</Text>
           <Box
             direction='row-responsive'
             fill='horizontal'
@@ -120,8 +113,9 @@ const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
             align='center'
           >
             <Box 
-              round='medium'
+              round='xsmall'
               background='brand-transparent'
+              border='all'
               onClick={()=>setSelectorOpen(true)}
               hoverIndicator='brand'
               direction='row'
@@ -129,7 +123,7 @@ const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
               pad='small'
               flex
             >
-              { activeSeries? activeSeries.displayName : 'Loading...' }
+              <Text color='brand' size='large'>{ activeSeries? `${activeSeries.yieldAPR_}% ${activeSeries.displayName}` : 'Loading...' }</Text>
             </Box>
   
             <Box justify='center'>
@@ -157,7 +151,8 @@ const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
             >
               <Box 
                 round='medium'
-                background='brand-transparent'
+                // background='brand-transparent'
+                border='all'
                 direction='row'
                 fill='horizontal'
                 pad='small'
@@ -180,7 +175,7 @@ const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
                   onClick={()=>setInputValue(userData.daiBalance_)}
                   hoverIndicator='brand-transparent'
                   border='all'
-              // border={{ color:'brand' }}
+                  // border={{ color:'brand' }}
                   pad={{ horizontal:'small', vertical:'small' }}
                   justify='center'
                 >
@@ -197,7 +192,7 @@ const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
                     <Text color='text-weak' size='xsmall'>Estimated APR</Text>
                     <Help />
                   </Box>
-                  <Text color={!inputValue? 'brand-transparent':'brand'} weight='bold' size='large'> {activeSeries && activeSeries.yieldAPR_ || ''}% </Text>
+                  <Text color={!inputValue? 'brand-transparent':'brand'} weight='bold' size='medium'> {activeSeries && activeSeries.yieldAPR_ || ''}% </Text>
                 </Box>
 
                 <Box gap='small'>
@@ -205,7 +200,7 @@ const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
                     <Text color='text-weak' size='xsmall'>Approx. Dai received at maturity</Text>
                     <Help />
                   </Box>
-                  <Text color={!inputValue? 'brand-transparent':'brand'} weight='bold' size='large'> 
+                  <Text color={!inputValue? 'brand-transparent':'brand'} weight='bold' size='medium'> 
                     { yDaiValue.toFixed(2) } Dai on {activeSeries && Moment(activeSeries.maturity_).format('DD MMMM YYYY')}
                   </Text>
                 </Box>
@@ -217,7 +212,7 @@ const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
                     <Text color='text-weak' size='xsmall'>Wallet Dai balance</Text>
                     <Help />
                   </Box>
-                  <Text color='brand' weight='bold' size='large'> {userData.daiBalance_?`${userData.daiBalance_} Dai`: '-'} </Text>
+                  <Text color='brand' weight='bold' size='medium'> {userData.daiBalance_?`${userData.daiBalance_} Dai`: '-'} </Text>
                 </Box>
               </Box>
             </Box>
@@ -261,15 +256,15 @@ const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
           <Box
             fill='horizontal'
             round='medium'
-            background={( !(inputValue>0) || borrowDisabled) ? 'brand-transparent' : 'brand'}
-            onClick={(!(inputValue>0) || borrowDisabled)? ()=>{}:()=>lendProcedure(inputValue)}
+            background={( !(inputValue>0) || lendDisabled) ? 'brand-transparent' : 'brand'}
+            onClick={(!(inputValue>0) || lendDisabled)? ()=>{}:()=>lendProcedure(inputValue)}
             align='center'
-            pad='medium'
+            pad='small'
           >
             <Text 
               weight='bold'
               size='large'
-              color={( !(inputValue>0) || borrowDisabled) ? 'text-xweak' : 'text'}
+              color={( !(inputValue>0) || lendDisabled) ? 'text-xweak' : 'text'}
             >
               {`Lend ${inputValue || ''} Dai`}
             </Text>

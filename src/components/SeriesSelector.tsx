@@ -108,7 +108,7 @@ const SeriesSelector = (props:any) => {
                 {activeSeries.wethDebtDai_}
               </Text>
             </Box>
-            <Box> 
+            <Box>
               <Box 
                 round
                 background='brand'

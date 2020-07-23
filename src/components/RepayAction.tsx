@@ -79,7 +79,7 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
       { !repayActive && !txActive &&
       <Box flex='grow' justify='between'>
         <Box gap='medium' align='center' fill='horizontal'>
-          <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Choose a series</Text>
+          <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Selected series</Text>
           <Box
             direction='row-responsive'
             fill='horizontal'
@@ -87,14 +87,17 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
             align='center'
           >
             <Box
-              round='medium'
+              round='xsmall'
               background='brand-transparent'
+              border='all'
+              onClick={()=>setSelectorOpen(true)}
+              // hoverIndicator='brand'
               direction='row'
               fill
               pad='small'
               flex
             >
-              { activeSeries? activeSeries.displayName : 'Loading...' }
+              <Text color='brand' size='large'>{ activeSeries? `${activeSeries.yieldAPR_}% ${activeSeries.displayName}` : 'Loading...' }</Text>
             </Box>
 
             <Box justify='center'>
@@ -112,6 +115,30 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
             </Box>
           </Box>
 
+          <Box direction='row-responsive' pad={{ horizontal:'medium' }} justify='start' gap='large' fill>
+            
+            <Box gap='small'>
+              <Box direction='row' gap='small'>
+                <Text color='text-weak' size='xsmall'>Current Debt</Text>
+                <Help />
+              </Box>
+              <Box direction='row' gap='small'>
+                {/* <Text color={maxDaiAvailable_? 'brand': 'brand-transparent'} size='xxsmall'>approx.</Text> */}
+                <Text color='brand' weight='bold' size='medium'> {activeSeries?.wethDebtDai_? `${activeSeries.wethDebtDai_.toFixed(2)} Dai`: ''}  </Text>
+              </Box>
+            </Box>
+
+            <Box gap='small'>
+              <Box direction='row' gap='small'>
+                <Text color='text-weak' size='xsmall'>Wallet Dai balance</Text>
+                <Help />
+              </Box>
+              <Text color='brand' weight='bold' size='large'> {userData? `${userData.daiBalance_} Dai`:'-'} </Text>
+            </Box>
+
+          </Box>
+
+
           <Box fill gap='medium' margin={{ vertical:'large' }}>
             <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to Repay</Text>
             <Box
@@ -122,7 +149,8 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
             >
               <Box 
                 round='medium'
-                background='brand-transparent'
+                // background='brand-transparent'
+                border='all'
                 direction='row'
                 fill='horizontal'
                 pad='small'
@@ -153,8 +181,7 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
               </Box>
             </Box>
 
-            <Box fill='horizontal' direction='row-responsive' justify='between'>
-
+            {/* <Box fill='horizontal' direction='row-responsive' justify='between'>
               <Box fill gap='small' pad={{ horizontal:'medium' }}>
                 <Box fill direction='row-responsive' justify='between'>
                   <Box gap='small'>
@@ -166,19 +193,7 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
                   </Box>
                 </Box>
               </Box>
-
-              <Box fill gap='small' pad={{ horizontal:'medium' }}>
-                <Box fill direction='row-responsive' justify='between'>
-                  <Box gap='small'>
-                    <Box direction='row' gap='small'>
-                      <Text color='text-weak' size='xsmall'>Wallet Dai balance</Text>
-                      <Help />
-                    </Box>
-                    <Text color='brand' weight='bold' size='large'> {userData? `${userData.daiBalance_} Dai`:'-'} </Text>
-                  </Box>
-                </Box>
-              </Box>
-            </Box>
+            </Box> */}
 
           </Box>
           
@@ -201,7 +216,7 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
             background={( !(inputValue>0) || repayDisabled) ? 'brand-transparent' : 'brand'}
             onClick={(!(inputValue>0) || repayDisabled)? ()=>{}:()=>repayProcedure(inputValue)}
             align='center'
-            pad='medium'
+            pad='small'
           >
             <Text 
               weight='bold'

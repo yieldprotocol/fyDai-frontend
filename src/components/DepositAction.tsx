@@ -97,7 +97,8 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
           >
             <Box 
               round='medium'
-              background='brand-transparent'
+              // background='brand-transparent'
+              border='all'
               direction='row'
               fill='horizontal'
               pad='small'
@@ -114,8 +115,8 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
               // icon={<Text alignSelf='start' size='xsmall'>Eth</Text>}
                 icon={<Ethereum />}
               />
+              
             </Box>
-
             <Box justify='center'>
               <Box
                 round
@@ -136,7 +137,7 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
 
           <Box gap='small'>
             <Text color='text-weak' size='xsmall'>Current Collateral</Text>
-            <Text color='brand' weight='bold' size='large'> {collateralAmount_? `${collateralAmount_.toFixed(4)} Eth` : '-' }</Text>
+            <Text color='brand' weight='bold' size='medium'> {collateralAmount_? `${collateralAmount_.toFixed(4)} Eth` : '-' }</Text>
             { false && 
             <Box pad='xsmall'>
               <Text alignSelf='start' size='xxsmall'>
@@ -146,22 +147,25 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
           </Box>
           <Box gap='small'>
             <Text color='text-weak' size='xsmall'>Collateralisation Ratio</Text>
-            <Text color='brand' weight='bold' size='large'> 
+            <Text color='brand' weight='bold' size='medium'> 
               { (collateralPercent_ && (collateralPercent_ !== 0))? `${collateralPercent_}%`: '-' }
             </Text>
           </Box>
-          <Box gap='small'>
-            <Text color='text-weak' size='xsmall'>Ratio after deposit</Text>
+
+          <Box gap='small' alignSelf='start' align='center'>
+            <Text color='text-weak' size='xsmall'>Collateralization Ratio after withdraw</Text>
             <Box direction='row' gap='small'>
-              <Text color={!inputValue? 'brand-transparent': 'brand'} weight='bold' size='large'> 
-                {(estRatio && estRatio !== 0)? `~${estRatio}%`: collateralPercent_ || '-' }
+              <Text color={!inputValue? 'brand-transparent': 'brand'} size='xxsmall'>approx.</Text> 
+              <Text color={!inputValue? 'brand-transparent': 'brand'} weight='bold' size='medium'> 
+                {(estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '' }
               </Text>
               { true &&
-                <Text color='green' size='large'> 
+                <Text color='green' size='medium'> 
                   { inputValue && (estIncrease !== 0) && `(+ ${estIncrease}%)` }
                 </Text>}
             </Box>
           </Box>
+            
         </Box>
 
         { warningMsg &&
@@ -192,7 +196,7 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
           background={( !(inputValue>0) || depositDisabled) ? 'brand-transparent' : 'brand'}
           onClick={(!(inputValue>0) || depositDisabled)? ()=>{}:()=>depositProcedure(inputValue)}
           align='center'
-          pad='medium'
+          pad='small'
         >
           <Text
             weight='bold'

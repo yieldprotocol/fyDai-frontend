@@ -56,6 +56,9 @@ export const useEthProxy = () => {
     await tx.wait();
     setPostEthActive(false);
     dispatch({ type: 'txComplete', payload:{ tx, message:`Deposit of ${amount} ETH complete` } } );
+    // eslint-disable-next-line consistent-return
+    return tx;
+
   };
 
   /**
@@ -91,6 +94,8 @@ export const useEthProxy = () => {
     await tx.wait();
     setWithdrawEthActive(false);
     dispatch({ type: 'txComplete', payload:{ tx, message:`Withdrawal of ${amount} complete.` } } );
+    // eslint-disable-next-line consistent-return
+    return tx;
   };
 
   return {

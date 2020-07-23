@@ -65,7 +65,7 @@ const DaiWithDrawAction = ({ close }:IWithDrawActionProps) => {
   };
 
   useEffect(()=>{
-    setMaxWithdraw(collateralAmount_- minSafeCollateral_);
+    setMaxWithdraw(activeSeries.yDaiBalance_);
   }, [collateralAmount_, minSafeCollateral_]);
 
   useEffect(() => {
@@ -96,7 +96,8 @@ const DaiWithDrawAction = ({ close }:IWithDrawActionProps) => {
             >
               <Box 
                 round='medium'
-                background='brand-transparent'
+                // background='brand-transparent'
+                border='all'
                 direction='row'
                 fill='horizontal'
                 pad='small'
@@ -168,7 +169,7 @@ const DaiWithDrawAction = ({ close }:IWithDrawActionProps) => {
             background={( !(inputValue>0) || withdrawDisabled) ? 'brand-transparent' : 'brand'}
             onClick={(!(inputValue>0) || withdrawDisabled)? ()=>{}:()=> withdrawProcedure(inputValue)}
             align='center'
-            pad='medium'
+            pad='small'
           >
             <Text
               weight='bold'

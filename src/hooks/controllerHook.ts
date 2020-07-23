@@ -82,6 +82,7 @@ export const useController = () => {
     amount:number
   ) => {
     let tx:any;
+
     /* Processing and sanitizing input */
     const parsedAmount = ethers.utils.parseEther(amount.toString());
     const fromAddr = account && ethers.utils.getAddress(account);
@@ -122,22 +123,25 @@ export const useController = () => {
     amount:number
   ) => {
     let tx:any;
+
     /* Processing and sanitizing input */
-    console.log(amount);
     const parsedAmount = ethers.utils.parseEther(amount.toString());
     const toAddr = account && ethers.utils.getAddress(account);
     const fromAddr = account && ethers.utils.getAddress(account);
     const controllerAddr = ethers.utils.getAddress(controllerAddress);
     const collateralBytes = ethers.utils.formatBytes32String(collateral);
 
+    const matdate = maturity;
+
     /* Contract interaction */
     setBorrowActive(true);
     const contract = new ethers.Contract( controllerAddr, controllerAbi, signer );
+
     try {
-      tx = await contract.borrow(collateralBytes, maturity, fromAddr, toAddr, parsedAmount);
+      tx = await contract.borrow(collateralBytes, matdate, fromAddr, toAddr, parsedAmount);
     } catch (e) {
       dispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed.', type:'error' } } );
-      console.log(e);
+      dispatch({ type: 'txComplete', payload:{ tx } } );
       setBorrowActive(false);
       return;
     }
@@ -145,8 +149,9 @@ export const useController = () => {
     dispatch({ type: 'txPending', payload:{ tx, message: `Borrowing of ${amount} pending...`, type:'BORROW' } } );
     await tx.wait();
     setBorrowActive(false);
-    dispatch({ type: 'txComplete', payload:{ tx, message:`Borrowing of ${amount} complete.` } } );
-    
+    dispatch({ type: 'txComplete', payload:{ tx } } );
+    // eslint-disable-next-line consistent-return
+    return tx;
   };
 
   /**
@@ -185,7 +190,7 @@ export const useController = () => {
       }
     } catch (e) {
       dispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed.', type:'error' } } );
-      console.log(e);
+      dispatch({ type: 'txComplete', payload:{ tx } } );
       setRepayActive(false);
       return;
     }
@@ -193,7 +198,10 @@ export const useController = () => {
     dispatch({ type: 'txPending', payload:{ tx, message: `Repayment of ${amount} pending...`, type:'REPAY' } } );
     await tx.wait();
     setRepayActive(false);
-    dispatch({ type: 'txComplete', payload:{ tx, message:`Repayment of ${amount} complete.` } } );
+    dispatch({ type: 'txComplete', payload:{ tx } } );
+    // eslint-disable-next-line consistent-return
+    return tx;
+
   };
 
   /**
@@ -226,16 +234,14 @@ export const useController = () => {
       tx = await contract.approve(controllerAddr, parsedAmount);
     } catch (e) {
       dispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed.', type:'error' } } );
-      console.log(e);
-      setApproveActive(false);
+      dispatch({ type: 'txComplete', payload:{ tx } } );      setApproveActive(false);
       return;
     }
     /* Transaction reporting & tracking */
     dispatch({ type: 'txPending', payload:{ tx, message: `Token approval of ${amount} pending...` } } );
     await tx.wait();
     setApproveActive(false);
-    dispatch({ type: 'txComplete', payload:{ tx, message:`Token approval of ${amount} complete. ${tokenAddress} and ${controllerAddress}` } } );
-  };
+    dispatch({ type: 'txComplete', payload:{ tx } } );  };
 
   /**
    * Approve the controller to ethProxy for ETH withdrawals.
@@ -261,13 +267,14 @@ export const useController = () => {
       tx = await contract.addDelegate(ethProxyAddr);
     } catch (e) {
       dispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed.', type:'error' } } );
+      dispatch({ type: 'txComplete', payload:{ tx } } );
       console.log(e);
       return;
     }
     /* Transaction reporting & tracking */
     dispatch({ type: 'txPending', payload:{ tx, message: 'Pending once-off approval of Eth withdrawals ...' } } );
     await tx.wait();
-    dispatch({ type: 'txComplete', payload:{ tx, message:'Eth withdrawals permanently approved' } } );
+    dispatch({ type: 'txComplete', payload:{ tx } } );
   };
 
   /**
@@ -278,20 +285,21 @@ export const useController = () => {
    * @param {string} controllerAddress address of the controller.
    * @param {string} ethProxyAddress address of the ethProxy (contract getting approved). 
    * 
-   * @returns {boolean} approved ?
+   * @returns {Promise<boolean>} approved ?
    */
   const checkWithdrawApproval = async (
     controllerAddress:string,
     ethProxyAddress:string
-  ) => {
+  ): Promise<boolean> => {
     const fromAddr = account && ethers.utils.getAddress(account);
     const ethProxyAddr = ethers.utils.getAddress(ethProxyAddress);
     const controllerAddr = ethers.utils.getAddress(controllerAddress);
+    
     const contract = new ethers.Contract( controllerAddr, controllerAbi, provider);
     let res;
     try {
-      // res = await contract.allowance(fromAddr, marketAddr);
-      console.log('checking withdrawal approval..')
+      res = await contract.delegated(fromAddr, ethProxyAddr);
+      // console.log('checking withdrawal approval..');
       res= false;
     }  catch (e) {
       console.log(e);
@@ -305,7 +313,7 @@ export const useController = () => {
     withdraw, withdrawActive,
     borrow, borrowActive,
     repay, repayActive,
-    approveController, approveActive, //TODO remove this if not used
+    approveController, approveActive, // TODO remove this if not used
     approveEthWithdraws,
     checkWithdrawApproval,
   } as const;

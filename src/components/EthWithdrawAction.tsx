@@ -91,7 +91,7 @@ const EthWithdrawAction = ({ close }:IWithDrawActionProps) => {
   }, [ estRatio ]);
 
   useEffect(()=>{
-    if (collateralAmount_ < inputValue ){
+    if (inputValue > maxWithdraw ){
       setWithdrawDisabled(true);
     } else { setWithdrawDisabled(false); }
 
@@ -104,7 +104,9 @@ const EthWithdrawAction = ({ close }:IWithDrawActionProps) => {
   }, [ inputValue ]);
 
   useEffect(()=>{
-    (async () => {setHasApproved(await checkWithdrawApproval(deployedContracts.Controller, deployedContracts.EthProxy));})();
+    (async () => {
+      setHasApproved( await checkWithdrawApproval(deployedContracts.Controller, deployedContracts.EthProxy) );
+    })();
   }, []);
 
   return (
@@ -129,7 +131,8 @@ const EthWithdrawAction = ({ close }:IWithDrawActionProps) => {
             >
               <Box 
                 round='medium'
-                background='brand-transparent'
+                // background='brand-transparent'
+                border='all'
                 direction='row'
                 fill='horizontal'
                 pad='small'
@@ -164,22 +167,30 @@ const EthWithdrawAction = ({ close }:IWithDrawActionProps) => {
 
           <Box fill direction='row-responsive' justify='between'>
 
-            <Box gap='small'>
-              <Text color='text-weak' size='xsmall'>Max withdraw</Text>
-              <Text color='brand' weight='bold' size='large'> {collateralAmount_? `~${maxWithdraw.toFixed(2)} Eth` : '-' }</Text>
+            <Box gap='small' alignSelf='start' align='center'>
+              <Text color='text-weak' size='xsmall'>
+                Max withdraw
+              </Text>
+              <Box direction='row' gap='small'>
+                {/* <Text color='brand' size='xxsmall'>approx.</Text>  */}
+                <Text 
+                  color='brand'
+                  weight='bold'
+                  size='medium'
+                  onClick={()=>setInputValue(maxWithdraw)}
+                > {collateralAmount_? `${maxWithdraw.toFixed(2)} Eth` : '-' }
+                </Text>
+              </Box>
             </Box>
 
             { (collateralPercent_ > 0) &&
-            <Box gap='small' alignSelf='start'>
+            <Box gap='small' alignSelf='start' align='center'>
               <Text color='text-weak' size='xsmall'>Collateralization Ratio after withdraw</Text>
               <Box direction='row' gap='small'>
-                <Text color={!inputValue? 'brand-transparent': indicatorColor} weight='bold' size='large'> 
-                  {(estRatio && estRatio !== 0)? ` approx. ${estRatio}%`: collateralPercent_ || '' }
+                <Text color={!inputValue? 'brand-transparent': indicatorColor} size='xxsmall'>approx.</Text> 
+                <Text color={!inputValue? 'brand-transparent': indicatorColor} weight='bold' size='medium'> 
+                  {(estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '' }
                 </Text>
-                { false &&
-                <Text color='red' size='large'> 
-                  { inputValue && (estDecrease !== 0) && `(- ${estDecrease}%)` }
-                </Text>}
               </Box>
             </Box>}
 
@@ -213,7 +224,7 @@ const EthWithdrawAction = ({ close }:IWithDrawActionProps) => {
             background={( !(inputValue>0) || withdrawDisabled) ? 'brand-transparent' : 'brand'}
             onClick={(!(inputValue>0) || withdrawDisabled)? ()=>{}:()=> withdrawProcedure(inputValue)}
             align='center'
-            pad='medium'
+            pad='small'
           >
             <Text
               weight='bold'

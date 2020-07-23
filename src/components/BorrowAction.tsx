@@ -56,12 +56,11 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
 
   const borrowProcedure = async (value:number) => {
-    borrow(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value);
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await borrow(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value);
     await buyDai(
       activeSeries.marketAddress,
       inputValue,
-      0 // transaction queue value
+      0
     );
     setInputValue('');
     yieldActions.updateUserData();
@@ -79,7 +78,7 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   const [txActive, setTxActive] = useState<any>(null);
 
   useEffect(()=>{
-    setTxActive(pendingTxs.find((x:any)=> x.type === 'BORROW'));
+    setTxActive(pendingTxs.find((x:any)=> x.type === 'BORROW' || x.type === 'BUY'));
   }, [ pendingTxs ]);
 
   useEffect(()=>{
@@ -101,13 +100,22 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   }, [ estRatio ]);
 
   useEffect(() => {
-    activeSeries && inputValue && ( async () => {
+    activeSeries && inputValue > 0 && ( async () => {
       const preview = await previewMarketTx('buyDai', activeSeries.marketAddress, inputValue);
-      setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
+      if (!preview.isZero()) {
+        setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
+        setBorrowDisabled(false);
+        setWarningMsg(null);
+        setErrorMsg(null);
+      } else {
+        setBorrowDisabled(true);
+        setErrorMsg('The Market doesn\'t have the liquidity to support a transaction of that size just yet.');
+      }
     })();
   }, [inputValue]);
 
   useEffect(() => {
+
     if ( inputValue && ( inputValue > maxDaiAvailable_ ) ) {
       console.log(inputValue, maxDaiAvailable_);
       setWarningMsg(null);
@@ -134,7 +142,8 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
       { !txActive && !borrowActive &&
       <Box flex='grow' justify='between'>
         <Box gap='medium' align='center' fill='horizontal'>
-          <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Choose a series</Text>
+          <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Selected series</Text>
+
           <Box
             direction='row-responsive'
             fill='horizontal'
@@ -142,18 +151,19 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
             align='center'
           >
             <Box 
-              round='medium'
+              round='xsmall'
               background='brand-transparent'
+              border='all'
               onClick={()=>setSelectorOpen(true)}
-              hoverIndicator='brand'
+              // hoverIndicator='brand'
               direction='row'
               fill
               pad='small'
               flex
+              // elevation='small'
             >
-              { activeSeries? activeSeries.displayName : 'Loading...' }
+              <Text color='brand' size='large'>{ activeSeries? `${activeSeries.yieldAPR_}% ${activeSeries.displayName}` : 'Loading...' }</Text>
             </Box>
-
             <Box justify='center'>
               <Box
                 round
@@ -168,12 +178,40 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
               </Box>
             </Box>
           </Box>
+          
+          <Box direction='row-responsive' pad={{ horizontal:'medium' }} justify='start' gap='large' fill>
+            
+            <Box gap='small'>
+              <Box direction='row' gap='small'>
+                <Text color='text-weak' size='xsmall'>Current Debt</Text>
+                <Help />
+              </Box>
+              <Box direction='row' gap='small'>
+                {/* <Text color={maxDaiAvailable_? 'brand': 'brand-transparent'} size='xxsmall'>approx.</Text> */}
+                <Text color='brand' weight='bold' size='medium'> {activeSeries?.wethDebtDai_? `${activeSeries.wethDebtDai_.toFixed(2)} Dai`: ''}  </Text>
+              </Box>
+            </Box>
+            
+            <Box gap='small'>
+              <Box direction='row' gap='small'>
+                <Text color='text-weak' size='xsmall'>Maximum Borrowing Power</Text>
+                <Help />
+              </Box>
+              <Box direction='row' gap='small'>
+                <Text color={maxDaiAvailable_? 'brand': 'brand-transparent'} size='xxsmall'>approx.</Text>
+                <Text color='brand' weight='bold' size='medium'> {maxDaiAvailable_? `${maxDaiAvailable_.toFixed(2)} Dai`: ''}  </Text>
+              </Box>
+            </Box>
+            
+          </Box>
+
 
           <Box fill gap='medium' margin={{ vertical:'large' }}>
             <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to borrow</Text>
             <Box 
               round='medium'
-              background='brand-transparent'
+              // background='brand-transparent'
+              border='all'
               direction='row'
               fill='horizontal'
               pad='small'
@@ -199,7 +237,7 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
                     <Text color='text-weak' size='xsmall'>Estimated APR</Text>
                     <Help />
                   </Box>
-                  <Text color={!inputValue? 'brand-transparent':'brand'} weight='bold' size='large'> {activeSeries && activeSeries.yieldAPR_ || ''}% </Text>
+                  <Text color={inputValue>0?'brand':'brand-transparent'} weight='bold' size='medium'> {activeSeries && activeSeries.yieldAPR_ || ''}% </Text>
                 </Box>
 
                 <Box gap='small'>
@@ -207,21 +245,14 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
                     <Text color='text-weak' size='xsmall'>Approx. Dai owed at maturity</Text>
                     <Help />
                   </Box>
-                  <Text color={!inputValue? 'brand-transparent':'brand'} weight='bold' size='large'> 
+                  <Text color={inputValue>0? 'brand':'brand-transparent'} weight='bold' size='medium'> 
                     {yDaiValue.toFixed(2)} Dai on {activeSeries && Moment(activeSeries.maturity_).format('DD MMMM YYYY')}
                   </Text>
                 </Box>
               </Box>
-              <Box gap='small'>
-                <Box direction='row' gap='small'>
-                  <Text color='text-weak' size='xsmall'>Maximum Borrowing Power</Text>
-                  <Help />
-                </Box>
-                <Box direction='row' gap='small'>
-                  <Text color='brand' weight='bold' size='large'> {maxDaiAvailable_? `approx. ${maxDaiAvailable_.toFixed(2)} Dai`: ''}  </Text>
-                </Box>
-                {/* <Text color='text-weak' size='xxsmall'>if you deposit {inputValue||0} Eth</Text> */}
-              </Box>
+
+              {/* add next layer here */}
+
             </Box>
           </Box>
 
@@ -229,16 +260,14 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
             <CheckBox 
               reverse
                 // value={true}
-              checked={!inputValue || ( approved >= inputValue )}
-              disabled={!inputValue || ( approved >= inputValue )}
-              onChange={()=>approveProcedure(inputValue)}
-              label={(approved >= inputValue) ? 
+              checked={!inputValue || ( approved >= yDaiValue )}
+              disabled={!inputValue || ( approved >= yDaiValue )}
+              onChange={()=>approveProcedure(yDaiValue)}
+              label={(approved >= yDaiValue) ? 
                 `Borrowing unlocked for up to ${approved.toFixed(2) || '' } Dai` 
                 : `Unlock borrowing of ${inputValue || ''} Dai`}
             />
           </Box>
-
-          
 
           { warningMsg &&
           <Box 
@@ -258,7 +287,7 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
             round='small'
             pad='small'
           >
-            <Text weight='bold' color='red'>Wooah, Hang on</Text>  
+            <Text weight='bold' color='red'>Oops!</Text>  
             <Text color='red'>{errorMsg}</Text>
           </Box> }
 
@@ -268,7 +297,7 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
             background={( !(inputValue>0) || borrowDisabled) ? 'brand-transparent' : 'brand'}
             onClick={(!(inputValue>0) || borrowDisabled)? ()=>{}:()=>borrowProcedure(inputValue)}
             align='center'
-            pad='medium'
+            pad='small'
           >
             <Text 
               weight='bold'
