@@ -157,6 +157,7 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
 
   useEffect(() => {
     approved && ( async () => {
+      console.log(approved);
       const preview = await previewMarketTx('SellYDai', activeSeries.marketAddress, approved);
       setDaiApproved( parseFloat(ethers.utils.formatEther(preview)) );
     })();

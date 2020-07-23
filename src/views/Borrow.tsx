@@ -73,6 +73,9 @@ const Borrow = ({
       <Box 
         background="brand-transparent"
         round='medium'
+        alignSelf="center"
+        width={{ max: '750px' }}
+        fill
       >
 
         <Box

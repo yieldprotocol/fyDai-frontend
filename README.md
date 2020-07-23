@@ -12,6 +12,7 @@ In a console ( yTokenMVP root folder ):
 Optionally add the flags:
 `-b 10` to delay blocks for 10 secs (it takes a while to run install - but gives more realistic product)
 `-e 1000` to increase the initially issued eth (it may be required to set up the market)
+`--verbose` for debugging via console
 
 In a seperate console ( yTokenMVP root folder ):
 2. `truffle migrate --network development --reset` to run migrations.
@@ -22,3 +23,5 @@ In a seperate console ( yTokenMVP root folder ):
 
 In a new console ( yDai fronend root folder ):
 `yarn && yarn start` to install and launch the dev server
+
+NB: Make sure you reset your metamask on every reload of the blockchain. metamask transactions fail if the blockchain is restarted. 
