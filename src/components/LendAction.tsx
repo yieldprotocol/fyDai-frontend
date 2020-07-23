@@ -141,7 +141,7 @@ const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
           >
             <Box 
               round='xsmall'
-              // background='brand-transparent'
+              background='brand-transparent'
               border='all'
               onClick={()=>setSelectorOpen(true)}
               hoverIndicator='brand-transparent'
