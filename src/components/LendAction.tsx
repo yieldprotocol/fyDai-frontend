@@ -52,6 +52,7 @@ const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   const [ sellOpen, setSellOpen ] = useState<boolean>(false);
 
   const [ yDaiValue, setYDaiValue ] = React.useState<number>(0);
+  const [ currentValue, setCurrentValue ] = React.useState<number>(0);
   
   const [ indicatorColor, setIndicatorColor ] = React.useState<string>('brand');
   const [ warningMsg, setWarningMsg] = React.useState<string|null>(null);
@@ -79,9 +80,15 @@ const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
       setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
     })();
   }, [inputValue]);
+
+  useEffect(() => {
+    activeSeries && inputValue && ( async () => {
+      const preview = await previewMarketTx('sellDai', activeSeries.marketAddress, inputValue);
+      setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
+    })();
+  }, [inputValue]);
   
   useEffect(() => {
-
     if ( inputValue && ( inputValue > userData.daiBalance_ ) ) {
       setLendDisabled(true);
       setWarningMsg(null);
@@ -92,10 +99,18 @@ const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
       setErrorMsg(null);
     }
   }, [ inputValue ]);
+
+  useEffect(() => {
+    activeSeries && ( async ()=> {
+      const preview = await previewMarketTx('SellYDai', activeSeries.marketAddress, activeSeries.yDaiBalance_);
+      setCurrentValue( parseFloat(ethers.utils.formatEther(preview)));
+    })();
+  }, [ activeSeries, ]);
   
   useEffect(() => {
     ( async ()=>{
       activeSeries && setApproved(await getTokenAllowance(deployedContracts.Dai, activeSeries.marketAddress, 'Dai'));
+      console.log(activeSeries);
     })();
   }, [ activeSeries ]);
   
@@ -114,10 +129,10 @@ const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
           >
             <Box 
               round='xsmall'
-              background='brand-transparent'
+              // background='brand-transparent'
               border='all'
               onClick={()=>setSelectorOpen(true)}
-              hoverIndicator='brand'
+              hoverIndicator='brand-transparent'
               direction='row'
               fill
               pad='small'
@@ -139,6 +154,29 @@ const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
                 <Text size='xsmall'>Change series</Text>
               </Box>
             </Box>
+          </Box>
+
+          <Box fill gap='small' pad={{ horizontal:'medium' }}>
+
+            <Box fill direction='row-responsive' justify='start' gap='large'>
+
+              <Box gap='small'>
+                <Box direction='row' gap='small'>
+                  <Text color='text-weak' size='xsmall'>Series value @ Maturity</Text>
+                  <Help />
+                </Box>
+                <Text color='brand' weight='bold' size='medium'> {activeSeries && `${activeSeries?.yDaiBalance_.toFixed(2)} Dai` || '-'} </Text>
+              </Box>
+
+              <Box gap='small'>
+                <Box direction='row' gap='small'>
+                  <Text color='text-weak' size='xsmall'>Current Series Value</Text>
+                  <Help />
+                </Box>
+                <Text color='brand' weight='bold' size='medium'> {currentValue!==0?`${currentValue.toFixed(2)} Dai`: '-'} </Text>
+              </Box>
+            </Box>
+
           </Box>
   
           <Box fill gap='medium' margin={{ vertical:'large' }}>
@@ -204,16 +242,25 @@ const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
                     { yDaiValue.toFixed(2) } Dai on {activeSeries && Moment(activeSeries.maturity_).format('DD MMMM YYYY')}
                   </Text>
                 </Box>
-              </Box>
 
-              <Box fill direction='row-responsive' justify='between'>
                 <Box gap='small'>
                   <Box direction='row' gap='small'>
                     <Text color='text-weak' size='xsmall'>Wallet Dai balance</Text>
                     <Help />
                   </Box>
-                  <Text color='brand' weight='bold' size='medium'> {userData.daiBalance_?`${userData.daiBalance_} Dai`: '-'} </Text>
+                  <Text color='brand' weight='bold' size='medium'> {userData.daiBalance_?`${userData.daiBalance_.toFixed(2)} Dai`: '-'} </Text>
                 </Box>
+              
+              </Box>
+
+              <Box fill direction='row-responsive' justify='between'>
+                {/* <Box gap='small'>
+                  <Box direction='row' gap='small'>
+                    <Text color='text-weak' size='xsmall'>Wallet Dai balance</Text>
+                    <Help />
+                  </Box>
+                  <Text color='brand' weight='bold' size='medium'> {userData.daiBalance_?`${userData.daiBalance_} Dai`: '-'} </Text>
+                </Box> */}
               </Box>
             </Box>
           </Box>

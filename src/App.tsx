@@ -25,7 +25,7 @@ import { IYieldSeries } from './types';
 
 function App() {
   const [darkmode, setDarkmode] = React.useState(false);
-  const [activeView, setActiveView] = React.useState<string>('BORROW');
+  const [activeView, setActiveView] = React.useState<string>('LEND');
   // const [activeSeries, setActiveSeries] = React.useState<IYieldSeries | null>(null);
 
   const [showConnectLayer, setShowConnectLayer] = React.useState<boolean>(false);

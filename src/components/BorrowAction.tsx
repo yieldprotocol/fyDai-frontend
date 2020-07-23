@@ -259,9 +259,6 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
               pad='small'
               flex
             >
-              {/* <Box width='15px' height='15px'>
-              <Image src={ethLogo} fit='contain' />
-            </Box> */}
               <TextInput
                 type="number"
                 placeholder='Enter the amount of Dai to borrow'
@@ -292,9 +289,7 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
                   </Text>
                 </Box>
               </Box>
-
               {/* add next layer here */}
-
             </Box>
           </Box>
 
@@ -335,16 +330,17 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
 
           <Box
             fill='horizontal'
-            round='medium'
-            background={( !(inputValue>0) || borrowDisabled && hasDelegated) ? 'brand-transparent' : 'brand'}
-            onClick={(!(inputValue>0) || borrowDisabled && hasDelegated)? ()=>{}:()=>borrowProcedure(inputValue)}
+            round='medium' 
+            background={( !(inputValue>0) || borrowDisabled || !hasDelegated) ? 'brand-transparent' : 'brand'} // TODO bring the logic into a useEffect
+            onClick={(!(inputValue>0) || borrowDisabled || !hasDelegated)? ()=>{}:()=>borrowProcedure(inputValue)} // TODO bring the logic into a useEffect
             align='center'
             pad='small'
           >
             <Text 
               weight='bold'
               size='large'
-              color={( !(inputValue>0) || borrowDisabled && hasDelegated) ? 'text-xweak' : 'text'}
+              
+              color={( !(inputValue>0) || borrowDisabled || !hasDelegated) ? 'text-xweak' : 'text'} // TODO bring the logic into a useEffect
             >
               {`Borrow ${inputValue || ''} Dai`}
             </Text>

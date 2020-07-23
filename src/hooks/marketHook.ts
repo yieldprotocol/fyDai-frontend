@@ -173,7 +173,7 @@ export const useMarket = () => {
 
     const overrides = { 
       // nonce: signer.getTransactionCount().then( (nonce:any) => nonce + queue) 
-      gasLimit: BigNumber.from('250000')
+      gasLimit: BigNumber.from('300000')
     };
 
     const parsedAmount = ethers.utils.parseEther(daiIn.toString());
@@ -225,7 +225,6 @@ export const useMarket = () => {
       // nonce: signer.getTransactionCount().then( (nonce:any) => nonce + queue) 
       gasLimit: BigNumber.from('300000')
     };
-
     const parsedAmount = ethers.utils.parseEther(daiOut.toString());
     // const parsedAmount = daiOut;
     const fromAddr = account && ethers.utils.getAddress(account);

@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import {ethers} from 'ethers';
+import { ethers } from 'ethers';
 import { Box, Layer, CheckBox, TextInput, Text } from 'grommet';
 import { 
   FiInfo as Info,
@@ -64,9 +64,15 @@ const DaiWithDrawAction = ({ close }:IWithDrawActionProps) => {
     setApproved( approvedYDai ); // TODO convert to Dai somehow
   };
 
-  useEffect(()=>{
-    setMaxWithdraw(activeSeries.yDaiBalance_);
-  }, [collateralAmount_, minSafeCollateral_]);
+  const checkMaxWithdraw = async () =>{
+    const preview = await previewMarketTx('sellYDai', activeSeries.marketAddress, activeSeries.yDaiBalance_);
+    console.log(parseFloat(ethers.utils.formatEther(preview)));
+    setMaxWithdraw( parseFloat(ethers.utils.formatEther(preview)) );
+  };
+
+  useEffect(() => {
+    activeSeries && inputValue && checkMaxWithdraw();
+  }, [activeSeries, inputValue]);
 
   useEffect(() => {
     activeSeries && inputValue && ( async () => {

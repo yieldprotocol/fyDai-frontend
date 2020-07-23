@@ -170,7 +170,6 @@ const SeriesProvider = ({ children }:any) => {
         console.log(_rates.sellYDai.toString());
         _seriesData.push(x);
         try {
-
           _seriesData[i].hasDelegated = await checkMarketDelegate(x.marketAddress, x.yDaiAddress);
           _seriesData[i].yDaiBalance = account? await callTx(x.yDaiAddress, 'YDai', 'balanceOf', [account]): BigNumber.from('0') ;
           _seriesData[i].isMature = await callTx(x.yDaiAddress, 'YDai', 'isMature', []);
@@ -187,6 +186,7 @@ const SeriesProvider = ({ children }:any) => {
       return acc.set(
         x.maturity,
         { ...x,
+          yDaiBalance_: parseFloat(ethers.utils.formatEther(x.yDaiBalance.toString())),
           wethDebtYDai_: parseFloat(ethers.utils.formatEther(x.wethDebtYDai.toString())),
           wethDebtDai_: parseFloat(ethers.utils.formatEther(x.wethDebtDai.toString())),
           yieldAPR_: x.yieldAPR.toFixed(2),
