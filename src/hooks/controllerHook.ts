@@ -272,7 +272,7 @@ export const useController = () => {
       return;
     }
     /* Transaction reporting & tracking */
-    dispatch({ type: 'txPending', payload:{ tx, message: 'Pending once-off approval of Eth withdrawals ...' } } );
+    dispatch({ type: 'txPending', payload:{ tx, message: 'Pending once-off approval of Eth withdrawals ...', type:'APPROVAL' } } );
     await tx.wait();
     dispatch({ type: 'txComplete', payload:{ tx } } );
   };
@@ -294,13 +294,10 @@ export const useController = () => {
     const fromAddr = account && ethers.utils.getAddress(account);
     const ethProxyAddr = ethers.utils.getAddress(ethProxyAddress);
     const controllerAddr = ethers.utils.getAddress(controllerAddress);
-    
     const contract = new ethers.Contract( controllerAddr, controllerAbi, provider);
     let res;
     try {
       res = await contract.delegated(fromAddr, ethProxyAddr);
-      // console.log('checking withdrawal approval..');
-      res= false;
     }  catch (e) {
       console.log(e);
       res = false;

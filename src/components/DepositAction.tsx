@@ -56,6 +56,7 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
   // TODO: maybe split into a custom hook
   const { state: { pendingTxs } } = React.useContext(NotifyContext);
   const [txActive, setTxActive] = React.useState<any>(null);
+  
   React.useEffect(()=>{
     setTxActive(pendingTxs.find((x:any)=> x.type === 'DEPOSIT'));
   }, [ pendingTxs ]);

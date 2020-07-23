@@ -230,11 +230,16 @@ const YieldProvider = ({ children }:any) => {
     const _userData:any = {};
     const _lastBlock = await provider.getBlockNumber();
 
-    /* Get balances, posted collateral and makerData? */
+    /* Get balances, posted collateral */
     _userData.ethBalance = await getEthBalance();
     _userData.daiBalance = await getTokenBalance(_deployedContracts.Dai, 'Dai');
+    // TODO :use controller hook
     _userData.ethPosted = await callTx(_deployedContracts.Controller, 'Controller', 'posted', [utils.ETH, account]);
     _userData.urn = await callTx(_deployedContracts.Vat, 'Vat', 'urns', [utils.ETH, account ]);
+
+    /* get previous approvals and settings */
+    // TODO: use controller hook for this
+    _userData.isEthProxyApproved = await callTx(_deployedContracts.Controller, 'Controller', 'delegated', [account, _deployedContracts.EthProxy]);
 
     /* Get transaction history (from cache first or rebuild if an update is forced) */
     forceUpdate && window.localStorage.removeItem('txHistory') && console.log('Re-building txHistory...');

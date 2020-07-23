@@ -20,20 +20,20 @@ interface IWithDrawActionProps {
 
 const EthWithdrawAction = ({ close }:IWithDrawActionProps) => {
 
+  const { state: yieldState, actions: yieldActions } = useContext(YieldContext);
+  const { deployedContracts, userData } = yieldState;
+
   const [ estRatio, setEstRatio ] = useState<any>();
   const [ estDecrease, setEstDecrease ] = useState<any>();
 
   const [ maxWithdraw, setMaxWithdraw ] = useState<number>(0);
   const [ inputValue, setInputValue ] = useState<any>();
-  const [ hasApproved, setHasApproved ] = useState<boolean>(false);
+  const [ hasApproved, setHasApproved ] = useState<boolean>( userData.isEthProxyApproved || false);
 
   const [ withdrawDisabled, setWithdrawDisabled ] = useState<boolean>(false);
   const [ indicatorColor, setIndicatorColor ] = useState<string>('brand');
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
-
-  const { state: yieldState, actions: yieldActions } = useContext(YieldContext);
-  const { deployedContracts } = yieldState;
 
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { userData: { ethBalance_ } } = yieldState;
@@ -58,21 +58,25 @@ const EthWithdrawAction = ({ close }:IWithDrawActionProps) => {
 
   const approveProcedure = async (value:number) => {
     await approveEthWithdraws(deployedContracts.Controller, deployedContracts.EthProxy);
-    setHasApproved(await checkWithdrawApproval(deployedContracts.Controller, deployedContracts.EthProxy));
+    const res = await checkWithdrawApproval(deployedContracts.Controller, deployedContracts.EthProxy);
+    setHasApproved(res);
   };
 
   // TODO: maybe split into a custom hook
   const { state: { pendingTxs } } = React.useContext(NotifyContext);
+
   const [txActive, setTxActive] = React.useState<any>(null);
   useEffect(()=>{
-    setTxActive(pendingTxs.find((x:any)=> x.type === 'WITHDRAW'));
+    setTxActive(pendingTxs.find((x:any)=> ( x.type === 'WITHDRAW' || x.type === 'APPROVAL')));
   }, [ pendingTxs ]);
 
   useEffect(()=>{
     setMaxWithdraw(collateralAmount_- minSafeCollateral_);
   }, [collateralAmount_, minSafeCollateral_]);
 
+  /* show warnings and errors with collateralisation ratio levels */
   useEffect(()=>{
+
     if (estRatio < 150) {
       setWithdrawDisabled(true);
       setIndicatorColor('red');
@@ -91,11 +95,14 @@ const EthWithdrawAction = ({ close }:IWithDrawActionProps) => {
   }, [ estRatio ]);
 
   useEffect(()=>{
-    if (inputValue > maxWithdraw ){
-      setWithdrawDisabled(true);
-    } else { setWithdrawDisabled(false); }
 
-    if ( (collateralAmount_ > inputValue) && inputValue  && debtValue_) {
+    if ( (inputValue > maxWithdraw) ){
+      setWithdrawDisabled(true);
+    } else { 
+      setWithdrawDisabled(false);
+    }
+
+    if ( (collateralAmount_ > inputValue) && inputValue && debtValue_) {
       const newRatio = estimateRatio((collateralAmount_- parseFloat(inputValue)), debtValue_); 
       setEstRatio(newRatio.toFixed(2));
       const newDecrease = collateralPercent_ - newRatio ;
@@ -103,9 +110,9 @@ const EthWithdrawAction = ({ close }:IWithDrawActionProps) => {
     }
   }, [ inputValue ]);
 
+  /* startup effects, if any */
   useEffect(()=>{
     (async () => {
-      setHasApproved( await checkWithdrawApproval(deployedContracts.Controller, deployedContracts.EthProxy) );
     })();
   }, []);
 
@@ -123,6 +130,28 @@ const EthWithdrawAction = ({ close }:IWithDrawActionProps) => {
         <Box align='center' flex='grow' justify='between' gap='large'>
           <Box gap='medium' align='center' fill='horizontal'>
             <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to withdraw</Text>
+
+            {!hasApproved &&
+            <Box pad='small' gap='small' border='all' elevation='small' fill>
+              Once-off Action required: 
+              <Box
+                round
+                onClick={()=>approveProcedure(inputValue)}
+                hoverIndicator='brand-transparent'
+                border='all'
+                pad={{ horizontal:'small', vertical:'small' }}
+                align='center'
+              >
+                <Text
+                  weight='bold'
+                // size='xxsmall'
+                  color='text'
+                >
+                  Approve Eth withdrawals
+                </Text>
+              </Box>
+            </Box>}
+          
             <Box
               direction='row-responsive'
               fill='horizontal'
@@ -221,38 +250,20 @@ const EthWithdrawAction = ({ close }:IWithDrawActionProps) => {
           <Box
             fill='horizontal'
             round='medium'
-            background={( !(inputValue>0) || withdrawDisabled) ? 'brand-transparent' : 'brand'}
-            onClick={(!(inputValue>0) || withdrawDisabled)? ()=>{}:()=> withdrawProcedure(inputValue)}
+            background={( !(inputValue>0) || withdrawDisabled && hasApproved ) ? 'brand-transparent' : 'brand'}
+            onClick={( !(inputValue>0) || withdrawDisabled && hasApproved )? ()=>{}:()=> withdrawProcedure(inputValue)}
             align='center'
             pad='small'
           >
             <Text
               weight='bold'
               size='large'
-              color={( !(inputValue>0) || withdrawDisabled) ? 'text-xweak' : 'text'}
+              color={( !(inputValue>0) || withdrawDisabled && hasApproved ) ? 'text-xweak' : 'text'}
             >
               {`Withdraw ${inputValue || ''} Eth`}
             </Text>
           </Box>
           
-          {!hasApproved && 
-          <Box
-            round
-            onClick={()=>approveProcedure(inputValue)}
-            hoverIndicator='brand-transparent'
-            // border='all'
-            pad={{ horizontal:'small', vertical:'small' }}
-            align='center'
-          >
-            <Text
-              weight='bold'
-              size='xxsmall'
-              color='text'
-            >
-              Approve Eth withdrawals (once-off)
-            </Text>
-          </Box>}
-
           <Box alignSelf='start'>
             <Box
               round
@@ -282,15 +293,20 @@ const EthWithdrawAction = ({ close }:IWithDrawActionProps) => {
               gap='large'
               align='center'
             >
-              <Text>You made a withdrawal of {inputValue} Eth</Text>
-              <Text>Transaction Pending: </Text>
+              { txActive.type === 'APPROVAL' ? 
+                <Text>{txActive.type === 'APPROVAL'? 'Withdraw Pending' : 'Approval pending'} </Text>
+                :
+                <>
+                  <Text>You made a withdrawal of {inputValue} Eth</Text>
+                  <Text>Withdraw Pending</Text>
+                </>}
               <Box
                 fill='horizontal'
                 round='medium'
                 background='brand'
                 onClick={()=>console.log('Going to etherscan')}
                 align='center'
-                pad='medium'
+                pad='xsmall'
               >
                 <Text
                   weight='bold'
