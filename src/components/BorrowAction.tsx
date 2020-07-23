@@ -50,13 +50,15 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   const { userAllowance } = useYDai();
 
   const [ inputValue, setInputValue ] = React.useState<any>();
-  const [ borrowDisabled, setBorrowDisabled ] = React.useState<boolean>(false);
+  const [ borrowDisabled, setBorrowDisabled ] = React.useState<boolean>(true);
   const [ selectorOpen, setSelectorOpen ] = React.useState<boolean>(false);
   const [ estRatio, setEstRatio ] = React.useState<any>(0);
 
   const [ hasDelegated, setHasDelegated] = React.useState<boolean>(activeSeries?.hasDelegated || true);
 
   const [ approved, setApproved ] = React.useState<any>(0);
+  const [ daiApproved, setDaiApproved ] = React.useState<any>(0);
+
   const [ yDaiValue, setYDaiValue ] = React.useState<number>(0);
 
   const [ indicatorColor, setIndicatorColor ] = React.useState<string>('brand');
@@ -90,10 +92,10 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   // TODO: maybe split into a custom hook
   const { state: { pendingTxs } } = React.useContext(NotifyContext);
   const [txActive, setTxActive] = useState<any>(null);
-
   useEffect(()=>{
     setTxActive(pendingTxs.find((x:any)=> x.type === 'BORROW' || x.type === 'BUY' || x.type === 'DELEGATION'));
   }, [ pendingTxs ]);
+
 
   useEffect(()=>{
     if (estRatio && estRatio <= 1.5) {
@@ -106,7 +108,6 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
       setErrorMsg(null);
       setWarningMsg('Borrowing that much will put you at risk of liquidation');
     } else {
-      setBorrowDisabled(false);
       setIndicatorColor('brand');
       setWarningMsg(null);
       setErrorMsg(null);
@@ -118,7 +119,6 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
       const preview = await previewMarketTx('buyDai', activeSeries.marketAddress, inputValue);
       if (!preview.isZero()) {
         setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
-        setBorrowDisabled(false);
         setWarningMsg(null);
         setErrorMsg(null);
       } else {
@@ -129,7 +129,6 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   }, [inputValue]);
 
   useEffect(() => {
-
     if ( inputValue && ( inputValue > maxDaiAvailable_ ) ) {
       console.log(inputValue, maxDaiAvailable_);
       setWarningMsg(null);
@@ -142,6 +141,27 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
       setErrorMsg(null);
     }
   }, [ inputValue ]);
+
+  /* borrow button disabling */
+  useEffect(()=>{
+    if (!hasDelegated) {
+      setBorrowDisabled(true);
+    } else if (approved < yDaiValue) {
+      setBorrowDisabled(true);
+    } else if (!(inputValue) || inputValue===0) {
+      setBorrowDisabled(true);
+    } else {
+      setBorrowDisabled(false);
+    }
+  }, [ approved, inputValue, yDaiValue, hasDelegated ]);
+
+  useEffect(() => {
+
+    approved && ( async () => {
+      const preview = await previewMarketTx('SellYDai', activeSeries.marketAddress, approved);
+      setDaiApproved( parseFloat(ethers.utils.formatEther(preview)) );
+    })();
+  }, [ approved ]);
 
   useEffect(() => {
     console.log(seriesAggregates);
@@ -301,7 +321,7 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
               disabled={!inputValue || ( approved >= yDaiValue )}
               onChange={()=>approveProcedure(yDaiValue)}
               label={(approved >= yDaiValue) ? 
-                `Borrowing unlocked for up to ${approved.toFixed(2) || '' } Dai` 
+                `Borrowing unlocked for ~${daiApproved.toFixed(2)} Dai (${approved.toFixed(2) || '' } yDai)` 
                 : `Unlock borrowing of ${inputValue || ''} Dai`}
             />
           </Box>
@@ -331,16 +351,15 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
           <Box
             fill='horizontal'
             round='medium' 
-            background={( !(inputValue>0) || borrowDisabled || !hasDelegated) ? 'brand-transparent' : 'brand'} // TODO bring the logic into a useEffect
-            onClick={(!(inputValue>0) || borrowDisabled || !hasDelegated)? ()=>{}:()=>borrowProcedure(inputValue)} // TODO bring the logic into a useEffect
+            background={borrowDisabled ? 'brand-transparent' : 'brand'} 
+            onClick={borrowDisabled ? ()=>{}:()=>borrowProcedure(inputValue)} 
             align='center'
             pad='small'
           >
             <Text 
               weight='bold'
               size='large'
-              
-              color={( !(inputValue>0) || borrowDisabled || !hasDelegated) ? 'text-xweak' : 'text'} // TODO bring the logic into a useEffect
+              color={borrowDisabled ? 'text-xweak' : 'text'} 
             >
               {`Borrow ${inputValue || ''} Dai`}
             </Text>
