@@ -94,11 +94,22 @@ const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
       setWarningMsg(null);
       setErrorMsg('That amount exceeds the amount of Dai you have'); 
     } else {
-      setLendDisabled(false);
+      // setLendDisabled(false);
       setWarningMsg(null);
       setErrorMsg(null);
     }
   }, [ inputValue ]);
+
+  /* Lend button disabling logic */
+  useEffect(()=>{
+    if (approved < inputValue) {
+      setLendDisabled(true);
+    } else if (!(inputValue) || inputValue===0) {
+      setLendDisabled(true);
+    } else {
+      setLendDisabled(false);
+    }
+  }, [ approved, inputValue ]);
 
   useEffect(() => {
     activeSeries && ( async ()=> {
@@ -114,6 +125,7 @@ const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
     })();
   }, [ activeSeries ]);
   
+
   return (
     <>
       {selectorOpen && <SeriesSelector close={()=>setSelectorOpen(false)} /> }

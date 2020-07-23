@@ -22,9 +22,11 @@ const DaiWithDrawAction = ({ close }:IWithDrawActionProps) => {
   const [ inputValue, setInputValue ] = useState<any>();
 
   const [ approved, setApproved ] = React.useState<any>(0);
+  const [ daiApproved, setDaiApproved ] = React.useState<any>(0);
+
   const [ yDaiValue, setYDaiValue ] = React.useState<number>(0);
 
-  const [ withdrawDisabled, setWithdrawDisabled ] = useState<boolean>(false);
+  const [ withdrawDisabled, setWithdrawDisabled ] = useState<boolean>(true);
   const [ indicatorColor, setIndicatorColor ] = useState<string>('brand');
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
@@ -68,11 +70,30 @@ const DaiWithDrawAction = ({ close }:IWithDrawActionProps) => {
     const preview = await previewMarketTx('sellYDai', activeSeries.marketAddress, activeSeries.yDaiBalance_);
     console.log(parseFloat(ethers.utils.formatEther(preview)));
     setMaxWithdraw( parseFloat(ethers.utils.formatEther(preview)) );
+    return parseFloat(ethers.utils.formatEther(preview));
   };
 
   useEffect(() => {
-    activeSeries && inputValue && checkMaxWithdraw();
+    activeSeries && checkMaxWithdraw();
   }, [activeSeries, inputValue]);
+
+  useEffect(() => {
+    approved && ( async () => {
+      const preview = await previewMarketTx('SellYDai', activeSeries.marketAddress, approved);
+      setDaiApproved( parseFloat(ethers.utils.formatEther(preview)) );
+    })();
+  }, [ approved ]);
+
+  /* Borrow button disabling logic */
+  useEffect(()=>{
+    if (approved < yDaiValue) {
+      setWithdrawDisabled(true);
+    } else if (!(inputValue) || inputValue===0) {
+      setWithdrawDisabled(true);
+    } else {
+      setWithdrawDisabled(false);
+    }
+  }, [ approved, inputValue, yDaiValue ]);
 
   useEffect(() => {
     activeSeries && inputValue && ( async () => {
@@ -122,7 +143,7 @@ const DaiWithDrawAction = ({ close }:IWithDrawActionProps) => {
               <Box justify='center'>
                 <Box
                   round
-                  onClick={()=>setInputValue(maxWithdraw)}
+                  onClick={()=>setInputValue( maxWithdraw || checkMaxWithdraw() )}
                   hoverIndicator='brand-transparent'
                   border='all'
                   pad={{ horizontal:'small', vertical:'small' }}
@@ -163,9 +184,9 @@ const DaiWithDrawAction = ({ close }:IWithDrawActionProps) => {
               checked={!inputValue || ( approved >= inputValue )}
               disabled={!inputValue || ( approved >= inputValue )}
               onChange={()=>approveProcedure(yDaiValue)}
-              label={(approved >= inputValue) ? 
-                `Withdrawals unlocked for up to ${approved.toFixed(2) || '' } Dai` 
-                : `Unlock withdrawals of ${inputValue || ''} Dai`}
+              label={(approved >= yDaiValue) ? 
+                `~${daiApproved.toFixed(2)} Dai unlocked (${approved.toFixed(2) || '' } yDai)` 
+                : `Unlock ${inputValue || ''} Dai`}
             />
           </Box>
 
