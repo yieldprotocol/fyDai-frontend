@@ -18,7 +18,6 @@ import EthProxy from '../contracts/EthProxy.json';
 import Migrations from '../contracts/Migrations.json';
 import Market from '../contracts/Market.json';
 
-
 // ethers.errors.setLogLevel('error');
 
 const contractMap = new Map<string, any>([

@@ -2135,7 +2135,7 @@
     }
   },
   "schemaVersion": "3.0.23",
-  "updatedAt": "2020-07-20T13:24:18.515Z",
+  "updatedAt": "2020-07-23T06:32:18.832Z",
   "networkType": "ethereum",
   "devdoc": {
     "details": "The Migrations contract is a standard truffle contract that keeps track of which migrations were done on the current network. For yDai, we have updated it and added functionality that enables it as well to work as a deployed contract registry.",
