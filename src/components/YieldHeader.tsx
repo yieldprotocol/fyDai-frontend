@@ -23,6 +23,7 @@ import { NotifyContext } from '../contexts/NotifyContext';
 interface LinkProps {
   link: string;
   text: string;
+  disabled: boolean;
 }
 
 const YieldHeader = (props: any) => {
@@ -50,21 +51,25 @@ const YieldHeader = (props: any) => {
       link: 'DASHBOARD',
       text: 'Dashboard',
       id: 0,
+      disabled: true,
     },
     {
       link: 'BORROW',
       text: 'Borrow',
       id: 1,
+      disabled: false,
     },
     {
       link: 'LEND',
       text: 'Lend',
       id: 2,
+      disabled: false,
     },
     {
       link: 'AMM',
       text: 'Market',
       id: 3,
+      disabled: true,
     },
   ]);
 
@@ -170,11 +175,11 @@ const YieldHeader = (props: any) => {
     </Box>
   );
 
-  const NavLink = ({ link, text }: LinkProps) => (
+  const NavLink = ({ link, text, disabled }: LinkProps) => (
     <Box
       direction="row"
       onClick={() => {
-        setActiveView(link);
+        !disabled && setActiveView(link);
         closeMenu();
       }}
       pad={{
@@ -187,7 +192,9 @@ const YieldHeader = (props: any) => {
       <Text
         textAlign="center"
         weight={600}
-        color={activeView === link ? 'brand' : 'text-weak'}
+        // TODO undo this when pages are ready
+        // eslint-disable-next-line no-nested-ternary
+        color={disabled? 'lightgrey' : (activeView === link ? 'brand' : 'text-weak')}
         size={screenSize === 'small' ? 'xxlarge' : 'medium'}
         style={{
           textDecoration: activeView === link ? 'underline' : 'none',
@@ -206,7 +213,7 @@ const YieldHeader = (props: any) => {
     >
       {navLinks &&
         navLinks.map((item) => (
-          <NavLink link={item.link} text={item.text} key={`nav-${item.id}`} />
+          <NavLink link={item.link} text={item.text} key={`nav-${item.id}`} disabled={item.disabled} />
         ))}
     </Box>
   );
