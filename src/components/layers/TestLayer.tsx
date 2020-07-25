@@ -16,12 +16,10 @@ import { useSendTx, useCallTx, useController, useBalances, useEthProxy } from '.
 
 import { YieldContext } from '../../contexts/YieldContext';
 import { SeriesContext } from '../../contexts/SeriesContext';
-import { ConnectionContext } from '../../contexts/ConnectionContext';
+// import { ConnectionContext } from '../../contexts/ConnectionContext';
 
 const TestLayer = (props:any) => {
-  // const { chainId, account } = useWeb3React();
-  const { state: { chainId, account } } = React.useContext(ConnectionContext);
-
+  const { chainId, account } = useWeb3React();
 
   // const web3 = useWeb3React();
   const { state: yieldState, actions: yieldActions } = React.useContext( YieldContext );

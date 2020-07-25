@@ -17,7 +17,6 @@ import logoDark from '../assets/images/logo.svg';
 import logoLight from '../assets/images/logo_light.svg';
 import ProfileButton from './ProfileButton';
 
-import { ConnectionContext } from '../contexts/ConnectionContext';
 import { NotifyContext } from '../contexts/NotifyContext';
 
 interface LinkProps {
@@ -28,7 +27,7 @@ interface LinkProps {
 
 const YieldHeader = (props: any) => {
 
-  const { connector, library, chainId, account, activate, deactivate, active, error } = useWeb3React();
+  const { account } = useWeb3React();
 
   const {
     openConnectLayer,
@@ -36,10 +35,6 @@ const YieldHeader = (props: any) => {
     activeView,
     setActiveView,
   } = props;
-
-  // const {
-  //   state: { account },
-  // } = React.useContext(ConnectionContext);
   
   const {
     state: { pendingTxs },
