@@ -56,10 +56,10 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
 
   const [ hasDelegated, setHasDelegated] = React.useState<boolean>(activeSeries?.hasDelegated || true);
 
+  /* token balances and values */
+  const [ yDaiValue, setYDaiValue ] = React.useState<number>(0);
   const [ approved, setApproved ] = React.useState<any>(0);
   const [ daiApproved, setDaiApproved ] = React.useState<any>(0);
-
-  const [ yDaiValue, setYDaiValue ] = React.useState<number>(0);
 
   const [ indicatorColor, setIndicatorColor ] = React.useState<string>('brand');
   const [ warningMsg, setWarningMsg] = React.useState<string|null>(null);
@@ -97,6 +97,7 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   }, [ pendingTxs ]);
 
 
+  /* Handle collateralisation ratio exceptions and warnings */
   useEffect(()=>{
     if (estRatio && estRatio <= 1.5) {
       setBorrowDisabled(true);
@@ -114,6 +115,7 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
     }
   }, [ estRatio ]);
 
+  /* Handle dai to yDai conversion (yDai needed to compare with the approved allowance)  */
   useEffect(() => {
     activeSeries && inputValue > 0 && ( async () => {
       const preview = await previewMarketTx('buyDai', activeSeries.marketAddress, inputValue);
@@ -157,7 +159,6 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
 
   useEffect(() => {
     approved && ( async () => {
-      console.log(approved);
       const preview = await previewMarketTx('SellYDai', activeSeries.marketAddress, approved);
       setDaiApproved( parseFloat(ethers.utils.formatEther(preview)) );
     })();
@@ -242,7 +243,6 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
 
           
           <Box direction='row-responsive' pad={{ horizontal:'medium' }} justify='start' gap='large' fill>
-            
             <Box gap='small'>
               <Box direction='row' gap='small'>
                 <Text color='text-weak' size='xsmall'>Current Debt</Text>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-// import { useWeb3React } from '@web3-react/core';
+import { useWeb3React } from '@web3-react/core';
 
 import {
   Text,
@@ -27,6 +27,9 @@ interface LinkProps {
 }
 
 const YieldHeader = (props: any) => {
+
+  const { connector, library, chainId, account, activate, deactivate, active, error } = useWeb3React();
+
   const {
     openConnectLayer,
     openAccountLayer,
@@ -34,9 +37,10 @@ const YieldHeader = (props: any) => {
     setActiveView,
   } = props;
 
-  const {
-    state: { account },
-  } = React.useContext(ConnectionContext);
+  // const {
+  //   state: { account },
+  // } = React.useContext(ConnectionContext);
+  
   const {
     state: { pendingTxs },
   } = React.useContext(NotifyContext);
@@ -51,7 +55,7 @@ const YieldHeader = (props: any) => {
       link: 'DASHBOARD',
       text: 'Dashboard',
       id: 0,
-      disabled: true,
+      disabled: false,
     },
     {
       link: 'BORROW',

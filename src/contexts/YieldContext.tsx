@@ -1,15 +1,12 @@
 import React from 'react';
 import { ethers } from 'ethers';
 import Moment from 'moment';
-// import { useWeb3React } from '@web3-react/core';
 
 import * as utils from '../utils';
 
 import { IYieldSeries, IUser } from '../types';
 import { NotifyContext } from './NotifyContext';
-import { ConnectionContext } from './ConnectionContext';
-
-import { useCallTx, useCachedState, useBalances, useEvents } from '../hooks';
+import { useCallTx, useCachedState, useBalances, useEvents, useSignerAccount, useWeb3React } from '../hooks';
 
 const YieldContext = React.createContext<any>({});
 
@@ -100,7 +97,10 @@ const initState = {
 const YieldProvider = ({ children }:any) => {
 
   const [ state, dispatch ] = React.useReducer(reducer, initState);
-  const { state: { account, chainId, provider } } = React.useContext(ConnectionContext);
+  // const { state: { account, chainId, provider } } = React.useContext(ConnectionContext);
+  const { account, provider } = useSignerAccount();
+  const { chainId } = useWeb3React();
+
   const { dispatch: notifyDispatch } = React.useContext(NotifyContext);
 
   /* cache|localStorage declarations */
@@ -336,7 +336,7 @@ const YieldProvider = ({ children }:any) => {
 
   /* Init app and re-init app on change of user and/or network  */
   React.useEffect( () => {
-    ( async () => chainId && initContext(chainId))();
+    chainId && ( async () => initContext(chainId))();
   }, [chainId, account]);
 
   const actions = {

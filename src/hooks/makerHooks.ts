@@ -3,7 +3,8 @@ import React from 'react';
 import Maker from '@makerdao/dai';
 import { McdPlugin, ETH, DAI, BAT } from '@makerdao/dai-plugin-mcd';
 
-import { ConnectionContext } from '../contexts/ConnectionContext';
+// import { ConnectionContext } from '../contexts/ConnectionContext';
+import { useSignerAccount } from './connectionHooks';
 
 import rinkebyAddresses from '../contracts/makerAddrs/rinkeby.json';
 import goerliAddresses from '../contracts/makerAddrs/goerli.json';
@@ -57,14 +58,18 @@ const defineNetwork = (_networkId:number) => {
 
 export const useMaker = () => {
 
-  const { state : { account, chainId, provider } } = React.useContext(ConnectionContext);
+  // const { state : { account, chainId, provider } } = React.useContext(ConnectionContext);
+
+  const { signer, provider, account, altProvider, voidSigner } = useSignerAccount();
+
   // const { account, chainId, library } = useWeb3React();
   const [openVaultActive, setOpenVaultActive] = React.useState<boolean>(false);
   const [convertVaultActive, setConvertVaultActive] = React.useState<boolean>(false);
   const [getVaultActive, setGetVaultActive] = React.useState<boolean>(false);
 
   // const networkNumber = await chainId;
-  const network = defineNetwork(chainId || 0);
+
+  const network = defineNetwork( provider.network.chainId || 0 );
 
   const addressOverrides = ['rinkeby', 'ropsten', 'goerli'].some(
     networkName => networkName === network.network

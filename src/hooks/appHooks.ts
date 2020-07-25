@@ -1,5 +1,4 @@
 import React from 'react';
-import { ConnectionContext } from '../contexts/ConnectionContext';
 import { NotifyContext } from '../contexts/NotifyContext';
 
 export const useTxActive = (type:string) => {
@@ -7,7 +6,6 @@ export const useTxActive = (type:string) => {
 };
 
 export const useCachedState = (key:string, initialValue:any) => {
-  const { state:{ chainId } } = React.useContext(ConnectionContext);
   // const genKey = `${chainId}_${key}` || key;
   const genKey = key;
   const [storedValue, setStoredValue] = React.useState(

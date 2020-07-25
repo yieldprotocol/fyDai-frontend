@@ -3,7 +3,9 @@ import { useWeb3React } from '@web3-react/core';
 import { ethers, BigNumber}  from 'ethers';
 
 import { NotifyContext } from '../contexts/NotifyContext';
-import { ConnectionContext } from '../contexts/ConnectionContext';
+// import { ConnectionContext } from '../contexts/ConnectionContext';
+
+import { useSignerAccount } from './connectionHooks';
 
 import YDai from '../contracts/YDai.json';
 import Controller from '../contracts/Controller.json';
@@ -44,9 +46,8 @@ const contractMap = new Map<string, any>([
  * @returns { boolean } sendTxActive
  */
 export const useSendTx = () => {
-  const { state: { signer, account } } = React.useContext(ConnectionContext);
-  // const { library, account } = useWeb3React();
-  // const signer = library.getSigner();
+  // const { state: { signer, account } } = React.useContext(ConnectionContext);
+  const { signer, account } = useSignerAccount();
   const [ sendTxActive, setSendTxActive ] = React.useState<boolean>();
 
   /**
@@ -87,8 +88,9 @@ export const useSendTx = () => {
  */
 export const useCallTx = () => {
 
-  const { state: { provider, altProvider } } = React.useContext(ConnectionContext);
-  // const { library: provider, account } = useWeb3React();
+  // const { state: { provider, altProvider } } = React.useContext(ConnectionContext);
+  const { signer, provider, account, altProvider, voidSigner } = useSignerAccount();
+
   const [ callTxActive, setCallTxActive ] = React.useState<boolean>();
   /**
    * Get data from the blockchain via provider (no signer reqd)
@@ -118,8 +120,8 @@ export const useCallTx = () => {
  * @returns { boolean } getTokenBalance
  */
 export function useBalances() {
-  const { state: { provider, account } } = React.useContext(ConnectionContext);
-  // const { library: txProvider, account } = useWeb3React();
+  // const { state: { provider, account } } = React.useContext(ConnectionContext);
+  const { signer, provider, account, altProvider, voidSigner } = useSignerAccount();
 
   /**
    * Native user account balance (WEI)
@@ -175,4 +177,4 @@ export function useBalances() {
   };
 
   return { getTokenAllowance, getEthBalance, getTokenBalance } as const;
-};
+}

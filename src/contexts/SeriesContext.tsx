@@ -2,10 +2,8 @@ import React from 'react';
 import { ethers, BigNumber } from 'ethers';
 
 import * as utils from '../utils';
-import { useCallTx, useMath, useMarket } from '../hooks';
-
+import { useCallTx, useMath, useMarket, useSignerAccount, useWeb3React } from '../hooks';
 import { YieldContext } from './YieldContext';
-import { ConnectionContext } from './ConnectionContext';
 
 import { IYieldSeries } from '../types';
 
@@ -45,7 +43,8 @@ function reducer(state:any, action:any) {
 
 const SeriesProvider = ({ children }:any) => {
 
-  const { state: { chainId, account } } = React.useContext(ConnectionContext);
+  const { account, provider } = useSignerAccount();
+  const { chainId } = useWeb3React();
 
   const initState = { 
     seriesData : new Map(),
@@ -242,8 +241,8 @@ const SeriesProvider = ({ children }:any) => {
   }, [ userData, feedData ]);
 
   React.useEffect( () => {
-    ( async () => {
-      chainId && !yieldState?.isLoading && await getPositions(yieldState.deployedSeries, false);
+    chainId && !yieldState?.isLoading && ( async () => {
+      await getPositions(yieldState.deployedSeries, false);
     })();
   }, [ account, chainId, yieldState ]);
 

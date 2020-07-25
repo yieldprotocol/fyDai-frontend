@@ -2,8 +2,8 @@ import React from 'react';
 import { ethers, BigNumber }  from 'ethers';
 
 import { NotifyContext } from '../contexts/NotifyContext';
-import { ConnectionContext } from '../contexts/ConnectionContext';
-
+// import { ConnectionContext } from '../contexts/ConnectionContext';
+import { useSignerAccount } from './connectionHooks';
 // import { YieldContext } from '../contexts/YieldContext';
 
 import Market from '../contracts/Market.json';
@@ -17,9 +17,8 @@ import YDai from '../contracts/YDai.json';
  * @returns { boolean } redeemActive
  */
 export const useMarket = () => {
-  const { state: { provider, signer, account } } = React.useContext(ConnectionContext);
-  // const { library, account } = useWeb3React();
-  // const signer = library.getSigner();
+  // const { state: { provider, signer, account } } = React.useContext(ConnectionContext);
+  const { provider, signer, account } = useSignerAccount();
 
   const { abi: marketAbi } = Market;
   const  { dispatch }  = React.useContext<any>(NotifyContext);

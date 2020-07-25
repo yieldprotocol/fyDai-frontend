@@ -8,7 +8,7 @@ import { Anchor, Layer, Header, Heading, Footer, Button, Box, Text } from 'gromm
 // import { BigNumber.from } from 'ethers';
 import * as utils from '../../utils';
 
-import { getNetworkName }  from '../../hooks/connectionHooks';
+// import { getNetworkName }  from '../../hooks/connectionHooks';
 import ProfileButton from '../ProfileButton';
 import { NotifyContext } from '../../contexts/NotifyContext';
 
