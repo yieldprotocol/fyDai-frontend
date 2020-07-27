@@ -74,7 +74,8 @@ export const useYDai = () => {
       console.log(e);
       res = BigNumber.from('0');
     }
-    return parseFloat(ethers.utils.formatEther(res));
+    console.log(ethers.utils.formatEther(res.toString()));
+    return parseFloat(ethers.utils.formatEther(res.toString()));
   };
 
   return {

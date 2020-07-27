@@ -65,12 +65,15 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   const [ warningMsg, setWarningMsg] = React.useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
 
-  const borrowProcedure = async (value:number) => {
-    await borrow(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value);
-    await buyDai(
-      activeSeries.marketAddress,
-      inputValue,
-      0
+  const borrowProcedure = (value:number) => {
+    borrow(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value).then(
+      async () => {
+        await buyDai(
+          activeSeries.marketAddress,
+          inputValue,
+          0
+        );
+      }
     );
     setInputValue('');
     yieldActions.updateUserData();
@@ -167,7 +170,11 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   useEffect(() => {
     console.log(seriesAggregates);
     ( async ()=>{
-      activeSeries && setApproved(await userAllowance(activeSeries.yDaiAddress, activeSeries.marketAddress));
+      const approvedAmount = await userAllowance(activeSeries.yDaiAddress, activeSeries.marketAddress);
+      console.log('1', approvedAmount); 
+      console.log('2', approvedAmount.toString());
+      console.log('3', parseFloat(approvedAmount.toString()));
+      activeSeries && setApproved( parseFloat(approvedAmount.toString()));
       activeSeries && setHasDelegated(activeSeries.hasDelegated);
     })();
   }, [ activeSeries ]);
@@ -314,7 +321,7 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
           </Box>
 
           <Box>
-            <CheckBox 
+            <CheckBox
               reverse
                 // value={true}
               checked={!inputValue || ( approved >= yDaiValue )}

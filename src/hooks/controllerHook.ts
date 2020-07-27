@@ -140,7 +140,6 @@ export const useController = () => {
     /* Contract interaction */
     setBorrowActive(true);
     const contract = new ethers.Contract( controllerAddr, controllerAbi, signer );
-
     try {
       tx = await contract.borrow(collateralBytes, matdate, fromAddr, toAddr, parsedAmount);
     } catch (e) {
