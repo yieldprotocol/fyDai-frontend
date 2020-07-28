@@ -2,8 +2,8 @@ import React from 'react';
 import { ethers, BigNumber }  from 'ethers';
 
 import { NotifyContext } from '../contexts/NotifyContext';
-import { ConnectionContext } from '../contexts/ConnectionContext';
-
+// import { ConnectionContext } from '../contexts/ConnectionContext';
+import { useSignerAccount } from './connectionHooks';
 // import { YieldContext } from '../contexts/YieldContext';
 
 import Market from '../contracts/Market.json';
@@ -17,9 +17,8 @@ import YDai from '../contracts/YDai.json';
  * @returns { boolean } redeemActive
  */
 export const useMarket = () => {
-  const { state: { provider, signer, account } } = React.useContext(ConnectionContext);
-  // const { library, account } = useWeb3React();
-  // const signer = library.getSigner();
+  // const { state: { provider, signer, account } } = React.useContext(ConnectionContext);
+  const { provider, signer, account } = useSignerAccount();
 
   const { abi: marketAbi } = Market;
   const  { dispatch }  = React.useContext<any>(NotifyContext);
@@ -236,6 +235,8 @@ export const useMarket = () => {
     /// @param chaiOut Amount of chai being bought that will be deposited in `to` wallet
     const contract = new ethers.Contract( marketAddr, marketAbi, signer );
     try {
+      console.log('gas est:', ( await contract.estimateGas.buyDai(fromAddr, toAddr, parsedAmount, overrides )).toString());
+      console.log('dry-run:', ( await contract.callStatic.buyDai(fromAddr, toAddr, parsedAmount, overrides )).toString());
       tx = await contract.buyDai(fromAddr, toAddr, parsedAmount, overrides );
     } catch (e) {
       console.log(e);
@@ -271,7 +272,7 @@ export const useMarket = () => {
   const previewMarketTx = async (
     txType: string,
     marketAddress: string,
-    amount: number
+    amount: number,
   ): Promise<BigNumber> => {
     const parsedAmount = ethers.utils.parseEther(amount.toString());
     const marketAddr = ethers.utils.getAddress(marketAddress);
@@ -290,7 +291,7 @@ export const useMarket = () => {
         default : result = BigNumber.from('0'); break;
       }
     } catch (e) {
-      console.log(e);
+      console.log('Market Liquidity Error:', e);
       result = BigNumber.from('0');
     }
     return result;
@@ -357,7 +358,6 @@ export const useMarket = () => {
     }
     return res;
   };
-
 
   return {
     checkMarketDelegate, addMarketDelegate, approveToken, previewMarketTx, sellYDai, buyYDai, sellDai, buyDai, sellActive, buyActive, approveActive

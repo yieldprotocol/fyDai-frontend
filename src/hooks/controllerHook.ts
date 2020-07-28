@@ -1,11 +1,14 @@
 import React from 'react';
 import { ethers }  from 'ethers';
+import { useWeb3React } from '@web3-react/core';
+
 import { NotifyContext } from '../contexts/NotifyContext';
-import { ConnectionContext } from '../contexts/ConnectionContext';
 import Controller from '../contracts/Controller.json';
 import TestERC20 from '../contracts/TestERC20.json';
 
+import { useSignerAccount } from './connectionHooks';
 // ethers.errors.setLogLevel('error');
+
 
 /**
  * Hook for interacting with the yield 'DEALER' Contract
@@ -23,7 +26,8 @@ import TestERC20 from '../contracts/TestERC20.json';
 export const useController = () => {
 
   const { abi: controllerAbi } = Controller;
-  const { state: { provider, signer, account } } = React.useContext(ConnectionContext);
+  // const { state: { provider, signer, account } } = React.useContext(ConnectionContext);
+  const { signer, provider, account } = useSignerAccount();
 
   const  { dispatch }  = React.useContext<any>(NotifyContext);
   const [ postActive, setPostActive ] = React.useState<boolean>(false);
@@ -136,7 +140,6 @@ export const useController = () => {
     /* Contract interaction */
     setBorrowActive(true);
     const contract = new ethers.Contract( controllerAddr, controllerAbi, signer );
-
     try {
       tx = await contract.borrow(collateralBytes, matdate, fromAddr, toAddr, parsedAmount);
     } catch (e) {
@@ -241,7 +244,8 @@ export const useController = () => {
     dispatch({ type: 'txPending', payload:{ tx, message: `Token approval of ${amount} pending...` } } );
     await tx.wait();
     setApproveActive(false);
-    dispatch({ type: 'txComplete', payload:{ tx } } );  };
+    dispatch({ type: 'txComplete', payload:{ tx } } );  
+  };
 
   /**
    * Delegate a 3rd party to act on behalf of the user in the Controller

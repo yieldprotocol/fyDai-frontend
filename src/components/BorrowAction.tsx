@@ -56,21 +56,24 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
 
   const [ hasDelegated, setHasDelegated] = React.useState<boolean>(activeSeries?.hasDelegated || true);
 
+  /* token balances and values */
+  const [ yDaiValue, setYDaiValue ] = React.useState<number>(0);
   const [ approved, setApproved ] = React.useState<any>(0);
   const [ daiApproved, setDaiApproved ] = React.useState<any>(0);
-
-  const [ yDaiValue, setYDaiValue ] = React.useState<number>(0);
 
   const [ indicatorColor, setIndicatorColor ] = React.useState<string>('brand');
   const [ warningMsg, setWarningMsg] = React.useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
 
-  const borrowProcedure = async (value:number) => {
-    await borrow(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value);
-    await buyDai(
-      activeSeries.marketAddress,
-      inputValue,
-      0
+  const borrowProcedure = (value:number) => {
+    borrow(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value).then(
+      async () => {
+        await buyDai(
+          activeSeries.marketAddress,
+          inputValue,
+          0
+        );
+      }
     );
     setInputValue('');
     yieldActions.updateUserData();
@@ -97,6 +100,7 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   }, [ pendingTxs ]);
 
 
+  /* Handle collateralisation ratio exceptions and warnings */
   useEffect(()=>{
     if (estRatio && estRatio <= 1.5) {
       setBorrowDisabled(true);
@@ -114,6 +118,7 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
     }
   }, [ estRatio ]);
 
+  /* Handle dai to yDai conversion (yDai needed to compare with the approved allowance)  */
   useEffect(() => {
     activeSeries && inputValue > 0 && ( async () => {
       const preview = await previewMarketTx('buyDai', activeSeries.marketAddress, inputValue);
@@ -122,11 +127,29 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
         setWarningMsg(null);
         setErrorMsg(null);
       } else {
+        /* if the market doesnt have liquidity just estimate from rate */
+        const rate = await previewMarketTx('buyDai', activeSeries.marketAddress, 1);
+        setYDaiValue(inputValue* parseFloat((ethers.utils.formatEther(rate))) );
         setBorrowDisabled(true);
         setErrorMsg('The Market doesn\'t have the liquidity to support a transaction of that size just yet.');
       }
     })();
   }, [inputValue]);
+
+  /* Then also the opposite, Handle yDai to Dai conversion for the approved Dai */
+  useEffect(() => {
+    approved && ( async () => {
+      const preview = await previewMarketTx('SellYDai', activeSeries.marketAddress, approved);
+      if (!preview.isZero()) {
+        setDaiApproved( parseFloat(ethers.utils.formatEther(preview)) );
+      } else {
+        /* market doesn't have liquidity - estimate from a rate */
+        const rate = await previewMarketTx('SellYDai', activeSeries.marketAddress, 1);
+        setDaiApproved( approved*parseFloat(ethers.utils.formatEther(rate)) );
+      }
+    })();
+  }, [ approved ]);
+
 
   useEffect(() => {
     if ( inputValue && ( inputValue > maxDaiAvailable_ ) ) {
@@ -156,18 +179,10 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   }, [ approved, inputValue, yDaiValue, hasDelegated ]);
 
   useEffect(() => {
-    approved && ( async () => {
-      console.log(approved);
-      const preview = await previewMarketTx('SellYDai', activeSeries.marketAddress, approved);
-      setDaiApproved( parseFloat(ethers.utils.formatEther(preview)) );
-    })();
-  }, [ approved ]);
-
-  useEffect(() => {
-    console.log(seriesAggregates);
-    ( async ()=>{
-      activeSeries && setApproved(await userAllowance(activeSeries.yDaiAddress, activeSeries.marketAddress));
-      activeSeries && setHasDelegated(activeSeries.hasDelegated);
+    activeSeries && ( async ()=>{
+      const approvedAmount = await userAllowance(activeSeries.yDaiAddress, activeSeries.marketAddress);
+      setApproved( parseFloat(approvedAmount.toString()));
+      setHasDelegated(activeSeries.hasDelegated);
     })();
   }, [ activeSeries ]);
 
@@ -242,7 +257,6 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
 
           
           <Box direction='row-responsive' pad={{ horizontal:'medium' }} justify='start' gap='large' fill>
-            
             <Box gap='small'>
               <Box direction='row' gap='small'>
                 <Text color='text-weak' size='xsmall'>Current Debt</Text>
@@ -314,7 +328,7 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
           </Box>
 
           <Box>
-            <CheckBox 
+            <CheckBox
               reverse
                 // value={true}
               checked={!inputValue || ( approved >= yDaiValue )}

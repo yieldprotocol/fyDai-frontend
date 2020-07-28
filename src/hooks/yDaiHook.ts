@@ -1,7 +1,8 @@
 import React from 'react';
 import { ethers, BigNumber }  from 'ethers';
 import { NotifyContext } from '../contexts/NotifyContext';
-import { ConnectionContext } from '../contexts/ConnectionContext';
+// import { ConnectionContext } from '../contexts/ConnectionContext';
+import { useSignerAccount } from './connectionHooks';
 import YDai from '../contracts/YDai.json';
 
 // ethers.errors.setLogLevel('error');
@@ -13,9 +14,8 @@ import YDai from '../contracts/YDai.json';
  */
 export const useYDai = () => {
 
-  const { state: { signer, account } } = React.useContext(ConnectionContext);
-  // const { library, account } = useWeb3React();
-  // const signer = library.getSigner();
+  // const { state: { signer, account } } = React.useContext(ConnectionContext);
+  const { provider, signer, account } = useSignerAccount();
 
   const { abi: yDaiAbi } = YDai;
   const  { dispatch }  = React.useContext<any>(NotifyContext);
@@ -52,7 +52,8 @@ export const useYDai = () => {
   };
 
   /**
-   * User yDai token alloance 
+   * User yDai token allowance
+   * 
    * @param {string} yDaiAddress address of the yDai series to redeem from.
    * @param {string} marketAddress address of the yDai series to redeem from.
    * 
@@ -65,16 +66,16 @@ export const useYDai = () => {
     const fromAddr = account && ethers.utils.getAddress(account);
     const yDaiAddr = ethers.utils.getAddress(yDaiAddress);
     const marketAddr = ethers.utils.getAddress(marketAddress);
-    const contract = new ethers.Contract( yDaiAddr, yDaiAbi, signer );
+    const contract = new ethers.Contract( yDaiAddr, yDaiAbi, provider );
     let res;
     try {
       res = await contract.allowance(fromAddr, marketAddr);
     }  catch (e) {
-      // dispatch({ type: 'notify', payload:{ message:'Error Redeeming funds.', type:'error' } } );
       console.log(e);
       res = BigNumber.from('0');
     }
-    return parseFloat(ethers.utils.formatEther(res));
+    console.log(ethers.utils.formatEther(res.toString()));
+    return parseFloat(ethers.utils.formatEther(res.toString()));
   };
 
   return {

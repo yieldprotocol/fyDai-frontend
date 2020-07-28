@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { ethers } from 'ethers';
+import { Web3ReactProvider } from '@web3-react/core';
+
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
@@ -8,23 +10,16 @@ import * as serviceWorker from './serviceWorker';
 import { NotifyProvider }  from './contexts/NotifyContext';
 import { YieldProvider }  from './contexts/YieldContext';
 import { SeriesProvider }  from './contexts/SeriesContext';
-import { ConnectionProvider } from './contexts/ConnectionContext';
 
-// TODO: re-implement web3-react
-import { Web3ReactProvider, createWeb3ReactRoot, UnsupportedChainIdError } from '@web3-react/core';
-import { NoEthereumProviderError, UserRejectedRequestError as UserRejectedRequestErrorInjected } from '@web3-react/injected-connector';
-
-// TODO: re-implement web3-react & Production infura support
-function getLibrary(provider:any) {
-  // return new ethers.providers.InfuraProvider([network = “homestead”][,apiAccessToken])
-  // @ts-ignore
-  return new ethers.providers.Web3Provider(provider);
+function getLibrary(provider: any) {
+  const library = new ethers.providers.Web3Provider(provider);
+  library.pollingInterval = 12000;
+  return library;
 }
 
 ReactDOM.render(
   <React.StrictMode>
-    {/* <Web3ReactProvider getLibrary={getLibrary}> */}
-    <ConnectionProvider>
+    <Web3ReactProvider getLibrary={getLibrary}> 
       <NotifyProvider>
         <YieldProvider>
           <SeriesProvider>
@@ -32,8 +27,7 @@ ReactDOM.render(
           </SeriesProvider>
         </YieldProvider>
       </NotifyProvider>
-    </ConnectionProvider>
-    {/* </Web3ReactProvider> */}
+    </Web3ReactProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );

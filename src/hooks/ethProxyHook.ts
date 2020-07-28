@@ -1,8 +1,11 @@
 import React from 'react';
+
 import { ethers, BigNumber }  from 'ethers';
 import { NotifyContext } from '../contexts/NotifyContext';
-import { ConnectionContext } from '../contexts/ConnectionContext';
+// import { ConnectionContext } from '../contexts/ConnectionContext';
 import EthProxy from '../contracts/EthProxy.json';
+
+import { useSignerAccount } from './connectionHooks';
 
 // ethers.errors.setLogLevel('error');
 
@@ -16,11 +19,21 @@ import EthProxy from '../contracts/EthProxy.json';
  */
 export const useEthProxy = () => {
 
-  const { state: { signer, account } } = React.useContext(ConnectionContext);
+  // const { state: { signer, account } } = React.useContext(ConnectionContext);
+  const { signer, provider, account } = useSignerAccount();
+
   const { abi: ethProxyAbi } = EthProxy;
   const  { dispatch }  = React.useContext<any>(NotifyContext);
   const [ postEthActive, setPostEthActive ] = React.useState<boolean>(false);
   const [ withdrawEthActive, setWithdrawEthActive ] = React.useState<boolean>(false);
+
+  // const { library: provider, account } = useWeb3React();
+  // const [ signer, setSigner ] = React.useState<any>();
+  // React.useEffect(()=>{
+  //   (async () => {
+  //     setSigner( await provider.getSigner() );
+  //   })();
+  // }, [account, provider]);
 
   /**
    * Posts collateral (ETH) via ethProxy

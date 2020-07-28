@@ -1,22 +1,20 @@
-import React, { useEffect } from 'react';
-import { useWeb3React } from '@web3-react/core';
-import { Image, Text, Button, Box } from 'grommet';
+import React, { useEffect, useState } from 'react';
 
-import { useConnectorImage } from '../hooks/connectionHooks';
+import { Text, Box } from 'grommet';
+// import { useConnectorImage } from '../hooks/connectionHooks';
+// import { NotifyContext } from '../contexts/NotifyContext';
+import { useWeb3React } from '../hooks';
 
-import { ConnectionContext } from '../contexts/ConnectionContext'; 
+const ProfileButton = ({ action }: any) => {
 
-import { NotifyContext} from '../contexts/NotifyContext';
-
-const ProfileButton = (props: any) => {
-  // const { account } = React.useContext(ConnectionContext);
-  const [ accLabel, setAccLabel ] = React.useState<string>('');
+  const [ accLabel, setAccLabel ] = useState<string>('');
   // const [ connectorImage, setConnectorImage ] = React.useState<string>('');
-  const { action, account } = props;
+  const { account } = useWeb3React();
 
-  React.useEffect(()=>{
+  useEffect(()=>{
     (async () => {
       setAccLabel(`${account?.substring(0, 4)}...${account?.substring(account.length - 4)}`);
+      // setConnectorImage(()=>useConnectorImage);
     })(); 
   }, [account]);
 

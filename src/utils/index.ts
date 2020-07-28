@@ -1,12 +1,12 @@
 import { ethers, BigNumber } from 'ethers';
 
+/* constants */
 export const BN_RAY = BigNumber.from('1000000000000000000000000000');
 export const N_RAY = '1000000000000000000000000000';
 export const WAD = BigNumber.from('1000000000000000000');
 export const RAY = BigNumber.from('1000000000000000000000000000');
 export const RAD = BigNumber.from('10000000000000000000000000000000000000000');
 export const SECONDS_PER_YEAR = 365 * 24 * 60 * 60;
-
 export const ETH = ethers.utils.formatBytes32String('ETH-A');
 export const CHAI = ethers.utils.formatBytes32String('CHAI');
 

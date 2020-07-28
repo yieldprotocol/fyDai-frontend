@@ -1,6 +1,8 @@
 import React from 'react';
 import { ethers }  from 'ethers';
-import { ConnectionContext } from '../contexts/ConnectionContext';
+// import { ConnectionContext } from '../contexts/ConnectionContext';
+
+import { useSignerAccount } from './connectionHooks';
 
 import YDai from '../contracts/YDai.json';
 import Controller from '../contracts/Controller.json';
@@ -36,7 +38,8 @@ const contractMap = new Map<string, any>([
  * @returns { function } getEvents
  */
 export const useEvents = () => {
-  const { state: { provider } } = React.useContext(ConnectionContext);
+  // const { state: { provider } } = React.useContext(ConnectionContext);
+  const { provider } = useSignerAccount();
   const [ eventListenerList, setEventListenerList ] = React.useState<boolean>();
   const [ isLoading, setIsLoading ] = React.useState<boolean>();
 

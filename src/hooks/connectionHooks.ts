@@ -1,5 +1,5 @@
 import React from 'react';
-
+import { ethers } from 'ethers';
 import { useWeb3React } from '@web3-react/core';
 import { injected, trezor, walletlink, torus } from '../connectors';
 
@@ -9,11 +9,7 @@ import walletlinkImage from '../assets/images/providers/walletlink.png';
 import torusImage from '../assets/images/providers/torus.png';
 import noConnectionImage from '../assets/images/providers/noconnection.png';
 
-import { ConnectionContext } from '../contexts/ConnectionContext';
-
-// Eager connect is an attempt to 'auto connect' to injected connection eg. Metamask.
 export function useEagerConnect() {
-  console.log('eager connect fired');
   const { activate, active } = useWeb3React();
   const [tried, setTried] = React.useState(false);
   React.useEffect(() => {
@@ -26,71 +22,18 @@ export function useEagerConnect() {
         setTried(true);
       }
     });
-  }, [activate]);
+  }, []); // intentionally only running on mount (make sure it's only mounted once :))
   // if the connection worked, wait until we get confirmation of that to flip the flag
   React.useEffect(() => {
     if (!tried && active) {
       setTried(true);
     }
   }, [tried, active]);
-  return [ tried ] as const;
-}
-
-export function useConnectorImage() {
-  const { connector } = useWeb3React();
-  const { state:{ provider } } = React.useContext(ConnectionContext);
-  const [ image, setImage ] = React.useState<any>();
-  React.useEffect(() => {
-    switch (connector) {
-      case injected:
-        setImage(injectedImage);
-        break;
-      case trezor:
-        setImage(trezorImage);
-        break;
-      case walletlink:
-        setImage(walletlinkImage);
-        break;
-      case torus:
-        setImage(torusImage);
-        break;
-      default:
-        setImage(noConnectionImage);
-    }
-  }, [connector]);
-  return image;
-}
-
-// TODO: not a hook... but here for the time-being. 
-export function getNetworkName(networkId: Number) {
-  switch (networkId) {
-    case 1: {
-      return 'Main Ethereum Network';
-    }
-    case 3: {
-      return 'Ropsten Test Network';
-    }
-    case 4: {
-      return 'Rinkeby Test Network';
-    }
-    case 5: {
-      return 'Görli Test Network';
-    }
-    case 42: {
-      return 'Kovan Test Network';
-    }
-    case 1337: {
-      return 'Ganache Localhost';
-    }
-    default: {
-      return '..ummm...';
-    }
-  }
+  return tried;
 }
 
 export function useInactiveListener(suppress: boolean = false) {
   const { active, error, activate } = useWeb3React();
-
   // eslint-disable-next-line consistent-return
   React.useEffect((): any => {
     const { ethereum } = window as any;
@@ -131,3 +74,42 @@ export function useInactiveListener(suppress: boolean = false) {
   }, [active, error, suppress, activate]);
 }
 
+export function useConnectorImage() {
+  const { connector } = useWeb3React();
+  const [ image, setImage ] = React.useState<any>();
+  React.useEffect(() => {
+    switch (connector) {
+      case injected:
+        setImage(injectedImage);
+        break;
+      case trezor:
+        setImage(trezorImage);
+        break;
+      case walletlink:
+        setImage(walletlinkImage);
+        break;
+      case torus:
+        setImage(torusImage);
+        break;
+      default:
+        setImage(noConnectionImage);
+    }
+  }, [connector]);
+  return image;
+}
+
+export function useSignerAccount() {
+  const { library: provider, account } = useWeb3React();
+  const [ signer, setSigner ] = React.useState<any>();
+  const [ voidSigner, setVoidSigner ] = React.useState<any>();
+  const [ altProvider, setAltProvider ] = React.useState<any>();
+  React.useEffect(()=>{
+    provider && (async () => {
+      setSigner( await provider.getSigner() );
+      // TODO: create alternate provider
+      setAltProvider( provider );
+      account && setVoidSigner( new ethers.VoidSigner( account ));
+    })();
+  }, [account, provider]);
+  return { signer, provider, account, voidSigner, altProvider };
+}

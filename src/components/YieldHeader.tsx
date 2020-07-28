@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-// import { useWeb3React } from '@web3-react/core';
+import { useWeb3React } from '@web3-react/core';
 
 import {
   Text,
@@ -17,7 +17,6 @@ import logoDark from '../assets/images/logo.svg';
 import logoLight from '../assets/images/logo_light.svg';
 import ProfileButton from './ProfileButton';
 
-import { ConnectionContext } from '../contexts/ConnectionContext';
 import { NotifyContext } from '../contexts/NotifyContext';
 
 interface LinkProps {
@@ -27,16 +26,16 @@ interface LinkProps {
 }
 
 const YieldHeader = (props: any) => {
+
+  const { account } = useWeb3React();
+
   const {
     openConnectLayer,
     openAccountLayer,
     activeView,
     setActiveView,
   } = props;
-
-  const {
-    state: { account },
-  } = React.useContext(ConnectionContext);
+  
   const {
     state: { pendingTxs },
   } = React.useContext(NotifyContext);
@@ -51,7 +50,7 @@ const YieldHeader = (props: any) => {
       link: 'DASHBOARD',
       text: 'Dashboard',
       id: 0,
-      disabled: true,
+      disabled: false,
     },
     {
       link: 'BORROW',

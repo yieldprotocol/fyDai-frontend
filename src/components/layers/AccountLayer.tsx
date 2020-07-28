@@ -1,18 +1,17 @@
 import React from 'react';
-import { useWeb3React } from '@web3-react/core';
 import { Anchor, Layer, Header, Footer, Button, Box, Text } from 'grommet';
 
-import { getNetworkName }  from '../../hooks/connectionHooks';
+import ProfileButton from '../ProfileButton';
 
 import { YieldContext } from '../../contexts/YieldContext';
-import { ConnectionContext } from '../../contexts/ConnectionContext';
-
-import ProfileButton from '../ProfileButton';
+import { useWeb3React } from '../../hooks';
 
 const AccountLayer = (props:any) => {
   const { closeLayer, changeWallet } = props;
 
-  const { state: { chainId }  } = React.useContext(ConnectionContext);
+  const { library } = useWeb3React();
+
+  // const { state: { chainId }  } = React.useContext(ConnectionContext);
   const { state: { userData } } = React.useContext(YieldContext);
   
   const onClose = () => {
@@ -53,7 +52,7 @@ const AccountLayer = (props:any) => {
           gap='small'
         >
           <Text size='xsmall'>Connected to:</Text> 
-          <Text weight="bold">{chainId && getNetworkName(chainId) }</Text>
+          <Text weight="bold"> { library.network.name } </Text>
           <Box direction='row' gap='small'>
             <Text size='xsmall'>ETH balance:</Text>
             <Text>{ userData.ethBalance_ && userData.ethBalance_ || '' }</Text>
