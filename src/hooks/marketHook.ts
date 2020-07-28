@@ -291,7 +291,7 @@ export const useMarket = () => {
         default : result = BigNumber.from('0'); break;
       }
     } catch (e) {
-      console.log(e);
+      console.log('Market Liquidity Error:', e);
       result = BigNumber.from('0');
     }
     return result;

@@ -127,11 +127,29 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
         setWarningMsg(null);
         setErrorMsg(null);
       } else {
+        /* if the market doesnt have liquidity just estimate from rate */
+        const rate = await previewMarketTx('buyDai', activeSeries.marketAddress, 1);
+        setYDaiValue(inputValue* parseFloat((ethers.utils.formatEther(rate))) );
         setBorrowDisabled(true);
         setErrorMsg('The Market doesn\'t have the liquidity to support a transaction of that size just yet.');
       }
     })();
   }, [inputValue]);
+
+  /* Then also the opposite, Handle yDai to Dai conversion for the approved Dai */
+  useEffect(() => {
+    approved && ( async () => {
+      const preview = await previewMarketTx('SellYDai', activeSeries.marketAddress, approved);
+      if (!preview.isZero()) {
+        setDaiApproved( parseFloat(ethers.utils.formatEther(preview)) );
+      } else {
+        /* market doesn't have liquidity - estimate from a rate */
+        const rate = await previewMarketTx('SellYDai', activeSeries.marketAddress, 1);
+        setDaiApproved( approved*parseFloat(ethers.utils.formatEther(rate)) );
+      }
+    })();
+  }, [ approved ]);
+
 
   useEffect(() => {
     if ( inputValue && ( inputValue > maxDaiAvailable_ ) ) {
@@ -161,21 +179,10 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   }, [ approved, inputValue, yDaiValue, hasDelegated ]);
 
   useEffect(() => {
-    approved && ( async () => {
-      const preview = await previewMarketTx('SellYDai', activeSeries.marketAddress, approved);
-      setDaiApproved( parseFloat(ethers.utils.formatEther(preview)) );
-    })();
-  }, [ approved ]);
-
-  useEffect(() => {
-    console.log(seriesAggregates);
-    ( async ()=>{
+    activeSeries && ( async ()=>{
       const approvedAmount = await userAllowance(activeSeries.yDaiAddress, activeSeries.marketAddress);
-      console.log('1', approvedAmount); 
-      console.log('2', approvedAmount.toString());
-      console.log('3', parseFloat(approvedAmount.toString()));
-      activeSeries && setApproved( parseFloat(approvedAmount.toString()));
-      activeSeries && setHasDelegated(activeSeries.hasDelegated);
+      setApproved( parseFloat(approvedAmount.toString()));
+      setHasDelegated(activeSeries.hasDelegated);
     })();
   }, [ activeSeries ]);
 
