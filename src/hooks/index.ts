@@ -17,10 +17,10 @@ import { useCallTx, useSendTx, useBalances } from './transactionHooks';
 import { useYDai } from './yDaiHook';
 import { useController } from './controllerHook';
 import { useEthProxy } from './ethProxyHook';
-import { useMarket } from './marketHook';
+import { usePool } from './poolHook';
 
 export {
-  useMarket,
+  usePool,
   useTxActive,
   useCachedState,
   useDebounce,

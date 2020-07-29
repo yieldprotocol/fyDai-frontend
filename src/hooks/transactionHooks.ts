@@ -18,7 +18,7 @@ import Vat from '../contracts/Vat.json';
 import Pot from '../contracts/Pot.json';
 import EthProxy from '../contracts/EthProxy.json';
 import Migrations from '../contracts/Migrations.json';
-import Market from '../contracts/Market.json';
+import Pool from '../contracts/Pool.json';
 
 // ethers.errors.setLogLevel('error');
 
@@ -34,7 +34,7 @@ const contractMap = new Map<string, any>([
   ['Pot', Pot.abi],
   ['EthProxy', EthProxy.abi],
   ['Migrations', Migrations.abi],
-  ['Market', Market.abi],
+  ['Pool', Pool.abi],
 ]);
 
 // TODO: Sanitize all inputs NB!!

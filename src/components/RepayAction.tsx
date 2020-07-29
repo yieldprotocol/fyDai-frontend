@@ -13,7 +13,7 @@ import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
 import { NotifyContext } from '../contexts/NotifyContext';
 
-import { useController, useMarket, useBalances } from '../hooks';
+import { useController, usePool, useBalances } from '../hooks';
 
 interface RepayActionProps {
   repayFn:any
@@ -26,7 +26,7 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
   const { deployedContracts, userData } = yieldState;
   const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
 
-  const { buyDai, previewMarketTx, approveToken }  = useMarket();
+  const { buyDai, previewPoolTx, approveToken }  = usePool();
   const { getTokenAllowance }  = useBalances();
 
   const { isLoading: positionsLoading, seriesAggregates, activeSeries, setActiveSeries } = seriesState;

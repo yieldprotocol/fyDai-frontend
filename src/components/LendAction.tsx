@@ -17,7 +17,7 @@ import DaiWithDrawAction from './DaiWithDrawAction';
 import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
   
-import { useMarket, useBalances } from '../hooks';
+import { usePool, useBalances } from '../hooks';
 
 interface BorrowActionProps {
   borrowFn?:any
@@ -40,7 +40,7 @@ const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   
   // const { borrow, borrowActive }  = useController();
 
-  const { sellDai, previewMarketTx, approveToken }  = useMarket();
+  const { sellDai, previewPoolTx, approveToken }  = usePool();
   const { getTokenAllowance } = useBalances();
   
   const [ inputValue, setInputValue ] = React.useState<any>();
@@ -76,14 +76,14 @@ const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
 
   useEffect(() => {
     activeSeries && inputValue && ( async () => {
-      const preview = await previewMarketTx('sellDai', activeSeries.marketAddress, inputValue);
+      const preview = await previewPoolTx('sellDai', activeSeries.marketAddress, inputValue);
       setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
     })();
   }, [inputValue]);
 
   useEffect(() => {
     activeSeries && inputValue && ( async () => {
-      const preview = await previewMarketTx('sellDai', activeSeries.marketAddress, inputValue);
+      const preview = await previewPoolTx('sellDai', activeSeries.marketAddress, inputValue);
       setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
     })();
   }, [inputValue]);
@@ -113,7 +113,7 @@ const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
 
   useEffect(() => {
     activeSeries && ( async ()=> {
-      const preview = await previewMarketTx('SellYDai', activeSeries.marketAddress, activeSeries.yDaiBalance_);
+      const preview = await previewPoolTx('SellYDai', activeSeries.marketAddress, activeSeries.yDaiBalance_);
       setCurrentValue( parseFloat(ethers.utils.formatEther(preview)));
     })();
   }, [ activeSeries, ]);

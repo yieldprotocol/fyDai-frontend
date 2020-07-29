@@ -66,7 +66,7 @@ const YieldHeader = (props: any) => {
     },
     {
       link: 'AMM',
-      text: 'Market',
+      text: 'Pool',
       id: 3,
       disabled: true,
     },

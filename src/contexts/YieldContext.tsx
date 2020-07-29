@@ -159,7 +159,7 @@ const YieldProvider = ({ children }:any) => {
         );
         await Promise.all(
           _seriesList.map(async (x:string, i:number)=>{
-            const marketAddress = await callTx(state.migrationsAddr.get(networkId), 'Migrations', 'contracts', [ethers.utils.formatBytes32String(`Market-yDai${i}`)]);
+            const marketAddress = await callTx(state.migrationsAddr.get(networkId), 'Migrations', 'contracts', [ethers.utils.formatBytes32String(`Pool-yDai${i}`)]);
             const name = await callTx(x, 'YDai', 'name', []);
             const maturity = (await callTx(x, 'YDai', 'maturity', [])).toNumber();
             return {
@@ -253,7 +253,7 @@ const YieldProvider = ({ children }:any) => {
 
     // TODO add in AMM history collection
     // _deployedSeries.forEach(async (x:any)=>{
-    //   const _marketHistory = await getEventHistory(x.market, 'Market', 'Borrowed', [], !txHistory?0:txHistory.lastBlock+1 )
+    //   const _marketHistory = await getEventHistory(x.market, 'Pool', 'Borrowed', [], !txHistory?0:txHistory.lastBlock+1 )
     //   .then((res:any) => parseEventList(res));
     // });
 

@@ -166,18 +166,18 @@ const TestLayer = (props:any) => {
               <Box gap='small'>
                 Approvals required:
                 <Button primary label='EthProxy (once-off)' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />
-                <Button primary label='Market1 (for each market)' onClick={()=> sendTx(deployedSeries[0].marketAddress, 'Market', 'addDelegate', [deployedSeries[0].yDaiAddress], utils.toWei('0'))} />
-                <Button primary label='Market2 (for each market)' onClick={()=> sendTx(deployedContracts.Market, 'Market', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />
+                <Button primary label='Pool1 (for each market)' onClick={()=> sendTx(deployedSeries[0].marketAddress, 'Pool', 'addDelegate', [deployedSeries[0].yDaiAddress], utils.toWei('0'))} />
+                <Button primary label='Pool2 (for each market)' onClick={()=> sendTx(deployedContracts.Pool, 'Pool', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />
               </Box>
             }
 
             {
             flow === 'MARKET' &&
               <Box gap='small'>
-                Market:
+                Pool:
 
                 <Button primary label='Check buy Rate' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />
-                <Button primary label='Market (for each market)' onClick={()=> sendTx(deployedContracts.Market, 'Controller', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />
+                <Button primary label='Pool (for each market)' onClick={()=> sendTx(deployedContracts.Pool, 'Controller', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />
               </Box>
             }
 

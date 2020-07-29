@@ -18,7 +18,7 @@ import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { NotifyContext } from '../contexts/NotifyContext';
 
-import { useController, useCallTx, useMarket, useYDai } from '../hooks';
+import { useController, useCallTx, usePool, useYDai } from '../hooks';
 
 interface BorrowActionProps {
   borrowFn?:any
@@ -42,11 +42,11 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   const { borrow, borrowActive }  = useController();
   const { 
     buyDai,
-    previewMarketTx,
+    previewPoolTx,
     approveToken,
-    addMarketDelegate,
-    checkMarketDelegate
-  }  = useMarket();
+    addPoolDelegate,
+    checkPoolDelegate
+  }  = usePool();
   const { userAllowance } = useYDai();
 
   const [ inputValue, setInputValue ] = React.useState<any>();
@@ -87,8 +87,8 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   };
 
   const delegateProcedure = async () => {
-    await addMarketDelegate(activeSeries.marketAddress, activeSeries.yDaiAddress);
-    const res = await checkMarketDelegate(activeSeries.marketAddress, activeSeries.yDaiAddress);
+    await addPoolDelegate(activeSeries.marketAddress, activeSeries.yDaiAddress);
+    const res = await checkPoolDelegate(activeSeries.marketAddress, activeSeries.yDaiAddress);
     setHasDelegated(res);
   };
 
@@ -121,17 +121,17 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   /* Handle dai to yDai conversion (yDai needed to compare with the approved allowance)  */
   useEffect(() => {
     activeSeries && inputValue > 0 && ( async () => {
-      const preview = await previewMarketTx('buyDai', activeSeries.marketAddress, inputValue);
+      const preview = await previewPoolTx('buyDai', activeSeries.marketAddress, inputValue);
       if (!preview.isZero()) {
         setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
         setWarningMsg(null);
         setErrorMsg(null);
       } else {
         /* if the market doesnt have liquidity just estimate from rate */
-        const rate = await previewMarketTx('buyDai', activeSeries.marketAddress, 1);
+        const rate = await previewPoolTx('buyDai', activeSeries.marketAddress, 1);
         setYDaiValue(inputValue* parseFloat((ethers.utils.formatEther(rate))) );
         setBorrowDisabled(true);
-        setErrorMsg('The Market doesn\'t have the liquidity to support a transaction of that size just yet.');
+        setErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
       }
     })();
   }, [inputValue]);
@@ -139,12 +139,12 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   /* Then also the opposite, Handle yDai to Dai conversion for the approved Dai */
   useEffect(() => {
     approved && ( async () => {
-      const preview = await previewMarketTx('SellYDai', activeSeries.marketAddress, approved);
+      const preview = await previewPoolTx('SellYDai', activeSeries.marketAddress, approved);
       if (!preview.isZero()) {
         setDaiApproved( parseFloat(ethers.utils.formatEther(preview)) );
       } else {
         /* market doesn't have liquidity - estimate from a rate */
-        const rate = await previewMarketTx('SellYDai', activeSeries.marketAddress, 1);
+        const rate = await previewPoolTx('SellYDai', activeSeries.marketAddress, 1);
         setDaiApproved( approved*parseFloat(ethers.utils.formatEther(rate)) );
       }
     })();
