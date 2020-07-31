@@ -11,6 +11,7 @@ import { YieldContext } from '../contexts/YieldContext';
 import { useEthProxy, useController } from '../hooks';
 
 import { NotifyContext } from '../contexts/NotifyContext';
+import InlineAlert from '../components/InlineAlert';
 
 interface IWithDrawActionProps {
   close?: any;
@@ -18,7 +19,7 @@ interface IWithDrawActionProps {
   maxValue?: number;
 }
 
-const EthWithdrawAction = ({ close }:IWithDrawActionProps) => {
+const WithdrawEth = ({ close }:IWithDrawActionProps) => {
 
   const { state: yieldState, actions: yieldActions } = useContext(YieldContext);
   const { deployedContracts, userData } = yieldState;
@@ -225,27 +226,7 @@ const EthWithdrawAction = ({ close }:IWithDrawActionProps) => {
 
           </Box>
 
-          { warningMsg && !errorMsg &&
-          <Box 
-            border={{ color:'orange' }} 
-            fill
-            round='small'
-            pad='small'
-          >
-            <Text weight='bold' color='orange'>Procced with Caution:</Text>  
-            <Text color='orange'>{warningMsg}</Text>
-          </Box> }
-
-          { errorMsg &&
-          <Box
-            border={{ color:'red' }}
-            fill
-            round='small'
-            pad='small'
-          >
-            <Text weight='bold' color='red'>Hang on...</Text>  
-            <Text color='red'>{errorMsg}</Text>
-          </Box> }
+          <InlineAlert warnMsg={warningMsg} errorMsg={errorMsg} />
 
           <Box
             fill='horizontal'
@@ -324,4 +305,4 @@ const EthWithdrawAction = ({ close }:IWithDrawActionProps) => {
   );
 };
 
-export default EthWithdrawAction;
+export default WithdrawEth;

@@ -13,7 +13,7 @@ import {
 
 import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
-import DepositAction from './DepositAction';
+import DepositAction from './Deposit';
 
 interface DashBorrowProps {
   // borrowFn:any

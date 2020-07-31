@@ -360,6 +360,16 @@ export const usePool = () => {
   };
 
   return {
-    checkPoolDelegate, addPoolDelegate, approveToken, previewPoolTx, sellYDai, buyYDai, sellDai, buyDai, sellActive, buyActive, approveActive
+    checkPoolDelegate,
+    addPoolDelegate,
+    approveToken,
+    previewPoolTx, 
+    sellYDai,
+    buyYDai,
+    sellDai,
+    buyDai, 
+    sellActive, 
+    buyActive, 
+    approveActive
   } as const;
 };

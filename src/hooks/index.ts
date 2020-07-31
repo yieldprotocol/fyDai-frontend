@@ -37,7 +37,7 @@ export {
   useEagerConnect,
   useInactiveListener,
   useConnectorImage,
-  
+
   useSignerAccount,
   
 };

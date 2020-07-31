@@ -1,52 +1,22 @@
 import React from 'react';
-import moment from 'moment';
-import { Box, Button, Heading, Text } from 'grommet';
-
-import RotateLoader from 'react-spinners/RotateLoader';
-
+import { Box, Text } from 'grommet';
 import { FiCheckCircle as CheckCircle } from 'react-icons/fi';
-import { YieldContext } from '../contexts/YieldContext';
-import { SeriesContext } from '../contexts/SeriesContext';
 
-import DepositAction from '../components/DepositAction';
-import BorrowAction from '../components/BorrowAction';
-import RepayAction from '../components/RepayAction';
+import Deposit from '../containers/Deposit';
+import Borrow from '../containers/Borrow';
+import Repay from '../containers/Repay';
+
 import PageHeader from '../components/PageHeader';
 
 interface BorrowProps {
-  setShowSeriesLayer?: any;
   activeView?: string;
 }
 
-const Borrow = ({
-  setShowSeriesLayer,
-  activeView: viewFromProp,
+const BorrowView = ({
+  activeView: activeViewFromProps,
 }: BorrowProps) => {
-  const { state: yieldState, actions: yieldActions } = React.useContext(
-    YieldContext
-  );
-  const { state: seriesState, actions: seriesActions } = React.useContext(
-    SeriesContext
-  );
-  const [activeView, setActiveView] = React.useState<string>(
-    viewFromProp || 'collateral'
-  );
-  const [activePosition, setActivePosition] = React.useState<any>(null);
-  const [borrowRepayActive, setBorrowRepayActive] = React.useState<boolean>(
-    true
-  );
-  const [depositWithdrawActive, setDepositWithdrawActive] = React.useState<
-  boolean
-  >(false);
-  const { isLoading: positionsLoading, seriesData, activeSeries } = seriesState;
-  const {
-    isLoading: yieldLoading,
-    userData,
-    deployedSeries,
-    deployedContracts,
-    yieldData,
-    makerData,
-  } = yieldState;
+
+  const [ activeView, setActiveView ] = React.useState<string>( activeViewFromProps || 'collateral' );
 
   return (
     <Box
@@ -138,8 +108,6 @@ const Borrow = ({
                 3. Repay Dai Debt
               </Text>
             </Box>
-
-
           </Box>
         </Box>
 
@@ -151,24 +119,21 @@ const Borrow = ({
           round="medium"
           pad="large"
         >
-          {activeView === 'collateral' && <DepositAction />}
+          {activeView === 'collateral' && <Deposit />}
           {activeView === 'borrow' && (
-          <BorrowAction maxValue={12} borrowFn={(x: any) => console.log(x)} />
+          <Borrow maxValue={12} borrowFn={(x: any) => console.log(x)} />
           )}
           {activeView === 'repay' && (
-          <RepayAction maxValue={12} repayFn={(x: any) => console.log(x)} />
+          <Repay maxValue={12} repayFn={(x: any) => console.log(x)} />
           )}
         </Box>
-
-      </Box>
-      
+      </Box>    
     </Box>
   );
 };
 
-Borrow.defaultProps = {
-  setShowSeriesLayer: null,
+BorrowView.defaultProps = {
   activeView: null,
 };
 
-export default Borrow;
+export default BorrowView;

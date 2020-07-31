@@ -1,33 +1,27 @@
 import React from 'react';
 
-// import { UnsupportedChainIdError } from '@web3-react/core';
-// import {
-//   NoEthereumProviderError,
-//   UserRejectedRequestError as UserRejectedRequestErrorInjected
-// } from '@web3-react/injected-connector';
-
 import { Grommet, base, Grid, Main, Box } from 'grommet';
 import { deepMerge } from 'grommet/utils';
 import { yieldTheme } from './themes';
 
-import { useEagerConnect, useInactiveListener, useWeb3React } from './hooks';
+import { useWeb3React } from './hooks';
 
 import Dashboard from './views/Dashboard';
-import Borrow from './views/Borrow';
-import Lend from './views/Lend';
+import BorrowView from './views/BorrowView';
+import LendView from './views/LendView';
 import Amm from './views/Amm';
 
 import YieldHeader from './components/YieldHeader';
 import YieldFooter from './components/YieldFooter';
 // import YieldSidebar from './components/YieldSidebar';
 
-import ConnectLayer from './components/layers/ConnectLayer';
-import AccountLayer from './components/layers/AccountLayer';
-import NotifyLayer from './components/layers/NotifyLayer';
+import ConnectLayer from './containers/layers/ConnectLayer';
+import AccountLayer from './containers/layers/AccountLayer';
+import NotifyLayer from './containers/layers/NotifyLayer';
 import SeriesSelector from './components/SeriesSelector';
 
 // TODO: remove testLayer for prod
-import TestLayer from './components/layers/TestLayer';
+import TestLayer from './containers/layers/TestLayer';
 
 const App = () =>  {
 
@@ -92,10 +86,10 @@ const App = () =>  {
                   <Box align="center">
                     {activeView === 'DASHBOARD' && <Dashboard />}
                     {activeView === 'BORROW' && (
-                      <Borrow setShowSeriesLayer={setShowSeriesLayer} />
+                      <BorrowView  />
                     )}
                     {activeView === 'LEND' && (
-                      <Lend setShowSeriesLayer={setShowSeriesLayer} />
+                      <LendView  />
                     )}
                     {activeView === 'AMM' && <Amm />}
                   </Box>

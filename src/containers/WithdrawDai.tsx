@@ -16,7 +16,7 @@ interface IWithDrawActionProps {
   maxValue?: number;
 }
 
-const DaiWithDrawAction = ({ close }:IWithDrawActionProps) => {
+const WithdrawDai = ({ close }:IWithDrawActionProps) => {
 
   const [ maxWithdraw, setMaxWithdraw ] = useState<number>(0);
   const [ inputValue, setInputValue ] = useState<any>();
@@ -228,4 +228,4 @@ const DaiWithDrawAction = ({ close }:IWithDrawActionProps) => {
   );
 };
 
-export default DaiWithDrawAction;
+export default WithdrawDai;

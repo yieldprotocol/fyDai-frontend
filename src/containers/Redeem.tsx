@@ -19,7 +19,7 @@ interface RedeemActionProps {
   ydaiAmount?: number,
 }
 
-function RedeemAction({ close }:RedeemActionProps) {
+const Redeem  = ({ close }:RedeemActionProps)  => {
 
   const [daiValue, setDaiValue] = React.useState<any>();
 
@@ -81,4 +81,4 @@ function RedeemAction({ close }:RedeemActionProps) {
   );
 }
 
-export default RedeemAction;
+export default Redeem;

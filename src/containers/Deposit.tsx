@@ -10,8 +10,9 @@ import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
 import { NotifyContext } from '../contexts/NotifyContext';
 
-import EthWithdrawAction from './EthWithdrawAction';
+import WithdrawEth from './WithdrawEth';
 import { useEthProxy } from '../hooks';
+import InlineAlert from '../components/InlineAlert';
 
 interface DepositProps {
   deposit?:any
@@ -20,7 +21,7 @@ interface DepositProps {
   disabled?:boolean
 }
 
-const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) => {
+const Deposit = ({ disabled, deposit, convert, maxValue }:DepositProps) => {
 
   const [ estRatio, setEstRatio ] = useState<any>(0);
   const [ estIncrease, setEstIncrease ] = useState<any>(0); 
@@ -85,7 +86,7 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
 
   return (
     <>
-      { withdrawOpen && <EthWithdrawAction close={()=>setWithdrawOpen(false)} /> }
+      { withdrawOpen && <WithdrawEth close={()=>setWithdrawOpen(false)} /> }
       { !txActive && !postEthActive &&
       <Box align='center' flex='grow' justify='between' gap='large'>
         <Box gap='medium' align='center' fill='horizontal'>
@@ -169,27 +170,7 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
             
         </Box>
 
-        { warningMsg &&
-        <Box 
-          border={{ color:'orange' }} 
-          fill
-          round='small'
-          pad='small'
-        >
-          <Text weight='bold' color='orange'>Procced with Caution:</Text>  
-          <Text color='orange'>{warningMsg}</Text>
-        </Box> }
-
-        { errorMsg &&
-        <Box
-          border={{ color:'red' }}
-          fill
-          round='small'
-          pad='small'
-        >
-          <Text weight='bold' color='red'>Wooah, Hang on</Text>  
-          <Text color='red'>{errorMsg}</Text>
-        </Box> }
+        <InlineAlert warnMsg={warningMsg} errorMsg={errorMsg} />
 
         <Box
           fill='horizontal'
@@ -262,4 +243,4 @@ const DepositAction = ({ disabled, deposit, convert, maxValue }:DepositProps) =>
   );
 };
 
-export default DepositAction;
+export default Deposit;

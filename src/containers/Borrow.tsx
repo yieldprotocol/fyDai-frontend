@@ -11,7 +11,8 @@ import {
   FiAlertTriangle as Warning,
 } from 'react-icons/fi';
 
-import SeriesSelector from './SeriesSelector';
+import SeriesSelector from '../components/SeriesSelector';
+import InlineAlert from '../components/InlineAlert';
 
 import { YieldContext } from '../contexts/YieldContext';
 
@@ -20,13 +21,13 @@ import { NotifyContext } from '../contexts/NotifyContext';
 
 import { useController, useCallTx, usePool, useYDai } from '../hooks';
 
-interface BorrowActionProps {
+interface BorrowProps {
   borrowFn?:any
   // activeSeries?:IYieldSeries,
   maxValue?:number
 }
 
-const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
+const Borrow = ({ borrowFn, maxValue }:BorrowProps) => {
 
   const { state: yieldState, actions: yieldActions } = React.useContext(YieldContext);
   const { deployedContracts } = yieldState;
@@ -149,7 +150,6 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
       }
     })();
   }, [ approved ]);
-
 
   useEffect(() => {
     if ( inputValue && ( inputValue > maxDaiAvailable_ ) ) {
@@ -340,27 +340,7 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
             />
           </Box>
 
-          { warningMsg &&
-          <Box 
-            border={{ color:'orange' }} 
-            fill
-            round='small'
-            pad='small'
-          >
-            <Text weight='bold' color='orange'>Procced with Caution:</Text>  
-            <Text color='orange'>{warningMsg}</Text>
-          </Box> }
-
-          { errorMsg &&
-          <Box
-            border={{ color:'red' }}
-            fill
-            round='small'
-            pad='small'
-          >
-            <Text weight='bold' color='red'>Oops!</Text>  
-            <Text color='red'>{errorMsg}</Text>
-          </Box> }
+          <InlineAlert warnMsg={warningMsg} errorMsg={errorMsg} />
 
           <Box
             fill='horizontal'
@@ -469,4 +449,4 @@ const BorrowAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   );
 };
 
-export default BorrowAction;
+export default Borrow;

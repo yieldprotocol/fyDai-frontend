@@ -1,9 +1,11 @@
 import React from 'react';
 import { Box, Button, Image, Heading, Text } from 'grommet';
 
-import DashBorrow from '../components/DashBorrow';
+import DashBorrow from '../containers/DashBorrow';
+import DashLend from '../containers/DashLend';
+
 import PageHeader from '../components/PageHeader';
-import DashLend from '../components/DashLend';
+
 
 const Dashboard = () => {
   const [activeView, setActiveView] = React.useState<string>('borrow');

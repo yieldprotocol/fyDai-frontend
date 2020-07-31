@@ -1,7 +1,7 @@
 import React from 'react';
 import { Anchor, Layer, Header, Footer, Button, Box, Text } from 'grommet';
 
-import ProfileButton from '../ProfileButton';
+import ProfileButton from '../../components/ProfileButton';
 
 import { YieldContext } from '../../contexts/YieldContext';
 import { useWeb3React } from '../../hooks';

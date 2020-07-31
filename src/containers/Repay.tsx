@@ -8,19 +8,20 @@ import {
   FiSettings as SettingsGear,
 } from 'react-icons/fi';
 
-import SeriesSelector from './SeriesSelector';
+import SeriesSelector from '../components/SeriesSelector';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
 import { NotifyContext } from '../contexts/NotifyContext';
 
 import { useController, usePool, useBalances } from '../hooks';
+import InlineAlert from '../components/InlineAlert';
 
 interface RepayActionProps {
   repayFn:any
   maxValue:number
 }
 
-function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
+function Repay({ repayFn, maxValue }:RepayActionProps) {
 
   const { state: yieldState, actions: yieldActions } = React.useContext(YieldContext);
   const { deployedContracts, userData } = yieldState;
@@ -207,29 +208,8 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
             </Box>
           </Box>
 
-          { warningMsg &&
-          <Box 
-            border={{ color:'orange' }} 
-            fill
-            round='small'
-            pad='small'
-          >
-            <Text weight='bold' color='orange'>Procced with Caution:</Text>  
-            <Text color='orange'>{warningMsg}</Text>
-          </Box> }
-
-          { errorMsg &&
-          <Box
-            border={{ color:'red' }}
-            fill
-            round='small'
-            pad='small'
-          >
-            <Text weight='bold' color='red'>Wooah!</Text>  
-            <Text color='red'>{errorMsg}</Text>
-          </Box> }
-
-          
+          <InlineAlert warnMsg={warningMsg} errorMsg={errorMsg} />
+      
           <Box>
             <CheckBox 
               reverse
@@ -299,4 +279,4 @@ function PaybackAction({ repayFn, maxValue }:RepayActionProps) {
   );
 }
 
-export default PaybackAction;
+export default Repay;

@@ -12,12 +12,13 @@ import {
   FiArrowRight as ArrowRight,
 } from 'react-icons/fi';
   
-import SeriesSelector from './SeriesSelector';
-import DaiWithDrawAction from './DaiWithDrawAction';
+import SeriesSelector from '../components/SeriesSelector';
+import WithdrawDai from './WithdrawDai';
 import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
   
 import { usePool, useBalances } from '../hooks';
+import InlineAlert from '../components/InlineAlert';
 
 interface BorrowActionProps {
   borrowFn?:any
@@ -25,7 +26,7 @@ interface BorrowActionProps {
   maxValue?:number
 }
   
-const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
+const Lend = ({ borrowFn, maxValue }:BorrowActionProps) => {
   
   const { state: yieldState, actions: yieldActions } = React.useContext(YieldContext);
   const { deployedContracts, userData } = yieldState;
@@ -129,7 +130,7 @@ const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   return (
     <>
       {selectorOpen && <SeriesSelector close={()=>setSelectorOpen(false)} /> }
-      { sellOpen && <DaiWithDrawAction close={()=>setSellOpen(false)} /> }
+      { sellOpen && <WithdrawDai close={()=>setSellOpen(false)} /> }
       <Box flex='grow' justify='between'>
         <Box gap='medium' align='center' fill='horizontal'>
           <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Selected series</Text>
@@ -277,27 +278,7 @@ const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
             </Box>
           </Box>
   
-          { warningMsg &&
-            <Box 
-              border={{ color:'orange' }} 
-              fill
-              round='small'
-              pad='small'
-            >
-              <Text weight='bold' color='orange'>Procced with Caution:</Text>  
-              <Text color='orange'>{warningMsg}</Text>
-            </Box> }
-  
-          { errorMsg &&
-            <Box
-              border={{ color:'red' }}
-              fill
-              round='small'
-              pad='small'
-            >
-              <Text weight='bold' color='red'>Wooah, Hang on</Text>  
-              <Text color='red'>{errorMsg}</Text>
-            </Box> }
+          <InlineAlert warnMsg={warningMsg} errorMsg={errorMsg} />
 
           <Box>
             <CheckBox 
@@ -349,4 +330,4 @@ const LendAction = ({ borrowFn, maxValue }:BorrowActionProps) => {
   );
 };
   
-export default LendAction;
+export default Lend;

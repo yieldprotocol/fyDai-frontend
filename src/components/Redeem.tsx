@@ -3,14 +3,14 @@ import React from 'react';
 import moment from 'moment';
 
 import { Box, Button, Heading, TextInput, Text } from 'grommet';
-import DepositAction from './DepositAction';
-import WithdrawAction from './EthWithdrawAction';
+import DepositAction from '../containers/Deposit';
+import WithdrawAction from '../containers/WithdrawEth';
 
 import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 
 import { useController, useBalances } from '../hooks';
-import RedeemAction from './RedeemAction';
+import RedeemAction from '../containers/Redeem';
 
 const Redeem = ({ activeSeries }:any) => {
 
