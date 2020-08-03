@@ -76,12 +76,13 @@ export const usePool = () => {
    */
   const sellYDai = async (
     marketAddress:string,
-    yDaiIn: number
+    yDaiIn: number,
+
   ) => {
     let tx:any;
     const overrides = { 
       // nonce: signer.getTransactionCount().then( (nonce:any) => nonce + queue) 
-      gasLimit: BigNumber.from('250000')
+      gasLimit: BigNumber.from('300000')
     };
     const parsedAmount = ethers.utils.parseEther(yDaiIn.toString());
     const fromAddr = account && ethers.utils.getAddress(account);

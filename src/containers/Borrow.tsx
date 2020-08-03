@@ -19,7 +19,7 @@ import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { NotifyContext } from '../contexts/NotifyContext';
 
-import { useController, useCallTx, usePool, useYDai } from '../hooks';
+import { useController, useCallTx, usePool, useYDai, useMath } from '../hooks';
 import OnceOffAuthorize from '../components/OnceOffAuthorize';
 import ApprovalPending from '../components/ApprovalPending';
 
@@ -45,6 +45,7 @@ const Borrow = ({ borrowFn, maxValue }:BorrowProps) => {
   const { borrow, borrowActive }  = useController();
   const { 
     buyDai,
+    sellYDai,
     previewPoolTx,
     approveToken,
     addPoolDelegate,
@@ -52,7 +53,10 @@ const Borrow = ({ borrowFn, maxValue }:BorrowProps) => {
   }  = usePool();
   const { userAllowance } = useYDai();
 
-  const [ inputValue, setInputValue ] = React.useState<any>();
+  const {
+    yieldAPR 
+  } = useMath();
+
   const [ borrowDisabled, setBorrowDisabled ] = React.useState<boolean>(true);
   const [ selectorOpen, setSelectorOpen ] = React.useState<boolean>(false);
   const [ estRatio, setEstRatio ] = React.useState<any>(0);
@@ -60,7 +64,10 @@ const Borrow = ({ borrowFn, maxValue }:BorrowProps) => {
   const [ hasDelegated, setHasDelegated] = React.useState<boolean>(activeSeries?.hasDelegated || true);
 
   /* token balances and values */
+  const [ inputValue, setInputValue ] = React.useState<any>();
   const [ yDaiValue, setYDaiValue ] = React.useState<number>(0);
+  const [ APR, setAPR ] = React.useState<number>();
+
   const [ approved, setApproved ] = React.useState<any>(0);
   const [ daiApproved, setDaiApproved ] = React.useState<any>(0);
 
@@ -71,10 +78,10 @@ const Borrow = ({ borrowFn, maxValue }:BorrowProps) => {
   const borrowProcedure = (value:number) => {
     borrow(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value).then(
       async () => {
-        await buyDai(
+        await sellYDai(
           activeSeries.marketAddress,
-          inputValue,
-          0
+          yDaiValue,
+          // 0
         );
       }
     );
@@ -127,6 +134,7 @@ const Borrow = ({ borrowFn, maxValue }:BorrowProps) => {
       const preview = await previewPoolTx('buyDai', activeSeries.marketAddress, inputValue);
       if (!preview.isZero()) {
         setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
+        setAPR( yieldAPR( ethers.utils.parseEther(inputValue.toString()), preview, activeSeries.maturity ) );
         setWarningMsg(null);
         setErrorMsg(null);
       } else {
@@ -291,7 +299,13 @@ const Borrow = ({ borrowFn, maxValue }:BorrowProps) => {
                     <Text color='text-weak' size='xsmall'>Estimated APR</Text>
                     <Help />
                   </Box>
-                  <Text color={inputValue>0?'brand':'brand-transparent'} weight='bold' size='medium'> {activeSeries && activeSeries.yieldAPR_ || ''}% </Text>
+                  <Text 
+                    color={inputValue>0?'brand':'brand-transparent'}
+                    weight='bold' 
+                    size='medium'
+                  >
+                    {APR && APR.toFixed(2)}%               
+                  </Text>
                 </Box>
 
                 <Box gap='small'>
