@@ -89,15 +89,15 @@
     "absolutePath": "/C/Users/bruce/dev/yield/yDai/contracts/helpers/Delegable.sol",
     "exportedSymbols": {
       "Delegable": [
-        9499
+        9204
       ]
     },
-    "id": 9500,
+    "id": 9205,
     "license": "GPL-3.0-or-later",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 9413,
+        "id": 9118,
         "literals": [
           "solidity",
           "^",
@@ -113,15 +113,15 @@
         "contractDependencies": [],
         "contractKind": "contract",
         "documentation": {
-          "id": 9414,
+          "id": 9119,
           "nodeType": "StructuredDocumentation",
           "src": "76:86:15",
           "text": "@dev Delegable enables users to delegate their account management to other users"
         },
         "fullyImplemented": true,
-        "id": 9499,
+        "id": 9204,
         "linearizedBaseContracts": [
-          9499
+          9204
         ],
         "name": "Delegable",
         "nodeType": "ContractDefinition",
@@ -129,22 +129,22 @@
           {
             "anonymous": false,
             "documentation": null,
-            "id": 9422,
+            "id": 9127,
             "name": "Delegate",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 9421,
+              "id": 9126,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 9416,
+                  "id": 9121,
                   "indexed": true,
                   "mutability": "mutable",
                   "name": "user",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 9422,
+                  "scope": 9127,
                   "src": "203:20:15",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -153,7 +153,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 9415,
+                    "id": 9120,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "203:7:15",
@@ -168,13 +168,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 9418,
+                  "id": 9123,
                   "indexed": true,
                   "mutability": "mutable",
                   "name": "delegate",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 9422,
+                  "scope": 9127,
                   "src": "225:24:15",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -183,7 +183,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 9417,
+                    "id": 9122,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "225:7:15",
@@ -198,13 +198,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 9420,
+                  "id": 9125,
                   "indexed": false,
                   "mutability": "mutable",
                   "name": "enabled",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 9422,
+                  "scope": 9127,
                   "src": "251:12:15",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -213,7 +213,7 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 9419,
+                    "id": 9124,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
                     "src": "251:4:15",
@@ -233,12 +233,12 @@
           {
             "constant": false,
             "functionSelector": "f6bcbd31",
-            "id": 9428,
+            "id": 9133,
             "mutability": "mutable",
             "name": "delegated",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 9499,
+            "scope": 9204,
             "src": "273:61:15",
             "stateVariable": true,
             "storageLocation": "default",
@@ -247,9 +247,9 @@
               "typeString": "mapping(address => mapping(address => bool))"
             },
             "typeName": {
-              "id": 9427,
+              "id": 9132,
               "keyType": {
-                "id": 9423,
+                "id": 9128,
                 "name": "address",
                 "nodeType": "ElementaryTypeName",
                 "src": "281:7:15",
@@ -265,9 +265,9 @@
                 "typeString": "mapping(address => mapping(address => bool))"
               },
               "valueType": {
-                "id": 9426,
+                "id": 9131,
                 "keyType": {
-                  "id": 9424,
+                  "id": 9129,
                   "name": "address",
                   "nodeType": "ElementaryTypeName",
                   "src": "300:7:15",
@@ -283,7 +283,7 @@
                   "typeString": "mapping(address => bool)"
                 },
                 "valueType": {
-                  "id": 9425,
+                  "id": 9130,
                   "name": "bool",
                   "nodeType": "ElementaryTypeName",
                   "src": "311:4:15",
@@ -299,7 +299,7 @@
           },
           {
             "body": {
-              "id": 9451,
+              "id": 9156,
               "nodeType": "Block",
               "src": "491:144:15",
               "statements": [
@@ -313,7 +313,7 @@
                           "typeIdentifier": "t_bool",
                           "typeString": "bool"
                         },
-                        "id": 9446,
+                        "id": 9151,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -324,7 +324,7 @@
                             "typeIdentifier": "t_address",
                             "typeString": "address"
                           },
-                          "id": 9439,
+                          "id": 9144,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
@@ -333,7 +333,7 @@
                             "argumentTypes": null,
                             "expression": {
                               "argumentTypes": null,
-                              "id": 9436,
+                              "id": 9141,
                               "name": "msg",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
@@ -344,7 +344,7 @@
                                 "typeString": "msg"
                               }
                             },
-                            "id": 9437,
+                            "id": 9142,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": false,
@@ -362,11 +362,11 @@
                           "operator": "==",
                           "rightExpression": {
                             "argumentTypes": null,
-                            "id": 9438,
+                            "id": 9143,
                             "name": "holder",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 9431,
+                            "referencedDeclaration": 9136,
                             "src": "538:6:15",
                             "typeDescriptions": {
                               "typeIdentifier": "t_address",
@@ -387,25 +387,25 @@
                             "argumentTypes": null,
                             "baseExpression": {
                               "argumentTypes": null,
-                              "id": 9440,
+                              "id": 9145,
                               "name": "delegated",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 9428,
+                              "referencedDeclaration": 9133,
                               "src": "548:9:15",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_mapping$_t_address_$_t_mapping$_t_address_$_t_bool_$_$",
                                 "typeString": "mapping(address => mapping(address => bool))"
                               }
                             },
-                            "id": 9442,
+                            "id": 9147,
                             "indexExpression": {
                               "argumentTypes": null,
-                              "id": 9441,
+                              "id": 9146,
                               "name": "holder",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 9431,
+                              "referencedDeclaration": 9136,
                               "src": "558:6:15",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_address",
@@ -423,12 +423,12 @@
                               "typeString": "mapping(address => bool)"
                             }
                           },
-                          "id": 9445,
+                          "id": 9150,
                           "indexExpression": {
                             "argumentTypes": null,
                             "expression": {
                               "argumentTypes": null,
-                              "id": 9443,
+                              "id": 9148,
                               "name": "msg",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
@@ -439,7 +439,7 @@
                                 "typeString": "msg"
                               }
                             },
-                            "id": 9444,
+                            "id": 9149,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": false,
@@ -472,11 +472,11 @@
                       },
                       {
                         "argumentTypes": null,
-                        "id": 9447,
+                        "id": 9152,
                         "name": "errorMessage",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 9433,
+                        "referencedDeclaration": 9138,
                         "src": "592:12:15",
                         "typeDescriptions": {
                           "typeIdentifier": "t_string_memory_ptr",
@@ -495,7 +495,7 @@
                           "typeString": "string memory"
                         }
                       ],
-                      "id": 9435,
+                      "id": 9140,
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
@@ -509,7 +509,7 @@
                         "typeString": "function (bool,string memory) pure"
                       }
                     },
-                    "id": 9448,
+                    "id": 9153,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -524,39 +524,39 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 9449,
+                  "id": 9154,
                   "nodeType": "ExpressionStatement",
                   "src": "502:113:15"
                 },
                 {
-                  "id": 9450,
+                  "id": 9155,
                   "nodeType": "PlaceholderStatement",
                   "src": "626:1:15"
                 }
               ]
             },
             "documentation": {
-              "id": 9429,
+              "id": 9134,
               "nodeType": "StructuredDocumentation",
               "src": "343:68:15",
               "text": "@dev Require that msg.sender is the account holder or a delegate"
             },
-            "id": 9452,
+            "id": 9157,
             "name": "onlyHolderOrDelegate",
             "nodeType": "ModifierDefinition",
             "overrides": null,
             "parameters": {
-              "id": 9434,
+              "id": 9139,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 9431,
+                  "id": 9136,
                   "mutability": "mutable",
                   "name": "holder",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 9452,
+                  "scope": 9157,
                   "src": "447:14:15",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -565,7 +565,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 9430,
+                    "id": 9135,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "447:7:15",
@@ -580,12 +580,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 9433,
+                  "id": 9138,
                   "mutability": "mutable",
                   "name": "errorMessage",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 9452,
+                  "scope": 9157,
                   "src": "463:26:15",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -594,7 +594,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 9432,
+                    "id": 9137,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "463:6:15",
@@ -615,14 +615,14 @@
           },
           {
             "body": {
-              "id": 9474,
+              "id": 9179,
               "nodeType": "Block",
               "src": "752:109:15",
               "statements": [
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 9465,
+                    "id": 9170,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -633,23 +633,23 @@
                         "argumentTypes": null,
                         "baseExpression": {
                           "argumentTypes": null,
-                          "id": 9458,
+                          "id": 9163,
                           "name": "delegated",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 9428,
+                          "referencedDeclaration": 9133,
                           "src": "763:9:15",
                           "typeDescriptions": {
                             "typeIdentifier": "t_mapping$_t_address_$_t_mapping$_t_address_$_t_bool_$_$",
                             "typeString": "mapping(address => mapping(address => bool))"
                           }
                         },
-                        "id": 9462,
+                        "id": 9167,
                         "indexExpression": {
                           "argumentTypes": null,
                           "expression": {
                             "argumentTypes": null,
-                            "id": 9459,
+                            "id": 9164,
                             "name": "msg",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
@@ -660,7 +660,7 @@
                               "typeString": "msg"
                             }
                           },
-                          "id": 9460,
+                          "id": 9165,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
@@ -685,14 +685,14 @@
                           "typeString": "mapping(address => bool)"
                         }
                       },
-                      "id": 9463,
+                      "id": 9168,
                       "indexExpression": {
                         "argumentTypes": null,
-                        "id": 9461,
+                        "id": 9166,
                         "name": "delegate",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 9455,
+                        "referencedDeclaration": 9160,
                         "src": "785:8:15",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
@@ -715,7 +715,7 @@
                     "rightHandSide": {
                       "argumentTypes": null,
                       "hexValue": "74727565",
-                      "id": 9464,
+                      "id": 9169,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -736,7 +736,7 @@
                       "typeString": "bool"
                     }
                   },
-                  "id": 9466,
+                  "id": 9171,
                   "nodeType": "ExpressionStatement",
                   "src": "763:38:15"
                 },
@@ -748,7 +748,7 @@
                         "argumentTypes": null,
                         "expression": {
                           "argumentTypes": null,
-                          "id": 9468,
+                          "id": 9173,
                           "name": "msg",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
@@ -759,7 +759,7 @@
                             "typeString": "msg"
                           }
                         },
-                        "id": 9469,
+                        "id": 9174,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -775,11 +775,11 @@
                       },
                       {
                         "argumentTypes": null,
-                        "id": 9470,
+                        "id": 9175,
                         "name": "delegate",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 9455,
+                        "referencedDeclaration": 9160,
                         "src": "838:8:15",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
@@ -789,7 +789,7 @@
                       {
                         "argumentTypes": null,
                         "hexValue": "74727565",
-                        "id": 9471,
+                        "id": 9176,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -820,18 +820,18 @@
                           "typeString": "bool"
                         }
                       ],
-                      "id": 9467,
+                      "id": 9172,
                       "name": "Delegate",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 9422,
+                      "referencedDeclaration": 9127,
                       "src": "817:8:15",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_event_nonpayable$_t_address_$_t_address_$_t_bool_$returns$__$",
                         "typeString": "function (address,address,bool)"
                       }
                     },
-                    "id": 9472,
+                    "id": 9177,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -846,20 +846,20 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 9473,
+                  "id": 9178,
                   "nodeType": "EmitStatement",
                   "src": "812:41:15"
                 }
               ]
             },
             "documentation": {
-              "id": 9453,
+              "id": 9158,
               "nodeType": "StructuredDocumentation",
               "src": "643:57:15",
               "text": "@dev Enable a delegate to act on the behalf of caller"
             },
             "functionSelector": "e71bdf41",
-            "id": 9475,
+            "id": 9180,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -867,17 +867,17 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 9456,
+              "id": 9161,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 9455,
+                  "id": 9160,
                   "mutability": "mutable",
                   "name": "delegate",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 9475,
+                  "scope": 9180,
                   "src": "727:16:15",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -886,7 +886,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 9454,
+                    "id": 9159,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "727:7:15",
@@ -903,12 +903,12 @@
               "src": "726:18:15"
             },
             "returnParameters": {
-              "id": 9457,
+              "id": 9162,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "752:0:15"
             },
-            "scope": 9499,
+            "scope": 9204,
             "src": "706:155:15",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -916,14 +916,14 @@
           },
           {
             "body": {
-              "id": 9497,
+              "id": 9202,
               "nodeType": "Block",
               "src": "984:111:15",
               "statements": [
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 9488,
+                    "id": 9193,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -934,23 +934,23 @@
                         "argumentTypes": null,
                         "baseExpression": {
                           "argumentTypes": null,
-                          "id": 9481,
+                          "id": 9186,
                           "name": "delegated",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 9428,
+                          "referencedDeclaration": 9133,
                           "src": "995:9:15",
                           "typeDescriptions": {
                             "typeIdentifier": "t_mapping$_t_address_$_t_mapping$_t_address_$_t_bool_$_$",
                             "typeString": "mapping(address => mapping(address => bool))"
                           }
                         },
-                        "id": 9485,
+                        "id": 9190,
                         "indexExpression": {
                           "argumentTypes": null,
                           "expression": {
                             "argumentTypes": null,
-                            "id": 9482,
+                            "id": 9187,
                             "name": "msg",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
@@ -961,7 +961,7 @@
                               "typeString": "msg"
                             }
                           },
-                          "id": 9483,
+                          "id": 9188,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
@@ -986,14 +986,14 @@
                           "typeString": "mapping(address => bool)"
                         }
                       },
-                      "id": 9486,
+                      "id": 9191,
                       "indexExpression": {
                         "argumentTypes": null,
-                        "id": 9484,
+                        "id": 9189,
                         "name": "delegate",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 9478,
+                        "referencedDeclaration": 9183,
                         "src": "1017:8:15",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
@@ -1016,7 +1016,7 @@
                     "rightHandSide": {
                       "argumentTypes": null,
                       "hexValue": "66616c7365",
-                      "id": 9487,
+                      "id": 9192,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -1037,7 +1037,7 @@
                       "typeString": "bool"
                     }
                   },
-                  "id": 9489,
+                  "id": 9194,
                   "nodeType": "ExpressionStatement",
                   "src": "995:39:15"
                 },
@@ -1049,7 +1049,7 @@
                         "argumentTypes": null,
                         "expression": {
                           "argumentTypes": null,
-                          "id": 9491,
+                          "id": 9196,
                           "name": "msg",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
@@ -1060,7 +1060,7 @@
                             "typeString": "msg"
                           }
                         },
-                        "id": 9492,
+                        "id": 9197,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -1076,11 +1076,11 @@
                       },
                       {
                         "argumentTypes": null,
-                        "id": 9493,
+                        "id": 9198,
                         "name": "delegate",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 9478,
+                        "referencedDeclaration": 9183,
                         "src": "1071:8:15",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
@@ -1090,7 +1090,7 @@
                       {
                         "argumentTypes": null,
                         "hexValue": "66616c7365",
-                        "id": 9494,
+                        "id": 9199,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -1121,18 +1121,18 @@
                           "typeString": "bool"
                         }
                       ],
-                      "id": 9490,
+                      "id": 9195,
                       "name": "Delegate",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 9422,
+                      "referencedDeclaration": 9127,
                       "src": "1050:8:15",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_event_nonpayable$_t_address_$_t_address_$_t_bool_$returns$__$",
                         "typeString": "function (address,address,bool)"
                       }
                     },
-                    "id": 9495,
+                    "id": 9200,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1147,20 +1147,20 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 9496,
+                  "id": 9201,
                   "nodeType": "EmitStatement",
                   "src": "1045:42:15"
                 }
               ]
             },
             "documentation": {
-              "id": 9476,
+              "id": 9181,
               "nodeType": "StructuredDocumentation",
               "src": "869:60:15",
               "text": "@dev Stop a delegate from acting on the behalf of caller"
             },
             "functionSelector": "fa352c00",
-            "id": 9498,
+            "id": 9203,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -1168,17 +1168,17 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 9479,
+              "id": 9184,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 9478,
+                  "id": 9183,
                   "mutability": "mutable",
                   "name": "delegate",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 9498,
+                  "scope": 9203,
                   "src": "959:16:15",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -1187,7 +1187,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 9477,
+                    "id": 9182,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "959:7:15",
@@ -1204,19 +1204,19 @@
               "src": "958:18:15"
             },
             "returnParameters": {
-              "id": 9480,
+              "id": 9185,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "984:0:15"
             },
-            "scope": 9499,
+            "scope": 9204,
             "src": "935:160:15",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "public"
           }
         ],
-        "scope": 9500,
+        "scope": 9205,
         "src": "162:936:15"
       }
     ],
@@ -1226,15 +1226,15 @@
     "absolutePath": "/C/Users/bruce/dev/yield/yDai/contracts/helpers/Delegable.sol",
     "exportedSymbols": {
       "Delegable": [
-        9499
+        9204
       ]
     },
-    "id": 9500,
+    "id": 9205,
     "license": "GPL-3.0-or-later",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 9413,
+        "id": 9118,
         "literals": [
           "solidity",
           "^",
@@ -1250,15 +1250,15 @@
         "contractDependencies": [],
         "contractKind": "contract",
         "documentation": {
-          "id": 9414,
+          "id": 9119,
           "nodeType": "StructuredDocumentation",
           "src": "76:86:15",
           "text": "@dev Delegable enables users to delegate their account management to other users"
         },
         "fullyImplemented": true,
-        "id": 9499,
+        "id": 9204,
         "linearizedBaseContracts": [
-          9499
+          9204
         ],
         "name": "Delegable",
         "nodeType": "ContractDefinition",
@@ -1266,22 +1266,22 @@
           {
             "anonymous": false,
             "documentation": null,
-            "id": 9422,
+            "id": 9127,
             "name": "Delegate",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 9421,
+              "id": 9126,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 9416,
+                  "id": 9121,
                   "indexed": true,
                   "mutability": "mutable",
                   "name": "user",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 9422,
+                  "scope": 9127,
                   "src": "203:20:15",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -1290,7 +1290,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 9415,
+                    "id": 9120,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "203:7:15",
@@ -1305,13 +1305,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 9418,
+                  "id": 9123,
                   "indexed": true,
                   "mutability": "mutable",
                   "name": "delegate",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 9422,
+                  "scope": 9127,
                   "src": "225:24:15",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -1320,7 +1320,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 9417,
+                    "id": 9122,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "225:7:15",
@@ -1335,13 +1335,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 9420,
+                  "id": 9125,
                   "indexed": false,
                   "mutability": "mutable",
                   "name": "enabled",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 9422,
+                  "scope": 9127,
                   "src": "251:12:15",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -1350,7 +1350,7 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 9419,
+                    "id": 9124,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
                     "src": "251:4:15",
@@ -1370,12 +1370,12 @@
           {
             "constant": false,
             "functionSelector": "f6bcbd31",
-            "id": 9428,
+            "id": 9133,
             "mutability": "mutable",
             "name": "delegated",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 9499,
+            "scope": 9204,
             "src": "273:61:15",
             "stateVariable": true,
             "storageLocation": "default",
@@ -1384,9 +1384,9 @@
               "typeString": "mapping(address => mapping(address => bool))"
             },
             "typeName": {
-              "id": 9427,
+              "id": 9132,
               "keyType": {
-                "id": 9423,
+                "id": 9128,
                 "name": "address",
                 "nodeType": "ElementaryTypeName",
                 "src": "281:7:15",
@@ -1402,9 +1402,9 @@
                 "typeString": "mapping(address => mapping(address => bool))"
               },
               "valueType": {
-                "id": 9426,
+                "id": 9131,
                 "keyType": {
-                  "id": 9424,
+                  "id": 9129,
                   "name": "address",
                   "nodeType": "ElementaryTypeName",
                   "src": "300:7:15",
@@ -1420,7 +1420,7 @@
                   "typeString": "mapping(address => bool)"
                 },
                 "valueType": {
-                  "id": 9425,
+                  "id": 9130,
                   "name": "bool",
                   "nodeType": "ElementaryTypeName",
                   "src": "311:4:15",
@@ -1436,7 +1436,7 @@
           },
           {
             "body": {
-              "id": 9451,
+              "id": 9156,
               "nodeType": "Block",
               "src": "491:144:15",
               "statements": [
@@ -1450,7 +1450,7 @@
                           "typeIdentifier": "t_bool",
                           "typeString": "bool"
                         },
-                        "id": 9446,
+                        "id": 9151,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -1461,7 +1461,7 @@
                             "typeIdentifier": "t_address",
                             "typeString": "address"
                           },
-                          "id": 9439,
+                          "id": 9144,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
@@ -1470,7 +1470,7 @@
                             "argumentTypes": null,
                             "expression": {
                               "argumentTypes": null,
-                              "id": 9436,
+                              "id": 9141,
                               "name": "msg",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
@@ -1481,7 +1481,7 @@
                                 "typeString": "msg"
                               }
                             },
-                            "id": 9437,
+                            "id": 9142,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": false,
@@ -1499,11 +1499,11 @@
                           "operator": "==",
                           "rightExpression": {
                             "argumentTypes": null,
-                            "id": 9438,
+                            "id": 9143,
                             "name": "holder",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 9431,
+                            "referencedDeclaration": 9136,
                             "src": "538:6:15",
                             "typeDescriptions": {
                               "typeIdentifier": "t_address",
@@ -1524,25 +1524,25 @@
                             "argumentTypes": null,
                             "baseExpression": {
                               "argumentTypes": null,
-                              "id": 9440,
+                              "id": 9145,
                               "name": "delegated",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 9428,
+                              "referencedDeclaration": 9133,
                               "src": "548:9:15",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_mapping$_t_address_$_t_mapping$_t_address_$_t_bool_$_$",
                                 "typeString": "mapping(address => mapping(address => bool))"
                               }
                             },
-                            "id": 9442,
+                            "id": 9147,
                             "indexExpression": {
                               "argumentTypes": null,
-                              "id": 9441,
+                              "id": 9146,
                               "name": "holder",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 9431,
+                              "referencedDeclaration": 9136,
                               "src": "558:6:15",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_address",
@@ -1560,12 +1560,12 @@
                               "typeString": "mapping(address => bool)"
                             }
                           },
-                          "id": 9445,
+                          "id": 9150,
                           "indexExpression": {
                             "argumentTypes": null,
                             "expression": {
                               "argumentTypes": null,
-                              "id": 9443,
+                              "id": 9148,
                               "name": "msg",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
@@ -1576,7 +1576,7 @@
                                 "typeString": "msg"
                               }
                             },
-                            "id": 9444,
+                            "id": 9149,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": false,
@@ -1609,11 +1609,11 @@
                       },
                       {
                         "argumentTypes": null,
-                        "id": 9447,
+                        "id": 9152,
                         "name": "errorMessage",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 9433,
+                        "referencedDeclaration": 9138,
                         "src": "592:12:15",
                         "typeDescriptions": {
                           "typeIdentifier": "t_string_memory_ptr",
@@ -1632,7 +1632,7 @@
                           "typeString": "string memory"
                         }
                       ],
-                      "id": 9435,
+                      "id": 9140,
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
@@ -1646,7 +1646,7 @@
                         "typeString": "function (bool,string memory) pure"
                       }
                     },
-                    "id": 9448,
+                    "id": 9153,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1661,39 +1661,39 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 9449,
+                  "id": 9154,
                   "nodeType": "ExpressionStatement",
                   "src": "502:113:15"
                 },
                 {
-                  "id": 9450,
+                  "id": 9155,
                   "nodeType": "PlaceholderStatement",
                   "src": "626:1:15"
                 }
               ]
             },
             "documentation": {
-              "id": 9429,
+              "id": 9134,
               "nodeType": "StructuredDocumentation",
               "src": "343:68:15",
               "text": "@dev Require that msg.sender is the account holder or a delegate"
             },
-            "id": 9452,
+            "id": 9157,
             "name": "onlyHolderOrDelegate",
             "nodeType": "ModifierDefinition",
             "overrides": null,
             "parameters": {
-              "id": 9434,
+              "id": 9139,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 9431,
+                  "id": 9136,
                   "mutability": "mutable",
                   "name": "holder",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 9452,
+                  "scope": 9157,
                   "src": "447:14:15",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -1702,7 +1702,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 9430,
+                    "id": 9135,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "447:7:15",
@@ -1717,12 +1717,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 9433,
+                  "id": 9138,
                   "mutability": "mutable",
                   "name": "errorMessage",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 9452,
+                  "scope": 9157,
                   "src": "463:26:15",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -1731,7 +1731,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 9432,
+                    "id": 9137,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "463:6:15",
@@ -1752,14 +1752,14 @@
           },
           {
             "body": {
-              "id": 9474,
+              "id": 9179,
               "nodeType": "Block",
               "src": "752:109:15",
               "statements": [
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 9465,
+                    "id": 9170,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1770,23 +1770,23 @@
                         "argumentTypes": null,
                         "baseExpression": {
                           "argumentTypes": null,
-                          "id": 9458,
+                          "id": 9163,
                           "name": "delegated",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 9428,
+                          "referencedDeclaration": 9133,
                           "src": "763:9:15",
                           "typeDescriptions": {
                             "typeIdentifier": "t_mapping$_t_address_$_t_mapping$_t_address_$_t_bool_$_$",
                             "typeString": "mapping(address => mapping(address => bool))"
                           }
                         },
-                        "id": 9462,
+                        "id": 9167,
                         "indexExpression": {
                           "argumentTypes": null,
                           "expression": {
                             "argumentTypes": null,
-                            "id": 9459,
+                            "id": 9164,
                             "name": "msg",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
@@ -1797,7 +1797,7 @@
                               "typeString": "msg"
                             }
                           },
-                          "id": 9460,
+                          "id": 9165,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
@@ -1822,14 +1822,14 @@
                           "typeString": "mapping(address => bool)"
                         }
                       },
-                      "id": 9463,
+                      "id": 9168,
                       "indexExpression": {
                         "argumentTypes": null,
-                        "id": 9461,
+                        "id": 9166,
                         "name": "delegate",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 9455,
+                        "referencedDeclaration": 9160,
                         "src": "785:8:15",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
@@ -1852,7 +1852,7 @@
                     "rightHandSide": {
                       "argumentTypes": null,
                       "hexValue": "74727565",
-                      "id": 9464,
+                      "id": 9169,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -1873,7 +1873,7 @@
                       "typeString": "bool"
                     }
                   },
-                  "id": 9466,
+                  "id": 9171,
                   "nodeType": "ExpressionStatement",
                   "src": "763:38:15"
                 },
@@ -1885,7 +1885,7 @@
                         "argumentTypes": null,
                         "expression": {
                           "argumentTypes": null,
-                          "id": 9468,
+                          "id": 9173,
                           "name": "msg",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
@@ -1896,7 +1896,7 @@
                             "typeString": "msg"
                           }
                         },
-                        "id": 9469,
+                        "id": 9174,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -1912,11 +1912,11 @@
                       },
                       {
                         "argumentTypes": null,
-                        "id": 9470,
+                        "id": 9175,
                         "name": "delegate",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 9455,
+                        "referencedDeclaration": 9160,
                         "src": "838:8:15",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
@@ -1926,7 +1926,7 @@
                       {
                         "argumentTypes": null,
                         "hexValue": "74727565",
-                        "id": 9471,
+                        "id": 9176,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -1957,18 +1957,18 @@
                           "typeString": "bool"
                         }
                       ],
-                      "id": 9467,
+                      "id": 9172,
                       "name": "Delegate",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 9422,
+                      "referencedDeclaration": 9127,
                       "src": "817:8:15",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_event_nonpayable$_t_address_$_t_address_$_t_bool_$returns$__$",
                         "typeString": "function (address,address,bool)"
                       }
                     },
-                    "id": 9472,
+                    "id": 9177,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1983,20 +1983,20 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 9473,
+                  "id": 9178,
                   "nodeType": "EmitStatement",
                   "src": "812:41:15"
                 }
               ]
             },
             "documentation": {
-              "id": 9453,
+              "id": 9158,
               "nodeType": "StructuredDocumentation",
               "src": "643:57:15",
               "text": "@dev Enable a delegate to act on the behalf of caller"
             },
             "functionSelector": "e71bdf41",
-            "id": 9475,
+            "id": 9180,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -2004,17 +2004,17 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 9456,
+              "id": 9161,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 9455,
+                  "id": 9160,
                   "mutability": "mutable",
                   "name": "delegate",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 9475,
+                  "scope": 9180,
                   "src": "727:16:15",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -2023,7 +2023,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 9454,
+                    "id": 9159,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "727:7:15",
@@ -2040,12 +2040,12 @@
               "src": "726:18:15"
             },
             "returnParameters": {
-              "id": 9457,
+              "id": 9162,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "752:0:15"
             },
-            "scope": 9499,
+            "scope": 9204,
             "src": "706:155:15",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -2053,14 +2053,14 @@
           },
           {
             "body": {
-              "id": 9497,
+              "id": 9202,
               "nodeType": "Block",
               "src": "984:111:15",
               "statements": [
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 9488,
+                    "id": 9193,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -2071,23 +2071,23 @@
                         "argumentTypes": null,
                         "baseExpression": {
                           "argumentTypes": null,
-                          "id": 9481,
+                          "id": 9186,
                           "name": "delegated",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 9428,
+                          "referencedDeclaration": 9133,
                           "src": "995:9:15",
                           "typeDescriptions": {
                             "typeIdentifier": "t_mapping$_t_address_$_t_mapping$_t_address_$_t_bool_$_$",
                             "typeString": "mapping(address => mapping(address => bool))"
                           }
                         },
-                        "id": 9485,
+                        "id": 9190,
                         "indexExpression": {
                           "argumentTypes": null,
                           "expression": {
                             "argumentTypes": null,
-                            "id": 9482,
+                            "id": 9187,
                             "name": "msg",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
@@ -2098,7 +2098,7 @@
                               "typeString": "msg"
                             }
                           },
-                          "id": 9483,
+                          "id": 9188,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
@@ -2123,14 +2123,14 @@
                           "typeString": "mapping(address => bool)"
                         }
                       },
-                      "id": 9486,
+                      "id": 9191,
                       "indexExpression": {
                         "argumentTypes": null,
-                        "id": 9484,
+                        "id": 9189,
                         "name": "delegate",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 9478,
+                        "referencedDeclaration": 9183,
                         "src": "1017:8:15",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
@@ -2153,7 +2153,7 @@
                     "rightHandSide": {
                       "argumentTypes": null,
                       "hexValue": "66616c7365",
-                      "id": 9487,
+                      "id": 9192,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -2174,7 +2174,7 @@
                       "typeString": "bool"
                     }
                   },
-                  "id": 9489,
+                  "id": 9194,
                   "nodeType": "ExpressionStatement",
                   "src": "995:39:15"
                 },
@@ -2186,7 +2186,7 @@
                         "argumentTypes": null,
                         "expression": {
                           "argumentTypes": null,
-                          "id": 9491,
+                          "id": 9196,
                           "name": "msg",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
@@ -2197,7 +2197,7 @@
                             "typeString": "msg"
                           }
                         },
-                        "id": 9492,
+                        "id": 9197,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -2213,11 +2213,11 @@
                       },
                       {
                         "argumentTypes": null,
-                        "id": 9493,
+                        "id": 9198,
                         "name": "delegate",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 9478,
+                        "referencedDeclaration": 9183,
                         "src": "1071:8:15",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
@@ -2227,7 +2227,7 @@
                       {
                         "argumentTypes": null,
                         "hexValue": "66616c7365",
-                        "id": 9494,
+                        "id": 9199,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -2258,18 +2258,18 @@
                           "typeString": "bool"
                         }
                       ],
-                      "id": 9490,
+                      "id": 9195,
                       "name": "Delegate",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 9422,
+                      "referencedDeclaration": 9127,
                       "src": "1050:8:15",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_event_nonpayable$_t_address_$_t_address_$_t_bool_$returns$__$",
                         "typeString": "function (address,address,bool)"
                       }
                     },
-                    "id": 9495,
+                    "id": 9200,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -2284,20 +2284,20 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 9496,
+                  "id": 9201,
                   "nodeType": "EmitStatement",
                   "src": "1045:42:15"
                 }
               ]
             },
             "documentation": {
-              "id": 9476,
+              "id": 9181,
               "nodeType": "StructuredDocumentation",
               "src": "869:60:15",
               "text": "@dev Stop a delegate from acting on the behalf of caller"
             },
             "functionSelector": "fa352c00",
-            "id": 9498,
+            "id": 9203,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -2305,17 +2305,17 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 9479,
+              "id": 9184,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 9478,
+                  "id": 9183,
                   "mutability": "mutable",
                   "name": "delegate",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 9498,
+                  "scope": 9203,
                   "src": "959:16:15",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -2324,7 +2324,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 9477,
+                    "id": 9182,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "959:7:15",
@@ -2341,19 +2341,19 @@
               "src": "958:18:15"
             },
             "returnParameters": {
-              "id": 9480,
+              "id": 9185,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "984:0:15"
             },
-            "scope": 9499,
+            "scope": 9204,
             "src": "935:160:15",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "public"
           }
         ],
-        "scope": 9500,
+        "scope": 9205,
         "src": "162:936:15"
       }
     ],
@@ -2365,7 +2365,7 @@
   },
   "networks": {},
   "schemaVersion": "3.2.3",
-  "updatedAt": "2020-07-29T20:51:03.385Z",
+  "updatedAt": "2020-08-03T09:57:49.916Z",
   "devdoc": {
     "details": "Delegable enables users to delegate their account management to other users",
     "methods": {

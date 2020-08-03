@@ -4888,7 +4888,7 @@
     }
   },
   "schemaVersion": "3.2.3",
-  "updatedAt": "2020-07-29T20:51:53.530Z",
+  "updatedAt": "2020-08-03T09:59:13.729Z",
   "networkType": "ethereum",
   "devdoc": {
     "details": "LimitPool is a proxy contract to Pool that implements limit orders.",
