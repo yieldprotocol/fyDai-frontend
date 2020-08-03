@@ -12,6 +12,9 @@ import { useEthProxy, useController } from '../hooks';
 
 import { NotifyContext } from '../contexts/NotifyContext';
 import InlineAlert from '../components/InlineAlert';
+import OnceOffAuthorize from '../components/OnceOffAuthorize';
+import ApprovalPending from '../components/ApprovalPending';
+import TransactionPending from '../components/TransactionPending';
 
 interface IWithDrawActionProps {
   close?: any;
@@ -132,26 +135,12 @@ const WithdrawEth = ({ close }:IWithDrawActionProps) => {
           <Box gap='medium' align='center' fill='horizontal'>
             <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to withdraw</Text>
 
-            {!hasDelegated &&
-            <Box round pad='small' gap='small' border='all' elevation='small' align='center' fill>
-              Once-off Action required: 
-              <Box
-                round
-                onClick={()=>delegateProcedure()}
-                hoverIndicator='brand-transparent'
-                border='all'
-                pad={{ horizontal:'small', vertical:'small' }}
-                align='center'
-              >
-                <Text
-                  weight='bold'
-                // size='xxsmall'
-                  color='text'
-                >
-                  Approve Eth withdrawals
-                </Text>
-              </Box>
-            </Box>}
+            {!hasDelegated && 
+            <OnceOffAuthorize 
+              authProcedure={delegateProcedure}
+              authMsg='Authorise ETH withdrawals'
+              txPending={txActive?.type === 'DELEGATION'}
+            />}
           
             <Box
               direction='row-responsive'
@@ -191,12 +180,10 @@ const WithdrawEth = ({ close }:IWithDrawActionProps) => {
                   <Text size='xsmall'>Use max</Text>
                 </Box>
               </Box>
-
             </Box>
           </Box>
 
           <Box fill direction='row-responsive' justify='between'>
-
             <Box gap='small' alignSelf='start' align='center'>
               <Text color='text-weak' size='xsmall'>
                 Max withdraw
@@ -261,44 +248,9 @@ const WithdrawEth = ({ close }:IWithDrawActionProps) => {
             </Box>
           </Box>
         </Box>}
-        { withdrawEthActive && !txActive &&
-        <Box>Awaiting transaction approval</Box>}
 
-        { txActive &&
-        <Box align='center' flex='grow' justify='between' gap='large'>
-          <Box gap='medium' align='center' fill='horizontal'>
-            <Text size='xlarge' color='brand' weight='bold'>Good One!</Text>
-            <Box
-            // direction='row-responsive'
-              fill='horizontal'
-              gap='large'
-              align='center'
-            >
-              { txActive.type === 'APPROVAL' ? 
-                <Text>{txActive.type === 'APPROVAL'? 'Withdraw Pending' : 'Approval pending'} </Text>
-                :
-                <>
-                  <Text>You made a withdrawal of {inputValue} Eth</Text>
-                  <Text>Withdraw Pending</Text>
-                </>}
-              <Box
-                fill='horizontal'
-                round='medium'
-                background='brand'
-                onClick={()=>console.log('Going to etherscan')}
-                align='center'
-                pad='xsmall'
-              >
-                <Text
-                  weight='bold'
-                  size='large'
-                >
-                  View on Etherscan
-                </Text>
-              </Box>
-            </Box>
-          </Box>
-        </Box>}
+        { withdrawEthActive && !txActive && <ApprovalPending /> }
+        { txActive && <TransactionPending msg={`You made a withdrawal of ${inputValue} Eth.`} tx={txActive} /> }
 
       </Box>
     </Layer>

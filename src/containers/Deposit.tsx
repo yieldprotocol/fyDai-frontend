@@ -1,42 +1,55 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Box, Button, Image, TextInput, Text, Paragraph, Layer } from 'grommet';
+import { BigNumber } from 'ethers';
+
+import { 
+  Box, 
+  TextInput, 
+  Text, 
+  ThemeContext,
+} from 'grommet';
+
+import { ScaleLoader } from 'react-spinners';
+
 import { 
   FiInfo as Info,
   FiArrowRight as ArrowRight,
 } from 'react-icons/fi';
-
 import { FaEthereum as Ethereum } from 'react-icons/fa';
-import { SeriesContext } from '../contexts/SeriesContext';
-import { YieldContext } from '../contexts/YieldContext';
-import { NotifyContext } from '../contexts/NotifyContext';
 
 import WithdrawEth from './WithdrawEth';
-import { useEthProxy } from '../hooks';
+
 import InlineAlert from '../components/InlineAlert';
+import ApprovalPending from '../components/ApprovalPending';
+import TransactionPending from '../components/TransactionPending';
+
+import { SeriesContext } from '../contexts/SeriesContext';
+import { YieldContext } from '../contexts/YieldContext';
+
+
+import { useEthProxy, useTxActive } from '../hooks';
 
 interface DepositProps {
-  deposit?:any
-  convert?:any
-  maxValue?:number
-  disabled?:boolean
+  /* deposit amount prop is for quick linking into component */
+  depositAmount?:number|BigNumber|null;
 }
 
-const Deposit = ({ disabled, deposit, convert, maxValue }:DepositProps) => {
+const Deposit = ({ depositAmount }:DepositProps) => {
 
+  const [ inputValue, setInputValue ] = useState<any>(depositAmount || undefined);
   const [ estRatio, setEstRatio ] = useState<any>(0);
-  const [ estIncrease, setEstIncrease ] = useState<any>(0); 
-  const [ inputValue, setInputValue ] = useState<any>();
-  const [ depositDisabled, setDepositDisabled ] = useState<boolean>(false);
+  
   const [ withdrawOpen, setWithdrawOpen ] = useState<boolean>(false);
+
+  const [ depositPending, setDepositPending ] = useState<boolean>(false);
+
+  const [ depositDisabled, setDepositDisabled ] = useState<boolean>(false);
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
 
   const { state: yieldState, actions: yieldActions } = useContext(YieldContext);
-  const { deployedContracts } = yieldState;
+  const {  deployedContracts } = yieldState;
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
-  const inputRef = React.useRef(null);
-  
-  const { seriesAggregates } = seriesState;
+  const { isLoading, seriesAggregates } = seriesState;
   const {
     ethBalance_,
     collateralAmount_,
@@ -45,31 +58,32 @@ const Deposit = ({ disabled, deposit, convert, maxValue }:DepositProps) => {
     debtValue_,
     estimateRatio, // TODO << this is a function (basically just passed from hooks via context) >> 
   } = seriesAggregates || {};
+  const theme:any = useContext(ThemeContext);
 
   const { postEth, postEthActive }  = useEthProxy();
+  const [ txActive ] = useTxActive('Deposit');
+
+  const ref = React.useRef();
+
+  /* Steps required to deposit and update values */
   const depositProcedure = async (value:number) => {
+    setDepositPending(true);
     await postEth(deployedContracts.EthProxy, value);
-    yieldActions.updateUserData();
+    await yieldActions.updateUserData();
     setInputValue('');
+    setDepositPending(false);
   };
 
-  // Handle active transactions
-  // TODO: maybe split into a custom hook
-  const { state: { pendingTxs } } = React.useContext(NotifyContext);
-  const [txActive, setTxActive] = React.useState<any>(null);
-  
-  React.useEffect(()=>{
-    setTxActive(pendingTxs.find((x:any)=> x.type === 'DEPOSIT'));
-  }, [ pendingTxs ]);
-
-  // Handle input values (warnings errors etc.)
+  /* Handle input value changes (warnings errors etc.) */
   useEffect(()=>{
+
+    /* 1. Adjust estimated ratio based on input changes */
     if (inputValue && collateralAmount_ && debtValue_) {
       const newRatio = estimateRatio((collateralAmount_+ parseFloat(inputValue)), debtValue_); 
       setEstRatio(newRatio.toFixed(0));
-      const newIncrease = newRatio - collateralPercent_ ;
-      setEstIncrease(newIncrease.toFixed(0));
     }
+
+    /* 2. Input errors and warnings */
     if ( inputValue && ( inputValue > ethBalance_) ) {
       setDepositDisabled(true);
       setWarningMsg(null);
@@ -87,10 +101,13 @@ const Deposit = ({ disabled, deposit, convert, maxValue }:DepositProps) => {
   return (
     <>
       { withdrawOpen && <WithdrawEth close={()=>setWithdrawOpen(false)} /> }
-      { !txActive && !postEthActive &&
-      <Box align='center' flex='grow' justify='between' gap='large'>
-        <Box gap='medium' align='center' fill='horizontal'>
-          <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to deposit</Text>
+      { !txActive &&
+      <Box
+        gap='large'         
+      >
+        <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to deposit</Text>
+
+        <Box gap='medium' justify='between' align='center' fill='horizontal'>       
           <Box
             direction='row-responsive'
             fill='horizontal'
@@ -107,7 +124,6 @@ const Deposit = ({ disabled, deposit, convert, maxValue }:DepositProps) => {
               flex
             >
               <TextInput
-                ref={inputRef}
                 type='number'
                 placeholder='Enter the amount to deposit in Eth'
                 value={inputValue || ''}
@@ -125,7 +141,7 @@ const Deposit = ({ disabled, deposit, convert, maxValue }:DepositProps) => {
                 onClick={()=>setInputValue(ethBalance_)}
                 hoverIndicator='brand-transparent'
                 border='all'
-              // border={{ color:'brand' }}
+                // border={{ color:'brand' }}
                 pad={{ horizontal:'small', vertical:'small' }}
                 justify='center'
               >
@@ -136,22 +152,28 @@ const Deposit = ({ disabled, deposit, convert, maxValue }:DepositProps) => {
         </Box>
 
         <Box fill direction='row-responsive' justify='evenly'>
-
           <Box gap='small'>
             <Text color='text-weak' size='xsmall'>Current Collateral</Text>
-            <Text color='brand' weight='bold' size='medium'> {collateralAmount_? `${collateralAmount_.toFixed(4)} Eth` : '-' }</Text>
-            { false && 
-            <Box pad='xsmall'>
-              <Text alignSelf='start' size='xxsmall'>
-                <Info /> You need to deposit collateral in order to Borrow Dai.
-              </Text>
-            </Box>}
+            { isLoading || collateralAmount_ === undefined || depositPending ?           
+              <ScaleLoader color={theme?.global?.colors['brand-transparent'].dark} height='13' /> 
+              :
+              <Text color='brand' weight='bold' size='medium'> { collateralAmount_ ? 
+                `${collateralAmount_.toFixed(4)} Eth` 
+                : '0 Eth' }
+              </Text>}
           </Box>
+
           <Box gap='small'>
             <Text color='text-weak' size='xsmall'>Collateralisation Ratio</Text>
-            <Text color='brand' weight='bold' size='medium'> 
-              { (collateralPercent_ && (collateralPercent_ !== 0))? `${collateralPercent_}%`: '-' }
+            <Text color='brand' weight='bold' size='medium'>
+              { (collateralPercent_ && (collateralPercent_ !== 0))? `${collateralPercent_}%`: '' }
             </Text>
+            { collateralPercent_ === 0 && 
+            <Box direction='row'>
+              <Text color='brand-transparent' size='xxsmall'>
+                'No Dai has been borrowed yet.'
+              </Text>
+            </Box>}
           </Box>
 
           <Box gap='small' alignSelf='start' align='center'>
@@ -163,11 +185,10 @@ const Deposit = ({ disabled, deposit, convert, maxValue }:DepositProps) => {
               </Text>
               { true &&
                 <Text color='green' size='medium'> 
-                  { inputValue && (estIncrease !== 0) && `(+ ${estIncrease}%)` }
+                  { inputValue && collateralPercent_ && ( (estRatio-collateralPercent_) !== 0) && `(+ ${(estRatio-collateralPercent_).toFixed(0)}%)` }
                 </Text>}
             </Box>
-          </Box>
-            
+          </Box>           
         </Box>
 
         <InlineAlert warnMsg={warningMsg} errorMsg={errorMsg} />
@@ -194,53 +215,24 @@ const Deposit = ({ disabled, deposit, convert, maxValue }:DepositProps) => {
             round
             onClick={()=>setWithdrawOpen(true)}
             hoverIndicator='brand-transparent'
-          // border='all'
             pad={{ horizontal:'small', vertical:'small' }}
             justify='center'
           >
+
             <Box direction='row' gap='small'>
               <Text size='xsmall' color='text-weak'> alternatively, withdraw collateral</Text>
               <ArrowRight color='text-weak' />
             </Box>
           </Box>
         </Box>
-      </Box>}
-
-      { postEthActive && !txActive &&
-        <Box>Awaiting transaction approval</Box>}
-
-      { txActive &&
-      <Box align='center' flex='grow' justify='between' gap='large'>
-        <Box gap='medium' align='center' fill='horizontal'>
-          <Text size='xlarge' color='brand' weight='bold'>Good One!</Text>
-          <Box
-            // direction='row-responsive'
-            fill='horizontal'
-            gap='large'
-            align='center'
-          >
-            <Text>You deposited {inputValue} Eth.</Text>
-            <Text>Transaction Pending: </Text>
-            <Box
-              fill='horizontal'
-              round='medium'
-              background='brand'
-              onClick={()=>console.log('Going to etherscan')}
-              align='center'
-              pad='medium'
-            >
-              <Text
-                weight='bold'
-                size='large'
-              >
-                View on Etherscan
-              </Text>
-            </Box>
-          </Box>
-        </Box>
-      </Box>}
+       
+      </Box>}   
+      { postEthActive && !txActive && <ApprovalPending /> } 
+      { txActive && <TransactionPending msg={`You deposited ${inputValue} Eth.`} tx={txActive} /> }
     </>
   );
 };
+
+Deposit.defaultProps = { depositAmount: null };
 
 export default Deposit;

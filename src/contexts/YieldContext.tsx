@@ -127,20 +127,11 @@ const YieldProvider = ({ children }: any) => {
   const { dispatch: notifyDispatch } = React.useContext(NotifyContext);
 
   /* cache|localStorage declarations */
-  const [cachedContracts, setCachedContracts] = useCachedState(
-    'deployedContracts',
-    null
-  );
-  const [cachedSeries, setCachedSeries] = useCachedState(
-    'deployedSeries',
-    null
-  );
+  const [cachedContracts, setCachedContracts] = useCachedState('deployedContracts', null );
+  const [cachedSeries, setCachedSeries] = useCachedState('deployedSeries', null);
   const [cachedFeed, setCachedFeed] = useCachedState('lastFeed', null);
   const [txHistory, setTxHistory] = useCachedState('txHistory', null);
-  const [userPreferences, setUserPreferences] = useCachedState(
-    'userPreferences',
-    null
-  );
+  const [userPreferences, setUserPreferences] = useCachedState('userPreferences', null );
 
   /* hook declarations */
   const [callTx] = useCallTx();
@@ -176,20 +167,11 @@ const YieldProvider = ({ children }: any) => {
         const contractAddrs = await Promise.all(
           contractGroups.contractList.map(async (x: string) => {
             return {
-              [x]: await callTx(
-                state.migrationsAddr.get(networkId),
-                'Migrations',
-                'contracts',
-                [ethers.utils.formatBytes32String(x)]
-              ),
+              [x]: await callTx( state.migrationsAddr.get(networkId), 'Migrations', 'contracts', [ethers.utils.formatBytes32String(x)] ),
             };
           })
         );
-        console.log('this is wehre');
-        _deployedContracts = contractAddrs.reduce(
-          (prevObj, item) => ({ ...prevObj, ...item }),
-          {}
-        );
+        _deployedContracts = contractAddrs.reduce( (prevObj, item) => ({ ...prevObj, ...item }), {} );
         window.localStorage.removeItem('deployedContracts');
         setCachedContracts(_deployedContracts);
         console.log('Contract addresses updated:', _deployedContracts);
@@ -201,26 +183,15 @@ const YieldProvider = ({ children }: any) => {
         // TODO: better implementation of iterating through series (possibly a list length from contracts function?)
         const _seriesList = await Promise.all(
           ['yDai0', 'yDai1', 'yDai2', 'yDai3'].map(async (x: string) => {
-            return callTx(
-              state.migrationsAddr.get(networkId),
-              'Migrations',
-              'contracts',
-              [ethers.utils.formatBytes32String(x)]
-            );
+            return callTx(state.migrationsAddr.get(networkId), 'Migrations', 'contracts', [ethers.utils.formatBytes32String(x)]);
           })
         );
         await Promise.all(
           _seriesList.map(async (x: string, i: number) => {
             const name = await callTx(x, 'YDai', 'name', []);
-            const marketAddress = await callTx(
-              state.migrationsAddr.get(networkId),
-              'Migrations',
-              'contracts',
-              [ethers.utils.formatBytes32String(`${name}-Pool`)]
-            );
-            const maturity = (
-              await callTx(x, 'YDai', 'maturity', [])
-            ).toNumber();
+            const marketAddress = await callTx( state.migrationsAddr.get(networkId), 'Migrations', 'contracts', [ethers.utils.formatBytes32String(`${name}-Pool`)] );
+            const maturity = (await callTx(x, 'YDai', 'maturity', [])).toNumber();
+
             return {
               yDaiAddress: x,
               name,
@@ -261,9 +232,7 @@ const YieldProvider = ({ children }: any) => {
     } else {
       _state = state.feedData;
     }
-    const _ilks = await callTx(deployedContracts.Vat, 'Vat', 'ilks', [
-      ethers.utils.formatBytes32String('ETH-A'),
-    ]);
+    const _ilks = await callTx(deployedContracts.Vat, 'Vat', 'ilks', [ethers.utils.formatBytes32String('ETH-A') ]);
     /* parse and return feed data if reqd. */
     const _feedData = {
       ..._state,
@@ -309,24 +278,14 @@ const YieldProvider = ({ children }: any) => {
       'posted',
       [utils.ETH, account]
     );
-    _userData.urn = await callTx(_deployedContracts.Vat, 'Vat', 'urns', [
-      utils.ETH,
-      account,
-    ]);
+    _userData.urn = await callTx(_deployedContracts.Vat, 'Vat', 'urns', [ utils.ETH, account ]);
 
     /* get previous approvals and settings */
     // TODO: use controller hook for this
-    _userData.isEthProxyApproved = await callTx(
-      _deployedContracts.Controller,
-      'Controller',
-      'delegated',
-      [account, _deployedContracts.EthProxy]
-    );
+    _userData.isEthProxyApproved = await callTx( _deployedContracts.Controller, 'Controller', 'delegated', [account, _deployedContracts.EthProxy]);
 
     /* Get transaction history (from cache first or rebuild if an update is forced) */
-    forceUpdate &&
-      window.localStorage.removeItem('txHistory') &&
-      console.log('Re-building txHistory...');
+    forceUpdate && window.localStorage.removeItem('txHistory') && console.log('Re-building txHistory...');
 
     const postedHistory = await getEventHistory(
       _deployedContracts.Controller,
@@ -335,6 +294,7 @@ const YieldProvider = ({ children }: any) => {
       [null, account, null],
       !txHistory ? 0 : txHistory.lastBlock + 1
     ).then((res: any) => parseEventList(res));
+    
     const borrowedHistory = await getEventHistory(
       _deployedContracts.Controller,
       'Controller',
@@ -342,6 +302,7 @@ const YieldProvider = ({ children }: any) => {
       [],
       !txHistory ? 0 : txHistory.lastBlock + 1
     ).then((res: any) => parseEventList(res));
+
     const adminHistory = await getEventHistory(
       _deployedContracts.Controller,
       'Controller',

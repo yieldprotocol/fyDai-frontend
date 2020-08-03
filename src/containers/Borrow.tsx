@@ -20,6 +20,8 @@ import { SeriesContext } from '../contexts/SeriesContext';
 import { NotifyContext } from '../contexts/NotifyContext';
 
 import { useController, useCallTx, usePool, useYDai } from '../hooks';
+import OnceOffAuthorize from '../components/OnceOffAuthorize';
+import ApprovalPending from '../components/ApprovalPending';
 
 interface BorrowProps {
   borrowFn?:any
@@ -189,7 +191,7 @@ const Borrow = ({ borrowFn, maxValue }:BorrowProps) => {
   return (
     <>
       {selectorOpen && <SeriesSelector close={()=>setSelectorOpen(false)} /> }
-      { txActive?.type !== 'BORROW' && txActive?.type !== 'BUY' && !borrowActive &&
+      { txActive?.type !== 'BORROW' && txActive?.type !== 'BUY' &&
       <Box flex='grow' justify='between'>
         <Box gap='medium' align='center' fill='horizontal'>
           <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Selected series</Text>
@@ -228,33 +230,13 @@ const Borrow = ({ borrowFn, maxValue }:BorrowProps) => {
               </Box>
             </Box>
           </Box>
-
-          {!hasDelegated &&
-            <Box round pad='small' gap='small' border='all' elevation='small' align='center' fill>
-              <Text weight='bold' size='medium' color='brand'>Once-off Action required: </Text>
-              <CheckBox 
-                reverse
-                onChange={()=>delegateProcedure()}
-                label={( txActive?.type === 'DELEGATION')? 'Approval pending...' : 'Approve Transactions for this series'}
-              />
-              {/* <Box
-                round
-                onClick={()=>delegateProcedure()}
-                hoverIndicator='brand-transparent'
-                border='all'
-                pad={{ horizontal:'small', vertical:'small' }}
-                align='center'
-              >
-                <Text
-                  weight='bold'
-                // size='xxsmall'
-                  color='text'
-                >
-                  Approve Transactions for this series
-                </Text>
-              </Box> */}
-            </Box>}
-
+      
+          {!hasDelegated && 
+            <OnceOffAuthorize
+              authProcedure={delegateProcedure} 
+              authMsg='Allow Pool to trade on your behalf' 
+              txPending={txActive?.type === 'DELEGATION'}  
+            />}
           
           <Box direction='row-responsive' pad={{ horizontal:'medium' }} justify='start' gap='large' fill>
             <Box gap='small'>
@@ -280,7 +262,6 @@ const Borrow = ({ borrowFn, maxValue }:BorrowProps) => {
             </Box>
             
           </Box>
-
 
           <Box fill gap='medium' margin={{ vertical:'large' }}>
             <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to borrow</Text>
@@ -362,8 +343,7 @@ const Borrow = ({ borrowFn, maxValue }:BorrowProps) => {
         </Box>
       </Box> }
 
-      { borrowActive && !txActive &&
-        <Box>Awaiting transaction approval</Box>}
+      { borrowActive && !txActive && <ApprovalPending /> } 
 
       { (txActive?.type === 'BORROW') &&
       <Box align='center' flex='grow' justify='between' gap='large'>
@@ -444,7 +424,6 @@ const Borrow = ({ borrowFn, maxValue }:BorrowProps) => {
           </Box>
         </Box>
       </Box>}
-
     </>
   );
 };

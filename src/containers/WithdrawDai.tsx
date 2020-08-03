@@ -10,13 +10,13 @@ import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
 import { usePool, useYDai } from '../hooks';
 
-interface IWithDrawActionProps {
+interface WithDrawDaiProps {
   close?: any;
   withdraw?: any;
   maxValue?: number;
 }
 
-const WithdrawDai = ({ close }:IWithDrawActionProps) => {
+const WithdrawDai = ({ close }:WithDrawDaiProps) => {
 
   const [ maxWithdraw, setMaxWithdraw ] = useState<number>(0);
   const [ inputValue, setInputValue ] = useState<any>();
