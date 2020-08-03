@@ -56,7 +56,7 @@ export const useEthProxy = () => {
     setPostEthActive(true);
     const contract = new ethers.Contract( ethProxyAddr, ethProxyAbi, signer );
     try {
-      tx = await contract.post(fromAddr, toAddr, parsedAmount, { value: parsedAmount });
+      tx = await contract.post(toAddr, parsedAmount, { value: parsedAmount });
     } catch (e) {
       dispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed. See console.', type:'error' } } );
       // eslint-disable-next-line no-console
@@ -96,7 +96,7 @@ export const useEthProxy = () => {
     setWithdrawEthActive(true);
     const contract = new ethers.Contract( ethProxyAddr, ethProxyAbi, signer );
     try {
-      tx = await contract.withdraw(fromAddr, toAddr, parsedAmount);
+      tx = await contract.withdraw(toAddr, parsedAmount);
     } catch (e) {
       dispatch({ type: 'notify', payload:{ message:'Error Withdrawing funds', type:'error' } } );
       setWithdrawEthActive(false);

@@ -8,7 +8,7 @@ import {
 import { FaEthereum as Ethereum } from 'react-icons/fa';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
-import { useMarket, useYDai } from '../hooks';
+import { usePool, useYDai } from '../hooks';
 
 interface IWithDrawActionProps {
   close?: any;
@@ -46,7 +46,7 @@ const DaiWithDrawAction = ({ close }:IWithDrawActionProps) => {
     estimateRatio, // TODO << this is a function (basically just passed from hooks via context) >> 
   } = seriesAggregates;
 
-  const { buyDai, previewMarketTx, approveToken }  = useMarket();
+  const { buyDai, previewPoolTx, approveToken }  = usePool();
   const { userAllowance } = useYDai();
 
   const withdrawProcedure = async (value:number) => {
@@ -67,7 +67,7 @@ const DaiWithDrawAction = ({ close }:IWithDrawActionProps) => {
   };
 
   const checkMaxWithdraw = async () =>{
-    const preview = await previewMarketTx('sellYDai', activeSeries.marketAddress, activeSeries.yDaiBalance_);
+    const preview = await previewPoolTx('sellYDai', activeSeries.marketAddress, activeSeries.yDaiBalance_);
     console.log(parseFloat(ethers.utils.formatEther(preview)));
     setMaxWithdraw( parseFloat(ethers.utils.formatEther(preview)) );
     return parseFloat(ethers.utils.formatEther(preview));
@@ -79,7 +79,7 @@ const DaiWithDrawAction = ({ close }:IWithDrawActionProps) => {
 
   useEffect(() => {
     approved && ( async () => {
-      const preview = await previewMarketTx('SellYDai', activeSeries.marketAddress, approved);
+      const preview = await previewPoolTx('SellYDai', activeSeries.marketAddress, approved);
       setDaiApproved( parseFloat(ethers.utils.formatEther(preview)) );
     })();
   }, [ approved ]);
@@ -97,7 +97,7 @@ const DaiWithDrawAction = ({ close }:IWithDrawActionProps) => {
 
   useEffect(() => {
     activeSeries && inputValue && ( async () => {
-      const preview = await previewMarketTx('buyDai', activeSeries.marketAddress, inputValue);
+      const preview = await previewPoolTx('buyDai', activeSeries.marketAddress, inputValue);
       setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
     })();
   }, [inputValue]);
