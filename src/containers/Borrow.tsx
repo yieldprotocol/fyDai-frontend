@@ -1,103 +1,90 @@
 import React, { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 import Moment from 'moment';
-import { Box, Button, Select, Image, TextInput, Text, CheckBox, Collapsible, RangeInput } from 'grommet';
+import { Box, TextInput, Text, ThemeContext, } from 'grommet';
+
+import { ScaleLoader } from 'react-spinners';
 
 import { 
-  FiCheckCircle,
-  FiInfo as Info,
   FiHelpCircle as Help,
-  FiChevronDown as CaretDown,
-  FiAlertTriangle as Warning,
 } from 'react-icons/fi';
 
 import SeriesSelector from '../components/SeriesSelector';
 import InlineAlert from '../components/InlineAlert';
+import OnceOffAuthorize from '../components/OnceOffAuthorize';
+import ApprovalPending from '../components/ApprovalPending';
+import TransactionPending from '../components/TransactionPending';
 
 import { YieldContext } from '../contexts/YieldContext';
-
 import { SeriesContext } from '../contexts/SeriesContext';
 import { NotifyContext } from '../contexts/NotifyContext';
 
-import { useController, useCallTx, usePool, useYDai, useMath, useProxy } from '../hooks';
-import OnceOffAuthorize from '../components/OnceOffAuthorize';
-import ApprovalPending from '../components/ApprovalPending';
+import { useController, useCallTx, usePool, useYDai, useMath, useProxy, useTxActive } from '../hooks';
 
-interface BorrowProps {
-  borrowFn?:any
-  // activeSeries?:IYieldSeries,
-  maxValue?:number
+interface IBorrowProps {
+  borrowAmount?:number|null;
 }
 
-const Borrow = ({ borrowFn, maxValue }:BorrowProps) => {
+const Borrow = ({ borrowAmount }:IBorrowProps) => {
 
   const { state: yieldState, actions: yieldActions } = React.useContext(YieldContext);
   const { deployedContracts } = yieldState;
-  const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
-  const { isLoading, seriesAggregates, seriesRates, activeSeries } = seriesState;
-  const {
-    maxDaiAvailable_,
-    debtValue_,
-    collateralValue_,
-    collateralRatio_,
-  } = seriesAggregates;
 
-  const { addControllerDelegate, checkControllerDelegate, borrow, borrowActive }  = useController();
-  const { borrowUsingExactDai, borrowActive: proxyBorrowActive } = useProxy(); 
+  const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
+  const { isLoading, seriesAggregates, seriesRates, activeSeries } = seriesState; 
+  const { maxDaiAvailable_ } = seriesAggregates;
+
+  const theme:any = React.useContext(ThemeContext);
+
   const { 
-    buyDai,
-    sellYDai,
+    addControllerDelegate,
+    checkControllerDelegate,
+    borrow,
+    borrowActive: noProxyBorrowActive,
+  }  = useController();
+
+  const { 
     previewPoolTx,
     approveToken,
-    addPoolDelegate,
+    addPoolDelegate, //
     checkPoolDelegate
   }  = usePool();
+
+  const { borrowUsingExactDai, borrowActive } = useProxy(); 
   const { userAllowance } = useYDai();
+  const { yieldAPR } = useMath();
 
-  const {
-    yieldAPR 
-  } = useMath();
-
+  /* internal component state */
   const [ borrowDisabled, setBorrowDisabled ] = React.useState<boolean>(true);
   const [ selectorOpen, setSelectorOpen ] = React.useState<boolean>(false);
-  const [ estRatio, setEstRatio ] = React.useState<any>(0);
-
-  const [ hasDelegated, setHasDelegated] = React.useState<boolean>(activeSeries?.hasDelegated || true);
-
-  /* token balances and values */
-  const [ inputValue, setInputValue ] = React.useState<any>();
-  const [ yDaiValue, setYDaiValue ] = React.useState<number>(0);
-  const [ APR, setAPR ] = React.useState<number>();
-
-  const [ approved, setApproved ] = React.useState<any>(0);
-  const [ daiApproved, setDaiApproved ] = React.useState<any>(0);
 
   const [ indicatorColor, setIndicatorColor ] = React.useState<string>('brand');
   const [ warningMsg, setWarningMsg] = React.useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
 
+  /* flags */ 
+  const [ hasDelegated, setHasDelegated] = React.useState<boolean>(activeSeries?.hasDelegated || true);
+  const [ borrowPending, setBorrowPending ] = React.useState<boolean>(false);
+
+  /* token balances and values */
+  const [ inputValue, setInputValue ] = React.useState<any>(borrowAmount || undefined);
+  const [ yDaiValue, setYDaiValue ] = React.useState<number>(0);
+  const [ APR, setAPR ] = React.useState<number>();
+  const [ estRatio, setEstRatio ] = React.useState<any>(0);
+
+  const [ approved, setApproved ] = React.useState<any>(0);
+  const [ daiApproved, setDaiApproved ] = React.useState<any>(0);
+
+  const [ txActive ] = useTxActive(['borrow', 'buy', 'delegation']);
+
   const borrowProcedure = async (value:number, autoSell:boolean=true) => {
-    // TODO: remove this if certain it won't be needed. 
-    // borrow(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value).then(
-    //   async () => {
-    //     await sellYDai(
-    //       activeSeries.poolAddress,
-    //       yDaiValue,
-    //       // 0
-    //     );
-    //   }
-    // );
-    autoSell && await borrowUsingExactDai( activeSeries.daiProxyAddress, activeSeries.maturity, yDaiValue, value);
+    setBorrowPending(true); 
+    autoSell && await borrowUsingExactDai( activeSeries.daiProxyAddress, 'ETH-A', activeSeries.maturity, yDaiValue, value);
     !autoSell && await borrow(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value);
     setInputValue('');
-    yieldActions.updateUserData();
-    seriesActions.refreshPositions([ activeSeries ]);
-  };
-
-  const approveProcedure = async (value:number) => {
-    await approveToken(activeSeries.yDaiAddress, activeSeries.poolAddress, value);
-    const approvedYDai = await userAllowance(activeSeries.yDaiAddress, activeSeries.poolAddress);
-    setApproved( approvedYDai ); // TODO convert to Dai somehow
+    await yieldActions.updateUserData();
+    await seriesActions.refreshPositions([ activeSeries ]);
+    setBorrowPending(false);
   };
 
   const delegateProcedure = async () => {
@@ -105,17 +92,17 @@ const Borrow = ({ borrowFn, maxValue }:BorrowProps) => {
     // await addPoolDelegate(activeSeries.poolAddress, activeSeries.yDaiAddress);
     // const res = await checkPoolDelegate(activeSeries.poolAddress, activeSeries.yDaiAddress);
     await addControllerDelegate(deployedContracts.Controller, activeSeries.daiProxyAddress);
-    const res = await checkControllerDelegate(activeSeries.poolAddress, activeSeries.yDaiAddress);
+    const res = await checkControllerDelegate(deployedContracts.Controller, activeSeries.yDaiAddress);
     setHasDelegated(res);
   };
 
-  // TODO: maybe split into a custom hook
-  const { state: { pendingTxs } } = React.useContext(NotifyContext);
-  const [txActive, setTxActive] = useState<any>(null);
-  useEffect(()=>{
-    setTxActive(pendingTxs.find((x:any)=> x.type === 'BORROW' || x.type === 'BUY' || x.type === 'DELEGATION'));
-  }, [ pendingTxs ]);
-
+  /* ADVANCED SETTINGS setting approval limit */
+  const approveProcedure = async (value:number) => {
+    await approveToken(activeSeries.yDaiAddress, activeSeries.marketAddress, value);
+    const approvedYDai = await userAllowance(activeSeries.yDaiAddress, activeSeries.marketAddress);
+    setApproved( approvedYDai ); // TODO convert to Dai somehow
+  };
+  
   /* Handle collateralisation ratio exceptions and warnings */
   useEffect(()=>{
     if (estRatio && estRatio <= 1.5) {
@@ -153,7 +140,7 @@ const Borrow = ({ borrowFn, maxValue }:BorrowProps) => {
     })();
   }, [inputValue]);
 
-  /* Then also the opposite, Handle yDai to Dai conversion for the approved Dai */
+  /* ADVANCED SETTINGS Handle yDai to Dai conversion for the approved Dai */
   useEffect(() => {
     approved && ( async () => {
       const preview = await previewPoolTx('SellYDai', activeSeries.poolAddress, approved);
@@ -167,6 +154,7 @@ const Borrow = ({ borrowFn, maxValue }:BorrowProps) => {
     })();
   }, [ approved ]);
 
+  /* Handle input execption logic */
   useEffect(() => {
     if ( inputValue && ( inputValue > maxDaiAvailable_ ) ) {
       console.log(inputValue, maxDaiAvailable_);
@@ -182,11 +170,12 @@ const Borrow = ({ borrowFn, maxValue }:BorrowProps) => {
   }, [ inputValue ]);
 
   /* Borrow button disabling logic */
+  // TODO split out advanced setting approval logic
   useEffect(()=>{
     if (!hasDelegated) {
       setBorrowDisabled(true);
-    } else if (approved < yDaiValue) {
-      setBorrowDisabled(true);
+    // } else if (approved < yDaiValue) {
+    //   setBorrowDisabled(true);
     } else if (!(inputValue) || inputValue===0) {
       setBorrowDisabled(true);
     } else {
@@ -194,11 +183,13 @@ const Borrow = ({ borrowFn, maxValue }:BorrowProps) => {
     }
   }, [ approved, inputValue, yDaiValue, hasDelegated ]);
 
+
   useEffect(() => {
     activeSeries && ( async ()=>{
+      // TODO split out advanced approval settings for optimization
       const approvedAmount = await userAllowance(activeSeries.yDaiAddress, activeSeries.poolAddress);
       setApproved( parseFloat(approvedAmount.toString()));
-      setHasDelegated(activeSeries.hasDelegated);
+      setHasDelegated(activeSeries.hasDelegatedController);
     })();
   }, [ activeSeries ]);
 
@@ -248,7 +239,7 @@ const Borrow = ({ borrowFn, maxValue }:BorrowProps) => {
           {!hasDelegated && 
             <OnceOffAuthorize
               authProcedure={delegateProcedure} 
-              authMsg='Allow Pool to trade on your behalf' 
+              authMsg='Allow Yield trade on your behalf' 
               txPending={txActive?.type === 'DELEGATION'}  
             />}
           
@@ -258,9 +249,15 @@ const Borrow = ({ borrowFn, maxValue }:BorrowProps) => {
                 <Text color='text-weak' size='xsmall'>Current Debt</Text>
                 <Help />
               </Box>
+
               <Box direction='row' gap='small'>
-                {/* <Text color={maxDaiAvailable_? 'brand': 'brand-transparent'} size='xxsmall'>approx.</Text> */}
-                <Text color='brand' weight='bold' size='medium'> {activeSeries?.wethDebtDai_? `${activeSeries.wethDebtDai_.toFixed(2)} Dai`: ''}  </Text>
+                { borrowPending ?           
+                  <ScaleLoader color={theme?.global?.colors['brand-transparent'].dark} height='13' /> 
+                  :
+                  <Text color='brand' weight='bold' size='medium'> 
+                    {activeSeries?.wethDebtDai_? `${activeSeries.wethDebtDai_.toFixed(2)} Dai`: ''}
+                  </Text>}
+                {/* <Text color='brand' weight='bold' size='medium'> {activeSeries?.wethDebtDai_? `${activeSeries.wethDebtDai_.toFixed(2)} Dai`: ''}  </Text> */}
               </Box>
             </Box>
             
@@ -347,9 +344,8 @@ const Borrow = ({ borrowFn, maxValue }:BorrowProps) => {
             fill='horizontal'
             round='medium' 
             background={borrowDisabled ? 'brand-transparent' : 'brand'} 
-            // onClick={borrowDisabled ? ()=>{}:()=>borrowProcedure(inputValue)} 
-            onClick={()=>borrowProcedure(inputValue)}
-
+            onClick={borrowDisabled ? ()=>{}:()=>borrowProcedure(inputValue)} 
+            // onClick={()=>borrowProcedure(inputValue)}
             align='center'
             pad='small'
           >
@@ -365,88 +361,12 @@ const Borrow = ({ borrowFn, maxValue }:BorrowProps) => {
       </Box> }
 
       { borrowActive && !txActive && <ApprovalPending /> } 
-
-      { (txActive?.type === 'BORROW') &&
-      <Box align='center' flex='grow' justify='between' gap='large'>
-        <Box gap='medium' align='center' fill='horizontal'>
-          <Text size='xlarge' color='brand' weight='bold'>Thank you.</Text>
-          <Box
-            // direction='row-responsive'
-            fill='horizontal'
-            gap='large'
-            align='center'
-          >
-            <Text>You are in the process of borrowing {inputValue} Dai</Text>
-            <Text>The transaction is pending. </Text>
-            <Box
-              fill='horizontal'
-              round='medium'
-              // background='brand'
-              border='all'
-              onClick={()=>console.log('Going to etherscan')}
-              align='center'
-              pad='xsmall'
-            >
-              <Text
-                weight='bold'
-                size='small'
-              >
-                View on Etherscan
-              </Text>
-            </Box>
-          </Box>
-        </Box>
-      </Box>}
-
-      { (txActive?.type === 'BUY') &&
-      <Box align='center' flex='grow' justify='between' gap='large'>
-        <Box gap='medium' align='center' fill='horizontal'>
-          <Text size='xlarge' color='brand' weight='bold'>Good One!</Text>
-          <Box
-            // direction='row-responsive'
-            fill='horizontal'
-            gap='large'
-            align='center'
-          >
-            <Text>You borrowed {inputValue} Dai</Text>
-            <Text>We are now putting the Dai in your wallet.</Text>
-            <Box
-              fill='horizontal'
-              round='medium'
-              // background='brand'
-              border='all'
-              onClick={()=>console.log('Cancelling Dai buying')}
-              align='center'
-              pad='xsmall'
-            >
-              <Text
-                weight='bold'
-                size='small'
-              >
-                Cancel automatic Dai conversion to keep your yDai.
-              </Text>
-            </Box>
-            <Box
-              fill='horizontal'
-              round='medium'
-              // background='brand'
-              border='all'
-              onClick={()=>console.log('Going to etherscan')}
-              align='center'
-              pad='xsmall'
-            >
-              <Text
-                weight='bold'
-                size='small'
-              >
-                View on Etherscan
-              </Text>
-            </Box>
-          </Box>
-        </Box>
-      </Box>}
+      { txActive && <TransactionPending msg={`You borrowed ${inputValue} Dai.`} tx={txActive} /> }
+      {/* { txActive?.type === 'BORROW' && <TransactionPending msg={`You borrowed ${inputValue} Dai.`} tx={txActive} /> } */}
     </>
   );
 };
+
+Borrow.defaultProps = { borrowAmount: null };
 
 export default Borrow;

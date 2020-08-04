@@ -2,13 +2,15 @@ import React from 'react';
 import { NotifyContext } from '../contexts/NotifyContext';
 
 
-export const useTxActive = (type:string) => {
+export const useTxActive = (typeList:string[]) => {
 
   const { state: { pendingTxs } } = React.useContext(NotifyContext);
   const [txActive, setTxActive] = React.useState<any>(null);
 
+  const upperTypeList = typeList.map( (x:any) => x.toUpperCase() );
+
   React.useEffect(()=>{
-    setTxActive(pendingTxs.find( (x:any)=> x.type === type.toUpperCase() ));
+    setTxActive(pendingTxs.find( (x:any)=> upperTypeList.includes(x.type) ));
   }, [ pendingTxs ]);
 
   return [txActive] as const; 
