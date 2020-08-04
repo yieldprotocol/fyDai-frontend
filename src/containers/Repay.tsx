@@ -101,9 +101,6 @@ function Repay({ repayAmount }:IRepayProps) {
     if ( inputValue  && userData?.daiBalance_ && ( inputValue > userData?.daiBalance_ ) ) {
       setWarningMsg(null);
       setErrorMsg('That amount exceeds the amount of Dai in your wallet'); 
-    } else if ( false ) {
-      setErrorMsg(null);
-      setWarningMsg('If you borrow right up to your maximum allowance, there is high probability you will be liquidated soon!');
     } else {
       setWarningMsg(null);
       setErrorMsg(null);
@@ -114,10 +111,9 @@ function Repay({ repayAmount }:IRepayProps) {
   useEffect(() => {
     activeSeries && inputValue > 0 && ( async () => {
       const preview = await previewPoolTx('sellDai', activeSeries.poolAddress, inputValue);
+      
       if (!preview.isZero()) {
         setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
-        setWarningMsg(null);
-        setErrorMsg(null);
       } else {
         /* if the market doesnt have liquidity just estimate from rate */
         const rate = await previewPoolTx('sellDai', activeSeries.poolAddress, 1);
@@ -132,7 +128,7 @@ function Repay({ repayAmount }:IRepayProps) {
   useEffect(()=>{
     if (approved < inputValue) {
       setRepayDisabled(true);
-    } else if (!(inputValue) || inputValue===0) {
+    } else if (!(inputValue) || inputValue===0 || !userData?.daiBalance_) {
       setRepayDisabled(true);
     } else {
       setRepayDisabled(false);
