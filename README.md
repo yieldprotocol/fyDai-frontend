@@ -4,7 +4,6 @@ Front end for yDai
 ## To start a new ganache instance to test frontend against
 
 Clone the yToken MVP repositiory: https://github.com/yieldprotocol/ytoken-mvp.git
-( working commit: c293a86fd80dbcf22c755b1784a4d11ed00fea04 )
 
 In a console ( yTokenMVP root folder ):
 1. `ganache-cli -m 'SOME MNEMONIC OF YOUR CHOICE' -i 1337` to run a ganache insatnce.
@@ -24,4 +23,5 @@ In a seperate console ( yTokenMVP root folder ):
 In a new console ( yDai fronend root folder ):
 `yarn && yarn start` to install and launch the dev server
 
-NB: Make sure you reset your metamask on every reload of the blockchain. metamask transactions fail if the blockchain is restarted. 
+NB: Make sure you reset your metamask on every reload of the blockchain. metamask transactions fail if the blockchain is restarted.
+

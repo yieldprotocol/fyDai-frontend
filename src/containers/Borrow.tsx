@@ -13,6 +13,7 @@ import SeriesSelector from '../components/SeriesSelector';
 import InlineAlert from '../components/InlineAlert';
 import OnceOffAuthorize from '../components/OnceOffAuthorize';
 import ApprovalPending from '../components/ApprovalPending';
+import TransactionPending from '../components/TransactionPending';
 
 import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
@@ -360,86 +361,8 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
       </Box> }
 
       { borrowActive && !txActive && <ApprovalPending /> } 
-
-      { (txActive?.type === 'BORROW') &&
-      <Box align='center' flex='grow' justify='between' gap='large'>
-        <Box gap='medium' align='center' fill='horizontal'>
-          <Text size='xlarge' color='brand' weight='bold'>Thank you.</Text>
-          <Box
-            // direction='row-responsive'
-            fill='horizontal'
-            gap='large'
-            align='center'
-          >
-            <Text>You are in the process of borrowing {inputValue} Dai</Text>
-            <Text>The transaction is pending. </Text>
-            <Box
-              fill='horizontal'
-              round='medium'
-              // background='brand'
-              border='all'
-              onClick={()=>console.log('Going to etherscan')}
-              align='center'
-              pad='xsmall'
-            >
-              <Text
-                weight='bold'
-                size='small'
-              >
-                View on Etherscan
-              </Text>
-            </Box>
-          </Box>
-        </Box>
-      </Box>}
-
-      { (txActive?.type === 'BUY') &&
-      <Box align='center' flex='grow' justify='between' gap='large'>
-        <Box gap='medium' align='center' fill='horizontal'>
-          <Text size='xlarge' color='brand' weight='bold'>Good One!</Text>
-          <Box
-            // direction='row-responsive'
-            fill='horizontal'
-            gap='large'
-            align='center'
-          >
-            <Text>You borrowed {inputValue} Dai</Text>
-            <Text>We are now putting the Dai in your wallet.</Text>
-            <Box
-              fill='horizontal'
-              round='medium'
-              // background='brand'
-              border='all'
-              onClick={()=>console.log('Cancelling Dai buying')}
-              align='center'
-              pad='xsmall'
-            >
-              <Text
-                weight='bold'
-                size='small'
-              >
-                Cancel automatic Dai conversion to keep your yDai.
-              </Text>
-            </Box>
-            <Box
-              fill='horizontal'
-              round='medium'
-              // background='brand'
-              border='all'
-              onClick={()=>console.log('Going to etherscan')}
-              align='center'
-              pad='xsmall'
-            >
-              <Text
-                weight='bold'
-                size='small'
-              >
-                View on Etherscan
-              </Text>
-            </Box>
-          </Box>
-        </Box>
-      </Box>}
+      { txActive && <TransactionPending msg={`You borrowed ${inputValue} Dai.`} tx={txActive} /> }
+      {/* { txActive?.type === 'BORROW' && <TransactionPending msg={`You borrowed ${inputValue} Dai.`} tx={txActive} /> } */}
     </>
   );
 };

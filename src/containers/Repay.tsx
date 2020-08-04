@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { ethers } from 'ethers';
-import { Box, Button, Image, Select, TextInput, Text, Heading, Collapsible, CheckBox } from 'grommet';
+import { Box, Button, Image, Select, TextInput, Text, Heading, Collapsible, CheckBox,  ThemeContext, } from 'grommet';
 import { 
   FiInfo as Info,
   FiHelpCircle as Help,
@@ -8,10 +8,13 @@ import {
   FiSettings as SettingsGear,
 } from 'react-icons/fi';
 
+import { ScaleLoader } from 'react-spinners';
+
 import SeriesSelector from '../components/SeriesSelector';
 import InlineAlert from '../components/InlineAlert';
 import OnceOffAuthorize from '../components/OnceOffAuthorize';
 import ApprovalPending from '../components/ApprovalPending';
+import TransactionPending from '../components/TransactionPending';
 
 import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
@@ -31,7 +34,7 @@ function Repay({ repayAmount }:IRepayProps) {
   
   const { 
     previewPoolTx,
-    approveToken,
+    approveToken, approveActive,
     addPoolDelegate,
     checkPoolDelegate
   }  = usePool(); 
@@ -44,6 +47,7 @@ function Repay({ repayAmount }:IRepayProps) {
     debtValue_,
     estimateRatio, // TODO << this is a function (basically just passed from hooks via context) >> 
   } = seriesAggregates;
+  const theme:any = useContext(ThemeContext);
 
   const { repay, repayActive }  = useController();
   const { repayUsingExactDai } = useProxy();
@@ -51,11 +55,12 @@ function Repay({ repayAmount }:IRepayProps) {
   const [ inputValue, setInputValue ] = React.useState<any>();
   const [ yDaiValue, setYDaiValue ] = React.useState<any>();
 
+  const [ repayPending, setRepayPending ] = React.useState<boolean>(false);
   const [ repayDisabled, setRepayDisabled ] = React.useState<boolean>(false);
   const [ selectorOpen, setSelectorOpen ] = React.useState<boolean>(false);
 
   const [ hasDelegated, setHasDelegated ] = React.useState<any>(0);
-  const [ approved, setApproved ] = React.useState<any>(0);
+  const [ approved, setApproved ] = React.useState<any>();
 
   const [ warningMsg, setWarningMsg] = React.useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
@@ -63,17 +68,16 @@ function Repay({ repayAmount }:IRepayProps) {
   const [ txActive ] = useTxActive(['repay']);
 
   const repayProcedure = async (value:number) => {
-
+    setRepayPending(true);
     /* direct repay without proxy */
     await repay(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value, 'Dai' );
-
     /* repay using proxy */
     // await repayUsingExactDai(activeSeries.daiProxyAddress, 'ETH-A', activeSeries.maturity, yDaiValue, value);
-
     setApproved(await getTokenAllowance(deployedContracts.Dai, deployedContracts.Treasury, 'Dai'));
     setInputValue('');
-    seriesActions.refreshPositions([activeSeries]);
-    yieldActions.updateUserData();
+    await seriesActions.refreshPositions([activeSeries]);
+    await yieldActions.updateUserData();
+    setRepayPending(false);
   };
 
   const delegateProcedure = async () => {
@@ -262,15 +266,19 @@ function Repay({ repayAmount }:IRepayProps) {
           <InlineAlert warnMsg={warningMsg} errorMsg={errorMsg} />
       
           <Box>
-            <CheckBox 
-              reverse
-              checked={!inputValue || ( approved >= inputValue )}
-              disabled={!inputValue || ( approved >= inputValue )}
-              onChange={()=>approveProcedure(inputValue)}
-              label={(approved >= inputValue) ? 
-                `Repayments are unlocked for up to ${approved.toFixed(2) || '' } Dai` 
-                : `Unlock repayments of ${inputValue || ''} Dai`}
-            />
+            {approveActive || approved === undefined ?             
+              <ScaleLoader color={theme?.global?.colors['brand-transparent'].dark} height='13' />
+              : <CheckBox
+                reverse
+                checked={approved && !inputValue || ( approved >= inputValue )}
+                disabled={!inputValue || ( approved >= inputValue )}
+                onChange={()=>approveProcedure(inputValue)}
+                label={                
+                  (approved >= inputValue) ? 
+                    `Repayments are unlocked for up to ${approved.toFixed(2) || '' } Dai` 
+                    : `Unlock repayments of ${inputValue || ''} Dai` 
+                }
+              />}
           </Box>
 
           <Box
@@ -294,37 +302,8 @@ function Repay({ repayAmount }:IRepayProps) {
       </Box>}
 
       { repayActive && !txActive && <ApprovalPending /> } 
+      { txActive && <TransactionPending msg={`You made a repayment of ${inputValue} Dai.`} tx={txActive} /> }
 
-      { txActive &&
-        <Box align='center' flex='grow' justify='between' gap='large'>
-          <Box gap='medium' align='center' fill='horizontal'>
-            <Text size='xlarge' color='brand' weight='bold'>Good One!</Text>
-            <Box
-            // direction='row-responsive'
-              fill='horizontal'
-              gap='large'
-              align='center'
-            >
-              <Text>Repayment of  {inputValue} Dai</Text>
-              <Text>Transaction Pending: </Text>
-              <Box
-                fill='horizontal'
-                round='medium'
-                border='all'
-                onClick={()=>console.log('Going to etherscan')}
-                align='center'
-                pad='small'
-              >
-                <Text
-                  weight='bold'
-                  size='small'
-                >
-                  View on Etherscan
-                </Text>
-              </Box>
-            </Box>
-          </Box>
-        </Box>}
     </>
   );
 }
