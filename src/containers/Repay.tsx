@@ -9,13 +9,15 @@ import {
 } from 'react-icons/fi';
 
 import SeriesSelector from '../components/SeriesSelector';
+import InlineAlert from '../components/InlineAlert';
+import OnceOffAuthorize from '../components/OnceOffAuthorize';
+import ApprovalPending from '../components/ApprovalPending';
+
 import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
 import { NotifyContext } from '../contexts/NotifyContext';
 
-import { useController, usePool, useBalances, useProxy } from '../hooks';
-import InlineAlert from '../components/InlineAlert';
-import OnceOffAuthorize from '../components/OnceOffAuthorize';
+import { useController, usePool, useBalances, useProxy, useTxActive } from '../hooks';
 
 interface IRepayProps {
   repayAmount?:any
@@ -43,8 +45,8 @@ function Repay({ repayAmount }:IRepayProps) {
     estimateRatio, // TODO << this is a function (basically just passed from hooks via context) >> 
   } = seriesAggregates;
 
-  const { repay, repayActive: directRepayActive }  = useController();
-  const { repayUsingExactDai, repayActive } = useProxy();
+  const { repay, repayActive }  = useController();
+  const { repayUsingExactDai } = useProxy();
 
   const [ inputValue, setInputValue ] = React.useState<any>();
   const [ yDaiValue, setYDaiValue ] = React.useState<any>();
@@ -58,12 +60,7 @@ function Repay({ repayAmount }:IRepayProps) {
   const [ warningMsg, setWarningMsg] = React.useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
 
-  // TODO: maybe split into a custom hook
-  const { state: { pendingTxs } } = React.useContext(NotifyContext);
-  const [txActive, setTxActive] = React.useState<any>(null);
-  useEffect(()=>{
-    setTxActive(pendingTxs.find((x:any)=> x.type === 'REPAY'));
-  }, [ pendingTxs ]);
+  const [ txActive ] = useTxActive(['repay']);
 
   const repayProcedure = async (value:number) => {
 
@@ -150,7 +147,7 @@ function Repay({ repayAmount }:IRepayProps) {
   return (
     <>
       {selectorOpen && <SeriesSelector close={()=>setSelectorOpen(false)} /> }
-      { !repayActive && !txActive &&
+      { !txActive &&
       <Box flex='grow' justify='between'>
         <Box gap='medium' align='center' fill='horizontal'>
           <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Selected series</Text>
@@ -296,8 +293,7 @@ function Repay({ repayAmount }:IRepayProps) {
         </Box>
       </Box>}
 
-      { repayActive && !txActive &&
-        <Box>Awaiting transaction approval</Box>}
+      { repayActive && !txActive && <ApprovalPending /> } 
 
       { txActive &&
         <Box align='center' flex='grow' justify='between' gap='large'>

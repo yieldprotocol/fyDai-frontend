@@ -61,7 +61,7 @@ const Deposit = ({ depositAmount }:DepositProps) => {
   const theme:any = useContext(ThemeContext);
 
   const { postEth, postEthActive }  = useProxy();
-  const [ txActive ] = useTxActive('Deposit');
+  const [ txActive ] = useTxActive(['Deposit']);
 
   /* Steps required to deposit and update values */
   const depositProcedure = async (value:number) => {

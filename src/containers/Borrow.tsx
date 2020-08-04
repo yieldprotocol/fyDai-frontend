@@ -18,7 +18,7 @@ import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { NotifyContext } from '../contexts/NotifyContext';
 
-import { useController, useCallTx, usePool, useYDai, useMath, useProxy } from '../hooks';
+import { useController, useCallTx, usePool, useYDai, useMath, useProxy, useTxActive } from '../hooks';
 
 interface IBorrowProps {
   borrowAmount?:number|null;
@@ -45,7 +45,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
   const { 
     previewPoolTx,
     approveToken,
-    addPoolDelegate,
+    addPoolDelegate, //
     checkPoolDelegate
   }  = usePool();
 
@@ -56,13 +56,14 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
   /* internal component state */
   const [ borrowDisabled, setBorrowDisabled ] = React.useState<boolean>(true);
   const [ selectorOpen, setSelectorOpen ] = React.useState<boolean>(false);
+
   const [ indicatorColor, setIndicatorColor ] = React.useState<string>('brand');
   const [ warningMsg, setWarningMsg] = React.useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
-  const [ borrowPending, setBorrowPending ] = React.useState<boolean>(false);
 
   /* flags */ 
   const [ hasDelegated, setHasDelegated] = React.useState<boolean>(activeSeries?.hasDelegated || true);
+  const [ borrowPending, setBorrowPending ] = React.useState<boolean>(false);
 
   /* token balances and values */
   const [ inputValue, setInputValue ] = React.useState<any>(borrowAmount || undefined);
@@ -72,6 +73,8 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
 
   const [ approved, setApproved ] = React.useState<any>(0);
   const [ daiApproved, setDaiApproved ] = React.useState<any>(0);
+
+  const [ txActive ] = useTxActive(['borrow', 'buy', 'delegation']);
 
   const borrowProcedure = async (value:number, autoSell:boolean=true) => {
     setBorrowPending(true); 
@@ -92,19 +95,12 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
     setHasDelegated(res);
   };
 
-  /* ADVANCED SETTINGS set approval limit */
+  /* ADVANCED SETTINGS setting approval limit */
   const approveProcedure = async (value:number) => {
     await approveToken(activeSeries.yDaiAddress, activeSeries.marketAddress, value);
     const approvedYDai = await userAllowance(activeSeries.yDaiAddress, activeSeries.marketAddress);
     setApproved( approvedYDai ); // TODO convert to Dai somehow
   };
-
-  // TODO: maybe split into a custom hook 
-  const { state: { pendingTxs } } = React.useContext(NotifyContext);
-  const [txActive, setTxActive] = useState<any>(null);
-  useEffect(()=>{
-    setTxActive(pendingTxs.find((x:any)=> x.type === 'BORROW' || x.type === 'BUY' || x.type === 'DELEGATION'));
-  }, [ pendingTxs ]);
   
   /* Handle collateralisation ratio exceptions and warnings */
   useEffect(()=>{
