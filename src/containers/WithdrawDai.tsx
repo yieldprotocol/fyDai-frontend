@@ -51,7 +51,7 @@ const WithdrawDai = ({ close }:WithDrawDaiProps) => {
 
   const withdrawProcedure = async (value:number) => {
     await buyDai(
-      activeSeries.marketAddress,
+      activeSeries.poolAddress,
       inputValue,
       0 // transaction queue value
     );
@@ -61,13 +61,13 @@ const WithdrawDai = ({ close }:WithDrawDaiProps) => {
   };
 
   const approveProcedure = async (value:number) => {
-    await approveToken(activeSeries.yDaiAddress, activeSeries.marketAddress, value);
-    const approvedYDai = await userAllowance(activeSeries.yDaiAddress, activeSeries.marketAddress);
+    await approveToken(activeSeries.yDaiAddress, activeSeries.poolAddress, value);
+    const approvedYDai = await userAllowance(activeSeries.yDaiAddress, activeSeries.poolAddress);
     setApproved( approvedYDai ); // TODO convert to Dai somehow
   };
 
   const checkMaxWithdraw = async () =>{
-    const preview = await previewPoolTx('sellYDai', activeSeries.marketAddress, activeSeries.yDaiBalance_);
+    const preview = await previewPoolTx('sellYDai', activeSeries.poolAddress, activeSeries.yDaiBalance_);
     console.log(parseFloat(ethers.utils.formatEther(preview)));
     setMaxWithdraw( parseFloat(ethers.utils.formatEther(preview)) );
     return parseFloat(ethers.utils.formatEther(preview));
@@ -79,7 +79,7 @@ const WithdrawDai = ({ close }:WithDrawDaiProps) => {
 
   useEffect(() => {
     approved && ( async () => {
-      const preview = await previewPoolTx('SellYDai', activeSeries.marketAddress, approved);
+      const preview = await previewPoolTx('SellYDai', activeSeries.poolAddress, approved);
       setDaiApproved( parseFloat(ethers.utils.formatEther(preview)) );
     })();
   }, [ approved ]);
@@ -97,7 +97,7 @@ const WithdrawDai = ({ close }:WithDrawDaiProps) => {
 
   useEffect(() => {
     activeSeries && inputValue && ( async () => {
-      const preview = await previewPoolTx('buyDai', activeSeries.marketAddress, inputValue);
+      const preview = await previewPoolTx('buyDai', activeSeries.poolAddress, inputValue);
       setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
     })();
   }, [inputValue]);

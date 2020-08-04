@@ -8,7 +8,7 @@ import { FaEthereum as Ethereum } from 'react-icons/fa';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
 
-import { useEthProxy, useController } from '../hooks';
+import { useProxy, useController } from '../hooks';
 
 import { NotifyContext } from '../contexts/NotifyContext';
 import InlineAlert from '../components/InlineAlert';
@@ -51,7 +51,7 @@ const WithdrawEth = ({ close }:IWithDrawActionProps) => {
     estimateRatio, // TODO << this is a function (basically just passed from hooks via context) >> 
   } = seriesAggregates;
 
-  const { withdrawEth, withdrawEthActive }  = useEthProxy();
+  const { withdrawEth, withdrawEthActive }  = useProxy();
   const { addControllerDelegate, checkControllerDelegate }  = useController();
 
   const withdrawProcedure = async (value:number) => {

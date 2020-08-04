@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { ethers } from 'ethers';
 import { Box, Button, Image, Select, TextInput, Text, Heading, Collapsible, CheckBox } from 'grommet';
 import { 
   FiCheckCircle, 
@@ -13,7 +14,7 @@ import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
 import { NotifyContext } from '../contexts/NotifyContext';
 
-import { useController, usePool, useBalances } from '../hooks';
+import { useController, usePool, useBalances, useProxy } from '../hooks';
 import InlineAlert from '../components/InlineAlert';
 
 interface RepayActionProps {
@@ -27,7 +28,7 @@ function Repay({ repayFn, maxValue }:RepayActionProps) {
   const { deployedContracts, userData } = yieldState;
   const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
 
-  const { buyDai, previewPoolTx, approveToken }  = usePool();
+  const { approveToken, previewPoolTx }  = usePool();
   const { getTokenAllowance }  = useBalances();
 
   const { isLoading: positionsLoading, seriesAggregates, activeSeries, setActiveSeries } = seriesState;
@@ -38,10 +39,13 @@ function Repay({ repayFn, maxValue }:RepayActionProps) {
     estimateRatio, // TODO << this is a function (basically just passed from hooks via context) >> 
   } = seriesAggregates;
 
-  const { repay, repayActive }  = useController();
+  const { repay, repayActive: directRepayActive }  = useController();
+  const { repayUsingExactDai, repayActive } = useProxy();
 
   const [ inputValue, setInputValue ] = React.useState<any>();
-  const [repayDisabled, setRepayDisabled] = React.useState<boolean>(false);
+  const [ yDaiValue, setYDaiValue ] = React.useState<any>();
+
+  const [ repayDisabled, setRepayDisabled ] = React.useState<boolean>(false);
   const [ selectorOpen, setSelectorOpen ] = React.useState<boolean>(false);
   const [ approved, setApproved ] = React.useState<any>(0);
 
@@ -56,7 +60,10 @@ function Repay({ repayFn, maxValue }:RepayActionProps) {
   }, [ pendingTxs ]);
 
   const repayProcedure = async (value:number) => {
-    await repay(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value, 'Dai' );
+
+    /* direct repay without proxy */
+    // await repay(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value, 'Dai' );
+    await repayUsingExactDai(activeSeries.daiProxyAddress, activeSeries.maturity, yDaiValue, value);
     setApproved(await getTokenAllowance(deployedContracts.Dai, deployedContracts.Treasury, 'Dai'));
     setInputValue('');
     seriesActions.refreshPositions([activeSeries]);
@@ -68,6 +75,7 @@ function Repay({ repayFn, maxValue }:RepayActionProps) {
     setApproved(await getTokenAllowance(deployedContracts.Dai, deployedContracts.Treasury, 'Dai'));
   };
 
+  /* Input warning and error logic */ 
   useEffect(() => {
     if ( inputValue  && userData?.daiBalance_ && ( inputValue > userData?.daiBalance_ ) ) {
       setWarningMsg(null);
@@ -80,6 +88,24 @@ function Repay({ repayFn, maxValue }:RepayActionProps) {
       setErrorMsg(null);
     }
   }, [ inputValue ]);
+
+  /* Handle dai to yDai conversion  (needed to set a min yDai value for repayment) */
+  useEffect(() => {
+    activeSeries && inputValue > 0 && ( async () => {
+      const preview = await previewPoolTx('sellDai', activeSeries.poolAddress, inputValue);
+      if (!preview.isZero()) {
+        setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
+        setWarningMsg(null);
+        setErrorMsg(null);
+      } else {
+        /* if the market doesnt have liquidity just estimate from rate */
+        const rate = await previewPoolTx('sellDai', activeSeries.poolAddress, 1);
+        setYDaiValue(inputValue* parseFloat((ethers.utils.formatEther(rate))) );
+        setRepayDisabled(true);
+        setErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
+      }
+    })();
+  }, [inputValue]);
 
   /* Repay button disabling logic */
   useEffect(()=>{
@@ -227,7 +253,8 @@ function Repay({ repayFn, maxValue }:RepayActionProps) {
             fill='horizontal'
             round='medium'
             background={repayDisabled ? 'brand-transparent' : 'brand'}
-            onClick={repayDisabled ? ()=>{}:()=>repayProcedure(inputValue)}
+            // onClick={repayDisabled ? ()=>{}:()=>repayProcedure(inputValue)}
+            onClick={()=>repayProcedure(inputValue)}
             align='center'
             pad='small'
           >

@@ -132,10 +132,10 @@ const SeriesProvider = ({ children }:any) => {
     const _ratesData = await Promise.all(
       seriesArr.map( async (x:any, i:number) => {
         // TODO fix this when all markets are operational => x.market (not seriesArr[0].market )
-        const sellYDai = await previewPoolTx('sellYDai', seriesArr[0].marketAddress, 1);
-        const buyYDai = await previewPoolTx('buyYDai', seriesArr[0].marketAddress, 1);
-        const sellDai = await previewPoolTx('sellDai', seriesArr[0].marketAddress, 1);
-        const buyDai = await previewPoolTx('buyDai', seriesArr[0].marketAddress, 1);
+        const sellYDai = await previewPoolTx('sellYDai', seriesArr[0].poolAddress, 1);
+        const buyYDai = await previewPoolTx('buyYDai', seriesArr[0].poolAddress, 1);
+        const sellDai = await previewPoolTx('sellDai', seriesArr[0].poolAddress, 1);
+        const buyDai = await previewPoolTx('buyDai', seriesArr[0].poolAddress, 1);
         return {
           maturity: x.maturity,
           sellYDai,
@@ -169,7 +169,7 @@ const SeriesProvider = ({ children }:any) => {
         console.log(_rates.sellYDai.toString());
         _seriesData.push(x);
         try {
-          _seriesData[i].hasDelegated = await checkPoolDelegate(x.marketAddress, x.yDaiAddress);
+          _seriesData[i].hasDelegated = await checkPoolDelegate(x.poolAddress, x.yDaiAddress);
           _seriesData[i].yDaiBalance = account? await callTx(x.yDaiAddress, 'YDai', 'balanceOf', [account]): BigNumber.from('0') ;
           _seriesData[i].isMature = await callTx(x.yDaiAddress, 'YDai', 'isMature', []);
           _seriesData[i].wethDebtYDai = account? await callTx(deployedContracts.Controller, 'Controller', 'debtYDai', [utils.ETH, x.maturity, account]): BigNumber.from('0');

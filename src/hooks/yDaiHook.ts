@@ -55,17 +55,17 @@ export const useYDai = () => {
    * User yDai token allowance
    * 
    * @param {string} yDaiAddress address of the yDai series to redeem from.
-   * @param {string} marketAddress address of the yDai series to redeem from.
+   * @param {string} poolAddress address of the yDai series to redeem from.
    * 
    * @returns {number} allowance amount
    */
   const userAllowance = async (
     yDaiAddress:string,
-    marketAddress: string
+    poolAddress: string
   ) => {
     const fromAddr = account && ethers.utils.getAddress(account);
     const yDaiAddr = ethers.utils.getAddress(yDaiAddress);
-    const marketAddr = ethers.utils.getAddress(marketAddress);
+    const marketAddr = ethers.utils.getAddress(poolAddress);
     const contract = new ethers.Contract( yDaiAddr, yDaiAbi, provider );
     let res;
     try {

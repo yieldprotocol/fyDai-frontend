@@ -12,7 +12,7 @@ import * as utils from '../../utils';
 import ProfileButton from '../../components/ProfileButton';
 import { NotifyContext } from '../../contexts/NotifyContext';
 
-import { useSendTx, useCallTx, useController, useBalances, useEthProxy } from '../../hooks';
+import { useSendTx, useCallTx, useController, useBalances, useProxy } from '../../hooks';
 
 import { YieldContext } from '../../contexts/YieldContext';
 import { SeriesContext } from '../../contexts/SeriesContext';
@@ -63,7 +63,7 @@ const TestLayer = (props:any) => {
     withdrawEth,
     postEthActive,
     withdrawEthActive,
-  }  = useEthProxy();
+  }  = useProxy();
 
   // const { getChaiBalance, getWethBalance, getDaiBalance }  = useBalances();
 
@@ -166,8 +166,12 @@ const TestLayer = (props:any) => {
               <Box gap='small'>
                 Approvals required:
                 <Button primary label='EthProxy (once-off)' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />
-                <Button primary label='Pool1 (for each market)' onClick={()=> sendTx(deployedSeries[0].marketAddress, 'Pool', 'addDelegate', [deployedSeries[0].yDaiAddress], utils.toWei('0'))} />
+                <Button primary label='Pool1 (for each market)' onClick={()=> sendTx(deployedSeries[0].poolAddress, 'Pool', 'addDelegate', [deployedSeries[0].yDaiAddress], utils.toWei('0'))} />
                 <Button primary label='Pool2 (for each market)' onClick={()=> sendTx(deployedContracts.Pool, 'Pool', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />
+              
+                <Button primary label='DO THIS (add Dai Proxy controller once-off) ' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedSeries[0].daiProxyAddress], utils.toWei('0'))} />
+                <Button primary label='Pool delegate daiProxy (for each proxy)' onClick={()=> sendTx(deployedSeries[0].poolAddress, 'Pool', 'addDelegate', [deployedSeries[0].daiProxyAddress], utils.toWei('0'))} />
+
               </Box>
             }
 
@@ -188,8 +192,9 @@ const TestLayer = (props:any) => {
               <Button label='Post ETH Collateral direct 1.5' disabled={postActive} onClick={()=> postEth(deployedContracts.EthProxy, 1.5)} />
               <Button primary label='DO THIS (addProxy once-off) ' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />
               <Button label='(Withdraw ETH 1.5)' onClick={()=> withdrawEth(deployedContracts.EthProxy, 1.5 )} />
-              
-              
+
+
+         
               Approvals required
               
               

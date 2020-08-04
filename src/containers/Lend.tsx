@@ -61,7 +61,7 @@ const Lend = ({ borrowFn, maxValue }:BorrowActionProps) => {
   
   const lendProcedure = async (value:number) => {
     await sellDai(
-      activeSeries.marketAddress,
+      activeSeries.poolAddress,
       inputValue,
       0 // transaction queue value
     );
@@ -71,20 +71,20 @@ const Lend = ({ borrowFn, maxValue }:BorrowActionProps) => {
   };
 
   const approveProcedure = async (value:number) => {
-    await approveToken(deployedContracts.Dai, activeSeries.marketAddress, value);
-    setApproved(await getTokenAllowance(deployedContracts.Dai, activeSeries.marketAddress, 'Dai'));
+    await approveToken(deployedContracts.Dai, activeSeries.poolAddress, value);
+    setApproved(await getTokenAllowance(deployedContracts.Dai, activeSeries.poolAddress, 'Dai'));
   };
 
   useEffect(() => {
     activeSeries && inputValue && ( async () => {
-      const preview = await previewPoolTx('sellDai', activeSeries.marketAddress, inputValue);
+      const preview = await previewPoolTx('sellDai', activeSeries.poolAddress, inputValue);
       setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
     })();
   }, [inputValue]);
 
   useEffect(() => {
     activeSeries && inputValue && ( async () => {
-      const preview = await previewPoolTx('sellDai', activeSeries.marketAddress, inputValue);
+      const preview = await previewPoolTx('sellDai', activeSeries.poolAddress, inputValue);
       setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
     })();
   }, [inputValue]);
@@ -114,14 +114,14 @@ const Lend = ({ borrowFn, maxValue }:BorrowActionProps) => {
 
   useEffect(() => {
     activeSeries && ( async ()=> {
-      const preview = await previewPoolTx('SellYDai', activeSeries.marketAddress, activeSeries.yDaiBalance_);
+      const preview = await previewPoolTx('SellYDai', activeSeries.poolAddress, activeSeries.yDaiBalance_);
       setCurrentValue( parseFloat(ethers.utils.formatEther(preview)));
     })();
   }, [ activeSeries, ]);
   
   useEffect(() => {
     ( async ()=>{
-      activeSeries && setApproved(await getTokenAllowance(deployedContracts.Dai, activeSeries.marketAddress, 'Dai'));
+      activeSeries && setApproved(await getTokenAllowance(deployedContracts.Dai, activeSeries.poolAddress, 'Dai'));
       console.log(activeSeries);
     })();
   }, [ activeSeries ]);

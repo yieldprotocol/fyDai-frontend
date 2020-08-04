@@ -16,7 +16,7 @@ import { useCallTx, useSendTx, useBalances } from './transactionHooks';
 /* Contract hooks */
 import { useYDai } from './yDaiHook';
 import { useController } from './controllerHook';
-import { useEthProxy } from './ethProxyHook';
+import { useProxy } from './proxyHook';
 import { usePool } from './poolHook';
 
 export {
@@ -27,7 +27,7 @@ export {
   useSendTx,
   useCallTx,
   useBalances,
-  useEthProxy,
+  useProxy,
   useController,
   useYDai,
   useEvents,

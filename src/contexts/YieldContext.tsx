@@ -189,14 +189,16 @@ const YieldProvider = ({ children }: any) => {
         await Promise.all(
           _seriesList.map(async (x: string, i: number) => {
             const name = await callTx(x, 'YDai', 'name', []);
-            const marketAddress = await callTx( state.migrationsAddr.get(networkId), 'Migrations', 'contracts', [ethers.utils.formatBytes32String(`${name}-Pool`)] );
+            const poolAddress = await callTx( state.migrationsAddr.get(networkId), 'Migrations', 'contracts', [ethers.utils.formatBytes32String(`${name}-Pool`)] );
+            const daiProxyAddress = await callTx( state.migrationsAddr.get(networkId), 'Migrations', 'contracts', [ethers.utils.formatBytes32String(`${name}-DaiProxy`)] );
             const maturity = (await callTx(x, 'YDai', 'maturity', [])).toNumber();
 
             return {
               yDaiAddress: x,
               name,
               maturity,
-              marketAddress,
+              poolAddress,
+              daiProxyAddress,
               maturity_: new Date(maturity * 1000),
               displayName: Moment(maturity * 1000).format('MMMM YYYY'),
               seriesColor: seriesColors[i],

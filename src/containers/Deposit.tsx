@@ -26,7 +26,7 @@ import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
 
 
-import { useEthProxy, useTxActive } from '../hooks';
+import { useProxy, useTxActive } from '../hooks';
 
 interface DepositProps {
   /* deposit amount prop is for quick linking into component */
@@ -60,7 +60,7 @@ const Deposit = ({ depositAmount }:DepositProps) => {
   } = seriesAggregates || {};
   const theme:any = useContext(ThemeContext);
 
-  const { postEth, postEthActive }  = useEthProxy();
+  const { postEth, postEthActive }  = useProxy();
   const [ txActive ] = useTxActive('Deposit');
 
   const ref = React.useRef();
