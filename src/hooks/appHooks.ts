@@ -1,8 +1,18 @@
 import React from 'react';
 import { NotifyContext } from '../contexts/NotifyContext';
 
+
 export const useTxActive = (type:string) => {
-  // TODO create the useTxActive hook
+
+  const { state: { pendingTxs } } = React.useContext(NotifyContext);
+  const [txActive, setTxActive] = React.useState<any>(null);
+
+  React.useEffect(()=>{
+    setTxActive(pendingTxs.find( (x:any)=> x.type === type.toUpperCase() ));
+  }, [ pendingTxs ]);
+
+  return [txActive] as const; 
+  
 };
 
 export const useCachedState = (key:string, initialValue:any) => {

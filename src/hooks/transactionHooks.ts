@@ -17,6 +17,7 @@ import Chai from '../contracts/Chai.json';
 import Vat from '../contracts/Vat.json';
 import Pot from '../contracts/Pot.json';
 import EthProxy from '../contracts/EthProxy.json';
+import DaiProxy from '../contracts/DaiProxy.json';
 import Migrations from '../contracts/Migrations.json';
 import Pool from '../contracts/Pool.json';
 
@@ -33,6 +34,7 @@ const contractMap = new Map<string, any>([
   ['Vat', Vat.abi],
   ['Pot', Pot.abi],
   ['EthProxy', EthProxy.abi],
+  ['DaiProxy', DaiProxy.abi],
   ['Migrations', Migrations.abi],
   ['Pool', Pool.abi],
 ]);

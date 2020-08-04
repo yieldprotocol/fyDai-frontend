@@ -11,7 +11,7 @@ import { useSignerAccount } from './connectionHooks';
 
 
 /**
- * Hook for interacting with the yield 'DEALER' Contract
+ * Hook for interacting with the yield 'CRONTROLLER' Contract
  * @returns { function } post
  * @returns { boolean } postActive
  * @returns { function } withdraw

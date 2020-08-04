@@ -6,7 +6,7 @@ export interface IYieldSeries {
   maturity: number;
   maturity_: Date;
   isMature: boolean;
-  marketAddress: string;
+  poolAddress: string;
   yDaiAddress: string;
 
   yDaiBalance_: number;

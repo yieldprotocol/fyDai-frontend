@@ -30,18 +30,18 @@ export const usePool = () => {
    * Approve the market contracts to transact with DAI or yDai token.
    * (Not strictly a Controller Contract function. But associated enough to keep in here.)
    * @param {string} tokenAddress address of the token to approve.
-   * @param {string} marketAddress address of the market.
+   * @param {string} poolAddress address of the market.
    * @param {number} amount to approve (in human understandable numbers)
    */
   const approveToken = async (
     tokenAddress:string,
-    marketAddress:string,
+    poolAddress:string,
     amount:number
   ) => {
     let tx:any;
     /* Processing and sanitizing input */
     const parsedAmount = ethers.utils.parseEther(amount.toString());
-    const marketAddr = ethers.utils.getAddress(marketAddress);
+    const marketAddr = ethers.utils.getAddress(poolAddress);
     const tokenAddr = ethers.utils.getAddress(tokenAddress);
 
     /* Contract interaction */
@@ -69,24 +69,26 @@ export const usePool = () => {
   /**
    * Sell yDai for Dai ( Chai )
    * 
-   * @param {string} marketAddress address of the yDai market series
+   * @param {string} poolAddress address of the yDai market series
    * @param {number} yDaiIn Amount of yDai being sold that will be taken from the user's wallet (in human numbers)
    *
    * @return Amount of chai that will be deposited on `to` wallet
    */
   const sellYDai = async (
-    marketAddress:string,
-    yDaiIn: number
+    poolAddress:string,
+    yDaiIn: number,
+
   ) => {
     let tx:any;
+
     const overrides = { 
       // nonce: signer.getTransactionCount().then( (nonce:any) => nonce + queue) 
-      gasLimit: BigNumber.from('250000')
+      gasLimit: BigNumber.from('300000')
     };
     const parsedAmount = ethers.utils.parseEther(yDaiIn.toString());
     const fromAddr = account && ethers.utils.getAddress(account);
     const toAddr = fromAddr;
-    const marketAddr = ethers.utils.getAddress(marketAddress);
+    const marketAddr = ethers.utils.getAddress(poolAddress);
     setSellActive(true);
     /// @param from Wallet providing the yDai being sold. Must have approved the operator with `market.addDelegate(operator)`.
     /// @param to Wallet receiving the chai being bought
@@ -112,14 +114,14 @@ export const usePool = () => {
   /**
    * @dev Buy yDai for dai/chai
    *
-   * @param {string} marketAddress address of the yDai series market.
+   * @param {string} poolAddress address of the yDai series market.
    * @param {number} yDaiOut Amount of yDai being bought that will be deposited in `to` wallet
    *
    * @return Amount of chai/Dai that will be taken from `from` wallet
    */
   const buyYDai = async (
     yDaiAddress:string,
-    marketAddress:string,
+    poolAddress:string,
     yDaiOut: number
   ) => {
     let tx:any;
@@ -132,7 +134,7 @@ export const usePool = () => {
     const parsedAmount = ethers.utils.parseEther(yDaiOut.toString());
     const fromAddr = ethers.utils.getAddress(yDaiAddress);
     const toAddr = account && ethers.utils.getAddress(account);
-    const marketAddr = ethers.utils.getAddress(marketAddress);
+    const marketAddr = ethers.utils.getAddress(poolAddress);
     setSellActive(true);
     /// @param from Wallet providing the chai being sold. Must have approved the operator with `market.addDelegate(operator)`.
     /// @param to Wallet receiving the yDai being bought
@@ -157,14 +159,14 @@ export const usePool = () => {
   /**
    * @dev Sell Dai/Chai for yDai
    * 
-   * @param {string} marketAddress address of the yDai series market.
+   * @param {string} poolAddress address of the yDai series market.
    * @param {number} daiIn Amount of yDai being bought that will be deposited in `to` wallet
    * @param {number} queue The number that this transaction is in the queue. // TODO extend the queue system globally
    * @return Amount of yDai that will be deposited on `to` wallet
    * 
    */
   const sellDai = async (
-    marketAddress:string,
+    poolAddress:string,
     daiIn: number,
     queue: number,
   ) => {
@@ -178,7 +180,7 @@ export const usePool = () => {
     const parsedAmount = ethers.utils.parseEther(daiIn.toString());
     const fromAddr = account && ethers.utils.getAddress(account);
     const toAddr = fromAddr;
-    const marketAddr = ethers.utils.getAddress(marketAddress);
+    const marketAddr = ethers.utils.getAddress(poolAddress);
     setSellActive(true);
     /// @param from Wallet providing the chai being sold. Must have approved the operator with `market.addDelegate(operator)`.
     /// @param to Wallet receiving the yDai being bought
@@ -206,7 +208,7 @@ export const usePool = () => {
    * @dev Buy Dai/Chai for yDai
    * 
    * @param {string} yDaiAddress address of the yDai contract.
-   * @param {string} marketAddress address of the yDai series market.
+   * @param {string} poolAddress address of the yDai series market.
    * @param {number} daiOut Amount of dai/chai being bought that will be deposited in `to` wallet
    * @param {number} queue The number that this transaction is in the queue. // TODO extend the queue system globally
    * 
@@ -214,7 +216,7 @@ export const usePool = () => {
    *
    */
   const buyDai = async (
-    marketAddress:string,
+    poolAddress:string,
     daiOut: number,
     queue: number,
   ) => {
@@ -228,7 +230,7 @@ export const usePool = () => {
     // const parsedAmount = daiOut;
     const fromAddr = account && ethers.utils.getAddress(account);
     const toAddr = account && ethers.utils.getAddress(account);
-    const marketAddr = ethers.utils.getAddress(marketAddress);
+    const marketAddr = ethers.utils.getAddress(poolAddress);
     setBuyActive(true);
     /// @param from Wallet providing the yDai being sold. Must have approved the operator with `market.addDelegate(operator)`.
     /// @param to Wallet receiving the chai being bought
@@ -264,18 +266,18 @@ export const usePool = () => {
    * sellDai -> Returns how much yDai would be obtained by selling x Dai
    * 
    * @param {string} txType string represnting transaction type //TODO tyescript it out
-   * @param {string} marketAddress address of the yDai series to redeem from.
+   * @param {string} poolAddress address of the yDai series to redeem from.
    * @param {number} amount input to preview
    *  
    * @returns {BigNumber} BigNumber in WEI/WAD precision - Dai or yDai (call dependent)
    */
   const previewPoolTx = async (
     txType: string,
-    marketAddress: string,
+    poolAddress: string,
     amount: number,
   ): Promise<BigNumber> => {
     const parsedAmount = ethers.utils.parseEther(amount.toString());
-    const marketAddr = ethers.utils.getAddress(marketAddress);
+    const marketAddr = ethers.utils.getAddress(poolAddress);
     const contract = new ethers.Contract( marketAddr, marketAbi, provider );
     let result;
     try {
@@ -299,16 +301,16 @@ export const usePool = () => {
 
   /**
    * Delegate a 3rd party to act on behalf of the user in the Pool contracts
-   * @param {string} marketAddress address of the market in question.
+   * @param {string} poolAddress address of the market in question.
    * @param {string} delegatedAddress address of the contract/entity getting delegated. 
    */
   const addPoolDelegate = async (
-    marketAddress:string,
+    poolAddress:string,
     delegatedAddress:string,
   ) => {
     let tx:any;
     /* Processing and sanitizing input */
-    const marketAddr = ethers.utils.getAddress(marketAddress);
+    const marketAddr = ethers.utils.getAddress(poolAddress);
     const delegatedAddr = ethers.utils.getAddress(delegatedAddress);
     /* Contract interaction */
     const contract = new ethers.Contract(
@@ -335,18 +337,18 @@ export const usePool = () => {
    * 
    * Call function no gas
    * 
-   * @param {string} marketAddress address of the market in question.
+   * @param {string} poolAddress address of the market in question.
    * @param {string} delegateAddress address of the ethProxy (contract getting approved). 
    * 
    * @returns {Promise<boolean>} approved ?
    */
   const checkPoolDelegate = async (
-    marketAddress:string,
+    poolAddress:string,
     delegateAddress:string
   ): Promise<boolean> => {
     const fromAddr = account && ethers.utils.getAddress(account);
     const delegateAddr = ethers.utils.getAddress(delegateAddress);
-    const marketAddr = ethers.utils.getAddress(marketAddress);
+    const marketAddr = ethers.utils.getAddress(poolAddress);
 
     const contract = new ethers.Contract( marketAddr, marketAbi, provider);
     let res;
@@ -360,6 +362,16 @@ export const usePool = () => {
   };
 
   return {
-    checkPoolDelegate, addPoolDelegate, approveToken, previewPoolTx, sellYDai, buyYDai, sellDai, buyDai, sellActive, buyActive, approveActive
+    checkPoolDelegate,
+    addPoolDelegate,
+    approveToken,
+    previewPoolTx, 
+    sellYDai,
+    buyYDai,
+    sellDai,
+    buyDai, 
+    sellActive, 
+    buyActive, 
+    approveActive
   } as const;
 };
