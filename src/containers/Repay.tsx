@@ -56,7 +56,7 @@ function Repay({ repayAmount }:IRepayProps) {
   const [ yDaiValue, setYDaiValue ] = React.useState<any>();
 
   const [ repayPending, setRepayPending ] = React.useState<boolean>(false);
-  const [ repayDisabled, setRepayDisabled ] = React.useState<boolean>(false);
+  const [ repayDisabled, setRepayDisabled ] = React.useState<boolean>(true);
   const [ selectorOpen, setSelectorOpen ] = React.useState<boolean>(false);
 
   const [ hasDelegated, setHasDelegated ] = React.useState<any>(0);
@@ -273,7 +273,7 @@ function Repay({ repayAmount }:IRepayProps) {
                 checked={approved && !inputValue || ( approved >= inputValue )}
                 disabled={!inputValue || ( approved >= inputValue )}
                 onChange={()=>approveProcedure(inputValue)}
-                label={                
+                label={            
                   (approved >= inputValue) ? 
                     `Repayments are unlocked for up to ${approved.toFixed(2) || '' } Dai` 
                     : `Unlock repayments of ${inputValue || ''} Dai` 

@@ -47,7 +47,7 @@ const LendView = ({ activeView: activeViewFromProp  }:LendProps) => {
         round='small'
         pad='large'
       >
-        <Lend maxValue={12} borrowFn={(x:any)=>console.log(x)} />
+        <Lend />
         {false && <Redeem /> }
       </Box>
     </Box>

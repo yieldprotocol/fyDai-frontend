@@ -17,16 +17,14 @@ import WithdrawDai from './WithdrawDai';
 import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
   
-import { usePool, useBalances } from '../hooks';
+import { usePool, useBalances, useMath } from '../hooks';
 import InlineAlert from '../components/InlineAlert';
 
-interface BorrowActionProps {
-  borrowFn?:any
-  // activeSeries?:IYieldSeries,
-  maxValue?:number
+interface ILendProps {
+  lendAmount?:any
 }
   
-const Lend = ({ borrowFn, maxValue }:BorrowActionProps) => {
+const Lend = ({ lendAmount }:ILendProps) => {
   
   const { state: yieldState, actions: yieldActions } = React.useContext(YieldContext);
   const { deployedContracts, userData } = yieldState;
@@ -43,6 +41,7 @@ const Lend = ({ borrowFn, maxValue }:BorrowActionProps) => {
 
   const { sellDai, previewPoolTx, approveToken }  = usePool();
   const { getTokenAllowance } = useBalances();
+  const { yieldAPR } = useMath();
   
   const [ inputValue, setInputValue ] = React.useState<any>();
   const [ lendDisabled, setLendDisabled ] = React.useState<boolean>(false);
@@ -52,10 +51,10 @@ const Lend = ({ borrowFn, maxValue }:BorrowActionProps) => {
 
   const [ sellOpen, setSellOpen ] = useState<boolean>(false);
 
+  const [ APR, setAPR ] = React.useState<number>();
   const [ yDaiValue, setYDaiValue ] = React.useState<number>(0);
   const [ currentValue, setCurrentValue ] = React.useState<number>(0);
   
-  const [ indicatorColor, setIndicatorColor ] = React.useState<string>('brand');
   const [ warningMsg, setWarningMsg] = React.useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
   
@@ -66,8 +65,8 @@ const Lend = ({ borrowFn, maxValue }:BorrowActionProps) => {
       0 // transaction queue value
     );
     setInputValue('');
-    yieldActions.updateUserData();
-    seriesActions.refreshPositions([activeSeries]);
+    await yieldActions.updateUserData();
+    await seriesActions.refreshPositions([activeSeries]);
   };
 
   const approveProcedure = async (value:number) => {
@@ -79,13 +78,7 @@ const Lend = ({ borrowFn, maxValue }:BorrowActionProps) => {
     activeSeries && inputValue && ( async () => {
       const preview = await previewPoolTx('sellDai', activeSeries.poolAddress, inputValue);
       setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
-    })();
-  }, [inputValue]);
-
-  useEffect(() => {
-    activeSeries && inputValue && ( async () => {
-      const preview = await previewPoolTx('sellDai', activeSeries.poolAddress, inputValue);
-      setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
+      setAPR( yieldAPR( ethers.utils.parseEther(inputValue.toString()), preview, activeSeries.maturity ) );
     })();
   }, [inputValue]);
   
@@ -126,7 +119,6 @@ const Lend = ({ borrowFn, maxValue }:BorrowActionProps) => {
     })();
   }, [ activeSeries ]);
   
-
   return (
     <>
       {selectorOpen && <SeriesSelector close={()=>setSelectorOpen(false)} /> }
@@ -242,8 +234,10 @@ const Lend = ({ borrowFn, maxValue }:BorrowActionProps) => {
                   <Box direction='row' gap='small'>
                     <Text color='text-weak' size='xsmall'>Estimated APR</Text>
                     <Help />
-                  </Box>
-                  <Text color={!inputValue? 'brand-transparent':'brand'} weight='bold' size='medium'> {activeSeries && activeSeries.yieldAPR_ || ''}% </Text>
+                  </Box>                
+                  <Text color={!inputValue? 'brand-transparent':'brand'} weight='bold' size='medium'> 
+                    {APR && APR.toFixed(2)}%                  
+                  </Text>
                 </Box>
 
                 <Box gap='small'>
@@ -329,5 +323,7 @@ const Lend = ({ borrowFn, maxValue }:BorrowActionProps) => {
     </>
   );
 };
-  
+
+Lend.defaultProps={ lendAmount:null };
+
 export default Lend;
