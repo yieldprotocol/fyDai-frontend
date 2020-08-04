@@ -167,7 +167,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
 
               <Box gap='small'>
                 <Box direction='row' gap='small'>
-                  <Text color='text-weak' size='xsmall'>Series value @ Maturity</Text>
+                  <Text color='text-weak' size='xsmall'>Portfolio Value at Maturity</Text>
                   <Help />
                 </Box>
                 <Text color='brand' weight='bold' size='medium'> {activeSeries && `${activeSeries?.yDaiBalance_.toFixed(2)} Dai` || '-'} </Text>
@@ -175,7 +175,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
 
               <Box gap='small'>
                 <Box direction='row' gap='small'>
-                  <Text color='text-weak' size='xsmall'>Current Series Value</Text>
+                  <Text color='text-weak' size='xsmall'>Current Value</Text>
                   <Help />
                 </Box>
                 <Text color='brand' weight='bold' size='medium'> {currentValue!==0?`${currentValue.toFixed(2)} Dai`: '-'} </Text>
