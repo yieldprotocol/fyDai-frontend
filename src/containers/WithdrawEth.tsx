@@ -18,8 +18,7 @@ import TransactionPending from '../components/TransactionPending';
 
 interface IWithDrawActionProps {
   close?: any;
-  withdraw?: any;
-  maxValue?: number;
+
 }
 
 const WithdrawEth = ({ close }:IWithDrawActionProps) => {

@@ -2,7 +2,7 @@ import React from 'react';
 import { ethers, BigNumber } from 'ethers';
 
 import * as utils from '../utils';
-import { useCallTx, useMath, usePool, useSignerAccount, useWeb3React } from '../hooks';
+import { useCallTx, useMath, usePool, useSignerAccount, useWeb3React, useController } from '../hooks';
 import { YieldContext } from './YieldContext';
 
 import { IYieldSeries } from '../types';
@@ -58,6 +58,8 @@ const SeriesProvider = ({ children }:any) => {
   const { userData, feedData, deployedContracts } = yieldState;
 
   const { previewPoolTx, checkPoolDelegate }  = usePool();
+  const { checkControllerDelegate }  = useController();
+
   const [ callTx ] = useCallTx();
   const {
     collAmount,
@@ -169,7 +171,8 @@ const SeriesProvider = ({ children }:any) => {
         console.log(_rates.sellYDai.toString());
         _seriesData.push(x);
         try {
-          _seriesData[i].hasDelegated = await checkPoolDelegate(x.poolAddress, x.yDaiAddress);
+          _seriesData[i].hasDelegatedPool = await checkPoolDelegate(x.poolAddress, x.yDaiAddress);
+          _seriesData[i].hasDelegatedController = await checkControllerDelegate(deployedContracts.Controller, x.daiProxyAddress);
           _seriesData[i].yDaiBalance = account? await callTx(x.yDaiAddress, 'YDai', 'balanceOf', [account]): BigNumber.from('0') ;
           _seriesData[i].isMature = await callTx(x.yDaiAddress, 'YDai', 'isMature', []);
           _seriesData[i].wethDebtYDai = account? await callTx(deployedContracts.Controller, 'Controller', 'debtYDai', [utils.ETH, x.maturity, account]): BigNumber.from('0');

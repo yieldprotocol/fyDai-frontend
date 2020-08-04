@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { ethers } from 'ethers';
 import { Box, Button, Image, Select, TextInput, Text, Heading, Collapsible, CheckBox } from 'grommet';
 import { 
-  FiCheckCircle, 
   FiInfo as Info,
   FiHelpCircle as Help,
   FiChevronDown as CaretDown,
@@ -16,19 +15,24 @@ import { NotifyContext } from '../contexts/NotifyContext';
 
 import { useController, usePool, useBalances, useProxy } from '../hooks';
 import InlineAlert from '../components/InlineAlert';
+import OnceOffAuthorize from '../components/OnceOffAuthorize';
 
-interface RepayActionProps {
-  repayFn:any
-  maxValue:number
+interface IRepayProps {
+  repayAmount?:any
 }
 
-function Repay({ repayFn, maxValue }:RepayActionProps) {
+function Repay({ repayAmount }:IRepayProps) {
 
   const { state: yieldState, actions: yieldActions } = React.useContext(YieldContext);
   const { deployedContracts, userData } = yieldState;
   const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
-
-  const { approveToken, previewPoolTx }  = usePool();
+  
+  const { 
+    previewPoolTx,
+    approveToken,
+    addPoolDelegate,
+    checkPoolDelegate
+  }  = usePool(); 
   const { getTokenAllowance }  = useBalances();
 
   const { isLoading: positionsLoading, seriesAggregates, activeSeries, setActiveSeries } = seriesState;
@@ -47,6 +51,8 @@ function Repay({ repayFn, maxValue }:RepayActionProps) {
 
   const [ repayDisabled, setRepayDisabled ] = React.useState<boolean>(false);
   const [ selectorOpen, setSelectorOpen ] = React.useState<boolean>(false);
+
+  const [ hasDelegated, setHasDelegated ] = React.useState<any>(0);
   const [ approved, setApproved ] = React.useState<any>(0);
 
   const [ warningMsg, setWarningMsg] = React.useState<string|null>(null);
@@ -62,17 +68,31 @@ function Repay({ repayFn, maxValue }:RepayActionProps) {
   const repayProcedure = async (value:number) => {
 
     /* direct repay without proxy */
-    // await repay(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value, 'Dai' );
-    await repayUsingExactDai(activeSeries.daiProxyAddress, activeSeries.maturity, yDaiValue, value);
+    await repay(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value, 'Dai' );
+
+    /* repay using proxy */
+    // await repayUsingExactDai(activeSeries.daiProxyAddress, 'ETH-A', activeSeries.maturity, yDaiValue, value);
+
     setApproved(await getTokenAllowance(deployedContracts.Dai, deployedContracts.Treasury, 'Dai'));
     setInputValue('');
     seriesActions.refreshPositions([activeSeries]);
     yieldActions.updateUserData();
   };
 
+  const delegateProcedure = async () => {
+    // TODO uncomment the following lines if not using auto sell?
+    await addPoolDelegate(activeSeries.poolAddress, activeSeries.yDaiAddress);
+    const res = await checkPoolDelegate(activeSeries.poolAddress, activeSeries.yDaiAddress);
+    // await addPoolDelegate(activeSeries.poolAddress, activeSeries.daiProxyAddress);
+    // const res = await checkPoolDelegate(activeSeries.poolAddress, activeSeries.daiProxyAddress);
+    setHasDelegated(res);
+  };
+
   const approveProcedure = async (value:number) => {
     await approveToken(deployedContracts.Dai, deployedContracts.Treasury, value);
     setApproved(await getTokenAllowance(deployedContracts.Dai, deployedContracts.Treasury, 'Dai'));
+    // await approveToken(deployedContracts.Dai, activeSeries.daiProxyAddress, value);
+    // setApproved(await getTokenAllowance(deployedContracts.Dai, activeSeries.daiProxyAddress, 'Dai'));
   };
 
   /* Input warning and error logic */ 
@@ -121,7 +141,9 @@ function Repay({ repayFn, maxValue }:RepayActionProps) {
   useEffect(() => {
     console.log(seriesAggregates);
     ( async ()=>{
+      // activeSeries && setApproved(await getTokenAllowance(deployedContracts.Dai, activeSeries.daiProxyAddress, 'Dai'));
       activeSeries && setApproved(await getTokenAllowance(deployedContracts.Dai, deployedContracts.Treasury, 'Dai'));
+      setHasDelegated(activeSeries.hasDelegatedPool);
     })();
   }, [ activeSeries ]);
 
@@ -158,7 +180,7 @@ function Repay({ repayFn, maxValue }:RepayActionProps) {
                 onClick={()=>setSelectorOpen(true)}
                 hoverIndicator='brand-transparent'
                 border='all'
-            // border={{ color:'brand' }}
+                // border={{ color:'brand' }}
                 pad={{ horizontal:'small', vertical:'small' }}
                 justify='center'
               >
@@ -166,6 +188,13 @@ function Repay({ repayFn, maxValue }:RepayActionProps) {
               </Box>
             </Box>
           </Box>
+
+          {/* {!hasDelegated && 
+            <OnceOffAuthorize
+              authProcedure={delegateProcedure} 
+              authMsg='Allow Pool to trade on your behalf' 
+              txPending={txActive?.type === 'DELEGATION'}  
+          />} */}
 
           <Box direction='row-responsive' pad={{ horizontal:'medium' }} justify='start' gap='large' fill>
             
@@ -189,7 +218,6 @@ function Repay({ repayFn, maxValue }:RepayActionProps) {
             </Box>
 
           </Box>
-
 
           <Box fill gap='medium' margin={{ vertical:'large' }}>
             <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to Repay</Text>
@@ -239,13 +267,12 @@ function Repay({ repayFn, maxValue }:RepayActionProps) {
           <Box>
             <CheckBox 
               reverse
-                // value={true}
               checked={!inputValue || ( approved >= inputValue )}
               disabled={!inputValue || ( approved >= inputValue )}
               onChange={()=>approveProcedure(inputValue)}
               label={(approved >= inputValue) ? 
-                `Trading unlocked for up to ${approved.toFixed(2) || '' } Dai` 
-                : `Unlock trading for ${inputValue || ''} Dai`}
+                `Repayments are unlocked for up to ${approved.toFixed(2) || '' } Dai` 
+                : `Unlock repayments of ${inputValue || ''} Dai`}
             />
           </Box>
 
@@ -253,8 +280,8 @@ function Repay({ repayFn, maxValue }:RepayActionProps) {
             fill='horizontal'
             round='medium'
             background={repayDisabled ? 'brand-transparent' : 'brand'}
-            // onClick={repayDisabled ? ()=>{}:()=>repayProcedure(inputValue)}
-            onClick={()=>repayProcedure(inputValue)}
+            onClick={repayDisabled ? ()=>{}:()=>repayProcedure(inputValue)}
+            // onClick={()=>repayProcedure(inputValue)}
             align='center'
             pad='small'
           >
@@ -305,5 +332,7 @@ function Repay({ repayFn, maxValue }:RepayActionProps) {
     </>
   );
 }
+
+Repay.defaultProps = { repayAmount:null };
 
 export default Repay;

@@ -63,8 +63,6 @@ const Deposit = ({ depositAmount }:DepositProps) => {
   const { postEth, postEthActive }  = useProxy();
   const [ txActive ] = useTxActive('Deposit');
 
-  const ref = React.useRef();
-
   /* Steps required to deposit and update values */
   const depositProcedure = async (value:number) => {
     setDepositPending(true);

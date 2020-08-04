@@ -216,7 +216,7 @@ const YieldProvider = ({ children }: any) => {
       console.log(e);
       notifyDispatch({
         type: 'fatal',
-        payload: { message: 'Error getting Yield Protocol addresses' },
+        payload: { message: 'Error finding Yield Protocol addresses: Please check you are on a supported network.' },
       });
     }
     return [_deployedSeries, _deployedContracts];

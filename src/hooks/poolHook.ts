@@ -77,7 +77,6 @@ export const usePool = () => {
   const sellYDai = async (
     poolAddress:string,
     yDaiIn: number,
-
   ) => {
     let tx:any;
 
@@ -85,6 +84,7 @@ export const usePool = () => {
       // nonce: signer.getTransactionCount().then( (nonce:any) => nonce + queue) 
       gasLimit: BigNumber.from('300000')
     };
+    
     const parsedAmount = ethers.utils.parseEther(yDaiIn.toString());
     const fromAddr = account && ethers.utils.getAddress(account);
     const toAddr = fromAddr;

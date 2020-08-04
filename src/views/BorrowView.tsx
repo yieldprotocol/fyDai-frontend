@@ -121,10 +121,10 @@ const BorrowView = ({
         >
           {activeView === 'collateral' && <Deposit />}
           {activeView === 'borrow' && (
-          <Borrow maxValue={12} borrowFn={(x: any) => console.log(x)} />
+          <Borrow />
           )}
           {activeView === 'repay' && (
-          <Repay maxValue={12} repayFn={(x: any) => console.log(x)} />
+          <Repay />
           )}
         </Box>
       </Box>    
