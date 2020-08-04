@@ -55,8 +55,8 @@ const WithdrawDai = ({ close }:WithDrawDaiProps) => {
       inputValue,
       0 // transaction queue value
     );
-    yieldActions.updateUserData();
-    seriesActions.refreshPositions([activeSeries]);
+    await yieldActions.updateUserData();
+    await seriesActions.refreshPositions([activeSeries]);
     close();
   };
 

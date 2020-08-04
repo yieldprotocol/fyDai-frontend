@@ -121,7 +121,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
     }
   }, [ estRatio ]);
 
-  /* Handle dai to yDai conversion (yDai needed to compare with the approved allowance)  */
+  /* Handle dai to yDai conversion and get APR (yDai needed to compare with the approved allowance)  */
   useEffect(() => {
     activeSeries && inputValue > 0 && ( async () => {
       const preview = await previewPoolTx('buyDai', activeSeries.poolAddress, inputValue);

@@ -56,7 +56,7 @@ function Repay({ repayAmount }:IRepayProps) {
   const [ yDaiValue, setYDaiValue ] = React.useState<any>();
 
   const [ repayPending, setRepayPending ] = React.useState<boolean>(false);
-  const [ repayDisabled, setRepayDisabled ] = React.useState<boolean>(false);
+  const [ repayDisabled, setRepayDisabled ] = React.useState<boolean>(true);
   const [ selectorOpen, setSelectorOpen ] = React.useState<boolean>(false);
 
   const [ hasDelegated, setHasDelegated ] = React.useState<any>(0);
@@ -101,9 +101,6 @@ function Repay({ repayAmount }:IRepayProps) {
     if ( inputValue  && userData?.daiBalance_ && ( inputValue > userData?.daiBalance_ ) ) {
       setWarningMsg(null);
       setErrorMsg('That amount exceeds the amount of Dai in your wallet'); 
-    } else if ( false ) {
-      setErrorMsg(null);
-      setWarningMsg('If you borrow right up to your maximum allowance, there is high probability you will be liquidated soon!');
     } else {
       setWarningMsg(null);
       setErrorMsg(null);
@@ -114,10 +111,9 @@ function Repay({ repayAmount }:IRepayProps) {
   useEffect(() => {
     activeSeries && inputValue > 0 && ( async () => {
       const preview = await previewPoolTx('sellDai', activeSeries.poolAddress, inputValue);
+      
       if (!preview.isZero()) {
         setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
-        setWarningMsg(null);
-        setErrorMsg(null);
       } else {
         /* if the market doesnt have liquidity just estimate from rate */
         const rate = await previewPoolTx('sellDai', activeSeries.poolAddress, 1);
@@ -132,7 +128,7 @@ function Repay({ repayAmount }:IRepayProps) {
   useEffect(()=>{
     if (approved < inputValue) {
       setRepayDisabled(true);
-    } else if (!(inputValue) || inputValue===0) {
+    } else if (!(inputValue) || inputValue===0 || !userData?.daiBalance_) {
       setRepayDisabled(true);
     } else {
       setRepayDisabled(false);
@@ -273,7 +269,7 @@ function Repay({ repayAmount }:IRepayProps) {
                 checked={approved && !inputValue || ( approved >= inputValue )}
                 disabled={!inputValue || ( approved >= inputValue )}
                 onChange={()=>approveProcedure(inputValue)}
-                label={                
+                label={            
                   (approved >= inputValue) ? 
                     `Repayments are unlocked for up to ${approved.toFixed(2) || '' } Dai` 
                     : `Unlock repayments of ${inputValue || ''} Dai` 
