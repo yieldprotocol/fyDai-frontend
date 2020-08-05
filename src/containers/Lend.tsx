@@ -17,7 +17,7 @@ import WithdrawDai from './WithdrawDai';
 import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
   
-import { usePool, useBalances, useMath } from '../hooks';
+import { usePool, useBalances, useMath, useToken } from '../hooks';
 import InlineAlert from '../components/InlineAlert';
 
 interface ILendProps {
@@ -39,7 +39,8 @@ const Lend = ({ lendAmount }:ILendProps) => {
   
   // const { borrow, borrowActive }  = useController();
 
-  const { sellDai, previewPoolTx, approveToken }  = usePool();
+  const { sellDai, previewPoolTx }  = usePool();
+  const { approveToken, approveActive } = useToken();
   const { getTokenAllowance } = useBalances();
   const { yieldAPR } = useMath();
   

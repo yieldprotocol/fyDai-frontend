@@ -4,12 +4,11 @@ import { ethers, BigNumber }  from 'ethers';
 import * as utils from '../utils';
 
 import { NotifyContext } from '../contexts/NotifyContext';
-// import { ConnectionContext } from '../contexts/ConnectionContext';
+
 import EthProxy from '../contracts/EthProxy.json';
 import DaiProxy from '../contracts/DaiProxy.json';
 
 import { useSignerAccount } from './connectionHooks';
-
 
 // ethers.errors.setLogLevel('error');
 
@@ -112,8 +111,6 @@ export const useProxy = () => {
     return tx;
   };
 
-
-
   /**
    * @dev Borrow yDai from Controller and sell it immediately for Dai, for a maximum yDai debt.
    * Must have approved the operator with `controller.addDelegate(controllerDai.address)`.
@@ -157,12 +154,12 @@ export const useProxy = () => {
       tx = await contract.borrowDaiForMaximumYDai( utils.ETH, parsedMaturity, toAddr, parsedYDai, parsedDai, overrides );
     } catch (e) {
       console.log(e);
-      dispatch({ type: 'notify', payload:{ message:'Error Buying Dai!', type:'error' } } );
+      dispatch({ type: 'notify', payload:{ message:'Error Borrowing Dai!', type:'error' } } );
       dispatch({ type: 'txComplete', payload:{ tx } } );
       setBorrowActive(false);
       return;
     }
-    dispatch({ type: 'txPending', payload:{ tx, message: `Buying ${daiToBorrow} Dai pending...`, type:'BUY' } } );
+    dispatch({ type: 'txPending', payload:{ tx, message: `Borrowing ${daiToBorrow} Dai pending...`, type:'BORROW' } } );
     await tx.wait();
     setBorrowActive(false);
     dispatch({ type: 'txComplete', payload:{ tx } } );

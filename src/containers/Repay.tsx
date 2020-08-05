@@ -20,7 +20,7 @@ import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
 import { NotifyContext } from '../contexts/NotifyContext';
 
-import { useController, usePool, useBalances, useProxy, useTxActive } from '../hooks';
+import { useController, usePool, useBalances, useProxy, useTxActive, useToken } from '../hooks';
 
 interface IRepayProps {
   repayAmount?:any
@@ -34,11 +34,11 @@ function Repay({ repayAmount }:IRepayProps) {
   
   const { 
     previewPoolTx,
-    approveToken, approveActive,
     addPoolDelegate,
     checkPoolDelegate
   }  = usePool(); 
   const { getTokenAllowance }  = useBalances();
+  const { approveToken, approveActive } = useToken();
 
   const { isLoading: positionsLoading, seriesAggregates, activeSeries, setActiveSeries } = seriesState;
   const {

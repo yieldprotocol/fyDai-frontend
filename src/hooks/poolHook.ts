@@ -7,7 +7,6 @@ import { useSignerAccount } from './connectionHooks';
 // import { YieldContext } from '../contexts/YieldContext';
 
 import Pool from '../contracts/Pool.json';
-import TestERC20 from '../contracts/TestERC20.json';
 import YDai from '../contracts/YDai.json';
 
 /**
@@ -25,46 +24,6 @@ export const usePool = () => {
   const [ approveActive, setApproveActive ] = React.useState<boolean>(false);
   const [ sellActive, setSellActive ] = React.useState<boolean>(false);
   const [ buyActive, setBuyActive ] = React.useState<boolean>(false);
-
-  /**
-   * Approve the market contracts to transact with DAI or yDai token.
-   * (Not strictly a Controller Contract function. But associated enough to keep in here.)
-   * @param {string} tokenAddress address of the token to approve.
-   * @param {string} poolAddress address of the market.
-   * @param {number} amount to approve (in human understandable numbers)
-   */
-  const approveToken = async (
-    tokenAddress:string,
-    poolAddress:string,
-    amount:number
-  ) => {
-    let tx:any;
-    /* Processing and sanitizing input */
-    const parsedAmount = ethers.utils.parseEther(amount.toString());
-    const marketAddr = ethers.utils.getAddress(poolAddress);
-    const tokenAddr = ethers.utils.getAddress(tokenAddress);
-
-    /* Contract interaction */
-    setApproveActive(true);
-    const contract = new ethers.Contract(
-      tokenAddr,
-      YDai.abi,
-      signer
-    );
-    try {
-      tx = await contract.approve(marketAddr, parsedAmount);
-    } catch (e) {
-      dispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed.', type:'error' } } );
-      dispatch({ type: 'txComplete', payload:{ tx } } );
-      setApproveActive(false);
-      return;
-    }
-    /* Transaction reporting & tracking */
-    dispatch({ type: 'txPending', payload:{ tx, message: `Token approval of ${amount} pending...` } } );
-    await tx.wait();
-    setApproveActive(false);
-    dispatch({ type: 'txComplete', payload:{ tx } } );
-  };
 
   /**
    * Sell yDai for Dai ( Chai )
@@ -364,14 +323,12 @@ export const usePool = () => {
   return {
     checkPoolDelegate,
     addPoolDelegate,
-    approveToken,
     previewPoolTx, 
     sellYDai,
     buyYDai,
     sellDai,
     buyDai, 
     sellActive, 
-    buyActive, 
-    approveActive
+    buyActive,
   } as const;
 };

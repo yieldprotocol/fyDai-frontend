@@ -8,7 +8,7 @@ import {
 import { FaEthereum as Ethereum } from 'react-icons/fa';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
-import { usePool, useYDai } from '../hooks';
+import { usePool, useYDai, useToken } from '../hooks';
 
 interface WithDrawDaiProps {
   close?: any;
@@ -46,8 +46,9 @@ const WithdrawDai = ({ close }:WithDrawDaiProps) => {
     estimateRatio, // TODO << this is a function (basically just passed from hooks via context) >> 
   } = seriesAggregates;
 
-  const { buyDai, previewPoolTx, approveToken }  = usePool();
+  const { buyDai, previewPoolTx }  = usePool();
   const { userAllowance } = useYDai();
+  const { approveToken, approveActive } = useToken();
 
   const withdrawProcedure = async (value:number) => {
     await buyDai(

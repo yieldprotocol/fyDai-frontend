@@ -18,13 +18,14 @@ import YieldFooter from './components/YieldFooter';
 import ConnectLayer from './containers/layers/ConnectLayer';
 import AccountLayer from './containers/layers/AccountLayer';
 import NotifyLayer from './containers/layers/NotifyLayer';
-import SeriesSelector from './components/SeriesSelector';
-
 // TODO: remove testLayer for prod
 import TestLayer from './containers/layers/TestLayer';
 
+import SeriesSelector from './components/SeriesSelector';
+
 const App = () =>  {
 
+  // TODO: Better connection error supporting
   const { connector, library, chainId, account, activate, deactivate, active, error } = useWeb3React();
 
   React.useEffect(()=> {
@@ -32,13 +33,13 @@ const App = () =>  {
   }, [account]);
 
   const [darkmode, setDarkmode] = React.useState(false);
-  // TODO possibly switch out for react router
+  // TODO Switch out for react router
   const [activeView, setActiveView] = React.useState<string>('BORROW');
 
   const [showConnectLayer, setShowConnectLayer] = React.useState<boolean>(false);
   const [showAccountLayer, setShowAccountLayer] = React.useState<boolean>(false);
-  const [showTestLayer, setShowTestLayer] = React.useState<boolean>(false);
   const [showSeriesLayer, setShowSeriesLayer] = React.useState<boolean>(false);
+  const [showTestLayer, setShowTestLayer] = React.useState<boolean>(false);
 
   const changeConnection = () => {
     setShowAccountLayer(false);
@@ -46,7 +47,6 @@ const App = () =>  {
   };
 
   const columnsWidth = ['5%', 'auto', '5%'];
-  // TODO: combine account and connectLayers
 
   return (
     <div className="App">
@@ -57,14 +57,13 @@ const App = () =>  {
       >
         <NotifyLayer />
         <ConnectLayer open={showConnectLayer} closeLayer={() => setShowConnectLayer(false)} />
-        {showAccountLayer && (
+        { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
+        { showSeriesLayer  && <SeriesSelector closeLayer={()=>setShowSeriesLayer(false)} /> }
+        { showAccountLayer &&
           <AccountLayer
             closeLayer={() => setShowAccountLayer(false)}
             changeWallet={() => changeConnection()}
-          />
-        )}
-        { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
-        { showSeriesLayer  && <SeriesSelector closeLayer={()=>setShowSeriesLayer(false)} /> }
+          /> }
 
         <Box direction="row" height={{ min: '100%' }}>
           <Box flex>

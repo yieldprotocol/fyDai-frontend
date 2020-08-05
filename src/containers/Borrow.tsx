@@ -19,7 +19,7 @@ import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { NotifyContext } from '../contexts/NotifyContext';
 
-import { useController, useCallTx, usePool, useYDai, useMath, useProxy, useTxActive } from '../hooks';
+import { useController, usePool, useYDai, useMath, useProxy, useTxActive, useToken } from '../hooks';
 
 interface IBorrowProps {
   borrowAmount?:number|null;
@@ -45,12 +45,12 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
 
   const { 
     previewPoolTx,
-    approveToken,
     addPoolDelegate, //
     checkPoolDelegate
   }  = usePool();
 
-  const { borrowUsingExactDai, borrowActive } = useProxy(); 
+  const { borrowUsingExactDai, borrowActive } = useProxy();
+  const { approveToken, approveActive } = useToken();
   const { userAllowance } = useYDai();
   const { yieldAPR } = useMath();
 

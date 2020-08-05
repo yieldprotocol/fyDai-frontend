@@ -2,8 +2,8 @@ import React from 'react';
 import { NotifyContext } from '../contexts/NotifyContext';
 
 
+/* Simple Hook for checking if a transaction family/families are in process */
 export const useTxActive = (typeList:string[]) => {
-
   const { state: { pendingTxs } } = React.useContext(NotifyContext);
   const [txActive, setTxActive] = React.useState<any>(null);
 
@@ -14,9 +14,9 @@ export const useTxActive = (typeList:string[]) => {
   }, [ pendingTxs ]);
 
   return [txActive] as const; 
-  
 };
 
+/* Simple Hook for caching retrieved data */
 export const useCachedState = (key:string, initialValue:any) => {
   // const genKey = `${chainId}_${key}` || key;
   const genKey = key;
@@ -46,6 +46,9 @@ export const useCachedState = (key:string, initialValue:any) => {
   };
   return [storedValue, setValue] as const;
 };
+
+
+
 
 export const useDebounce = () => {
   console.log('unBoing,..Debounc\'d');

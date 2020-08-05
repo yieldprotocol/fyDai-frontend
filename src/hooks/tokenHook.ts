@@ -39,91 +39,17 @@ const contractMap = new Map<string, any>([
   ['Pool', Pool.abi],
 ]);
 
-// TODO: Sanitize all inputs NB!!
-/**
- * SendTx is a generic function to interact with any contract.
- * Primarily used for development/testing, or for once off interactions with a contract.
- * Currently, There are no notifications other than console logs.
- * @returns { function } sendTx
- * @returns { boolean } sendTxActive
- */
-export const useSendTx = () => {
-  // const { state: { signer, account } } = React.useContext(ConnectionContext);
-  const { signer, account } = useSignerAccount();
-  const [ sendTxActive, setSendTxActive ] = React.useState<boolean>();
-
-  /**
-   * Send a transaction ()
-   * @param {string} contractAddress address of the contract to send to.
-   * @param {string} contractName name of the contract to call (uses this to get the abi from a contract map)
-   * @param {string} fn name of the function to call 
-   * @param {any[]} data array of any arguments required by the contract function 
-   * @param {BigNumber} value if the tx is to a payable contract, use a bigNumber value here. 
-   */
-  const sendTx = async (contractAddr:string, contractName:string, fn:string, data:any[], value:ethers.BigNumber ) => {
-    let tx;
-    console.log(contractAddr, contractMap.get(contractName), signer); 
-    setSendTxActive(true);
-    const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), signer);
-    if (!value.isZero()) {
-      console.log(`Tx sends ETH: ${value.toString()} `);
-      tx = await contract[fn](...data, { value });
-    } else {
-      console.log('Tx has no ETH associated with it (except gas, obs)');
-      tx = await contract[fn](...data);
-    }
-    console.log(`${tx.hash} pending`);
-    await tx.wait();
-    setSendTxActive(false);
-    console.log(`${tx.hash} send tx complete`);
-  };
-  return [ sendTx, sendTxActive ] as const;
-};
-
-/**
- * Hook for making blockchain calls
- * Does not incur gas charges
- * But only applicable if contract function has a view modifier
- * Fails ( mostly silently ) on functions that require gas.
- * @returns { function } callTx
- * @returns { boolean } callTxActive
- */
-export const useCallTx = () => {
-
-  // const { state: { provider, altProvider } } = React.useContext(ConnectionContext);
-  const { signer, provider, account, altProvider, voidSigner } = useSignerAccount();
-
-  const [ callTxActive, setCallTxActive ] = React.useState<boolean>();
-  /**
-   * Get data from the blockchain via provider (no signer reqd)
-   * @param {string} contractAddress address of the contract to be called
-   * @param {string} contractName name of the contract to call (uses this to get the abi from a contract map)
-   * @param {string} fn name of the function to call 
-   * @param {any[]} data array of any arguments required by the contract function 
-   */
-  const callTx = async (
-    contractAddr:string,
-    contractName:string,
-    fn:string,
-    data:any[]
-  ) => {
-    setCallTxActive(true);
-    const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), provider || altProvider);
-    const retVal = await contract[fn](...data);
-    setCallTxActive(false);
-    return retVal;
-  };
-  return [ callTx, callTxActive ] as const;
-};
-
 /**
  * Hook for getting native balances and token balances
  * @returns { function } getEthBalance
  * @returns { boolean } getTokenBalance
  */
-export function useBalances() {
+export function useToken() {
   // const { state: { provider, account } } = React.useContext(ConnectionContext);
   const { signer, provider, account, altProvider, voidSigner } = useSignerAccount();
+
+  const  { dispatch }  = React.useContext<any>(NotifyContext);
+  const [ approveActive, setApproveActive ] = React.useState<boolean>(false);
 
   /**
    * Native user account balance (WEI)
@@ -177,5 +103,45 @@ export function useBalances() {
     return parseFloat(ethers.utils.formatEther(res));
   };
 
-  return { getTokenAllowance, getEthBalance, getTokenBalance } as const;
+  /**
+   * Approve an allowance for a token.
+   * 
+   * @param {string} tokenAddress address of the token to approve.
+   * @param {string} poolAddress address of the market.
+   * @param {number} amount to approve (in human understandable numbers)
+   */
+  const approveToken = async (
+    tokenAddress:string,
+    poolAddress:string,
+    amount:number
+  ) => {
+    let tx:any;
+    /* Processing and sanitizing input */
+    const parsedAmount = ethers.utils.parseEther(amount.toString());
+    const marketAddr = ethers.utils.getAddress(poolAddress);
+    const tokenAddr = ethers.utils.getAddress(tokenAddress);
+
+    /* Contract interaction */
+    setApproveActive(true);
+    const contract = new ethers.Contract(
+      tokenAddr,
+      YDai.abi,
+      signer
+    );
+    try {
+      tx = await contract.approve(marketAddr, parsedAmount);
+    } catch (e) {
+      dispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed.', type:'error' } } );
+      dispatch({ type: 'txComplete', payload:{ tx } } );
+      setApproveActive(false);
+      return;
+    }
+    /* Transaction reporting & tracking */
+    dispatch({ type: 'txPending', payload:{ tx, message: `Token approval of ${amount} pending...` } } );
+    await tx.wait();
+    setApproveActive(false);
+    dispatch({ type: 'txComplete', payload:{ tx } } );
+  };
+
+  return { approveToken, approveActive, getTokenAllowance, getEthBalance, getTokenBalance } as const;
 }

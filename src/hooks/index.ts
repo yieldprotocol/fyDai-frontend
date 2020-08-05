@@ -12,12 +12,14 @@ import { useMath } from './mathHooks'; // TODO work out this cyclic reference (n
 
 /* Generic blockchain transactional hooks */
 import { useCallTx, useSendTx, useBalances } from './transactionHooks';
+import { useToken } from './tokenHook';
 
 /* Contract hooks */
 import { useYDai } from './yDaiHook';
 import { useController } from './controllerHook';
 import { useProxy } from './proxyHook';
 import { usePool } from './poolHook';
+
 
 export {
   usePool,
@@ -32,12 +34,11 @@ export {
   useYDai,
   useEvents,
   useMath,
+  useToken,
   // useMaker,
   useWeb3React,
   useEagerConnect,
   useInactiveListener,
   useConnectorImage,
-
-  useSignerAccount,
-  
+  useSignerAccount, 
 };

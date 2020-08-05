@@ -8,7 +8,7 @@ import { FaEthereum as Ethereum } from 'react-icons/fa';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
 
-import { useProxy, useController } from '../hooks';
+import { useProxy, useController, useToken } from '../hooks';
 
 import { NotifyContext } from '../contexts/NotifyContext';
 import InlineAlert from '../components/InlineAlert';
@@ -52,6 +52,7 @@ const WithdrawEth = ({ close }:IWithDrawActionProps) => {
 
   const { withdrawEth, withdrawEthActive }  = useProxy();
   const { addControllerDelegate, checkControllerDelegate }  = useController();
+  const { approveToken, approveActive } = useToken();
 
   const withdrawProcedure = async (value:number) => {
     await withdrawEth(deployedContracts.EthProxy, value);
