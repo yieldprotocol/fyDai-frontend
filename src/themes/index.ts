@@ -261,6 +261,13 @@ export const yieldTheme = {
     minSpeed: '100',
   },
   meter: {},
+  anchor: {
+    hover: {
+      extend: {
+        opacity: '0.5',
+      },
+    },
+  },
   button: {
     border: {
       width: '1px',

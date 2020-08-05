@@ -74,22 +74,18 @@ const YieldFooter = (props: any) => {
           top: '2px',
         }}
       >
-        <Test
+        <Anchor
           onClick={() => setShowTestLayer(!showTestLayer)}
-          size={IconSize}
           color={showTestLayer ? yieldTheme.global.colors.brand.light : 'grey'}
-        />
-        <Box direction="row">
-          {darkmode ? (
-            <Sun
-              onClick={() => setDarkmode(!darkmode)}
-              size={IconSize}
-              color={yieldTheme.global.colors.brand.light}
-            />
-          ) : (
-            <Moon onClick={() => setDarkmode(!darkmode)} size={IconSize} />
-          )}
-        </Box>
+        >
+          <Test size={IconSize} />
+        </Anchor>
+        <Anchor
+          onClick={() => setDarkmode(!darkmode)}
+          color={yieldTheme.global.colors.brand.light}
+        >
+          {darkmode ? <Sun size={IconSize} /> : <Moon size={IconSize} />}
+        </Anchor>
       </Box>
     </Footer>
   );
