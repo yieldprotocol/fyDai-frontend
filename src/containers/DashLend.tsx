@@ -14,6 +14,7 @@ import {
 
 import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
+import TxHistory from '../components/TxHistory';
 
 
 interface DashLendProps {
@@ -63,8 +64,8 @@ const DashLend = () => {
             pad='small'
             round={{ size:'small', corner:'top' }}
           >
-            <Box basis='1/2'><Text color='text-weak' size='xsmall'>SERIES</Text></Box>
-            <Box><Text color='text-weak' size='xsmall'>VALUE AT MATURITY</Text></Box>
+            <Box basis='1/2'><Text color='text-weak' size='xxsmall'>SERIES</Text></Box>
+            <Box><Text color='text-weak' size='xxsmall'>VALUE AT MATURITY</Text></Box>
             {/* <Box><Text color='text-weak' size='xsmall'>ACTION</Text></Box> */}
             {/* <Box /> */}
           </Box>
@@ -80,18 +81,18 @@ const DashLend = () => {
             pad='medium'
           >
             <Box>
-              <Text alignSelf='start' size='medium' color='brand'>
+              <Text alignSelf='start' size='xsmall' color='brand'>
                 {activeSeries.yieldAPR_}%
               </Text>
             </Box>
             <Box>
-              <Text alignSelf='start' size='medium' color='brand'>
+              <Text alignSelf='start' size='xsmall' color='brand'>
                 {activeSeries.displayName}
               </Text>
             </Box>
             <Box>
-              <Text alignSelf='start' size='medium' color='brand'>
-                {activeSeries.wethDebtDai_}
+              <Text alignSelf='start' size='xsmall' color='brand'>
+                {activeSeries.wethDebtDai_.toFixed(2)}
               </Text>
             </Box>
           </Box>}
@@ -101,7 +102,7 @@ const DashLend = () => {
 
       </Box>
 
-      <Box basis='2/3' gap='small'>
+      <Box gap='small'>
         <Text color='text-weak' size='xsmall'>Overview </Text>
         <Box gap='small' direction='row-responsive' fill='horizontal' justify='between' margin={{ bottom:'large' }}>  
           <Box
@@ -142,55 +143,9 @@ const DashLend = () => {
           </Box>
         </Box>
 
-        <Text color='text-weak' size='xsmall'>Your History</Text>
-        <Box
-          background='background-front'
-          fill='horizontal'
-          round='small'
-          pad='none'
-            // elevation='medium'
-          border
-        >
-          <Box 
-            direction='row'
-            gap='xsmall'
-            justify='between'
-            background='background-mid'
-            pad='small'
-            round={{ size:'small', corner:'top' }}
-            overflow='auto'
-          >
-            <Box basis='2/5'><Text color='text-weak' size='xsmall'>TRANSACTION</Text></Box>
-            <Box><Text color='text-weak' size='xsmall'>AMOUNT</Text></Box>
-            <Box><Text color='text-weak' size='xsmall'>DATE</Text></Box>
-            <Box><Text color='text-weak' size='xsmall'>ACTION</Text></Box>
-          </Box>
-
-          { txHistory_.length > 0 ? txHistory_.map((x:any, i:number)=>{
-            const key_ = i;
-            return (
-              <Box
-                pad='small'
-                direction='row'
-                gap='xsmall'
-                key={key_}
-                justify='between'
-                hoverIndicator='background-mid'
-                onClick={()=>console.log('click')}
-              >
-                <Box basis='2/5'><Text>{x.event}</Text> </Box>
-                <Box><Text> {x.amount} </Text></Box>
-                <Box><Text> {x.date} </Text></Box>
-                <Box><Text> : </Text></Box>
-              </Box>
-            );
-          }):
-          <Box align='center'>
-            { !isLoading ? 
-              <Text>Loading...</Text> 
-              : 
-              <Text> No history</Text> } 
-          </Box>}
+        <Box basis='2/3' gap='small' fill>
+          <Text color='text-weak' size='xsmall'>Your History</Text>    
+          <TxHistory filterTerms={[ 'Bought', 'Sold' ]} view='lend' /> 
         </Box>
       </Box>
     </Box>

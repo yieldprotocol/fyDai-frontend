@@ -1,7 +1,6 @@
 import React from 'react';
 import { NotifyContext } from '../contexts/NotifyContext';
 
-
 /* Simple Hook for checking if a transaction family/families are in process */
 export const useTxActive = (typeList:string[]) => {
   const { state: { pendingTxs } } = React.useContext(NotifyContext);
@@ -46,9 +45,6 @@ export const useCachedState = (key:string, initialValue:any) => {
   };
   return [storedValue, setValue] as const;
 };
-
-
-
 
 export const useDebounce = () => {
   console.log('unBoing,..Debounc\'d');

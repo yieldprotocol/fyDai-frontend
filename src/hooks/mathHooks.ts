@@ -3,7 +3,6 @@ import { ethers, BigNumber }  from 'ethers';
 import * as utils from '../utils';
 import { YieldContext } from '../contexts/YieldContext'; // TODO sort out this cyclic ref (not critical)
 
-
 /**
  * Hook for Yield maths functions
  * 
@@ -15,9 +14,9 @@ import { YieldContext } from '../contexts/YieldContext'; // TODO sort out this c
  */
 export const useMath = () => {
 
-  const { state: { feedData, userData } } = React.useContext(YieldContext);
-  const { ilks } = feedData;
-  const ethPosted = userData?.ethPosted || BigNumber.from('0');
+  const { state } = React.useContext(YieldContext);
+  // const { ilks } = feedData;
+  const ethPosted = state?.userData?.ethPosted || BigNumber.from('0');
   // const { seriesRates, seriesData } = React.useContext(SeriesContext);
 
   /**
@@ -34,8 +33,8 @@ export const useMath = () => {
    */
   const collPrice = (): BigNumber => {
     // TODO: Update this to use ETH-A Oracle - not ilks.spot for market price USD
-    console.log('ETH price:', ethers.utils.formatEther(utils.mulRay(utils.toWad(1.5), (ilks.spot)).toString()));
-    return utils.mulRay(utils.toRay(1.5), (ilks.spot));
+    console.log('ETH price:', ethers.utils.formatEther(utils.mulRay(utils.toWad(1.5), (state?.feedData?.ilks.spot)).toString()));
+    return utils.mulRay(utils.toRay(1.5), (state?.feedData?.ilks.spot));
   };
 
   /**
@@ -167,16 +166,23 @@ export const useMath = () => {
    * @param { BigNumber } _rate // current [Dai] price per unit y[Dai].
    * @param { BigNumber } _return // y[Dai] amount/price at maturity.
    * @param { number } _maturity  // date of maturity 
+   * @param { number } _fromDate // ***optional*** start date - defaults to now(). 
+   * 
    * @returns { number }
    */
-  const yieldAPR =(_rate: BigNumber, _return: BigNumber, _maturity:number)=> {
-    const secsToMaturity = _maturity - (Math.round(new Date().getTime() / 1000));
+  const yieldAPR =(
+    _rate: BigNumber,
+    _return: BigNumber,
+    _maturity:number,
+    _fromDate:number= (Math.round(new Date().getTime() / 1000)), // if not provided, defaults to current time.
+  )=> {
+    const secsToMaturity = _maturity - _fromDate;
     const propOfYear = secsToMaturity/utils.SECONDS_PER_YEAR;
 
     const priceRatio = parseFloat(ethers.utils.formatEther(_return)) / parseFloat(ethers.utils.formatEther(_rate));
     const powRatio = 1 / propOfYear;
     const apr = Math.pow(priceRatio, powRatio) - 1;
-    // console.log('series:', _maturity, 'APR:', apr);
+
     return apr;
   };
 

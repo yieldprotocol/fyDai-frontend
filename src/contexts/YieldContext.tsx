@@ -1,6 +1,6 @@
 import React from 'react';
 import { ethers } from 'ethers';
-import Moment from 'moment';
+import moment from 'moment';
 
 import * as utils from '../utils';
 
@@ -13,6 +13,7 @@ import {
   useEvents,
   useSignerAccount,
   useWeb3React,
+  useMath,
 } from '../hooks';
 
 const YieldContext = React.createContext<any>({});
@@ -134,9 +135,10 @@ const YieldProvider = ({ children }: any) => {
   const [userPreferences, setUserPreferences] = useCachedState('userPreferences', null );
 
   /* hook declarations */
-  const [callTx] = useCallTx();
+  const [ callTx ] = useCallTx();
   const { getEventHistory, addEventListener, parseEventList } = useEvents();
   const { getEthBalance, getTokenBalance } = useBalances();
+  const { yieldAPR } = useMath();
 
   /**
    * @dev internal fn: Get all public Yield addresses from localStorage (or chain if no cache)
@@ -200,7 +202,7 @@ const YieldProvider = ({ children }: any) => {
               poolAddress,
               daiProxyAddress,
               maturity_: new Date(maturity * 1000),
-              displayName: Moment(maturity * 1000).format('MMMM YYYY'),
+              displayName: moment(maturity * 1000).format('MMMM YYYY'),
               seriesColor: seriesColors[i],
             };
           })
@@ -295,7 +297,21 @@ const YieldProvider = ({ children }: any) => {
       'Posted',
       [null, account, null],
       !txHistory ? 0 : txHistory.lastBlock + 1
-    ).then((res: any) => parseEventList(res));
+    )
+      .then((res: any) => parseEventList(res))
+      .then((parsedList: any) => {     
+        return parsedList.map((x:any) => {
+          return {
+            ...x,
+            event: x.args_[2]>0 ? 'Deposited' : 'Withdrew',
+            collateral: ethers.utils.parseBytes32String(x.args_[0]),
+            maturity: null,
+            amount: Math.abs( parseFloat(ethers.utils.formatEther( x.args_[2] )) ),
+            dai: x.args_[2],
+            dai_: ethers.utils.formatEther( x.args_[2] ),
+          };
+        });     
+      });
     
     const borrowedHistory = await getEventHistory(
       _deployedContracts.Controller,
@@ -303,21 +319,62 @@ const YieldProvider = ({ children }: any) => {
       'Borrowed',
       [],
       !txHistory ? 0 : txHistory.lastBlock + 1
-    ).then((res: any) => parseEventList(res));
+    )
+      .then((res: any) => parseEventList(res))
+      .then((parsedList: any) => {     
+        return parsedList.map((x:any) => {
+          return {
+            ...x,
+            event: x.args_[3]>0 ? 'Borrowed' : 'Repaid',
+            collateral: ethers.utils.parseBytes32String(x.args_[0]),
+            maturity: parseInt(x.args_[1], 10),
+            amount: Math.abs( parseFloat(ethers.utils.formatEther( x.args_[3] )) ),
+            dai: x.args_[3],
+            dai_: ethers.utils.formatEther( x.args_[3] ),
+          };
+        });     
+      });
 
-    const adminHistory = await getEventHistory(
-      _deployedContracts.Controller,
-      'Controller',
-      'Delegate',
-      [account, null],
-      !txHistory ? 0 : txHistory.lastBlock + 1
-    ).then((res: any) => parseEventList(res));
+    const poolHistory = await _deployedSeries.reduce( async ( accP: any, cur:any) => {
+      const acc = await accP; 
+      const _seriesHist = await getEventHistory(
+        cur.poolAddress, 
+        'Pool', 
+        'Trade',
+        [null, null, account, null, null],
+        !txHistory?0:txHistory.lastBlock+1 
+      )
+        .then((res:any) => parseEventList(res))
+        .then((parsedList: any) => {     
+          return parsedList.map((x:any) => {
+            return {
+              ...x,
+              event: x.args_[3]>0 ? 'Bought' : 'Sold',
+              from: x.args[1],
+              to:  x.args[2],
+              autoTraded: x.args[1] !== x.args[2],
+              maturity: parseInt(x.args_[0], 10),
+              amount: Math.abs( parseFloat(ethers.utils.formatEther( x.args_[3] )) ),
+              dai: x.args[3].abs(),
+              yDai: x.args[4].abs(),
+              APR: yieldAPR( x.args[3].abs(),  x.args[4].abs(), parseInt(x.args_[0], 10), x.date), 
+              dai_: ethers.utils.formatEther( x.args_[3] ),
+              yDai_: ethers.utils.formatEther( x.args_[4] ),
+            };
+          }); 
+        });
+      return [...acc, ..._seriesHist];
+    }, Promise.resolve([]) );
 
-    // TODO add in AMM history collection
-    // _deployedSeries.forEach(async (x:any)=>{
-    //   const _marketHistory = await getEventHistory(x.market, 'Pool', 'Borrowed', [], !txHistory?0:txHistory.lastBlock+1 )
-    //   .then((res:any) => parseEventList(res));
-    // });
+    // TODO: consider if its worth adding in the admin history
+    /* Admin history of secondary importance , maybe add back in later */
+    // const adminHistory = await getEventHistory(
+    //   _deployedContracts.Controller,
+    //   'Controller',
+    //   'Delegate',
+    //   [account, null],
+    //   !txHistory ? 0 : txHistory.lastBlock + 1
+    // ).then((res: any) => parseEventList(res));
 
     // TODO : get blocknumber at initialisation of yDaiProtocol instead of using first block(0).
     console.log(
@@ -330,7 +387,8 @@ const YieldProvider = ({ children }: any) => {
     const updatedHistory = [
       ...postedHistory,
       ...borrowedHistory,
-      ...adminHistory,
+      ...poolHistory,
+      // ...adminHistory,
     ];
 
     setTxHistory({

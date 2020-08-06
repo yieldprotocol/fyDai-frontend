@@ -63,7 +63,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
   const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
 
   /* flags */ 
-  const [ hasDelegated, setHasDelegated] = React.useState<boolean>(activeSeries?.hasDelegated || true);
+  const [ hasDelegated, setHasDelegated] = React.useState<boolean>(activeSeries?.hasDelegatedController || true);
   const [ borrowPending, setBorrowPending ] = React.useState<boolean>(false);
 
   /* token balances and values */

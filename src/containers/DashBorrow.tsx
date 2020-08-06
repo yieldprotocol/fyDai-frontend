@@ -15,6 +15,8 @@ import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 import DepositAction from './Deposit';
 
+import TxHistory from '../components/TxHistory';
+
 interface DashBorrowProps {
   // borrowFn:any
   // activeSeries?:IYieldSeries,
@@ -135,8 +137,8 @@ const DashBorrow = ({ }:DashBorrowProps) => {
               pad='small'
               round={{ size:'medium', corner:'top' }}
             >
-              <Box basis='1/2'><Text color='text-weak' size='xsmall'>SERIES</Text></Box>
-              <Box><Text color='text-weak' size='xsmall'>DEBT</Text></Box>
+              <Box basis='1/2'><Text color='text-weak' size='xxsmall'>SERIES</Text></Box>
+              <Box><Text color='text-weak' size='xxsmall'>DEBT</Text></Box>
               {/* <Box><Text color='text-weak' size='xsmall'>ACTION</Text></Box> */}
             </Box>
             <Box>
@@ -152,18 +154,18 @@ const DashBorrow = ({ }:DashBorrowProps) => {
                 pad='medium'
               >
                 <Box>
-                  <Text alignSelf='start' size='medium' color='brand'>
+                  <Text alignSelf='start' size='xsmall' color='brand'>
                     {activeSeries.yieldAPR_}%
                   </Text>
                 </Box>
                 <Box>
-                  <Text alignSelf='start' size='medium' color='brand'>
+                  <Text alignSelf='start' size='xsmall' color='brand'>
                     {activeSeries.displayName}
                   </Text>
                 </Box>
                 <Box>
-                  <Text alignSelf='start' size='medium' color='brand'>
-                    {activeSeries.wethDebtDai_}
+                  <Text alignSelf='start' size='xsmall' color='brand'>
+                    {activeSeries.wethDebtDai_.toFixed(2)}
                   </Text>
                 </Box>
               </Box>}
@@ -175,7 +177,8 @@ const DashBorrow = ({ }:DashBorrowProps) => {
 
         <Box basis='2/3' fill gap='small'>
           <Text color='text-weak' size='xsmall'>Your History</Text>
-          <Box
+          <TxHistory filterTerms={['Bought', 'Repaid', 'Deposited', 'Withdrew']} view='borrow' />
+          {/* <Box
             background='background-front'
             fill='horizontal'
             round='medium'
@@ -224,7 +227,8 @@ const DashBorrow = ({ }:DashBorrowProps) => {
                   <Text> No history</Text> } 
               </Box>}
             </Box>
-          </Box>
+          </Box> */}
+
         </Box>
       </Box>
     </Box>
