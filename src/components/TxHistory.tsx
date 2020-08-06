@@ -41,19 +41,20 @@ const TxHistory = ( { filterTerms, view }:HistoryProps) => {
   const [ txHistory, setTxHistory] = React.useState<any>([]);
   const [ itemOpen, setItemOpen ] = React.useState<any>(null);
 
-  // TODO improve preciseness of logic. may require a component split
+  // TODO NBNBNBNB improve preciseness of logic. may require a component split
+
   /* Cpmponent renaming pool events depending on the different views */
   const HistoryItemName = (props:any) => {
     const { item } = props;
-    // console.log(item);
+
     if (item.event === 'Bought') {
       return (
         <Box direction='row' gap='xsmall' align='center'>
           <Text size='xsmall' color='secondary'>
-            { view === 'borrow' ? 'Borrowed' : 'Redeemed' }           
+            { view === 'borrow' ? 'Borrowed' : 'Withdrew Dai' }           
           </Text>
           <Text size='xxsmall'> 
-            from { moment.unix(item.maturity).format('MMMM YYYY') } 
+            { moment.unix(item.maturity).format('MMMM YYYY') } 
             { view === 'borrow' &&  `@ ${item.APR.toFixed(2)}%` }
           </Text>
         </Box>
@@ -69,22 +70,23 @@ const TxHistory = ( { filterTerms, view }:HistoryProps) => {
               Lent               
             </Text>
             <Text size='xxsmall'> 
-              { `to ${moment.unix(item.maturity).format('MMMM YYYY') } @ ${item.APR.toFixed(2)}%` }
+              { `${moment.unix(item.maturity).format('MMMM YYYY') } @ ${item.APR.toFixed(2)}%` }
             </Text>  
           </Box>}
         </>
       );
     } 
 
+    /* cases covered: DEPOSIT, WITHDRAW, and REPAID */
     return (
       <Box direction='row' gap='xsmall' align='center'>
         <Text size='xsmall' color='secondary'>
-          { (item.event === 'Bought' ) ? 'Reclaimed': item.event }
+          { item.event === 'Repaid'? 'Repaid Debt' : item.event }
         </Text>
         <Text size='xxsmall'> 
           { (item.event === 'Withdrew' || item.event === 'Deposited') ? 
             `${item.collateral} collateral` 
-            : `to ${moment.unix(item.maturity).format('MMMM YYYY') }`}  
+            : `${moment.unix(item.maturity).format('MMMM YYYY') }`}  
         </Text>
       </Box>
     );  
