@@ -84,7 +84,7 @@ const initState = {
   isLoading: true,
   // cachable
   migrationsAddr: new Map([
-    [1337, process.env.REACT_APP_MIGRATION  || '0xAC172aca69D11D28DFaadbdEa57B01f697b34158' ],
+    [1337, process.env.REACT_APP_MIGRATION ],
     [1, '0x5632d2e2AEdf760F13d0531B18A39782ce9c814F'],
     [3, '0x5632d2e2AEdf760F13d0531B18A39782ce9c814F'],
     [4, '0x5632d2e2AEdf760F13d0531B18A39782ce9c814F'],
@@ -481,6 +481,7 @@ const YieldProvider = ({ children }: any) => {
 
   /* Init app and re-init app on change of user and/or network  */
   React.useEffect(() => {
+    console.log(process.env.REACT_APP_MIGRATION);
     chainId && (async () => initContext(chainId))();
   }, [chainId, account]);
 
