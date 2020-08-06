@@ -14,6 +14,7 @@ import {
   useSignerAccount,
   useWeb3React,
   useMath,
+  useMigrations,
 } from '../hooks';
 
 const YieldContext = React.createContext<any>({});
@@ -82,15 +83,6 @@ function reducer(state: any, action: any) {
 
 const initState = {
   isLoading: true,
-  // cachable
-  migrationsAddr: new Map([
-    [1337, process.env.REACT_APP_MIGRATION ],
-    [1, '0x5632d2e2AEdf760F13d0531B18A39782ce9c814F'],
-    [3, '0x5632d2e2AEdf760F13d0531B18A39782ce9c814F'],
-    [4, '0x5632d2e2AEdf760F13d0531B18A39782ce9c814F'],
-    [5, '0x5632d2e2AEdf760F13d0531B18A39782ce9c814F'],
-    [42, '0x5632d2e2AEdf760F13d0531B18A39782ce9c814F'],
-  ]),
   deployedSeries: [],
   deployedContracts: {},
   // transient
@@ -102,17 +94,8 @@ const initState = {
       },
     },
     urns: {},
-    marketRates: {},
-    // AMM rates mocked for now.
-    amm: {
-      rates: {
-        1601510399: utils.toRay(0.98),
-        1609459199: utils.toRay(0.96),
-        1617235199: utils.toRay(0.93),
-        1625097599: utils.toRay(0.89),
-      },
-    },
   },
+
   yieldData: {},
   // user centric
   userData: {},
@@ -138,6 +121,7 @@ const YieldProvider = ({ children }: any) => {
   const [ callTx ] = useCallTx();
   const { getEventHistory, addEventListener, parseEventList } = useEvents();
   const { getEthBalance, getTokenBalance } = useBalances();
+  const { getAddresses } = useMigrations();
   const { yieldAPR } = useMath();
 
   /**
@@ -150,30 +134,25 @@ const YieldProvider = ({ children }: any) => {
   ): Promise<any[]> => {
     const _deployedSeries: any[] = [];
     let _deployedContracts: any;
-    const contractGroups = {
-      contractList: [
-        'Controller',
-        'Treasury',
-        'Chai',
-        'Dai',
-        'WethJoin',
-        'Vat',
-        'Weth',
-        'EthProxy',
-        'Liquidations',
-      ],
-    };
+    
+    const contractList = [
+      'Controller',
+      'Treasury',
+      'Chai',
+      'Dai',
+      'WethJoin',
+      'Vat',
+      'Weth',
+      'EthProxy',
+      'Liquidations',
+    ];
 
     try {
       if (!cachedContracts || forceUpdate) {
-        const contractAddrs = await Promise.all(
-          contractGroups.contractList.map(async (x: string) => {
-            return {
-              [x]: await callTx( state.migrationsAddr.get(networkId), 'Migrations', 'contracts', [ethers.utils.formatBytes32String(x)] ),
-            };
-          })
-        );
-        _deployedContracts = contractAddrs.reduce( (prevObj, item) => ({ ...prevObj, ...item }), {} );
+
+        const contractAddrs = await getAddresses(contractList);
+        _deployedContracts = Object.fromEntries(contractAddrs);
+
         window.localStorage.removeItem('deployedContracts');
         setCachedContracts(_deployedContracts);
         console.log('Contract addresses updated:', _deployedContracts);
@@ -183,18 +162,19 @@ const YieldProvider = ({ children }: any) => {
 
       if (!cachedSeries || forceUpdate) {
         // TODO: better implementation of iterating through series (possibly a list length from contracts function?)
-        const _seriesList = await Promise.all(
-          ['yDai0', 'yDai1', 'yDai2', 'yDai3'].map(async (x: string) => {
-            return callTx(state.migrationsAddr.get(networkId), 'Migrations', 'contracts', [ethers.utils.formatBytes32String(x)]);
-          })
-        );
+        const _list = await getAddresses(['yDai0', 'yDai1', 'yDai2', 'yDai3']);
+        const _seriesList = Array.from(_list.values());
+
         await Promise.all(
           _seriesList.map(async (x: string, i: number) => {
+
             const name = await callTx(x, 'YDai', 'name', []);
-            const poolAddress = await callTx( state.migrationsAddr.get(networkId), 'Migrations', 'contracts', [ethers.utils.formatBytes32String(`${name}-Pool`)] );
-            const daiProxyAddress = await callTx( state.migrationsAddr.get(networkId), 'Migrations', 'contracts', [ethers.utils.formatBytes32String(`${name}-DaiProxy`)] );
             const maturity = (await callTx(x, 'YDai', 'maturity', [])).toNumber();
 
+            const _peripheralAddrs = await getAddresses([ `${name}-Pool`, `${name}-DaiProxy`] );     
+            const poolAddress = _peripheralAddrs.get(`${name}-Pool`);
+            const daiProxyAddress = _peripheralAddrs.get(`${name}-DaiProxy`);
+            
             return {
               yDaiAddress: x,
               name,
@@ -481,16 +461,15 @@ const YieldProvider = ({ children }: any) => {
 
   /* Init app and re-init app on change of user and/or network  */
   React.useEffect(() => {
-    console.log(process.env.REACT_APP_MIGRATION);
     chainId && (async () => initContext(chainId))();
-  }, [chainId, account]);
+  }, [ chainId, account ]);
 
   const actions = {
     updateUserData: () =>
       _getUserData(
         state.deployedContracts,
         state.deployedSeries,
-        true
+        true,
       ).then((res: any) => dispatch({ type: 'updateUserData', payload: res })),
   };
 

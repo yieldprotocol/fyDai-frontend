@@ -176,7 +176,7 @@ const SeriesProvider = ({ children }:any) => {
           _seriesData[i].yDaiBalance = account? await callTx(x.yDaiAddress, 'YDai', 'balanceOf', [account]): BigNumber.from('0') ;
           _seriesData[i].isMature = await callTx(x.yDaiAddress, 'YDai', 'isMature', []);
           _seriesData[i].wethDebtYDai = account? await callTx(deployedContracts.Controller, 'Controller', 'debtYDai', [utils.ETH, x.maturity, account]): BigNumber.from('0');
-          _seriesData[i].wethDebtDai = account? utils.mulRay( _seriesData[i].wethDebtYDai, feedData.amm.rates[x.maturity]): BigNumber.from('0');
+          _seriesData[i].wethDebtDai = account? utils.mulRay( _seriesData[i].wethDebtYDai, _rates.sellYDai): BigNumber.from('0');
           _seriesData[i].yieldAPR = yieldAPR(_rates.sellYDai, ethers.utils.parseEther('1'), x.maturity);
         } catch (e) {
           console.log(`Could not load account positions data: ${e}`);
@@ -231,9 +231,8 @@ const SeriesProvider = ({ children }:any) => {
 
       /* if there is an account associated, run aggregation */
       account && dispatch({ type:'updateAggregates', payload: _runAggregation() });
-
       dispatch({ type:'isLoading', payload: false });
-
+      
     } else {
       console.log('Positions exist... force fetch if required');
     }
