@@ -114,13 +114,14 @@ const YieldProvider = ({ children }: any) => {
   const [cachedContracts, setCachedContracts] = useCachedState('deployedContracts', null );
   const [cachedSeries, setCachedSeries] = useCachedState('deployedSeries', null);
   const [cachedFeed, setCachedFeed] = useCachedState('lastFeed', null);
+  
   const [txHistory, setTxHistory] = useCachedState('txHistory', null);
   const [userPreferences, setUserPreferences] = useCachedState('userPreferences', null );
 
   /* hook declarations */
   const [ callTx ] = useCallTx();
   const { getEventHistory, addEventListener, parseEventList } = useEvents();
-  const { getEthBalance, getTokenBalance } = useBalances();
+  const { getBalance } = useBalances();
   const { getAddresses } = useMigrations();
   const { yieldAPR } = useMath();
 
@@ -253,8 +254,8 @@ const YieldProvider = ({ children }: any) => {
     const _lastBlock = await provider.getBlockNumber();
 
     /* Get balances, posted collateral */
-    _userData.ethBalance = await getEthBalance();
-    _userData.daiBalance = await getTokenBalance(_deployedContracts.Dai, 'Dai');
+    _userData.ethBalance = await getBalance();
+    _userData.daiBalance = await getBalance(_deployedContracts.Dai, 'Dai');
     // TODO :use controller hook
     _userData.ethPosted = await callTx(
       _deployedContracts.Controller,

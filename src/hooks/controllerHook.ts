@@ -308,6 +308,34 @@ export const useController = () => {
     return res;
   };
 
+  /**
+   * Gets the value of collateral posted to the Yield protocol.
+   * 
+   * Call function no gas
+   * 
+   * @param {string} controllerAddress address of the controller.
+   * @param {string} collateralType collateral type to check (eg. ETH-A)
+   * 
+   * @returns {BigNumber} amount collateral depositied (in Wei)
+   */
+  const collateralPosted = async (
+    controllerAddress:string,
+    collateralType:string
+  ): Promise<boolean> => {
+    const accAddr = account && ethers.utils.getAddress(account);
+    const collType = ethers.utils.formatBytes32String(collateralType);
+    const controllerAddr = ethers.utils.getAddress(controllerAddress);
+    const contract = new ethers.Contract( controllerAddr, controllerAbi, provider);
+    let res;
+    try {
+      res = await contract.posted(collType, accAddr );
+    }  catch (e) {
+      console.log(e);
+      res = false;
+    }
+    return res;
+  };
+
   return {
     post, postActive,
     withdraw, withdrawActive,
@@ -316,5 +344,6 @@ export const useController = () => {
     approveController, approveActive, // TODO remove this if not used
     addControllerDelegate,
     checkControllerDelegate,
+    collateralPosted,
   } as const;
 };

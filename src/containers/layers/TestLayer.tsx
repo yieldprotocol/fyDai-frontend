@@ -92,7 +92,7 @@ const TestLayer = (props:any) => {
   }, [ yieldState ] );
 
   // React.useEffect(() => {
-  //   // (async () => setBalance( await getEthBalance()) )();
+  //   // (async () => setBalance( await getBalance()) )();
   //   // (async () => setWeiBalance( await getWeiBalance()) )();
   //   // (async () => activate(injected, console.log))();
   // }, [chainId, account]);

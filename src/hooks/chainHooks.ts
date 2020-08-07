@@ -118,35 +118,29 @@ export const useCallTx = () => {
 
 /**
  * Hook for getting native balances and token balances
- * @returns { function } getEthBalance
- * @returns { boolean } getTokenBalance
+ * @returns { function } getBalance
+ * @returns { boolean } getBalance
  */
 export function useBalances() {
   // const { state: { provider, account } } = React.useContext(ConnectionContext);
   const { signer, provider, account, altProvider, voidSigner } = useSignerAccount();
 
   /**
-   * Native user account balance (WEI)
-   * @returns balance in Wei! 
+   * Get the user account balance of ETH  (omit args) or an ERC20token (provide args)
+   * 
+   * @param {string} tokenAddr address of the Token, *optional, omit for ETH
+   * @param {string} abi abi of the token (probably ERC20 in most cases) *optional, omit for ETH
+   * 
+   * @returns {BigNumber} ETH in Wei or token balance.
    */
-  const getEthBalance = async () => {
-    if (!!provider && !!account) {
-      const balance = await provider.getBalance(account);
-      return balance;
-    } return ethers.BigNumber.from('0');
-  };
-
-  /**
-   * Get the user account balance of an ERC20token
-   * @param {string} tokenAddr address of the Token
-   * @param {string} abi abi of the token (probably ERC20 in most cases)
-   * @returns whatever token value
-   */
-  const getTokenBalance = async (tokenAddr:string, contractName:string) => {
-    if (!!provider && !!account) {
-      const contract = new ethers.Contract(tokenAddr, contractMap.get(contractName), provider);
-      const balance = await contract.balanceOf(account);
-      return balance;
+  const getBalance = async (tokenAddr:string|null=null, contractName:string|null=null) => {
+    if (!!provider && !!account ) {
+      if (tokenAddr && contractName) {
+        const contract = new ethers.Contract(tokenAddr, contractMap.get(contractName), provider);
+        const balance = await contract.balanceOf(account);
+        return balance;
+      }
+      return provider.getBalance(account);
     } return ethers.BigNumber.from('0');
   };
 
@@ -177,5 +171,5 @@ export function useBalances() {
     return parseFloat(ethers.utils.formatEther(res));
   };
 
-  return { getTokenAllowance, getEthBalance, getTokenBalance } as const;
+  return { getTokenAllowance, getBalance } as const;
 }

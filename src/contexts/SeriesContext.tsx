@@ -232,7 +232,6 @@ const SeriesProvider = ({ children }:any) => {
       /* if there is an account associated, run aggregation */
       account && dispatch({ type:'updateAggregates', payload: _runAggregation() });
       dispatch({ type:'isLoading', payload: false });
-      
     } else {
       console.log('Positions exist... force fetch if required');
     }

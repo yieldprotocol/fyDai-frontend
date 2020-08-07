@@ -1,6 +1,6 @@
 import React from 'react';
 import { useWeb3React } from '@web3-react/core';
-import { ethers, BigNumber}  from 'ethers';
+import { ethers, BigNumber }  from 'ethers';
 
 import { NotifyContext } from '../contexts/NotifyContext';
 // import { ConnectionContext } from '../contexts/ConnectionContext';
@@ -41,8 +41,8 @@ const contractMap = new Map<string, any>([
 
 /**
  * Hook for getting native balances and token balances
- * @returns { function } getEthBalance
- * @returns { boolean } getTokenBalance
+ * @returns { function } getBalance
+ * @returns { boolean } getBalance
  */
 export function useToken() {
   // const { state: { provider, account } } = React.useContext(ConnectionContext);
@@ -52,27 +52,21 @@ export function useToken() {
   const [ approveActive, setApproveActive ] = React.useState<boolean>(false);
 
   /**
-   * Native user account balance (WEI)
-   * @returns balance in Wei! 
+   * Get the user account balance of ETH  (omit args) or an ERC20token (provide args)
+   * 
+   * @param {string} tokenAddr address of the Token, *optional, omit for ETH
+   * @param {string} abi abi of the token (probably ERC20 in most cases) *optional, omit for ETH
+   * 
+   * @returns {BigNumber} ETH in Wei or token balance.
    */
-  const getEthBalance = async () => {
-    if (!!provider && !!account) {
-      const balance = await provider.getBalance(account);
-      return balance;
-    } return ethers.BigNumber.from('0');
-  };
-
-  /**
-   * Get the user account balance of an ERC20token
-   * @param {string} tokenAddr address of the Token
-   * @param {string} abi abi of the token (probably ERC20 in most cases)
-   * @returns whatever token value
-   */
-  const getTokenBalance = async (tokenAddr:string, contractName:string) => {
-    if (!!provider && !!account) {
-      const contract = new ethers.Contract(tokenAddr, contractMap.get(contractName), provider);
-      const balance = await contract.balanceOf(account);
-      return balance;
+  const getBalance = async (tokenAddr:string|null=null, contractName:string|null=null) => {
+    if (!!provider && !!account ) {
+      if (tokenAddr && contractName) {
+        const contract = new ethers.Contract(tokenAddr, contractMap.get(contractName), provider);
+        const balance = await contract.balanceOf(account);
+        return balance;
+      }
+      return provider.getBalance(account);
     } return ethers.BigNumber.from('0');
   };
 
@@ -143,5 +137,5 @@ export function useToken() {
     dispatch({ type: 'txComplete', payload:{ tx } } );
   };
 
-  return { approveToken, approveActive, getTokenAllowance, getEthBalance, getTokenBalance } as const;
+  return { approveToken, approveActive, getTokenAllowance, getBalance } as const;
 }

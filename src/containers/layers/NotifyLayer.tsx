@@ -70,7 +70,7 @@ function NotifyLayer() {
           round="medium"
           elevation="medium"
           pad={{ vertical: 'large', horizontal: 'large' }}
-          background='pink'
+          border={{ color:'red' }}
         >
           { notificationTypeMap(state.type).icon }
           <Box align="center" direction="row" gap="xsmall">
