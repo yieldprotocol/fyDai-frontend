@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  Button,
-  Box,
-  Sidebar,
-  Text,
-} from 'grommet';
+import { Button, Box, Sidebar, Text } from 'grommet';
 
 import PulseLoader from 'react-spinners/PulseLoader';
 
@@ -16,14 +11,13 @@ import YieldSeriesMenuItem from './YieldSeriesMenuItem';
 const YieldSidebar = ({
   activeSeries,
   setActiveSeries,
-  setShowSeriesLayer }
-: {
-  activeSeries:IYieldSeries|null,
-  setActiveSeries:any,
-  setShowSeriesLayer:any
+  setShowSeriesLayer,
+}: {
+  activeSeries: IYieldSeries | null;
+  setActiveSeries: any;
+  setShowSeriesLayer: any;
 }) => {
-
-  const { state } = React.useContext( YieldContext );
+  const { state } = React.useContext(YieldContext);
   const [seriesList, setSeriesList] = React.useState<IYieldSeries[]>([]);
 
   const { deployedSeries } = state;
@@ -37,32 +31,29 @@ const YieldSidebar = ({
 
   React.useEffect(() => {
     !state.isLoading && setSeriesList(deployedSeries);
-  }, [ state.isLoading, deployedSeries ]);
+  }, [state.isLoading, deployedSeries]);
 
   return (
-    <Sidebar
-      background="background"
-      pad="none"
-      gap='small'
-    >
-      <Box margin={{ left: 'small', vertical:'none' }} pad='small'>
-        <Text size='large'> Series Available </Text>
+    <Sidebar background="background" pad="none" gap="small">
+      <Box margin={{ left: 'small', vertical: 'none' }} pad="small">
+        <Text size="large"> Series Available </Text>
       </Box>
-      
-      {state.isLoading && 
-      <Box
-        round='xlarge'
-        width='xsmall'
-        height='xsmall'
-        // background={activePosition?.seriesColor}
-        justify='center'
-        align='center'
-        margin='small'
-      >
-        <PulseLoader size='5px' margin='5px' />
-      </Box>}
 
-      {seriesList.map((x:any, i:number) => {
+      {state.isLoading && (
+        <Box
+          round="xlarge"
+          width="xsmall"
+          height="xsmall"
+          // background={activePosition?.seriesColor}
+          justify="center"
+          align="center"
+          margin="small"
+        >
+          <PulseLoader size="5px" margin="5px" />
+        </Box>
+      )}
+
+      {seriesList.map((x: any, i: number) => {
         return (
           <YieldSeriesMenuItem
             key={x.symbol}
@@ -72,12 +63,12 @@ const YieldSidebar = ({
           />
         );
       })}
-      <Box pad='small'>
-        <Button 
-          color='background-mid'
-          hoverIndicator='background-mid'
-          onClick={()=>setShowSeriesLayer(true)}
-          label={<Text size='xsmall'>Discover more</Text>}
+      <Box pad="small">
+        <Button
+          color="background-mid"
+          hoverIndicator="background-mid"
+          onClick={() => setShowSeriesLayer(true)}
+          label={<Text size="xsmall">Discover more</Text>}
         />
       </Box>
     </Sidebar>

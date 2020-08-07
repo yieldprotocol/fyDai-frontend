@@ -243,7 +243,6 @@ const YieldHeader = (props: any) => {
           color="border"
           fill="horizontal"
           style={{
-            minWidth: '160px',
             fontWeight: 600,
             height: screenSize === 'small' ? '2.25rem' : 'auto',
           }}
