@@ -26,7 +26,6 @@ interface LinkProps {
 }
 
 const YieldHeader = (props: any) => {
-
   const { account } = useWeb3React();
 
   const {
@@ -35,7 +34,7 @@ const YieldHeader = (props: any) => {
     activeView,
     setActiveView,
   } = props;
-  
+
   const {
     state: { pendingTxs },
   } = React.useContext(NotifyContext);
@@ -193,7 +192,7 @@ const YieldHeader = (props: any) => {
         weight={600}
         // TODO undo this when pages are ready
         // eslint-disable-next-line no-nested-ternary
-        color={disabled? 'lightgrey' : (activeView === link ? 'brand' : 'text-weak')}
+        color={disabled ? 'lightgrey' : activeView === link ? 'brand' : 'text-weak'}
         size={screenSize === 'small' ? 'xxlarge' : 'medium'}
         style={{
           textDecoration: activeView === link ? 'underline' : 'none',
@@ -212,7 +211,12 @@ const YieldHeader = (props: any) => {
     >
       {navLinks &&
         navLinks.map((item) => (
-          <NavLink link={item.link} text={item.text} key={`nav-${item.id}`} disabled={item.disabled} />
+          <NavLink
+            link={item.link}
+            text={item.text}
+            key={`nav-${item.id}`}
+            disabled={item.disabled}
+          />
         ))}
     </Box>
   );
@@ -238,7 +242,10 @@ const YieldHeader = (props: any) => {
     return (
       <Box direction="row" fill="horizontal">
         <Button
-          onClick={() => openConnectLayer()}
+          onClick={() => {
+            closeMenu();
+            openConnectLayer();
+          }}
           label="Connect to a wallet"
           color="border"
           fill="horizontal"

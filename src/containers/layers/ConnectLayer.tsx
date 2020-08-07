@@ -76,7 +76,7 @@ const ConnectLayer = (props: any) => {
     { name: 'Tezor', image: trezorImage, connection: trezor },
     { name: 'Torus', image: torusImage, connection: torus },
     { name: 'Walletlink', image: walletlinkImage, connection: walletlink },
-    { name: 'ledger', image: walletlinkImage, connection: ledger },
+    { name: 'Ledger', image: walletlinkImage, connection: ledger },
   ];
 
   return (
@@ -95,23 +95,35 @@ const ConnectLayer = (props: any) => {
               <Paragraph>Try connecting with:</Paragraph>
               {connectorList.map((x) => (
                 <Button
-                  fill="horizontal"
-                  color="border"
                   hoverIndicator="border"
-                  key={x.name}
+                  onClick={() => handleSelectConnector(x.connection)}
+                  label={x.name}
+                  color="border"
+                  fill="horizontal"
+                  size="large"
                   icon={
-                    <Box height="15px" width="15px">
+                    <Box
+                      height="1rem"
+                      width="1rem"
+                      style={{
+                        position: 'absolute',
+                        left: '1rem',
+                      }}
+                    >
                       <Image src={x.image} fit="contain" />
                     </Box>
                   }
-                  label={x.name}
-                  onClick={() => handleSelectConnector(x.connection)}
+                  style={{
+                    fontWeight: 500,
+                    position: 'relative',
+                  }}
+                  key={x.name}
                 />
               ))}
             </Box>
             <Footer direction="column" pad="medium">
               <Box gap="xsmall" direction="row">
-                <Anchor href="#" label="help!" size="xsmall" color="brand" />
+                <Anchor href="#" label="Help!" size="xsmall" color="brand" />
                 <Text size="xsmall"> I'm not sure what this means.</Text>
               </Box>
               <Box direction="row">
