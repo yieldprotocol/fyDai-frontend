@@ -83,7 +83,9 @@ const ConnectLayer = (props: any) => {
     <>
       {open && (
         <Layer
+          onClickOutside={() => closeLayer(true)}
           animation="slide"
+          onEsc={() => closeLayer(true)}
         >
           <Box
             background="background-front"
