@@ -82,14 +82,28 @@ const ConnectLayer = (props: any) => {
   return (
     <>
       {open && (
-        <Layer animation="slide" position="right" full="vertical">
-          <Box direction="column" fill="vertical" background="background-front">
-            <Header
-              round={{ corner: 'bottom', size: 'medium' }}
-              fill="horizontal"
-              pad={{ horizontal: 'medium', vertical: 'large' }}
-            >
-              <Heading level="2">Connect to a Wallet</Heading>
+        <Layer
+          animation="slide"
+        >
+          <Box
+            background="background-front"
+            direction="column"
+            fill="vertical"
+            style={{
+              borderRadius: '0.5rem',
+              padding: '2rem',
+            }}
+          >
+            <Header fill="horizontal" gap="medium">
+              <Heading
+                level="2"
+                style={{
+                  textAlign: 'center',
+                  margin: 'auto',
+                }}
+              >
+                Connect to a Wallet
+              </Heading>
             </Header>
             <Box align="center" pad="medium" gap="small">
               <Paragraph>Try connecting with:</Paragraph>
@@ -100,7 +114,6 @@ const ConnectLayer = (props: any) => {
                   label={x.name}
                   color="border"
                   fill="horizontal"
-                  size="large"
                   icon={
                     <Box
                       height="1rem"
@@ -114,8 +127,10 @@ const ConnectLayer = (props: any) => {
                     </Box>
                   }
                   style={{
+                    marginBottom: '1rem',
                     fontWeight: 500,
                     position: 'relative',
+                    padding: '0.5rem',
                   }}
                   key={x.name}
                 />
