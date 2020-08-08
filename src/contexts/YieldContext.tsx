@@ -4,7 +4,6 @@ import moment from 'moment';
 
 import * as utils from '../utils';
 
-import { IYieldSeries, IUser } from '../types';
 import { NotifyContext } from './NotifyContext';
 import {
   useCallTx,
@@ -15,6 +14,7 @@ import {
   useWeb3React,
   useMath,
   useMigrations,
+  useController,
 } from '../hooks';
 
 const YieldContext = React.createContext<any>({});
@@ -61,16 +61,6 @@ function reducer(state: any, action: any) {
         ...state,
         yieldData: action.payload,
       };
-    case 'updateUserData':
-      return {
-        ...state,
-        userData: action.payload,
-      };
-    case 'updateTxHistory':
-      return {
-        ...state,
-        txHistory: action.payload,
-      };
     case 'isLoading':
       return {
         ...state,
@@ -85,21 +75,15 @@ const initState = {
   isLoading: true,
   deployedSeries: [],
   deployedContracts: {},
+
   // transient
   feedData: {
     ilks: {
-      EthA: {
-        rate: null, // localStorage.getItem(feedData.ilks.EthA.rate)
-        spot: null, // localStorage.getItem(feedData.ilks.EthA.spot)
-      },
+      rate: null, // localStorage.getItem(feedData.ilks.EthA.rate)
+      spot: null, // localStorage.getItem(feedData.ilks.EthA.spot)
     },
-    urns: {},
   },
-
   yieldData: {},
-  // user centric
-  userData: {},
-  txHistory: {},
 };
 
 const YieldProvider = ({ children }: any) => {
@@ -114,16 +98,12 @@ const YieldProvider = ({ children }: any) => {
   const [cachedContracts, setCachedContracts] = useCachedState('deployedContracts', null );
   const [cachedSeries, setCachedSeries] = useCachedState('deployedSeries', null);
   const [cachedFeed, setCachedFeed] = useCachedState('lastFeed', null);
-  
-  const [txHistory, setTxHistory] = useCachedState('txHistory', null);
-  const [userPreferences, setUserPreferences] = useCachedState('userPreferences', null );
 
   /* hook declarations */
   const [ callTx ] = useCallTx();
   const { getEventHistory, addEventListener, parseEventList } = useEvents();
-  const { getBalance } = useBalances();
   const { getAddresses } = useMigrations();
-  const { yieldAPR } = useMath();
+  const { collateralPosted } = useController();
 
   /**
    * @dev internal fn: Get all public Yield addresses from localStorage (or chain if no cache)
@@ -234,173 +214,13 @@ const YieldProvider = ({ children }: any) => {
   /**
    * @dev get PUBLIC, non-cached, non-user specific yield protocol general data
    */
+  
   const _getYieldData = async (deployedContracts: any): Promise<any> => {
     const _yieldData: any = {};
+    _yieldData.ethPosted = await collateralPosted(deployedContracts.Controller, 'ETH-A');
     // parse data if required.
     return {
       ..._yieldData,
-    };
-  };
-
-  /**
-   * @dev gets private, user specific Yield data
-   */
-  const _getUserData = async (
-    _deployedContracts: any,
-    _deployedSeries: any,
-    forceUpdate: boolean
-  ): Promise<any> => {
-    const _userData: any = {};
-    const _lastBlock = await provider.getBlockNumber();
-
-    /* Get balances, posted collateral */
-    _userData.ethBalance = await getBalance();
-    _userData.daiBalance = await getBalance(_deployedContracts.Dai, 'Dai');
-    // TODO :use controller hook
-    _userData.ethPosted = await callTx(
-      _deployedContracts.Controller,
-      'Controller',
-      'posted',
-      [utils.ETH, account]
-    );
-    _userData.urn = await callTx(_deployedContracts.Vat, 'Vat', 'urns', [ utils.ETH, account ]);
-
-    /* get previous approvals and settings */
-    // TODO: use controller hook for this
-    _userData.isEthProxyApproved = await callTx( _deployedContracts.Controller, 'Controller', 'delegated', [account, _deployedContracts.EthProxy]);
-
-    /* Get transaction history (from cache first or rebuild if an update is forced) */
-    forceUpdate && window.localStorage.removeItem('txHistory') && console.log('Re-building txHistory...');
-
-    const postedHistory = await getEventHistory(
-      _deployedContracts.Controller,
-      'Controller',
-      'Posted',
-      [null, account, null],
-      !txHistory ? 0 : txHistory.lastBlock + 1
-    )
-      .then((res: any) => parseEventList(res))
-      .then((parsedList: any) => {     
-        return parsedList.map((x:any) => {
-          return {
-            ...x,
-            event: x.args_[2]>0 ? 'Deposited' : 'Withdrew',
-            collateral: ethers.utils.parseBytes32String(x.args_[0]),
-            maturity: null,
-            amount: Math.abs( parseFloat(ethers.utils.formatEther( x.args_[2] )) ),
-            dai: x.args_[2],
-            dai_: ethers.utils.formatEther( x.args_[2] ),
-          };
-        });     
-      });
-    
-    const borrowedHistory = await getEventHistory(
-      _deployedContracts.Controller,
-      'Controller',
-      'Borrowed',
-      [],
-      !txHistory ? 0 : txHistory.lastBlock + 1
-    )
-      .then((res: any) => parseEventList(res))
-      .then((parsedList: any) => {     
-        return parsedList.map((x:any) => {
-          return {
-            ...x,
-            event: x.args_[3]>0 ? 'Borrowed' : 'Repaid',
-            collateral: ethers.utils.parseBytes32String(x.args_[0]),
-            maturity: parseInt(x.args_[1], 10),
-            amount: Math.abs( parseFloat(ethers.utils.formatEther( x.args_[3] )) ),
-            dai: x.args_[3],
-            dai_: ethers.utils.formatEther( x.args_[3] ),
-          };
-        });     
-      });
-
-    const poolHistory = await _deployedSeries.reduce( async ( accP: any, cur:any) => {
-      const acc = await accP; 
-      const _seriesHist = await getEventHistory(
-        cur.poolAddress, 
-        'Pool', 
-        'Trade',
-        [null, null, account, null, null],
-        !txHistory?0:txHistory.lastBlock+1 
-      )
-        .then((res:any) => parseEventList(res))
-        .then((parsedList: any) => {     
-          return parsedList.map((x:any) => {
-            return {
-              ...x,
-              event: x.args_[3]>0 ? 'Bought' : 'Sold',
-              from: x.args[1],
-              to:  x.args[2],
-              autoTraded: x.args[1] !== x.args[2],
-              maturity: parseInt(x.args_[0], 10),
-              amount: Math.abs( parseFloat(ethers.utils.formatEther( x.args_[3] )) ),
-              dai: x.args[3].abs(),
-              yDai: x.args[4].abs(),
-              APR: yieldAPR( x.args[3].abs(),  x.args[4].abs(), parseInt(x.args_[0], 10), x.date), 
-              dai_: ethers.utils.formatEther( x.args_[3] ),
-              yDai_: ethers.utils.formatEther( x.args_[4] ),
-            };
-          }); 
-        });
-      return [...acc, ..._seriesHist];
-    }, Promise.resolve([]) );
-
-    // TODO: consider if its worth adding in the admin history
-    /* Admin history of secondary importance , maybe add back in later */
-    // const adminHistory = await getEventHistory(
-    //   _deployedContracts.Controller,
-    //   'Controller',
-    //   'Delegate',
-    //   [account, null],
-    //   !txHistory ? 0 : txHistory.lastBlock + 1
-    // ).then((res: any) => parseEventList(res));
-
-    // TODO : get blocknumber at initialisation of yDaiProtocol instead of using first block(0).
-    console.log(
-      'txHistory updated from block:',
-      txHistory?.lastBlock + 1 || 0,
-      'to block:',
-      _lastBlock
-    );
-
-    const updatedHistory = [
-      ...postedHistory,
-      ...borrowedHistory,
-      ...poolHistory,
-      // ...adminHistory,
-    ];
-
-    setTxHistory({
-      lastBlock: _lastBlock,
-      items: txHistory
-        ? [...txHistory.items, ...updatedHistory]
-        : [...updatedHistory],
-    });
-
-    /* parse and return user data */
-    return {
-      ..._userData,
-      ethBalance_: parseFloat(
-        ethers.utils.formatEther(_userData.ethBalance.toString())
-      ),
-      daiBalance_: parseFloat(
-        ethers.utils.formatEther(_userData.daiBalance.toString())
-      ),
-      ethPosted_: parseFloat(
-        ethers.utils.formatEther(_userData.ethPosted.toString())
-      ),
-      txHistory: {
-        ...txHistory,
-        items: txHistory?.items,
-      },
-      urn: {
-        ..._userData.urn,
-        // art_: utils.rayToHuman(_userData.urn.art),
-        // ink_: utils.rayToHuman(_userData.urn.ink),
-      },
-      preferences: userPreferences,
     };
   };
 
@@ -447,15 +267,6 @@ const YieldProvider = ({ children }: any) => {
       payload: await _getYieldData(deployedContracts),
     });
 
-    /* 4. Fetch any user data based on address (if any), possibly cached. */
-    const userData = account
-      ? await _getUserData(deployedContracts, deployedSeries, false)
-      : null;
-    dispatch({ type: 'updateUserData', payload: userData });
-
-    // TODO: maybe split history from _getUserData
-    /* 5. Fetch user history */
-
     /* Init end */
     dispatch({ type: 'isLoading', payload: false });
   };
@@ -466,12 +277,12 @@ const YieldProvider = ({ children }: any) => {
   }, [ chainId, account ]);
 
   const actions = {
-    updateUserData: () =>
-      _getUserData(
-        state.deployedContracts,
-        state.deployedSeries,
-        true,
-      ).then((res: any) => dispatch({ type: 'updateUserData', payload: res })),
+    // updateUserData: () =>
+    //   _getUserData(
+    //     state.deployedContracts,
+    //     state.deployedSeries,
+    //     true,
+    //   ).then((res: any) => dispatch({ type: 'updateUserData', payload: res })),
   };
 
   return (

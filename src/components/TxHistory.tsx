@@ -10,6 +10,7 @@ import {
 
 import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
+import { UserContext } from '../contexts/UserContext';
 
 interface HistoryProps {
   filterTerms: string[];
@@ -37,7 +38,9 @@ const EtherscanButton = (props:any) => {
 };
 
 const TxHistory = ( { filterTerms, view }:HistoryProps) => {
-  const { state: { isLoading, deployedSeries, deployedContracts, yieldData, userData }, actions } = React.useContext(YieldContext);
+
+  const { state, actions } = React.useContext(UserContext);
+
   const [ txHistory, setTxHistory] = React.useState<any>([]);
   const [ itemOpen, setItemOpen ] = React.useState<any>(null);
 
@@ -119,10 +122,10 @@ const TxHistory = ( { filterTerms, view }:HistoryProps) => {
   };
 
   React.useEffect(()=> {
-    const _txHist = userData?.txHistory?.items || [];
+    const _txHist = state.txHistory.items;
     const filteredHist = _txHist.filter((x:any) => filterTerms.includes(x.event) );  
     setTxHistory(filteredHist);
-  }, [ userData ]);
+  }, [ state.txHistory ]);
 
   React.useEffect(()=> {
   }, [ txHistory ]);
@@ -193,7 +196,7 @@ const TxHistory = ( { filterTerms, view }:HistoryProps) => {
             );
           }):
           <Box align='center'>
-            { isLoading ? 
+            { state.isLoading ? 
               <Box pad='xsmall'> 
                 <Text size='xxsmall'>Loading...</Text> 
               </Box>

@@ -16,9 +16,11 @@ import SeriesSelector from '../components/SeriesSelector';
 import WithdrawDai from './WithdrawDai';
 import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
+import { UserContext } from '../contexts/UserContext';
   
 import { usePool, useBalances, useMath, useToken } from '../hooks';
 import InlineAlert from '../components/InlineAlert';
+
 
 interface ILendProps {
   lendAmount?:any
@@ -27,15 +29,16 @@ interface ILendProps {
 const Lend = ({ lendAmount }:ILendProps) => {
   
   const { state: yieldState, actions: yieldActions } = React.useContext(YieldContext);
-  const { deployedContracts, userData } = yieldState;
+  const { deployedContracts } = yieldState;
+
   const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
-  const { isLoading, seriesAggregates, activeSeries } = seriesState;
+  const { isLoading, activeSeries } = seriesState;
+
+  const { state: userState, actions: userActions } = React.useContext(UserContext);
   const {
-    maxDaiAvailable_,
-    // estimateRatio,
-    debtValue_,
-    ethBalance_,
-  } = seriesAggregates;
+    daiBalance_,
+    ethBorrowingPower_: maximumDai
+  } = userState.position;
   
   // const { borrow, borrowActive }  = useController();
 
@@ -66,8 +69,8 @@ const Lend = ({ lendAmount }:ILendProps) => {
       0 // transaction queue value
     );
     setInputValue('');
-    await yieldActions.updateUserData();
-    await seriesActions.refreshPositions([activeSeries]);
+    await userActions.updatePosition();
+    // await seriesActions.refreshPositions([activeSeries]);
   };
 
   const approveProcedure = async (value:number) => {
@@ -84,7 +87,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
   }, [inputValue]);
   
   useEffect(() => {
-    if ( inputValue && ( inputValue > userData.daiBalance_ ) ) {
+    if ( inputValue && ( inputValue > daiBalance_ ) ) {
       setLendDisabled(true);
       setWarningMsg(null);
       setErrorMsg('That amount exceeds the amount of Dai you have'); 
@@ -216,7 +219,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
               <Box justify='center'>
                 <Box
                   round
-                  onClick={()=>setInputValue(userData.daiBalance_)}
+                  onClick={()=>setInputValue(daiBalance_)}
                   hoverIndicator='brand-transparent'
                   border='all'
                   // border={{ color:'brand' }}
@@ -256,19 +259,13 @@ const Lend = ({ lendAmount }:ILendProps) => {
                     <Text color='text-weak' size='xsmall'>Wallet Dai balance</Text>
                     <Help />
                   </Box>
-                  <Text color='brand' weight='bold' size='medium'> {userData.daiBalance_?`${userData.daiBalance_.toFixed(2)} Dai`: '-'} </Text>
+                  <Text color='brand' weight='bold' size='medium'> {daiBalance_?`${daiBalance_.toFixed(2)} Dai`: '-'} </Text>
                 </Box>
               
               </Box>
 
               <Box fill direction='row-responsive' justify='between'>
-                {/* <Box gap='small'>
-                  <Box direction='row' gap='small'>
-                    <Text color='text-weak' size='xsmall'>Wallet Dai balance</Text>
-                    <Help />
-                  </Box>
-                  <Text color='brand' weight='bold' size='medium'> {userData.daiBalance_?`${userData.daiBalance_} Dai`: '-'} </Text>
-                </Box> */}
+                {/* next block */}
               </Box>
             </Box>
           </Box>

@@ -15,6 +15,7 @@ import {
 import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 import TxHistory from '../components/TxHistory';
+import { UserContext } from '../contexts/UserContext';
 
 
 interface DashLendProps {
@@ -25,24 +26,17 @@ interface DashLendProps {
 
 const DashLend = () => {
 
-  const [ addCollateral, setAddCollateral ] = React.useState<boolean>(false);
-  const [ borrowType, setBorrowType ] = React.useState<string>('yDai');
-
-  const { state: { deployedContracts, yieldData, userData }, actions } = React.useContext(YieldContext);
-
   const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
-  const { isLoading, seriesAggregates, activeSeries } = seriesState;
+  const { activeSeries } = seriesState; 
 
-  const txHistory = userData?.txHistory?.items || [];
-  const txHistory_ = txHistory.filter((x:any) => x.event==='Borrowed' ).map((x:any) => {
-    return {
-      event: x.args_[3]>0 ? 'Borrow' : 'Repay',
-      date: moment(x.date_).format('D MMM YYYY'),
-      amount: ethers.utils.formatEther( x.args_[3] ),
-    };
-  });
-
-  // console.log(userData?.txHistory?.seriesTxs);
+  const { state: userState, actions: userActions } = React.useContext(UserContext);
+  const { position } = userState;
+  const { 
+    debtValue_,
+    ethPosted_,
+    collateralPercent_,
+    ethBorrowingPower_: maximumDai
+  } = position;
 
   return (
     <Box gap='small' direction='row'>
@@ -92,14 +86,11 @@ const DashLend = () => {
             </Box>
             <Box>
               <Text alignSelf='start' size='xsmall' color='brand'>
-                {activeSeries.wethDebtDai_.toFixed(2)}
+                {activeSeries.ethDebtDai_.toFixed(2)}
               </Text>
             </Box>
-          </Box>}
-              
+          </Box>}           
         </Box>
-
-
       </Box>
 
       <Box gap='small'>

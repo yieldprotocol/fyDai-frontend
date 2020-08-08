@@ -1,6 +1,7 @@
 import React from 'react';
 import { ethers, BigNumber }  from 'ethers';
 import * as utils from '../utils';
+
 import { YieldContext } from '../contexts/YieldContext'; // TODO sort out this cyclic ref (not critical)
 
 /**
@@ -14,10 +15,17 @@ import { YieldContext } from '../contexts/YieldContext'; // TODO sort out this c
  */
 export const useMath = () => {
 
-  const { state } = React.useContext(YieldContext);
-  // const { ilks } = feedData;
-  const ethPosted = state?.userData?.ethPosted || BigNumber.from('0');
-  // const { seriesRates, seriesData } = React.useContext(SeriesContext);
+  const { state: { feedData, yieldData } } = React.useContext(YieldContext);
+
+  const [ethPosted, setEthPosted] = React.useState<any>(BigNumber.from('0'));
+  React.useEffect(()=>{
+    yieldData && setEthPosted(yieldData.ethPosted);
+  }, [yieldData]);
+
+  const [ilks, setIlks] = React.useState<any>();
+  React.useEffect(()=>{
+    feedData.ilks && setIlks(feedData.ilks);
+  }, [feedData]);
 
   /**
    * Gets the amount of collateral posted in Wei
@@ -33,17 +41,17 @@ export const useMath = () => {
    */
   const collPrice = (): BigNumber => {
     // TODO: Update this to use ETH-A Oracle - not ilks.spot for market price USD
-    console.log('ETH price:', ethers.utils.formatEther(utils.mulRay(utils.toWad(1.5), (state?.feedData?.ilks.spot)).toString()));
-    return utils.mulRay(utils.toRay(1.5), (state?.feedData?.ilks.spot));
+    console.log('ETH price:', ethers.utils.formatEther(utils.mulRay(utils.toWad(1.5), (ilks.spot)).toString()));
+    return utils.mulRay(utils.toRay(1.5), (ilks.spot));
   };
 
   /**
    * Calculates the total value of collateral at the current unit price
    * @returns {BigNumber} USD value (in wad/wei precision)
    */
-  const collValue = (): BigNumber => {
+  const collValue = (collateralPosted:BigNumber): BigNumber => {
     console.log('Collateral Value USD:', ethers.utils.formatEther( utils.mulRay(collAmount(), collPrice()) ) );
-    return utils.mulRay(collAmount(), collPrice());
+    return utils.mulRay(collateralPosted, collPrice());
   };
 
   /**

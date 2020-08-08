@@ -1,5 +1,5 @@
 import React from 'react';
-import { ethers } from 'ethers';
+import { ethers, BigNumber } from 'ethers';
 import moment from 'moment';
 
 import * as utils from '../utils';
@@ -35,6 +35,16 @@ function reducer(state: any, action: any) {
         ...state,
         balances: action.payload,
       };
+    case 'updatePosition':
+      return {
+        ...state,
+        position: action.payload,
+      };
+    case 'updateDelegations':
+      return {
+        ...state,
+        delegations: action.payload,
+      };
     case 'updateTxHistory':
       return {
         ...state,
@@ -57,11 +67,12 @@ function reducer(state: any, action: any) {
 
 const initState = {
   isLoading: true,
-  balances: {},
+  position: {},
   txHistory: {
     lastBlock: 0, 
-    items:{}
+    items:[],
   },
+  delegations:{},
   preferences:{},
   makerData:{},
 };
@@ -72,59 +83,125 @@ const UserProvider = ({ children }: any) => {
 
   const { dispatch: notifyDispatch } = React.useContext(NotifyContext);
   const { state: yieldState } = React.useContext(YieldContext);
-  const { deployedContracts, deployedSeries } = yieldState;
+  const { deployedContracts, deployedSeries, yieldData } = yieldState;
 
   const { account, provider } = useSignerAccount();
   const { chainId } = useWeb3React();
 
   /* cache|localStorage declarations */
-  const [txHistory, setTxHistory] = useCachedState('txHistory-new', null);
+  const [txHistory, setTxHistory] = useCachedState('txHistory', null);
   const [preferences, setPreferences] = useCachedState('userPreferences', null );
   
   /* hook declarations */
   const [ callTx ] = useCallTx();
   const { getEventHistory, addEventListener, parseEventList } = useEvents();
   const { getBalance } = useBalances();
-  const { collateralPosted } = useController();
-  const { yieldAPR } = useMath();
+  const { 
+    collateralPosted, 
+    collateralLocked,
+    totalDebtDai,
+    borrowingPower,
+  } = useController();
+
+  const {
+    collValue,
+    collPrice,
+    collRatio,
+    collPercent,
+    yieldAPR,
+    estCollRatio: estimateRatio,
+    minSafeColl,
+    daiAvailable,
+  } = useMath();
 
   /**
-   * @dev gets user balances from required tokens,and ETH native.
+   * @dev gets and updates yield positions {}
    */
-  const _getBalances = async () => {
-
-    const _balances: any = {};
+  const _getPosition = async () => {
 
     /* Get balances and posted collateral */
-    _balances.ethBalance = await getBalance();
-    _balances.daiBalance = await getBalance(deployedContracts.Dai, 'Dai');
-    _balances.ethPosted = await collateralPosted(deployedContracts.Controller, 'ETH-A');   
-    // _user.ethPosted = await callTx(
-    //   deployedContracts.Controller,
-    //   'Controller',
-    //   'posted',
-    //   [utils.ETH, account]
-    // );
-
-    // TODO test the promises below.
-    await Promise.all([
-      (_balances.ethBalance = await getBalance()), 
-      (_balances.daiBalance = await getBalance(deployedContracts.Dai, 'Dai')), 
-      (_balances.ethPosted = await collateralPosted(deployedContracts.Controller, 'ETH-A')),
+    const [ 
+      ethBalance, 
+      daiBalance, 
+      ethPosted, 
+      chaiPosted, 
+    ]:any[] = await Promise.all([
+      getBalance(), 
+      getBalance(deployedContracts.Dai, 'Dai'), 
+      collateralPosted(deployedContracts.Controller, 'ETH-A'),
+      collateralPosted(deployedContracts.Controller, 'CHAI'),
     ]);
-    
-    /* parse to human usable */
-    _balances.ethBalance_ = parseFloat(
-      ethers.utils.formatEther(_balances.ethBalance.toString())
-    );
-    _balances.daiBalance_ = parseFloat(
-      ethers.utils.formatEther(_balances.daiBalance.toString())
-    );
-    _balances.ethPosted_ = parseFloat(
-      ethers.utils.formatEther(_balances.ethPosted.toString())
-    );
 
-    dispatch({ type: 'updateBalances', payload: _balances });
+    const [
+      ethLocked, 
+      ethBorrowingPower, 
+      ethTotalDebtDai
+    ]:any[] = await Promise.all([
+      await collateralLocked(deployedContracts.Controller, 'ETH-A'),
+      await borrowingPower(deployedContracts.Controller, 'ETH-A'),
+      await totalDebtDai(deployedContracts.Controller, 'ETH-A'),
+    ]);
+
+    // const collateralAmount = collAmount();
+    const debtValue = ethTotalDebtDai; 
+    const collateralPrice = collPrice();
+    const collateralValue = collValue(ethPosted);
+    const collateralRatio = collRatio(collateralValue, ethTotalDebtDai);
+    const collateralPercent = collPercent(collateralRatio);
+    // const minSafeCollateral = minSafeColl( ethTotalDebtDai, 1.5, collateralPrice);
+    // const maxDaiAvailable = daiAvailable( collateralValue, ethTotalDebtDai, 1.5);
+
+    const values = {
+      ethBalance, 
+      daiBalance, 
+      ethPosted, 
+      chaiPosted,
+      ethLocked, 
+      ethBorrowingPower, 
+      ethTotalDebtDai,
+      debtValue,
+      collateralPrice,
+      collateralValue,
+      collateralRatio,
+      collateralPercent,
+      // minSafeCollateral,
+      // maxDaiAvailable,
+      // collateralAmount
+    };
+
+    const parsedValues = {
+      /* parse to human usable */
+      ethBalance_ : utils.wadToHuman(ethBalance),
+      daiBalance_ : utils.wadToHuman(daiBalance),
+      ethPosted_ : utils.wadToHuman(ethPosted),
+      chaiPosted_ : utils.wadToHuman(chaiPosted),
+      ethLocked_ : utils.wadToHuman(ethLocked),
+      ethBorrowingPower_ : utils.wadToHuman(ethBorrowingPower),
+      ethTotalDebtDai_ : utils.wadToHuman(ethTotalDebtDai),  
+      debtValue_ : utils.wadToHuman(ethTotalDebtDai),
+      collateralPrice_ : utils.wadToHuman(collateralPrice),
+      collateralValue_ : utils.wadToHuman(collateralValue),
+      collateralRatio_ : parseFloat(collateralRatio.toString()),
+      collateralPercent_ : parseFloat(collateralPercent.toString()),
+      // collateralAmount_ : utils.wadToHuman(collateralAmount),
+      // minSafeCollateral_ : utils.wadToHuman(minSafeCollateral),
+      // maxDaiAvailable_ : utils.wadToHuman(maxDaiAvailable),
+    };
+
+    console.log({ ...values, ...parsedValues } );
+
+    dispatch( { type: 'updatePosition', payload: { ...values, ...parsedValues } } );
+    return { ...values, ...parsedValues };
+  };
+
+  /**
+   * @dev gets confirmation of contracts that the user has delegated to operate on thier behalf.
+   */
+  const _getDelegations = async () => {
+    const _delegations:any={};
+    _delegations.ethProxy = await callTx( deployedContracts.Controller, 'Controller', 'delegated', [account, deployedContracts.EthProxy]);
+    dispatch( { type: 'updateDelegations', payload: _delegations });
+    return _delegations;
   };
 
 
@@ -132,7 +209,6 @@ const UserProvider = ({ children }: any) => {
    * @dev gets user balances from required tokens,and ETH native.
    */
   const _getTxHistory = async ( forceUpdate:boolean=false ) => {
-
     const _lastBlock = await provider.getBlockNumber();
 
     /* Get transaction history (from cache first or rebuild if an update is forced) */
@@ -233,25 +309,30 @@ const UserProvider = ({ children }: any) => {
     };
 
     setTxHistory(_payload);
-    dispatch({ type: 'updateTxHistory', payload: _payload });
-    
+    dispatch( { type: 'updateTxHistory', payload: _payload });
+    return _payload;    
   };
 
   /**
-   * @dev gets user balances from required tokens,and ETH native.
+   * @dev gets user Maker data if available.
    */
   const _getMakerData = async () => {
     const urn = await callTx(deployedContracts.Vat, 'Vat', 'urns', [ utils.ETH, account ]);
+    dispatch( { type: 'updateMakerData', payload: urn });
+    return {};
   };
 
+
   /**
-   * @dev gets user balances from required tokens,and ETH native.
+   * @dev gets preferences.
    */
   const _getPreferences = async () => {
     console.log('dont forget to add in the preferences' );
-    // TODO: use controller hook for this
-    const isEthProxyApproved = await callTx( deployedContracts.Controller, 'Controller', 'delegated', [account, deployedContracts.EthProxy]);
+
+    dispatch( { type: 'updatePreferences', payload: {} });
+    return {};
   };
+
 
   // /**
   //  * @dev gets user balances from required tokens,and ETH native.
@@ -307,33 +388,35 @@ const UserProvider = ({ children }: any) => {
   const initUserContext = async () => {
     /* Init start */
     dispatch({ type: 'isLoading', payload: true });
-
     // TODO: look at splitting these up cleverly, in particular makerData.
-    /* get all the bits */
     await Promise.all([
-      _getBalances(),
+      _getPosition(),
+      _getDelegations(),
       _getTxHistory(),
       _getPreferences(),
       _getMakerData(),
     ]);
+    console.log('userContext initiated');
     /* Init end */
     dispatch({ type: 'isLoading', payload: false });
   };
 
-  /* Init app and re-init app on any user and/or network change */
+  // React.useEffect(()=>{  
+  // },[])
+
+  /* Init user context and re-init on any user and/or network change */
   React.useEffect(() => {
-    chainId && deployedSeries.length && (async () => initUserContext())();
-  }, [ deployedSeries, chainId ]);
+    !yieldState.isLoading && (async () => initUserContext())();
+  }, [ chainId, account, yieldState.isLoading ]);
 
   const actions = {
-
-    refreshHistory: () => _getTxHistory(),
+    updateHistory: () => _getTxHistory(),
     rebuildHistory: () => _getTxHistory(true),
 
-    refreshBalances: () => console.log('blaances update'),
-    refreshMakerData: () => console.log('makerData update'),
+    updatePosition: () => _getPosition(),
 
-    refreshPreferences: () => console.log('makerData update'),
+    updateMakerData: () => console.log('makerData update'),
+    updatePreferences: () => console.log('makerData update'),
     resetPreferences: () => console.log('preferences reset'),
   };
 

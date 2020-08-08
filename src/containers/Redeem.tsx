@@ -8,20 +8,32 @@ import {
   FiSettings as SettingsGear,
 } from 'react-icons/fi';
 
+import { YieldContext } from '../contexts/YieldContext';
+import { SeriesContext } from '../contexts/SeriesContext';
+import { UserContext } from '../contexts/UserContext';
+
 import { IYieldSeries } from '../types';
 import ethLogo from '../assets/images/tokens/eth.svg';
 
-interface RedeemActionProps {
-  activeSeries?:IYieldSeries,
-  fixedOpen?:boolean,
+interface IRedeemProps {
   close?:any,
-  daiRate?: number,
-  ydaiAmount?: number,
 }
 
-const Redeem  = ({ close }:RedeemActionProps)  => {
+const Redeem  = ({ close }:IRedeemProps)  => {
 
   const [daiValue, setDaiValue] = React.useState<any>();
+
+  const { state: yieldState, actions: yieldActions } = React.useContext(YieldContext);
+  const { deployedContracts } = yieldState;
+
+  const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
+  const { isLoading, activeSeries } = seriesState;
+
+  const { state: userState, actions: userActions } = React.useContext(UserContext);
+  const {
+    daiBalance_,
+    ethBorrowingPower_: maximumDai
+  } = userState.position;
 
   return (
 
@@ -79,6 +91,8 @@ const Redeem  = ({ close }:RedeemActionProps)  => {
       </Box>
     </Box>
   );
-}
+};
+
+Redeem.defaultProps={ close:null };
 
 export default Redeem;

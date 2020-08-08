@@ -7,8 +7,9 @@ import {
 import { FaEthereum as Ethereum } from 'react-icons/fa';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
+import { UserContext } from '../contexts/UserContext';
 
-import { useProxy, useController, useToken } from '../hooks';
+import { useProxy, useController, useMath } from '../hooks';
 
 import { NotifyContext } from '../contexts/NotifyContext';
 import InlineAlert from '../components/InlineAlert';
@@ -16,47 +17,43 @@ import OnceOffAuthorize from '../components/OnceOffAuthorize';
 import ApprovalPending from '../components/ApprovalPending';
 import TransactionPending from '../components/TransactionPending';
 
-interface IWithDrawActionProps {
+interface IWithDrawProps {
   close?: any;
-
 }
 
-const WithdrawEth = ({ close }:IWithDrawActionProps) => {
+const WithdrawEth = ({ close }:IWithDrawProps) => {
 
-  const { state: yieldState, actions: yieldActions } = useContext(YieldContext);
-  const { deployedContracts, userData } = yieldState;
+  const { state: { deployedContracts }, actions: yieldActions } = useContext(YieldContext);
+
+  const { state: { delegations, position }, actions: userActions } = useContext(UserContext);
+  const {
+    ethBalance_,
+    ethPosted_,
+    ethLocked_,
+    collateralPercent_,
+    debtValue_,
+  } = position;
+
 
   const [ estRatio, setEstRatio ] = useState<any>();
   const [ estDecrease, setEstDecrease ] = useState<any>();
 
   const [ maxWithdraw, setMaxWithdraw ] = useState<number>(0);
   const [ inputValue, setInputValue ] = useState<any>();
-  const [ hasDelegated, setHasDelegated ] = useState<boolean>( userData.isEthProxyApproved || false);
+  const [ hasDelegated, setHasDelegated ] = useState<boolean>( delegations.ethProxy || false);
 
   const [ withdrawDisabled, setWithdrawDisabled ] = useState<boolean>(false);
   const [ indicatorColor, setIndicatorColor ] = useState<string>('brand');
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
 
-  const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
-  const { userData: { ethBalance_ } } = yieldState;
-  const { seriesAggregates } = seriesState;
-  const {
-    collateralAmount_,
-    minSafeCollateral_,
-    // collateralRatio_,
-    collateralPercent_,
-    debtValue_,
-    estimateRatio, // TODO << this is a function (basically just passed from hooks via context) >> 
-  } = seriesAggregates;
-
   const { withdrawEth, withdrawEthActive }  = useProxy();
-  const { addControllerDelegate, checkControllerDelegate }  = useController();
-  const { approveToken, approveActive } = useToken();
+  const { addControllerDelegate, checkControllerDelegate } = useController();
+  const { estCollRatio: estimateRatio } = useMath();
 
   const withdrawProcedure = async (value:number) => {
     await withdrawEth(deployedContracts.EthProxy, value);
-    yieldActions.updateUserData();
+    userActions.updatePosition();
     close();
   };
 
@@ -75,8 +72,8 @@ const WithdrawEth = ({ close }:IWithDrawActionProps) => {
   }, [ pendingTxs ]);
 
   useEffect(()=>{
-    setMaxWithdraw(collateralAmount_- minSafeCollateral_);
-  }, [collateralAmount_, minSafeCollateral_]);
+    setMaxWithdraw(ethPosted_ - ethLocked_);
+  }, [ethPosted_, ethLocked_]);
 
   /* show warnings and errors with collateralisation ratio levels */
   useEffect(()=>{
@@ -105,12 +102,13 @@ const WithdrawEth = ({ close }:IWithDrawActionProps) => {
     } else { 
       setWithdrawDisabled(false);
     }
-
-    if ( (collateralAmount_ > inputValue) && inputValue && debtValue_) {
-      const newRatio = estimateRatio((collateralAmount_- parseFloat(inputValue)), debtValue_); 
-      setEstRatio(newRatio.toFixed(2));
-      const newDecrease = collateralPercent_ - newRatio ;
-      setEstDecrease(newDecrease.toFixed(2));
+    if ( (ethPosted_ > inputValue) && inputValue && debtValue_) {
+      const newRatio = estimateRatio((ethPosted_- parseFloat(inputValue)), debtValue_); 
+      if (newRatio) {
+        setEstRatio(newRatio.toFixed(2));
+        const newDecrease = collateralPercent_ - newRatio ;
+        setEstDecrease(newDecrease.toFixed(2));
+      }
     }
   }, [ inputValue ]);
 
@@ -195,7 +193,7 @@ const WithdrawEth = ({ close }:IWithDrawActionProps) => {
                   weight='bold'
                   size='medium'
                   onClick={()=>setInputValue(maxWithdraw)}
-                > {collateralAmount_? `${maxWithdraw.toFixed(2)} Eth` : '-' }
+                > {ethPosted_ ? `${maxWithdraw.toFixed(2)} Eth` : '-' }
                 </Text>
               </Box>
             </Box>
@@ -256,5 +254,7 @@ const WithdrawEth = ({ close }:IWithDrawActionProps) => {
     </Layer>
   );
 };
+
+WithdrawEth.defaultProps={ close:null };
 
 export default WithdrawEth;

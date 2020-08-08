@@ -63,3 +63,9 @@ export const rayToHuman = (x:BigNumber) => {
   // const unit = BigNumber.from('10').pow(BigNumber.from('27'));
   return divRay(x, RAY).toString();
 };
+
+// @dev Takes a bignumber in WEI, WAD or the like and converts it to human.
+// @return {number}
+export const wadToHuman = (x:BigNumber) => {
+  return parseFloat( ethers.utils.formatEther(x) );
+};

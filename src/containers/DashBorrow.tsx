@@ -13,6 +13,8 @@ import {
 
 import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
+import { UserContext } from '../contexts/UserContext';
+
 import DepositAction from './Deposit';
 
 import TxHistory from '../components/TxHistory';
@@ -27,33 +29,17 @@ const DashBorrow = ({ }:DashBorrowProps) => {
 
   const [ addCollateral, setAddCollateral ] = React.useState<boolean>(false);
 
-  const [ txHistory, setTxHistory] = React.useState<any>([]);
-
-  const { state: { deployedSeries, deployedContracts, yieldData, userData }, actions } = React.useContext(YieldContext);
-
   const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
-  const { isLoading, seriesAggregates, activeSeries } = seriesState;
-  const {
-    maxDaiAvailable_,
-    // estimateRatio,
-    debtValue_,
-    collateralValue_,
-    collateralAmount_,
-    collateralRatio_,
-    collateralPercent_,
-  } = seriesAggregates;
+  const { activeSeries } = seriesState; 
 
-  React.useEffect(()=> {
-    const _txHist = userData?.txHistory?.items || [];
-    const txHist = _txHist.filter((x:any) => x.event==='Borrowed' ).map((x:any) => {
-      return {
-        event: x.args_[3]>0 ? 'Borrow' : 'Repay',
-        date: moment(x.date_).format('D MMM YYYY'),
-        amount: ethers.utils.formatEther( x.args_[3] ),
-      };
-    });
-    setTxHistory(txHist);
-  }, [ userData ]);
+  const { state: userState, actions: userActions } = React.useContext(UserContext);
+  const { position } = userState;
+  const { 
+    debtValue_,
+    ethPosted_,
+    collateralPercent_,
+    ethBorrowingPower_: maximumDai
+  } = position;
 
   return (
     <Box gap='small'>
@@ -86,7 +72,7 @@ const DashBorrow = ({ }:DashBorrowProps) => {
         >
           <Box gap='small'>
             <Text color='text-weak' size='xxsmall'> Collateral </Text>
-            <Text color='brand' weight='bold' size='large'> { collateralAmount_? `${collateralAmount_.toFixed(2)} Eth`: '' }</Text>
+            <Text color='brand' weight='bold' size='large'> { ethPosted_? `${ethPosted_.toFixed(2)} Eth`: '' }</Text>
           </Box>
 
           <Box gap='small'>
@@ -165,14 +151,12 @@ const DashBorrow = ({ }:DashBorrowProps) => {
                 </Box>
                 <Box>
                   <Text alignSelf='start' size='xsmall' color='brand'>
-                    {activeSeries.wethDebtDai_.toFixed(2)}
+                    {activeSeries.ethDebtDai_.toFixed(2)}
                   </Text>
                 </Box>
               </Box>}
-
             </Box>
           </Box>
-
         </Box>
 
         <Box basis='2/3' fill gap='small'>

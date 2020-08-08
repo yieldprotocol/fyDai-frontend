@@ -1,5 +1,5 @@
 import React from 'react';
-import { ethers }  from 'ethers';
+import { ethers, BigNumber }  from 'ethers';
 import { useWeb3React } from '@web3-react/core';
 
 import { NotifyContext } from '../contexts/NotifyContext';
@@ -321,7 +321,7 @@ export const useController = () => {
   const collateralPosted = async (
     controllerAddress:string,
     collateralType:string
-  ): Promise<boolean> => {
+  ): Promise<BigNumber> => {
     const accAddr = account && ethers.utils.getAddress(account);
     const collType = ethers.utils.formatBytes32String(collateralType);
     const controllerAddr = ethers.utils.getAddress(controllerAddress);
@@ -336,14 +336,139 @@ export const useController = () => {
     return res;
   };
 
+
+  /**
+   * Gets the amount of collateral locked in borrowing operations.
+   * 
+   * Call function no gas
+   * 
+   * @param {string} controllerAddress address of the controller.
+   * @param {string} collateralType collateral type to check (eg. ETH-A)
+   * 
+   * @returns {BigNumber} amount collateral depositied (in Wei)
+   */
+  const collateralLocked = async (
+    controllerAddress:string,
+    collateralType:string
+  ): Promise<BigNumber> => {
+    const accAddr = account && ethers.utils.getAddress(account);
+    const collType = ethers.utils.formatBytes32String(collateralType);
+    const controllerAddr = ethers.utils.getAddress(controllerAddress);
+    const contract = new ethers.Contract( controllerAddr, controllerAbi, provider);
+    let res;
+    try {
+      res = await contract.locked(collType, accAddr );
+    }  catch (e) {
+      console.log(e);
+      res = false;
+    }
+    return res;
+  };
+
+  /**
+   * Borrowing power (in dai) of a user for a specific series and collateral
+   * 
+   * Call function no gas
+   * 
+   * @param {string} controllerAddress address of the controller.
+   * @param {string} collateralType collateral type to check (eg. ETH-A)
+   * 
+   * @returns {BigNumber} amount Dai (in Wei)
+   */
+  const borrowingPower = async (
+    controllerAddress:string,
+    collateralType:string
+  ): Promise<BigNumber> => {
+    const accAddr = account && ethers.utils.getAddress(account);
+    const collType = ethers.utils.formatBytes32String(collateralType);
+    const controllerAddr = ethers.utils.getAddress(controllerAddress);
+    const contract = new ethers.Contract( controllerAddr, controllerAbi, provider);
+    let res;
+    try {
+      res = await contract.powerOf(collType, accAddr);
+    }  catch (e) {
+      console.log(e);
+      res = false;
+    }
+    return res;
+  };
+
+  /**
+   *  Dai debt of a series
+   *  
+   * After maturity, the Dai debt of a position grows according to either the stability fee (for WETH collateral) or the Dai Saving Rate (for Chai collateral).
+   * 
+   * Call function no gas
+   * 
+   * @param {string} controllerAddress address of the controller.
+   * @param {string} collateralType collateral type to check (eg. ETH-A)
+   *  @param maturity Maturity of an added series
+   * 
+   * @returns {BigNumber} amount Dai (in Wei)
+   */
+  const debtDai = async (
+    controllerAddress:string,
+    collateralType:string,
+    maturity:number,
+  ): Promise<BigNumber> => {
+    const accAddr = account && ethers.utils.getAddress(account);
+    const collType = ethers.utils.formatBytes32String(collateralType);
+    const controllerAddr = ethers.utils.getAddress(controllerAddress);
+    const contract = new ethers.Contract( controllerAddr, controllerAbi, provider);
+    let res;
+    try {
+      res = await contract.debtDai(collType,  maturity, accAddr);
+    }  catch (e) {
+      console.log(e);
+      res = false;
+    }
+    return res;
+  };
+
+
+  /**
+   * Total debt of an user across all series, in Dai
+   * 
+   * Call function no gas
+   * 
+   * @param {string} controllerAddress address of the controller.
+   * @param {string} collateralType collateral type to check (eg. ETH-A)
+   * 
+   * @returns {BigNumber} amount Dai (in Wei)
+   */
+  const totalDebtDai = async (
+    controllerAddress:string,
+    collateralType:string
+  ): Promise<BigNumber> => {
+    const accAddr = account && ethers.utils.getAddress(account);
+    const collType = ethers.utils.formatBytes32String(collateralType);
+    const controllerAddr = ethers.utils.getAddress(controllerAddress);
+    const contract = new ethers.Contract( controllerAddr, controllerAbi, provider);
+    let res;
+    try {
+      res = await contract.totalDebtDai(collType, accAddr);
+    }  catch (e) {
+      console.log(e);
+      res = false;
+    }
+    return res;
+  };
+
   return {
     post, postActive,
     withdraw, withdrawActive,
     borrow, borrowActive,
     repay, repayActive,
+
     approveController, approveActive, // TODO remove this if not used
     addControllerDelegate,
     checkControllerDelegate,
+   
     collateralPosted,
+    collateralLocked,
+    borrowingPower,
+    totalDebtDai,
+    debtDai, 
+
   } as const;
 };
