@@ -3,12 +3,27 @@ import React from 'react';
 import { UnsupportedChainIdError } from '@web3-react/core';
 import {
   NoEthereumProviderError,
-  UserRejectedRequestError as UserRejectedRequestErrorInjected
+  UserRejectedRequestError as UserRejectedRequestErrorInjected,
 } from '@web3-react/injected-connector';
 
-import { Anchor, Grommet, grommet, Grid, Layer, Main, Image, Header, Heading, Footer, Button, Box, Avatar, Text, CheckBox, ThemeContext, Paragraph } from 'grommet';
-import { useEagerConnect, useInactiveListener, useWeb3React } from '../../hooks';
-
+import {
+  Anchor,
+  Layer,
+  Image,
+  Header,
+  Heading,
+  Footer,
+  Button,
+  Box,
+  Text,
+  ResponsiveContext,
+  Paragraph,
+} from 'grommet';
+import {
+  useEagerConnect,
+  useInactiveListener,
+  useWeb3React,
+} from '../../hooks';
 
 import { injected, trezor, walletlink, torus, ledger } from '../../connectors';
 
@@ -21,9 +36,11 @@ import torusImage from '../../assets/images/providers/torus.png';
 function getErrorMessage(error: Error) {
   if (error instanceof NoEthereumProviderError) {
     return 'No Ethereum browser extension detected, install MetaMask on desktop or visit from a dApp browser on mobile.';
-  } if (error instanceof UnsupportedChainIdError) {
+  }
+  if (error instanceof UnsupportedChainIdError) {
     return "You're connected to an unsupported network.";
-  } if (
+  }
+  if (
     error instanceof UserRejectedRequestErrorInjected // ||
     // error instanceof UserRejectedRequestErrorWalletConnect ||
     // error instanceof UserRejectedRequestErrorFrame
@@ -34,7 +51,9 @@ function getErrorMessage(error: Error) {
   return 'An unknown error occurred. Check the console for more details.';
 }
 
-const ConnectLayer = (props:any) => {
+const ConnectLayer = (props: any) => {
+  const screenSize = React.useContext(ResponsiveContext);
+
   const { connector, activate } = useWeb3React();
   const { open, closeLayer } = props;
 
@@ -47,74 +66,99 @@ const ConnectLayer = (props:any) => {
   }, [activatingConnector, connector]);
   const triedEager = useEagerConnect();
   useInactiveListener(!triedEager || !!activatingConnector);
-  const handleSelectConnector = async (_connection:any) => {
-    await activate(_connection, console.log );
+  const handleSelectConnector = async (_connection: any) => {
+    await activate(_connection, console.log);
     closeLayer();
   };
 
   const connectorList = [
-    { name:'Metamask', image:metamaskImage, connection:injected },
-    { name:'Tezor', image:trezorImage, connection:trezor },
-    { name:'Torus', image:torusImage, connection:torus },
-    { name:'Walletlink', image:walletlinkImage, connection:walletlink },
-    { name:'ledger', image:walletlinkImage, connection:ledger }
+    { name: 'Metamask', image: metamaskImage, connection: injected },
+    { name: 'Tezor', image: trezorImage, connection: trezor },
+    { name: 'Torus', image: torusImage, connection: torus },
+    { name: 'Walletlink', image: walletlinkImage, connection: walletlink },
+    { name: 'Ledger', image: walletlinkImage, connection: ledger },
   ];
 
   return (
     <>
-      { open && 
-      <Layer animation='slide' position='right' full="vertical">
-        <Box 
-          direction='column'
-          fill='vertical'
-          background='background-front'
-         // alignContent='center'
-          style={{ minWidth: '240px' }}
+      {open && (
+        <Layer
+          onClickOutside={() => closeLayer(true)}
+          animation="slide"
+          onEsc={() => closeLayer(true)}
         >
-          <Header 
-            round={{ corner:'bottom', size:'medium' }}
-            fill='horizontal'
-            background='background-mid'
-            pad={{ horizontal: 'medium', vertical:'large' }}
+          <Box
+            background="background-front"
+            direction="column"
+            fill="vertical"
+            style={{
+              borderRadius: '0.5rem',
+              padding: '2rem',
+            }}
           >
-            {/* <Heading level='4' >Connect to a Wallet</Heading> */}
-            <Box 
-              round='xlarge'
-              border={{ color: 'brand' }}
-              pad={{ horizontal: 'medium', vertical:'xsmall' }}
-            >
-              <Text>Connect to a Wallet</Text>
+            <Header fill="horizontal" gap="medium">
+              <Heading
+                level="2"
+                style={{
+                  textAlign: 'center',
+                  margin: 'auto',
+                }}
+              >
+                Connect to a Wallet
+              </Heading>
+            </Header>
+            <Box align="center" pad="medium" gap="small">
+              <Paragraph>Try connecting with:</Paragraph>
+              {connectorList.map((x) => (
+                <Button
+                  hoverIndicator="border"
+                  onClick={() => handleSelectConnector(x.connection)}
+                  label={x.name}
+                  color="border"
+                  fill="horizontal"
+                  icon={
+                    <Box
+                      height="1rem"
+                      width="1rem"
+                      style={{
+                        position: 'absolute',
+                        left: '1rem',
+                      }}
+                    >
+                      <Image src={x.image} fit="contain" />
+                    </Box>
+                  }
+                  style={{
+                    marginBottom: '1rem',
+                    fontWeight: 500,
+                    position: 'relative',
+                    padding: '0.5rem',
+                  }}
+                  key={x.name}
+                />
+              ))}
             </Box>
-            <Anchor color='brand' onClick={()=>closeLayer()} size='xsmall' label='Cancel' />
-          </Header>
-          <Box 
-            align='center'
-            pad='medium'
-            gap='small'
-          >
-            <Paragraph>Try connecting with:</Paragraph>
-            {connectorList.map((x) => (
-              <Button 
-                fill='horizontal'
-                color="border"
-                hoverIndicator="border"
-                key={x.name}
-                icon={<Box height="15px" width="15px"><Image src={x.image} fit='contain' /></Box>}
-                label={x.name}
-                onClick={() => handleSelectConnector(x.connection)}
-              />
-            ))}
+            <Footer direction="column" pad="medium">
+              <Box gap="xsmall" direction="row">
+                <Anchor href="#" label="Help!" size="xsmall" color="brand" />
+                <Text size="xsmall"> I'm not sure what this means.</Text>
+              </Box>
+              <Box direction="row">
+                <Button
+                  label="Close"
+                  fill="horizontal"
+                  color="border"
+                  style={{
+                    fontWeight: 600,
+                    height: screenSize === 'small' ? '2.25rem' : 'auto',
+                  }}
+                  onClick={() => closeLayer()}
+                />
+              </Box>
+            </Footer>
           </Box>
-          <Footer
-            pad='medium'
-          >
-            <Box gap='xsmall' direction='row'>
-              <Anchor href="#" label="help!" size='xsmall' color='brand' />
-              <Text size='xsmall'> I'm not sure what this means.</Text>
-            </Box>
-          </Footer>
-        </Box>
-      </Layer>}
+        </Layer>
+      )}
     </>
   );
 };
