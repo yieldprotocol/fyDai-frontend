@@ -1,8 +1,8 @@
 import React from 'react';
 import { ethers, BigNumber }  from 'ethers';
 import * as utils from '../utils';
-import { YieldContext } from '../contexts/YieldContext'; // TODO sort out this cyclic ref (not critical)
 
+import { YieldContext } from '../contexts/YieldContext'; // TODO sort out this cyclic ref (not critical)
 
 /**
  * Hook for Yield maths functions
@@ -15,10 +15,17 @@ import { YieldContext } from '../contexts/YieldContext'; // TODO sort out this c
  */
 export const useMath = () => {
 
-  const { state: { feedData, userData } } = React.useContext(YieldContext);
-  const { ilks } = feedData;
-  const ethPosted = userData?.ethPosted || BigNumber.from('0');
-  // const { seriesRates, seriesData } = React.useContext(SeriesContext);
+  const { state: { feedData, yieldData } } = React.useContext(YieldContext);
+
+  const [ethPosted, setEthPosted] = React.useState<any>(BigNumber.from('0'));
+  React.useEffect(()=>{
+    yieldData && setEthPosted(yieldData.ethPosted);
+  }, [yieldData]);
+
+  const [ilks, setIlks] = React.useState<any>();
+  React.useEffect(()=>{
+    feedData.ilks && setIlks(feedData.ilks);
+  }, [feedData]);
 
   /**
    * Gets the amount of collateral posted in Wei
@@ -42,9 +49,9 @@ export const useMath = () => {
    * Calculates the total value of collateral at the current unit price
    * @returns {BigNumber} USD value (in wad/wei precision)
    */
-  const collValue = (): BigNumber => {
+  const collValue = (collateralPosted:BigNumber): BigNumber => {
     console.log('Collateral Value USD:', ethers.utils.formatEther( utils.mulRay(collAmount(), collPrice()) ) );
-    return utils.mulRay(collAmount(), collPrice());
+    return utils.mulRay(collateralPosted, collPrice());
   };
 
   /**
@@ -167,16 +174,23 @@ export const useMath = () => {
    * @param { BigNumber } _rate // current [Dai] price per unit y[Dai].
    * @param { BigNumber } _return // y[Dai] amount/price at maturity.
    * @param { number } _maturity  // date of maturity 
+   * @param { number } _fromDate // ***optional*** start date - defaults to now(). 
+   * 
    * @returns { number }
    */
-  const yieldAPR =(_rate: BigNumber, _return: BigNumber, _maturity:number)=> {
-    const secsToMaturity = _maturity - (Math.round(new Date().getTime() / 1000));
+  const yieldAPR =(
+    _rate: BigNumber,
+    _return: BigNumber,
+    _maturity:number,
+    _fromDate:number= (Math.round(new Date().getTime() / 1000)), // if not provided, defaults to current time.
+  )=> {
+    const secsToMaturity = _maturity - _fromDate;
     const propOfYear = secsToMaturity/utils.SECONDS_PER_YEAR;
 
     const priceRatio = parseFloat(ethers.utils.formatEther(_return)) / parseFloat(ethers.utils.formatEther(_rate));
     const powRatio = 1 / propOfYear;
     const apr = Math.pow(priceRatio, powRatio) - 1;
-    // console.log('series:', _maturity, 'APR:', apr);
+
     return apr;
   };
 

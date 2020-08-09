@@ -19,6 +19,8 @@ import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { NotifyContext } from '../contexts/NotifyContext';
 
+import { UserContext } from '../contexts/UserContext';
+
 import { useController, usePool, useYDai, useMath, useProxy, useTxActive, useToken } from '../hooks';
 
 interface IBorrowProps {
@@ -31,8 +33,11 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
   const { deployedContracts } = yieldState;
 
   const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
-  const { isLoading, seriesAggregates, seriesRates, activeSeries } = seriesState; 
-  const { maxDaiAvailable_ } = seriesAggregates;
+  const { activeSeries } = seriesState; 
+
+  const { state: userState, actions: userActions } = React.useContext(UserContext);
+  const { position } = userState;
+  const { ethBorrowingPower_: maximumDai } = position;
 
   const theme:any = React.useContext(ThemeContext);
 
@@ -45,7 +50,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
 
   const { 
     previewPoolTx,
-    addPoolDelegate, //
+    addPoolDelegate,
     checkPoolDelegate
   }  = usePool();
 
@@ -63,7 +68,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
   const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
 
   /* flags */ 
-  const [ hasDelegated, setHasDelegated] = React.useState<boolean>(activeSeries?.hasDelegated || true);
+  const [ hasDelegated, setHasDelegated] = React.useState<boolean>(activeSeries?.hasDelegatedController || true);
   const [ borrowPending, setBorrowPending ] = React.useState<boolean>(false);
 
   /* token balances and values */
@@ -82,8 +87,8 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
     autoSell && await borrowUsingExactDai( activeSeries.daiProxyAddress, 'ETH-A', activeSeries.maturity, yDaiValue, value);
     !autoSell && await borrow(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value);
     setInputValue('');
-    await yieldActions.updateUserData();
-    await seriesActions.refreshPositions([ activeSeries ]);
+    await userActions.updatePosition();
+    await seriesActions.updateActiveSeries();
     setBorrowPending(false);
   };
 
@@ -156,11 +161,11 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
 
   /* Handle input execption logic */
   useEffect(() => {
-    if ( inputValue && ( inputValue > maxDaiAvailable_ ) ) {
-      console.log(inputValue, maxDaiAvailable_);
+    if ( inputValue && ( inputValue > maximumDai ) ) {
+      console.log(inputValue, maximumDai);
       setWarningMsg(null);
       setErrorMsg('That amount exceeds the amount of yDai you can borrow based on your collateral'); 
-    } else if (inputValue && ( inputValue > Math.round(maxDaiAvailable_-1) ) ) {
+    } else if (inputValue && ( inputValue > Math.round(maximumDai-1) ) ) {
       setErrorMsg(null);
       setWarningMsg('If you borrow right up to your maximum allowance, there is high probability you will be liquidated soon!');
     } else {
@@ -185,6 +190,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
 
 
   useEffect(() => {
+    console.log(activeSeries);
     activeSeries && ( async ()=>{
       // TODO split out advanced approval settings for optimization
       const approvedAmount = await userAllowance(activeSeries.yDaiAddress, activeSeries.poolAddress);
@@ -255,7 +261,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
                   <ScaleLoader color={theme?.global?.colors['brand-transparent'].dark} height='13' /> 
                   :
                   <Text color='brand' weight='bold' size='medium'> 
-                    {activeSeries?.wethDebtDai_? `${activeSeries.wethDebtDai_.toFixed(2)} Dai`: ''}
+                    {activeSeries?.ethDebtDai_? `${activeSeries.ethDebtDai_.toFixed(2)} Dai`: ''}
                   </Text>}
                 {/* <Text color='brand' weight='bold' size='medium'> {activeSeries?.wethDebtDai_? `${activeSeries.wethDebtDai_.toFixed(2)} Dai`: ''}  </Text> */}
               </Box>
@@ -267,8 +273,8 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
                 <Help />
               </Box>
               <Box direction='row' gap='small'>
-                <Text color={maxDaiAvailable_? 'brand': 'brand-transparent'} size='xxsmall'>approx.</Text>
-                <Text color='brand' weight='bold' size='medium'> {maxDaiAvailable_? `${maxDaiAvailable_.toFixed(2)} Dai`: ''}  </Text>
+                <Text color={maximumDai? 'brand': 'brand-transparent'} size='xxsmall'>approx.</Text>
+                <Text color='brand' weight='bold' size='medium'> {maximumDai? `${maximumDai.toFixed(2)} Dai`: ''}  </Text>
               </Box>
             </Box>
             

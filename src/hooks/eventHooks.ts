@@ -91,6 +91,7 @@ export const useEvents = () => {
       const { timestamp } = await provider.getBlock(x.blockNumber);
       return {
         ...x,
+        date: timestamp,
         date_: new Date(timestamp*1000),
         args_: x.args.map((y:any)=>{
           if (ethers.BigNumber.isBigNumber(y)) {

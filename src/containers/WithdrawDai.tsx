@@ -9,14 +9,19 @@ import { FaEthereum as Ethereum } from 'react-icons/fa';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
 import { usePool, useYDai, useToken } from '../hooks';
+import { UserContext } from '../contexts/UserContext';
 
-interface WithDrawDaiProps {
+interface IWithDrawDaiProps {
   close?: any;
-  withdraw?: any;
-  maxValue?: number;
 }
 
-const WithdrawDai = ({ close }:WithDrawDaiProps) => {
+const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
+
+  const { state: yieldState, actions: yieldActions } = useContext(YieldContext);
+  const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
+  const { activeSeries  } = seriesState;
+
+  const { state: userState, actions: userActions } = useContext(UserContext);
 
   const [ maxWithdraw, setMaxWithdraw ] = useState<number>(0);
   const [ inputValue, setInputValue ] = useState<any>();
@@ -31,21 +36,6 @@ const WithdrawDai = ({ close }:WithDrawDaiProps) => {
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
 
-  const { state: yieldState, actions: yieldActions } = useContext(YieldContext);
-  const { deployedContracts } = yieldState;
-
-  const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
-
-  const { userData: { ethBalance_ } } = yieldState;
-  const { seriesAggregates, activeSeries  } = seriesState;
-  const {
-    collateralAmount_,
-    minSafeCollateral_,
-    collateralRatio_,
-    debtValue_,
-    estimateRatio, // TODO << this is a function (basically just passed from hooks via context) >> 
-  } = seriesAggregates;
-
   const { buyDai, previewPoolTx }  = usePool();
   const { userAllowance } = useYDai();
   const { approveToken, approveActive } = useToken();
@@ -56,8 +46,8 @@ const WithdrawDai = ({ close }:WithDrawDaiProps) => {
       inputValue,
       0 // transaction queue value
     );
-    await yieldActions.updateUserData();
-    await seriesActions.refreshPositions([activeSeries]);
+    await userActions.updatePosition();
+    await seriesActions.updateActiveSeries();
     close();
   };
 
@@ -228,5 +218,7 @@ const WithdrawDai = ({ close }:WithDrawDaiProps) => {
     </Layer>
   );
 };
+
+WithdrawDai.defaultProps={ close:null };
 
 export default WithdrawDai;

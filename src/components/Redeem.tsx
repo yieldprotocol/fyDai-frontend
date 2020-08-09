@@ -8,6 +8,7 @@ import WithdrawAction from '../containers/WithdrawEth';
 
 import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
+import { UserContext } from '../contexts/UserContext';
 
 import { useController, useBalances } from '../hooks';
 import RedeemAction from '../containers/Redeem';
@@ -19,9 +20,11 @@ const Redeem = ({ activeSeries }:any) => {
   const [taskView, setTaskView] = React.useState<string>('TIMER');
   const [ ethBalance, setEthBalance ] = React.useState<number>(0);
   const [ ethPosted, setEthPosted ] = React.useState<number>(0);
-  const { state, dispatch } = React.useContext(YieldContext);
 
-  const { deployedContracts, yieldData, userData } = state; 
+  const { state } = React.useContext(YieldContext);
+  const { state: { balances }, actions : userActions } = React.useContext(UserContext);
+
+  const { deployedContracts, yieldData } = state;
 
   const {
     approveController,
@@ -33,7 +36,7 @@ const Redeem = ({ activeSeries }:any) => {
 
   React.useEffect(()=>{
     // (async () => setWethBalance( await getWethBalance(deployedContracts.Weth)) )();
-    (async () => setEthPosted(userData.ethPosted_) )();
+    (async () => setEthPosted(balances.ethPosted_) )();
   }, []);
 
   // const depositSteps = async (value:number) => {

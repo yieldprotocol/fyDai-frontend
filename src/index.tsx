@@ -9,6 +9,7 @@ import * as serviceWorker from './serviceWorker';
 
 import { NotifyProvider }  from './contexts/NotifyContext';
 import { YieldProvider }  from './contexts/YieldContext';
+import { UserProvider }  from './contexts/UserContext';
 import { SeriesProvider }  from './contexts/SeriesContext';
 
 function getLibrary(provider: any) {
@@ -22,9 +23,11 @@ ReactDOM.render(
     <Web3ReactProvider getLibrary={getLibrary}> 
       <NotifyProvider>
         <YieldProvider>
-          <SeriesProvider>
-            <App />
-          </SeriesProvider>
+          <UserProvider>
+            <SeriesProvider>
+              <App />
+            </SeriesProvider>
+          </UserProvider>
         </YieldProvider>
       </NotifyProvider>
     </Web3ReactProvider>

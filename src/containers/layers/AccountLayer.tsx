@@ -3,16 +3,14 @@ import { Anchor, Layer, Header, Footer, Button, Box, Text } from 'grommet';
 
 import ProfileButton from '../../components/ProfileButton';
 
-import { YieldContext } from '../../contexts/YieldContext';
+import { UserContext } from '../../contexts/UserContext';
 import { useWeb3React } from '../../hooks';
 
 const AccountLayer = (props:any) => {
   const { closeLayer, changeWallet } = props;
+  const { state: { balances } } = React.useContext(UserContext);
 
   const { library } = useWeb3React();
-
-  // const { state: { chainId }  } = React.useContext(ConnectionContext);
-  const { state: { userData } } = React.useContext(YieldContext);
   
   const onClose = () => {
     closeLayer();
@@ -55,7 +53,7 @@ const AccountLayer = (props:any) => {
           <Text weight="bold"> { library.network.name } </Text>
           <Box direction='row' gap='small'>
             <Text size='xsmall'>ETH balance:</Text>
-            <Text>{ userData.ethBalance_ && userData.ethBalance_ || '' }</Text>
+            <Text>{ balances.ethBalance_ && balances.ethBalance_ || '' }</Text>
           </Box>
           {/* <Button fill='horizontal' label='Connect to another wallet' onClick={()=>setShowConnectLayer(true)} /> */}
         </Box>

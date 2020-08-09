@@ -24,9 +24,9 @@ import TransactionPending from '../components/TransactionPending';
 
 import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
+import { UserContext } from '../contexts/UserContext';
 
-
-import { useProxy, useTxActive } from '../hooks';
+import { useProxy, useTxActive, useMath } from '../hooks';
 
 interface DepositProps {
   /* deposit amount prop is for quick linking into component */
@@ -48,37 +48,39 @@ const Deposit = ({ depositAmount }:DepositProps) => {
 
   const { state: yieldState, actions: yieldActions } = useContext(YieldContext);
   const {  deployedContracts } = yieldState;
+
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
-  const { isLoading, seriesAggregates } = seriesState;
+
+  const { state: userState, actions: userActions } = useContext(UserContext);
   const {
     ethBalance_,
-    collateralAmount_,
-    collateralRatio_,
+    ethPosted_,
     collateralPercent_,
     debtValue_,
-    estimateRatio, // TODO << this is a function (basically just passed from hooks via context) >> 
-  } = seriesAggregates || {};
+  } = userState.position;
+
   const theme:any = useContext(ThemeContext);
 
   const { postEth, postEthActive }  = useProxy();
+  const { estCollRatio: estimateRatio } = useMath();
   const [ txActive ] = useTxActive(['Deposit']);
 
   /* Steps required to deposit and update values */
   const depositProcedure = async (value:number) => {
     setDepositPending(true);
     await postEth(deployedContracts.EthProxy, value);
-    await yieldActions.updateUserData();
+
+    await userActions.updatePosition();
     setInputValue('');
     setDepositPending(false);
   };
 
   /* Handle input value changes (warnings errors etc.) */
   useEffect(()=>{
-
     /* 1. Adjust estimated ratio based on input changes */
-    if (inputValue && collateralAmount_ && debtValue_) {
-      const newRatio = estimateRatio((collateralAmount_+ parseFloat(inputValue)), debtValue_); 
-      setEstRatio(newRatio.toFixed(0));
+    if (inputValue && ethPosted_ && debtValue_) {
+      const newRatio = estimateRatio((ethPosted_+ parseFloat(inputValue)), debtValue_); 
+      newRatio && setEstRatio(newRatio.toFixed(0));
     }
 
     /* 2. Input errors and warnings */
@@ -152,14 +154,14 @@ const Deposit = ({ depositAmount }:DepositProps) => {
         <Box fill direction='row-responsive' justify='evenly'>
           <Box gap='small'>
             <Text color='text-weak' size='xsmall'>Current Collateral</Text>
-            { isLoading || collateralAmount_ === undefined || depositPending ?           
+            { depositPending ?    
               <ScaleLoader color={theme?.global?.colors['brand-transparent'].dark} height='13' /> 
               :
-              <Text color='brand' weight='bold' size='medium'> { collateralAmount_ ? 
-                `${collateralAmount_.toFixed(4)} Eth` 
+              <Text color='brand' weight='bold' size='medium'> { ethPosted_ ? 
+                `${ethPosted_.toFixed(4)} Eth` 
                 : '0 Eth' }
               </Text>}
-          </Box>
+          </Box>       
 
           <Box gap='small'>
             <Text color='text-weak' size='xsmall'>Collateralisation Ratio</Text>

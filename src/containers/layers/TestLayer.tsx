@@ -16,18 +16,19 @@ import { useSendTx, useCallTx, useController, useBalances, useProxy } from '../.
 
 import { YieldContext } from '../../contexts/YieldContext';
 import { SeriesContext } from '../../contexts/SeriesContext';
-// import { ConnectionContext } from '../../contexts/ConnectionContext';
+import { UserContext } from '../../contexts/UserContext';
 
 const TestLayer = (props:any) => {
   const { chainId, account } = useWeb3React();
 
   // const web3 = useWeb3React();
+  const { state: { balances } } = React.useContext( UserContext );
   const { state: yieldState, actions: yieldActions } = React.useContext( YieldContext );
   const { state: seriesState, actions: seriesActions } = React.useContext( SeriesContext );
   const [ flow, setFlow ] = React.useState<string|null>('APPROVALS');
 
   const { seriesData } = seriesState;
-  const { yieldData, deployedContracts, deployedSeries, userData } = yieldState;
+  const { yieldData, deployedContracts, deployedSeries } = yieldState;
   
 
   // const [ wethBalance, setWethBalance ] = React.useState<string|null|number>(0);
@@ -92,7 +93,7 @@ const TestLayer = (props:any) => {
   }, [ yieldState ] );
 
   // React.useEffect(() => {
-  //   // (async () => setBalance( await getEthBalance()) )();
+  //   // (async () => setBalance( await getBalance()) )();
   //   // (async () => setWeiBalance( await getWeiBalance()) )();
   //   // (async () => activate(injected, console.log))();
   // }, [chainId, account]);
@@ -140,7 +141,7 @@ const TestLayer = (props:any) => {
 
             <Box direction='row' gap='small'>
               <Text size='xsmall'>ETH balance:</Text>
-              <Text size='xsmall'>{ userData?.ethBalance_ || '' }</Text>
+              <Text size='xsmall'>{ balances.ethBalance_ || '' }</Text>
             </Box>
           </Box>
 
@@ -276,20 +277,8 @@ const TestLayer = (props:any) => {
                 </Box>
                 <Box gap='small'>
                   <Text weight='bold'>Posted collateral:</Text>
-                  <Text>weth posted: { userData?.ethPosted_ || '' }</Text>
-                  {/* <Text>chai posted: { yieldData.chaiPosted_ }</Text> */}
-                  <Text weight='bold'>yDai balance:</Text>
-                  {/* <Text>yDai Balance: { seriesData.get('yDai-2020-09-30').yDaiBalance_ }</Text> */}
-                  <Text weight='bold'>Weth Controller:</Text>
-                  {/* <Text>weth Debt Dai: { seriesData.get('yDai-2020-09-30').wethDebtDai_ }</Text> */}
-                  {/* <Text>weth Debt YDai: { seriesData.get('yDai-2020-09-30').ethDebtYDai_ }</Text> */}
-                  {/* <Text>weth Total Debt Dai { yieldData.wethTotalDebtDai_ }</Text> */}
-                  <Text> weth Total Debt YDai: { userData?.ethTotalDebtYDai_ }</Text>
-                  <Text weight='bold'>ChaiController:</Text>
-                  {/* <Text>chai Debt Dai : { seriesData.get('yDai-2020-09-30').chaiDebtDai_}</Text> */}
-                  {/* <Text>chai Debt yDai : { seriesData.get('yDai-2020-09-30').chaiDebtYDai_}</Text> */}
-                  {/* <Text>chai Total Debt Dai: { yieldData.chaiTotalDebtDai_ }</Text> */}
-                  <Text>chai Total Debt YDai: { userData?.chaiTotalDebtYDai_ }</Text>
+                  <Text>weth posted: { yieldData.ethPosted_ || '' }</Text>
+
                 </Box>
               </Box>
               :
@@ -317,7 +306,7 @@ const TestLayer = (props:any) => {
             ()=> {
               seriesActions.refreshSeries([yieldState.deployedSeries[0]]);
               yieldActions.updateYieldBalances(yieldState.deployedContracts);
-              yieldActions.updateUserData(yieldState.deployedContracts);
+              // yieldActions.updateUserData(yieldState.deployedContracts);
             }
           }
           />

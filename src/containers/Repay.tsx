@@ -19,6 +19,7 @@ import TransactionPending from '../components/TransactionPending';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
 import { NotifyContext } from '../contexts/NotifyContext';
+import { UserContext } from '../contexts/UserContext';
 
 import { useController, usePool, useBalances, useProxy, useTxActive, useToken } from '../hooks';
 
@@ -28,10 +29,15 @@ interface IRepayProps {
 
 function Repay({ repayAmount }:IRepayProps) {
 
-  const { state: yieldState, actions: yieldActions } = React.useContext(YieldContext);
-  const { deployedContracts, userData } = yieldState;
+  const { state: { deployedContracts }, actions: yieldActions } = React.useContext(YieldContext);
   const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
-  
+  const { activeSeries } = seriesState;
+
+  const { state: userState, actions: userActions } = useContext(UserContext);
+  const { daiBalance_ } = userState.position;
+
+  const theme:any = useContext(ThemeContext);
+
   const { 
     previewPoolTx,
     addPoolDelegate,
@@ -39,16 +45,6 @@ function Repay({ repayAmount }:IRepayProps) {
   }  = usePool(); 
   const { getTokenAllowance }  = useBalances();
   const { approveToken, approveActive } = useToken();
-
-  const { isLoading: positionsLoading, seriesAggregates, activeSeries, setActiveSeries } = seriesState;
-  const {
-    collateralAmount_,
-    collateralRatio_,
-    debtValue_,
-    estimateRatio, // TODO << this is a function (basically just passed from hooks via context) >> 
-  } = seriesAggregates;
-  const theme:any = useContext(ThemeContext);
-
   const { repay, repayActive }  = useController();
   const { repayUsingExactDai } = useProxy();
 
@@ -69,14 +65,16 @@ function Repay({ repayAmount }:IRepayProps) {
 
   const repayProcedure = async (value:number) => {
     setRepayPending(true);
-    /* direct repay without proxy */
-    await repay(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value, 'Dai' );
+
     /* repay using proxy */
     // await repayUsingExactDai(activeSeries.daiProxyAddress, 'ETH-A', activeSeries.maturity, yDaiValue, value);
+
+    /* direct repay without proxy */
+    await repay(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value, 'Dai' );
     setApproved(await getTokenAllowance(deployedContracts.Dai, deployedContracts.Treasury, 'Dai'));
     setInputValue('');
-    await seriesActions.refreshPositions([activeSeries]);
-    await yieldActions.updateUserData();
+    await userActions.updatePosition();
+    await seriesActions.updateActiveSeries(); // or, await seriesActions.updateSeries([activeSeries]);
     setRepayPending(false);
   };
 
@@ -98,7 +96,7 @@ function Repay({ repayAmount }:IRepayProps) {
 
   /* Input warning and error logic */ 
   useEffect(() => {
-    if ( inputValue  && userData?.daiBalance_ && ( inputValue > userData?.daiBalance_ ) ) {
+    if ( inputValue  && daiBalance_ && ( inputValue > daiBalance_ ) ) {
       setWarningMsg(null);
       setErrorMsg('That amount exceeds the amount of Dai in your wallet'); 
     } else {
@@ -128,7 +126,7 @@ function Repay({ repayAmount }:IRepayProps) {
   useEffect(()=>{
     if (approved < inputValue) {
       setRepayDisabled(true);
-    } else if (!(inputValue) || inputValue===0 || !userData?.daiBalance_) {
+    } else if (!(inputValue) || inputValue===0 || !daiBalance_) {
       setRepayDisabled(true);
     } else {
       setRepayDisabled(false);
@@ -136,7 +134,6 @@ function Repay({ repayAmount }:IRepayProps) {
   }, [ approved, inputValue ]);
 
   useEffect(() => {
-    console.log(seriesAggregates);
     ( async ()=>{
       // activeSeries && setApproved(await getTokenAllowance(deployedContracts.Dai, activeSeries.daiProxyAddress, 'Dai'));
       activeSeries && setApproved(await getTokenAllowance(deployedContracts.Dai, deployedContracts.Treasury, 'Dai'));
@@ -202,7 +199,7 @@ function Repay({ repayAmount }:IRepayProps) {
               </Box>
               <Box direction='row' gap='small'>
                 {/* <Text color={maxDaiAvailable_? 'brand': 'brand-transparent'} size='xxsmall'>approx.</Text> */}
-                <Text color='brand' weight='bold' size='medium'> {activeSeries?.wethDebtDai_? `${activeSeries.wethDebtDai_.toFixed(2)} Dai`: ''}  </Text>
+                <Text color='brand' weight='bold' size='medium'> {activeSeries?.ethDebtDai_? `${activeSeries.ethDebtDai_.toFixed(2)} Dai`: ''}  </Text>
               </Box>
             </Box>
 
@@ -211,7 +208,7 @@ function Repay({ repayAmount }:IRepayProps) {
                 <Text color='text-weak' size='xsmall'>Wallet Dai balance</Text>
                 <Help />
               </Box>
-              <Text color='brand' weight='bold' size='medium'> {userData?.daiBalance_? `${userData.daiBalance_.toFixed(2)} Dai`:'-'} </Text>
+              <Text color='brand' weight='bold' size='medium'> {daiBalance_? `${daiBalance_.toFixed(2)} Dai`:'-'} </Text>
             </Box>
 
           </Box>
@@ -246,7 +243,7 @@ function Repay({ repayAmount }:IRepayProps) {
               <Box justify='center'>
                 <Box
                   round
-                  onClick={()=>setInputValue(userData.daiBalance_)}
+                  onClick={()=>setInputValue(daiBalance_)}
                   hoverIndicator='brand-transparent'
                   border='all'
               // border={{ color:'brand' }}
