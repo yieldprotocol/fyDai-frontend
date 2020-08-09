@@ -30,11 +30,6 @@ function reducer(state: any, action: any) {
         ...state,
         preferences: action.payload,
       };
-    case 'updateBalances':
-      return {
-        ...state,
-        balances: action.payload,
-      };
     case 'updatePosition':
       return {
         ...state,
@@ -137,9 +132,9 @@ const UserProvider = ({ children }: any) => {
       ethBorrowingPower, 
       ethTotalDebtDai
     ]:any[] = await Promise.all([
-      await collateralLocked(deployedContracts.Controller, 'ETH-A'),
-      await borrowingPower(deployedContracts.Controller, 'ETH-A'),
-      await totalDebtDai(deployedContracts.Controller, 'ETH-A'),
+      collateralLocked(deployedContracts.Controller, 'ETH-A'),
+      borrowingPower(deployedContracts.Controller, 'ETH-A'),
+      totalDebtDai(deployedContracts.Controller, 'ETH-A'),
     ]);
 
     // const collateralAmount = collAmount();
@@ -169,8 +164,8 @@ const UserProvider = ({ children }: any) => {
       // collateralAmount
     };
 
-    const parsedValues = {
-      /* parse to human usable */
+    /* parse to human usable */
+    const parsedValues = {  
       ethBalance_ : utils.wadToHuman(ethBalance),
       daiBalance_ : utils.wadToHuman(daiBalance),
       ethPosted_ : utils.wadToHuman(ethPosted),
@@ -189,7 +184,6 @@ const UserProvider = ({ children }: any) => {
     };
 
     console.log({ ...values, ...parsedValues } );
-
     dispatch( { type: 'updatePosition', payload: { ...values, ...parsedValues } } );
     return { ...values, ...parsedValues };
   };

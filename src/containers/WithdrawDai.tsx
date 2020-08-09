@@ -47,7 +47,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
       0 // transaction queue value
     );
     await userActions.updatePosition();
-    // await seriesActions.refreshPositions([activeSeries]);
+    await seriesActions.updateActiveSeries();
     close();
   };
 

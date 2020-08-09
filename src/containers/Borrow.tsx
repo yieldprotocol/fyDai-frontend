@@ -88,7 +88,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
     !autoSell && await borrow(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value);
     setInputValue('');
     await userActions.updatePosition();
-    // await seriesActions.refreshPositions([activeSeries]);
+    await seriesActions.updateActiveSeries();
     setBorrowPending(false);
   };
 
@@ -190,6 +190,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
 
 
   useEffect(() => {
+    console.log(activeSeries);
     activeSeries && ( async ()=>{
       // TODO split out advanced approval settings for optimization
       const approvedAmount = await userAllowance(activeSeries.yDaiAddress, activeSeries.poolAddress);

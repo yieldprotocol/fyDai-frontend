@@ -65,14 +65,16 @@ function Repay({ repayAmount }:IRepayProps) {
 
   const repayProcedure = async (value:number) => {
     setRepayPending(true);
-    /* direct repay without proxy */
-    await repay(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value, 'Dai' );
+
     /* repay using proxy */
     // await repayUsingExactDai(activeSeries.daiProxyAddress, 'ETH-A', activeSeries.maturity, yDaiValue, value);
+
+    /* direct repay without proxy */
+    await repay(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value, 'Dai' );
     setApproved(await getTokenAllowance(deployedContracts.Dai, deployedContracts.Treasury, 'Dai'));
     setInputValue('');
-    // await seriesActions.refreshPositions([activeSeries]);
     await userActions.updatePosition();
+    await seriesActions.updateActiveSeries(); // or, await seriesActions.updateSeries([activeSeries]);
     setRepayPending(false);
   };
 

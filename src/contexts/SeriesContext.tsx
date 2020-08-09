@@ -24,11 +24,6 @@ function reducer(state:any, action:any) {
         ...state,
         seriesRates: action.payload,
       };
-    case 'updateAggregates':
-      return {
-        ...state,
-        seriesAggregates: action.payload,
-      };
     case 'setActiveSeries':
       return {
         ...state,
@@ -46,25 +41,22 @@ function reducer(state:any, action:any) {
 
 const SeriesProvider = ({ children }:any) => {
 
-  const { account, provider } = useSignerAccount();
+  const { account } = useSignerAccount();
   const { chainId } = useWeb3React();
 
   const initState = { 
     seriesData : new Map(),
-    seriesAggregates: {}, // TODO convert to Map 
     seriesRates: new Map(),
     activeSeries: null,
   };
 
   const [ state, dispatch ] = React.useReducer(reducer, initState);
-
   const { state: userState } = React.useContext( UserContext );
   const { state: yieldState } = React.useContext(YieldContext);
   const { feedData, deployedContracts } = yieldState;
 
   const { previewPoolTx, checkPoolDelegate }  = usePool();
   const { checkControllerDelegate }  = useController();
-
   const [ callTx ] = useCallTx();
   const { yieldAPR }  = useMath();
 
@@ -80,10 +72,13 @@ const SeriesProvider = ({ children }:any) => {
     const _ratesData = await Promise.all(
       seriesArr.map( async (x:any, i:number) => {
         // TODO fix this when all markets are operational => x.market (not seriesArr[0].market )
-        const sellYDai = await previewPoolTx('sellYDai', seriesArr[0].poolAddress, 1);
-        const buyYDai = await previewPoolTx('buyYDai', seriesArr[0].poolAddress, 1);
-        const sellDai = await previewPoolTx('sellDai', seriesArr[0].poolAddress, 1);
-        const buyDai = await previewPoolTx('buyDai', seriesArr[0].poolAddress, 1);
+        const [ sellYDai, buyYDai, sellDai, buyDai ] = await Promise.all([
+          await previewPoolTx('sellYDai', seriesArr[0].poolAddress, 1),
+          await previewPoolTx('buyYDai', seriesArr[0].poolAddress, 1),
+          await previewPoolTx('sellDai', seriesArr[0].poolAddress, 1),
+          await previewPoolTx('buyDai', seriesArr[0].poolAddress, 1)
+        ]);
+
         return {
           maturity: x.maturity,
           sellYDai,
@@ -94,7 +89,7 @@ const SeriesProvider = ({ children }:any) => {
       })
     );
 
-    return _ratesData.reduce((acc: any, x:any) => {
+    const _parsedRatesData = _ratesData.reduce((acc: any, x:any) => {
       return acc.set(
         x.maturity,
         { ...x,
@@ -105,6 +100,11 @@ const SeriesProvider = ({ children }:any) => {
         }
       );
     }, state.seriesRates);
+
+    /* update context state and return */
+    dispatch( { type:'updateRates', payload: _parsedRatesData });
+    return _parsedRatesData;
+
   };
 
   /* Get the data for a particular series, or set of series */
@@ -129,7 +129,7 @@ const SeriesProvider = ({ children }:any) => {
       })
     );
 
-    return _seriesData.reduce((acc: Map<string, any>, x:any) => {
+    const _parsedSeriesData = _seriesData.reduce((acc: Map<string, any>, x:any) => {
       return acc.set(
         x.maturity,
         { ...x,
@@ -140,26 +140,29 @@ const SeriesProvider = ({ children }:any) => {
         }
       );
     }, state.seriesData);
+
+    /* Update state and return  */
+    dispatch( { type:'updateSeries', payload: _parsedSeriesData });
+    return _parsedSeriesData;
   };
 
   // Get the Positions data for a series list
-  const getPositions = async (seriesArr:IYieldSeries[], force:boolean) => {
+  const updateSeriesList = async (seriesArr:IYieldSeries[], force:boolean) => {
     let filteredSeriesArr;
     if (force !== true) {
       filteredSeriesArr = seriesArr.filter(x => !state.seriesData.has(x.maturity));
     } else {
       filteredSeriesArr = seriesArr;
     }
-
     if ( !yieldState.isLoading && filteredSeriesArr.length > 0) {
-      
       dispatch({ type:'isLoading', payload: true });
-      /* Get series rates */
+
+      /* Get series rates and update */
       const rates = await _getRates(filteredSeriesArr);
-      dispatch( { type:'updateRates', payload: rates });
+      
       /* Build/re-build series map */
       const seriesMap:any = await _getSeriesData(filteredSeriesArr, rates);
-      dispatch( { type:'updateSeries', payload: seriesMap });
+          
       /* set the active series */
       if (!state.activeSeries) {
         /* if no active series or , set it to the first entry of the map. */
@@ -171,9 +174,14 @@ const SeriesProvider = ({ children }:any) => {
         // other situation catch
         dispatch({ type:'setActiveSeries', payload: seriesMap.entries().next().value[1] });
       }
+
       dispatch({ type:'isLoading', payload: false });
+
+      console.log('Series Updated:' );
+      console.log(filteredSeriesArr);
+
     } else {
-      console.log('Positions exist... force fetch if required');
+      console.log('Positions exist... Force fetch if required');
     }
   };
 
@@ -182,20 +190,20 @@ const SeriesProvider = ({ children }:any) => {
     !yieldState.isLoading &&
     console.log('triggered series update');
     // ( async () => {
-    //   await getPositions(yieldState.deployedSeries, false);
+    //   await updateSeriesList(yieldState.deployedSeries, false);
     // })();
   }, [ userState.balances ]);
 
   /* Init series context and re-init on any user and/or network change */
   React.useEffect( () => {
     chainId && !yieldState.isLoading && ( async () => {
-      await getPositions(yieldState.deployedSeries, false);
+      await updateSeriesList(yieldState.deployedSeries, false);
     })();
   }, [ chainId, account, yieldState.isLoading ]);
 
   const actions = {
-    updateSeries: (series:IYieldSeries[]) => console.log('updating series from list'),
-    updateActiveSeries: () => console.log('updating active series'),
+    updateSeries: (series:IYieldSeries[]) => updateSeriesList(series, true),
+    updateActiveSeries: () => updateSeriesList([state.activeSeries], true), // not really required now but may have application later
     setActiveSeries: (seriesMaturity:string) => dispatch({ type:'setActiveSeries', payload: state.seriesData.get(seriesMaturity) }),
   };
 

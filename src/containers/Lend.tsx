@@ -70,7 +70,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
     );
     setInputValue('');
     await userActions.updatePosition();
-    // await seriesActions.refreshPositions([activeSeries]);
+    await seriesActions.updateActiveSeries(); // or, await seriesActions.updateSeries([activeSeries]);
   };
 
   const approveProcedure = async (value:number) => {
