@@ -137,7 +137,7 @@ function Repay({ repayAmount }:IRepayProps) {
     ( async ()=>{
       // activeSeries && setApproved(await getTokenAllowance(deployedContracts.Dai, activeSeries.daiProxyAddress, 'Dai'));
       activeSeries && setApproved(await getTokenAllowance(deployedContracts.Dai, deployedContracts.Treasury, 'Dai'));
-      setHasDelegated(activeSeries.hasDelegatedPool);
+      activeSeries && setHasDelegated(activeSeries.hasDelegatedPool);
     })();
   }, [ activeSeries ]);
 
@@ -199,7 +199,9 @@ function Repay({ repayAmount }:IRepayProps) {
               </Box>
               <Box direction='row' gap='small'>
                 {/* <Text color={maxDaiAvailable_? 'brand': 'brand-transparent'} size='xxsmall'>approx.</Text> */}
-                <Text color='brand' weight='bold' size='medium'> {activeSeries?.ethDebtDai_? `${activeSeries.ethDebtDai_.toFixed(2)} Dai`: ''}  </Text>
+                <Text color='brand' weight='bold' size='medium'>
+                  {activeSeries?.ethDebtYDai_? `${activeSeries.ethDebtYDai_.toFixed(2)} Dai`: 'O Dai'}
+                </Text>
               </Box>
             </Box>
 

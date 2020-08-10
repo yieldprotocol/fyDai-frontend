@@ -37,7 +37,10 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
 
   const { state: userState, actions: userActions } = React.useContext(UserContext);
   const { position } = userState;
-  const { ethBorrowingPower_: maximumDai } = position;
+  const { 
+    ethBorrowingPower_: maximumDai, 
+    collateralPercent_ 
+  } = position;
 
   const theme:any = React.useContext(ThemeContext);
 
@@ -57,7 +60,10 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
   const { borrowUsingExactDai, borrowActive } = useProxy();
   const { approveToken, approveActive } = useToken();
   const { userAllowance } = useYDai();
-  const { yieldAPR } = useMath();
+  const { 
+    yieldAPR, 
+    estCollRatio: estimateRatio
+  } = useMath();
 
   /* internal component state */
   const [ borrowDisabled, setBorrowDisabled ] = React.useState<boolean>(true);
@@ -97,7 +103,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
     // await addPoolDelegate(activeSeries.poolAddress, activeSeries.yDaiAddress);
     // const res = await checkPoolDelegate(activeSeries.poolAddress, activeSeries.yDaiAddress);
     await addControllerDelegate(deployedContracts.Controller, activeSeries.daiProxyAddress);
-    const res = await checkControllerDelegate(deployedContracts.Controller, activeSeries.yDaiAddress);
+    const res = await checkControllerDelegate(deployedContracts.Controller, activeSeries.daiProxyAddress);
     setHasDelegated(res);
   };
 
@@ -114,7 +120,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
       setBorrowDisabled(true);
       setIndicatorColor('red');
       setWarningMsg(null);
-      setErrorMsg('That amount exceeds the amount of yDai you can borrow based on your collateral'); 
+      setErrorMsg('That amount exceeds the amount of Dai you can borrow based on your collateral'); 
     } else if (estRatio > 1.5 && estRatio < 2.0 ) {
       setIndicatorColor('orange');
       setErrorMsg(null);
@@ -126,13 +132,24 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
     }
   }, [ estRatio ]);
 
-  /* Handle dai to yDai conversion and get APR (yDai needed to compare with the approved allowance)  */
+
+  /* 
+  * Handle input changes:
+  * 1. dai to yDai conversion and get APR (yDai needed to compare with the approved allowance)
+  * 2. calcalute yield APR
+  * 3. calculate estimated collateralisation ration
+  */
   useEffect(() => {
+     
     activeSeries && inputValue > 0 && ( async () => {
+
+      const newRatio = estimateRatio(position.ethPosted_, ( position.debtValue_+ parseFloat(inputValue)) ); 
+      newRatio && setEstRatio(newRatio.toFixed(0));
+
       const preview = await previewPoolTx('buyDai', activeSeries.poolAddress, inputValue);
       if (!preview.isZero()) {
         setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
-        setAPR( yieldAPR( ethers.utils.parseEther(inputValue.toString()), preview, activeSeries.maturity ) );
+        setAPR( yieldAPR( ethers.utils.parseEther(inputValue.toString()), preview, activeSeries.maturity ) );      
         setWarningMsg(null);
         setErrorMsg(null);
       } else {
@@ -142,7 +159,9 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
         setBorrowDisabled(true);
         setErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
       }
+
     })();
+
   }, [inputValue]);
 
   /* ADVANCED SETTINGS Handle yDai to Dai conversion for the approved Dai */
@@ -164,10 +183,10 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
     if ( inputValue && ( inputValue > maximumDai ) ) {
       console.log(inputValue, maximumDai);
       setWarningMsg(null);
-      setErrorMsg('That amount exceeds the amount of yDai you can borrow based on your collateral'); 
+      setErrorMsg('That amount exceeds the amount of Dai you can borrow based on your collateral'); 
     } else if (inputValue && ( inputValue > Math.round(maximumDai-1) ) ) {
       setErrorMsg(null);
-      setWarningMsg('If you borrow right up to your maximum allowance, there is high probability you will be liquidated soon!');
+      setWarningMsg('If you borrow right up to your maximum allowance, there is high probability you will be liquidated!');
     } else {
       setWarningMsg(null);
       setErrorMsg(null);
@@ -255,13 +274,12 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
                 <Text color='text-weak' size='xsmall'>Current Debt</Text>
                 <Help />
               </Box>
-
               <Box direction='row' gap='small'>
                 { borrowPending ?           
                   <ScaleLoader color={theme?.global?.colors['brand-transparent'].dark} height='13' /> 
                   :
                   <Text color='brand' weight='bold' size='medium'> 
-                    {activeSeries?.ethDebtDai_? `${activeSeries.ethDebtDai_.toFixed(2)} Dai`: ''}
+                    {activeSeries?.ethDebtYDai_? `${activeSeries.ethDebtYDai_.toFixed(2)} Dai`: '0 Dai'}
                   </Text>}
                 {/* <Text color='brand' weight='bold' size='medium'> {activeSeries?.wethDebtDai_? `${activeSeries.wethDebtDai_.toFixed(2)} Dai`: ''}  </Text> */}
               </Box>
@@ -316,6 +334,20 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
                     {APR && APR.toFixed(2)}%               
                   </Text>
                 </Box>
+
+                <Box gap='small' alignSelf='start' align='center'>
+                  <Text color='text-weak' size='xsmall'>Collateralization Ratio after Borrow</Text>
+                  <Box direction='row' gap='small'>
+                    <Text color={!inputValue? 'brand-transparent': 'brand'} size='xxsmall'>approx.</Text> 
+                    <Text color={!inputValue? 'brand-transparent': 'brand'} weight='bold' size='medium'> 
+                      {(estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '' }
+                    </Text>
+                    { collateralPercent_ > 0 &&
+                    <Text color='red' size='medium'> 
+                      { inputValue && estRatio && ( (collateralPercent_- estRatio) !== 0) && `(- ${(collateralPercent_- estRatio).toFixed(0)}%)` }
+                    </Text>}
+                  </Box>
+                </Box> 
 
                 <Box gap='small'>
                   <Box direction='row' gap='small'>
