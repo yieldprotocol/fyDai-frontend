@@ -19,7 +19,6 @@ interface ISeriesSelectorProps {
   close:any;
 }
 
-
 const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
 
   const [showMore, setShowMore] = React.useState<boolean>(false);
@@ -111,7 +110,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
                 background='orange'
               >
                 <Text size='xxsmall'>
-                  { activeView.toUpperCase() === 'BORROW'? 'Limited Liquidity': 'Not Available' }         
+                  { activeView.toUpperCase() === 'BORROW'? 'Temporarily Unavailable': 'Temporarily Unavailable' }         
                 </Text>
               </Box>
               :

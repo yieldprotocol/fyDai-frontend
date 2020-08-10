@@ -99,6 +99,8 @@ const YieldProvider = ({ children }: any) => {
   const [cachedSeries, setCachedSeries] = useCachedState('deployedSeries', null);
   const [cachedFeed, setCachedFeed] = useCachedState('lastFeed', null);
 
+  const [ loadRetried, setLoadRetried ] = React.useState<boolean>(false);
+
   /* hook declarations */
   const [ callTx ] = useCallTx();
   const { getEventHistory, addEventListener, parseEventList } = useEvents();
@@ -110,7 +112,6 @@ const YieldProvider = ({ children }: any) => {
    *
    * */
   const _getProtocolAddrs = async (
-    networkId: number | string,
     forceUpdate: boolean
   ): Promise<any[]> => {
     const _deployedSeries: any[] = [];
@@ -176,11 +177,13 @@ const YieldProvider = ({ children }: any) => {
         _deployedSeries.push(...cachedSeries);
       }
     } catch (e) {
-      console.log(e);
-      notifyDispatch({
+      
+      !loadRetried && _getProtocolAddrs(true);
+      loadRetried && notifyDispatch({
         type: 'fatal',
         payload: { message: 'Error finding Yield Protocol addresses: Please check you are on a supported network.' },
       });
+      console.log(e);
     }
     return [_deployedSeries, _deployedContracts];
   };
@@ -245,10 +248,7 @@ const YieldProvider = ({ children }: any) => {
     dispatch({ type: 'isLoading', payload: true });
 
     /* 1. Fetch PUBLIC Yield protocol ADDRESSES from cache or chain */
-    const [deployedSeries, deployedContracts] = await _getProtocolAddrs(
-      networkId,
-      false
-    );
+    const [deployedSeries, deployedContracts] = await _getProtocolAddrs(false);
     dispatch({ type: 'updateDeployedContracts', payload: deployedContracts });
     dispatch({ type: 'updateDeployedSeries', payload: deployedSeries });
 
