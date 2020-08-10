@@ -14,9 +14,14 @@ import { SeriesContext } from '../contexts/SeriesContext';
 import YieldSeriesSummary from './YieldSeriesSummary';
 // import YieldSeries from '../../components/YieldSeries';
 
-const SeriesSelector = (props:any) => {
+interface ISeriesSelectorProps {
+  activeView:string;
+  close:any;
+}
 
-  const { close } = props;
+
+const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
+
   const [showMore, setShowMore] = React.useState<boolean>(false);
   const [openIndex, setOpenIndex] = React.useState<number | null >(null);
   const [seriesList, setSeriesList] = React.useState<IYieldSeries[]>([]);
@@ -74,7 +79,9 @@ const SeriesSelector = (props:any) => {
               <Text alignSelf='start' size='medium' color='text-weak'>SERIES NAME</Text>
             </Box>
             <Box>
-              <Text alignSelf='start' size='medium' color='text-weak'>DEBT</Text>
+              <Text alignSelf='start' size='medium' color='text-weak'>
+                { activeView.toUpperCase() === 'BORROW'? 'DEBT' : 'BALANCE' }               
+              </Text>
             </Box>
             <Box>
               <Text alignSelf='start' size='medium' color='text-weak'>SELECT</Text>
@@ -93,11 +100,27 @@ const SeriesSelector = (props:any) => {
             fill
             pad='medium'
           >
-            <Box>
-              <Text alignSelf='start' size='medium' color='brand'>
-                {activeSeries.yieldAPR_}%
-              </Text>
-            </Box>
+
+            {  ( activeSeries && activeSeries.yieldAPR_ === Infinity ) ? 
+              <Box 
+                round 
+                border='all'
+                direction='row'
+                pad={{ horizontal:'small' }}
+                align='center'
+                background='orange'
+              >
+                <Text size='xxsmall'>
+                  { activeView.toUpperCase() === 'BORROW'? 'Limited Liquidity': 'Not Available' }         
+                </Text>
+              </Box>
+              :
+              <Box>
+                <Text alignSelf='start' size='medium' color='brand'>
+                  {activeSeries.yieldAPR_}%
+                </Text>
+              </Box>}
+
             <Box>
               <Text alignSelf='start' size='medium' color='brand'>
                 {activeSeries.displayName}
@@ -105,14 +128,16 @@ const SeriesSelector = (props:any) => {
             </Box>
             <Box>
               <Text alignSelf='start' size='medium' color='brand'>
-                {activeSeries.wethDebtDai_}
+                {activeView.toUpperCase() === 'BORROW'? 
+                  activeSeries.ethDebtYDai_.toFixed(2) :
+                  activeSeries.yDaiBalance_.toFixed(2)} Dai
               </Text>
             </Box>
             <Box>
               <Box 
                 round
                 background='brand'
-                pad={{ horizontal:'medium', vertical:'xsmall'}}
+                pad={{ horizontal:'medium', vertical:'xsmall' }}
                 direction='row'
                 gap='xsmall'
                 align='center'

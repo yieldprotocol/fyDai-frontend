@@ -58,7 +58,7 @@ const App = () =>  {
         <NotifyLayer />
         <ConnectLayer open={showConnectLayer} closeLayer={() => setShowConnectLayer(false)} />
         { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
-        { showSeriesLayer  && <SeriesSelector closeLayer={()=>setShowSeriesLayer(false)} /> }
+        { showSeriesLayer  && <SeriesSelector activeView='borrow' close={()=>setShowSeriesLayer(false)} /> }
         { showAccountLayer &&
           <AccountLayer
             closeLayer={() => setShowAccountLayer(false)}

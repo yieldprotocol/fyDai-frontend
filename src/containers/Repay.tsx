@@ -147,7 +147,7 @@ function Repay({ repayAmount }:IRepayProps) {
         <Box gap='medium' align='center' fill='horizontal'>
           <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Selected series</Text>
 
-          <SeriesDescriptor />
+          <SeriesDescriptor activeView='borrow' />
 
           {/* {!hasDelegated && 
             <OnceOffAuthorize

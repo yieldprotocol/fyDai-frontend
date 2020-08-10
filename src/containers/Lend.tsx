@@ -130,16 +130,13 @@ const Lend = ({ lendAmount }:ILendProps) => {
         <Box gap='medium' align='center' fill='horizontal'>
           <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Selected series</Text>
 
-          <SeriesDescriptor />
-
+          <SeriesDescriptor activeView='lend' />
 
           <Box fill gap='small' pad={{ horizontal:'medium' }}>
-
             <Box fill direction='row-responsive' justify='start' gap='large'>
-
               <Box gap='small'>
                 <Box direction='row' gap='small'>
-                  <Text color='text-weak' size='xsmall'>Portfolio Value at Maturity</Text>
+                  <Text color='text-weak' size='xsmall'>Holdings Value at Maturity</Text>
                   <Help />
                 </Box>
                 <Text color='brand' weight='bold' size='medium'> {activeSeries && `${activeSeries?.yDaiBalance_.toFixed(2)} Dai` || '-'} </Text>
@@ -228,10 +225,8 @@ const Lend = ({ lendAmount }:ILendProps) => {
                     <Help />
                   </Box>
                   <Text color='brand' weight='bold' size='medium'> {daiBalance_?`${daiBalance_.toFixed(2)} Dai`: '-'} </Text>
-                </Box>
-              
+                </Box>         
               </Box>
-
               <Box fill direction='row-responsive' justify='between'>
                 {/* next block */}
               </Box>
@@ -243,7 +238,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
           <Box>
             <CheckBox 
               reverse
-                // value={true}
+              // value={true}
               checked={!inputValue || ( approved >= inputValue )}
               disabled={!inputValue || ( approved >= inputValue )}
               onChange={()=>approveProcedure(inputValue)}
