@@ -1,121 +1,214 @@
 import React from 'react';
-import firebase, { firestore } from 'firebase';
-import { ethers } from 'ethers';
-import { useWeb3React } from '@web3-react/core';
+import { ethers, BigNumber } from 'ethers';
 
-import * as Constants from '../constants';
+import * as utils from '../utils';
+
+import { YieldContext } from './YieldContext';
+import { UserContext } from './UserContext';
+
+import { useCallTx, useMath, usePool, useSignerAccount, useWeb3React, useController } from '../hooks';
 import { IYieldSeries } from '../types';
 
-import { useCallTx } from '../hooks/txHooks';
 
 const SeriesContext = React.createContext<any>({});
 
-firebase.initializeApp({
-  apiKey: 'AIzaSyATOt3mpg8B512V-6Pl_2ZqjY1WjE5q49s',
-  projectId: 'yield-ydai'
-});
-
+function reducer(state:any, action:any) {
+  switch (action.type) {
+    case 'updateSeries':
+      return {
+        ...state,
+        seriesData: action.payload,
+      };
+    case 'updateRates':
+      return {
+        ...state,
+        seriesRates: action.payload,
+      };
+    case 'setActiveSeries':
+      return {
+        ...state,
+        activeSeries: action.payload,
+      };
+    case 'isLoading':
+      return { 
+        ...state,
+        isLoading: action.payload
+      };
+    default:
+      return state;
+  }
+}
 
 const SeriesProvider = ({ children }:any) => {
 
-  const initState = { isLoading: true, seriesData : [], sysAddrList: {} };
-  const [ state, dispatch ] = React.useReducer(seriesReducer, initState);
+  const { account } = useSignerAccount();
   const { chainId } = useWeb3React();
+
+  const initState = { 
+    seriesData : new Map(),
+    seriesRates: new Map(),
+    activeSeries: null,
+  };
+
+  const [ state, dispatch ] = React.useReducer(reducer, initState);
+  const { state: userState } = React.useContext( UserContext );
+  const { state: yieldState } = React.useContext(YieldContext);
+  const { feedData, deployedContracts } = yieldState;
+
+  const { previewPoolTx, checkPoolDelegate }  = usePool();
+  const { checkControllerDelegate }  = useController();
   const [ callTx ] = useCallTx();
+  const { yieldAPR }  = useMath();
 
-  // reducer
-  function seriesReducer(redState:any, action:any) {
-    switch (action.type) {
-      case 'updateSeries':
+  /* Get the yield market rates for a particular set of series */
+  const _getRates = async (seriesArr:IYieldSeries[]) => {
+    /* 
+      Rates:
+        sellYDai -> Returns how much Dai would be obtained by selling 1 yDai
+        buyDai -> Returns how much yDai would be required to buy 1 Dai
+        buyYDai -> Returns how much Dai would be required to buy 1 yDai
+        sellDai -> Returns how much yDai would be obtained by selling 1 Dai
+    */
+    const _ratesData = await Promise.all(
+      seriesArr.map( async (x:any, i:number) => {
+        // TODO fix this when all markets are operational => x.market (not seriesArr[0].market )
+        const [ sellYDai, buyYDai, sellDai, buyDai ] = await Promise.all([
+          await previewPoolTx('sellYDai', seriesArr[0].poolAddress, 1),
+          await previewPoolTx('buyYDai', seriesArr[0].poolAddress, 1),
+          await previewPoolTx('sellDai', seriesArr[0].poolAddress, 1),
+          await previewPoolTx('buyDai', seriesArr[0].poolAddress, 1)
+        ]);
+
         return {
-          ...redState,
-          seriesData: action.payload,
+          maturity: x.maturity,
+          sellYDai,
+          buyYDai,
+          sellDai,
+          buyDai,
         };
-      case 'updateSysAddrList':
-        return {
-          ...redState,
-          sysAddrList: action.payload,
-        };
-      case 'updateRates':
-        return {
-          ...redState,
-        };
-      case 'isLoading':
-        return { 
-          ...redState,
-          isLoading: action.payload,
-        };
-      default:
-        return redState;
+      })
+    );
+
+    const _parsedRatesData = _ratesData.reduce((acc: any, x:any) => {
+      return acc.set(
+        x.maturity,
+        { ...x,
+          sellYDai_: parseFloat(ethers.utils.formatEther(x.sellYDai.toString())),
+          buyYDai_: parseFloat(ethers.utils.formatEther(x.buyYDai.toString())),
+          sellDai_: parseFloat(ethers.utils.formatEther(x.sellDai.toString())),
+          buyDai_: parseFloat(ethers.utils.formatEther(x.buyDai.toString())),
+        }
+      );
+    }, state.seriesRates);
+
+    /* update context state and return */
+    dispatch( { type:'updateRates', payload: _parsedRatesData });
+    return _parsedRatesData;
+
+  };
+
+  /* Get the data for a particular series, or set of series */
+  const _getSeriesData = async (seriesArr:IYieldSeries[], rates:Map<string, any>) => {
+    const _seriesData:any[] = [];
+    await Promise.all(
+      seriesArr.map( async (x:any, i:number) => {
+        const _rates = rates.get(x.maturity);
+        console.log(_rates.sellYDai.toString());
+        _seriesData.push(x);
+        try {
+          _seriesData[i].hasDelegatedPool = await checkPoolDelegate(x.poolAddress, x.yDaiAddress);
+          _seriesData[i].hasDelegatedController = await checkControllerDelegate(deployedContracts.Controller, x.daiProxyAddress);
+          _seriesData[i].yDaiBalance = account? await callTx(x.yDaiAddress, 'YDai', 'balanceOf', [account]): BigNumber.from('0') ;
+          _seriesData[i].isMature = await callTx(x.yDaiAddress, 'YDai', 'isMature', []);
+          _seriesData[i].ethDebtYDai = account? await callTx(deployedContracts.Controller, 'Controller', 'debtYDai', [utils.ETH, x.maturity, account]): BigNumber.from('0');
+          _seriesData[i].ethDebtDai = account? utils.mulRay( _seriesData[i].ethDebtYDai, _rates.sellYDai): BigNumber.from('0');
+          _seriesData[i].yieldAPR = yieldAPR(_rates.sellYDai, ethers.utils.parseEther('1'), x.maturity);
+        } catch (e) {
+          console.log(`Could not load account positions data: ${e}`);
+        }
+      })
+    );
+
+    const _parsedSeriesData = _seriesData.reduce((acc: Map<string, any>, x:any) => {
+      return acc.set(
+        x.maturity,
+        { ...x,
+          yDaiBalance_: parseFloat(ethers.utils.formatEther(x.yDaiBalance.toString())),
+          ethDebtYDai_: parseFloat(ethers.utils.formatEther(x.ethDebtYDai.toString())),
+          ethDebtDai_: parseFloat(ethers.utils.formatEther(x.ethDebtDai.toString())),
+          yieldAPR_: x.yieldAPR.toFixed(2),
+        }
+      );
+    }, state.seriesData);
+
+    /* Update state and return  */
+    dispatch( { type:'updateSeries', payload: _parsedSeriesData });
+    return _parsedSeriesData;
+  };
+
+  // Get the Positions data for a series list
+  const updateSeriesList = async (seriesArr:IYieldSeries[], force:boolean) => {
+    let filteredSeriesArr;
+    if (force !== true) {
+      filteredSeriesArr = seriesArr.filter(x => !state.seriesData.has(x.maturity));
+    } else {
+      filteredSeriesArr = seriesArr;
     }
-  }
+    if ( !yieldState.isLoading && filteredSeriesArr.length > 0) {
+      dispatch({ type:'isLoading', payload: true });
 
-  // async get all yield addresses from db in a single call
-  const getYieldAddrs = async (networkId:number|string): Promise<any[]> => {
-    const seriesAddrs:any[] = [];
-    let sysAddrList = {};
-    try {
-      await firebase.firestore().collection(networkId.toString())
-        .get()
-        .then( (querySnapshot:any) => {
-          querySnapshot.forEach((doc:any) => {
-            if ( doc.id === 'sysAddrList') {
-              sysAddrList = doc.data();
-            } else {
-              seriesAddrs.push(doc.data());
-            }
-          });
-        });
-    } catch (e) {
-      console.log(`Could not load Yield Addresses: ${e}`);
+      /* Get series rates and update */
+      const rates = await _getRates(filteredSeriesArr);
+      
+      /* Build/re-build series map */
+      const seriesMap:any = await _getSeriesData(filteredSeriesArr, rates);
+          
+      /* set the active series */
+      if (!state.activeSeries) {
+        /* if no active series or , set it to the first entry of the map. */
+        dispatch({ type:'setActiveSeries', payload: seriesMap.entries().next().value[1] });
+      } else if (seriesArr.length===1 ){
+        /* if there was only one series updated set that one as the active series */
+        dispatch({ type:'setActiveSeries', payload: seriesMap.get(seriesArr[0].maturity) });
+      } else {
+        // other situation catch
+        dispatch({ type:'setActiveSeries', payload: seriesMap.entries().next().value[1] });
+      }
+
+      dispatch({ type:'isLoading', payload: false });
+
+      console.log('Series Updated:' );
+      console.log(filteredSeriesArr);
+
+    } else {
+      console.log('Positions exist... Force fetch if required');
     }
-    return [ seriesAddrs, sysAddrList];
-  };
-
-  // async add blockchain data
-  const getChainData = async (seriesAddrs:IYieldSeries[], sysAddrList:any): Promise<IYieldSeries[]> => {
-    const chainData:any[] = [];
-    console.log(sysAddrList);
-    await Promise.all(seriesAddrs.map( async (x:any, i:number)=> {
-      chainData.push(x);
-      try {
-        chainData[i].rate = await callTx(x.YDai, 'YDai', 'rate', []);
-        chainData[i].currentValue = (await callTx( sysAddrList.Vat, 'Vat', 'ilks', [ethers.utils.formatBytes32String('weth')] )).spot;
-      } catch (e) { console.log(`Could not load series blockchain data: ${e}`); }
-    }));
-    return chainData;
-  };
-
-  // post fetching data processing
-  const processSeriesData = (chainData:IYieldSeries[]): IYieldSeries[] => {
-    const processedData:any[] = [];
-    chainData.forEach(async (x:any, i:any) =>{
-      processedData.push(x);
-      processedData[i].rate = x.rate.div(Constants.BN_RAY).toNumber();
-      processedData[i].maturity = new Date( (x.maturity as number) * 1000 );
-    });
-    return processedData;
-  };
-
-  const getAllData = async (networkId:number|string) => {
-    dispatch({ type:'isLoading', payload: true });
-    // fetch yield addresses from db
-    const [ addrData, sysAddrList] = await getYieldAddrs(networkId);
-    // fetch chain data
-    const chainData:any = await getChainData(addrData, sysAddrList);
-    // process chain data (number formats, dates etc.)
-    const processedData:any = processSeriesData(chainData);
-    dispatch({ type:'updateSysAddrList', payload: sysAddrList });
-    dispatch({ type:'updateSeries', payload: processedData });
-    dispatch({ type:'isLoading', payload: false });
   };
 
   React.useEffect( () => {
-    ( async () => chainId && getAllData(chainId))();
-  }, [chainId]);
+    !userState.isLoading &&
+    !yieldState.isLoading &&
+    console.log('triggered series update');
+    // ( async () => {
+    //   await updateSeriesList(yieldState.deployedSeries, false);
+    // })();
+  }, [ userState.balances ]);
+
+  /* Init series context and re-init on any user and/or network change */
+  React.useEffect( () => {
+    chainId && !yieldState.isLoading && ( async () => {
+      await updateSeriesList(yieldState.deployedSeries, false);
+    })();
+  }, [ chainId, account, yieldState.isLoading ]);
+
+  const actions = {
+    updateSeries: (series:IYieldSeries[]) => updateSeriesList(series, true),
+    updateActiveSeries: () => updateSeriesList([state.activeSeries], true), // not really required now but may have application later
+    setActiveSeries: (seriesMaturity:string) => dispatch({ type:'setActiveSeries', payload: state.seriesData.get(seriesMaturity) }),
+  };
 
   return (
-    <SeriesContext.Provider value={{ state, dispatch }}>
+    <SeriesContext.Provider value={{ state, actions }}>
       {children}
     </SeriesContext.Provider>
   );

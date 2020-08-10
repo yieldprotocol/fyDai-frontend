@@ -2,10 +2,22 @@ import React from 'react';
 import { Box, Text } from 'grommet';
 import moment from 'moment';
 
+// import {
+//   FaRegEye as EyeOpen,
+//   FaRegEyeSlash as EyeClosed,
+//   FaStar as Star,
+// } from 'react-icons/fa';
+
+import {
+  FiEye as EyeOpen,
+  FiEyeOff as EyeClosed,
+  FiStar as Star,
+} from 'react-icons/fi';
+
 import { IYieldSeries } from '../types';
 
 type YieldSeriesProps = {
-  series: IYieldSeries;
+  series: any;
   seriesAction: any;
   children?: any;
   highlighted?: boolean;
@@ -20,7 +32,7 @@ const YieldSeriesSummary = ({
   const {
     name,
     maturity,
-    rate,
+    // rate,
     currentValue,
   } = series;
 
@@ -32,10 +44,12 @@ const YieldSeriesSummary = ({
       align="center"
       justify="between"
       direction="row"
-      hoverIndicator={{ color: 'background-frontheader' }}
+      hoverIndicator={{ color: 'background-mid' }}
       // background={highlighted? { color: 'lightgrey' }: {}}
       border={{ color:'background-front' }}
-      round="small"
+      round="xsmall"
+      gap='small'
+      fill='horizontal'
     >
       <Box direction="column">
         <Text weight="bold"> {name}</Text>
@@ -45,8 +59,7 @@ const YieldSeriesSummary = ({
           pad={{ horizontal: 'small', vertical: 'none' }}
           background="brand"
         >
-          {/* <Text size="xsmall"> {rate}%</Text> */}
-          <Text size="xsmall"> {rate.toString()} %</Text>
+          <Text size="xsmall"> apr %</Text>
         </Box>
       </Box>
       <Box direction="column" align='end'>
@@ -61,6 +74,10 @@ const YieldSeriesSummary = ({
           <Text size="xsmall" weight="bold">{`${currentValue} DAI`}</Text>
         </Box>
       </Box>
+
+      <EyeOpen />
+      <Star />
+
     </Box>
   );
 };

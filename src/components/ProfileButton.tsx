@@ -1,26 +1,42 @@
-import React, { useEffect } from 'react';
-import { useWeb3React } from '@web3-react/core';
-import { Image, Button, Box } from 'grommet';
+import React, { useEffect, useState } from 'react';
 
-import { useConnectorImage } from '../hooks/connectionFns';
+import { Text, Box } from 'grommet';
+// import { useConnectorImage } from '../hooks/connectionHooks';
+// import { NotifyContext } from '../contexts/NotifyContext';
+import { useWeb3React } from '../hooks';
 
-const ProfileButton = (props: any) => {
+const ProfileButton = ({ action }: any) => {
+
+  const [ accLabel, setAccLabel ] = useState<string>('');
+  // const [ connectorImage, setConnectorImage ] = React.useState<string>('');
   const { account } = useWeb3React();
-  const { action } = props;
-  const connectorImage = useConnectorImage();
+
+  useEffect(()=>{
+    (async () => {
+      setAccLabel(`${account?.substring(0, 4)}...${account?.substring(account.length - 4)}`);
+      // setConnectorImage(()=>useConnectorImage);
+    })(); 
+  }, [account]);
+
   return (
-    <Button
-      icon={
-        <Box height="15px" width="15px">
+    <>
+      <Box 
+        round='small'
+        onClick={() => action && action()}
+        hoverIndicator='brand-transparent'
+        border='all'
+        pad={{ vertical:'xsmall', horizontal:'small' }}
+        direction='row'
+        gap='small'
+        align='center'
+      >
+        {/* <Box height="15px" width="15px">
           <Image src={connectorImage} fit="contain" />
-        </Box>
-      }
-      label={`${account?.substring(0, 6)}...${account?.substring(
-        account.length - 4
-      )}`}
-      onClick={() => action && action()}
-      // style={{ minWidth:'150px' }}
-    />
+        </Box> */}
+        <Text> {accLabel}
+        </Text>
+      </Box>
+    </>
   );
 };
 

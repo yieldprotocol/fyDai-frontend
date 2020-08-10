@@ -1,8 +1,7 @@
 import React from 'react';
-import { INotification } from '../types';
+import { INotification, IReducerAction } from '../types';
 
 const NotifyContext = React.createContext<any>({});
-
 const initState = {
   open: false,
   position: 'top-right',
@@ -11,9 +10,12 @@ const initState = {
   timerMs: 2000,
   callbackAction: null,
   callbackCancel: null,
+  fatalOpen: false,
+  fatalMsg: '',
+  pendingTxs: [],
 };
 
-function notifyReducer(state:any, action:any) {
+function notifyReducer(state:INotification, action:IReducerAction) {
   switch (action.type) {
     case 'notify':
       return { 
@@ -26,6 +28,22 @@ function notifyReducer(state:any, action:any) {
         callbackAction: action.payload.callbackAction? action.payload.callbackAction: null,
         callbackCancel: action.payload.callbackCancel? action.payload.callbackCancel: null,
       };
+    case 'fatal':
+      return { 
+        ...state, 
+        fatalOpen: true,
+        fatalMsg: action.payload.message,
+      };
+    case 'txPending':
+      return {
+        ...state,
+        pendingTxs: [ ...state.pendingTxs, action.payload],
+      };
+    case 'txComplete':
+      return {
+        ...state,
+        pendingTxs: state.pendingTxs.filter( (x:any) => x.tx.hash !== action.payload.tx.hash)
+      };
     case '_closeNotify':
       return { ...state, open: false, timerMs: initState.timerMs };
     case '_openNotify':
@@ -37,18 +55,21 @@ function notifyReducer(state:any, action:any) {
 
 const NotifyProvider = ({ children }:any) => {
   const [state, dispatch] = React.useReducer(notifyReducer, initState);
-
   React.useEffect( () => {
-    state.open && ( async () => {
+    state.open && ( () => {
       if (state.timerMs === 0) {
         dispatch({ type: '_openNotify' });
       } else {
-        await setTimeout(() => {
+        setTimeout(() => {
           dispatch({ type: '_closeNotify' });
         }, state.timerMs);
       }
     })();
   }, [state.open]);
+
+  React.useEffect( () => {
+    console.log(state.pendingTxs);
+  }, [state.pendingTxs]);
 
   return (
     <NotifyContext.Provider value={{ state, dispatch }}>

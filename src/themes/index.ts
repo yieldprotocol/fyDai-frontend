@@ -1,50 +1,67 @@
 import { css } from 'styled-components';
-import background from '../assets/images/background.png'
+import background from '../assets/images/background.png';
 
 export const yieldTheme = {
   name: 'yieldTheme',
   rounding: 24,
   spacing: 20,
-  pad: 'xlarge',
+  pad: 'medium',
   defaultMode: 'light',
   global: {
     elevation: {
       dark: {
         none: 'none',
-        xsmall: '0px 2px 2px rgba(255, 255, 255, 0.10)',
-        small: '0px 4px 4px rgba(255, 255, 255, 0.10)',
-        medium: '0px 6px 8px rgba(255, 255, 255, 0.10)',
-        large: '0px 8px 16px rgba(255, 255, 255, 0.10)',
-        xlarge: '0px 12px 24px rgba(255, 255, 255, 0.10)',
+        xsmall: '0px 2px 2px rgba(255, 255, 255, 0.5)',
+        small: '0px 4px 4px rgba(255, 255, 255, 0.5)',
+        medium: '0px 6px 8px rgba(255, 255, 255, 0.5)',
+        large: '0px 8px 16px rgba(255, 255, 255, 0.5)',
+        xlarge: '0px 12px 24px rgba(255, 255, 255, 0.5)',
       },
     },
     colors: {
       brand: {
-        dark: '#78F029',
-        light: '#49E303',
+        dark: '#005792',
+        light: '#005792',
+        // dark: '#009E83',
+        // light:'#009E83',
+      },
+      'brand-transparent': {
+        // dark: 'rgba(0, 158, 131, 0.1)',
+        // light: 'rgba(0, 158, 131, 0.1)',
+        dark: '#0057921A',
+        light: '#0057921A',
+      },
+      secondary: {
+        dark: '#627EEA',
+        light: '#627EEA',
+      },
+      'secondary-transparent': {
+        dark: '#627EEA1A',
+        light: '#627EEA1A',
+        // dark: 'rgb(98, 126, 234, 0.1)',
+        // light: 'rgb(98, 126, 234, 0.1)',
       },
       background: {
         // 'dark': '#111111',
-        // 'light': '#FFFFFF'
-        dark:
-          'linear-gradient(135deg, rgba(138,5,12,1) 0%, rgba(17,17,17,1) 33%, rgba(17,17,17,1) 100%)',
-        light:
-          'linear-gradient(45deg, rgba(120,240,41,0.30) 0%, rgba(255,255,255,0) 33%, rgba(255,255,255,0) 100%)',
+        // 'light': '#FFFFFF',
+        dark: '#111111',
+        light: '#F1F5F9',
       },
+
       'background-back': {
         dark: '#111111',
         light: '#EEEEEE',
       },
-      'background-frontheader': {
-        // 'dark': 'linear-gradient(135deg, rgba(138,5,12,1) 0%, rgba(17,17,17,1) 33%, rgba(17,17,17,1) 100%)',
-        // 'light': 'linear-gradient(45deg, rgba(120,240,41,0.30) 0%, #EEEEEE 33%, #EEEEEE 100%)'
+      'background-mid': {
         dark: 'dark-1',
-        light: 'light-3',
+        light: '#F5FAFF',
+        // light: 'light-3',
       },
       'background-front': {
         dark: '#222222',
+        light: '#ffffff',
         // 'dark': 'dark-1',
-        light: 'light-1',
+        // light: 'light-1',
       },
       'background-contrast': {
         dark: '#FFFFFF11',
@@ -52,7 +69,7 @@ export const yieldTheme = {
       },
       text: {
         dark: '#EEEEEE',
-        light: '#333333',
+        light: '#005792',
       },
       'text-strong': {
         dark: '#FFFFFF',
@@ -60,17 +77,20 @@ export const yieldTheme = {
       },
       'text-weak': {
         dark: '#CCCCCC',
-        light: '#444444',
+        light: '#78859A',
       },
       'text-xweak': {
         dark: '#999999',
-        light: '#666666',
+        light: '#ffffff',
       },
       border: {
-        dark: '#444444',
-        light: '#CCCCCC',
+        // dark: '#444444',
+        // light: '#CCCCCC',
+        dark: 'rgba(0, 0, 0, 0.08)',
+        light: 'rgba(0, 0, 0, 0.08)',
       },
       focus: 'none',
+      placeholder: 'text',
       control: 'brand',
       'active-background': 'background-contrast',
       'active-text': 'text-strong',
@@ -88,15 +108,6 @@ export const yieldTheme = {
       },
     },
     // font: {
-    //   family: '"Jost"',
-    //   size: '15px',
-    //   height: '20px',
-    //   maxWidth: '300px',
-    //   face:
-    //     "/* cyrillic */\n@font-face {\n  font-family: 'Jost';\n  font-style: normal;\n  font-weight: 400;\n  src: url(https://fonts.gstatic.com/s/jost/v1/92z8tBhPNqw79Ij1C9z1vBQv7mxrZh9NHHnUBkLNPUtGwv1mORTOmqVU7ialrkw.woff) format('woff');\n  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;\n}\n/* latin-ext */\n@font-face {\n  font-family: 'Jost';\n  font-style: normal;\n  font-weight: 400;\n  src: url(https://fonts.gstatic.com/s/jost/v1/92z8tBhPNqw79Ij1C9z1vBQv7mxrZh9NHHnUBkLNPUtGwv1mMxTOmqVU7ialrkw.woff) format('woff');\n  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;\n}\n/* latin */\n@font-face {\n  font-family: 'Jost';\n  font-style: normal;\n  font-weight: 400;\n  src: url(https://fonts.gstatic.com/s/jost/v1/92z8tBhPNqw79Ij1C9z1vBQv7mxrZh9NHHnUBkLNPUtGwv1mPRTOmqVU7ial.woff) format('woff');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;\n}\n\n/* latin-ext */\n@font-face {\n  font-family: 'Lato';\n  font-style: normal;\n  font-weight: 400;\n  src: local('Lato Regular'), local('Lato-Regular'), url(https://fonts.gstatic.com/s/lato/v16/S6uyw4BMUTPHjxAwXiWtFCfQ7A.woff2) format('woff2');\n  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;\n}\n/* latin */\n@font-face {\n  font-family: 'Lato';\n  font-style: normal;\n  font-weight: 400;\n  src: local('Lato Regular'), local('Lato-Regular'), url(https://fonts.gstatic.com/s/lato/v16/S6uyw4BMUTPHjx4wXiWtFCc.woff2) format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;\n}\n\n/* latin-ext */\n@font-face {\n  font-family: 'Lato';\n  font-style: normal;\n  font-weight: 400;\n  src: local('Lato Regular'), local('Lato-Regular'), url(https://fonts.gstatic.com/s/lato/v16/S6uyw4BMUTPHjxAwXiWtFCfQ7A.woff2) format('woff2');\n  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;\n}\n/* latin */\n@font-face {\n  font-family: 'Lato';\n  font-style: normal;\n  font-weight: 400;\n  src: local('Lato Regular'), local('Lato-Regular'), url(https://fonts.gstatic.com/s/lato/v16/S6uyw4BMUTPHjx4wXiWtFCc.woff2) format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;\n}\n",
-    // },
-
-    // font: {
     //   family: 'Oswald',
     //   size: '14px',
     //   height: '20px',
@@ -105,23 +116,24 @@ export const yieldTheme = {
     // },
 
     // font: {
-    //   family: '"Press Start 2P"',
+    //   family: 'Lato',
     //   size: '14px',
     //   height: '20px',
     //   maxWidth: '300px',
-    //   face: "/* cyrillic-ext */\n@font-face {\n  font-family: 'Press Start 2P';\n  font-style: normal;\n  font-weight: 400;\n  src: local('Press Start 2P Regular'), local('PressStart2P-Regular'), url(https://fonts.gstatic.com/s/pressstart2p/v8/e3t4euO8T-267oIAQAu6jDQyK3nYivNm4I81PZQ.woff2) format('woff2');\n  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;\n}\n/* cyrillic */\n@font-face {\n  font-family: 'Press Start 2P';\n  font-style: normal;\n  font-weight: 400;\n  src: local('Press Start 2P Regular'), local('PressStart2P-Regular'), url(https://fonts.gstatic.com/s/pressstart2p/v8/e3t4euO8T-267oIAQAu6jDQyK3nRivNm4I81PZQ.woff2) format('woff2');\n  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;\n}\n/* greek */\n@font-face {\n  font-family: 'Press Start 2P';\n  font-style: normal;\n  font-weight: 400;\n  src: local('Press Start 2P Regular'), local('PressStart2P-Regular'), url(https://fonts.gstatic.com/s/pressstart2p/v8/e3t4euO8T-267oIAQAu6jDQyK3nWivNm4I81PZQ.woff2) format('woff2');\n  unicode-range: U+0370-03FF;\n}\n/* latin-ext */\n@font-face {\n  font-family: 'Press Start 2P';\n  font-style: normal;\n  font-weight: 400;\n  src: local('Press Start 2P Regular'), local('PressStart2P-Regular'), url(https://fonts.gstatic.com/s/pressstart2p/v8/e3t4euO8T-267oIAQAu6jDQyK3nbivNm4I81PZQ.woff2) format('woff2');\n  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;\n}\n/* latin */\n@font-face {\n  font-family: 'Press Start 2P';\n  font-style: normal;\n  font-weight: 400;\n  src: local('Press Start 2P Regular'), local('PressStart2P-Regular'), url(https://fonts.gstatic.com/s/pressstart2p/v8/e3t4euO8T-267oIAQAu6jDQyK3nVivNm4I81.woff2) format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;\n}\n\n/* cyrillic-ext */\n@font-face {\n  font-family: 'Lobster';\n  font-style: normal;\n  font-weight: 400;\n  src: local('Lobster Regular'), local('Lobster-Regular'), url(https://fonts.gstatic.com/s/lobster/v22/neILzCirqoswsqX9zo-mM4MwWJXNqA.woff2) format('woff2');\n  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;\n}\n/* cyrillic */\n@font-face {\n  font-family: 'Lobster';\n  font-style: normal;\n  font-weight: 400;\n  src: local('Lobster Regular'), local('Lobster-Regular'), url(https://fonts.gstatic.com/s/lobster/v22/neILzCirqoswsqX9zoamM4MwWJXNqA.woff2) format('woff2');\n  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;\n}\n/* vietnamese */\n@font-face {\n  font-family: 'Lobster';\n  font-style: normal;\n  font-weight: 400;\n  src: local('Lobster Regular'), local('Lobster-Regular'), url(https://fonts.gstatic.com/s/lobster/v22/neILzCirqoswsqX9zo2mM4MwWJXNqA.woff2) format('woff2');\n  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;\n}\n/* latin-ext */\n@font-face {\n  font-family: 'Lobster';\n  font-style: normal;\n  font-weight: 400;\n  src: local('Lobster Regular'), local('Lobster-Regular'), url(https://fonts.gstatic.com/s/lobster/v22/neILzCirqoswsqX9zoymM4MwWJXNqA.woff2) format('woff2');\n  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;\n}\n/* latin */\n@font-face {\n  font-family: 'Lobster';\n  font-style: normal;\n  font-weight: 400;\n  src: local('Lobster Regular'), local('Lobster-Regular'), url(https://fonts.gstatic.com/s/lobster/v22/neILzCirqoswsqX9zoKmM4MwWJU.woff2) format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;\n}\n"
+    //   face: "/* latin-ext */\n@font-face {\n  font-family: 'Lato';\n  font-style: normal;\n  font-weight: 400;\n  src: local('Lato Regular'), local('Lato-Regular'), url(https://fonts.gstatic.com/s/lato/v16/S6uyw4BMUTPHjxAwXiWtFCfQ7A.woff2) format('woff2');\n  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;\n}\n/* latin */\n@font-face {\n  font-family: 'Lato';\n  font-style: normal;\n  font-weight: 400;\n  src: local('Lato Regular'), local('Lato-Regular'), url(https://fonts.gstatic.com/s/lato/v16/S6uyw4BMUTPHjx4wXiWtFCc.woff2) format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;\n}\n"
     // },
-
     font: {
-      family: 'Lato',
-      size: '14px',
+      family:
+        "'Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'",
+      face:
+        "/* cyrillic-ext */\n@font-face {\n  font-family: 'Inter';\n  font-style: normal;\n  font-weight: 400;\n  src: url(https://fonts.gstatic.com/s/inter/v1/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZJhjp-Ek-_EeAmM.woff) format('woff');\n  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;\n}\n/* cyrillic */\n@font-face {\n  font-family: 'Inter';\n  font-style: normal;\n  font-weight: 400;\n  src: url(https://fonts.gstatic.com/s/inter/v1/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZthjp-Ek-_EeAmM.woff) format('woff');\n  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;\n}\n/* greek-ext */\n@font-face {\n  font-family: 'Inter';\n  font-style: normal;\n  font-weight: 400;\n  src: url(https://fonts.gstatic.com/s/inter/v1/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZNhjp-Ek-_EeAmM.woff) format('woff');\n  unicode-range: U+1F00-1FFF;\n}\n/* greek */\n@font-face {\n  font-family: 'Inter';\n  font-style: normal;\n  font-weight: 400;\n  src: url(https://fonts.gstatic.com/s/inter/v1/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZxhjp-Ek-_EeAmM.woff) format('woff');\n  unicode-range: U+0370-03FF;\n}\n/* vietnamese */\n@font-face {\n  font-family: 'Inter';\n  font-style: normal;\n  font-weight: 400;\n  src: url(https://fonts.gstatic.com/s/inter/v1/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZBhjp-Ek-_EeAmM.woff) format('woff');\n  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;\n}\n/* latin-ext */\n@font-face {\n  font-family: 'Inter';\n  font-style: normal;\n  font-weight: 400;\n  src: url(https://fonts.gstatic.com/s/inter/v1/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZFhjp-Ek-_EeAmM.woff) format('woff');\n  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;\n}\n/* latin */\n@font-face {\n  font-family: 'Inter';\n  font-style: normal;\n  font-weight: 400;\n  src: url(https://fonts.gstatic.com/s/inter/v1/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hjp-Ek-_EeA.woff) format('woff');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;\n}\n\n/* cyrillic-ext */\n@font-face {\n  font-family: 'Inter';\n  font-style: normal;\n  font-weight: 400;\n  src: url(https://fonts.gstatic.com/s/inter/v1/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZJhjp-Ek-_EeAmM.woff) format('woff');\n  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;\n}\n/* cyrillic */\n@font-face {\n  font-family: 'Inter';\n  font-style: normal;\n  font-weight: 400;\n  src: url(https://fonts.gstatic.com/s/inter/v1/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZthjp-Ek-_EeAmM.woff) format('woff');\n  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;\n}\n/* greek-ext */\n@font-face {\n  font-family: 'Inter';\n  font-style: normal;\n  font-weight: 400;\n  src: url(https://fonts.gstatic.com/s/inter/v1/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZNhjp-Ek-_EeAmM.woff) format('woff');\n  unicode-range: U+1F00-1FFF;\n}\n/* greek */\n@font-face {\n  font-family: 'Inter';\n  font-style: normal;\n  font-weight: 400;\n  src: url(https://fonts.gstatic.com/s/inter/v1/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZxhjp-Ek-_EeAmM.woff) format('woff');\n  unicode-range: U+0370-03FF;\n}\n/* vietnamese */\n@font-face {\n  font-family: 'Inter';\n  font-style: normal;\n  font-weight: 400;\n  src: url(https://fonts.gstatic.com/s/inter/v1/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZBhjp-Ek-_EeAmM.woff) format('woff');\n  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;\n}\n/* latin-ext */\n@font-face {\n  font-family: 'Inter';\n  font-style: normal;\n  font-weight: 400;\n  src: url(https://fonts.gstatic.com/s/inter/v1/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZFhjp-Ek-_EeAmM.woff) format('woff');\n  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;\n}\n/* latin */\n@font-face {\n  font-family: 'Inter';\n  font-style: normal;\n  font-weight: 400;\n  src: url(https://fonts.gstatic.com/s/inter/v1/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hjp-Ek-_EeA.woff) format('woff');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;\n}\n",
+      size: '15px',
       height: '20px',
       maxWidth: '300px',
-      face: "/* latin-ext */\n@font-face {\n  font-family: 'Lato';\n  font-style: normal;\n  font-weight: 400;\n  src: local('Lato Regular'), local('Lato-Regular'), url(https://fonts.gstatic.com/s/lato/v16/S6uyw4BMUTPHjxAwXiWtFCfQ7A.woff2) format('woff2');\n  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;\n}\n/* latin */\n@font-face {\n  font-family: 'Lato';\n  font-style: normal;\n  font-weight: 400;\n  src: local('Lato Regular'), local('Lato-Regular'), url(https://fonts.gstatic.com/s/lato/v16/S6uyw4BMUTPHjx4wXiWtFCc.woff2) format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;\n}\n"
     },
 
     active: {
-      // 'background': 'active-background',
+      background: 'active-background',
       color: 'active-text',
     },
     hover: {
@@ -139,7 +151,7 @@ export const yieldTheme = {
     },
     drop: {
       border: {
-        // radius: '24px',
+        radius: '24px',
       },
     },
     borderSize: {
@@ -198,6 +210,16 @@ export const yieldTheme = {
     input: {
       padding: { vertical: 'xsmall', horizontal: 'small' },
       weight: 100,
+      extend: () => css`
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+        input[type='number'] {
+          -moz-appearance: textfield;
+        }
+      `,
     },
     spacing: '20px',
     size: {
@@ -215,19 +237,45 @@ export const yieldTheme = {
   diagram: {
     line: {},
   },
+  grommet: {
+    // @ts-ignore
+    extend: () => css`
+      input::-webkit-outer-spin-button,
+      input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+      input[type='number'] {
+        -moz-appearance: textfield;
+      }
+      overflow: auto;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+      ::-webkit-scrollbar {
+        display: none;
+      }
+    `,
+  },
   TextInput: {},
   collapsible: {
     minSpeed: '100',
   },
   meter: {},
+  anchor: {
+    hover: {
+      extend: {
+        opacity: '0.5',
+      },
+    },
+  },
   button: {
     border: {
       width: '1px',
-      radius: '15px',
+      radius: '8px',
     },
     padding: {
       vertical: '3px',
-      horizontal: '18px',
+      horizontal: '10px',
     },
   },
   checkBox: {
@@ -302,76 +350,8 @@ export const yieldTheme = {
     },
     round: '24px',
   },
-  calendar: {
-    small: {
-      fontSize: '13.333333333333334px',
-      lineHeight: 1.375,
-      daySize: '22.86px',
-    },
-    medium: {
-      fontSize: '15px',
-      lineHeight: 1.45,
-      daySize: '45.71px',
-    },
-    large: {
-      fontSize: '20px',
-      lineHeight: 1.11,
-      daySize: '91.43px',
-    },
-  },
-  clock: {
-    analog: {
-      hour: {
-        width: '7px',
-        size: '20px',
-      },
-      minute: {
-        width: '3px',
-        size: '10px',
-      },
-      second: {
-        width: '3px',
-        size: '8px',
-      },
-      size: {
-        small: '60px',
-        medium: '80px',
-        large: '120px',
-        xlarge: '180px',
-        huge: '240px',
-      },
-    },
-    digital: {
-      text: {
-        xsmall: {
-          size: '11.666666666666666px',
-          height: 1.5,
-        },
-        small: {
-          size: '13.333333333333334px',
-          height: 1.43,
-        },
-        medium: {
-          size: '15px',
-          height: 1.375,
-        },
-        large: {
-          size: '16.666666666666668px',
-          height: 1.167,
-        },
-        xlarge: {
-          size: '18.333333333333332px',
-          height: 1.1875,
-        },
-        xxlarge: {
-          size: '21.666666666666668px',
-          height: 1.125,
-        },
-      },
-    },
-  },
-  heading: {
 
+  heading: {
     level: {
       '1': {
         small: {
@@ -535,6 +515,18 @@ export const yieldTheme = {
     },
   },
   text: {
+    xxxsmall: {
+      size: '8px',
+      height: '14px',
+      maxWidth: '220px',
+    },
+
+    xxsmall: {
+      size: '10px',
+      height: '15px',
+      maxWidth: '243px',
+    },
+
     xsmall: {
       size: '13px',
       height: '18px',
@@ -567,16 +559,15 @@ export const yieldTheme = {
     },
   },
   scale: 0.5,
-
   layer: {
     background: {
       dark: '#11111100',
       light: '#FFFFFF00',
     },
-    container : {
+    container: {
       zIndex: '20',
     },
-    zIndex : '15',
+    zIndex: '15',
     overlay: {
       //  background: '#000000BF', //75%
       background: '#00000080', // 50%
@@ -587,7 +578,6 @@ export const yieldTheme = {
     // extend: ({ theme }) => css`
     //     filter: blur(3px);
     //   `,
-
   },
 
   table: {
@@ -598,12 +588,15 @@ export const yieldTheme = {
     margin: { horizontal: 'none', vertical: 'xxsmall' },
     color: 'active-text',
     active: {
-      background: 'brand',
+      // background: 'brand',
       // background: `url("${background}")`,
       // @ts-ignore
       extend: ({ theme }) => css`
-      font-weight: 'bold';
-      `
+        font-weight: 'bold';
+      `,
+    },
+    hover: {
+      background: 'background-front',
     },
 
     border: {
@@ -615,16 +608,15 @@ export const yieldTheme = {
         color: 'brand',
       },
       active: {
-        color: 'none',
+        color: 'brand',
       },
     },
     pad: 'small',
     // @ts-ignore
     extend: ({ theme }) => css`
-      border-radius: ${theme.global.edgeSize.large};
+      border-radius: ${theme.global.edgeSize.xsmall};
       positon: fixed;
     `,
-
   },
 
   tabs: {
@@ -638,19 +630,29 @@ export const yieldTheme = {
       // position: fixed;
       // `
     },
-    panel : {
-      // @ts-ignore
-      extend: ({ theme }) => css`
-      overflow: auto;
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-      ::-webkit-scrollbar { display:none; }
-    `
+    panel: {
+      //   // @ts-ignore
+      //   extend: ({ theme }) => css`
+      //   overflow: auto;
+      //   -ms-overflow-style: none;
+      //   scrollbar-width: none;
+      //   ::-webkit-scrollbar { display:none; }
+      // `
     },
     // @ts-ignore
     extend: ({ theme }) => css`
       flex: ${theme.global.edgeSize.small};
       radius: ${theme.global.edgeSize.large};
     `,
+  },
+  rangeInput: {
+    track: {
+      // color: 'accent-2',
+      height: 'small',
+      extend: () => 'border-radius: 10px',
+    },
+    thumb: {
+      color: 'brand',
+    },
   },
 };
