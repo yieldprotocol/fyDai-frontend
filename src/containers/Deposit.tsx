@@ -125,7 +125,7 @@ const Deposit = ({ depositAmount }:DepositProps) => {
             >
               <TextInput
                 type='number'
-                placeholder='Enter the amount to deposit in Eth'
+                placeholder='Enter the ETH amount to deposit'
                 value={inputValue || ''}
                 disabled={postEthActive}
                 plain
@@ -164,7 +164,7 @@ const Deposit = ({ depositAmount }:DepositProps) => {
           </Box>       
 
           <Box gap='small'>
-            <Text color='text-weak' size='xsmall'>Collateralisation Ratio</Text>
+            <Text color='text-weak' size='xsmall'>Collateralization Ratio</Text>
             <Text color='brand' weight='bold' size='medium'>
               { (collateralPercent_ && (collateralPercent_ !== 0))? `${collateralPercent_}%`: '' }
             </Text>
@@ -177,7 +177,7 @@ const Deposit = ({ depositAmount }:DepositProps) => {
           </Box>
 
           <Box gap='small' alignSelf='start' align='center'>
-            <Text color='text-weak' size='xsmall'>Collateralization Ratio after withdraw</Text>
+            <Text color='text-weak' size='xsmall'>Collateralization Ratio after Deposit</Text>
             <Box direction='row' gap='small'>
               <Text color={!inputValue? 'brand-transparent': 'brand'} size='xxsmall'>approx.</Text> 
               <Text color={!inputValue? 'brand-transparent': 'brand'} weight='bold' size='medium'> 

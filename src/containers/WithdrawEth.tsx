@@ -200,7 +200,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
 
             { (collateralPercent_ > 0) &&
             <Box gap='small' alignSelf='start' align='center'>
-              <Text color='text-weak' size='xsmall'>Collateralization Ratio after withdraw</Text>
+              <Text color='text-weak' size='xsmall'>Collateralization Ratio after Withdraw</Text>
               <Box direction='row' gap='small'>
                 <Text color={!inputValue? 'brand-transparent': indicatorColor} size='xxsmall'>approx.</Text> 
                 <Text color={!inputValue? 'brand-transparent': indicatorColor} weight='bold' size='medium'> 

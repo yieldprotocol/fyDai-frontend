@@ -22,12 +22,8 @@ import { UserContext } from '../contexts/UserContext';
 import { usePool, useBalances, useMath, useToken } from '../hooks';
 import InlineAlert from '../components/InlineAlert';
 
-
-interface ILendProps {
-  lendAmount?:any
-}
   
-const Lend = ({ lendAmount }:ILendProps) => {
+const Pool = (props:any) => {
   
   const { state: yieldState, actions: yieldActions } = React.useContext(YieldContext);
   const { deployedContracts } = yieldState;
@@ -136,7 +132,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
             <Box fill direction='row-responsive' justify='start' gap='large'>
               <Box gap='small'>
                 <Box direction='row' gap='small'>
-                  <Text color='text-weak' size='xsmall'>Portfolio Value at Maturity</Text>
+                  <Text color='text-weak' size='xsmall'>Holdings Value at Maturity</Text>
                   <Help />
                 </Box>
                 <Text color='brand' weight='bold' size='medium'> {activeSeries && `${activeSeries?.yDaiBalance_.toFixed(2)} Dai` || '-'} </Text>
@@ -285,6 +281,4 @@ const Lend = ({ lendAmount }:ILendProps) => {
   );
 };
 
-Lend.defaultProps={ lendAmount:null };
-
-export default Lend;
+export default Pool;

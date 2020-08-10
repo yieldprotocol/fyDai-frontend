@@ -9,7 +9,7 @@ import { useWeb3React } from './hooks';
 import Dashboard from './views/Dashboard';
 import BorrowView from './views/BorrowView';
 import LendView from './views/LendView';
-import Amm from './views/Amm';
+import PoolView from './views/PoolView';
 
 import YieldHeader from './components/YieldHeader';
 import YieldFooter from './components/YieldFooter';
@@ -90,7 +90,7 @@ const App = () =>  {
                     {activeView === 'LEND' && (
                       <LendView  />
                     )}
-                    {activeView === 'AMM' && <Amm />}
+                    {activeView === 'POOL' && <PoolView />}
                   </Box>
                   <Box background="background" />
                 </Grid>

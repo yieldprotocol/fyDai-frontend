@@ -3,7 +3,7 @@ import { Box } from 'grommet';
 
 import PageHeader from '../components/PageHeader';
 
-const Amm = () => {
+const PoolView = () => {
   return (
     <Box
       gap="small"
@@ -19,8 +19,8 @@ const Amm = () => {
         align="center"
       >
         <PageHeader
-          title="AMM"
-          subtitle="Description of AMM"
+          title="Pool"
+          subtitle="Description of pool"
           tipPrimary="Tip: Convert your Maker vault"
           tipSecondary="View more tips"
         />
@@ -29,4 +29,4 @@ const Amm = () => {
   );
 };
 
-export default Amm;
+export default PoolView;

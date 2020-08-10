@@ -76,7 +76,7 @@ const DashBorrow = ({ }:DashBorrowProps) => {
           </Box>
 
           <Box gap='small'>
-            <Text color='text-weak' size='xxsmall'> Collateralisation </Text>
+            <Text color='text-weak' size='xxsmall'> Collateralization </Text>
             <Text color='brand' weight='bold' size='large'> { collateralPercent_? `${collateralPercent_.toFixed(2)} %`: '' } </Text>
           </Box>
           {!addCollateral? <PlusCircle size='25' color='brand' onClick={()=>setAddCollateral(!addCollateral)} />
@@ -162,56 +162,6 @@ const DashBorrow = ({ }:DashBorrowProps) => {
         <Box basis='2/3' fill gap='small'>
           <Text color='text-weak' size='xsmall'>Your History</Text>
           <TxHistory filterTerms={['Bought', 'Repaid', 'Deposited', 'Withdrew']} view='borrow' />
-          {/* <Box
-            background='background-front'
-            fill='horizontal'
-            round='medium'
-            pad='none'
-            // elevation='medium'
-            border
-          >
-            <Box 
-              direction='row'
-              gap='xsmall'
-              justify='between'
-              background='background-mid'
-              pad='small'
-              round={{ size:'medium', corner:'top' }}
-            >
-              <Box basis='2/5'><Text color='text-weak' size='xsmall'>TRANSACTION</Text></Box>
-              <Box><Text color='text-weak' size='xsmall'>AMOUNT</Text></Box>
-              <Box><Text color='text-weak' size='xsmall'>DATE</Text></Box>
-              <Box><Text color='text-weak' size='xsmall'>ACTION</Text></Box>
-            </Box>
-            <Box>
-              { txHistory.length > 0 ? txHistory.map((x:any, i:number)=>{
-                const key_ = i;
-                return (
-                  <Box
-                    pad='small'
-                    direction='row'
-                    gap='xsmall'
-                    key={key_}
-                    justify='between'
-                    hoverIndicator='background-mid'
-                    onClick={()=>console.log('click')}
-                    fill
-                  >
-                    <Box basis='2/5'><Text>{x.event}</Text> </Box>
-                    <Box><Text> {x.amount} </Text></Box>
-                    <Box><Text> {x.date} </Text></Box>
-                    <Box><Text> : </Text></Box>
-                  </Box>
-                );
-              }):
-              <Box align='center'>
-                { !isLoading ? 
-                  <Text>Loading...</Text> 
-                  : 
-                  <Text> No history</Text> } 
-              </Box>}
-            </Box>
-          </Box> */}
 
         </Box>
       </Box>
