@@ -39,7 +39,8 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
   const { state: userState, actions: userActions } = React.useContext(UserContext);
   const { position } = userState;
   const { 
-    ethBorrowingPower_: maximumDai, 
+    // ethBorrowingPower_: maximumDai, 
+    maxDaiAvailable_: maximumDai,
     collateralPercent_ 
   } = position;
 
