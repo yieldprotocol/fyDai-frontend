@@ -104,6 +104,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
     // const res = await checkPoolDelegate(activeSeries.poolAddress, activeSeries.yDaiAddress);
     await addControllerDelegate(deployedContracts.Controller, activeSeries.daiProxyAddress);
     const res = await checkControllerDelegate(deployedContracts.Controller, activeSeries.daiProxyAddress);
+    await seriesActions.updateActiveSeries();
     setHasDelegated(res);
   };
 

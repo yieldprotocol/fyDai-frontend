@@ -101,7 +101,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
             pad='medium'
           >
 
-            {  ( activeSeries && activeSeries.yieldAPR_ === Infinity ) ? 
+            {  ( activeSeries && !Number.isFinite(parseFloat(activeSeries.yieldAPR_)) ) ? 
               <Box 
                 round 
                 border='all'

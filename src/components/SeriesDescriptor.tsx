@@ -24,8 +24,9 @@ function SeriesDescriptor( props: ISeriesDescriptorProps, children:any) {
 
   /* Set Series description/display name */
   React.useEffect(()=>{
+
     activeSeries && setDescription(activeSeries.displayName);
-    activeSeries && activeSeries.yieldAPR_ !== Infinity &&
+    activeSeries && Number.isFinite(parseFloat(activeSeries.yieldAPR_)) &&
       setDescription(`${activeSeries.yieldAPR_}% ${activeSeries.displayName}`);
   }, [ activeSeries ]);
 
@@ -56,7 +57,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps, children:any) {
 
           { activeSeries && 
             activeView === 'borrow' && 
-            activeSeries.yieldAPR_ === Infinity &&        
+            !Number.isFinite(parseFloat(activeSeries.yieldAPR_)) &&        
             <Box 
               round
               border='all'
