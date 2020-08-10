@@ -6,6 +6,8 @@ import Deposit from '../containers/Deposit';
 import Borrow from '../containers/Borrow';
 import Repay from '../containers/Repay';
 
+import { UserContext } from '../contexts/UserContext';
+
 import PageHeader from '../components/PageHeader';
 
 interface BorrowProps {
@@ -15,8 +17,12 @@ interface BorrowProps {
 const BorrowView = ({
   activeView: activeViewFromProps,
 }: BorrowProps) => {
+  
+  const { state: { position }, } = React.useContext(UserContext);
 
-  const [ activeView, setActiveView ] = React.useState<string>( activeViewFromProps || 'collateral' );
+  const [ activeView, setActiveView ] = React.useState<string>( 
+    activeViewFromProps || 'collateral'
+  );
 
   return (
     <Box
@@ -79,7 +85,7 @@ const BorrowView = ({
               <Text size="xsmall" weight="bold">
                 1. Add Collateral
               </Text>
-              {true && <CheckCircle color="green" />}
+              {position.ethPosted>0 && <CheckCircle color="green" />}
             </Box>
 
 

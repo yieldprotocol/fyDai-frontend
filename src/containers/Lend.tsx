@@ -12,7 +12,8 @@ import {
   FiArrowRight as ArrowRight,
 } from 'react-icons/fi';
   
-import SeriesSelector from '../components/SeriesSelector';
+import SeriesDescriptor from '../components/SeriesDescriptor';
+
 import WithdrawDai from './WithdrawDai';
 import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
@@ -49,7 +50,6 @@ const Lend = ({ lendAmount }:ILendProps) => {
   
   const [ inputValue, setInputValue ] = React.useState<any>();
   const [ lendDisabled, setLendDisabled ] = React.useState<boolean>(false);
-  const [ selectorOpen, setSelectorOpen ] = React.useState<boolean>(false);
 
   const [ approved, setApproved ] = React.useState<any>(0);
 
@@ -125,53 +125,18 @@ const Lend = ({ lendAmount }:ILendProps) => {
   
   return (
     <>
-      {selectorOpen && <SeriesSelector close={()=>setSelectorOpen(false)} /> }
       { sellOpen && <WithdrawDai close={()=>setSellOpen(false)} /> }
       <Box flex='grow' justify='between'>
         <Box gap='medium' align='center' fill='horizontal'>
           <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Selected series</Text>
-          <Box
-            direction='row-responsive'
-            fill='horizontal'
-            gap='small'
-            align='center'
-          >
-            <Box 
-              round='xsmall'
-              background='brand-transparent'
-              border='all'
-              onClick={()=>setSelectorOpen(true)}
-              hoverIndicator='brand-transparent'
-              direction='row'
-              fill
-              pad='small'
-              flex
-            >
-              <Text color='brand' size='large'>{ activeSeries? `${activeSeries.yieldAPR_}% ${activeSeries.displayName}` : 'Loading...' }</Text>
-            </Box>
-  
-            <Box justify='center'>
-              <Box
-                round
-                onClick={()=>setSelectorOpen(true)}
-                hoverIndicator='brand-transparent'
-                border='all'
-                // border={{ color:'brand' }}
-                pad={{ horizontal:'small', vertical:'small' }}
-                justify='center'
-              >
-                <Text size='xsmall'>Change series</Text>
-              </Box>
-            </Box>
-          </Box>
+
+          <SeriesDescriptor activeView='lend' />
 
           <Box fill gap='small' pad={{ horizontal:'medium' }}>
-
             <Box fill direction='row-responsive' justify='start' gap='large'>
-
               <Box gap='small'>
                 <Box direction='row' gap='small'>
-                  <Text color='text-weak' size='xsmall'>Portfolio Value at Maturity</Text>
+                  <Text color='text-weak' size='xsmall'>Holdings Value at Maturity</Text>
                   <Help />
                 </Box>
                 <Text color='brand' weight='bold' size='medium'> {activeSeries && `${activeSeries?.yDaiBalance_.toFixed(2)} Dai` || '-'} </Text>
@@ -260,10 +225,8 @@ const Lend = ({ lendAmount }:ILendProps) => {
                     <Help />
                   </Box>
                   <Text color='brand' weight='bold' size='medium'> {daiBalance_?`${daiBalance_.toFixed(2)} Dai`: '-'} </Text>
-                </Box>
-              
+                </Box>         
               </Box>
-
               <Box fill direction='row-responsive' justify='between'>
                 {/* next block */}
               </Box>
@@ -275,7 +238,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
           <Box>
             <CheckBox 
               reverse
-                // value={true}
+              // value={true}
               checked={!inputValue || ( approved >= inputValue )}
               disabled={!inputValue || ( approved >= inputValue )}
               onChange={()=>approveProcedure(inputValue)}

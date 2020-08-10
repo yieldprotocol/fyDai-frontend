@@ -8,7 +8,7 @@ import { useWeb3React } from '../../hooks';
 
 const AccountLayer = (props:any) => {
   const { closeLayer, changeWallet } = props;
-  const { state: { balances } } = React.useContext(UserContext);
+  const { state: { position } } = React.useContext(UserContext);
 
   const { library } = useWeb3React();
   
@@ -53,7 +53,7 @@ const AccountLayer = (props:any) => {
           <Text weight="bold"> { library.network.name } </Text>
           <Box direction='row' gap='small'>
             <Text size='xsmall'>ETH balance:</Text>
-            <Text>{ balances.ethBalance_ && balances.ethBalance_ || '' }</Text>
+            <Text>{ position.ethBalance_ && position.ethBalance_ || '' }</Text>
           </Box>
           {/* <Button fill='horizontal' label='Connect to another wallet' onClick={()=>setShowConnectLayer(true)} /> */}
         </Box>

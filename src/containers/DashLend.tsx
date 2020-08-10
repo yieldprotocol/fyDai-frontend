@@ -12,11 +12,11 @@ import {
 
 } from 'react-icons/fi';
 
-import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 import TxHistory from '../components/TxHistory';
 import { UserContext } from '../contexts/UserContext';
 
+import { usePool } from '../hooks';
 
 interface DashLendProps {
   // borrowFn:any
@@ -37,6 +37,18 @@ const DashLend = () => {
     collateralPercent_,
     ethBorrowingPower_: maximumDai
   } = position;
+
+  const { sellDai, previewPoolTx }  = usePool();
+
+  const [ currentValue, setCurrentValue ] = React.useState<number>(0);
+
+  React.useEffect(() => {
+    console.log(position)
+    activeSeries && ( async ()=> {
+      const preview = await previewPoolTx('SellYDai', activeSeries.poolAddress, activeSeries.yDaiBalance_);
+      setCurrentValue( parseFloat(ethers.utils.formatEther(preview)));
+    })();
+  }, [ activeSeries, ]);
 
   return (
     <Box gap='small' direction='row'>
@@ -86,7 +98,7 @@ const DashLend = () => {
             </Box>
             <Box>
               <Text alignSelf='start' size='xsmall' color='brand'>
-                {activeSeries.ethDebtDai_.toFixed(2)}
+                {activeSeries?.yDaiBalance_.toFixed(2)}
               </Text>
             </Box>
           </Box>}           
@@ -110,7 +122,7 @@ const DashLend = () => {
               </Box>
               <Box>
                 <Text color='text-weak' size='xsmall'>Current Portfolio Value</Text> 
-                <Text color='brand' weight='bold' size='large'>140 Dai</Text> 
+                <Text color='brand' weight='bold' size='large'>{currentValue.toFixed(2)}</Text> 
               </Box>
             </Box>
           </Box>
@@ -128,7 +140,7 @@ const DashLend = () => {
               </Box>
               <Box>
                 <Text color='text-weak' size='xsmall'>Total Value at Maturity</Text> 
-                <Text color='brand' weight='bold' size='large'>150 Dai</Text> 
+                <Text color='brand' weight='bold' size='large'>{activeSeries?.yDaiBalance_.toFixed(2)}</Text> 
               </Box>
             </Box>
           </Box>

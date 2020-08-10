@@ -34,7 +34,7 @@ const App = () =>  {
 
   const [darkmode, setDarkmode] = React.useState(false);
   // TODO Switch out for react router
-  const [activeView, setActiveView] = React.useState<string>('DASHBOARD');
+  const [activeView, setActiveView] = React.useState<string>('BORROW');
 
   const [showConnectLayer, setShowConnectLayer] = React.useState<boolean>(false);
   const [showAccountLayer, setShowAccountLayer] = React.useState<boolean>(false);
@@ -58,7 +58,7 @@ const App = () =>  {
         <NotifyLayer />
         <ConnectLayer open={showConnectLayer} closeLayer={() => setShowConnectLayer(false)} />
         { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
-        { showSeriesLayer  && <SeriesSelector closeLayer={()=>setShowSeriesLayer(false)} /> }
+        { showSeriesLayer  && <SeriesSelector activeView='borrow' close={()=>setShowSeriesLayer(false)} /> }
         { showAccountLayer &&
           <AccountLayer
             closeLayer={() => setShowAccountLayer(false)}

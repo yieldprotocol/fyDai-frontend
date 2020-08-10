@@ -192,6 +192,7 @@ export const useMath = () => {
     const apr = Math.pow(priceRatio, powRatio) - 1;
 
     return apr;
+
   };
 
   return {

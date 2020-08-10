@@ -10,7 +10,7 @@ import {
 
 import { ScaleLoader } from 'react-spinners';
 
-import SeriesSelector from '../components/SeriesSelector';
+import SeriesDescriptor from '../components/SeriesDescriptor';
 import InlineAlert from '../components/InlineAlert';
 import OnceOffAuthorize from '../components/OnceOffAuthorize';
 import ApprovalPending from '../components/ApprovalPending';
@@ -53,7 +53,6 @@ function Repay({ repayAmount }:IRepayProps) {
 
   const [ repayPending, setRepayPending ] = React.useState<boolean>(false);
   const [ repayDisabled, setRepayDisabled ] = React.useState<boolean>(true);
-  const [ selectorOpen, setSelectorOpen ] = React.useState<boolean>(false);
 
   const [ hasDelegated, setHasDelegated ] = React.useState<any>(0);
   const [ approved, setApproved ] = React.useState<any>();
@@ -137,51 +136,18 @@ function Repay({ repayAmount }:IRepayProps) {
     ( async ()=>{
       // activeSeries && setApproved(await getTokenAllowance(deployedContracts.Dai, activeSeries.daiProxyAddress, 'Dai'));
       activeSeries && setApproved(await getTokenAllowance(deployedContracts.Dai, deployedContracts.Treasury, 'Dai'));
-      setHasDelegated(activeSeries.hasDelegatedPool);
+      activeSeries && setHasDelegated(activeSeries.hasDelegatedPool);
     })();
   }, [ activeSeries ]);
 
   return (
     <>
-      {selectorOpen && <SeriesSelector close={()=>setSelectorOpen(false)} /> }
       { !txActive &&
       <Box flex='grow' justify='between'>
         <Box gap='medium' align='center' fill='horizontal'>
           <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Selected series</Text>
-          <Box
-            direction='row-responsive'
-            fill='horizontal'
-            gap='small'
-            align='center'
-          >
-            <Box
-              round='xsmall'
-              background='brand-transparent'
-              border='all'
-              onClick={()=>setSelectorOpen(true)}
-              // hoverIndicator='brand'
-              direction='row'
-              fill
-              pad='small'
-              flex
-            >
-              <Text color='brand' size='large'>{ activeSeries? `${activeSeries.yieldAPR_}% ${activeSeries.displayName}` : 'Loading...' }</Text>
-            </Box>
 
-            <Box justify='center'>
-              <Box
-                round
-                onClick={()=>setSelectorOpen(true)}
-                hoverIndicator='brand-transparent'
-                border='all'
-                // border={{ color:'brand' }}
-                pad={{ horizontal:'small', vertical:'small' }}
-                justify='center'
-              >
-                <Text size='xsmall'>Change series</Text>
-              </Box>
-            </Box>
-          </Box>
+          <SeriesDescriptor activeView='borrow' />
 
           {/* {!hasDelegated && 
             <OnceOffAuthorize
@@ -199,7 +165,9 @@ function Repay({ repayAmount }:IRepayProps) {
               </Box>
               <Box direction='row' gap='small'>
                 {/* <Text color={maxDaiAvailable_? 'brand': 'brand-transparent'} size='xxsmall'>approx.</Text> */}
-                <Text color='brand' weight='bold' size='medium'> {activeSeries?.ethDebtDai_? `${activeSeries.ethDebtDai_.toFixed(2)} Dai`: ''}  </Text>
+                <Text color='brand' weight='bold' size='medium'>
+                  {activeSeries?.ethDebtYDai_? `${activeSeries.ethDebtYDai_.toFixed(2)} Dai`: 'O Dai'}
+                </Text>
               </Box>
             </Box>
 
