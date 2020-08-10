@@ -9,6 +9,7 @@ import {
   FiHelpCircle as Help,
 } from 'react-icons/fi';
 
+import SeriesDescriptor from '../components/SeriesDescriptor';
 import SeriesSelector from '../components/SeriesSelector';
 import InlineAlert from '../components/InlineAlert';
 import OnceOffAuthorize from '../components/OnceOffAuthorize';
@@ -67,7 +68,6 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
 
   /* internal component state */
   const [ borrowDisabled, setBorrowDisabled ] = React.useState<boolean>(true);
-  const [ selectorOpen, setSelectorOpen ] = React.useState<boolean>(false);
 
   const [ indicatorColor, setIndicatorColor ] = React.useState<string>('brand');
   const [ warningMsg, setWarningMsg] = React.useState<string|null>(null);
@@ -219,48 +219,14 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
   }, [ activeSeries ]);
 
   return (
-    <>
-      {selectorOpen && <SeriesSelector close={()=>setSelectorOpen(false)} /> }
+    <>    
       { txActive?.type !== 'BORROW' && txActive?.type !== 'BUY' &&
       <Box flex='grow' justify='between'>
         <Box gap='medium' align='center' fill='horizontal'>
           <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Selected series</Text>
 
-          <Box
-            direction='row-responsive'
-            fill='horizontal'
-            gap='small'
-            align='center'
-          >
-            <Box 
-              round='xsmall'
-              background='brand-transparent'
-              border='all'
-              onClick={()=>setSelectorOpen(true)}
-              // hoverIndicator='brand'
-              direction='row'
-              fill
-              pad='small'
-              flex
-              // elevation='small'
-            >
-              <Text color='brand' size='large'>{ activeSeries? `${activeSeries.yieldAPR_}% ${activeSeries.displayName}` : 'Loading...' }</Text>
-            </Box>
-            <Box justify='center'>
-              <Box
-                round
-                onClick={()=>setSelectorOpen(true)}
-                hoverIndicator='brand-transparent'
-                border='all'
-              // border={{ color:'brand' }}
-                pad={{ horizontal:'small', vertical:'small' }}
-                justify='center'
-              >
-                <Text size='xsmall'>Change series</Text>
-              </Box>
-            </Box>
-          </Box>
-      
+          <SeriesDescriptor />
+
           {!hasDelegated && 
             <OnceOffAuthorize
               authProcedure={delegateProcedure} 
