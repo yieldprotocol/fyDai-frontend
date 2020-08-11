@@ -21,7 +21,7 @@ const BorrowView = ({
   const { state: { position }, } = React.useContext(UserContext);
 
   const [ activeView, setActiveView ] = React.useState<string>( 
-    activeViewFromProps || 'collateral'
+    activeViewFromProps || 'COLLATERAL'
   );
 
   return (
@@ -74,10 +74,10 @@ const BorrowView = ({
               round="medium"
               pad={{ horizontal: 'large', vertical: 'small' }}
               background={
-              activeView === 'collateral' ? 'background-front' : undefined
+              activeView === 'COLLATERAL' ? 'background-front' : undefined
             }
-              elevation={activeView === 'collateral' ? 'small' : undefined}
-              onClick={() => setActiveView('collateral')}
+              elevation={activeView === 'COLLATERAL' ? 'small' : undefined}
+              onClick={() => setActiveView('COLLATERAL')}
               direction="row"
               justify="between"
               gap="small"
@@ -93,10 +93,10 @@ const BorrowView = ({
               round="medium"
               pad={{ horizontal: 'large', vertical: 'small' }}
               background={
-              activeView === 'borrow' ? 'background-front' : undefined
+              activeView === 'BORROW' ? 'background-front' : undefined
             }
-              elevation={activeView === 'borrow' ? 'small' : undefined}
-              onClick={() => setActiveView('borrow')}
+              elevation={activeView === 'BORROW' ? 'small' : undefined}
+              onClick={() => setActiveView('BORROW')}
             >
               <Text size="xsmall" weight="bold">
                 2. Borrow Dai
@@ -106,9 +106,9 @@ const BorrowView = ({
             <Box
               round="medium"
               pad={{ horizontal: 'large', vertical: 'small' }}
-              background={activeView === 'repay' ? 'background-front' : undefined}
-              elevation={activeView === 'repay' ? 'small' : undefined}
-              onClick={() => setActiveView('repay')}
+              background={activeView === 'REPAY' ? 'background-front' : undefined}
+              elevation={activeView === 'REPAY' ? 'small' : undefined}
+              onClick={() => setActiveView('REPAY')}
             >
               <Text size="xsmall" weight="bold">
                 3. Repay Dai Debt
@@ -125,11 +125,11 @@ const BorrowView = ({
           round="medium"
           pad="large"
         >
-          {activeView === 'collateral' && <Deposit />}
-          {activeView === 'borrow' && (
+          {activeView === 'COLLATERAL' && <Deposit setActiveView={(x:string)=>setActiveView(x.toUpperCase())} />}
+          {activeView === 'BORROW' && (
           <Borrow />
           )}
-          {activeView === 'repay' && (
+          {activeView === 'REPAY' && (
           <Repay />
           )}
         </Box>
