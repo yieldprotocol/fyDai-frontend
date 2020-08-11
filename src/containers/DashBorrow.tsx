@@ -15,7 +15,7 @@ import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
 
-import DepositAction from './Deposit';
+import Deposit from './Deposit';
 
 import TxHistory from '../components/TxHistory';
 
@@ -53,7 +53,7 @@ const DashBorrow = ({ }:DashBorrowProps) => {
             round='medium'
             pad='large'
           >
-            <DepositAction  />
+            <Deposit setActiveView={()=>null} />
           </Box>
         </Layer>}
       <Text color='text-weak' size='xsmall'>Overview </Text>

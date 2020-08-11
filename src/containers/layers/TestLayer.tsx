@@ -12,7 +12,7 @@ import * as utils from '../../utils';
 import ProfileButton from '../../components/ProfileButton';
 import { NotifyContext } from '../../contexts/NotifyContext';
 
-import { useSendTx, useCallTx, useController, useBalances, useProxy } from '../../hooks';
+import { useSendTx, useCallTx, useController, useProxy } from '../../hooks';
 
 import { YieldContext } from '../../contexts/YieldContext';
 import { SeriesContext } from '../../contexts/SeriesContext';
@@ -22,7 +22,7 @@ const TestLayer = (props:any) => {
   const { chainId, account } = useWeb3React();
 
   // const web3 = useWeb3React();
-  const { state: { balances } } = React.useContext( UserContext );
+  const { state: { position }, actions: userActions } = React.useContext( UserContext );
   const { state: yieldState, actions: yieldActions } = React.useContext( YieldContext );
   const { state: seriesState, actions: seriesActions } = React.useContext( SeriesContext );
   const [ flow, setFlow ] = React.useState<string|null>('APPROVALS');
@@ -141,7 +141,7 @@ const TestLayer = (props:any) => {
 
             <Box direction='row' gap='small'>
               <Text size='xsmall'>ETH balance:</Text>
-              <Text size='xsmall'>{ balances.ethBalance_ || '' }</Text>
+              <Text size='xsmall'>{ position.ethBalance_ || '' }</Text>
             </Box>
           </Box>
 
@@ -153,25 +153,21 @@ const TestLayer = (props:any) => {
           >
             <Box direction='row'>
               <Button primary={flow==='APPROVALS'} label='Approvals' onClick={()=>setFlow('APPROVALS')} style={{ borderRadius:'24px 0px 0px 24px' }} />
-              <Button primary={flow==='MARKET'} label='MArket' onClick={()=>setFlow('MARKET')} style={{ borderRadius:'0px 0px 0px 0px' }} />
-
-             
-              <Button primary={flow==='ETH-A'} label='ETH-A flow' onClick={()=>setFlow('ETH-A')} style={{ borderRadius:'0px 0px 0px 0px' }} />
-              <Button primary={flow==='CHAI'} label='CHAI flow' onClick={()=>setFlow('CHAI')} style={{ borderRadius:'0px 0px 0px 0px' }} />
-              <Button primary={flow==='MATURITY'} label='Maturity' onClick={()=>setFlow('MATURITY')} style={{ borderRadius:'0px 24px 24px 0px' }} />
-            
+              <Button primary={flow==='MARKET'} label='Pool' onClick={()=>setFlow('MARKET')} style={{ borderRadius:'0px 0px 0px 0px' }} />    
+              <Button primary={flow==='MATURITY'} label='Maturity' onClick={()=>setFlow('MATURITY')} style={{ borderRadius:'0px 24px 24px 0px' }} />        
             </Box>
 
             {
               flow === 'APPROVALS' &&
               <Box gap='small'>
-                Approvals required:
-                <Button primary label='EthProxy (once-off)' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />
-                <Button primary label='Pool1 (for each market)' onClick={()=> sendTx(deployedSeries[0].poolAddress, 'Pool', 'addDelegate', [deployedSeries[0].yDaiAddress], utils.toWei('0'))} />
-                <Button primary label='Pool2 (for each market)' onClick={()=> sendTx(deployedContracts.Pool, 'Pool', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />
-              
-                <Button primary label='DO THIS (add Dai Proxy controller once-off) ' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedSeries[0].daiProxyAddress], utils.toWei('0'))} />
-                <Button primary label='Pool delegate daiProxy (for each proxy)' onClick={()=> sendTx(deployedSeries[0].poolAddress, 'Pool', 'addDelegate', [deployedSeries[0].daiProxyAddress], utils.toWei('0'))} />
+                Test Approvals (not all reqd.):
+
+                <Button primary label='controller addDelegate:EthProxy' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />             
+                <Button primary label='controller addDelegate:DaiProxy[0]' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedSeries[0].daiProxyAddress], utils.toWei('0'))} />
+
+                <Button primary label='pool[0] addDelegate: yDai[0]' onClick={()=> sendTx(deployedSeries[0].poolAddress, 'Pool', 'addDelegate', [deployedSeries[0].yDaiAddress], utils.toWei('0'))} />
+                <Button primary label='pool[0] addDelegate: ethProxy[0]' onClick={()=> sendTx(deployedSeries[0].poolAddress, 'Pool', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />
+                <Button primary label='Pool[0] addDelegate: daiProxy[0]' onClick={()=> sendTx(deployedSeries[0].poolAddress, 'Pool', 'addDelegate', [deployedSeries[0].daiProxyAddress], utils.toWei('0'))} />
 
               </Box>
             }
@@ -180,7 +176,6 @@ const TestLayer = (props:any) => {
             flow === 'MARKET' &&
               <Box gap='small'>
                 Pool:
-
                 <Button primary label='Check buy Rate' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />
                 <Button primary label='Pool (for each market)' onClick={()=> sendTx(deployedContracts.Pool, 'Controller', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />
               </Box>
@@ -190,26 +185,12 @@ const TestLayer = (props:any) => {
             <Box gap='small'>
 
               New ETH direct deposit/withdraw: 
-              <Button label='Post ETH Collateral direct 1.5' disabled={postActive} onClick={()=> postEth(deployedContracts.EthProxy, 1.5)} />
-              <Button primary label='DO THIS (addProxy once-off) ' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />
-              <Button label='(Withdraw ETH 1.5)' onClick={()=> withdrawEth(deployedContracts.EthProxy, 1.5 )} />
-
-
-         
-              Approvals required
-              
-              
-              {/* 
-              get ETH-A:
-              <Button label='1. wrap 10 eth to weth' onClick={()=> sendTx(deployedContracts.Weth, 'Weth', 'deposit', [], utils.toWei('10'))} />
-              ETH-A deposit and borrow: 
-              <Button label='2. Weth approve YieldController for 1.5' onClick={()=> approveController(deployedContracts.Weth, deployedContracts.Controller, 1.5 )} />
-              <Button label='3. Post Collateral 1.5' disabled={postActive} onClick={()=> post(deployedContracts.Controller, 'ETH-A', 1.5)} />
-              <Button label='(4. Withdraw 1.5)' onClick={()=> withdraw(deployedContracts.Controller, 'ETH-A', 1.5 )} />
-              <Button label='5.Borrow 0.5' onClick={()=> borrow(deployedContracts.Controller, 'ETH-A', yieldState.deployedSeries[0].maturity, 0.5 )} /> */}
-              ETH-A repay:
+              <Button label='Post ETH Collateral via proxy 1.5' disabled={postActive} onClick={()=> postEth(deployedContracts.EthProxy, 1.5)} />
+              <Button primary label='controller addDelegate:EthProxy' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />             
+              <Button label='Withdraw ETH via proxy 1.5)' onClick={()=> withdrawEth(deployedContracts.EthProxy, 1.5 )} />
               <Button label='6.1 Repay 0.5 eth/weth debt in yDai' onClick={()=> repay(deployedContracts.Controller, 'ETH-A', yieldState.deployedSeries[0].maturity, 0.5, 'YDAI' )} />
               <Button label='( 6.2 Repay 0.5 eth/weth debt in Dai) ' onClick={()=> repay(deployedContracts.Controller, 'ETH-A', yieldState.deployedSeries[0].maturity, 0.5, 'DAI' )} />
+            
             </Box>}
 
             { flow === 'CHAI' && 
@@ -277,7 +258,7 @@ const TestLayer = (props:any) => {
                 </Box>
                 <Box gap='small'>
                   <Text weight='bold'>Posted collateral:</Text>
-                  <Text>weth posted: { yieldData.ethPosted_ || '' }</Text>
+                  <Text>weth posted: { position.ethPosted_ || '' }</Text>
 
                 </Box>
               </Box>
@@ -301,12 +282,34 @@ const TestLayer = (props:any) => {
           </Box>
           <Button
             alignSelf='end'
-            label='refresh' 
+            label='soft refresh data' 
             onClick={
-            ()=> {
-              seriesActions.refreshSeries([yieldState.deployedSeries[0]]);
-              yieldActions.updateYieldBalances(yieldState.deployedContracts);
-              // yieldActions.updateUserData(yieldState.deployedContracts);
+            async ()=> {
+              await Promise.all([
+                seriesActions.updateSeries(yieldState.deployedSeries),
+                userActions.updatePosition(),
+                seriesActions.updateActiveSeries(),
+              ]);
+            }
+          }
+          />
+
+          <Button
+            alignSelf='end'
+            label='clear cache' 
+            onClick={
+            async ()=> {
+              window.localStorage.clear();
+            }
+          }
+          />
+
+          <Button
+            alignSelf='end'
+            label='reload app' 
+            onClick={
+            async ()=> {
+              window.location.reload();
             }
           }
           />

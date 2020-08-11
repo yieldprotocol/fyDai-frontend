@@ -30,18 +30,16 @@ import { useProxy, useTxActive, useMath } from '../hooks';
 
 interface DepositProps {
   /* deposit amount prop is for quick linking into component */
+  setActiveView: any;
   depositAmount?:number|BigNumber|null;
 }
 
-const Deposit = ({ depositAmount }:DepositProps) => {
+const Deposit = ({ setActiveView, depositAmount }:DepositProps) => {
 
   const [ inputValue, setInputValue ] = useState<any>(depositAmount || undefined);
   const [ estRatio, setEstRatio ] = useState<any>(0);
-  
   const [ withdrawOpen, setWithdrawOpen ] = useState<boolean>(false);
-
-  const [ depositPending, setDepositPending ] = useState<boolean>(false);
-
+  const [ depositPending, setDepositPending ] = useState<boolean>(true);
   const [ depositDisabled, setDepositDisabled ] = useState<boolean>(false);
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
@@ -69,10 +67,9 @@ const Deposit = ({ depositAmount }:DepositProps) => {
   const depositProcedure = async (value:number) => {
     setDepositPending(true);
     await postEth(deployedContracts.EthProxy, value);
-
     await userActions.updatePosition();
-    setInputValue('');
     setDepositPending(false);
+    setActiveView('BORROW');
   };
 
   /* Handle input value changes (warnings errors etc.) */
@@ -154,7 +151,7 @@ const Deposit = ({ depositAmount }:DepositProps) => {
         <Box fill direction='row-responsive' justify='evenly'>
           <Box gap='small'>
             <Text color='text-weak' size='xsmall'>Current Collateral</Text>
-            { depositPending ?    
+            { !ethPosted_ && depositPending ?    
               <ScaleLoader color={theme?.global?.colors['brand-transparent'].dark} height='13' /> 
               :
               <Text color='brand' weight='bold' size='medium'> { ethPosted_ ? 

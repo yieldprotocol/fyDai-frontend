@@ -94,8 +94,10 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
     autoSell && await borrowUsingExactDai( activeSeries.daiProxyAddress, 'ETH-A', activeSeries.maturity, yDaiValue, value);
     !autoSell && await borrow(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value);
     setInputValue('');
-    await userActions.updatePosition();
-    await seriesActions.updateActiveSeries();
+    await Promise.all([
+      userActions.updatePosition(),
+      seriesActions.updateActiveSeries()
+    ]);
     setBorrowPending(false);
   };
 
@@ -105,8 +107,8 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
     // const res = await checkPoolDelegate(activeSeries.poolAddress, activeSeries.yDaiAddress);
     await addControllerDelegate(deployedContracts.Controller, activeSeries.daiProxyAddress);
     const res = await checkControllerDelegate(deployedContracts.Controller, activeSeries.daiProxyAddress);
-    await seriesActions.updateActiveSeries();
     setHasDelegated(res);
+    await seriesActions.updateActiveSeries();
   };
 
   /* ADVANCED SETTINGS setting approval limit */
