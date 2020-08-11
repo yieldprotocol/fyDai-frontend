@@ -190,7 +190,7 @@ function Repay({ repayAmount }:IRepayProps) {
               align='center'
             >
               <Box 
-                round='medium'
+                round='small'
                 // background='brand-transparent'
                 border='all'
                 direction='row'
@@ -244,7 +244,7 @@ function Repay({ repayAmount }:IRepayProps) {
 
           <Box
             fill='horizontal'
-            round='medium'
+            round='small'
             background={repayDisabled ? 'brand-transparent' : 'brand'}
             onClick={repayDisabled ? ()=>{}:()=>repayProcedure(inputValue)}
             // onClick={()=>repayProcedure(inputValue)}

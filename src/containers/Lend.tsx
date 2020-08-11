@@ -162,7 +162,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
               align='center'
             >
               <Box 
-                round='medium'
+                round='small'
                 // background='brand-transparent'
                 border='all'
                 direction='row'
@@ -250,7 +250,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
   
           <Box
             fill='horizontal'
-            round='medium'
+            round='small'
             background={( !(inputValue>0) || lendDisabled) ? 'brand-transparent' : 'brand'}
             onClick={(!(inputValue>0) || lendDisabled)? ()=>{}:()=>lendProcedure(inputValue)}
             align='center'

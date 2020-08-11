@@ -75,7 +75,7 @@ const YieldSeriesMenuItem = ({
           gap='small'
         >
           <Box
-            round='xlarge'
+            round='small'
             width='xxsmall'
             height='xxsmall'
             background={seriesColor}

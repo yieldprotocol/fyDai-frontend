@@ -111,7 +111,7 @@ const Deposit = ({ setActiveView, depositAmount }:DepositProps) => {
             align='center'
           >
             <Box 
-              round='medium'
+              round='small'
               // background='brand-transparent'
               border='all'
               direction='row'
@@ -193,7 +193,7 @@ const Deposit = ({ setActiveView, depositAmount }:DepositProps) => {
 
         <Box
           fill='horizontal'
-          round='medium'
+          round='small'
           background={( !(inputValue>0) || depositDisabled) ? 'brand-transparent' : 'brand'}
           onClick={(!(inputValue>0) || depositDisabled)? ()=>{}:()=>depositProcedure(inputValue)}
           align='center'

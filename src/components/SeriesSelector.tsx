@@ -55,7 +55,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
       onEsc={()=>close()}
     >
       <Box
-        round='medium'
+        round='small'
         fill='horizontal'
         background='background-front'
         pad={{ horizontal: 'medium', vertical:'large' }}

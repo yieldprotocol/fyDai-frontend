@@ -25,7 +25,7 @@ interface DashBorrowProps {
   // maxValue?:number
 }
 
-const DashBorrow = ({ }:DashBorrowProps) => {
+const DashBorrow = (props:DashBorrowProps) => {
 
   const [ addCollateral, setAddCollateral ] = React.useState<boolean>(false);
 
@@ -50,7 +50,7 @@ const DashBorrow = ({ }:DashBorrowProps) => {
             alignSelf='center'
             fill='horizontal'
             background='background-front'
-            round='medium'
+            round='small'
             pad='large'
           >
             <Deposit setActiveView={()=>null} />
@@ -61,7 +61,7 @@ const DashBorrow = ({ }:DashBorrowProps) => {
         <Box
           background='background-front'
           fill='horizontal'
-          round='medium'
+          round='small'
           pad={{ vertical:'small', horizontal:'large' }}
           // elevation='medium'
           border
@@ -88,7 +88,7 @@ const DashBorrow = ({ }:DashBorrowProps) => {
           basis='1/3'
           background='background-front'
           fill='horizontal'
-          round='medium'
+          round='small'
           pad='large'
           // elevation='medium'
           border
@@ -110,7 +110,7 @@ const DashBorrow = ({ }:DashBorrowProps) => {
           <Box
             background='background-front'
             fill
-            round='medium'
+            round='small'
             pad='none'
             // elevation='medium'
             border

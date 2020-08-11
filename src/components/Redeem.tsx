@@ -50,7 +50,7 @@ const Redeem = ({ activeSeries }:any) => {
 
   return (
     <Box 
-      round='medium'
+      round='small'
       border='all'
       fill
       pad='small'
