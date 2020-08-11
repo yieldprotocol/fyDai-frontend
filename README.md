@@ -3,11 +3,15 @@ Front end for yDai
 
 ### Start a new locally served ganache instance to test the frontend UI > 
 
-1. Clone the yToken MVP repositiory: https://github.com/yieldprotocol/ytoken-mvp.git
+1. Clone the yDai repositiory: https://github.com/yieldprotocol/yDai.git
 
 In a console ( yTokenMVP root folder ):
 
-2. Run a new ganache instance >
+2. Prepare necessary files:
+ - `.secret` should contain a wallet mnemonic. You will reuse this mnemonic in the next step when starting ganache.
+ - `.infuraKey` should contain an infuraKey. This is used only for public network deploys but is currently expected to run the frontend. 
+
+3. Run a new ganache instance >
 `npx ganache-cli -m 'SOME MNEMONIC OF YOUR CHOICE' -i 1337 -e 1000`
 
 *Optionally add the flags:*
@@ -18,10 +22,10 @@ In a console ( yTokenMVP root folder ):
 
 In a seperate console ( yTokenMVP root folder ):
 
-3. Run truffle migrations >
+4. Run truffle migrations >
 `truffle migrate --network development --reset`  
 
-4. Setup a few proxies and a basic single market >
+5. Setup a few proxies and a basic single market >
 `truffle exec ./scripts/setup_market_dev.js`
 
 'Market Initiated' on success. 
