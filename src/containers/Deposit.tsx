@@ -8,8 +8,6 @@ import {
   ThemeContext,
 } from 'grommet';
 
-import { ScaleLoader } from 'react-spinners';
-
 import { 
   FiInfo as Info,
   FiArrowRight as ArrowRight,
@@ -21,6 +19,7 @@ import WithdrawEth from './WithdrawEth';
 import InlineAlert from '../components/InlineAlert';
 import ApprovalPending from '../components/ApprovalPending';
 import TransactionPending from '../components/TransactionPending';
+import Loading from '../components/Loading';
 
 import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
@@ -149,28 +148,30 @@ const Deposit = ({ setActiveView, depositAmount }:DepositProps) => {
         </Box>
 
         <Box fill direction='row-responsive' justify='evenly'>
+
           <Box gap='small'>
             <Text color='text-weak' size='xsmall'>Current Collateral</Text>
-            { !ethPosted_ && depositPending ?    
-              <ScaleLoader color={theme?.global?.colors['brand-transparent'].dark} height='13' /> 
-              :
+            <Loading condition={!ethPosted_ && depositPending && ethPosted_ !== 0} size='medium'>
               <Text color='brand' weight='bold' size='medium'> { ethPosted_ ? 
                 `${ethPosted_.toFixed(4)} Eth` 
                 : '0 Eth' }
-              </Text>}
-          </Box>       
+              </Text>
+            </Loading>
+          </Box> 
 
           <Box gap='small'>
             <Text color='text-weak' size='xsmall'>Collateralization Ratio</Text>
-            <Text color='brand' weight='bold' size='medium'>
-              { (collateralPercent_ && (collateralPercent_ !== 0))? `${collateralPercent_}%`: '' }
-            </Text>
-            { collateralPercent_ === 0 && 
-            <Box direction='row'>
-              <Text color='brand-transparent' size='xxsmall'>
-                'No Dai has been borrowed yet.'
+            <Loading condition={!ethPosted_ && depositPending && ethPosted_ !== 0} size='medium'>
+              <Text color='brand' weight='bold' size='medium'>
+                { (collateralPercent_ && (collateralPercent_ !== 0))? `${collateralPercent_}%`: '' }
               </Text>
-            </Box>}
+              { collateralPercent_ === 0 && 
+              <Box direction='row'>
+                <Text color='brand-transparent' size='xxsmall'>
+                  'No Dai has been borrowed yet.'
+                </Text>
+              </Box>}
+            </Loading>
           </Box>
 
           <Box gap='small' alignSelf='start' align='center'>
