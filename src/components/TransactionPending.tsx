@@ -31,7 +31,7 @@ const TransactionPending = ({ msg, tx }:TransactionPendingProps) => {
 
           <Box 
             fill='horizontal'
-            round='medium'
+            round='small'
             border='all'
             // background='brand'
             hoverIndicator='brand-transparent'

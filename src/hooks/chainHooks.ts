@@ -1,6 +1,6 @@
 import React from 'react';
 import { useWeb3React } from '@web3-react/core';
-import { ethers, BigNumber}  from 'ethers';
+import { ethers, BigNumber }  from 'ethers';
 
 import { NotifyContext } from '../contexts/NotifyContext';
 // import { ConnectionContext } from '../contexts/ConnectionContext';
@@ -173,3 +173,97 @@ export function useBalances() {
 
   return { getTokenAllowance, getBalance } as const;
 }
+
+
+export const useTimeTravel = () => {
+
+  const { provider } = useSignerAccount();
+  const [ snapshot, setSnapshot ] = React.useState<any>('0x1');
+  const [ block, setBlock ] = React.useState<any>(null);
+  const [ timestamp, setTimestamp ] = React.useState<number|null>(null);
+
+  React.useEffect(()=>{
+    ( async () => {
+      const { timestamp: ts } = await provider.getBlock(await provider.blockNumber);
+      setTimestamp(ts);
+    })();
+  }, [block]);
+
+  const takeSnapshot = async () => {
+    const res = await fetch('http://localhost:8545', {
+      method:'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: '{"id":1337,"jsonrpc":"2.0","method":"evm_snapshot","params":[]}'
+    });
+    const num = await res.json();
+    console.log( 'Snapshot taken', num.result );
+    setSnapshot( num.result );
+    setBlock(provider.blockNumber);
+  };
+
+  const revertToSnapshot = async () => {
+    const res = await fetch('http://localhost:8545', {
+      method:'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: `{"id":1337,"jsonrpc":"2.0","method":"evm_revert","params":["${snapshot}"]}`
+    });
+    console.log('Reverted to Snapshot', (await res.json()).result );
+    takeSnapshot();
+    setBlock(provider.blockNumber);
+
+    window.localStorage.clear();
+    window.location.reload();
+  };
+
+  const revertToT0 = async () => {
+    const res = await fetch('http://localhost:8545', {
+      method:'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: '{"id":1337,"jsonrpc":"2.0","method":"evm_revert","params":["0x1"]}'
+    });
+    console.log('Reverted to start of blockchain.', (await res.json()).result );
+    setBlock(provider.blockNumber);
+
+    window.localStorage.clear();
+    window.location.reload();
+  };
+
+  const advanceTime = async (time:string) => {
+    const res = await fetch('http://localhost:8545', {
+      method:'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: `{"id":1337,"jsonrpc":"2.0","method":"evm_increaseTime","params":[${time}]}`
+    });
+    console.log(await res.json()); 
+    setBlock(provider.blockNumber);
+    window.location.reload();
+  };
+
+  const advanceBlock = async () => {
+    const res = await fetch('http://localhost:8545', {
+      method:'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: '{"id":1337,"jsonrpc":"2.0","method":"evm_mine","params":[]}'
+    });
+    console.log(await res.json());
+    setBlock(provider.blockNumber);
+    console.log('new block:', provider.blockNumber);
+  };
+
+  const advanceTimeAndBlock = async (time:string) =>{
+    await advanceTime(time);
+    await advanceBlock();
+  };
+
+  return { advanceTimeAndBlock, revertToSnapshot, takeSnapshot, revertToT0, block, timestamp } as const;
+};

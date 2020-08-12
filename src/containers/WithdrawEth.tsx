@@ -125,7 +125,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
         alignSelf='center'
         fill='horizontal'
         background='background-front'
-        round='medium'
+        round='small'
         pad='large'
       >
         { !txActive && !withdrawEthActive && 
@@ -147,7 +147,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
               align='center'
             >
               <Box 
-                round='medium'
+                round='small'
                 // background='brand-transparent'
                 border='all'
                 direction='row'
@@ -215,7 +215,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
 
           <Box
             fill='horizontal'
-            round='medium'
+            round='small'
             background={( !(inputValue>0) || withdrawDisabled && hasDelegated ) ? 'brand-transparent' : 'brand'}
             onClick={( !(inputValue>0) || withdrawDisabled && hasDelegated )? ()=>{}:()=> withdrawProcedure(inputValue)}
             align='center'

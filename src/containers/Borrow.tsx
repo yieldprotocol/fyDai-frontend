@@ -271,7 +271,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
           <Box fill gap='medium' margin={{ vertical:'large' }}>
             <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to borrow</Text>
             <Box 
-              round='medium'
+              round='small'
               // background='brand-transparent'
               border='all'
               direction='row'
@@ -350,7 +350,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
 
           <Box
             fill='horizontal'
-            round='medium' 
+            round='small' 
             background={borrowDisabled ? 'brand-transparent' : 'brand'} 
             onClick={borrowDisabled ? ()=>{}:()=>borrowProcedure(inputValue)} 
             // onClick={()=>borrowProcedure(inputValue)}

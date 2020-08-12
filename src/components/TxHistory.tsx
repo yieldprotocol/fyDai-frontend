@@ -1,7 +1,7 @@
 import React from 'react';
 import ethers, { BigNumber } from 'ethers';
 import moment from 'moment';
-import { Box, Text, Collapsible } from 'grommet';
+import { Box, Text, Collapsible, Button } from 'grommet';
 
 import {
   FiChevronDown as ChevronDown,
@@ -21,15 +21,14 @@ const EtherscanButton = (props:any) => {
   const { txHash } = props;
   return (
     <Box
-      // pad='xsmall'
       border
       round
-      hoverIndicator='brand-transparent'
-      onClick={()=> { console.log(txHash);}}   
+      hoverIndicator='brand'
+      onClick={()=>{ window.open( `https://etherscan.io/tx/${txHash}`, '_blank');}} 
+      pad={{ horizontal:'small' }}
     >
       <Text 
         size='xxsmall'
-        alignSelf='center'
       >
         View on Etherscan
       </Text>
@@ -113,7 +112,6 @@ const TxHistory = ( { filterTerms, view }:HistoryProps) => {
           <Text size='xxsmall'>Amount redeemable @ maturity</Text>
           <Text size='xsmall'>{Math.abs(item.yDai_).toFixed(2)} Dai</Text>
         </Box> }
-
         <Box alignSelf='end'>
           <EtherscanButton txHash={item.transactionHash} />
         </Box>
@@ -169,6 +167,7 @@ const TxHistory = ( { filterTerms, view }:HistoryProps) => {
                 pad='small'          
                 gap='xsmall'             
                 hoverIndicator='background-mid'
+                background={itemOpen === key_ ? 'background-mid' : undefined}
                 onClick={itemOpen === key_ ? ()=>setItemOpen(null):()=>setItemOpen(key_)}
               >         
                 <Box

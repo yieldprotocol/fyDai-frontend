@@ -100,7 +100,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
         alignSelf='center'
         fill='horizontal'
         background='background-front'
-        round='medium'
+        round='small'
         pad='large'
       >
         <Box align='center' flex='grow' justify='between' gap='large'>
@@ -113,7 +113,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
               align='center'
             >
               <Box 
-                round='medium'
+                round='small'
                 // background='brand-transparent'
                 border='all'
                 direction='row'
@@ -183,7 +183,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
 
           <Box
             fill='horizontal'
-            round='medium'
+            round='small'
             background={( !(inputValue>0) || withdrawDisabled) ? 'brand-transparent' : 'brand'}
             onClick={(!(inputValue>0) || withdrawDisabled)? ()=>{}:()=> withdrawProcedure(inputValue)}
             align='center'

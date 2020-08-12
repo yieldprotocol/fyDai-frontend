@@ -274,8 +274,8 @@ export const yieldTheme = {
       radius: '8px',
     },
     padding: {
-      vertical: '3px',
-      horizontal: '10px',
+      vertical: '0px',
+      horizontal: '8px',
     },
   },
   checkBox: {

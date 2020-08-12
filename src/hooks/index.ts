@@ -11,7 +11,7 @@ import { useMath } from './mathHooks';  // TODO work out this cyclic reference (
 // import { useMaker } from './makerHooks';
 
 /* Generic blockchain transactional hooks */
-import { useCallTx, useSendTx, useBalances } from './chainHooks';
+import { useCallTx, useSendTx, useBalances, useTimeTravel } from './chainHooks'; 
 import { useToken } from './tokenHook';
 
 /* Contract hooks */
@@ -44,4 +44,6 @@ export {
   useInactiveListener,
   useConnectorImage,
   useSignerAccount, 
+
+  useTimeTravel, 
 };

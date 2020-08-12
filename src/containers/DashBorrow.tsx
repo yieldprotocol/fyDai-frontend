@@ -18,6 +18,7 @@ import { UserContext } from '../contexts/UserContext';
 import Deposit from './Deposit';
 
 import TxHistory from '../components/TxHistory';
+import Loading from '../components/Loading';
 
 interface DashBorrowProps {
   // borrowFn:any
@@ -25,7 +26,7 @@ interface DashBorrowProps {
   // maxValue?:number
 }
 
-const DashBorrow = ({ }:DashBorrowProps) => {
+const DashBorrow = (props:DashBorrowProps) => {
 
   const [ addCollateral, setAddCollateral ] = React.useState<boolean>(false);
 
@@ -50,7 +51,7 @@ const DashBorrow = ({ }:DashBorrowProps) => {
             alignSelf='center'
             fill='horizontal'
             background='background-front'
-            round='medium'
+            round='small'
             pad='large'
           >
             <Deposit setActiveView={()=>null} />
@@ -61,7 +62,7 @@ const DashBorrow = ({ }:DashBorrowProps) => {
         <Box
           background='background-front'
           fill='horizontal'
-          round='medium'
+          round='small'
           pad={{ vertical:'small', horizontal:'large' }}
           // elevation='medium'
           border
@@ -72,12 +73,22 @@ const DashBorrow = ({ }:DashBorrowProps) => {
         >
           <Box gap='small'>
             <Text color='text-weak' size='xxsmall'> Collateral </Text>
-            <Text color='brand' weight='bold' size='large'> { ethPosted_? `${ethPosted_.toFixed(2)} Eth`: '' }</Text>
+            <Loading condition={!ethPosted_ && ethPosted_ !== 0} size='medium'>
+              <Text color='brand' weight='bold' size='large'> { ethPosted_? `${ethPosted_.toFixed(2)} Eth`: '0 Eth' }</Text>
+            </Loading>
           </Box>
 
           <Box gap='small'>
             <Text color='text-weak' size='xxsmall'> Collateralization </Text>
-            <Text color='brand' weight='bold' size='large'> { collateralPercent_? `${collateralPercent_.toFixed(2)} %`: '' } </Text>
+            <Loading condition={!ethPosted_ && ethPosted_ !== 0} size='medium'>
+              <Text color='brand' weight='bold' size='large'> { collateralPercent_? `${collateralPercent_.toFixed(2)} %`: '' } </Text>
+            </Loading>
+            { collateralPercent_ === 0 && 
+              <Box direction='row'>
+                <Text color='brand-transparent' size='xxsmall'>
+                  'No Dai has been borrowed yet.'
+                </Text>
+              </Box>}
           </Box>
           {!addCollateral? <PlusCircle size='25' color='brand' onClick={()=>setAddCollateral(!addCollateral)} />
             :
@@ -88,7 +99,7 @@ const DashBorrow = ({ }:DashBorrowProps) => {
           basis='1/3'
           background='background-front'
           fill='horizontal'
-          round='medium'
+          round='small'
           pad='large'
           // elevation='medium'
           border
@@ -110,7 +121,7 @@ const DashBorrow = ({ }:DashBorrowProps) => {
           <Box
             background='background-front'
             fill
-            round='medium'
+            round='small'
             pad='none'
             // elevation='medium'
             border

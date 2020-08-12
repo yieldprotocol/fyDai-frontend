@@ -158,7 +158,7 @@ const Pool = (props:any) => {
               align='center'
             >
               <Box 
-                round='medium'
+                round='small'
                 // background='brand-transparent'
                 border='all'
                 direction='row'
@@ -246,7 +246,7 @@ const Pool = (props:any) => {
   
           <Box
             fill='horizontal'
-            round='medium'
+            round='small'
             background={( !(inputValue>0) || lendDisabled) ? 'brand-transparent' : 'brand'}
             onClick={(!(inputValue>0) || lendDisabled)? ()=>{}:()=>lendProcedure(inputValue)}
             align='center'

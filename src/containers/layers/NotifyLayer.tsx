@@ -40,7 +40,7 @@ function NotifyLayer() {
           direction="row"
           gap="large"
           justify="between"
-          round="medium"
+         round='small'
           elevation="medium"
           pad={{ vertical: 'xsmall', horizontal: 'small' }}
           background={notificationTypeMap(state.type).color}
@@ -67,7 +67,7 @@ function NotifyLayer() {
           align="center"
           direction="row"
           gap="large"
-          round="medium"
+         round='small'
           elevation="medium"
           pad={{ vertical: 'large', horizontal: 'large' }}
           border={{ color:'red' }}

@@ -18,9 +18,9 @@ import YieldFooter from './components/YieldFooter';
 import ConnectLayer from './containers/layers/ConnectLayer';
 import AccountLayer from './containers/layers/AccountLayer';
 import NotifyLayer from './containers/layers/NotifyLayer';
+
 // TODO: remove testLayer for prod
 import TestLayer from './containers/layers/TestLayer';
-
 import SeriesSelector from './components/SeriesSelector';
 
 const App = () =>  {
@@ -34,7 +34,7 @@ const App = () =>  {
 
   const [darkmode, setDarkmode] = React.useState(false);
   // TODO Switch out for react router
-  const [activeView, setActiveView] = React.useState<string>('BORROW');
+  const [activeView, setActiveView] = React.useState<string>('DASHBOARD');
 
   const [showConnectLayer, setShowConnectLayer] = React.useState<boolean>(false);
   const [showAccountLayer, setShowAccountLayer] = React.useState<boolean>(false);
@@ -45,6 +45,11 @@ const App = () =>  {
     setShowAccountLayer(false);
     setShowConnectLayer(true);
   };
+
+
+  React.useEffect(()=> {
+    console.log('migration address: ', process.env.REACT_APP_MIGRATION);
+  }, []);
 
   const columnsWidth = ['5%', 'auto', '5%'];
 
@@ -64,7 +69,6 @@ const App = () =>  {
             closeLayer={() => setShowAccountLayer(false)}
             changeWallet={() => changeConnection()}
           /> }
-
         <Box direction="row" height={{ min: '100%' }}>
           <Box flex>
             <Grid fill rows={['auto', 'flex', 'auto']}>
