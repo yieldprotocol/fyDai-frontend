@@ -228,7 +228,7 @@ export const useTimeTravel = () => {
       },
       body: '{"id":1337,"jsonrpc":"2.0","method":"evm_revert","params":["0x1"]}'
     });
-    console.log('Reverted to start of blockchain.', (await res.json()).result );
+    console.log('Reverted to first snapshot', (await res.json()).result );
     takeSnapshot();
     setBlock(provider.blockNumber);
     window.localStorage.clear();

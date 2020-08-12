@@ -302,12 +302,12 @@ const TestLayer = (props:any) => {
               await revertToSnapshot();
             }}
           />
-          {/* <Button 
-            label='revert to time 0' 
+          <Button 
+            label='revert to first snapshot' 
             onClick={async ()=> {
               await revertToT0();
             }}
-          /> */}
+          />
           blockchain date: {timestamp && Moment(timestamp*1000).format('DD MMM YYYY') }
         </Box>
 
