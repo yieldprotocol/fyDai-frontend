@@ -200,6 +200,8 @@ export const useTimeTravel = () => {
     const num = await res.json();
     console.log( 'Snapshot taken', num.result );
     setSnapshot( num.result );
+
+    window.localStorage.setItem('snapshot', num.result);
     setBlock(provider.blockNumber);
   };
 
@@ -209,12 +211,11 @@ export const useTimeTravel = () => {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: `{"id":1337,"jsonrpc":"2.0","method":"evm_revert","params":["${snapshot}"]}`
+      body: `{"id":1337,"jsonrpc":"2.0","method":"evm_revert","params":["${window.localStorage.getItem('snapshot')}"]}`
     });
     console.log('Reverted to Snapshot', (await res.json()).result );
     takeSnapshot();
     setBlock(provider.blockNumber);
-
     window.localStorage.clear();
     window.location.reload();
   };
@@ -228,8 +229,8 @@ export const useTimeTravel = () => {
       body: '{"id":1337,"jsonrpc":"2.0","method":"evm_revert","params":["0x1"]}'
     });
     console.log('Reverted to start of blockchain.', (await res.json()).result );
+    takeSnapshot();
     setBlock(provider.blockNumber);
-
     window.localStorage.clear();
     window.location.reload();
   };
