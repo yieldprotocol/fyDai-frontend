@@ -50,7 +50,7 @@ const TestLayer = (props:any) => {
   const [ sendTx ]  = useSendTx();
   const [ callTx ]  = useCallTx();
 
-  const { advanceTimeAndBlock, block, timestamp } = useTimeTravel(); 
+  const { advanceTimeAndBlock, takeSnapshot, revertToSnapshot, revertToT0, block, timestamp } = useTimeTravel(); 
   
   const { 
     post,
@@ -281,7 +281,7 @@ const TestLayer = (props:any) => {
           </Box>
         </Box>
 
-        <Box direction='row' justify='between' border='all' pad='small'>
+        <Box direction='row' justify='between' border='all' pad='small' gap='small'>
 
           Time-travelling: 
           <Button 
@@ -290,8 +290,29 @@ const TestLayer = (props:any) => {
               await advanceTimeAndBlock('2592000');
             }}
           />
+          <Button 
+            label='take snapshot' 
+            onClick={async ()=> {
+              await takeSnapshot();
+            }}
+          />
+          <Button 
+            label='revert to snapshot' 
+            onClick={async ()=> {
+              await revertToSnapshot();
+            }}
+          />
+          <Button 
+            label='revert to time 0' 
+            onClick={async ()=> {
+              await revertToT0();
+            }}
+          />
           blockchain date: {timestamp && Moment(timestamp*1000).format('DD MMM YYYY') }
         </Box>
+
+
+        NB: dont forget to reset metamask after any timetravelling!!
 
         <Footer pad='medium' gap='xsmall' direction='row' justify='between' align='center'>
           <Box round>
