@@ -118,6 +118,7 @@ const Deposit = ({ setActiveView, depositAmount }:DepositProps) => {
               fill='horizontal'
               pad='small'
               flex
+              
             >
               <TextInput
                 type='number'
@@ -127,7 +128,7 @@ const Deposit = ({ setActiveView, depositAmount }:DepositProps) => {
                 plain
                 onChange={(event:any) => setInputValue(event.target.value)}
               // icon={<Text alignSelf='start' size='xsmall'>Eth</Text>}
-                icon={<Ethereum />}
+                icon={<Ethereum />}             
               />
               
             </Box>

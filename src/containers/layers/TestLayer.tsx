@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { ethers } from 'ethers';
+import Moment from 'moment'; 
 
 import { useWeb3React } from '@web3-react/core';
 import { Anchor, Layer, Header, Heading, Footer, Button, Box, Text } from 'grommet';
@@ -12,7 +13,7 @@ import * as utils from '../../utils';
 import ProfileButton from '../../components/ProfileButton';
 import { NotifyContext } from '../../contexts/NotifyContext';
 
-import { useSendTx, useCallTx, useController, useProxy } from '../../hooks';
+import { useSendTx, useCallTx, useController, useProxy, useTimeTravel } from '../../hooks';
 
 import { YieldContext } from '../../contexts/YieldContext';
 import { SeriesContext } from '../../contexts/SeriesContext';
@@ -40,12 +41,16 @@ const TestLayer = (props:any) => {
   const [wethTokens, setWethTokens] = React.useState<ethers.BigNumber>();
   const [chaiTokens, setChaiTokens] = React.useState<ethers.BigNumber>();
 
+  const [chainDate, setChainDate] = React.useState<any>(null);
+
   const { closeLayer, changeWallet } = props;
   // const [ connectMakerVault ] = useMakerVault();
   const { dispatch } = React.useContext<any>(NotifyContext);
 
   const [ sendTx ]  = useSendTx();
   const [ callTx ]  = useCallTx();
+
+  const { advanceTimeAndBlock, block, timestamp } = useTimeTravel(); 
   
   const { 
     post,
@@ -91,6 +96,13 @@ const TestLayer = (props:any) => {
     }
 
   }, [ yieldState ] );
+
+  React.useEffect(()=>{
+
+
+
+
+  }, [chainDate]);
 
   // React.useEffect(() => {
   //   // (async () => setBalance( await getBalance()) )();
@@ -267,6 +279,18 @@ const TestLayer = (props:any) => {
                 <Text>Loading... </Text>
               </Box>}
           </Box>
+        </Box>
+
+        <Box direction='row' justify='between' border='all' pad='small'>
+
+          Time-travelling: 
+          <Button 
+            label='Jump forward a month' 
+            onClick={async ()=> {
+              await advanceTimeAndBlock('2592000');
+            }}
+          />
+          blockchain date: {timestamp && Moment(timestamp*1000).format('DD MMM YYYY') }
         </Box>
 
         <Footer pad='medium' gap='xsmall' direction='row' justify='between' align='center'>

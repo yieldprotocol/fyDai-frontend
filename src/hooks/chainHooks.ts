@@ -1,6 +1,6 @@
 import React from 'react';
 import { useWeb3React } from '@web3-react/core';
-import { ethers, BigNumber}  from 'ethers';
+import { ethers, BigNumber }  from 'ethers';
 
 import { NotifyContext } from '../contexts/NotifyContext';
 // import { ConnectionContext } from '../contexts/ConnectionContext';
@@ -173,3 +173,49 @@ export function useBalances() {
 
   return { getTokenAllowance, getBalance } as const;
 }
+
+
+export const useTimeTravel = () => {
+
+  const { provider } = useSignerAccount();
+  const [ block, setBlock ] = React.useState<any>(null);
+  const [ timestamp, setTimestamp ] = React.useState<number|null>(null);
+
+  React.useEffect(()=>{
+    ( async () => {
+      const { timestamp: ts } = await provider.getBlock(await provider.blockNumber);
+      setTimestamp(ts);
+    })();
+  }, [block]);
+
+  const advanceTime = async (time:string) => {
+    const res = await fetch('http://localhost:8545', {
+      method:'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: '{"id":1337,"jsonrpc":"2.0","method":"evm_increaseTime","params":[2600000]}'
+    });
+    console.log(res); 
+  };
+
+  const advanceBlock = async () => {
+    await fetch('http://localhost:8545', {
+      method:'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: '{"id":1337,"jsonrpc":"2.0","method":"evm_mine"}'
+    }).then(x=>console.log(x.json()));
+
+    setBlock(provider.blockNumber);
+    console.log('new block:', provider.blockNumber);
+  };
+
+  const advanceTimeAndBlock = async (time:string) =>{
+    await advanceTime(time);
+    await advanceBlock();
+  };
+
+  return { advanceTimeAndBlock, block, timestamp } as const;
+};
