@@ -12,15 +12,18 @@ import {
   FiArrowRight as ArrowRight,
 } from 'react-icons/fi';
   
-import SeriesDescriptor from '../components/SeriesDescriptor';
 
 import WithdrawDai from './WithdrawDai';
+import Redeem from './Redeem';
+
+import SeriesDescriptor from '../components/SeriesDescriptor';
+import InlineAlert from '../components/InlineAlert';
+
 import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
   
 import { usePool, useBalances, useMath, useToken } from '../hooks';
-import InlineAlert from '../components/InlineAlert';
 
 
 interface ILendProps {
@@ -52,7 +55,6 @@ const Lend = ({ lendAmount }:ILendProps) => {
   const [ lendDisabled, setLendDisabled ] = React.useState<boolean>(false);
 
   const [ approved, setApproved ] = React.useState<any>(0);
-
   const [ sellOpen, setSellOpen ] = useState<boolean>(false);
 
   const [ APR, setAPR ] = React.useState<number>();
@@ -79,7 +81,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
   };
 
   useEffect(() => {
-    activeSeries && inputValue && ( async () => {
+    activeSeries && !(activeSeries.isMature) && inputValue && ( async () => {
       const preview = await previewPoolTx('sellDai', activeSeries.poolAddress, inputValue);
       setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
       setAPR( yieldAPR( ethers.utils.parseEther(inputValue.toString()), preview, activeSeries.maturity ) );
@@ -109,24 +111,23 @@ const Lend = ({ lendAmount }:ILendProps) => {
     }
   }, [ approved, inputValue ]);
 
+  /* handle active series loads and changes */
   useEffect(() => {
-    activeSeries && ( async ()=> {
+    activeSeries && !(activeSeries.isMature) && ( async ()=> {
       const preview = await previewPoolTx('SellYDai', activeSeries.poolAddress, activeSeries.yDaiBalance_);
       setCurrentValue( parseFloat(ethers.utils.formatEther(preview)));
     })();
-  }, [ activeSeries, ]);
-  
-  useEffect(() => {
     ( async ()=>{
       activeSeries && setApproved(await getTokenAllowance(deployedContracts.Dai, activeSeries.poolAddress, 'Dai'));
       console.log(activeSeries);
     })();
   }, [ activeSeries ]);
-  
+
   return (
     <>
       { sellOpen && <WithdrawDai close={()=>setSellOpen(false)} /> }
       <Box flex='grow' justify='between'>
+
         <Box gap='medium' align='center' fill='horizontal'>
           <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Selected series</Text>
 
@@ -150,135 +151,138 @@ const Lend = ({ lendAmount }:ILendProps) => {
                 <Text color='brand' weight='bold' size='medium'> {currentValue!==0?`${currentValue.toFixed(2)} Dai`: '-'} </Text>
               </Box>
             </Box>
-
           </Box>
-  
-          <Box fill gap='medium' margin={{ vertical:'large' }}>
-            <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to lend</Text>
-            <Box
-              direction='row-responsive'
-              fill='horizontal'
-              gap='small'
-              align='center'
-            >
-              <Box 
-                round='small'
-                // background='brand-transparent'
-                border='all'
-                direction='row'
+
+          { !activeSeries?.isMature ?
+            <Box fill gap='medium' margin={{ vertical:'large' }}>
+              <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to lend</Text>
+              <Box
+                direction='row-responsive'
                 fill='horizontal'
-                pad='small'
-                flex
+                gap='small'
+                align='center'
               >
-                <TextInput
-                  type="number"
-                  placeholder='Enter the amount of Dai to lend'
-                  value={inputValue || ''}
-                  plain
-                  onChange={(event:any) => setInputValue(event.target.value)}
-              // icon={<Text alignSelf='start' size='xsmall'>Eth</Text>}
-                  // icon={<Ethereum />}
-                />
-              </Box>
-
-              <Box justify='center'>
-                <Box
-                  round
-                  onClick={()=>setInputValue(daiBalance_)}
-                  hoverIndicator='brand-transparent'
+                <Box 
+                  round='small'
+                // background='brand-transparent'
                   border='all'
-                  // border={{ color:'brand' }}
-                  pad={{ horizontal:'small', vertical:'small' }}
-                  justify='center'
+                  direction='row'
+                  fill='horizontal'
+                  pad='small'
+                  flex
                 >
-                  <Text size='xsmall'>Use max</Text>
-                </Box>
-              </Box>
-            </Box>
-
-            <Box fill gap='small' pad={{ horizontal:'medium' }}>
-
-              <Box fill direction='row-responsive' justify='between'>
-                <Box gap='small'>
-                  <Box direction='row' gap='small'>
-                    <Text color='text-weak' size='xsmall'>Estimated APR</Text>
-                    <Help />
-                  </Box>                
-                  <Text color={!inputValue? 'brand-transparent':'brand'} weight='bold' size='medium'> 
-                    {APR && APR.toFixed(2)}%                  
-                  </Text>
+                  <TextInput
+                    type="number"
+                    placeholder='Enter the amount of Dai to lend'
+                    value={inputValue || ''}
+                    plain
+                    onChange={(event:any) => setInputValue(event.target.value)}
+                  />
                 </Box>
 
-                <Box gap='small'>
-                  <Box direction='row' gap='small'>
-                    <Text color='text-weak' size='xsmall'>Approx. Dai received at maturity</Text>
-                    <Help />
+                <Box justify='center'>
+                  <Box
+                    round
+                    onClick={()=>setInputValue(daiBalance_)}
+                    hoverIndicator='brand-transparent'
+                    border='all'
+                  // border={{ color:'brand' }}
+                    pad={{ horizontal:'small', vertical:'small' }}
+                    justify='center'
+                  >
+                    <Text size='xsmall'>Use max</Text>
                   </Box>
-                  <Text color={!inputValue? 'brand-transparent':'brand'} weight='bold' size='medium'> 
-                    { yDaiValue.toFixed(2) } Dai on {activeSeries && Moment(activeSeries.maturity_).format('DD MMMM YYYY')}
-                  </Text>
                 </Box>
+              </Box>
 
-                <Box gap='small'>
-                  <Box direction='row' gap='small'>
-                    <Text color='text-weak' size='xsmall'>Wallet Dai balance</Text>
-                    <Help />
+              <Box fill gap='small' pad={{ horizontal:'medium' }}>
+
+                <Box fill direction='row-responsive' justify='between'>
+                  <Box gap='small'>
+                    <Box direction='row' gap='small'>
+                      <Text color='text-weak' size='xsmall'>Estimated APR</Text>
+                      <Help />
+                    </Box>                
+                    <Text color={!inputValue? 'brand-transparent':'brand'} weight='bold' size='medium'> 
+                      {APR && APR.toFixed(2)}%                  
+                    </Text>
                   </Box>
-                  <Text color='brand' weight='bold' size='medium'> {daiBalance_?`${daiBalance_.toFixed(2)} Dai`: '-'} </Text>
-                </Box>         
+
+                  <Box gap='small'>
+                    <Box direction='row' gap='small'>
+                      <Text color='text-weak' size='xsmall'>Approx. Dai received at maturity</Text>
+                      <Help />
+                    </Box>
+                    <Text color={!inputValue? 'brand-transparent':'brand'} weight='bold' size='medium'> 
+                      { yDaiValue.toFixed(2) } Dai on {activeSeries && Moment(activeSeries.maturity_).format('DD MMMM YYYY')}
+                    </Text>
+                  </Box>
+
+                  <Box gap='small'>
+                    <Box direction='row' gap='small'>
+                      <Text color='text-weak' size='xsmall'>Wallet Dai balance</Text>
+                      <Help />
+                    </Box>
+                    <Text color='brand' weight='bold' size='medium'> {daiBalance_?`${daiBalance_.toFixed(2)} Dai`: '-'} </Text>
+                  </Box>         
+                </Box>
+                <Box fill direction='row-responsive' justify='between'>
+                  {/* next block */}
+                </Box>
               </Box>
-              <Box fill direction='row-responsive' justify='between'>
-                {/* next block */}
-              </Box>
-            </Box>
-          </Box>
+            </Box> :
+          
+            <Redeem />}
   
           <InlineAlert warnMsg={warningMsg} errorMsg={errorMsg} />
 
-          <Box>
-            <CheckBox 
-              reverse
+          { !activeSeries?.isMature && 
+          <>
+            <Box>
+              <CheckBox 
+                reverse
               // value={true}
-              checked={!inputValue || ( approved >= inputValue )}
-              disabled={!inputValue || ( approved >= inputValue )}
-              onChange={()=>approveProcedure(inputValue)}
-              label={(approved >= inputValue) ? 
-                `Lending unlocked for up to ${approved.toFixed(2) || '' } Dai` 
-                : `Unlock lending of ${inputValue || ''} Dai`}
-            />
-          </Box>
-  
-          <Box
-            fill='horizontal'
-            round='small'
-            background={( !(inputValue>0) || lendDisabled) ? 'brand-transparent' : 'brand'}
-            onClick={(!(inputValue>0) || lendDisabled)? ()=>{}:()=>lendProcedure(inputValue)}
-            align='center'
-            pad='small'
-          >
-            <Text 
-              weight='bold'
-              size='large'
-              color={( !(inputValue>0) || lendDisabled) ? 'text-xweak' : 'text'}
-            >
-              {`Lend ${inputValue || ''} Dai`}
-            </Text>
-          </Box>
-          <Box alignSelf='end'>
-            <Box
-              round
-              onClick={()=>setSellOpen(true)}
-              hoverIndicator='brand-transparent'
-          // border='all'
-              pad={{ horizontal:'small', vertical:'small' }}
-              justify='center'
-            >
-              <Box direction='row' gap='small'>
-                <Text size='xsmall' color='text-weak'> Alternatively, withdraw Dai from this series</Text>
-                <ArrowRight color='text-weak' />
-              </Box>
+                checked={!inputValue || ( approved >= inputValue )}
+                disabled={!inputValue || ( approved >= inputValue )}
+                onChange={()=>approveProcedure(inputValue)}
+                label={(approved >= inputValue) ? 
+                  `Lending unlocked for up to ${approved.toFixed(2) || '' } Dai` 
+                  : `Unlock lending of ${inputValue || ''} Dai`}
+              />
             </Box>
-          </Box>
+
+            <Box
+              fill='horizontal'
+              round='small'
+              background={( !(inputValue>0) || lendDisabled) ? 'brand-transparent' : 'brand'}
+              onClick={(!(inputValue>0) || lendDisabled)? ()=>{}:()=>lendProcedure(inputValue)}
+              align='center'
+              pad='small'
+            >
+              <Text 
+                weight='bold'
+                size='large'
+                color={( !(inputValue>0) || lendDisabled) ? 'text-xweak' : 'text'}
+              >
+                {`Lend ${inputValue || ''} Dai`}
+              </Text>
+            </Box>
+            <Box alignSelf='end'>
+              <Box
+                round
+                onClick={()=>setSellOpen(true)}
+                hoverIndicator='brand-transparent'
+                // border='all'
+                pad={{ horizontal:'small', vertical:'small' }}
+                justify='center'
+              >
+                <Box direction='row' gap='small'>
+                  <Text size='xsmall' color='text-weak'> Alternatively, withdraw Dai from this series</Text>
+                  <ArrowRight color='text-weak' />
+                </Box>
+              </Box>
+            </Box>          
+          </>}
         </Box>
       </Box>
     </>

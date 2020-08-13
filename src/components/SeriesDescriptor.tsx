@@ -24,7 +24,6 @@ function SeriesDescriptor( props: ISeriesDescriptorProps, children:any) {
 
   /* Set Series description/display name */
   React.useEffect(()=>{
-
     activeSeries && setDescription(activeSeries.displayName);
     activeSeries && Number.isFinite(parseFloat(activeSeries.yieldAPR_)) &&
       setDescription(`${activeSeries.yieldAPR_}% ${activeSeries.displayName}`);
@@ -53,9 +52,12 @@ function SeriesDescriptor( props: ISeriesDescriptorProps, children:any) {
         >
           { !activeSeries ? 
             <ScaleLoader color={theme?.global?.colors['brand-transparent'].dark} height='13' /> : 
-            <Text color='brand' size='large'>{ description }</Text>}
+            <Text color='brand' size='large'>
+              { description }
+            </Text>}
 
-          { activeSeries && 
+          {
+            activeSeries?.isMature === false && 
             activeView === 'borrow' && 
             !Number.isFinite(parseFloat(activeSeries.yieldAPR_)) &&        
             <Box 
@@ -68,6 +70,20 @@ function SeriesDescriptor( props: ISeriesDescriptorProps, children:any) {
             >
               <Text size='xxsmall'>
                 Limited Liquidity            
+              </Text>
+            </Box>}
+
+          { activeSeries?.isMature === true && 
+            !Number.isFinite(parseFloat(activeSeries.yieldAPR_)) &&        
+            <Box 
+              round
+              border='all'
+              direction='row'
+              pad={{ horizontal:'small' }}
+              align='center'
+            >
+              <Text size='xxsmall'>
+                Matured Series         
               </Text>
             </Box>}
         </Box>

@@ -239,6 +239,7 @@ export const usePool = () => {
     const marketAddr = ethers.utils.getAddress(poolAddress);
     const contract = new ethers.Contract( marketAddr, marketAbi, provider );
     let result;
+
     try {
       switch (txType.toUpperCase()) {
         case 'BUYDAI':
@@ -252,9 +253,10 @@ export const usePool = () => {
         default : result = BigNumber.from('0'); break;
       }
     } catch (e) {
-      console.log('Pool Liquidity Error:', e);
+      console.log('Error:', e);
       result = BigNumber.from('0');
     }
+
     return result;
   };
 

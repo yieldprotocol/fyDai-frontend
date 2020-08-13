@@ -194,7 +194,6 @@ export const useProxy = () => {
       gasLimit: BigNumber.from('300000')
     };
 
-
     const parsedDai = ethers.utils.parseEther(repaymentInDai.toString());   
     const parsedYDai = ethers.utils.parseEther(minimumYDaiRepayment.toString());
     const daiProxyAddr = ethers.utils.getAddress(daiProxyAddress);

@@ -24,14 +24,15 @@ export const useYDai = () => {
   /**
    * Redeems yDai for dai after maturity
    * @param {string} yDaiAddress address of the yDai series to redeem from.
-   * @param {number} amount in human understandable numbers.
+   * @param {BigNumber} amount in exact yDai available to burn
    */
   const redeem = async (
     yDaiAddress:string,
     amount: number
   ) => {
     let tx:any;
-    const parsedAmount = ethers.utils.parseEther(amount.toString());
+    // const parsedAmount = ethers.utils.parseEther(amount.toString());
+    const parsedAmount = amount;
     const fromAddr = account && ethers.utils.getAddress(account);
     const toAddr = fromAddr;
     const yDaiAddr = ethers.utils.getAddress(yDaiAddress);
@@ -78,7 +79,31 @@ export const useYDai = () => {
     return parseFloat(ethers.utils.formatEther(res.toString()));
   };
 
+  /**
+   * yDai Series is Mature or not
+   * 
+   * @param {string} yDaiAddress address of the yDai series to redeem from.
+   * 
+   * @returns {boolean} allowance amount
+   */
+  const isMature = async (
+    yDaiAddress:string,
+  ) => {
+    const fromAddr = account && ethers.utils.getAddress(account);
+    const yDaiAddr = ethers.utils.getAddress(yDaiAddress);
+    const contract = new ethers.Contract( yDaiAddr, yDaiAbi, provider );
+    let res;
+    try {
+      res = await contract.isMature();
+    }  catch (e) {
+      console.log(e);
+      res = BigNumber.from('0');
+    }
+    console.log('Series is mature?', res);
+    return res;
+  };
+
   return {
-    redeem, redeemActive, userAllowance
+    isMature, redeem, redeemActive, userAllowance
   } as const;
 };

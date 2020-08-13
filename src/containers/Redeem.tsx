@@ -12,6 +12,8 @@ import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
 
+import { useYDai } from '../hooks';
+
 import { IYieldSeries } from '../types';
 import ethLogo from '../assets/images/tokens/eth.svg';
 
@@ -21,7 +23,8 @@ interface IRedeemProps {
 
 const Redeem  = ({ close }:IRedeemProps)  => {
 
-  const [daiValue, setDaiValue] = React.useState<any>();
+  const [redeemPending, setRedeemPending] = React.useState<boolean>(false);
+  const [redeemDisabled, setRedeemDisabled] = React.useState<boolean>(true);
 
   const { state: yieldState, actions: yieldActions } = React.useContext(YieldContext);
   const { deployedContracts } = yieldState;
@@ -35,61 +38,85 @@ const Redeem  = ({ close }:IRedeemProps)  => {
     ethBorrowingPower_: maximumDai
   } = userState.position;
 
+  const { isMature, redeem, redeemActive } = useYDai();
+
+  const redeemProcedure = async () =>{
+    setRedeemPending(true);
+    await redeem(activeSeries.yDaiAddress, activeSeries.yDaiBalance);
+    await Promise.all([
+      userActions.updatePosition(),
+      seriesActions.updateActiveSeries()
+    ]);
+    setRedeemPending(false);
+  };
+
+  React.useEffect( () => {
+    (activeSeries?.yDaiBalance_ > 0) && setRedeemDisabled(false);
+    // (async () => {
+    //   const mature = await isMature(activeSeries.yDaiAddress);
+    //   setRedeemDisabled(!mature);
+    // })();
+  }, [activeSeries]);
+
   return (
 
-    <Box flex='grow' justify='between' pad='small'>
-      <Box margin={{ top:'medium' }} gap='xsmall' align='start' fill='horizontal'>
-        <Text color='secondary' size='small' weight='bold'> 
-          You're ready to redeem your yDai for Dai!
-        </Text>
-      </Box>
+    <Box fill gap='medium' margin={{ vertical:'large' }}>
+      
+      <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Redeem Dai</Text>
+      <Box
+        direction='row-responsive'
+        fill='horizontal'
+        gap='small'
+        align='center'
+      />
 
-      <Box fill='horizontal' margin={{ vertical:'medium' }}>
-        <Box pad='xsmall'>
-          <Box direction='row' gap='small' justify='between'>
-            <Text size='xsmall'>
-              Current value per yDai:
+      <Box fill gap='small' pad={{ horizontal:'medium' }}>
+        <Box fill direction='row-responsive' justify='between'>
+
+          <Box gap='small'>
+            <Box direction='row' gap='small'>
+              <Text color='text-weak' size='xsmall'>Current Unit Value</Text>
+              <Help />
+            </Box>
+            <Text color='brand' weight='bold' size='medium'>
+              1.01* - no
             </Text>
-            <Help />
           </Box>
-          <Text weight='bold' size='xsmall'>
-            1.01 Dai
-          </Text>
+
+          <Box gap='small'>
+            <Box direction='row' gap='small'>
+              <Text color='text-weak' size='xsmall'>Total redeemable value</Text>
+              <Help />
+            </Box>
+            <Text color='brand' weight='bold' size='medium'>
+              { activeSeries.yDaiBalance_.toFixed(4) }          
+            </Text>
+          </Box>         
         </Box>
 
-        <Box pad='xsmall'>
-          <Box direction='row' gap='small' justify='between'>
-            <Text size='xsmall'>
-              Total Dai value you will recieve:
-            </Text>
-            <Help />
-          </Box>
-          <Text weight='bold' size='xsmall'>
-            12.12 Dai
-          </Text>
+        <Box fill direction='row-responsive' justify='between'>
+          {/* next block */}
         </Box>
       </Box>
 
-      {/* 
-      <Box direction='row' gap='small' margin={{ bottom:'medium' }}>
-         
-        <Text size='xxsmall'>
-          <SettingsGear /> Advanced Options
+      <Box
+        fill='horizontal'
+        round='small'
+        background={(redeemDisabled) ? 'brand-transparent' : 'brand'}
+        onClick={(redeemDisabled)? ()=>{}:()=>redeemProcedure()}
+        align='center'
+        pad='small'
+      >
+        <Text 
+          weight='bold'
+          size='large'
+          color={( redeemDisabled) ? 'text-xweak' : 'text'}
+        >
+          {`Redeem ${activeSeries.yDaiBalance_.toFixed(4) || ''} Dai`}
         </Text>
-      </Box> */}
-
-      <Box fill='horizontal' alignSelf='end'>
-        <Button
-          fill='horizontal'
-          primary
-          // disabled={!(daiValue>0)}
-          disabled={false}
-          color='secondary'
-          onClick={()=>console.log(daiValue)}
-          label={`Redeem your ${daiValue} Dai`}
-        />
       </Box>
     </Box>
+ 
   );
 };
 

@@ -104,7 +104,6 @@ const SeriesProvider = ({ children }:any) => {
     /* update context state and return */
     dispatch( { type:'updateRates', payload: _parsedRatesData });
     return _parsedRatesData;
-
   };
 
   /* Get the data for a particular series, or set of series */
