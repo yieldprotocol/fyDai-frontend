@@ -51,7 +51,7 @@ const App = (props:any) => {
   const { connector, library, chainId, account, activate, deactivate, active, error } = useWeb3React();
 
   // TODO Switch out for react router
-  const [activeView, setActiveView] = React.useState<string>('BORROW');
+  const [activeView, setActiveView] = React.useState<string>('LEND');
 
   const [showConnectLayer, setShowConnectLayer] = React.useState<boolean>(false);
   const [showAccountLayer, setShowAccountLayer] = React.useState<boolean>(false);
@@ -91,70 +91,62 @@ const App = (props:any) => {
   return (
 
     <div className="App">
-      {/* <Grommet
-        theme={deepMerge(base, yieldTheme)}
-        themeMode={darkMode ? 'dark' : 'light'}
-        full
-      > */}
-      <Box>
-        <NotifyLayer />
-        <ConnectLayer open={showConnectLayer} closeLayer={() => setShowConnectLayer(false)} />
-        { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
-        { showSeriesLayer  && <SeriesSelector activeView='borrow' close={()=>setShowSeriesLayer(false)} /> }
-        { showAccountLayer &&
-          <AccountLayer
-            closeLayer={() => setShowAccountLayer(false)}
-            changeWallet={() => changeConnection()}
-          /> }
-        <Box direction="row" height={{ min: '100%' }}>
-          <Box flex height='100%'>
+      <NotifyLayer />
+      <ConnectLayer open={showConnectLayer} closeLayer={() => setShowConnectLayer(false)} />
+      { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
+      { showSeriesLayer  && <SeriesSelector activeView='borrow' close={()=>setShowSeriesLayer(false)} /> }
+      { showAccountLayer &&
+      <AccountLayer
+        closeLayer={() => setShowAccountLayer(false)}
+        changeWallet={() => changeConnection()}
+      /> }
+      <Box direction="row" height={{ min: '100%' }}>
+        <Box flex height='100%'>
 
-            <Grid fill rows={screenSize === 'small'? ['xsmall', 'auto', 'xsmall']: ['auto', 'flex', 'auto']}>
-              <Grid fill columns={columnsWidth}>
-                <Box background={{ color: 'background-front' }} />
-                <YieldHeader
-                  openConnectLayer={() => setShowConnectLayer(true)}
-                  openAccountLayer={() => setShowAccountLayer(true)}
-                  activeView={activeView}
-                  setActiveView={setActiveView}
-                />
-                <Box background={{ color: 'background-front' }} />
-              </Grid>
-
-              <Main pad="none" direction="row" flex>
-                <Grid fill columns={columnsWidth}>
-                  <Box background="background" />
-                  <Box align="center">
-                    {activeView === 'DASHBOARD' && <Dashboard />}
-                    {activeView === 'BORROW' && (
-                      <BorrowView  />
-                    )}
-                    {activeView === 'LEND' && (
-                      <LendView  />
-                    )}
-                    {activeView === 'POOL' && <PoolView />}
-                  </Box>
-                  <Box background="background" />
-                </Grid>
-              </Main>
-              
-              <Grid fill columns={columnsWidth}>
-                <Box background="background" />
-
-                {screenSize !== 'small' &&
-                  <YieldFooter
-                    showTestLayer={showTestLayer}
-                    setShowTestLayer={setShowTestLayer}
-                    darkMode={props.darkMode}
-                    setDarkMode={props.setDarkMode}
-                    changeConnection={changeConnection}
-                  />}
-                  
-
-                <Box background="background" />
-              </Grid>
+          <Grid fill rows={screenSize === 'small'? ['xsmall', 'auto', 'xsmall']: ['auto', 'flex', 'auto']}>
+                        
+            <Grid fill columns={columnsWidth}>
+              <Box background={{ color: 'background-front' }} />
+              <YieldHeader
+                openConnectLayer={() => setShowConnectLayer(true)}
+                openAccountLayer={() => setShowAccountLayer(true)}
+                activeView={activeView}
+                setActiveView={setActiveView}
+              />
+              <Box background={{ color: 'background-front' }} />
             </Grid>
-          </Box>
+
+            <Main pad="none" direction="row" flex>
+              <Grid fill columns={columnsWidth}>
+                <Box background="background" />
+                <Box
+                  pad={{ vertical: 'large' }}
+                  fill="horizontal"
+                  align="center"
+                > 
+                  {activeView === 'DASHBOARD' && <Dashboard />}
+                  {activeView === 'BORROW' && <BorrowView />}
+                  {activeView === 'LEND' && <LendView />}
+                  {activeView === 'POOL' && <PoolView />}
+                </Box>               
+                <Box background="background" />
+              </Grid>
+            </Main>
+              
+            <Grid fill columns={columnsWidth}>
+              <Box background="background" />
+              {screenSize !== 'small' &&
+              <YieldFooter
+                showTestLayer={showTestLayer}
+                setShowTestLayer={setShowTestLayer}
+                darkMode={props.darkMode}
+                setDarkMode={props.setDarkMode}
+                changeConnection={changeConnection}
+              />}                  
+              <Box background="background" />      
+            </Grid>
+
+          </Grid>
         </Box>
       </Box>
       {screenSize === 'small' &&    
@@ -168,7 +160,7 @@ const App = (props:any) => {
             direction="row"
             background="background"
             
-            round={{corner:'top', size:'small'}}
+            round={{ corner:'top', size:'small' }}
             elevation='small'
 
             pad="medium"

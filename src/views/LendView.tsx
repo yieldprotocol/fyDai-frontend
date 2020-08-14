@@ -25,21 +25,13 @@ const LendView = ({ activeView: activeViewFromProp  }:LendProps) => {
   const { isLoading: positionsLoading, seriesData, activeSeries } = seriesState; 
 
   return (
-    <Box gap='small' pad={{ vertical:'large', horizontal:'small' }} fill='horizontal' justify='between'>
-      <Box
-        direction="row"
-        fill="horizontal"
-        pad={{ bottom: 'large', horizontal: 'none' }}
-        justify="between"
-        align="center"
-      >
-        <PageHeader
-          title="Lend"
-          subtitle="Description of lending"
-          tipPrimary="Tip: Convert your Maker vault"
-          tipSecondary="View more tips"
-        />
-      </Box>    
+    <>
+      <PageHeader
+        title="Lend"
+        subtitle="Description of lending"
+        tipPrimary="Tip: Convert your Maker vault"
+        tipSecondary="View more tips"
+      />
       <Box
         width={{ max:'750px' }}
         alignSelf='center'
@@ -53,8 +45,10 @@ const LendView = ({ activeView: activeViewFromProp  }:LendProps) => {
         <SeriesDescriptor activeView='lend' />
         { activeSeries?.isMature === false  && <Lend /> }
         { activeSeries?.isMature === true && <Redeem /> }
+        
+        {/* <Redeem /> */}
       </Box>
-    </Box>
+    </>
   );
 };
 

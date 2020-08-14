@@ -12,7 +12,6 @@ interface PageHeaderProps {
   title?: string;
 }
 
-
 const PageHeader = (props: PageHeaderProps) => {
   const { title, subtitle, tipPrimary, tipSecondary } = props;
   const screenSize = React.useContext(ResponsiveContext);
@@ -37,13 +36,9 @@ const PageHeader = (props: PageHeaderProps) => {
       direction="row"
       justify="between"
       align="center"
-      width={{
-        min: '100%',
-      }}
       fill="horizontal"
       gap="small"
-      flex
-      wrap
+      pad={screenSize === 'small'? 'small' : { bottom: 'large', horizontal: 'small' }}
     >
       <Box
         width={{

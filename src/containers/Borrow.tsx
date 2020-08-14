@@ -230,14 +230,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
           <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Selected series</Text>
 
           <SeriesDescriptor activeView='borrow' />
-
-          {!hasDelegated && 
-            <OnceOffAuthorize
-              authProcedure={delegateProcedure} 
-              authMsg='Allow Yield trade on your behalf' 
-              txPending={txActive?.type === 'DELEGATION'}  
-            />}
-          
+      
           <Box direction='row-responsive' pad={{ horizontal:'medium' }} justify='start' gap='large' fill>
             <Box gap='small'>
               <Box direction='row' gap='small'>
@@ -267,6 +260,13 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
             </Box>
             
           </Box>
+
+          {!hasDelegated && 
+            <OnceOffAuthorize
+              authProcedure={delegateProcedure} 
+              authMsg='Allow Yield trade on your behalf' 
+              txPending={txActive?.type === 'DELEGATION'}  
+            />}
 
           <Box fill gap='medium' margin={{ vertical:'large' }}>
             <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to borrow</Text>
@@ -332,19 +332,6 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
               {/* add next layer here */}
             </Box>
           </Box>
-
-          {/* <Box>
-            <CheckBox
-              reverse
-                // value={true}
-              checked={!inputValue || ( approved >= yDaiValue )}
-              disabled={!inputValue || ( approved >= yDaiValue )}
-              onChange={()=>approveProcedure(yDaiValue)}
-              label={(approved >= yDaiValue) ? 
-                `Borrowing unlocked for ~${daiApproved.toFixed(2)} Dai (${approved.toFixed(2) || '' } yDai)` 
-                : `Unlock borrowing of ${inputValue || ''} Dai`}
-            />
-          </Box> */}
 
           <InlineAlert warnMsg={warningMsg} errorMsg={errorMsg} />
 
