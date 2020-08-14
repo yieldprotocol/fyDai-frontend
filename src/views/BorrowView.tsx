@@ -62,7 +62,7 @@ const BorrowView = ({
           fill="horizontal"
         >
           <Box
-           round='small'
+            round='small'
             direction="row"
             // background="brand-transparent"
           // pad="xxsmall"
@@ -71,7 +71,7 @@ const BorrowView = ({
             justify='between'
           >
             <Box
-             round='small'
+              round='small'
               pad={{ horizontal: 'large', vertical: 'small' }}
               background={
               activeView === 'COLLATERAL' ? 'background-front' : undefined
@@ -90,7 +90,7 @@ const BorrowView = ({
 
 
             <Box
-             round='small'
+              round='small'
               pad={{ horizontal: 'large', vertical: 'small' }}
               background={
               activeView === 'BORROW' ? 'background-front' : undefined
@@ -104,7 +104,7 @@ const BorrowView = ({
             </Box>
 
             <Box
-             round='small'
+              round='small'
               pad={{ horizontal: 'large', vertical: 'small' }}
               background={activeView === 'REPAY' ? 'background-front' : undefined}
               elevation={activeView === 'REPAY' ? 'small' : undefined}
@@ -120,9 +120,9 @@ const BorrowView = ({
         <Box
           width={{ max: '750px' }}
           alignSelf="center"
-          fill="horizontal"
+          fill
           background="background-front"
-         round='small'
+          round='small'
           pad="large"
         >
           {activeView === 'COLLATERAL' && <Deposit setActiveView={(x:string)=>setActiveView(x.toUpperCase())} />}

@@ -6,6 +6,7 @@ import {
   TextInput, 
   Text, 
   ThemeContext,
+  ResponsiveContext,
 } from 'grommet';
 
 import { 
@@ -98,11 +99,8 @@ const Deposit = ({ setActiveView, depositAmount }:DepositProps) => {
     <>
       { withdrawOpen && <WithdrawEth close={()=>setWithdrawOpen(false)} /> }
       { !txActive &&
-      <Box
-        gap='large'         
-      >
+      <Box gap='small'>
         <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to deposit</Text>
-
         <Box gap='medium' justify='between' align='center' fill='horizontal'>       
           <Box
             direction='row-responsive'

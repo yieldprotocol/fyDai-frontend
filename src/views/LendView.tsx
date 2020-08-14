@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { Box } from 'grommet';
+import { Box, Text } from 'grommet';
 
 import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
@@ -8,6 +8,7 @@ import Redeem from '../containers/Redeem';
 import Lend from '../containers/Lend';
 
 import PageHeader from '../components/PageHeader';
+import SeriesDescriptor from '../components/SeriesDescriptor';
 
 
 interface LendProps {
@@ -46,9 +47,12 @@ const LendView = ({ activeView: activeViewFromProp  }:LendProps) => {
         background='background-front'
         round='small'
         pad='large'
+        gap='medium'
       >
-        <Lend />
-        {false && <Redeem /> }
+        <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Selected series</Text>
+        <SeriesDescriptor activeView='lend' />
+        { activeSeries?.isMature === false  && <Lend /> }
+        { activeSeries?.isMature === true && <Redeem /> }
       </Box>
     </Box>
   );

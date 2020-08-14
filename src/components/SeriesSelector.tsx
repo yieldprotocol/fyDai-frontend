@@ -1,5 +1,5 @@
 import React from 'react';
-import { Anchor, Text, Box, Layer, Header } from 'grommet';
+import { Anchor, Text, Box, Layer, Header, ResponsiveContext } from 'grommet';
 import { 
   FiInfo as Info,
   FiArrowLeft as ArrowLeft,
@@ -24,6 +24,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
   const [showMore, setShowMore] = React.useState<boolean>(false);
   const [openIndex, setOpenIndex] = React.useState<number | null >(null);
   const [seriesList, setSeriesList] = React.useState<IYieldSeries[]>([]);
+  const screenSize = React.useContext(ResponsiveContext);
   
   // const refsArray = React.useRef([]);
   // const elementsRef = React.useRef(seriesList.map(() => createRef()));
@@ -53,14 +54,16 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
     <Layer
       onClickOutside={()=>close()}
       onEsc={()=>close()}
+      responsive={true}
+      animation='slide'  
     >
       <Box
         round='small'
-        fill='horizontal'
+        fill
         background='background-front'
         pad={{ horizontal: 'medium', vertical:'large' }}
         gap='medium'
-        width={{ max:'750px', min:'600px' }}
+        width={screenSize !== 'small'? { max:'750px', min:'640px' }: {}}
       >
         <Box gap='medium'>
           <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Choose a series</Text>

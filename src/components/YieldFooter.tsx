@@ -22,8 +22,8 @@ const YieldFooter = (props: any) => {
   const {
     setShowTestLayer,
     showTestLayer,
-    setDarkmode,
-    darkmode,
+    setDarkMode,
+    darkMode,
     changeConnection,
   } = props;
   const { account } = useSignerAccount();
@@ -81,10 +81,10 @@ const YieldFooter = (props: any) => {
           <Test size={IconSize} />
         </Anchor>
         <Anchor
-          onClick={() => setDarkmode(!darkmode)}
+          onClick={()=>setDarkMode(!darkMode)}
           color={yieldTheme.global.colors.brand.light}
         >
-          {darkmode ? <Sun size={IconSize} /> : <Moon size={IconSize} />}
+          {darkMode ? <Sun size={IconSize} /> : <Moon size={IconSize} />}
         </Anchor>
       </Box>
     </Footer>
