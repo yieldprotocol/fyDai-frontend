@@ -7,6 +7,7 @@ import {
   Text, 
   ThemeContext,
   ResponsiveContext,
+  Grid,
 } from 'grommet';
 
 import { 
@@ -27,6 +28,7 @@ import { YieldContext } from '../contexts/YieldContext';
 import { UserContext } from '../contexts/UserContext';
 
 import { useProxy, useTxActive, useMath } from '../hooks';
+import InfoGrid from '../components/InfoGrid';
 
 interface DepositProps {
   /* deposit amount prop is for quick linking into component */
@@ -58,6 +60,7 @@ const Deposit = ({ setActiveView, depositAmount }:DepositProps) => {
   } = userState.position;
 
   const theme:any = useContext(ThemeContext);
+  const screenSize = React.useContext(ResponsiveContext);
 
   const { postEth, postEthActive }  = useProxy();
   const { estCollRatio: estimateRatio } = useMath();
@@ -146,47 +149,41 @@ const Deposit = ({ setActiveView, depositAmount }:DepositProps) => {
           </Box>
         </Box>
 
-        <Box fill direction='row-responsive' justify='evenly'>
+        <InfoGrid entries={[
+          {
+            label: 'Current Collateral',
+            visible: true,
+            active: true,
+            loading: !ethPosted_ && depositPending && ethPosted_ !== 0,     
+            value: ethPosted_ ? `${ethPosted_.toFixed(4)} Eth` : '0 Eth',
+            valuePrefix: null,
+            valueExtra: null, 
+          },
 
-          <Box gap='small'>
-            <Text color='text-weak' size='xsmall'>Current Collateral</Text>
-            <Loading condition={!ethPosted_ && depositPending && ethPosted_ !== 0} size='medium'>
-              <Text color='brand' weight='bold' size='medium'> { ethPosted_ ? 
-                `${ethPosted_.toFixed(4)} Eth` 
-                : '0 Eth' }
+          {
+            label: 'Collateralization Ratio',
+            visible: collateralPercent_ > 0,
+            active: collateralPercent_ > 0,
+            loading: !ethPosted_ && depositPending && ethPosted_ !== 0,            
+            value: (collateralPercent_ && (collateralPercent_ !== 0))? `${collateralPercent_}%`: '',
+            valuePrefix: null,
+            valueExtra: null, 
+          },
+          {
+            label: 'Ratio after Deposit',
+            visible: inputValue,
+            active: inputValue,
+            loading: !ethPosted_ && depositPending && ethPosted_ !== 0,           
+            value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
+            valuePrefix: 'Approx.',
+            valueExtra: () => (
+              <Text color='green' size='medium'> 
+                { inputValue && collateralPercent_ && ( (estRatio-collateralPercent_) !== 0) && `(+ ${(estRatio-collateralPercent_).toFixed(0)}%)` }
               </Text>
-            </Loading>
-          </Box> 
-
-          <Box gap='small'>
-            <Text color='text-weak' size='xsmall'>Collateralization Ratio</Text>
-            <Loading condition={!ethPosted_ && depositPending && ethPosted_ !== 0} size='medium'>
-              <Text color='brand' weight='bold' size='medium'>
-                { (collateralPercent_ && (collateralPercent_ !== 0))? `${collateralPercent_}%`: '' }
-              </Text>
-              { collateralPercent_ === 0 && 
-              <Box direction='row'>
-                <Text color='brand-transparent' size='xxsmall'>
-                  'No Dai has been borrowed yet.'
-                </Text>
-              </Box>}
-            </Loading>
-          </Box>
-
-          <Box gap='small' alignSelf='start' align='center'>
-            <Text color='text-weak' size='xsmall'>Collateralization Ratio after Deposit</Text>
-            <Box direction='row' gap='small'>
-              <Text color={!inputValue? 'brand-transparent': 'brand'} size='xxsmall'>approx.</Text> 
-              <Text color={!inputValue? 'brand-transparent': 'brand'} weight='bold' size='medium'> 
-                {(estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '' }
-              </Text>
-              { true &&
-                <Text color='green' size='medium'> 
-                  { inputValue && collateralPercent_ && ( (estRatio-collateralPercent_) !== 0) && `(+ ${(estRatio-collateralPercent_).toFixed(0)}%)` }
-                </Text>}
-            </Box>
-          </Box>           
-        </Box>
+            )
+          },
+        ]}
+        />
 
         <InlineAlert warnMsg={warningMsg} errorMsg={errorMsg} />
 

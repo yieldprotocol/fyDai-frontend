@@ -16,6 +16,7 @@ import InlineAlert from '../components/InlineAlert';
 import OnceOffAuthorize from '../components/OnceOffAuthorize';
 import ApprovalPending from '../components/ApprovalPending';
 import TransactionPending from '../components/TransactionPending';
+import InfoGrid from '../components/InfoGrid';
 
 interface IWithDrawProps {
   close?: any;
@@ -181,35 +182,33 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
             </Box>
           </Box>
 
-          <Box fill direction='row-responsive' justify='between'>
-            <Box gap='small' alignSelf='start' align='center'>
-              <Text color='text-weak' size='xsmall'>
-                Max withdraw
-              </Text>
-              <Box direction='row' gap='small'>
-                {/* <Text color='brand' size='xxsmall'>approx.</Text>  */}
-                <Text 
-                  color='brand'
-                  weight='bold'
-                  size='medium'
-                  onClick={()=>setInputValue(maxWithdraw)}
-                > {ethPosted_ ? `${maxWithdraw.toFixed(2)} Eth` : '-' }
-                </Text>
-              </Box>
-            </Box>
 
-            { (collateralPercent_ > 0) &&
-            <Box gap='small' alignSelf='start' align='center'>
-              <Text color='text-weak' size='xsmall'>Collateralization Ratio after Withdraw</Text>
-              <Box direction='row' gap='small'>
-                <Text color={!inputValue? 'brand-transparent': indicatorColor} size='xxsmall'>approx.</Text> 
-                <Text color={!inputValue? 'brand-transparent': indicatorColor} weight='bold' size='medium'> 
-                  {(estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '' }
-                </Text>
-              </Box>
-            </Box>}
-
-          </Box>
+          <InfoGrid entries={[
+            {
+              label: 'Max withdraw',
+              visible: true,
+              active: true,
+              loading: false, 
+              value: ethPosted_ ? `${maxWithdraw.toFixed(2)} Eth` : '-',
+              valuePrefix: null,
+              valueExtra: null, 
+            },
+            {
+              label: 'Ratio after Withdraw',
+              visible: collateralPercent_ > 0,
+              active: inputValue,
+              loading: false,           
+              value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
+              valuePrefix: 'Approx.',
+              valueExtra: null,
+              // valueExtra: () => (
+              //   <Text color='green' size='medium'> 
+              //     { inputValue && collateralPercent_ && ( (estRatio-collateralPercent_) !== 0) && `(+ ${(estRatio-collateralPercent_).toFixed(0)}%)` }
+              //   </Text>
+              // )
+            },
+          ]}
+          />
 
           <InlineAlert warnMsg={warningMsg} errorMsg={errorMsg} />
 

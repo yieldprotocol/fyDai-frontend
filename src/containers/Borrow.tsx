@@ -23,6 +23,7 @@ import { NotifyContext } from '../contexts/NotifyContext';
 import { UserContext } from '../contexts/UserContext';
 
 import { useController, usePool, useYDai, useMath, useProxy, useTxActive, useToken } from '../hooks';
+import InfoGrid from '../components/InfoGrid';
 
 interface IBorrowProps {
   borrowAmount?:number|null;
@@ -41,7 +42,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
   const { 
     // ethBorrowingPower_: maximumDai, 
     maxDaiAvailable_: maximumDai,
-    collateralPercent_ 
+    collateralPercent_,
   } = position;
 
   const theme:any = React.useContext(ThemeContext);
@@ -230,37 +231,30 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
           <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Selected series</Text>
 
           <SeriesDescriptor activeView='borrow' />
-      
-          <Box direction='row-responsive' pad={{ horizontal:'medium' }} justify='start' gap='large' fill>
-            <Box gap='small'>
-              <Box direction='row' gap='small'>
-                <Text color='text-weak' size='xsmall'>Current Debt</Text>
-                <Help />
-              </Box>
-              <Box direction='row' gap='small'>
-                { borrowPending ?           
-                  <ScaleLoader color={theme?.global?.colors['brand-transparent'].dark} height='13' /> 
-                  :
-                  <Text color='brand' weight='bold' size='medium'> 
-                    {activeSeries?.ethDebtYDai_? `${activeSeries.ethDebtYDai_.toFixed(2)} Dai`: '0 Dai'}
-                  </Text>}
-                {/* <Text color='brand' weight='bold' size='medium'> {activeSeries?.wethDebtDai_? `${activeSeries.wethDebtDai_.toFixed(2)} Dai`: ''}  </Text> */}
-              </Box>
-            </Box>
-            
-            <Box gap='small'>
-              <Box direction='row' gap='small'>
-                <Text color='text-weak' size='xsmall'>Maximum Borrowing Power</Text>
-                <Help />
-              </Box>
-              <Box direction='row' gap='small'>
-                <Text color={maximumDai? 'brand': 'brand-transparent'} size='xxsmall'>approx.</Text>
-                <Text color='brand' weight='bold' size='medium'> {maximumDai? `${maximumDai.toFixed(2)} Dai`: ''}  </Text>
-              </Box>
-            </Box>
-            
-          </Box>
 
+          <InfoGrid entries={[
+            {
+              label: 'Current Debt',
+              visible: true,
+              active: true,
+              loading: borrowPending,     
+              value: activeSeries?.ethDebtYDai_? `${activeSeries.ethDebtYDai_.toFixed(2)} Dai`: '0 Dai',
+              valuePrefix: null,
+              valueExtra: null, 
+            },
+
+            {
+              label: 'Max Borrowing Power',
+              visible: true,
+              active: maximumDai,
+              loading: borrowPending,           
+              value: maximumDai ? `${maximumDai.toFixed(2)} Dai`: '',
+              valuePrefix: 'Approx.',
+              valueExtra: null,
+            },
+          ]}
+          />
+      
           {!hasDelegated && 
             <OnceOffAuthorize
               authProcedure={delegateProcedure} 
@@ -268,70 +262,65 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
               txPending={txActive?.type === 'DELEGATION'}  
             />}
 
-          <Box fill gap='medium' margin={{ vertical:'large' }}>
-            <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to borrow</Text>
-            <Box 
-              round='small'
-              // background='brand-transparent'
-              border='all'
-              direction='row'
-              fill='horizontal'
-              pad='small'
-              flex
-            >
-              <TextInput
-                type="number"
-                placeholder='Enter the amount of Dai to borrow'
-                value={inputValue || ''}
+          <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to borrow</Text>
+          <Box 
+            round='small'
+            border='all'
+            direction='row'
+            fill='horizontal'
+            pad='small'
+            flex
+          >
+            <TextInput
+              type="number"
+              placeholder='Enter the amount of Dai to borrow'
+              value={inputValue || ''}
                 // disabled={depositDisabled}
-                plain
-                onChange={(event:any) => setInputValue(event.target.value)}
-              />
-            </Box>
-
-            <Box fill gap='small' pad={{ horizontal:'medium' }}>
-              <Box fill direction='row-responsive' justify='between'>
-                <Box gap='small'>
-                  <Box direction='row' gap='small'>
-                    <Text color='text-weak' size='xsmall'>Estimated APR</Text>
-                    <Help />
-                  </Box>
-                  <Text 
-                    color={inputValue>0?'brand':'brand-transparent'}
-                    weight='bold' 
-                    size='medium'
-                  >
-                    {APR && APR.toFixed(2)}%               
-                  </Text>
-                </Box>
-
-                <Box gap='small' alignSelf='start' align='center'>
-                  <Text color='text-weak' size='xsmall'>Collateralization Ratio after Borrow</Text>
-                  <Box direction='row' gap='small'>
-                    <Text color={!inputValue? 'brand-transparent': 'brand'} size='xxsmall'>approx.</Text> 
-                    <Text color={!inputValue? 'brand-transparent': 'brand'} weight='bold' size='medium'> 
-                      {(estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '' }
-                    </Text>
-                    { collateralPercent_ > 0 &&
-                    <Text color='red' size='medium'> 
-                      { inputValue && estRatio && ( (collateralPercent_- estRatio) !== 0) && `(- ${(collateralPercent_- estRatio).toFixed(0)}%)` }
-                    </Text>}
-                  </Box>
-                </Box> 
-
-                <Box gap='small'>
-                  <Box direction='row' gap='small'>
-                    <Text color='text-weak' size='xsmall'>Approx. Dai owed at maturity</Text>
-                    <Help />
-                  </Box>
-                  <Text color={inputValue>0? 'brand':'brand-transparent'} weight='bold' size='medium'> 
-                    {yDaiValue.toFixed(2)} Dai on {activeSeries && Moment(activeSeries.maturity_).format('DD MMMM YYYY')}
-                  </Text>
-                </Box>
-              </Box>
-              {/* add next layer here */}
-            </Box>
+              plain
+              onChange={(event:any) => setInputValue(event.target.value)}
+            />
           </Box>
+
+          <InfoGrid entries={[
+            {
+              label: 'Estimated APR',
+              visible: true,
+              active: inputValue,
+              loading: false,     
+              value: APR?`${APR.toFixed(2)}%`:'- %',
+              valuePrefix: null,
+              valueExtra: null, 
+            },
+            {
+              label: 'Approx. Dai owed at maturity',
+              visible: true,
+              active: inputValue,
+              loading: false,           
+              value: `${yDaiValue.toFixed(2)} Dai`,
+              valuePrefix: null,
+              // valueExtra: () => (
+              //   <Text size='xxsmall'>
+              //     {activeSeries && Moment(activeSeries.maturity_).format('DD MMMM YYYY')}
+              //   </Text>
+              // ),
+            },
+
+            {
+              label: 'Ratio after Borrow',
+              visible: true,
+              active: inputValue,
+              loading: false,            
+              value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
+              valuePrefix: 'Approx.',
+              valueExtra: () => (
+                <Text color='red' size='small'> 
+                  { inputValue && estRatio && ( (collateralPercent_- estRatio) !== 0) && `(- ${(collateralPercent_- estRatio).toFixed(0)}%)` }
+                </Text>
+              )
+            },
+
+          ]}
+          />
 
           <InlineAlert warnMsg={warningMsg} errorMsg={errorMsg} />
 
@@ -357,7 +346,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
 
       { borrowActive && !txActive && <ApprovalPending /> } 
       { txActive && <TransactionPending msg={`You borrowed ${inputValue} Dai.`} tx={txActive} /> }
-      {/* { txActive?.type === 'BORROW' && <TransactionPending msg={`You borrowed ${inputValue} Dai.`} tx={txActive} /> } */}
+
     </>
   );
 };

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Text } from 'grommet';
+import { Box, Text, Tabs, Tab } from 'grommet';
 
 interface IActionSelectorProps {
   setActiveView: any;
@@ -8,7 +8,6 @@ interface IActionSelectorProps {
 
 function ActionSelector({ setActiveView, activeView }:IActionSelectorProps) {
   return (
-
     <Box
       direction="row"
       pad={{ horizontal:'medium', vertical :'medium' }}
@@ -27,8 +26,8 @@ function ActionSelector({ setActiveView, activeView }:IActionSelectorProps) {
           round='small'
           pad={{ horizontal: 'large', vertical: 'small' }}
           background={
-              activeView === 'COLLATERAL' ? 'background-front' : undefined
-            }
+            activeView === 'COLLATERAL' ? 'background-front' : undefined
+          }
           elevation={activeView === 'COLLATERAL' ? 'small' : undefined}
           onClick={() => setActiveView('COLLATERAL')}
           direction="row"
@@ -45,8 +44,8 @@ function ActionSelector({ setActiveView, activeView }:IActionSelectorProps) {
           round='small'
           pad={{ horizontal: 'large', vertical: 'small' }}
           background={
-              activeView === 'BORROW' ? 'background-front' : undefined
-            }
+            activeView === 'BORROW' ? 'background-front' : undefined
+          }
           elevation={activeView === 'BORROW' ? 'small' : undefined}
           onClick={() => setActiveView('BORROW')}
         >

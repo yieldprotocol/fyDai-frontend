@@ -18,6 +18,7 @@ import Redeem from './Redeem';
 
 import SeriesDescriptor from '../components/SeriesDescriptor';
 import InlineAlert from '../components/InlineAlert';
+import InfoGrid from '../components/InfoGrid';
 
 import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
@@ -127,30 +128,38 @@ const Lend = ({ lendAmount }:ILendProps) => {
     <>
       { sellOpen && <WithdrawDai close={()=>setSellOpen(false)} /> }
       <Box flex='grow' gap='medium' align='center' fill='horizontal'>
-          
-        {/* <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Selected series</Text>
-          
-        <SeriesDescriptor activeView='lend' /> */}
 
-        <Box fill gap='small' pad={{ horizontal:'medium' }}>
-          <Box fill direction='row-responsive' justify='start' gap='large'>
-            <Box gap='small'>
-              <Box direction='row' gap='small'>
-                <Text color='text-weak' size='xsmall'>Portfolio Value at Maturity</Text>
-                <Help />
-              </Box>
-              <Text color='brand' weight='bold' size='medium'> {activeSeries && `${activeSeries?.yDaiBalance_.toFixed(2)} Dai` || '-'} </Text>
-            </Box>
+        <InfoGrid entries={[
+          {
+            label: 'Portfolio Value at Maturity',
+            visible: true,
+            active: true,
+            loading: false,     
+            value: activeSeries && `${activeSeries?.yDaiBalance_.toFixed(2)} Dai` || '-',
+            valuePrefix: null,
+            valueExtra: null, 
+          },
+          {
+            label: 'Current Value',
+            visible: true,
+            active: true,
+            loading: false,           
+            value: currentValue!==0?`${currentValue.toFixed(2)} Dai`: '-',
+            valuePrefix: null,
+            valueExtra: null,
+          },
 
-            <Box gap='small'>
-              <Box direction='row' gap='small'>
-                <Text color='text-weak' size='xsmall'>Current Value</Text>
-                <Help />
-              </Box>
-              <Text color='brand' weight='bold' size='medium'> {currentValue!==0?`${currentValue.toFixed(2)} Dai`: '-'} </Text>
-            </Box>
-          </Box>
-        </Box>
+          {
+            label: 'Dai balance',
+            visible: true,
+            active: true,
+            loading: false,            
+            value: daiBalance_?`${daiBalance_.toFixed(2)} Dai`: '0 Dai',
+            valuePrefix: null,
+            valueExtra: null,
+          },
+        ]}
+        />
 
         { !activeSeries?.isMature ?
           <Box fill gap='medium' margin={{ vertical:'large' }}>
@@ -194,41 +203,33 @@ const Lend = ({ lendAmount }:ILendProps) => {
               </Box>
             </Box>
 
-            <Box fill gap='small' pad={{ horizontal:'medium' }}>
+            <InfoGrid entries={[
+              {
+                label: 'Estimated APR',
+                visible: true,
+                active: inputValue,
+                loading: false,     
+                value: APR?`${APR.toFixed(2)}%`:'- %',
+                valuePrefix: null,
+                valueExtra: null, 
+              },
+              {
+                label: 'Approx. Dai received at maturity',
+                visible: true,
+                active: inputValue,
+                loading: false,           
+                value: `${yDaiValue.toFixed(2)} Dai`,
+                valuePrefix: null,
+                valueExtra: null,
+              //   valueExtra: () => (
+              //   <Text size='xxsmall'>
+              //     {activeSeries && Moment(activeSeries.maturity_).format('DD MMMM YYYY')}
+              //   </Text>
+              // ),
+              },
+            ]}
+            />
 
-              <Box fill direction='row-responsive' justify='between'>
-                <Box gap='small'>
-                  <Box direction='row' gap='small'>
-                    <Text color='text-weak' size='xsmall'>Estimated APR</Text>
-                    <Help />
-                  </Box>                
-                  <Text color={!inputValue? 'brand-transparent':'brand'} weight='bold' size='medium'> 
-                    {APR && APR.toFixed(2)}%                  
-                  </Text>
-                </Box>
-
-                <Box gap='small'>
-                  <Box direction='row' gap='small'>
-                    <Text color='text-weak' size='xsmall'>Approx. Dai received at maturity</Text>
-                    <Help />
-                  </Box>
-                  <Text color={!inputValue? 'brand-transparent':'brand'} weight='bold' size='medium'> 
-                    { yDaiValue.toFixed(2) } Dai on {activeSeries && Moment(activeSeries.maturity_).format('DD MMMM YYYY')}
-                  </Text>
-                </Box>
-
-                <Box gap='small'>
-                  <Box direction='row' gap='small'>
-                    <Text color='text-weak' size='xsmall'>Wallet Dai balance</Text>
-                    <Help />
-                  </Box>
-                  <Text color='brand' weight='bold' size='medium'> {daiBalance_?`${daiBalance_.toFixed(2)} Dai`: '-'} </Text>
-                </Box>         
-              </Box>
-              <Box fill direction='row-responsive' justify='between'>
-                {/* next block */}
-              </Box>
-            </Box>
           </Box> :
           <Box fill gap='medium' margin={{ vertical:'large' }}>
             <Redeem />

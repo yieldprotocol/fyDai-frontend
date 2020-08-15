@@ -51,7 +51,7 @@ const App = (props:any) => {
   const { connector, library, chainId, account, activate, deactivate, active, error } = useWeb3React();
 
   // TODO Switch out for react router
-  const [activeView, setActiveView] = React.useState<string>('LEND');
+  const [activeView, setActiveView] = React.useState<string>('BORROW');
 
   const [showConnectLayer, setShowConnectLayer] = React.useState<boolean>(false);
   const [showAccountLayer, setShowAccountLayer] = React.useState<boolean>(false);
