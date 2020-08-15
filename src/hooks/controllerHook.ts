@@ -185,6 +185,7 @@ export const useController = () => {
     /* Contract interaction */
     setRepayActive(true);
     const contract = new ethers.Contract( controllerAddr, controllerAbi, signer );
+
     try {
       if (typeCaps === 'YDAI') {
         tx = await contract.repayYDai(collateralBytes, maturity, fromAddr, toAddr, parsedAmount);
@@ -468,7 +469,7 @@ export const useController = () => {
     collateralLocked,
     borrowingPower,
     totalDebtDai,
-    debtDai, 
+    debtDai,
 
   } as const;
 };

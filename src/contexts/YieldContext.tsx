@@ -164,6 +164,7 @@ const YieldProvider = ({ children }: any) => {
               poolAddress,
               daiProxyAddress,
               maturity_: new Date(maturity * 1000),
+              isMature: new Date() > new Date(maturity * 1000), 
               displayName: moment(maturity * 1000).format('MMMM YYYY'),
               seriesColor: seriesColors[i],
             };

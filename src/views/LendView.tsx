@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { Box } from 'grommet';
+import { Box, Text } from 'grommet';
 
 import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
@@ -8,6 +8,7 @@ import Redeem from '../containers/Redeem';
 import Lend from '../containers/Lend';
 
 import PageHeader from '../components/PageHeader';
+import SeriesDescriptor from '../components/SeriesDescriptor';
 
 
 interface LendProps {
@@ -24,21 +25,13 @@ const LendView = ({ activeView: activeViewFromProp  }:LendProps) => {
   const { isLoading: positionsLoading, seriesData, activeSeries } = seriesState; 
 
   return (
-    <Box gap='small' pad={{ vertical:'large', horizontal:'small' }} fill='horizontal' justify='between'>
-      <Box
-        direction="row"
-        fill="horizontal"
-        pad={{ bottom: 'large', horizontal: 'none' }}
-        justify="between"
-        align="center"
-      >
-        <PageHeader
-          title="Lend"
-          subtitle="Description of lending"
-          tipPrimary="Tip: Convert your Maker vault"
-          tipSecondary="View more tips"
-        />
-      </Box>    
+    <>
+      <PageHeader
+        title="Lend"
+        subtitle="Description of lending"
+        tipPrimary="Tip: Convert your Maker vault"
+        tipSecondary="View more tips"
+      />
       <Box
         width={{ max:'750px' }}
         alignSelf='center'
@@ -46,11 +39,16 @@ const LendView = ({ activeView: activeViewFromProp  }:LendProps) => {
         background='background-front'
         round='small'
         pad='large'
+        gap='medium'
       >
-        <Lend />
-        {false && <Redeem /> }
+        <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Selected series</Text>
+        <SeriesDescriptor activeView='lend' />
+        { activeSeries?.isMature === false  && <Lend /> }
+        { activeSeries?.isMature === true && <Redeem /> }
+        
+        {/* <Redeem /> */}
       </Box>
-    </Box>
+    </>
   );
 };
 

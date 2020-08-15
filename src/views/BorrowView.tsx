@@ -9,6 +9,7 @@ import Repay from '../containers/Repay';
 import { UserContext } from '../contexts/UserContext';
 
 import PageHeader from '../components/PageHeader';
+import ActionSelector from '../components/ActionSelector';
 
 interface BorrowProps {
   activeView?: string;
@@ -25,26 +26,13 @@ const BorrowView = ({
   );
 
   return (
-    <Box
-      gap="small"
-      pad={{ vertical: 'large', horizontal: 'small' }}
-      fill="horizontal"
-      justify="between"
-    >
-      <Box
-        direction="row"
-        fill="horizontal"
-        pad={{ bottom: 'large', horizontal: 'none' }}
-        justify="between"
-        align="center"
-      >
-        <PageHeader
-          title="Borrow"
-          subtitle="Description of borrowing"
-          tipPrimary="Tip: Convert your Maker vault"
-          tipSecondary="View more tips"
-        />
-      </Box>
+    <>
+      <PageHeader
+        title="Borrow"
+        subtitle="Description of borrowing"
+        tipPrimary="Tip: Convert your Maker vault"
+        tipSecondary="View more tips"
+      />
 
       <Box 
         background="brand-transparent"
@@ -54,75 +42,14 @@ const BorrowView = ({
         fill
       >
 
-        <Box
-          direction="row"
-          pad={{ horizontal:'medium', vertical :'medium' }}
-          alignSelf="center"
-          width={{ max: '750px' }}
-          fill="horizontal"
-        >
-          <Box
-           round='small'
-            direction="row"
-            // background="brand-transparent"
-          // pad="xxsmall"
-            gap="small"
-            fill="horizontal"
-            justify='between'
-          >
-            <Box
-             round='small'
-              pad={{ horizontal: 'large', vertical: 'small' }}
-              background={
-              activeView === 'COLLATERAL' ? 'background-front' : undefined
-            }
-              elevation={activeView === 'COLLATERAL' ? 'small' : undefined}
-              onClick={() => setActiveView('COLLATERAL')}
-              direction="row"
-              justify="between"
-              gap="small"
-            >
-              <Text size="xsmall" weight="bold">
-                1. Add Collateral
-              </Text>
-              {position.ethPosted>0 && <CheckCircle color="green" />}
-            </Box>
-
-
-            <Box
-             round='small'
-              pad={{ horizontal: 'large', vertical: 'small' }}
-              background={
-              activeView === 'BORROW' ? 'background-front' : undefined
-            }
-              elevation={activeView === 'BORROW' ? 'small' : undefined}
-              onClick={() => setActiveView('BORROW')}
-            >
-              <Text size="xsmall" weight="bold">
-                2. Borrow Dai
-              </Text>
-            </Box>
-
-            <Box
-             round='small'
-              pad={{ horizontal: 'large', vertical: 'small' }}
-              background={activeView === 'REPAY' ? 'background-front' : undefined}
-              elevation={activeView === 'REPAY' ? 'small' : undefined}
-              onClick={() => setActiveView('REPAY')}
-            >
-              <Text size="xsmall" weight="bold">
-                3. Repay Dai Debt
-              </Text>
-            </Box>
-          </Box>
-        </Box>
-
+        <ActionSelector activeView={activeView} setActiveView={setActiveView} />
+        
         <Box
           width={{ max: '750px' }}
           alignSelf="center"
-          fill="horizontal"
+          fill
           background="background-front"
-         round='small'
+          round='small'
           pad="large"
         >
           {activeView === 'COLLATERAL' && <Deposit setActiveView={(x:string)=>setActiveView(x.toUpperCase())} />}
@@ -134,7 +61,7 @@ const BorrowView = ({
           )}
         </Box>
       </Box>    
-    </Box>
+    </>
   );
 };
 

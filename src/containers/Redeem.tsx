@@ -6,14 +6,21 @@ import {
   FiHelpCircle as Help,
   FiChevronDown as CaretDown,
   FiSettings as SettingsGear,
+  FiClock as Clock,
 } from 'react-icons/fi';
 
 import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
 
+import { useYDai, useTxActive } from '../hooks';
+
 import { IYieldSeries } from '../types';
 import ethLogo from '../assets/images/tokens/eth.svg';
+import SeriesDescriptor from '../components/SeriesDescriptor';
+import InlineAlert from '../components/InlineAlert';
+import ApprovalPending from '../components/ApprovalPending';
+import TransactionPending from '../components/TransactionPending';
 
 interface IRedeemProps {
   close?:any,
@@ -21,75 +28,87 @@ interface IRedeemProps {
 
 const Redeem  = ({ close }:IRedeemProps)  => {
 
-  const [daiValue, setDaiValue] = React.useState<any>();
-
-  const { state: yieldState, actions: yieldActions } = React.useContext(YieldContext);
-  const { deployedContracts } = yieldState;
+  const [redeemPending, setRedeemPending] = React.useState<boolean>(false);
+  const [redeemDisabled, setRedeemDisabled] = React.useState<boolean>(true);
+  const [ warningMsg, setWarningMsg] = React.useState<string|null>(null);
+  const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
 
   const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
   const { isLoading, activeSeries } = seriesState;
 
   const { state: userState, actions: userActions } = React.useContext(UserContext);
-  const {
-    daiBalance_,
-    ethBorrowingPower_: maximumDai
-  } = userState.position;
+
+  const { isMature, redeem, redeemActive } = useYDai();
+  const [ txActive ] = useTxActive(['redeem']);
+
+  const redeemProcedure = async () =>{
+    setRedeemPending(true);
+    await redeem(activeSeries.yDaiAddress, activeSeries.yDaiBalance);
+    await Promise.all([
+      userActions.updatePosition(),
+      seriesActions.updateActiveSeries()
+    ]);
+    setRedeemPending(false);
+  };
+
+  /* redeem button disabled logic */ 
+  React.useEffect( () => {
+    if ( activeSeries && activeSeries?.yDaiBalance_ > 0 ){
+      setRedeemDisabled(true);
+    }
+    setRedeemDisabled(true);
+
+  }, [activeSeries]);
 
   return (
 
-    <Box flex='grow' justify='between' pad='small'>
-      <Box margin={{ top:'medium' }} gap='xsmall' align='start' fill='horizontal'>
-        <Text color='secondary' size='small' weight='bold'> 
-          You're ready to redeem your yDai for Dai!
-        </Text>
-      </Box>
+    <>
+      <Box flex='grow' align='center' fill='horizontal'>
 
-      <Box fill='horizontal' margin={{ vertical:'medium' }}>
-        <Box pad='xsmall'>
-          <Box direction='row' gap='small' justify='between'>
-            <Text size='xsmall'>
-              Current value per yDai:
-            </Text>
-            <Help />
-          </Box>
-          <Text weight='bold' size='xsmall'>
-            1.01 Dai
-          </Text>
-        </Box>
+        <InlineAlert warnMsg={warningMsg} errorMsg={errorMsg} />
 
-        <Box pad='xsmall'>
-          <Box direction='row' gap='small' justify='between'>
-            <Text size='xsmall'>
-              Total Dai value you will recieve:
-            </Text>
-            <Help />
-          </Box>
-          <Text weight='bold' size='xsmall'>
-            12.12 Dai
-          </Text>
-        </Box>
-      </Box>
-
-      {/* 
-      <Box direction='row' gap='small' margin={{ bottom:'medium' }}>
-         
-        <Text size='xxsmall'>
-          <SettingsGear /> Advanced Options
-        </Text>
-      </Box> */}
-
-      <Box fill='horizontal' alignSelf='end'>
-        <Button
+        { txActive?.type !== 'REDEEM' &&
+        <Box 
+          gap='medium' 
+          margin={{ vertical:'large' }}  
+          pad='medium'     
+          round='small'
           fill='horizontal'
-          primary
-          // disabled={!(daiValue>0)}
-          disabled={false}
-          color='secondary'
-          onClick={()=>console.log(daiValue)}
-          label={`Redeem your ${daiValue} Dai`}
-        />
+          border='all'
+          // background='brand-transparent'
+          // elevation='small'
+        >    
+          <Box direction='row' gap='small' align='center' fill>          
+            <Box>
+              <Clock />
+            </Box>
+            <Box> 
+              <Text size='xlarge' color='brand' weight='bold'>This series has matured.</Text>         
+            </Box>
+          </Box>
+
+          <Box
+            round='xsmall'
+            background={(redeemDisabled) ? 'brand-transparent' : 'brand'}
+            onClick={(redeemDisabled)? ()=>{}:()=>redeemProcedure()}  
+            pad='small'
+            align='center'
+          >
+            <Text 
+              weight='bold'
+              size='large'
+              color={(redeemDisabled) ? 'text-xweak' : 'text'}
+            >
+              {`Redeem ${!activeSeries && activeSeries?.yDaiBalance_.toFixed(4) || ''} Dai`}
+            </Text>
+          </Box>               
+        </Box>}
+
+        { redeemActive && !txActive && <ApprovalPending /> } 
+        { txActive && <TransactionPending msg={`Redeeming your ${activeSeries?.yDaiBalance_.toFixed(4)} Dai.`} tx={txActive} /> }
+
       </Box>
-    </Box>
+    </>
   );
 };
 

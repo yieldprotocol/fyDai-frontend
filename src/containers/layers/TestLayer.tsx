@@ -28,7 +28,7 @@ const TestLayer = (props:any) => {
   const { state: seriesState, actions: seriesActions } = React.useContext( SeriesContext );
   const [ flow, setFlow ] = React.useState<string|null>('APPROVALS');
 
-  const { seriesData } = seriesState;
+  const { activeSeries, seriesData } = seriesState;
   const { yieldData, deployedContracts, deployedSeries } = yieldState;
   
 
@@ -265,13 +265,11 @@ const TestLayer = (props:any) => {
             { seriesData.size > 0 && !seriesState.isLoading ? 
               <Box pad='small' gap='medium' fill>
                 <Box direction='row'>
-                  s
                   {/* <Text weight='bold'>yDai[0]: {seriesData.get('yDai-2020-09-30').name}</Text> */}
                 </Box>
                 <Box gap='small'>
                   <Text weight='bold'>Posted collateral:</Text>
                   <Text>weth posted: { position.ethPosted_ || '' }</Text>
-
                 </Box>
               </Box>
               :
@@ -282,16 +280,30 @@ const TestLayer = (props:any) => {
         </Box>
 
         <Box direction='row' justify='between' border='all' pad='small' gap='small'>
-
           Time-travelling: 
           <Button 
+            primary
             label='Jump forward a month' 
             onClick={async ()=> {
               await advanceTimeAndBlock('2592000');
             }}
           />
+
+          blockchain date: {timestamp && Moment(timestamp*1000).format('DD MMM YYYY') }
+
+          <Button 
+            label='mature Active series' 
+            onClick={()=> sendTx(activeSeries.yDaiAddress, 'YDai', 'mature', [], ethers.BigNumber.from(0) )}
+          />
+
+        </Box>
+
+        <Box direction='row' justify='between' border='all' pad='small' gap='small'>
+          SnapShot and revert : 
+
           <Button 
             label='take snapshot' 
+            primary
             onClick={async ()=> {
               await takeSnapshot();
             }}
@@ -308,8 +320,9 @@ const TestLayer = (props:any) => {
               await revertToT0();
             }}
           />
-          blockchain date: {timestamp && Moment(timestamp*1000).format('DD MMM YYYY') }
         </Box>
+
+
 
 
         NB: dont forget to reset metamask after any timetravelling!!

@@ -22,6 +22,7 @@ import { NotifyContext } from '../contexts/NotifyContext';
 import { UserContext } from '../contexts/UserContext';
 
 import { useController, usePool, useBalances, useProxy, useTxActive, useToken } from '../hooks';
+import InfoGrid from '../components/InfoGrid';
 
 interface IRepayProps {
   repayAmount?:any
@@ -156,30 +157,27 @@ function Repay({ repayAmount }:IRepayProps) {
               txPending={txActive?.type === 'DELEGATION'}  
           />} */}
 
-          <Box direction='row-responsive' pad={{ horizontal:'medium' }} justify='start' gap='large' fill>
-            
-            <Box gap='small'>
-              <Box direction='row' gap='small'>
-                <Text color='text-weak' size='xsmall'>Current Debt</Text>
-                <Help />
-              </Box>
-              <Box direction='row' gap='small'>
-                {/* <Text color={maxDaiAvailable_? 'brand': 'brand-transparent'} size='xxsmall'>approx.</Text> */}
-                <Text color='brand' weight='bold' size='medium'>
-                  {activeSeries?.ethDebtYDai_? `${activeSeries.ethDebtYDai_.toFixed(2)} Dai`: 'O Dai'}
-                </Text>
-              </Box>
-            </Box>
-
-            <Box gap='small'>
-              <Box direction='row' gap='small'>
-                <Text color='text-weak' size='xsmall'>Wallet Dai balance</Text>
-                <Help />
-              </Box>
-              <Text color='brand' weight='bold' size='medium'> {daiBalance_? `${daiBalance_.toFixed(2)} Dai`:'-'} </Text>
-            </Box>
-
-          </Box>
+          <InfoGrid entries={[
+            {
+              label: 'Current Debt',
+              visible: true,
+              active: true,
+              loading: false,     
+              value: activeSeries?.ethDebtYDai_? `${activeSeries.ethDebtYDai_.toFixed(2)} Dai`: 'O Dai',
+              valuePrefix: null,
+              valueExtra: null, 
+            },
+            {
+              label: 'Dai balance',
+              visible: true,
+              active: true,
+              loading: false,            
+              value: daiBalance_?`${daiBalance_.toFixed(2)} Dai`: '-',
+              valuePrefix: null,
+              valueExtra: null,
+            },
+          ]}
+          />
 
           <Box fill gap='medium' margin={{ vertical:'large' }}>
             <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to Repay</Text>

@@ -11,12 +11,7 @@ const Dashboard = () => {
   const [activeView, setActiveView] = React.useState<string>('borrow');
 
   return (
-    <Box
-      gap="small"
-      pad={{ vertical: 'large', horizontal: 'small' }}
-      fill="horizontal"
-      justify="between"
-    >
+    <>
       <Box
         direction="row"
         fill="horizontal"
@@ -65,7 +60,8 @@ const Dashboard = () => {
 
       {activeView === 'borrow' && <DashBorrow />}
       {activeView === 'lend' && <DashLend />}
-    </Box>
+    </>
+
   );
 };
 
