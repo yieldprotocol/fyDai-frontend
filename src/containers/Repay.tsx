@@ -15,6 +15,7 @@ import InlineAlert from '../components/InlineAlert';
 import OnceOffAuthorize from '../components/OnceOffAuthorize';
 import ApprovalPending from '../components/ApprovalPending';
 import TransactionPending from '../components/TransactionPending';
+import DaiMark from '../components/logos/DaiMark';
 
 import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
@@ -182,6 +183,7 @@ function Repay({ repayAmount }:IRepayProps) {
               value={inputValue || ''}
               plain
               onChange={(event:any) => setInputValue(event.target.value)}
+              icon={<DaiMark />}
             />
             <Button 
               label='max'

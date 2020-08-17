@@ -14,6 +14,8 @@ import SeriesSelector from '../components/SeriesSelector';
 import InlineAlert from '../components/InlineAlert';
 import InputWrap from '../components/InputWrap';
 
+import DaiMark from '../components/logos/DaiMark';
+
 import OnceOffAuthorize from '../components/OnceOffAuthorize';
 import ApprovalPending from '../components/ApprovalPending';
 import TransactionPending from '../components/TransactionPending';
@@ -127,7 +129,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
       setBorrowDisabled(true);
       setIndicatorColor('red');
       setWarningMsg(null);
-      setErrorMsg('That amount exceeds the amount of Dai you can borrow based on your collateral'); 
+      setErrorMsg('That amount exceeds the amount of DAI you can borrow based on your collateral'); 
     } else if (estRatio > 1.5 && estRatio < 2.0 ) {
       setIndicatorColor('orange');
       setErrorMsg(null);
@@ -190,7 +192,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
     if ( inputValue && ( inputValue > maximumDai ) ) {
       console.log(inputValue, maximumDai);
       setWarningMsg(null);
-      setErrorMsg('That amount exceeds the amount of Dai you can borrow based on your collateral'); 
+      setErrorMsg('That amount exceeds the amount of DAI you can borrow based on your collateral'); 
     } else if (inputValue && ( inputValue > Math.round(maximumDai-1) ) ) {
       setErrorMsg(null);
       setWarningMsg('If you borrow right up to your maximum allowance, there is high probability you will be liquidated!');
@@ -240,7 +242,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
               visible: true,
               active: true,
               loading: borrowPending,     
-              value: activeSeries?.ethDebtYDai_? `${activeSeries.ethDebtYDai_.toFixed(2)} Dai`: '0 Dai',
+              value: activeSeries?.ethDebtYDai_? `${activeSeries.ethDebtYDai_.toFixed(2)} DAI`: '0 DAI',
               valuePrefix: null,
               valueExtra: null, 
             },
@@ -250,7 +252,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
               visible: true,
               active: maximumDai,
               loading: borrowPending,           
-              value: maximumDai ? `${maximumDai.toFixed(2)} Dai`: '',
+              value: maximumDai ? `${maximumDai.toFixed(2)} DAI`: '',
               valuePrefix: 'Approx.',
               valueExtra: null,
             },
@@ -270,11 +272,12 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
           <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={borrowDisabled}>
             <TextInput
               type="number"
-              placeholder='Enter the amount of Dai to borrow'
+              placeholder='Enter the amount of DAI to borrow'
               value={inputValue || ''}
                 // disabled={depositDisabled}
               plain
               onChange={(event:any) => setInputValue(event.target.value)}
+              icon={<DaiMark />}
             />
           </InputWrap>
 
@@ -289,11 +292,11 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
               valueExtra: null, 
             },
             {
-              label: 'Approx. Dai owed at maturity',
+              label: 'Approx. DAI owed at maturity',
               visible: true,
               active: inputValue,
               loading: false,           
-              value: `${yDaiValue.toFixed(2)} Dai`,
+              value: `${yDaiValue.toFixed(2)} DAI`,
               valuePrefix: null,
               // valueExtra: () => (
               //   <Text size='xxsmall'>
@@ -333,14 +336,14 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
               size='large'
               color={borrowDisabled ? 'text-xweak' : 'text'} 
             >
-              {`Borrow ${inputValue || ''} Dai`}
+              {`Borrow ${inputValue || ''} DAI`}
             </Text>
           </Box>
         </Box>
       </Box> }
 
       { borrowActive && !txActive && <ApprovalPending /> } 
-      { txActive && <TransactionPending msg={`You borrowed ${inputValue} Dai.`} tx={txActive} /> }
+      { txActive && <TransactionPending msg={`You borrowed ${inputValue} DAI.`} tx={txActive} /> }
 
     </>
   );

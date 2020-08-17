@@ -26,6 +26,7 @@ import { UserContext } from '../contexts/UserContext';
   
 import { usePool, useBalances, useMath, useToken } from '../hooks';
 import InputWrap from '../components/InputWrap';
+import DaiMark from '../components/logos/DaiMark';
 
 
 interface ILendProps {
@@ -94,7 +95,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
     if ( inputValue && ( inputValue > daiBalance_ ) ) {
       setLendDisabled(true);
       setWarningMsg(null);
-      setErrorMsg('That amount exceeds the amount of Dai you have'); 
+      setErrorMsg('That amount exceeds the amount of DAI you have'); 
     } else {
       // setLendDisabled(false);
       setWarningMsg(null);
@@ -128,15 +129,14 @@ const Lend = ({ lendAmount }:ILendProps) => {
   return (
     <>
       { sellOpen && <WithdrawDai close={()=>setSellOpen(false)} /> }
-      <Box flex='grow' gap='medium' align='center' fill='horizontal'>
-
+      <Box flex='grow' gap='small' align='center' fill='horizontal'>
         <InfoGrid entries={[
           {
             label: 'Portfolio Value at Maturity',
             visible: true,
             active: true,
             loading: false,     
-            value: activeSeries && `${activeSeries?.yDaiBalance_.toFixed(2)} Dai` || '-',
+            value: activeSeries && `${activeSeries?.yDaiBalance_.toFixed(2)} DAI` || '-',
             valuePrefix: null,
             valueExtra: null, 
           },
@@ -145,17 +145,17 @@ const Lend = ({ lendAmount }:ILendProps) => {
             visible: true,
             active: true,
             loading: false,           
-            value: currentValue!==0?`${currentValue.toFixed(2)} Dai`: '-',
+            value: currentValue!==0?`${currentValue.toFixed(2)} DAI`: '-',
             valuePrefix: null,
             valueExtra: null,
           },
 
           {
-            label: 'Dai balance',
+            label: 'DAI balance',
             visible: true,
             active: true,
             loading: false,            
-            value: daiBalance_?`${daiBalance_.toFixed(2)} Dai`: '0 Dai',
+            value: daiBalance_?`${daiBalance_.toFixed(2)} DAI`: '0 DAI',
             valuePrefix: null,
             valueExtra: null,
           },
@@ -163,16 +163,17 @@ const Lend = ({ lendAmount }:ILendProps) => {
         />
 
         { !activeSeries?.isMature ?
-          <Box fill gap='medium' margin={{ vertical:'large' }}>
-            <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to lend</Text>
+          <Box fill gap='medium'>
 
+            <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to lend</Text>
             <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={lendDisabled}>
               <TextInput
                 type="number"
-                placeholder='Enter the amount of Dai to lend'
+                placeholder='Enter the amount of DAI to lend'
                 value={inputValue || ''}
                 plain
                 onChange={(event:any) => setInputValue(event.target.value)}
+                icon={<DaiMark />}
               />
               <Button 
                 label='max'
@@ -192,11 +193,11 @@ const Lend = ({ lendAmount }:ILendProps) => {
                 valueExtra: null, 
               },
               {
-                label: 'Approx. Dai received at maturity',
+                label: 'Approx. DAI received at maturity',
                 visible: true,
                 active: inputValue,
                 loading: false,           
-                value: `${yDaiValue.toFixed(2)} Dai`,
+                value: `${yDaiValue.toFixed(2)} DAI`,
                 valuePrefix: null,
                 valueExtra: null,
               //   valueExtra: () => (
@@ -207,14 +208,14 @@ const Lend = ({ lendAmount }:ILendProps) => {
               },
             ]}
             />
-
-          </Box> :
+          </Box> 
+          :
           <Box fill gap='medium' margin={{ vertical:'large' }}>
             <Redeem />
           </Box>}
   
         { !activeSeries?.isMature && 
-          <>
+          <Box gap='small' fill='horizontal' align='center'>
             <Box>
               <CheckBox 
                 reverse
@@ -223,8 +224,8 @@ const Lend = ({ lendAmount }:ILendProps) => {
                 disabled={!inputValue || ( approved >= inputValue )}
                 onChange={()=>approveProcedure(inputValue)}
                 label={(approved >= inputValue) ? 
-                  `Lending unlocked for up to ${approved.toFixed(2) || '' } Dai` 
-                  : `Unlock lending of ${inputValue || ''} Dai`}
+                  `Lending unlocked for up to ${approved.toFixed(2) || '' } DAI` 
+                  : `Unlock lending of ${inputValue || ''} DAI`}
               />
             </Box>
 
@@ -241,9 +242,10 @@ const Lend = ({ lendAmount }:ILendProps) => {
                 size='large'
                 color={( !(inputValue>0) || lendDisabled) ? 'text-xweak' : 'text'}
               >
-                {`Lend ${inputValue || ''} Dai`}
+                {`Lend ${inputValue || ''} DAI`}
               </Text>
             </Box>
+
             <Box alignSelf='end'>
               <Box
                 round
@@ -254,12 +256,12 @@ const Lend = ({ lendAmount }:ILendProps) => {
                 justify='center'
               >
                 <Box direction='row' gap='small'>
-                  <Text size='xsmall' color='text-weak'> Alternatively, withdraw Dai from this series</Text>
+                  <Text size='xsmall' color='text-weak'> Alternatively, withdraw DAI from this series</Text>
                   <ArrowRight color='text-weak' />
                 </Box>
               </Box>
             </Box>          
-          </>}
+          </Box>}
       </Box>
     </>
   );

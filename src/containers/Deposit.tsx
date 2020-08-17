@@ -32,6 +32,8 @@ import { useProxy, useTxActive, useMath } from '../hooks';
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
 
+import EthMark from '../components/logos/EthMark';
+
 interface DepositProps {
   /* deposit amount prop is for quick linking into component */
   setActiveView: any;
@@ -116,7 +118,7 @@ const Deposit = ({ setActiveView, depositAmount }:DepositProps) => {
             disabled={postEthActive}
             plain
             onChange={(event:any) => setInputValue(event.target.value)}
-            icon={<Ethereum />}
+            icon={<EthMark />}
           />
           <Button
             secondary

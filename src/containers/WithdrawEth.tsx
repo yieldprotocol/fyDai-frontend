@@ -18,6 +18,7 @@ import ApprovalPending from '../components/ApprovalPending';
 import TransactionPending from '../components/TransactionPending';
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
+import EthMark from '../components/logos/EthMark';
 
 interface IWithDrawProps {
   close?: any;
@@ -150,7 +151,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
                 value={inputValue || ''}
                 plain
                 onChange={(event:any) => setInputValue(event.target.value)}
-                icon={<Ethereum />}
+                icon={<EthMark />}
               />
               <Button 
                 label='max'

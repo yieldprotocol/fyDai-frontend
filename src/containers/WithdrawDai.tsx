@@ -10,7 +10,10 @@ import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
 import { usePool, useYDai, useToken } from '../hooks';
 import { UserContext } from '../contexts/UserContext';
+
 import InputWrap from '../components/InputWrap';
+import DaiMark from '../components/logos/DaiMark';
+
 
 interface IWithDrawDaiProps {
   close?: any;
@@ -111,12 +114,12 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
             <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={withdrawDisabled}>
               <TextInput
                 type="number"
-                placeholder='ETH'
+                placeholder='DAI'
                 disabled={withdrawDisabled}
                 value={inputValue || ''}
                 plain
                 onChange={(event:any) => setInputValue(event.target.value)}
-                icon={<Ethereum />}
+                icon={<DaiMark />}
               />
               <Button 
                 label='max'
