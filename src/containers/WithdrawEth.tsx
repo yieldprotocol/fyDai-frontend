@@ -55,9 +55,11 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
   const { estCollRatio: estimateRatio } = useMath();
 
   const withdrawProcedure = async (value:number) => {
-    await withdrawEth(deployedContracts.EthProxy, value);
-    userActions.updatePosition();
-    close();
+    if (!withdrawDisabled && inputValue>0 && hasDelegated ) {
+      await withdrawEth(deployedContracts.EthProxy, value);
+      userActions.updatePosition();
+      close();
+    }
   };
 
   const delegateProcedure = async () => {
@@ -123,9 +125,9 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
 
   return (
     <Layer onClickOutside={()=>close()}>
-
       <Keyboard 
         onEsc={() => { inputValue? setInputValue(undefined): close();}}
+        onEnter={()=> withdrawProcedure(inputValue)}
         target='document'
       >
         <>
@@ -197,15 +199,15 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
             <Box
               fill='horizontal'
               round='small'
-              background={( !(inputValue>0) || withdrawDisabled && hasDelegated ) ? 'brand-transparent' : 'brand'}
-              onClick={( !(inputValue>0) || withdrawDisabled && hasDelegated )? ()=>{}:()=> withdrawProcedure(inputValue)}
+              background={( !(inputValue>0) || withdrawDisabled || !hasDelegated ) ? 'brand-transparent' : 'brand'}
+              onClick={()=> withdrawProcedure(inputValue)}
               align='center'
               pad='small'
             >
               <Text
                 weight='bold'
                 size='large'
-                color={( !(inputValue>0) || withdrawDisabled && hasDelegated ) ? 'text-xweak' : 'text'}
+                color={( !(inputValue>0) || withdrawDisabled || !hasDelegated ) ? 'text-xweak' : 'text'}
               >
                 {`Withdraw ${inputValue || ''} Eth`}
               </Text>

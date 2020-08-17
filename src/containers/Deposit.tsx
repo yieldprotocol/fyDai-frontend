@@ -73,14 +73,16 @@ const Deposit = ({ setActiveView, depositAmount }:DepositProps) => {
 
   /* Steps required to deposit and update values */
   const depositProcedure = async (value:number) => {
-    setDepositPending(true);
-    await postEth(deployedContracts.EthProxy, value);
-    await userActions.updatePosition();
-    setDepositPending(false);
-    setActiveView('BORROW');
+    if ( inputValue>0 && !depositDisabled ) {
+      setDepositPending(true);
+      await postEth(deployedContracts.EthProxy, value);
+      await userActions.updatePosition();
+      setDepositPending(false);
+      setActiveView('BORROW');
+    }
   };
 
-  /* Handle input value changes (warnings errors etc.) */
+  /* Handle input value changes (info, warnings errors etc.) */
   useEffect(()=>{
     /* 1. Adjust estimated ratio based on input changes */
     if (inputValue && ethPosted_ && debtValue_) {
@@ -106,107 +108,108 @@ const Deposit = ({ setActiveView, depositAmount }:DepositProps) => {
   return (
 
     <Keyboard 
-    onEsc={() => setInputValue(undefined)}
-    target='document'   
-  >
-    <>
-      { withdrawOpen && <WithdrawEth close={()=>setWithdrawOpen(false)} /> }
+      onEsc={() => setInputValue(undefined)}
+      onEnter={()=>depositProcedure(inputValue)}
+      target='document'
+    >
+      <>
+        { withdrawOpen && <WithdrawEth close={()=>setWithdrawOpen(false)} /> }
         
-      { !txActive &&
-      <Box gap='small'>
-        <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to deposit</Text>
+        { !txActive &&
+        <Box gap='small'>
+          <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to deposit</Text>
 
-        <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={depositDisabled}>
-          <TextInput
-            type='number'
-            placeholder={screenSize !== 'small' ? 'Enter the ETH amount to deposit': 'ETH'}
-            value={inputValue || ''}
-            disabled={postEthActive}
-            plain
-            onChange={(event:any) => setInputValue(event.target.value)}
-            icon={<EthMark />}
+          <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={depositDisabled}>
+            <TextInput
+              type='number'
+              placeholder={screenSize !== 'small' ? 'Enter the ETH amount to deposit': 'ETH'}
+              value={inputValue || ''}
+              disabled={postEthActive}
+              plain
+              onChange={(event:any) => setInputValue(event.target.value)}
+              icon={<EthMark />}
+            />
+            <Button
+              color='brand-transparent'
+              label={<Text size='xsmall' color='brand'> {screenSize !== 'small' ? 'Deposit Maximum': 'Max'}</Text>}
+              onClick={()=>setInputValue(ethBalance_)}
+              hoverIndicator='brand-transparent'
+            />
+          </InputWrap>
+
+          <InfoGrid entries={[
+            {
+              label: 'Current Collateral',
+              visible: true,
+              active: true,
+              loading: !ethPosted_ && depositPending && ethPosted_ !== 0,     
+              value: ethPosted_ ? `${ethPosted_.toFixed(4)} Eth` : '0 Eth',
+              valuePrefix: null,
+              valueExtra: null, 
+            },
+
+            {
+              label: 'Collateralization Ratio',
+              visible: true,
+              active: collateralPercent_ > 0,
+              loading: !ethPosted_ && depositPending && ethPosted_ !== 0,            
+              value: (collateralPercent_ && (collateralPercent_ !== 0))? `${collateralPercent_}%`: '',
+              valuePrefix: null,
+              valueExtra: null, 
+            },
+            {
+              label: 'Ratio after Deposit',
+              visible: true,
+              active: inputValue,
+              loading: !ethPosted_ && depositPending && ethPosted_ !== 0,           
+              value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
+              valuePrefix: 'Approx.',
+              valueExtra: () => (
+                <Text color='green' size='medium'> 
+                  { inputValue && collateralPercent_ && ( (estRatio-collateralPercent_) !== 0) && `(+ ${(estRatio-collateralPercent_).toFixed(0)}%)` }
+                </Text>
+              )
+            },
+          ]}
           />
-          <Button
-            color='brand-transparent'
-            label={<Text size='xsmall' color='brand'> {screenSize !== 'small' ? 'Deposit Maximum': 'Max'}</Text>}
-            onClick={()=>setInputValue(ethBalance_)}
-            hoverIndicator='brand-transparent'
-          />
-        </InputWrap>
 
-        <InfoGrid entries={[
-          {
-            label: 'Current Collateral',
-            visible: true,
-            active: true,
-            loading: !ethPosted_ && depositPending && ethPosted_ !== 0,     
-            value: ethPosted_ ? `${ethPosted_.toFixed(4)} Eth` : '0 Eth',
-            valuePrefix: null,
-            valueExtra: null, 
-          },
-
-          {
-            label: 'Collateralization Ratio',
-            visible: true,
-            active: collateralPercent_ > 0,
-            loading: !ethPosted_ && depositPending && ethPosted_ !== 0,            
-            value: (collateralPercent_ && (collateralPercent_ !== 0))? `${collateralPercent_}%`: '',
-            valuePrefix: null,
-            valueExtra: null, 
-          },
-          {
-            label: 'Ratio after Deposit',
-            visible: true,
-            active: inputValue,
-            loading: !ethPosted_ && depositPending && ethPosted_ !== 0,           
-            value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
-            valuePrefix: 'Approx.',
-            valueExtra: () => (
-              <Text color='green' size='medium'> 
-                { inputValue && collateralPercent_ && ( (estRatio-collateralPercent_) !== 0) && `(+ ${(estRatio-collateralPercent_).toFixed(0)}%)` }
-              </Text>
-            )
-          },
-        ]}
-        />
-
-        <Box
-          fill='horizontal'
-          round='small'
-          background={( !(inputValue>0) || depositDisabled) ? 'brand-transparent' : 'brand'}
-          onClick={(!(inputValue>0) || depositDisabled)? ()=>{}:()=>depositProcedure(inputValue)}
-          align='center'
-          pad='small'
-        >
-          <Text
-            weight='bold'
-            size='large'
-            color={( !(inputValue>0) || depositDisabled) ? 'text-xweak' : 'text'}
-          >
-            {`Deposit ${inputValue || ''} Eth`}
-          </Text>
-        </Box>
-
-        <Box alignSelf='end'>
           <Box
-            round
-            onClick={()=>setWithdrawOpen(true)}
-            hoverIndicator='brand-transparent'
-            pad={{ horizontal:'small', vertical:'small' }}
-            justify='center'
+            fill='horizontal'
+            round='small'
+            background={( !(inputValue>0) || depositDisabled) ? 'brand-transparent' : 'brand'}
+            onClick={()=>depositProcedure(inputValue)}
+            align='center'
+            pad='small'
           >
+            <Text
+              weight='bold'
+              size='large'
+              color={( !(inputValue>0) || depositDisabled) ? 'text-xweak' : 'text'}
+            >
+              {`Deposit ${inputValue || ''} Eth`}
+            </Text>
+          </Box>
 
-            <Box direction='row' gap='small'>
-              <Text size='xsmall' color='text-weak'> alternatively, withdraw collateral</Text>
-              <ArrowRight color='text-weak' />
+          <Box alignSelf='end'>
+            <Box
+              round
+              onClick={()=>setWithdrawOpen(true)}
+              hoverIndicator='brand-transparent'
+              pad={{ horizontal:'small', vertical:'small' }}
+              justify='center'
+            >
+
+              <Box direction='row' gap='small'>
+                <Text size='xsmall' color='text-weak'> alternatively, withdraw collateral</Text>
+                <ArrowRight color='text-weak' />
+              </Box>
             </Box>
           </Box>
-        </Box>
        
-      </Box>}   
-      { postEthActive && !txActive && <ApprovalPending /> } 
-      { txActive && <TransactionPending msg={`You deposited ${inputValue} Eth.`} tx={txActive} /> }
-    </>
+        </Box>}   
+        { postEthActive && !txActive && <ApprovalPending /> } 
+        { txActive && <TransactionPending msg={`You deposited ${inputValue} Eth.`} tx={txActive} /> }
+      </>
     </Keyboard>
   );
 };

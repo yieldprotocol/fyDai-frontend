@@ -97,15 +97,19 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
   const [ txActive ] = useTxActive(['borrow', 'buy', 'delegation']);
 
   const borrowProcedure = async (value:number, autoSell:boolean=true) => {
-    setBorrowPending(true); 
-    autoSell && await borrowUsingExactDai( activeSeries.daiProxyAddress, 'ETH-A', activeSeries.maturity, yDaiValue, value);
-    !autoSell && await borrow(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value);
-    setInputValue('');
-    await Promise.all([
-      userActions.updatePosition(),
-      seriesActions.updateActiveSeries()
-    ]);
-    setBorrowPending(false);
+
+    if (inputValue>0 && !borrowDisabled) {
+      setBorrowPending(true); 
+      autoSell && await borrowUsingExactDai( activeSeries.daiProxyAddress, 'ETH-A', activeSeries.maturity, yDaiValue, value);
+      !autoSell && await borrow(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value);
+      setInputValue('');
+      await Promise.all([
+        userActions.updatePosition(),
+        seriesActions.updateActiveSeries()
+      ]);
+      setBorrowPending(false);
+    }
+
   };
 
   const delegateProcedure = async () => {
@@ -232,6 +236,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
   return (
     <Keyboard 
       onEsc={() => setInputValue(undefined)}
+      onEnter={()=> borrowProcedure(inputValue)}
       target='document'   
     >
       <>
@@ -331,8 +336,8 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
             <Box
               fill='horizontal'
               round='small' 
-              background={borrowDisabled ? 'brand-transparent' : 'brand'} 
-              onClick={borrowDisabled ? ()=>{}:()=>borrowProcedure(inputValue)} 
+              background={!(inputValue>0) || borrowDisabled ? 'brand-transparent' : 'brand'} 
+              onClick={()=>borrowProcedure(inputValue)} 
             // onClick={()=>borrowProcedure(inputValue)}
               align='center'
               pad='small'
@@ -340,7 +345,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
               <Text 
                 weight='bold'
                 size='large'
-                color={borrowDisabled ? 'text-xweak' : 'text'}
+                color={!(inputValue>0) || borrowDisabled ? 'text-xweak' : 'text'}
               >
                 {`Borrow ${inputValue || ''} DAI`}
               </Text>

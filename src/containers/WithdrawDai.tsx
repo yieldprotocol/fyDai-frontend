@@ -45,14 +45,17 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
   const { approveToken, approveActive } = useToken();
 
   const withdrawProcedure = async (value:number) => {
-    await buyDai(
-      activeSeries.poolAddress,
-      inputValue,
-      0 // transaction queue value
-    );
-    await userActions.updatePosition();
-    await seriesActions.updateActiveSeries();
-    close();
+
+    if ( inputValue>0 && !withdrawDisabled ) {
+      await buyDai(
+        activeSeries.poolAddress,
+        inputValue,
+        0 // transaction queue value
+      );
+      await userActions.updatePosition();
+      await seriesActions.updateActiveSeries();
+      close();
+    }
   };
 
   const approveProcedure = async (value:number) => {
@@ -101,6 +104,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
     <Layer onClickOutside={()=>close()}>
       <Keyboard 
         onEsc={() => { inputValue? setInputValue(undefined): close();}}
+        onEnter={()=> withdrawProcedure(inputValue)}
         target='document'
       >
         <>
@@ -149,7 +153,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
               fill='horizontal'
               round='small'
               background={( !(inputValue>0) || withdrawDisabled) ? 'brand-transparent' : 'brand'}
-              onClick={(!(inputValue>0) || withdrawDisabled)? ()=>{}:()=> withdrawProcedure(inputValue)}
+              onClick={()=> withdrawProcedure(inputValue)}
               align='center'
               pad='small'
             >

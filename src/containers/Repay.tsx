@@ -67,18 +67,19 @@ function Repay({ repayAmount }:IRepayProps) {
   const [ txActive ] = useTxActive(['repay']);
 
   const repayProcedure = async (value:number) => {
-    setRepayPending(true);
 
-    /* repay using proxy */
-    // await repayUsingExactDai(activeSeries.daiProxyAddress, 'ETH-A', activeSeries.maturity, yDaiValue, value);
-
-    /* direct repay without proxy */
-    await repay(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value, 'Dai' );
-    setApproved(await getTokenAllowance(deployedContracts.Dai, deployedContracts.Treasury, 'Dai'));
-    setInputValue('');
-    await userActions.updatePosition();
-    await seriesActions.updateActiveSeries(); // or, await seriesActions.updateSeries([activeSeries]);
-    setRepayPending(false);
+    if (inputValue>0 && !repayDisabled) {
+      setRepayPending(true);
+      /* repay using proxy */
+      // await repayUsingExactDai(activeSeries.daiProxyAddress, 'ETH-A', activeSeries.maturity, yDaiValue, value);
+      /* direct repay without proxy */
+      await repay(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value, 'Dai' );
+      setApproved(await getTokenAllowance(deployedContracts.Dai, deployedContracts.Treasury, 'Dai'));
+      setInputValue('');
+      await userActions.updatePosition();
+      await seriesActions.updateActiveSeries(); // or, await seriesActions.updateSeries([activeSeries]);
+      setRepayPending(false);
+    }
   };
 
   const delegateProcedure = async () => {
@@ -146,97 +147,98 @@ function Repay({ repayAmount }:IRepayProps) {
 
   return (
     <Keyboard 
-    onEsc={() => setInputValue(undefined)}
-    target='document'   
-  >
-    <>
-      { !txActive &&
-      <Box flex='grow' justify='between'>
-        <Box gap='medium' align='center' fill='horizontal'>
-          <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Selected series</Text>
+      onEsc={() => setInputValue(undefined)}
+      onEnter={()=> repayProcedure(inputValue)}
+      target='document'
+    >
+      <>
+        { !txActive &&
+        <Box flex='grow' justify='between'>
+          <Box gap='medium' align='center' fill='horizontal'>
+            <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Selected series</Text>
 
-          <SeriesDescriptor activeView='borrow' />
+            <SeriesDescriptor activeView='borrow' />
 
-          <InfoGrid entries={[
-            {
-              label: 'Current Debt',
-              visible: true,
-              active: true,
-              loading: false,     
-              value: activeSeries?.ethDebtYDai_? `${activeSeries.ethDebtYDai_.toFixed(2)} DAI`: 'O DAI',
-              valuePrefix: null,
-              valueExtra: null, 
-            },
-            {
-              label: 'DAI balance',
-              visible: true,
-              active: true,
-              loading: false,            
-              value: daiBalance_?`${daiBalance_.toFixed(2)} DAI`: '-',
-              valuePrefix: null,
-              valueExtra: null,
-            },
-          ]}
-          />
-
-          <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to Repay</Text>
-
-          <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={repayDisabled}>
-            <TextInput
-              type="number"
-              placeholder={screenSize !== 'small' ? 'Enter the amount of DAI to Repay': 'DAI'}
-              value={inputValue || ''}
-              plain
-              onChange={(event:any) => setInputValue(event.target.value)}
-              icon={<DaiMark />}
+            <InfoGrid entries={[
+              {
+                label: 'Current Debt',
+                visible: true,
+                active: true,
+                loading: false,     
+                value: activeSeries?.ethDebtYDai_? `${activeSeries.ethDebtYDai_.toFixed(2)} DAI`: 'O DAI',
+                valuePrefix: null,
+                valueExtra: null, 
+              },
+              {
+                label: 'DAI balance',
+                visible: true,
+                active: true,
+                loading: false,            
+                value: daiBalance_?`${daiBalance_.toFixed(2)} DAI`: '-',
+                valuePrefix: null,
+                valueExtra: null,
+              },
+            ]}
             />
-            <Button 
-              label={<Text size='xsmall' color='brand'> {screenSize !== 'small' ? 'Repay Maximum': 'Max'}</Text>}
-              color='brand-transparent'
-              onClick={()=>setInputValue(daiBalance_)}
-              hoverIndicator='brand-transparent'
-            />
-          </InputWrap>
+
+            <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to Repay</Text>
+
+            <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={repayDisabled}>
+              <TextInput
+                type="number"
+                placeholder={screenSize !== 'small' ? 'Enter the amount of DAI to Repay': 'DAI'}
+                value={inputValue || ''}
+                plain
+                onChange={(event:any) => setInputValue(event.target.value)}
+                icon={<DaiMark />}
+              />
+              <Button 
+                label={<Text size='xsmall' color='brand'> {screenSize !== 'small' ? 'Repay Maximum': 'Max'}</Text>}
+                color='brand-transparent'
+                onClick={()=>setInputValue(daiBalance_)}
+                hoverIndicator='brand-transparent'
+              />
+            </InputWrap>
       
-          <Box>
-            {approveActive || approved === undefined ?             
-              <ScaleLoader color={theme?.global?.colors['brand-transparent'].dark} height='13' />
-              : <CheckBox
-                reverse
-                checked={approved && !inputValue || ( approved >= inputValue )}
-                disabled={!inputValue || ( approved >= inputValue )}
-                onChange={()=>approveProcedure(inputValue)}
-                label={            
+            <Box>
+              {approveActive || approved === undefined ?             
+                <ScaleLoader color={theme?.global?.colors['brand-transparent'].dark} height='13' />
+                : <CheckBox
+                  reverse
+                  checked={approved && !inputValue || ( approved >= inputValue )}
+                  disabled={!inputValue || ( approved >= inputValue )}
+                  onChange={()=>approveProcedure(inputValue)}
+                  label={            
                   (approved >= inputValue) ? 
                     `Repayments are unlocked for up to ${approved.toFixed(2) || '' } DAI` 
                     : `Unlock repayments of ${inputValue || ''} DAI` 
                 }
-              />}
-          </Box>
+                />}
+            </Box>
 
-          <Box
-            fill='horizontal'
-            round='small'
-            background={repayDisabled ? 'brand-transparent' : 'brand'}
-            onClick={repayDisabled ? ()=>{}:()=>repayProcedure(inputValue)}
-            align='center'
-            pad='small'
-          >
-            <Text 
-              weight='bold'
-              size='large'
-              color={repayDisabled ? 'text-xweak' : 'text'}
+            <Box
+              fill='horizontal'
+              round='small'
+              background={repayDisabled ? 'brand-transparent' : 'brand'}
+              onClick={()=>repayProcedure(inputValue)}
+              align='center'
+              pad='small'
             >
-              {`Repay ${inputValue || ''} DAI`}
-            </Text>
+              <Text 
+                weight='bold'
+                size='large'
+                color={repayDisabled ? 'text-xweak' : 'text'}
+              >
+                {`Repay ${inputValue || ''} DAI`}
+              </Text>
+            </Box>
           </Box>
-        </Box>
-      </Box>}
+        </Box>}
 
-      { repayActive && !txActive && <ApprovalPending /> } 
-      { txActive && <TransactionPending msg={`You made a repayment of ${inputValue} DAI.`} tx={txActive} /> }
+        { repayActive && !txActive && <ApprovalPending /> } 
+        { txActive && <TransactionPending msg={`You made a repayment of ${inputValue} DAI.`} tx={txActive} /> }
 
-    </>
+      </>
     </Keyboard>
   );
 }
