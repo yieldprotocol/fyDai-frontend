@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Box, Layer, Button, Image, TextInput, Text, CheckBox } from 'grommet';
+import { Box, Layer, Button, Keyboard, TextInput, Text, CheckBox } from 'grommet';
 import { 
   FiInfo as Info,
   FiArrowLeft as ArrowLeft,
@@ -123,109 +123,117 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
 
   return (
     <Layer onClickOutside={()=>close()}>
-      { !txActive && !withdrawEthActive && 
-      <Box 
-        width={{ max:'750px' }}
-        alignSelf='center'
-        fill
-        background='background-front'
-        round='small'
-        pad='large'
-        gap='medium'
-        justify='between'
-      >        
-        <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to withdraw</Text>
-        
-        {!hasDelegated &&
-        <OnceOffAuthorize 
-          authProcedure={delegateProcedure}
-          authMsg='Authorise ETH withdrawals'
-          txPending={txActive?.type === 'DELEGATION'}
-        />}
 
-        <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={withdrawDisabled}>
-          <TextInput
-            type="number"
-            placeholder='ETH'
-            disabled={withdrawEthActive}
-            value={inputValue || ''}
-            plain
-            onChange={(event:any) => setInputValue(event.target.value)}
-            icon={<EthMark />}
-          />
-          <Button 
-            label='Max'
-            color='brand-transparent'
-            onClick={()=>setInputValue(maxWithdraw)}
-            hoverIndicator='brand-transparent'
-          />
-        </InputWrap>
+      <Keyboard 
+        onEsc={() => { inputValue? setInputValue(undefined): close();}}
+        target='document'
+      >
+        <>
+          { !txActive && !withdrawEthActive && 
+          <Box 
+            width={{ max:'750px' }}
+            alignSelf='center'
+            fill
+            background='background-front'
+            round='small'
+            pad='large'
+            gap='medium'
+            justify='between'
+          >        
+            <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to withdraw</Text>
         
-        <InfoGrid entries={[
-          {
-            label: 'Max withdraw',
-            visible: true,
-            active: true,
-            loading: false, 
-            value: ethPosted_ ? `${maxWithdraw.toFixed(2)} Eth` : '-',
-            valuePrefix: null,
-            valueExtra: null, 
-          },
-          {
-            label: 'Ratio after Withdraw',
-            visible: collateralPercent_ > 0,
-            active: inputValue,
-            loading: false,           
-            value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
-            valuePrefix: 'Approx.',
-            valueExtra: null,
-            // valueExtra: () => (
-            //   <Text color='green' size='medium'> 
-            //     { inputValue && collateralPercent_ && ( (estRatio-collateralPercent_) !== 0) && `(+ ${(estRatio-collateralPercent_).toFixed(0)}%)` }
-            //   </Text>
-            // )
-          },
-        ]}
-        />
+            {!hasDelegated &&
+            <OnceOffAuthorize 
+              authProcedure={delegateProcedure}
+              authMsg='Authorise ETH withdrawals'
+              txPending={txActive?.type === 'DELEGATION'}
+            />}
 
-        <Box
-          fill='horizontal'
-          round='small'
-          background={( !(inputValue>0) || withdrawDisabled && hasDelegated ) ? 'brand-transparent' : 'brand'}
-          onClick={( !(inputValue>0) || withdrawDisabled && hasDelegated )? ()=>{}:()=> withdrawProcedure(inputValue)}
-          align='center'
-          pad='small'
-        >
-          <Text
-            weight='bold'
-            size='large'
-            color={( !(inputValue>0) || withdrawDisabled && hasDelegated ) ? 'text-xweak' : 'text'}
-          >
-            {`Withdraw ${inputValue || ''} Eth`}
-          </Text>
-        </Box>
-          
-        <Box alignSelf='start'>
-          <Box
-            round
-            onClick={()=>close()}
-            hoverIndicator='brand-transparent'
-          // border='all'
-            pad={{ horizontal:'small', vertical:'small' }}
-            justify='center'
-          >
-            <Box direction='row' gap='small' align='center'>
-              <ArrowLeft color='text-weak' />
-              <Text size='xsmall' color='text-weak'> { !withdrawEthActive? 'cancel, and go back.': 'go back'}  </Text>
+            <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={withdrawDisabled}>
+              <TextInput
+                type="number"
+                placeholder='ETH'
+                disabled={withdrawEthActive}
+                value={inputValue || ''}
+                plain
+                onChange={(event:any) => setInputValue(event.target.value)}
+                icon={<EthMark />}
+              />
+              <Button 
+                label='Max'
+                color='brand-transparent'
+                onClick={()=>setInputValue(maxWithdraw)}
+                hoverIndicator='brand-transparent'
+              />
+            </InputWrap>
+        
+            <InfoGrid entries={[
+              {
+                label: 'Max withdraw',
+                visible: true,
+                active: true,
+                loading: false, 
+                value: ethPosted_ ? `${maxWithdraw.toFixed(2)} Eth` : '-',
+                valuePrefix: null,
+                valueExtra: null, 
+              },
+              {
+                label: 'Ratio after Withdraw',
+                visible: collateralPercent_ > 0,
+                active: inputValue,
+                loading: false,           
+                value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
+                valuePrefix: 'Approx.',
+                valueExtra: null,
+                // valueExtra: () => (
+                //   <Text color='green' size='medium'> 
+                //     { inputValue && collateralPercent_ && ( (estRatio-collateralPercent_) !== 0) && `(+ ${(estRatio-collateralPercent_).toFixed(0)}%)` }
+                //   </Text>
+                // )
+              },
+            ]}
+            />
+
+            <Box
+              fill='horizontal'
+              round='small'
+              background={( !(inputValue>0) || withdrawDisabled && hasDelegated ) ? 'brand-transparent' : 'brand'}
+              onClick={( !(inputValue>0) || withdrawDisabled && hasDelegated )? ()=>{}:()=> withdrawProcedure(inputValue)}
+              align='center'
+              pad='small'
+            >
+              <Text
+                weight='bold'
+                size='large'
+                color={( !(inputValue>0) || withdrawDisabled && hasDelegated ) ? 'text-xweak' : 'text'}
+              >
+                {`Withdraw ${inputValue || ''} Eth`}
+              </Text>
             </Box>
-          </Box>
-        </Box>
+          
+            <Box alignSelf='start'>
+              <Box
+                round
+                onClick={()=>close()}
+                hoverIndicator='brand-transparent'
+          // border='all'
+                pad={{ horizontal:'small', vertical:'small' }}
+                justify='center'
+              >
+                <Box direction='row' gap='small' align='center'>
+                  <ArrowLeft color='text-weak' />
+                  <Text size='xsmall' color='text-weak'> { !withdrawEthActive? 'cancel, and go back.': 'go back'}  </Text>
+                </Box>
+              </Box>
+            </Box>
         
 
 
-      </Box>}
-      { withdrawEthActive && !txActive && <ApprovalPending /> }
-      { txActive && <TransactionPending msg={`You made a withdrawal of ${inputValue} Eth.`} tx={txActive} /> }
+          </Box>}
+          { withdrawEthActive && !txActive && <ApprovalPending /> }
+          { txActive && <TransactionPending msg={`You made a withdrawal of ${inputValue} Eth.`} tx={txActive} /> }
+        </>
+      </Keyboard>
     </Layer>
   );
 };

@@ -167,9 +167,9 @@ const App = (props:any) => {
             justify='evenly'
           >
             <Box>=</Box>
+            <Box>Collateral</Box>
             <Box>Borrow</Box>
-            <Box>Lend</Box>
-            <Box>Pool</Box>           
+            <Box>Repay</Box>         
           </Nav>
         </Layer>}
     </div>

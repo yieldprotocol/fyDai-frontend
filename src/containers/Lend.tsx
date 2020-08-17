@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 import Moment from 'moment';
-import { Box, Button, Select, Image, TextInput, Text, CheckBox, ResponsiveContext } from 'grommet';
+import { Box, Button, Keyboard, TextInput, Text, CheckBox, ResponsiveContext } from 'grommet';
 
 import { 
   FiCheckCircle,
@@ -129,6 +129,10 @@ const Lend = ({ lendAmount }:ILendProps) => {
   }, [ activeSeries ]);
 
   return (
+    <Keyboard 
+    onEsc={() => setInputValue(undefined)}
+    target='document'   
+  >
     <>
       { sellOpen && <WithdrawDai close={()=>setSellOpen(false)} /> }
       <Box flex='grow' gap='small' align='center' fill='horizontal'>
@@ -267,6 +271,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
           </Box>}
       </Box>
     </>
+    </Keyboard>
   );
 };
 

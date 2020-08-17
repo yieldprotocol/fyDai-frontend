@@ -31,7 +31,7 @@ function InfoGrid({ entries }:IInfoGridProps) {
             { x.visible &&
               <Box 
                 pad='small' 
-                align='center'
+                align='start'
               >
                 <Box gap='small' align='center'>
                   <Text wordBreak='keep-all' color='text-weak' size='xxsmall'>{x.label}</Text>            

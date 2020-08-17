@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 import Moment from 'moment';
-import { Box, TextInput, Text, ThemeContext, ResponsiveContext } from 'grommet';
+import { Keyboard, Box, TextInput, Text, ThemeContext, ResponsiveContext } from 'grommet';
 
 import { ScaleLoader } from 'react-spinners';
 
@@ -230,124 +230,128 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
   }, [ activeSeries ]);
 
   return (
-    <>    
-      { txActive?.type !== 'BORROW' && txActive?.type !== 'BUY' &&
-      <Box flex='grow' justify='between'>
-        <Box gap='medium' align='center' fill='horizontal'>
-          <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Selected series</Text>
+    <Keyboard 
+      onEsc={() => setInputValue(undefined)}
+      target='document'   
+    >
+      <>
+        { txActive?.type !== 'BORROW' && txActive?.type !== 'BUY' &&
+        <Box flex='grow' justify='between'>
+          <Box gap='medium' align='center' fill='horizontal'>
+            <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Selected series</Text>
 
-          <SeriesDescriptor activeView='borrow' />
+            <SeriesDescriptor activeView='borrow' />
 
-          <InfoGrid entries={[
-            {
-              label: 'Current Debt',
-              visible: true,
-              active: true,
-              loading: borrowPending,     
-              value: activeSeries?.ethDebtYDai_? `${activeSeries.ethDebtYDai_.toFixed(2)} DAI`: '0 DAI',
-              valuePrefix: null,
-              valueExtra: null, 
-            },
+            <InfoGrid entries={[
+              {
+                label: 'Current Debt',
+                visible: true,
+                active: true,
+                loading: borrowPending,     
+                value: activeSeries?.ethDebtYDai_? `${activeSeries.ethDebtYDai_.toFixed(2)} DAI`: '0 DAI',
+                valuePrefix: null,
+                valueExtra: null, 
+              },
 
-            {
-              label: 'Max Borrowing Power',
-              visible: true,
-              active: maximumDai,
-              loading: borrowPending,           
-              value: maximumDai ? `${maximumDai.toFixed(2)} DAI`: '',
-              valuePrefix: 'Approx.',
-              valueExtra: null,
-            },
-          ]}
-          />
+              {
+                label: 'Max Borrowing Power',
+                visible: true,
+                active: maximumDai,
+                loading: borrowPending,           
+                value: maximumDai ? `${maximumDai.toFixed(2)} DAI`: '',
+                valuePrefix: 'Approx.',
+                valueExtra: null,
+              },
+            ]}
+            />
       
-          {!hasDelegated && 
+            {!hasDelegated && 
             <OnceOffAuthorize
               authProcedure={delegateProcedure} 
               authMsg='Allow Yield trade on your behalf' 
               txPending={txActive?.type === 'DELEGATION'}  
             />}
 
-          <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to borrow</Text>
+            <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to borrow</Text>
 
 
-          <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={borrowDisabled}>
-            <TextInput
-              type="number"
-              placeholder={screenSize !== 'small' ? 'Enter the amount of DAI to borrow': 'DAI'} 
-              value={inputValue || ''}
+            <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={borrowDisabled}>
+              <TextInput
+                type="number"
+                placeholder={screenSize !== 'small' ? 'Enter the amount of DAI to borrow': 'DAI'} 
+                value={inputValue || ''}
                 // disabled={depositDisabled}
-              plain
-              onChange={(event:any) => setInputValue(event.target.value)}
-              icon={<DaiMark />}
-            />
-          </InputWrap>
+                plain
+                onChange={(event:any) => setInputValue(event.target.value)}
+                icon={<DaiMark />}
+              />
+            </InputWrap>
 
-          <InfoGrid entries={[
-            {
-              label: 'Estimated APR',
-              visible: true,
-              active: inputValue,
-              loading: false,     
-              value: APR?`${APR.toFixed(2)}%`:'- %',
-              valuePrefix: null,
-              valueExtra: null, 
-            },
-            {
-              label: 'Approx. DAI owed at maturity',
-              visible: true,
-              active: inputValue,
-              loading: false,           
-              value: `${yDaiValue.toFixed(2)} DAI`,
-              valuePrefix: null,
+            <InfoGrid entries={[
+              {
+                label: 'Estimated APR',
+                visible: true,
+                active: inputValue,
+                loading: false,     
+                value: APR?`${APR.toFixed(2)}%`:'- %',
+                valuePrefix: null,
+                valueExtra: null, 
+              },
+              {
+                label: 'Approx. DAI owed at maturity',
+                visible: true,
+                active: inputValue,
+                loading: false,           
+                value: `${yDaiValue.toFixed(2)} DAI`,
+                valuePrefix: null,
               // valueExtra: () => (
               //   <Text size='xxsmall'>
               //     {activeSeries && Moment(activeSeries.maturity_).format('DD MMMM YYYY')}
               //   </Text>
               // ),
-            },
+              },
 
-            {
-              label: 'Ratio after Borrow',
-              visible: true,
-              active: inputValue,
-              loading: false,            
-              value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
-              valuePrefix: 'Approx.',
-              valueExtra: () => (
-                <Text color='red' size='small'> 
-                  { inputValue && estRatio && ( (collateralPercent_- estRatio) !== 0) && `(- ${(collateralPercent_- estRatio).toFixed(0)}%)` }
-                </Text>
-              )
-            },
+              {
+                label: 'Ratio after Borrow',
+                visible: true,
+                active: inputValue,
+                loading: false,            
+                value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
+                valuePrefix: 'Approx.',
+                valueExtra: () => (
+                  <Text color='red' size='small'> 
+                    { inputValue && estRatio && ( (collateralPercent_- estRatio) !== 0) && `(- ${(collateralPercent_- estRatio).toFixed(0)}%)` }
+                  </Text>
+                )
+              },
 
-          ]}
-          />
-          {/* <InlineAlert warnMsg={warningMsg} errorMsg={errorMsg} /> */}
-          <Box
-            fill='horizontal'
-            round='small' 
-            background={borrowDisabled ? 'brand-transparent' : 'brand'} 
-            onClick={borrowDisabled ? ()=>{}:()=>borrowProcedure(inputValue)} 
+            ]}
+            />
+            {/* <InlineAlert warnMsg={warningMsg} errorMsg={errorMsg} /> */}
+            <Box
+              fill='horizontal'
+              round='small' 
+              background={borrowDisabled ? 'brand-transparent' : 'brand'} 
+              onClick={borrowDisabled ? ()=>{}:()=>borrowProcedure(inputValue)} 
             // onClick={()=>borrowProcedure(inputValue)}
-            align='center'
-            pad='small'
-          >
-            <Text 
-              weight='bold'
-              size='large'
-              color={borrowDisabled ? 'text-xweak' : 'text'} 
+              align='center'
+              pad='small'
             >
-              {`Borrow ${inputValue || ''} DAI`}
-            </Text>
+              <Text 
+                weight='bold'
+                size='large'
+                color={borrowDisabled ? 'text-xweak' : 'text'}
+              >
+                {`Borrow ${inputValue || ''} DAI`}
+              </Text>
+            </Box>
           </Box>
-        </Box>
-      </Box> }
+        </Box> }
 
-      { borrowActive && !txActive && <ApprovalPending /> } 
-      { txActive && <TransactionPending msg={`You borrowed ${inputValue} DAI.`} tx={txActive} /> }
-
-    </>
+        { borrowActive && !txActive && <ApprovalPending /> } 
+        { txActive && <TransactionPending msg={`You borrowed ${inputValue} DAI.`} tx={txActive} /> }
+      </>
+    </Keyboard>
   );
 };
 

@@ -4,6 +4,7 @@ import { BigNumber } from 'ethers';
 import { 
   Box, 
   Button,
+  Keyboard,
   TextInput, 
   Text, 
   ThemeContext,
@@ -103,6 +104,11 @@ const Deposit = ({ setActiveView, depositAmount }:DepositProps) => {
   }, [inputValue]);
 
   return (
+
+    <Keyboard 
+    onEsc={() => setInputValue(undefined)}
+    target='document'   
+  >
     <>
       { withdrawOpen && <WithdrawEth close={()=>setWithdrawOpen(false)} /> }
         
@@ -201,6 +207,7 @@ const Deposit = ({ setActiveView, depositAmount }:DepositProps) => {
       { postEthActive && !txActive && <ApprovalPending /> } 
       { txActive && <TransactionPending msg={`You deposited ${inputValue} Eth.`} tx={txActive} /> }
     </>
+    </Keyboard>
   );
 };
 

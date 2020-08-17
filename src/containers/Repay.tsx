@@ -1,6 +1,6 @@
 import React, { useEffect, useContext } from 'react';
 import { ethers } from 'ethers';
-import { Box, Button, Image, Select, TextInput, Text, ResponsiveContext, CheckBox,  ThemeContext, } from 'grommet';
+import { Box, Button, TextInput, Text, ResponsiveContext, CheckBox,  ThemeContext, Keyboard, } from 'grommet';
 import { 
   FiInfo as Info,
   FiHelpCircle as Help,
@@ -145,6 +145,10 @@ function Repay({ repayAmount }:IRepayProps) {
   }, [ activeSeries ]);
 
   return (
+    <Keyboard 
+    onEsc={() => setInputValue(undefined)}
+    target='document'   
+  >
     <>
       { !txActive &&
       <Box flex='grow' justify='between'>
@@ -233,6 +237,7 @@ function Repay({ repayAmount }:IRepayProps) {
       { txActive && <TransactionPending msg={`You made a repayment of ${inputValue} DAI.`} tx={txActive} /> }
 
     </>
+    </Keyboard>
   );
 }
 
