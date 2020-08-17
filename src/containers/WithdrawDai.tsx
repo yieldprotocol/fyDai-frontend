@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { ethers } from 'ethers';
-import { Box, Layer, CheckBox, TextInput, Text } from 'grommet';
+import { Box, Button, Layer, CheckBox, TextInput, Text } from 'grommet';
 import { 
   FiInfo as Info,
   FiArrowLeft as ArrowLeft,
@@ -10,6 +10,7 @@ import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
 import { usePool, useYDai, useToken } from '../hooks';
 import { UserContext } from '../contexts/UserContext';
+import InputWrap from '../components/InputWrap';
 
 interface IWithDrawDaiProps {
   close?: any;
@@ -105,45 +106,25 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
       >
         <Box align='center' flex='grow' justify='between' gap='large'>
           <Box gap='medium' align='center' fill='horizontal'>
+            
             <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Withdraw Dai</Text>
-            <Box
-              direction='row-responsive'
-              fill='horizontal'
-              gap='small'
-              align='center'
-            >
-              <Box 
-                round='small'
-                // background='brand-transparent'
-                border='all'
-                direction='row'
-                fill='horizontal'
-                pad='small'
-                flex
-              >
-                <TextInput
-                  type="number"
-                  placeholder='Dai'
-                  value={inputValue || ''}
-                  plain
-                  onChange={(event:any) => setInputValue(event.target.value)}
-                  icon={<Ethereum />}
-                />
-              </Box>
-
-              <Box justify='center'>
-                <Box
-                  round
-                  onClick={()=>setInputValue( maxWithdraw || checkMaxWithdraw() )}
-                  hoverIndicator='brand-transparent'
-                  border='all'
-                  pad={{ horizontal:'small', vertical:'small' }}
-                  justify='center'
-                >
-                  <Text size='xsmall'>Use max</Text>
-                </Box>
-              </Box>
-            </Box>
+            <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={withdrawDisabled}>
+              <TextInput
+                type="number"
+                placeholder='ETH'
+                disabled={withdrawDisabled}
+                value={inputValue || ''}
+                plain
+                onChange={(event:any) => setInputValue(event.target.value)}
+                icon={<Ethereum />}
+              />
+              <Button 
+                label='max'
+                onClick={()=>setInputValue( maxWithdraw || checkMaxWithdraw() )}
+                hoverIndicator='brand-transparent'
+              />
+            </InputWrap>
+            
           </Box>
 
           { warningMsg &&

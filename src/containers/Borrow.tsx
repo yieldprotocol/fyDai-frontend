@@ -12,6 +12,8 @@ import {
 import SeriesDescriptor from '../components/SeriesDescriptor';
 import SeriesSelector from '../components/SeriesSelector';
 import InlineAlert from '../components/InlineAlert';
+import InputWrap from '../components/InputWrap';
+
 import OnceOffAuthorize from '../components/OnceOffAuthorize';
 import ApprovalPending from '../components/ApprovalPending';
 import TransactionPending from '../components/TransactionPending';
@@ -263,14 +265,9 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
             />}
 
           <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to borrow</Text>
-          <Box 
-            round='small'
-            border='all'
-            direction='row'
-            fill='horizontal'
-            pad='small'
-            flex
-          >
+
+
+          <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={borrowDisabled}>
             <TextInput
               type="number"
               placeholder='Enter the amount of Dai to borrow'
@@ -279,7 +276,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
               plain
               onChange={(event:any) => setInputValue(event.target.value)}
             />
-          </Box>
+          </InputWrap>
 
           <InfoGrid entries={[
             {
@@ -321,9 +318,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
 
           ]}
           />
-
-          <InlineAlert warnMsg={warningMsg} errorMsg={errorMsg} />
-
+          {/* <InlineAlert warnMsg={warningMsg} errorMsg={errorMsg} /> */}
           <Box
             fill='horizontal'
             round='small' 

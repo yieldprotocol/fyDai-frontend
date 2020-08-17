@@ -3,11 +3,12 @@ import { BigNumber } from 'ethers';
 
 import { 
   Box, 
+  Button,
   TextInput, 
   Text, 
   ThemeContext,
   ResponsiveContext,
-  Grid,
+  Collapsible,
 } from 'grommet';
 
 import { 
@@ -29,6 +30,7 @@ import { UserContext } from '../contexts/UserContext';
 
 import { useProxy, useTxActive, useMath } from '../hooks';
 import InfoGrid from '../components/InfoGrid';
+import InputWrap from '../components/InputWrap';
 
 interface DepositProps {
   /* deposit amount prop is for quick linking into component */
@@ -101,53 +103,28 @@ const Deposit = ({ setActiveView, depositAmount }:DepositProps) => {
   return (
     <>
       { withdrawOpen && <WithdrawEth close={()=>setWithdrawOpen(false)} /> }
+        
       { !txActive &&
       <Box gap='small'>
         <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to deposit</Text>
-        <Box gap='medium' justify='between' align='center' fill='horizontal'>       
-          <Box
-            direction='row-responsive'
-            fill='horizontal'
-            gap='small'
-            align='center'
-          >
-            <Box 
-              round='small'
-              // background='brand-transparent'
-              border='all'
-              direction='row'
-              fill='horizontal'
-              pad='small'
-              flex
-              
-            >
-              <TextInput
-                type='number'
-                placeholder='Enter the ETH amount to deposit'
-                value={inputValue || ''}
-                disabled={postEthActive}
-                plain
-                onChange={(event:any) => setInputValue(event.target.value)}
-              // icon={<Text alignSelf='start' size='xsmall'>Eth</Text>}
-                icon={<Ethereum />}             
-              />
-              
-            </Box>
-            <Box justify='center'>
-              <Box
-                round
-                onClick={()=>setInputValue(ethBalance_)}
-                hoverIndicator='brand-transparent'
-                border='all'
-                // border={{ color:'brand' }}
-                pad={{ horizontal:'small', vertical:'small' }}
-                justify='center'
-              >
-                <Text size='xsmall'>Use max</Text>
-              </Box>
-            </Box>
-          </Box>
-        </Box>
+
+        <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={depositDisabled}>
+          <TextInput
+            type='number'
+            placeholder='Enter the ETH amount to deposit'
+            value={inputValue || ''}
+            disabled={postEthActive}
+            plain
+            onChange={(event:any) => setInputValue(event.target.value)}
+            icon={<Ethereum />}
+          />
+          <Button
+            secondary
+            label={<Box>Max</Box>}
+            onClick={()=>setInputValue(ethBalance_)}
+            hoverIndicator='brand-transparent'
+          />
+        </InputWrap>
 
         <InfoGrid entries={[
           {
@@ -162,7 +139,7 @@ const Deposit = ({ setActiveView, depositAmount }:DepositProps) => {
 
           {
             label: 'Collateralization Ratio',
-            visible: collateralPercent_ > 0,
+            visible: true,
             active: collateralPercent_ > 0,
             loading: !ethPosted_ && depositPending && ethPosted_ !== 0,            
             value: (collateralPercent_ && (collateralPercent_ !== 0))? `${collateralPercent_}%`: '',
@@ -171,7 +148,7 @@ const Deposit = ({ setActiveView, depositAmount }:DepositProps) => {
           },
           {
             label: 'Ratio after Deposit',
-            visible: inputValue,
+            visible: true,
             active: inputValue,
             loading: !ethPosted_ && depositPending && ethPosted_ !== 0,           
             value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
@@ -184,8 +161,6 @@ const Deposit = ({ setActiveView, depositAmount }:DepositProps) => {
           },
         ]}
         />
-
-        <InlineAlert warnMsg={warningMsg} errorMsg={errorMsg} />
 
         <Box
           fill='horizontal'

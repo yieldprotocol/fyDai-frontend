@@ -23,6 +23,7 @@ import { UserContext } from '../contexts/UserContext';
 
 import { useController, usePool, useBalances, useProxy, useTxActive, useToken } from '../hooks';
 import InfoGrid from '../components/InfoGrid';
+import InputWrap from '../components/InputWrap';
 
 interface IRepayProps {
   repayAmount?:any
@@ -150,13 +151,6 @@ function Repay({ repayAmount }:IRepayProps) {
 
           <SeriesDescriptor activeView='borrow' />
 
-          {/* {!hasDelegated && 
-            <OnceOffAuthorize
-              authProcedure={delegateProcedure} 
-              authMsg='Allow Pool to trade on your behalf' 
-              txPending={txActive?.type === 'DELEGATION'}  
-          />} */}
-
           <InfoGrid entries={[
             {
               label: 'Current Debt',
@@ -179,50 +173,22 @@ function Repay({ repayAmount }:IRepayProps) {
           ]}
           />
 
-          <Box fill gap='medium' margin={{ vertical:'large' }}>
-            <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to Repay</Text>
-            <Box
-              direction='row-responsive'
-              fill='horizontal'
-              gap='small'
-              align='center'
-            >
-              <Box 
-                round='small'
-                // background='brand-transparent'
-                border='all'
-                direction='row'
-                fill='horizontal'
-                pad='small'
-                flex
-              >
-                <TextInput
-                  type="number"
-                  placeholder='Enter the amount of Dai to Repay'
-                  value={inputValue || ''}
-                  // disabled={repayDisabled}
-                  plain
-                  onChange={(event:any) => setInputValue(event.target.value)}
-                />
-              </Box>
+          <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to Repay</Text>
 
-              <Box justify='center'>
-                <Box
-                  round
-                  onClick={()=>setInputValue(daiBalance_)}
-                  hoverIndicator='brand-transparent'
-                  border='all'
-              // border={{ color:'brand' }}
-                  pad={{ horizontal:'small', vertical:'small' }}
-                  justify='center'
-                >
-                  <Text size='xsmall'>Repay max</Text>
-                </Box>
-              </Box>
-            </Box>
-          </Box>
-
-          <InlineAlert warnMsg={warningMsg} errorMsg={errorMsg} />
+          <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={repayDisabled}>
+            <TextInput
+              type="number"
+              placeholder='Enter the amount of Dai to Repay'
+              value={inputValue || ''}
+              plain
+              onChange={(event:any) => setInputValue(event.target.value)}
+            />
+            <Button 
+              label='max'
+              onClick={()=>setInputValue(daiBalance_)}
+              hoverIndicator='brand-transparent'
+            />
+          </InputWrap>
       
           <Box>
             {approveActive || approved === undefined ?             
@@ -245,7 +211,6 @@ function Repay({ repayAmount }:IRepayProps) {
             round='small'
             background={repayDisabled ? 'brand-transparent' : 'brand'}
             onClick={repayDisabled ? ()=>{}:()=>repayProcedure(inputValue)}
-            // onClick={()=>repayProcedure(inputValue)}
             align='center'
             pad='small'
           >

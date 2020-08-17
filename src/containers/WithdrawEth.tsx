@@ -17,6 +17,7 @@ import OnceOffAuthorize from '../components/OnceOffAuthorize';
 import ApprovalPending from '../components/ApprovalPending';
 import TransactionPending from '../components/TransactionPending';
 import InfoGrid from '../components/InfoGrid';
+import InputWrap from '../components/InputWrap';
 
 interface IWithDrawProps {
   close?: any;
@@ -140,46 +141,24 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
               authMsg='Authorise ETH withdrawals'
               txPending={txActive?.type === 'DELEGATION'}
             />}
-          
-            <Box
-              direction='row-responsive'
-              fill='horizontal'
-              gap='small'
-              align='center'
-            >
-              <Box 
-                round='small'
-                // background='brand-transparent'
-                border='all'
-                direction='row'
-                fill='horizontal'
-                pad='small'
-                flex
-              >
-                <TextInput
-                  type="number"
-                  placeholder='ETH'
-                  disabled={withdrawEthActive}
-                  value={inputValue || ''}
-                  plain
-                  onChange={(event:any) => setInputValue(event.target.value)}
-                  icon={<Ethereum />}
-                />
-              </Box>
 
-              <Box justify='center'>
-                <Box
-                  round
-                  onClick={()=>setInputValue(maxWithdraw)}
-                  hoverIndicator='brand-transparent'
-                  border='all'
-                  pad={{ horizontal:'small', vertical:'small' }}
-                  justify='center'
-                >
-                  <Text size='xsmall'>Use max</Text>
-                </Box>
-              </Box>
-            </Box>
+            <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={withdrawDisabled}>
+              <TextInput
+                type="number"
+                placeholder='ETH'
+                disabled={withdrawEthActive}
+                value={inputValue || ''}
+                plain
+                onChange={(event:any) => setInputValue(event.target.value)}
+                icon={<Ethereum />}
+              />
+              <Button 
+                label='max'
+                onClick={()=>setInputValue(maxWithdraw)}
+                hoverIndicator='brand-transparent'
+              />
+            </InputWrap>
+          
           </Box>
 
 

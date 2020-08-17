@@ -25,6 +25,7 @@ import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
   
 import { usePool, useBalances, useMath, useToken } from '../hooks';
+import InputWrap from '../components/InputWrap';
 
 
 interface ILendProps {
@@ -164,44 +165,21 @@ const Lend = ({ lendAmount }:ILendProps) => {
         { !activeSeries?.isMature ?
           <Box fill gap='medium' margin={{ vertical:'large' }}>
             <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to lend</Text>
-            <Box
-              direction='row-responsive'
-              fill='horizontal'
-              gap='small'
-              align='center'
-            >
-              <Box 
-                round='small'
-                // background='brand-transparent'
-                border='all'
-                direction='row'
-                fill='horizontal'
-                pad='small'
-                flex
-              >
-                <TextInput
-                  type="number"
-                  placeholder='Enter the amount of Dai to lend'
-                  value={inputValue || ''}
-                  plain
-                  onChange={(event:any) => setInputValue(event.target.value)}
-                />
-              </Box>
 
-              <Box justify='center'>
-                <Box
-                  round
-                  onClick={()=>setInputValue(daiBalance_)}
-                  hoverIndicator='brand-transparent'
-                  border='all'
-                  // border={{ color:'brand' }}
-                  pad={{ horizontal:'small', vertical:'small' }}
-                  justify='center'
-                >
-                  <Text size='xsmall'>Use max</Text>
-                </Box>
-              </Box>
-            </Box>
+            <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={lendDisabled}>
+              <TextInput
+                type="number"
+                placeholder='Enter the amount of Dai to lend'
+                value={inputValue || ''}
+                plain
+                onChange={(event:any) => setInputValue(event.target.value)}
+              />
+              <Button 
+                label='max'
+                onClick={()=>setInputValue(daiBalance_)}
+                hoverIndicator='brand-transparent'           
+              />
+            </InputWrap>
 
             <InfoGrid entries={[
               {
@@ -235,8 +213,6 @@ const Lend = ({ lendAmount }:ILendProps) => {
             <Redeem />
           </Box>}
   
-        <InlineAlert warnMsg={warningMsg} errorMsg={errorMsg} />
-
         { !activeSeries?.isMature && 
           <>
             <Box>
