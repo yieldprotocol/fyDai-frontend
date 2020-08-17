@@ -113,7 +113,7 @@ const Deposit = ({ setActiveView, depositAmount }:DepositProps) => {
         <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={depositDisabled}>
           <TextInput
             type='number'
-            placeholder='Enter the ETH amount to deposit'
+            placeholder={screenSize !== 'small' ? 'Enter the ETH amount to deposit': 'ETH'}
             value={inputValue || ''}
             disabled={postEthActive}
             plain
@@ -121,8 +121,8 @@ const Deposit = ({ setActiveView, depositAmount }:DepositProps) => {
             icon={<EthMark />}
           />
           <Button
-            secondary
-            label={<Box>Max</Box>}
+            color='brand-transparent'
+            label={<Text size='xsmall' color='brand'> {screenSize !== 'small' ? 'Deposit Maximum': 'Max'}</Text>}
             onClick={()=>setInputValue(ethBalance_)}
             hoverIndicator='brand-transparent'
           />

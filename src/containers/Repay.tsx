@@ -1,6 +1,6 @@
 import React, { useEffect, useContext } from 'react';
 import { ethers } from 'ethers';
-import { Box, Button, Image, Select, TextInput, Text, Heading, Collapsible, CheckBox,  ThemeContext, } from 'grommet';
+import { Box, Button, Image, Select, TextInput, Text, ResponsiveContext, CheckBox,  ThemeContext, } from 'grommet';
 import { 
   FiInfo as Info,
   FiHelpCircle as Help,
@@ -40,6 +40,7 @@ function Repay({ repayAmount }:IRepayProps) {
   const { daiBalance_ } = userState.position;
 
   const theme:any = useContext(ThemeContext);
+  const screenSize = React.useContext(ResponsiveContext);
 
   const { 
     previewPoolTx,
@@ -100,7 +101,7 @@ function Repay({ repayAmount }:IRepayProps) {
   useEffect(() => {
     if ( inputValue  && daiBalance_ && ( inputValue > daiBalance_ ) ) {
       setWarningMsg(null);
-      setErrorMsg('That amount exceeds the amount of Dai in your wallet'); 
+      setErrorMsg('That amount exceeds the amount of DAI in your wallet'); 
     } else {
       setWarningMsg(null);
       setErrorMsg(null);
@@ -158,16 +159,16 @@ function Repay({ repayAmount }:IRepayProps) {
               visible: true,
               active: true,
               loading: false,     
-              value: activeSeries?.ethDebtYDai_? `${activeSeries.ethDebtYDai_.toFixed(2)} Dai`: 'O Dai',
+              value: activeSeries?.ethDebtYDai_? `${activeSeries.ethDebtYDai_.toFixed(2)} DAI`: 'O DAI',
               valuePrefix: null,
               valueExtra: null, 
             },
             {
-              label: 'Dai balance',
+              label: 'DAI balance',
               visible: true,
               active: true,
               loading: false,            
-              value: daiBalance_?`${daiBalance_.toFixed(2)} Dai`: '-',
+              value: daiBalance_?`${daiBalance_.toFixed(2)} DAI`: '-',
               valuePrefix: null,
               valueExtra: null,
             },
@@ -179,14 +180,15 @@ function Repay({ repayAmount }:IRepayProps) {
           <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={repayDisabled}>
             <TextInput
               type="number"
-              placeholder='Enter the amount of Dai to Repay'
+              placeholder={screenSize !== 'small' ? 'Enter the amount of DAI to Repay': 'DAI'}
               value={inputValue || ''}
               plain
               onChange={(event:any) => setInputValue(event.target.value)}
               icon={<DaiMark />}
             />
             <Button 
-              label='max'
+              label={<Text size='xsmall' color='brand'> {screenSize !== 'small' ? 'Repay Maximum': 'Max'}</Text>}
+              color='brand-transparent'
               onClick={()=>setInputValue(daiBalance_)}
               hoverIndicator='brand-transparent'
             />
@@ -202,8 +204,8 @@ function Repay({ repayAmount }:IRepayProps) {
                 onChange={()=>approveProcedure(inputValue)}
                 label={            
                   (approved >= inputValue) ? 
-                    `Repayments are unlocked for up to ${approved.toFixed(2) || '' } Dai` 
-                    : `Unlock repayments of ${inputValue || ''} Dai` 
+                    `Repayments are unlocked for up to ${approved.toFixed(2) || '' } DAI` 
+                    : `Unlock repayments of ${inputValue || ''} DAI` 
                 }
               />}
           </Box>
@@ -221,14 +223,14 @@ function Repay({ repayAmount }:IRepayProps) {
               size='large'
               color={repayDisabled ? 'text-xweak' : 'text'}
             >
-              {`Repay ${inputValue || ''} Dai`}
+              {`Repay ${inputValue || ''} DAI`}
             </Text>
           </Box>
         </Box>
       </Box>}
 
       { repayActive && !txActive && <ApprovalPending /> } 
-      { txActive && <TransactionPending msg={`You made a repayment of ${inputValue} Dai.`} tx={txActive} /> }
+      { txActive && <TransactionPending msg={`You made a repayment of ${inputValue} DAI.`} tx={txActive} /> }
 
     </>
   );

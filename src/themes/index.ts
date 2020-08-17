@@ -273,12 +273,16 @@ export const yieldTheme = {
   button: {
     border: {
       width: '1px',
-      radius: '8px',
+      radius: '20px',
     },
     padding: {
       vertical: '0px',
       horizontal: '8px',
     },
+    // @ts-ignore
+    extend: () => css`
+        white-space: nowrap
+      `
     // default: {
     //   padding: {
     //     vertical: '0px',
@@ -292,7 +296,6 @@ export const yieldTheme = {
     //   },
     //   hoverIndicator:'brand-transparent',
     // },
-
   },
   checkBox: {
     check: {

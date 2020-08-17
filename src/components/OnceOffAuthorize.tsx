@@ -10,17 +10,14 @@ interface OnceOffAuthorizeProps {
 
 const OnceOffAuthorize = ({ authProcedure, authMsg, txPending }:OnceOffAuthorizeProps) => {
   return (
-  // <Layer>
     <Box 
       round 
       pad='small'
       gap='small'
       background='background'
-      // border='all'
-      // elevation='small'
       align='center'
       justify='between'
-      fill
+      fill='horizontal'
       direction='row-responsive'
     >
       <Text weight='bold' size='medium' color='brand'>Once-off Action required: </Text>
@@ -41,7 +38,6 @@ const OnceOffAuthorize = ({ authProcedure, authMsg, txPending }:OnceOffAuthorize
         </Text>
       </Box>
     </Box>
-  // </Layer>
   );
 };
 

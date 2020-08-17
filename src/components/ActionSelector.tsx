@@ -50,7 +50,7 @@ function ActionSelector({ setActiveView, activeView }:IActionSelectorProps) {
           onClick={() => setActiveView('BORROW')}
         >
           <Text size="xsmall" weight="bold">
-            2. Borrow Dai
+            2. Borrow DAI
           </Text>
         </Box>
 
@@ -62,7 +62,7 @@ function ActionSelector({ setActiveView, activeView }:IActionSelectorProps) {
           onClick={() => setActiveView('REPAY')}
         >
           <Text size="xsmall" weight="bold">
-            3. Repay Dai Debt
+            3. Repay DAI Debt
           </Text>
         </Box>
       </Box>

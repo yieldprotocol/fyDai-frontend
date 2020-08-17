@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 import Moment from 'moment';
-import { Box, Button, Select, Image, TextInput, Text, CheckBox, Collapsible, RangeInput } from 'grommet';
+import { Box, Button, Select, Image, TextInput, Text, CheckBox, ResponsiveContext } from 'grommet';
 
 import { 
   FiCheckCircle,
@@ -46,6 +46,8 @@ const Lend = ({ lendAmount }:ILendProps) => {
     daiBalance_,
     ethBorrowingPower_: maximumDai
   } = userState.position;
+
+  const screenSize = React.useContext(ResponsiveContext);
   
   // const { borrow, borrowActive }  = useController();
 
@@ -169,14 +171,15 @@ const Lend = ({ lendAmount }:ILendProps) => {
             <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={lendDisabled}>
               <TextInput
                 type="number"
-                placeholder='Enter the amount of DAI to lend'
+                placeholder={screenSize !== 'small' ? 'Enter the amount of DAI to lend': 'DAI'}
                 value={inputValue || ''}
                 plain
                 onChange={(event:any) => setInputValue(event.target.value)}
                 icon={<DaiMark />}
               />
               <Button 
-                label='max'
+                label={<Text size='xsmall' color='brand'> {screenSize !== 'small' ? 'Lend Maximum': 'Max'}</Text>}
+                color='brand-transparent'
                 onClick={()=>setInputValue(daiBalance_)}
                 hoverIndicator='brand-transparent'           
               />

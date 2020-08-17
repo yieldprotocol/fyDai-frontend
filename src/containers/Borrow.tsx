@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 import Moment from 'moment';
-import { Box, TextInput, Text, ThemeContext, } from 'grommet';
+import { Box, TextInput, Text, ThemeContext, ResponsiveContext } from 'grommet';
 
 import { ScaleLoader } from 'react-spinners';
 
@@ -50,6 +50,8 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
   } = position;
 
   const theme:any = React.useContext(ThemeContext);
+
+  const screenSize = React.useContext(ResponsiveContext);
 
   const { 
     addControllerDelegate,
@@ -272,7 +274,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
           <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={borrowDisabled}>
             <TextInput
               type="number"
-              placeholder='Enter the amount of DAI to borrow'
+              placeholder={screenSize !== 'small' ? 'Enter the amount of DAI to borrow': 'DAI'} 
               value={inputValue || ''}
                 // disabled={depositDisabled}
               plain

@@ -102,99 +102,73 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
       <Box 
         width={{ max:'750px' }}
         alignSelf='center'
-        fill='horizontal'
+        fill
         background='background-front'
         round='small'
         pad='large'
+        gap='medium'
       >
-        <Box align='center' flex='grow' justify='between' gap='large'>
-          <Box gap='medium' align='center' fill='horizontal'>
-            
-            <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Withdraw Dai</Text>
-            <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={withdrawDisabled}>
-              <TextInput
-                type="number"
-                placeholder='DAI'
-                disabled={withdrawDisabled}
-                value={inputValue || ''}
-                plain
-                onChange={(event:any) => setInputValue(event.target.value)}
-                icon={<DaiMark />}
-              />
-              <Button 
-                label='max'
-                onClick={()=>setInputValue( maxWithdraw || checkMaxWithdraw() )}
-                hoverIndicator='brand-transparent'
-              />
-            </InputWrap>
-            
-          </Box>
+        <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Withdraw Dai</Text>
+        <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={withdrawDisabled}>
+          <TextInput
+            type="number"
+            placeholder='DAI'
+                // disabled={withdrawDisabled}
+            value={inputValue || ''}
+            plain
+            onChange={(event:any) => setInputValue(event.target.value)}
+            icon={<DaiMark />}
+          />
+          <Button 
+            label='Max'
+            color='brand-transparent'
+            onClick={()=>setInputValue( maxWithdraw || checkMaxWithdraw() )}
+            hoverIndicator='brand-transparent'
+          />
+        </InputWrap>
 
-          { warningMsg &&
-          <Box 
-            border={{ color:'orange' }} 
-            fill
-            round='small'
-            pad='small'
-          >
-            <Text weight='bold' color='orange'>Procced with Caution:</Text>  
-            <Text color='orange'>{warningMsg}</Text>
-          </Box> }
-
-          { errorMsg &&
-          <Box
-            border={{ color:'red' }}
-            fill
-            round='small'
-            pad='small'
-          >
-            <Text weight='bold' color='red'>Wooah, Hang on</Text>  
-            <Text color='red'>{errorMsg}</Text>
-          </Box> }
-
-          <Box>
-            <CheckBox 
-              reverse
+        <Box>
+          <CheckBox 
+            reverse
                 // value={true}
-              checked={!inputValue || ( approved >= inputValue )}
-              disabled={!inputValue || ( approved >= inputValue )}
-              onChange={()=>approveProcedure(yDaiValue)}
-              label={(approved >= yDaiValue) ? 
-                `~${daiApproved.toFixed(2)} Dai unlocked (${approved.toFixed(2) || '' } yDai)` 
-                : `Unlock ${inputValue || ''} Dai`}
-            />
-          </Box>
+            checked={!inputValue || ( approved >= inputValue )}
+            disabled={!inputValue || ( approved >= inputValue )}
+            onChange={()=>approveProcedure(yDaiValue)}
+            label={(approved >= yDaiValue) ? 
+              `~${daiApproved.toFixed(2)} Dai unlocked (${approved.toFixed(2) || '' } yDai)` 
+              : `Unlock ${inputValue || ''} Dai`}
+          />
+        </Box>
 
-          <Box
-            fill='horizontal'
-            round='small'
-            background={( !(inputValue>0) || withdrawDisabled) ? 'brand-transparent' : 'brand'}
-            onClick={(!(inputValue>0) || withdrawDisabled)? ()=>{}:()=> withdrawProcedure(inputValue)}
-            align='center'
-            pad='small'
+        <Box
+          fill='horizontal'
+          round='small'
+          background={( !(inputValue>0) || withdrawDisabled) ? 'brand-transparent' : 'brand'}
+          onClick={(!(inputValue>0) || withdrawDisabled)? ()=>{}:()=> withdrawProcedure(inputValue)}
+          align='center'
+          pad='small'
+        >
+          <Text
+            weight='bold'
+            size='large'
+            color={( !(inputValue>0) || withdrawDisabled) ? 'text-xweak' : 'text'}
           >
-            <Text
-              weight='bold'
-              size='large'
-              color={( !(inputValue>0) || withdrawDisabled) ? 'text-xweak' : 'text'}
-            >
-              {`Withdraw ${inputValue || ''} Dai`}
-            </Text>
-          </Box>
+            {`Withdraw ${inputValue || ''} Dai`}
+          </Text>
+        </Box>
 
-          <Box alignSelf='start'>
-            <Box
-              round
-              onClick={()=>close()}
-              hoverIndicator='brand-transparent'
+        <Box alignSelf='start'>
+          <Box
+            round
+            onClick={()=>close()}
+            hoverIndicator='brand-transparent'
           // border='all'
-              pad={{ horizontal:'small', vertical:'small' }}
-              justify='center'
-            >
-              <Box direction='row' gap='small' align='center'>
-                <ArrowLeft color='text-weak' />
-                <Text size='xsmall' color='text-weak'> go back </Text>
-              </Box>
+            pad={{ horizontal:'small', vertical:'small' }}
+            justify='center'
+          >
+            <Box direction='row' gap='small' align='center'>
+              <ArrowLeft color='text-weak' />
+              <Text size='xsmall' color='text-weak'> go back </Text>
             </Box>
           </Box>
         </Box>
