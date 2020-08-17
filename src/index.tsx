@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { ethers } from 'ethers';
-import { Web3ReactProvider } from '@web3-react/core';
+import { Web3ReactProvider, createWeb3ReactRoot } from '@web3-react/core';
 
 import './index.css';
 import App from './App';
@@ -17,19 +17,29 @@ function getLibrary(provider: any) {
   library.pollingInterval = 12000;
   return library;
 }
+function getFallbackLibrary(provider: any) {
+  const library = new ethers.providers.JsonRpcProvider(provider);
+  // const library = ethers.getDefaultProvider('ropsten');
+  library.pollingInterval = 12000;
+  return library;
+}
+
+const Web3ReactProviderFallback = createWeb3ReactRoot('fallback');
 
 ReactDOM.render(
   <React.StrictMode>
     <Web3ReactProvider getLibrary={getLibrary}> 
-      <NotifyProvider>
-        <YieldProvider>
-          <UserProvider>
-            <SeriesProvider>
-              <App />
-            </SeriesProvider>
-          </UserProvider>
-        </YieldProvider>
-      </NotifyProvider>
+      <Web3ReactProviderFallback getLibrary={getFallbackLibrary}> 
+        <NotifyProvider>
+          <YieldProvider>
+            <UserProvider>
+              <SeriesProvider>
+                <App />
+              </SeriesProvider>
+            </UserProvider>
+          </YieldProvider>
+        </NotifyProvider>
+      </Web3ReactProviderFallback>
     </Web3ReactProvider>
   </React.StrictMode>,
   document.getElementById('root')

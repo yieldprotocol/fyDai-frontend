@@ -24,7 +24,7 @@ function ActionSelector({ setActiveView, activeView }:IActionSelectorProps) {
       >
         <Box
           round='small'
-          pad={{ horizontal: 'large', vertical: 'small' }}
+          pad={{ horizontal: 'large', vertical: 'xsmall' }}
           background={
             activeView === 'COLLATERAL' ? 'background-front' : undefined
           }
@@ -42,7 +42,7 @@ function ActionSelector({ setActiveView, activeView }:IActionSelectorProps) {
 
         <Box
           round='small'
-          pad={{ horizontal: 'large', vertical: 'small' }}
+          pad={{ horizontal: 'large', vertical: 'xsmall' }}
           background={
             activeView === 'BORROW' ? 'background-front' : undefined
           }
@@ -56,7 +56,7 @@ function ActionSelector({ setActiveView, activeView }:IActionSelectorProps) {
 
         <Box
           round='small'
-          pad={{ horizontal: 'large', vertical: 'small' }}
+          pad={{ horizontal: 'large', vertical: 'xsmall' }}
           background={activeView === 'REPAY' ? 'background-front' : undefined}
           elevation={activeView === 'REPAY' ? 'small' : undefined}
           onClick={() => setActiveView('REPAY')}
