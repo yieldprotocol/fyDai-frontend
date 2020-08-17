@@ -9,7 +9,6 @@ import TestERC20 from '../contracts/TestERC20.json';
 import { useSignerAccount } from './connectionHooks';
 // ethers.errors.setLogLevel('error');
 
-
 /**
  * Hook for interacting with the yield 'CRONTROLLER' Contract
  * @returns { function } post

@@ -1,5 +1,7 @@
 import React, { useState, useContext } from 'react';
-import { Box, Text, ThemeContext } from 'grommet';
+import { Box, Text, ThemeContext, ResponsiveContext, Button } from 'grommet';
+
+import { FiLayers as ChangeSeries } from 'react-icons/fi';
 
 import { ScaleLoader } from 'react-spinners';
 import { SeriesContext } from '../contexts/SeriesContext';
@@ -16,6 +18,8 @@ function SeriesDescriptor( props: ISeriesDescriptorProps, children:any) {
   const { activeView, minified } = props;
 
   const theme:any = React.useContext(ThemeContext);
+  const screenSize = React.useContext(ResponsiveContext);
+
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { activeSeries } = seriesState; 
 
@@ -71,7 +75,8 @@ function SeriesDescriptor( props: ISeriesDescriptorProps, children:any) {
               <Text size='xxsmall'>
                 Limited Liquidity            
               </Text>
-            </Box>}
+            </Box>
+}
 
           { activeSeries?.isMature === true && 
             !Number.isFinite(parseFloat(activeSeries.yieldAPR_)) &&        
@@ -86,9 +91,27 @@ function SeriesDescriptor( props: ISeriesDescriptorProps, children:any) {
                 Matured Series         
               </Text>
             </Box>}
+
+          <Button
+            color='brand-transparent'
+            label={(screenSize !== 'small' ) ?
+            
+              <Box align='center' direction='row' gap='small'>
+                <ChangeSeries />
+                <Text size='xsmall' color='brand'>
+                  Change Series              
+                </Text>
+              </Box>
+              : 
+              <Box align='center'>
+                <ChangeSeries />
+              </Box>}
+            onClick={()=>setSelectorOpen(true)}
+            hoverIndicator='brand-transparent'
+          />
         </Box>
 
-        <Box justify='center'>
+        {/* <Box justify='center'>
           <Box
             round
             onClick={()=>setSelectorOpen(true)}
@@ -100,7 +123,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps, children:any) {
           >
             <Text size='xsmall'>Change series</Text>
           </Box>
-        </Box>
+        </Box> */}
       </Box>
     </>
   );

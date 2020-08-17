@@ -19,8 +19,11 @@ const ApprovalPending = React.forwardRef( (props, ref) => {
         round
         background='background-front'
       >
-        <Text>Transaction pending approval.  </Text>
-        <Text>Please check your wallet/provider (eg. Metamask) to confirm the transaction.</Text>
+        <Text weight='bold'>Transaction pending approval.</Text>
+
+        <Text>Please check your wallet/provider to confirm the transaction.</Text>
+
+        <Text>Please check your wallet/provider to confirm the transaction.</Text>
         
         {/* <Button
           label="Toggle gutter size"

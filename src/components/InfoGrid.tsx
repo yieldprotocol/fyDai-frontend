@@ -37,7 +37,7 @@ function InfoGrid({ entries }:IInfoGridProps) {
                   <Text wordBreak='keep-all' color='text-weak' size='xxsmall'>{x.label}</Text>            
                   <Loading condition={x.loading} size='small'>
                     <Box direction='row-responsive' gap='small'>
-                      { x.valuePrefix && <Text color={x.active ? 'brand':'brand-transparent'} size='xxsmall'>{x.valuePrefix}</Text> }
+                      { x.valuePrefix && screenSize !== 'small' && <Text color={x.active ? 'brand':'brand-transparent'} size='xxsmall'>{x.valuePrefix}</Text> }
                       <Text color={x.active? 'brand':'brand-transparent'} weight='bold' size='medium'> 
                         {x.value}
                       </Text>

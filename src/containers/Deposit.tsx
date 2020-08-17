@@ -38,10 +38,11 @@ import EthMark from '../components/logos/EthMark';
 interface DepositProps {
   /* deposit amount prop is for quick linking into component */
   setActiveView: any;
+  modalView?:boolean;
   depositAmount?:number|BigNumber|null;
 }
 
-const Deposit = ({ setActiveView, depositAmount }:DepositProps) => {
+const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
 
   const [ inputValue, setInputValue ] = useState<any>(depositAmount || undefined);
   const [ estRatio, setEstRatio ] = useState<any>(0);
@@ -122,7 +123,7 @@ const Deposit = ({ setActiveView, depositAmount }:DepositProps) => {
           <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={depositDisabled}>
             <TextInput
               type='number'
-              placeholder={screenSize !== 'small' ? 'Enter the ETH amount to deposit': 'ETH'}
+              placeholder={ (screenSize !== 'small' && !modalView) ? 'Enter the ETH amount to deposit': 'ETH'}
               value={inputValue || ''}
               disabled={postEthActive}
               plain
@@ -131,7 +132,7 @@ const Deposit = ({ setActiveView, depositAmount }:DepositProps) => {
             />
             <Button
               color='brand-transparent'
-              label={<Text size='xsmall' color='brand'> {screenSize !== 'small' ? 'Deposit Maximum': 'Max'}</Text>}
+              label={<Text size='xsmall' color='brand'> { (screenSize !== 'small' && !modalView) ? 'Deposit Maximum': 'Max'}</Text>}
               onClick={()=>setInputValue(ethBalance_)}
               hoverIndicator='brand-transparent'
             />
@@ -214,6 +215,6 @@ const Deposit = ({ setActiveView, depositAmount }:DepositProps) => {
   );
 };
 
-Deposit.defaultProps = { depositAmount: null };
+Deposit.defaultProps = { depositAmount: null, modalView: false};
 
 export default Deposit;
