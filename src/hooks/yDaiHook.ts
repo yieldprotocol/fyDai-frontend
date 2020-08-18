@@ -64,19 +64,22 @@ export const useYDai = () => {
     yDaiAddress:string,
     poolAddress: string
   ) => {
-    const fromAddr = account && ethers.utils.getAddress(account);
-    const yDaiAddr = ethers.utils.getAddress(yDaiAddress);
-    const marketAddr = ethers.utils.getAddress(poolAddress);
-    const contract = new ethers.Contract( yDaiAddr, yDaiAbi, provider );
-    let res;
-    try {
-      res = await contract.allowance(fromAddr, marketAddr);
-    }  catch (e) {
-      console.log(e);
-      res = BigNumber.from('0');
-    }
-    console.log(ethers.utils.formatEther(res.toString()));
-    return parseFloat(ethers.utils.formatEther(res.toString()));
+    if (account) {
+      const fromAddr = account && ethers.utils.getAddress(account);
+      const yDaiAddr = ethers.utils.getAddress(yDaiAddress);
+      const marketAddr = ethers.utils.getAddress(poolAddress);
+      const contract = new ethers.Contract( yDaiAddr, yDaiAbi, provider );
+      let res;
+      try {
+        res = await contract.allowance(fromAddr, marketAddr);
+      }  catch (e) {
+        console.log(e);
+        res = BigNumber.from('0');
+      }
+      console.log(ethers.utils.formatEther(res.toString()));
+      return parseFloat(ethers.utils.formatEther(res.toString()));
+    } 
+    return 0;
   };
 
   /**

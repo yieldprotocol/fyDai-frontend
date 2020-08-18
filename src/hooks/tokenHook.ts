@@ -46,7 +46,7 @@ const contractMap = new Map<string, any>([
  */
 export function useToken() {
   // const { state: { provider, account } } = React.useContext(ConnectionContext);
-  const { signer, provider, account, altProvider, voidSigner } = useSignerAccount();
+  const { signer, provider, account, voidSigner } = useSignerAccount();
 
   const  { dispatch }  = React.useContext<any>(NotifyContext);
   const [ approveActive, setApproveActive ] = React.useState<boolean>(false);
@@ -62,7 +62,7 @@ export function useToken() {
   const getBalance = async (tokenAddr:string|null=null, contractName:string|null=null) => {
     if (!!provider && !!account ) {
       if (tokenAddr && contractName) {
-        const contract = new ethers.Contract(tokenAddr, contractMap.get(contractName), provider);
+        const contract = new ethers.Contract(tokenAddr, contractMap.get(contractName), provider );
         const balance = await contract.balanceOf(account);
         return balance;
       }

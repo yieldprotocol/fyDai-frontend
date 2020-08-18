@@ -100,16 +100,24 @@ export function useConnectorImage() {
 
 export function useSignerAccount() {
   const { library: provider, account } = useWeb3React();
+  const { library: altProvider } = useWeb3React('fallback');
+
   const [ signer, setSigner ] = React.useState<any>();
   const [ voidSigner, setVoidSigner ] = React.useState<any>();
-  const [ altProvider, setAltProvider ] = React.useState<any>();
+  const [ fallbackProvider, setFallbackProvider ] = React.useState<any>();
   React.useEffect(()=>{
     provider && (async () => {
       setSigner( await provider.getSigner() );
-      // TODO: create alternate provider
-      setAltProvider( provider );
       account && setVoidSigner( new ethers.VoidSigner( account ));
     })();
   }, [account, provider]);
-  return { signer, provider, account, voidSigner, altProvider };
+
+  React.useEffect(()=>{
+    altProvider && (async () => {
+      setFallbackProvider( altProvider );
+    })();
+  }, [account, altProvider]);
+
+
+  return { signer, provider, account, voidSigner, fallbackProvider };
 }

@@ -15,25 +15,12 @@ import { YieldContext } from '../contexts/YieldContext'; // TODO sort out this c
  */
 export const useMath = () => {
 
-  const { state: { feedData, yieldData } } = React.useContext(YieldContext);
-
-  const [ethPosted, setEthPosted] = React.useState<any>(BigNumber.from('0'));
-  React.useEffect(()=>{
-    yieldData && setEthPosted(yieldData.ethPosted);
-  }, [yieldData]);
+  const { state: { feedData } } = React.useContext(YieldContext);
 
   const [ilks, setIlks] = React.useState<any>();
   React.useEffect(()=>{
     feedData.ilks && setIlks(feedData.ilks);
   }, [feedData]);
-
-  /**
-   * Gets the amount of collateral posted in Wei
-   * @returns {BigNumber}
-   */
-  const collAmount = (): BigNumber => {
-    return ethPosted;
-  };
 
   /**
    * Calculates the USD value per unit collateral
@@ -50,7 +37,7 @@ export const useMath = () => {
    * @returns {BigNumber} USD value (in wad/wei precision)
    */
   const collValue = (collateralPosted:BigNumber): BigNumber => {
-    console.log('Collateral Value USD:', ethers.utils.formatEther( utils.mulRay(collAmount(), collPrice()) ) );
+    console.log('Collateral Value USD:', ethers.utils.formatEther( utils.mulRay(collateralPosted, collPrice()) ) );
     return utils.mulRay(collateralPosted, collPrice());
   };
 
@@ -197,7 +184,6 @@ export const useMath = () => {
 
   return {
     yieldAPR,
-    collAmount,
     collValue,
     collPrice,
     debtValAdj,

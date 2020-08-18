@@ -89,8 +89,10 @@ const initState = {
 const YieldProvider = ({ children }: any) => {
   const [state, dispatch] = React.useReducer(reducer, initState);
   // const { state: { account, chainId, provider } } = React.useContext(ConnectionContext);
-  const { account, provider } = useSignerAccount();
+  const { account, provider, fallbackProvider } = useSignerAccount();
+  
   const { chainId } = useWeb3React();
+  // const { active: fallbackActive } = useWeb3React('fallback');
 
   const { dispatch: notifyDispatch } = React.useContext(NotifyContext);
 
@@ -106,6 +108,7 @@ const YieldProvider = ({ children }: any) => {
   const { getEventHistory, addEventListener, parseEventList } = useEvents();
   const { getAddresses } = useMigrations();
   const { collateralPosted } = useController();
+
 
   /**
    * @dev internal fn: Get all public Yield addresses from localStorage (or chain if no cache)
@@ -221,8 +224,7 @@ const YieldProvider = ({ children }: any) => {
   
   const _getYieldData = async (deployedContracts: any): Promise<any> => {
     const _yieldData: any = {};
-    _yieldData.ethPosted = await collateralPosted(deployedContracts.Controller, 'ETH-A');
-    // parse data if required.
+    // _yieldData.ethPosted = await collateralPosted(deployedContracts.Controller, 'ETH-A');
     return {
       ..._yieldData,
     };
@@ -244,7 +246,7 @@ const YieldProvider = ({ children }: any) => {
     // TODO: add event listener for AMM
   };
 
-  const initContext = async (networkId: number | string) => {
+  const initContext = async () => {
     /* Init start */
     dispatch({ type: 'isLoading', payload: true });
 
@@ -273,9 +275,10 @@ const YieldProvider = ({ children }: any) => {
   };
 
   /* Init app and re-init app on change of user and/or network  */
-  React.useEffect(() => {
-    chainId && (async () => initContext(chainId))();
-  }, [ chainId, account ]);
+  React.useEffect(() => { 
+    provider && (async () => initContext() )();
+    !provider && fallbackProvider && (async () => initContext() )();
+  }, [ fallbackProvider, chainId, account ]);
 
   const actions = {
     // updateUserData: () =>

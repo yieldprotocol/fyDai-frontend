@@ -37,8 +37,8 @@ function InputWrap( { warningMsg, errorMsg, disabled, children }: IInputProps) {
     if (errorMsg || warningMsg) {
       setCorners({ corner:'top', size:'small' });
       setAnimation([{ type:'jiggle', duration:100, size:'xsmall' }, { type:'none', delay:1000 }] );
-      errorMsg && setBorder([{ color: 'red', side:'top' }, { style:'dash', side:'bottom' }, { color: 'red', side:'vertical' }]);
-      warningMsg && setBorder([{ color: 'orange', side:'top' }, { style:'dash', side:'bottom' }, { color: 'orange', side:'vertical' }]);
+      errorMsg && setBorder([{ color: 'red', side:'top' }, { side:'bottom' }, { color: 'red', side:'vertical' }]);
+      warningMsg && setBorder([{ color: 'orange', side:'top' }, { side:'bottom' }, { color: 'orange', side:'vertical' }]);
     } else { 
       setCorners('small');
       setBorder('all');

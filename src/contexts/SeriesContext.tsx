@@ -41,7 +41,7 @@ function reducer(state:any, action:any) {
 
 const SeriesProvider = ({ children }:any) => {
 
-  const { account } = useSignerAccount();
+  const { account, provider, fallbackProvider } = useSignerAccount();
   const { chainId } = useWeb3React();
 
   const initState = { 
@@ -115,10 +115,10 @@ const SeriesProvider = ({ children }:any) => {
         console.log(_rates.sellYDai.toString());
         _seriesData.push(x);
         try {
-          _seriesData[i].hasDelegatedPool = await checkPoolDelegate(x.poolAddress, x.yDaiAddress);
-          _seriesData[i].hasDelegatedController = await checkControllerDelegate(deployedContracts.Controller, x.daiProxyAddress);
-          _seriesData[i].yDaiBalance = account? await callTx(x.yDaiAddress, 'YDai', 'balanceOf', [account]): BigNumber.from('0') ;
+          _seriesData[i].hasDelegatedPool = account? await checkPoolDelegate(x.poolAddress, x.yDaiAddress): null;
+          _seriesData[i].hasDelegatedController = account? await checkControllerDelegate(deployedContracts.Controller, x.daiProxyAddress): null;
           _seriesData[i].isMature = await callTx(x.yDaiAddress, 'YDai', 'isMature', []);
+          _seriesData[i].yDaiBalance = account? await callTx(x.yDaiAddress, 'YDai', 'balanceOf', [account]): BigNumber.from('0') ;
           _seriesData[i].ethDebtYDai = account? await callTx(deployedContracts.Controller, 'Controller', 'debtYDai', [utils.ETH, x.maturity, account]): BigNumber.from('0');
           _seriesData[i].ethDebtDai = account? utils.mulRay( _seriesData[i].ethDebtYDai, _rates.sellYDai): BigNumber.from('0');
           _seriesData[i].yieldAPR = yieldAPR(_rates.sellYDai, ethers.utils.parseEther('1'), x.maturity);
@@ -195,10 +195,13 @@ const SeriesProvider = ({ children }:any) => {
 
   /* Init series context and re-init on any user and/or network change */
   React.useEffect( () => {
-    chainId && !yieldState.isLoading && ( async () => {
+    (provider || fallbackProvider) && !yieldState.isLoading && ( async () => {
       await updateSeriesList(yieldState.deployedSeries, false);
     })();
-  }, [ chainId, account, yieldState.isLoading ]);
+
+  }, [ provider, fallbackProvider, chainId, account, yieldState.isLoading ]);
+
+
 
   const actions = {
     updateSeries: (series:IYieldSeries[]) => updateSeriesList(series, true),

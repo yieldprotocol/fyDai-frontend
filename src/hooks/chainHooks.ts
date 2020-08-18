@@ -91,7 +91,7 @@ export const useSendTx = () => {
 export const useCallTx = () => {
 
   // const { state: { provider, altProvider } } = React.useContext(ConnectionContext);
-  const { signer, provider, account, altProvider, voidSigner } = useSignerAccount();
+  const { signer, provider, account, fallbackProvider, voidSigner } = useSignerAccount();
 
   const [ callTxActive, setCallTxActive ] = React.useState<boolean>();
   /**
@@ -108,7 +108,7 @@ export const useCallTx = () => {
     data:any[]
   ) => {
     setCallTxActive(true);
-    const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), provider || altProvider);
+    const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), fallbackProvider);
     const retVal = await contract[fn](...data);
     setCallTxActive(false);
     return retVal;
@@ -123,7 +123,7 @@ export const useCallTx = () => {
  */
 export function useBalances() {
   // const { state: { provider, account } } = React.useContext(ConnectionContext);
-  const { signer, provider, account, altProvider, voidSigner } = useSignerAccount();
+  const { signer, provider, account, fallbackProvider, voidSigner } = useSignerAccount();
 
   /**
    * Get the user account balance of ETH  (omit args) or an ERC20token (provide args)
@@ -136,7 +136,7 @@ export function useBalances() {
   const getBalance = async (tokenAddr:string|null=null, contractName:string|null=null) => {
     if (!!provider && !!account ) {
       if (tokenAddr && contractName) {
-        const contract = new ethers.Contract(tokenAddr, contractMap.get(contractName), provider);
+        const contract = new ethers.Contract(tokenAddr, contractMap.get(contractName), provider );
         const balance = await contract.balanceOf(account);
         return balance;
       }
@@ -157,18 +157,21 @@ export function useBalances() {
     operatorAddress:string,
     tokenName: string
   ) => {
-    const fromAddr = account && ethers.utils.getAddress(account);
-    const tokenAddr = ethers.utils.getAddress(tokenAddress);
-    const operatorAddr = ethers.utils.getAddress(operatorAddress);
-    const contract = new ethers.Contract( tokenAddr, contractMap.get(tokenName), provider );
-    let res;
-    try {
-      res = await contract.allowance(fromAddr, operatorAddr);
-    }  catch (e) {
-      console.log(e);
-      res = ethers.BigNumber.from('0');
+    if (account) {
+      const fromAddr = account && ethers.utils.getAddress(account);
+      const tokenAddr = ethers.utils.getAddress(tokenAddress);
+      const operatorAddr = ethers.utils.getAddress(operatorAddress);
+      const contract = new ethers.Contract( tokenAddr, contractMap.get(tokenName), provider );
+      let res;
+      try {
+        res = await contract.allowance(fromAddr, operatorAddr);
+      }  catch (e) {
+        console.log(e);
+        res = ethers.BigNumber.from('0');
+      }
+      return parseFloat(ethers.utils.formatEther(res));
     }
-    return parseFloat(ethers.utils.formatEther(res));
+    return 0;
   };
 
   return { getTokenAllowance, getBalance } as const;

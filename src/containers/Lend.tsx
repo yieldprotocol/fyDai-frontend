@@ -11,7 +11,6 @@ import {
   FiAlertTriangle as Warning,
   FiArrowRight as ArrowRight,
 } from 'react-icons/fi';
-  
 
 import WithdrawDai from './WithdrawDai';
 import Redeem from './Redeem';
@@ -24,7 +23,7 @@ import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
   
-import { usePool, useBalances, useMath, useToken } from '../hooks';
+import { usePool, useBalances, useMath, useToken, useSignerAccount } from '../hooks';
 import InputWrap from '../components/InputWrap';
 import DaiMark from '../components/logos/DaiMark';
 
@@ -55,6 +54,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
   const { approveToken, approveActive } = useToken();
   const { getTokenAllowance } = useBalances();
   const { yieldAPR } = useMath();
+  const { account } = useSignerAccount();
   
   const [ inputValue, setInputValue ] = React.useState<any>();
   const [ lendDisabled, setLendDisabled ] = React.useState<boolean>(false);
@@ -121,7 +121,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
 
   /* handle active series loads and changes */
   useEffect(() => {
-    activeSeries && !(activeSeries.isMature) && ( async ()=> {
+    activeSeries.yDaiBalance_ && !(activeSeries.isMature) && ( async ()=> {
       const preview = await previewPoolTx('SellYDai', activeSeries.poolAddress, activeSeries.yDaiBalance_);
       setCurrentValue( parseFloat(ethers.utils.formatEther(preview)));
     })();
@@ -143,7 +143,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
           <InfoGrid entries={[
             {
               label: 'Portfolio Value at Maturity',
-              visible: true,
+              visible: !!account,
               active: true,
               loading: false,     
               value: activeSeries && `${activeSeries?.yDaiBalance_.toFixed(2)} DAI` || '-',
@@ -152,7 +152,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
             },
             {
               label: 'Current Value',
-              visible: true,
+              visible: !!account,
               active: true,
               loading: false,           
               value: currentValue!==0?`${currentValue.toFixed(2)} DAI`: '-',
@@ -162,7 +162,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
 
             {
               label: 'DAI balance',
-              visible: true,
+              visible: !!account,
               active: true,
               loading: false,            
               value: daiBalance_?`${daiBalance_.toFixed(2)} DAI`: '0 DAI',
@@ -185,12 +185,13 @@ const Lend = ({ lendAmount }:ILendProps) => {
                   onChange={(event:any) => setInputValue(event.target.value)}
                   icon={<DaiMark />}
                 />
+                {account &&
                 <Button 
                   label={<Text size='xsmall' color='brand'> {screenSize !== 'small' ? 'Lend Maximum': 'Max'}</Text>}
                   color='brand-transparent'
                   onClick={()=>setInputValue(daiBalance_)}
                   hoverIndicator='brand-transparent'
-                />
+                />}
               </InputWrap>
 
               <InfoGrid entries={[

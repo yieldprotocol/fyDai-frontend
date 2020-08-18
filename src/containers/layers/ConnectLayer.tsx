@@ -25,7 +25,7 @@ import {
   useWeb3React,
 } from '../../hooks';
 
-import { injected, trezor, walletlink, torus, ledger, network, frame } from '../../connectors';
+import { injected, trezor, walletlink, torus, ledger, network } from '../../connectors';
 
 import metamaskImage from '../../assets/images/providers/metamask.png';
 import trezorImage from '../../assets/images/providers/trezor.png';
@@ -55,13 +55,12 @@ const ConnectLayer = (props: any) => {
   const screenSize = React.useContext(ResponsiveContext);
 
   const { connector, activate } = useWeb3React();
-  const { connector: fallbackConnector, activate: fallbackActivate, active } = useWeb3React('fallback');
+  const { library, connector: fallbackConnector, activate: fallbackActivate, active } = useWeb3React('fallback');
 
   const { open, closeLayer } = props;
 
   /* web3 initiate */
   const [activatingConnector, setActivatingConnector] = React.useState<any>();
-
   React.useEffect(() => {
     if (activatingConnector && activatingConnector === connector) {
       setActivatingConnector(undefined);
@@ -78,7 +77,7 @@ const ConnectLayer = (props: any) => {
   React.useEffect(() => {
     (async () => { 
       await fallbackActivate(network, console.log);
-      fallbackConnector && console.log(fallbackConnector);
+      fallbackConnector && console.log(library);
     })();
   }, [fallbackConnector]);
 

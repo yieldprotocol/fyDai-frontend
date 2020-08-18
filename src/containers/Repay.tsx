@@ -22,7 +22,7 @@ import { YieldContext } from '../contexts/YieldContext';
 import { NotifyContext } from '../contexts/NotifyContext';
 import { UserContext } from '../contexts/UserContext';
 
-import { useController, usePool, useBalances, useProxy, useTxActive, useToken } from '../hooks';
+import { useController, usePool, useBalances, useProxy, useTxActive, useToken, useSignerAccount } from '../hooks';
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
 
@@ -65,6 +65,7 @@ function Repay({ repayAmount }:IRepayProps) {
   const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
 
   const [ txActive ] = useTxActive(['repay']);
+  const { account } = useSignerAccount();
 
   const repayProcedure = async (value:number) => {
 
@@ -162,7 +163,7 @@ function Repay({ repayAmount }:IRepayProps) {
             <InfoGrid entries={[
               {
                 label: 'Current Debt',
-                visible: true,
+                visible: !!account,
                 active: true,
                 loading: false,     
                 value: activeSeries?.ethDebtYDai_? `${activeSeries.ethDebtYDai_.toFixed(2)} DAI`: 'O DAI',
@@ -171,7 +172,7 @@ function Repay({ repayAmount }:IRepayProps) {
               },
               {
                 label: 'DAI balance',
-                visible: true,
+                visible: !!account,
                 active: true,
                 loading: false,            
                 value: daiBalance_?`${daiBalance_.toFixed(2)} DAI`: '-',

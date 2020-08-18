@@ -26,7 +26,7 @@ import { NotifyContext } from '../contexts/NotifyContext';
 
 import { UserContext } from '../contexts/UserContext';
 
-import { useController, usePool, useYDai, useMath, useProxy, useTxActive, useToken } from '../hooks';
+import { useController, usePool, useYDai, useMath, useProxy, useTxActive, useToken, useSignerAccount } from '../hooks';
 import InfoGrid from '../components/InfoGrid';
 
 interface IBorrowProps {
@@ -73,6 +73,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
     yieldAPR, 
     estCollRatio: estimateRatio
   } = useMath();
+  const { account } = useSignerAccount();
 
   /* internal component state */
   const [ borrowDisabled, setBorrowDisabled ] = React.useState<boolean>(true);
@@ -250,7 +251,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
             <InfoGrid entries={[
               {
                 label: 'Current Debt',
-                visible: true,
+                visible: !!account,
                 active: true,
                 loading: borrowPending,     
                 value: activeSeries?.ethDebtYDai_? `${activeSeries.ethDebtYDai_.toFixed(2)} DAI`: '0 DAI',
@@ -260,7 +261,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
 
               {
                 label: 'Max Borrowing Power',
-                visible: true,
+                visible: !!account,
                 active: maximumDai,
                 loading: borrowPending,           
                 value: maximumDai ? `${maximumDai.toFixed(2)} DAI`: '',
@@ -270,7 +271,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
             ]}
             />
       
-            {!hasDelegated && 
+            {!!account && !hasDelegated && 
             <OnceOffAuthorize
               authProcedure={delegateProcedure} 
               authMsg='Allow Yield trade on your behalf' 
@@ -278,7 +279,6 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
             />}
 
             <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to borrow</Text>
-
 
             <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={borrowDisabled}>
               <TextInput
@@ -318,7 +318,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
 
               {
                 label: 'Ratio after Borrow',
-                visible: true,
+                visible: !!account,
                 active: inputValue,
                 loading: false,            
                 value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',

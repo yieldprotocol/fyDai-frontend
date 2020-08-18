@@ -29,7 +29,7 @@ import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
 import { UserContext } from '../contexts/UserContext';
 
-import { useProxy, useTxActive, useMath } from '../hooks';
+import { useProxy, useTxActive, useMath, useSignerAccount } from '../hooks';
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
 
@@ -71,6 +71,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
   const { postEth, postEthActive }  = useProxy();
   const { estCollRatio: estimateRatio } = useMath();
   const [ txActive ] = useTxActive(['Deposit']);
+  const { account } = useSignerAccount();
 
   /* Steps required to deposit and update values */
   const depositProcedure = async (value:number) => {
@@ -123,7 +124,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
           <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={depositDisabled}>
             <TextInput
               type='number'
-              placeholder={ (screenSize !== 'small' && !modalView) ? 'Enter the ETH amount to deposit': 'ETH'}
+              placeholder={(screenSize !== 'small' && !modalView) ? 'Enter the ETH amount to deposit': 'ETH'}
               value={inputValue || ''}
               disabled={postEthActive}
               plain
@@ -143,7 +144,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
               label: 'Current Collateral',
               visible: true,
               active: true,
-              loading: !ethPosted_ && depositPending && ethPosted_ !== 0,     
+              loading: !!account && !ethPosted_ && depositPending && ethPosted_ !== 0,     
               value: ethPosted_ ? `${ethPosted_.toFixed(4)} Eth` : '0 Eth',
               valuePrefix: null,
               valueExtra: null, 
@@ -153,7 +154,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
               label: 'Collateralization Ratio',
               visible: true,
               active: collateralPercent_ > 0,
-              loading: !ethPosted_ && depositPending && ethPosted_ !== 0,            
+              loading: !!account && !ethPosted_ && depositPending && ethPosted_ !== 0,            
               value: (collateralPercent_ && (collateralPercent_ !== 0))? `${collateralPercent_}%`: '',
               valuePrefix: null,
               valueExtra: null, 
@@ -162,7 +163,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
               label: 'Ratio after Deposit',
               visible: true,
               active: inputValue,
-              loading: !ethPosted_ && depositPending && ethPosted_ !== 0,           
+              loading: !!account && !ethPosted_ && depositPending && ethPosted_ !== 0,           
               value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
               valuePrefix: 'Approx.',
               valueExtra: () => (
@@ -215,6 +216,6 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
   );
 };
 
-Deposit.defaultProps = { depositAmount: null, modalView: false};
+Deposit.defaultProps = { depositAmount: null, modalView: false };
 
 export default Deposit;

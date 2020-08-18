@@ -17,7 +17,7 @@ import YDai from '../contracts/YDai.json';
  */
 export const usePool = () => {
   // const { state: { provider, signer, account } } = React.useContext(ConnectionContext);
-  const { provider, signer, account } = useSignerAccount();
+  const { fallbackProvider, provider, signer, account } = useSignerAccount();
 
   const { abi: marketAbi } = Pool;
   const  { dispatch }  = React.useContext<any>(NotifyContext);
@@ -237,9 +237,8 @@ export const usePool = () => {
   ): Promise<BigNumber> => {
     const parsedAmount = ethers.utils.parseEther(amount.toString());
     const marketAddr = ethers.utils.getAddress(poolAddress);
-    const contract = new ethers.Contract( marketAddr, marketAbi, provider );
+    const contract = new ethers.Contract( marketAddr, marketAbi, fallbackProvider );
     let result;
-
     try {
       switch (txType.toUpperCase()) {
         case 'BUYDAI':

@@ -1,12 +1,13 @@
 import React from 'react';
-import { Box, Text } from 'grommet';
+import { Box, Layer } from 'grommet';
 import { FiCheckCircle as CheckCircle } from 'react-icons/fi';
 
 import Deposit from '../containers/Deposit';
 import Borrow from '../containers/Borrow';
 import Repay from '../containers/Repay';
 
-import { UserContext } from '../contexts/UserContext';
+
+import { useSignerAccount } from '../hooks';
 
 import PageHeader from '../components/PageHeader';
 import ActionSelector from '../components/ActionSelector';
@@ -19,8 +20,6 @@ const BorrowView = ({
   activeView: activeViewFromProps,
 }: BorrowProps) => {
   
-  const { state: { position }, } = React.useContext(UserContext);
-
   const [ activeView, setActiveView ] = React.useState<string>( 
     activeViewFromProps || 'COLLATERAL'
   );
@@ -54,10 +53,10 @@ const BorrowView = ({
         >
           {activeView === 'COLLATERAL' && <Deposit setActiveView={(x:string)=>setActiveView(x.toUpperCase())} />}
           {activeView === 'BORROW' && (
-          <Borrow />
+            <Borrow />
           )}
           {activeView === 'REPAY' && (
-          <Repay />
+            <Repay />
           )}
         </Box>
       </Box>    

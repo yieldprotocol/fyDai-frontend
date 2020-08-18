@@ -25,7 +25,7 @@ const migrationAddr = new Map([
 export const useMigrations = () => {
 
   // const { state: { signer, account } } = React.useContext(ConnectionContext);
-  const { provider, signer, account } = useSignerAccount();
+  const { provider, fallbackProvider, signer, account } = useSignerAccount();
 
   const { abi: migrationAbi } = Migration;
   const  { dispatch }  = React.useContext<any>(NotifyContext);
@@ -46,10 +46,11 @@ export const useMigrations = () => {
   const getAddresses = async (
     contractNameList:string[],
   ) => {
-    const contract = new ethers.Contract(migrationAddress, migrationAbi, provider );
+    console.log(fallbackProvider);
+    const contract = new ethers.Contract(migrationAddress, migrationAbi, fallbackProvider );
     let res = new Map<string, string>();
     try {
-      const contractAddrs = await Promise.all(
+      await Promise.all(
         contractNameList.map(async (x: string) => {
           res.set( x, await contract.contracts(ethers.utils.formatBytes32String(x)))
         })
