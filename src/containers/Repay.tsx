@@ -201,38 +201,41 @@ function Repay({ repayAmount }:IRepayProps) {
               />
             </InputWrap>
       
-            <Box>
-              {approveActive || approved === undefined ?             
-                <ScaleLoader color={theme?.global?.colors['brand-transparent'].dark} height='13' />
-                : <CheckBox
-                  reverse
-                  checked={approved && !inputValue || ( approved >= inputValue )}
-                  disabled={!inputValue || ( approved >= inputValue )}
-                  onChange={()=>approveProcedure(inputValue)}
-                  label={            
+            <> 
+              <Box>
+                {approveActive || approved === undefined ?             
+                  <ScaleLoader color={theme?.global?.colors['brand-transparent'].dark} height='13' />
+                  : <CheckBox
+                    reverse
+                    checked={approved && !inputValue || ( approved >= inputValue )}
+                    disabled={!inputValue || ( approved >= inputValue )}
+                    onChange={()=>approveProcedure(inputValue)}
+                    label={            
                   (approved >= inputValue) ? 
                     `Repayments are unlocked for up to ${approved.toFixed(2) || '' } DAI` 
                     : `Unlock repayments of ${inputValue || ''} DAI` 
                 }
-                />}
-            </Box>
+                  />}
+              </Box>
 
-            <Box
-              fill='horizontal'
-              round='small'
-              background={repayDisabled ? 'brand-transparent' : 'brand'}
-              onClick={()=>repayProcedure(inputValue)}
-              align='center'
-              pad='small'
-            >
-              <Text 
-                weight='bold'
-                size='large'
-                color={repayDisabled ? 'text-xweak' : 'text'}
+              <Box
+                fill='horizontal'
+                round='small'
+                background={repayDisabled ? 'brand-transparent' : 'brand'}
+                onClick={()=>repayProcedure(inputValue)}
+                align='center'
+                pad='small'
               >
-                {`Repay ${inputValue || ''} DAI`}
-              </Text>
-            </Box>
+                <Text 
+                  weight='bold'
+                  size='large'
+                  color={repayDisabled ? 'text-xweak' : 'text'}
+                >
+                  {`Repay ${inputValue || ''} DAI`}
+                </Text>
+              </Box>
+            </>
+            
           </Box>
         </Box>}
 

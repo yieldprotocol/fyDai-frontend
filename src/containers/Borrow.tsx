@@ -99,7 +99,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
 
   const borrowProcedure = async (value:number, autoSell:boolean=true) => {
 
-    if (inputValue>0 && !borrowDisabled) {
+    if (account && inputValue>0 && !borrowDisabled) {
       setBorrowPending(true); 
       autoSell && await borrowUsingExactDai( activeSeries.daiProxyAddress, 'ETH-A', activeSeries.maturity, yDaiValue, value);
       !autoSell && await borrow(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value);
@@ -271,7 +271,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
             ]}
             />
       
-            {!!account && !hasDelegated && 
+            {!hasDelegated && account &&
             <OnceOffAuthorize
               authProcedure={delegateProcedure} 
               authMsg='Allow Yield trade on your behalf' 
@@ -332,7 +332,8 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
 
             ]}
             />
-            {/* <InlineAlert warnMsg={warningMsg} errorMsg={errorMsg} /> */}
+
+            { account &&          
             <Box
               fill='horizontal'
               round='small' 
@@ -349,7 +350,8 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
               >
                 {`Borrow ${inputValue || ''} DAI`}
               </Text>
-            </Box>
+            </Box>}
+
           </Box>
         </Box> }
 

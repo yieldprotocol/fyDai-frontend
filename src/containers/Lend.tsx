@@ -71,7 +71,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
   
   const lendProcedure = async (value:number) => {
 
-    if ( inputValue>0 && !lendDisabled ) {
+    if (account && inputValue>0 && !lendDisabled ) {
       await sellDai(
         activeSeries.poolAddress,
         inputValue,
@@ -226,7 +226,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
               <Redeem />
             </Box>}
   
-          { !activeSeries?.isMature && 
+          { account && !activeSeries?.isMature && 
           <Box gap='small' fill='horizontal' align='center'>
             <Box>
               <CheckBox 
