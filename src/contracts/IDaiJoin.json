@@ -83,15 +83,15 @@
     "absolutePath": "/C/Users/bruce/dev/yield/yDai/contracts/interfaces/IDaiJoin.sol",
     "exportedSymbols": {
       "IDaiJoin": [
-        9679
+        9740
       ]
     },
-    "id": 9680,
+    "id": 9741,
     "license": "GPL-3.0-or-later",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 9650,
+        "id": 9711,
         "literals": [
           "solidity",
           "^",
@@ -107,15 +107,15 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "documentation": {
-          "id": 9651,
+          "id": 9712,
           "nodeType": "StructuredDocumentation",
           "src": "76:85:20",
           "text": "@dev Interface to interact with the `Join.sol` contract from MakerDAO using Dai"
         },
         "fullyImplemented": false,
-        "id": 9679,
+        "id": 9740,
         "linearizedBaseContracts": [
-          9679
+          9740
         ],
         "name": "IDaiJoin",
         "nodeType": "ContractDefinition",
@@ -124,7 +124,7 @@
             "body": null,
             "documentation": null,
             "functionSelector": "65fae35e",
-            "id": 9656,
+            "id": 9717,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -132,17 +132,17 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 9654,
+              "id": 9715,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 9653,
+                  "id": 9714,
                   "mutability": "mutable",
                   "name": "usr",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 9656,
+                  "scope": 9717,
                   "src": "201:11:20",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -151,7 +151,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 9652,
+                    "id": 9713,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "201:7:20",
@@ -168,12 +168,12 @@
               "src": "200:13:20"
             },
             "returnParameters": {
-              "id": 9655,
+              "id": 9716,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "222:0:20"
             },
-            "scope": 9679,
+            "scope": 9740,
             "src": "187:36:20",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -183,7 +183,7 @@
             "body": null,
             "documentation": null,
             "functionSelector": "9c52a7f1",
-            "id": 9661,
+            "id": 9722,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -191,17 +191,17 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 9659,
+              "id": 9720,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 9658,
+                  "id": 9719,
                   "mutability": "mutable",
                   "name": "usr",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 9661,
+                  "scope": 9722,
                   "src": "243:11:20",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -210,7 +210,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 9657,
+                    "id": 9718,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "243:7:20",
@@ -227,12 +227,12 @@
               "src": "242:13:20"
             },
             "returnParameters": {
-              "id": 9660,
+              "id": 9721,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "264:0:20"
             },
-            "scope": 9679,
+            "scope": 9740,
             "src": "229:36:20",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -242,7 +242,7 @@
             "body": null,
             "documentation": null,
             "functionSelector": "69245009",
-            "id": 9664,
+            "id": 9725,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -250,18 +250,18 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 9662,
+              "id": 9723,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "284:2:20"
             },
             "returnParameters": {
-              "id": 9663,
+              "id": 9724,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "295:0:20"
             },
-            "scope": 9679,
+            "scope": 9740,
             "src": "271:25:20",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -271,7 +271,7 @@
             "body": null,
             "documentation": null,
             "functionSelector": "3b4da69f",
-            "id": 9671,
+            "id": 9732,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -279,17 +279,17 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 9669,
+              "id": 9730,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 9666,
+                  "id": 9727,
                   "mutability": "mutable",
                   "name": "usr",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 9671,
+                  "scope": 9732,
                   "src": "316:11:20",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -298,7 +298,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 9665,
+                    "id": 9726,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "316:7:20",
@@ -313,12 +313,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 9668,
+                  "id": 9729,
                   "mutability": "mutable",
                   "name": "WAD",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 9671,
+                  "scope": 9732,
                   "src": "329:8:20",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -327,7 +327,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 9667,
+                    "id": 9728,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
                     "src": "329:4:20",
@@ -343,12 +343,12 @@
               "src": "315:23:20"
             },
             "returnParameters": {
-              "id": 9670,
+              "id": 9731,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "347:0:20"
             },
-            "scope": 9679,
+            "scope": 9740,
             "src": "302:46:20",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -358,7 +358,7 @@
             "body": null,
             "documentation": null,
             "functionSelector": "ef693bed",
-            "id": 9678,
+            "id": 9739,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -366,17 +366,17 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 9676,
+              "id": 9737,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 9673,
+                  "id": 9734,
                   "mutability": "mutable",
                   "name": "usr",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 9678,
+                  "scope": 9739,
                   "src": "368:11:20",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -385,7 +385,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 9672,
+                    "id": 9733,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "368:7:20",
@@ -400,12 +400,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 9675,
+                  "id": 9736,
                   "mutability": "mutable",
                   "name": "WAD",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 9678,
+                  "scope": 9739,
                   "src": "381:8:20",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -414,7 +414,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 9674,
+                    "id": 9735,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
                     "src": "381:4:20",
@@ -430,19 +430,19 @@
               "src": "367:23:20"
             },
             "returnParameters": {
-              "id": 9677,
+              "id": 9738,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "399:0:20"
             },
-            "scope": 9679,
+            "scope": 9740,
             "src": "354:46:20",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 9680,
+        "scope": 9741,
         "src": "161:242:20"
       }
     ],
@@ -452,15 +452,15 @@
     "absolutePath": "/C/Users/bruce/dev/yield/yDai/contracts/interfaces/IDaiJoin.sol",
     "exportedSymbols": {
       "IDaiJoin": [
-        9679
+        9740
       ]
     },
-    "id": 9680,
+    "id": 9741,
     "license": "GPL-3.0-or-later",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 9650,
+        "id": 9711,
         "literals": [
           "solidity",
           "^",
@@ -476,15 +476,15 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "documentation": {
-          "id": 9651,
+          "id": 9712,
           "nodeType": "StructuredDocumentation",
           "src": "76:85:20",
           "text": "@dev Interface to interact with the `Join.sol` contract from MakerDAO using Dai"
         },
         "fullyImplemented": false,
-        "id": 9679,
+        "id": 9740,
         "linearizedBaseContracts": [
-          9679
+          9740
         ],
         "name": "IDaiJoin",
         "nodeType": "ContractDefinition",
@@ -493,7 +493,7 @@
             "body": null,
             "documentation": null,
             "functionSelector": "65fae35e",
-            "id": 9656,
+            "id": 9717,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -501,17 +501,17 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 9654,
+              "id": 9715,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 9653,
+                  "id": 9714,
                   "mutability": "mutable",
                   "name": "usr",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 9656,
+                  "scope": 9717,
                   "src": "201:11:20",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -520,7 +520,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 9652,
+                    "id": 9713,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "201:7:20",
@@ -537,12 +537,12 @@
               "src": "200:13:20"
             },
             "returnParameters": {
-              "id": 9655,
+              "id": 9716,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "222:0:20"
             },
-            "scope": 9679,
+            "scope": 9740,
             "src": "187:36:20",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -552,7 +552,7 @@
             "body": null,
             "documentation": null,
             "functionSelector": "9c52a7f1",
-            "id": 9661,
+            "id": 9722,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -560,17 +560,17 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 9659,
+              "id": 9720,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 9658,
+                  "id": 9719,
                   "mutability": "mutable",
                   "name": "usr",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 9661,
+                  "scope": 9722,
                   "src": "243:11:20",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -579,7 +579,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 9657,
+                    "id": 9718,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "243:7:20",
@@ -596,12 +596,12 @@
               "src": "242:13:20"
             },
             "returnParameters": {
-              "id": 9660,
+              "id": 9721,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "264:0:20"
             },
-            "scope": 9679,
+            "scope": 9740,
             "src": "229:36:20",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -611,7 +611,7 @@
             "body": null,
             "documentation": null,
             "functionSelector": "69245009",
-            "id": 9664,
+            "id": 9725,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -619,18 +619,18 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 9662,
+              "id": 9723,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "284:2:20"
             },
             "returnParameters": {
-              "id": 9663,
+              "id": 9724,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "295:0:20"
             },
-            "scope": 9679,
+            "scope": 9740,
             "src": "271:25:20",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -640,7 +640,7 @@
             "body": null,
             "documentation": null,
             "functionSelector": "3b4da69f",
-            "id": 9671,
+            "id": 9732,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -648,17 +648,17 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 9669,
+              "id": 9730,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 9666,
+                  "id": 9727,
                   "mutability": "mutable",
                   "name": "usr",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 9671,
+                  "scope": 9732,
                   "src": "316:11:20",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -667,7 +667,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 9665,
+                    "id": 9726,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "316:7:20",
@@ -682,12 +682,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 9668,
+                  "id": 9729,
                   "mutability": "mutable",
                   "name": "WAD",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 9671,
+                  "scope": 9732,
                   "src": "329:8:20",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -696,7 +696,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 9667,
+                    "id": 9728,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
                     "src": "329:4:20",
@@ -712,12 +712,12 @@
               "src": "315:23:20"
             },
             "returnParameters": {
-              "id": 9670,
+              "id": 9731,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "347:0:20"
             },
-            "scope": 9679,
+            "scope": 9740,
             "src": "302:46:20",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -727,7 +727,7 @@
             "body": null,
             "documentation": null,
             "functionSelector": "ef693bed",
-            "id": 9678,
+            "id": 9739,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -735,17 +735,17 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 9676,
+              "id": 9737,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 9673,
+                  "id": 9734,
                   "mutability": "mutable",
                   "name": "usr",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 9678,
+                  "scope": 9739,
                   "src": "368:11:20",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -754,7 +754,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 9672,
+                    "id": 9733,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "368:7:20",
@@ -769,12 +769,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 9675,
+                  "id": 9736,
                   "mutability": "mutable",
                   "name": "WAD",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 9678,
+                  "scope": 9739,
                   "src": "381:8:20",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -783,7 +783,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 9674,
+                    "id": 9735,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
                     "src": "381:4:20",
@@ -799,19 +799,19 @@
               "src": "367:23:20"
             },
             "returnParameters": {
-              "id": 9677,
+              "id": 9738,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "399:0:20"
             },
-            "scope": 9679,
+            "scope": 9740,
             "src": "354:46:20",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 9680,
+        "scope": 9741,
         "src": "161:242:20"
       }
     ],
@@ -823,7 +823,7 @@
   },
   "networks": {},
   "schemaVersion": "3.2.3",
-  "updatedAt": "2020-08-03T09:57:49.945Z",
+  "updatedAt": "2020-08-19T15:24:08.749Z",
   "devdoc": {
     "details": "Interface to interact with the `Join.sol` contract from MakerDAO using Dai",
     "methods": {}
