@@ -201,8 +201,6 @@ const SeriesProvider = ({ children }:any) => {
 
   }, [ provider, fallbackProvider, chainId, account, yieldState.isLoading ]);
 
-
-
   const actions = {
     updateSeries: (series:IYieldSeries[]) => updateSeriesList(series, true),
     updateActiveSeries: () => updateSeriesList([state.activeSeries], true), // not really required now but may have application later

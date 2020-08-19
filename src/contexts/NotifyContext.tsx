@@ -4,7 +4,7 @@ import { INotification, IReducerAction } from '../types';
 const NotifyContext = React.createContext<any>({});
 const initState = {
   open: false,
-  position: 'top-right',
+  position: 'top',
   message: '',
   type: 'info',
   timerMs: 2000,

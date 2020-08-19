@@ -19,7 +19,7 @@ function NotifyLayer() {
       case 'warn' : return { color: 'orange', icon: <Warn /> };
       case 'error' : return { color: 'pink', icon: <Error /> };
       case 'success': return { color: 'lightgreen', icon: <CheckCircle /> };
-      default: return { color: 'lightgrey', icon: <Info /> };
+      default: return { color: 'background', icon: <Info /> };
     }
   };
 
@@ -29,7 +29,7 @@ function NotifyLayer() {
       <Layer
         position={state.position}
         modal={false}
-        margin={{ vertical: 'large', horizontal: 'xsmall' }}
+        margin={{ vertical: 'large', horizontal: 'small' }}
         onEsc={()=>dispatch({ type:'closeNotify' })}
         responsive={false}
         plain
@@ -40,9 +40,10 @@ function NotifyLayer() {
           direction="row"
           gap="large"
           justify="between"
-         round='small'
+          round='xsmall'
           elevation="medium"
           pad={{ vertical: 'xsmall', horizontal: 'small' }}
+          border={{ size:'small', color: notificationTypeMap(state.type).color }}
           background={notificationTypeMap(state.type).color}
         >
           { notificationTypeMap(state.type).icon }
@@ -67,7 +68,7 @@ function NotifyLayer() {
           align="center"
           direction="row"
           gap="large"
-         round='small'
+          round='xsmall'
           elevation="medium"
           pad={{ vertical: 'large', horizontal: 'large' }}
           border={{ color:'red' }}

@@ -36,14 +36,12 @@ const ThemedApp = () => {
       <App 
         darkMode={darkMode}
         setDarkMode={setDarkMode}
-
         partyMode={partyMode}
         setPartyMode={setPartyMode}
       />     
     </Grommet>
   );
 };
-
 
 const App = (props:any) => {
 
@@ -75,18 +73,12 @@ const App = (props:any) => {
   }, [account]);
 
   React.useEffect(()=> {
-
     if (screenSize === 'small') { 
       setColumnsWidth(['0%', 'auto', '0%']);
     } else {
       setColumnsWidth(['5%', 'auto', '5%']);
     }
-    console.log(screenSize);
-
   }, [screenSize]);
-
-
-  // const columnsWidth = ['5%', 'auto', '5%'];
 
   return (
 

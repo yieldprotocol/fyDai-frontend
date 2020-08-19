@@ -1,29 +1,25 @@
 import { InjectedConnector } from '@web3-react/injected-connector';
 import { NetworkConnector } from '@web3-react/network-connector';
-// import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
 import { WalletLinkConnector } from '@web3-react/walletlink-connector';
 import { LedgerConnector } from '@web3-react/ledger-connector';
 import { TrezorConnector } from '@web3-react/trezor-connector';
-import { FrameConnector } from '@web3-react/frame-connector';
-// import { AuthereumConnector } from '@web3-react/authereum-connector';
 import { FortmaticConnector } from '@web3-react/fortmatic-connector';
-// import { PortisConnector } from '@web3-react/portis-connector';
-// import { SquarelinkConnector } from '@web3-react/squarelink-connector';
 import { TorusConnector } from '@web3-react/torus-connector';
 
 const POLLING_INTERVAL = 12000;
 
 const RPC_URLS: { [chainId: number]: string } = {
   1: 'https://mainnet.infura.io/v3/9dbb21faf34448c9af1f3047c45b15df', // process.env.RPC_URL_1 as string,
-  4: 'https://rinkeby.infura.io/v3/60ab76e16df54c808e50a79975b4779f', // process.env.RPC_URL_4 as string
+  4: 'https://rinkeby.infura.io/v3/9dbb21faf34448c9af1f3047c45b15df', // process.env.RPC_URL_4 as string
   1337: 'http://localhost:8545'
 };
 
-export const injected = new InjectedConnector({ supportedChainIds: [1, 3, 4, 5, 42, 1337] });
+export const injected = new InjectedConnector({ supportedChainIds: [4] });
+// export const injected = new InjectedConnector({ supportedChainIds: [1, 4, 1337] });
 
 export const network = new NetworkConnector({
   urls: { 1: RPC_URLS[1], 4: RPC_URLS[4], 1337: RPC_URLS[1337], },
-  defaultChainId: 1337
+  defaultChainId: 4
 });
 
 export const walletlink = new WalletLinkConnector({
@@ -62,6 +58,3 @@ export const fortmatic = new FortmaticConnector({ apiKey: process.env.FORTMATIC_
 // export const authereum = new AuthereumConnector({ chainId: 42 });
 
 // export const frame = new FrameConnector({ supportedChainIds: [1] });
-
-
-

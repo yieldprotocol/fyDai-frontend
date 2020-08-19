@@ -101,14 +101,12 @@ const YieldProvider = ({ children }: any) => {
   const [cachedSeries, setCachedSeries] = useCachedState('deployedSeries', null);
   const [cachedFeed, setCachedFeed] = useCachedState('lastFeed', null);
 
-  const [ loadRetried, setLoadRetried ] = React.useState<boolean>(false);
 
   /* hook declarations */
   const [ callTx ] = useCallTx();
   const { getEventHistory, addEventListener, parseEventList } = useEvents();
   const { getAddresses } = useMigrations();
   const { collateralPosted } = useController();
-
 
   /**
    * @dev internal fn: Get all public Yield addresses from localStorage (or chain if no cache)
@@ -137,10 +135,10 @@ const YieldProvider = ({ children }: any) => {
 
         const contractAddrs = await getAddresses(contractList);
         _deployedContracts = Object.fromEntries(contractAddrs);
-
         window.localStorage.removeItem('deployedContracts');
         setCachedContracts(_deployedContracts);
         console.log('Contract addresses updated:', _deployedContracts);
+
       } else {
         _deployedContracts = cachedContracts;
       }
@@ -180,10 +178,10 @@ const YieldProvider = ({ children }: any) => {
       } else {
         _deployedSeries.push(...cachedSeries);
       }
-    } catch (e) {
-      
-      !loadRetried && _getProtocolAddrs(true);
-      loadRetried && notifyDispatch({
+    } catch (e) {     
+      // !loadRetried && _getProtocolAddrs(true);
+      // loadRetried && 
+      notifyDispatch({
         type: 'fatal',
         payload: { message: 'Error finding Yield Protocol addresses: Please check you are on a supported network.' },
       });
@@ -275,9 +273,10 @@ const YieldProvider = ({ children }: any) => {
   };
 
   /* Init app and re-init app on change of user and/or network  */
-  React.useEffect(() => { 
-    provider && (async () => initContext() )();
+  React.useEffect(() => {
+    // provider && (async () => initContext() )();
     !provider && fallbackProvider && (async () => initContext() )();
+    
   }, [ fallbackProvider, chainId, account ]);
 
   const actions = {

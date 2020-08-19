@@ -8,13 +8,10 @@ import Migration from '../contracts/Migrations.json';
 
 // ethers.errors.setLogLevel('error');
 
-const migrationAddr = new Map([
-  [1337, process.env.REACT_APP_MIGRATION ],
+const migrationAddrs = new Map([
+  [1337, process.env.REACT_APP_MIGRATION ], // '0xAC172aca69D11D28DFaadbdEa57B01f697b34158'
   [1, '0x5632d2e2AEdf760F13d0531B18A39782ce9c814F'],
-  [3, '0x5632d2e2AEdf760F13d0531B18A39782ce9c814F'],
-  [4, '0x5632d2e2AEdf760F13d0531B18A39782ce9c814F'],
-  [5, '0x5632d2e2AEdf760F13d0531B18A39782ce9c814F'],
-  [42, '0x5632d2e2AEdf760F13d0531B18A39782ce9c814F'],
+  [4, '0x08475B228575eFCb2e5d71E1B737deCeEdf21Db8'],
 ]);
 
 /**
@@ -29,11 +26,11 @@ export const useMigrations = () => {
 
   const { abi: migrationAbi } = Migration;
   const  { dispatch }  = React.useContext<any>(NotifyContext);
-  const [ fetchAddressesActive, setFetchAddressesActive ] = React.useState<boolean>(false);
 
-  const [migrationAddress, setMigrationsAddress] = React.useState<string>(migrationAddr.get(1337) || '');
+  const [migrationAddress, setMigrationsAddress] = React.useState<string>(process.env.REACT_APP_MIGRATION || '');
+  
   React.useEffect(()=>{
-    setMigrationsAddress( migrationAddr.get(1337) || '');
+    setMigrationsAddress( process.env.REACT_APP_MIGRATION || '');
   }, []);
 
   /**
@@ -46,19 +43,13 @@ export const useMigrations = () => {
   const getAddresses = async (
     contractNameList:string[],
   ) => {
-    console.log(fallbackProvider);
     const contract = new ethers.Contract(migrationAddress, migrationAbi, fallbackProvider );
-    let res = new Map<string, string>();
-    try {
-      await Promise.all(
-        contractNameList.map(async (x: string) => {
-          res.set( x, await contract.contracts(ethers.utils.formatBytes32String(x)))
-        })
-      );
-    } catch (e) {
-      console.log(e);
-      res = new Map();
-    }
+    const res = new Map<string, string>();
+    await Promise.all(
+      contractNameList.map(async (x: string) => {
+        res.set( x, await contract.contracts(ethers.utils.formatBytes32String(x)));
+      })
+    );
     return res;
   };
 
