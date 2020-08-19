@@ -26,9 +26,9 @@ function InfoGrid({ entries }:IInfoGridProps) {
       {entries.map((x:any, i:number) => {
         const _key = i;
         const ValueExtra = x.valueExtra; 
-        return (
-          <Box key={_key}>
-            { x.visible &&
+        if (x.visible) {
+          return (
+            <Box key={_key}>         
               <Box 
                 pad='small' 
                 align='start'
@@ -45,9 +45,10 @@ function InfoGrid({ entries }:IInfoGridProps) {
                     </Box> 
                   </Loading>
                 </Box> 
-              </Box>}
-          </Box>
-        );
+              </Box>
+            </Box>
+          );
+        }
       })}
     </Grid>
   );

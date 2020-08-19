@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 import Moment from 'moment';
-import { Keyboard, Box, TextInput, Text, ThemeContext, ResponsiveContext } from 'grommet';
+import { Keyboard, Box, Button, TextInput, Text, ThemeContext, ResponsiveContext } from 'grommet';
 
 import { ScaleLoader } from 'react-spinners';
 
@@ -110,7 +110,6 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
       ]);
       setBorrowPending(false);
     }
-
   };
 
   const delegateProcedure = async () => {
@@ -271,7 +270,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
             ]}
             />
       
-            {!hasDelegated && account &&
+            {account && !hasDelegated && 
             <OnceOffAuthorize
               authProcedure={delegateProcedure} 
               authMsg='Allow Yield trade on your behalf' 
@@ -298,7 +297,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
                 visible: true,
                 active: inputValue,
                 loading: false,     
-                value: APR?`${APR.toFixed(2)}%`:'- %',
+                value: APR?`${APR.toFixed(2)}%`: `${activeSeries? activeSeries.yieldAPR_: ''}%`,
                 valuePrefix: null,
                 valueExtra: null, 
               },
@@ -327,6 +326,22 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
                   <Text color='red' size='small'> 
                     { inputValue && estRatio && ( (collateralPercent_- estRatio) !== 0) && `(- ${(collateralPercent_- estRatio).toFixed(0)}%)` }
                   </Text>
+                )
+              },
+              {
+                label: 'Like what you see?',
+                visible: !account,
+                active: inputValue,
+                loading: false,            
+                value: '',
+                valuePrefix: null,
+                valueExtra: () => (
+                  <Button
+                    color='brand-transparent'
+                    label={<Text size='xsmall' color='brand'>Connect a wallet</Text>}
+                    onClick={()=>console.log('still to implement')}
+                    hoverIndicator='brand-transparent'
+                  /> 
                 )
               },
 

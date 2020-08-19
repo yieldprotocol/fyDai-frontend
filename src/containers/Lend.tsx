@@ -121,15 +121,16 @@ const Lend = ({ lendAmount }:ILendProps) => {
 
   /* handle active series loads and changes */
   useEffect(() => {
-    activeSeries.yDaiBalance_ && !(activeSeries.isMature) && ( async ()=> {
+    account && activeSeries && activeSeries.yDaiBalance_ && !(activeSeries.isMature) && ( async () => {
       const preview = await previewPoolTx('SellYDai', activeSeries.poolAddress, activeSeries.yDaiBalance_);
+      console.log(preview);
       setCurrentValue( parseFloat(ethers.utils.formatEther(preview)));
     })();
     ( async ()=>{
-      activeSeries && setApproved(await getTokenAllowance(deployedContracts.Dai, activeSeries.poolAddress, 'Dai'));
+      account && activeSeries && setApproved(await getTokenAllowance(deployedContracts.Dai, activeSeries.poolAddress, 'Dai'));
       console.log(activeSeries);
     })();
-  }, [ activeSeries ]);
+  }, [ activeSeries, account ]);
 
   return (
     <Keyboard 
@@ -192,6 +193,13 @@ const Lend = ({ lendAmount }:ILendProps) => {
                   onClick={()=>setInputValue(daiBalance_)}
                   hoverIndicator='brand-transparent'
                 />}
+                {/* {!account && screenSize !== 'small' &&
+                <Button 
+                  label={<Text size='xsmall' color='brand'>Connect a Wallet</Text>}
+                  color='brand-transparent'
+                  onClick={()=>console.log('connect a wallet')}
+                  hoverIndicator='brand-transparent'
+                />} */}
               </InputWrap>
 
               <InfoGrid entries={[
@@ -200,7 +208,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
                   visible: true,
                   active: inputValue,
                   loading: false,     
-                  value: APR?`${APR.toFixed(2)}%`:'- %',
+                  value: APR?`${APR.toFixed(2)}%`: `${activeSeries? activeSeries.yieldAPR_: ''}%`,
                   valuePrefix: null,
                   valueExtra: null, 
                 },
@@ -217,6 +225,22 @@ const Lend = ({ lendAmount }:ILendProps) => {
                   //     {activeSeries && Moment(activeSeries.maturity_).format('DD MMMM YYYY')}
                   //   </Text>
                   // ),
+                },
+                {
+                  label: 'Like what you see?',
+                  visible: !account,
+                  active: inputValue,
+                  loading: false,            
+                  value: '',
+                  valuePrefix: null,
+                  valueExtra: () => (
+                    <Button
+                      color='brand-transparent'
+                      label={<Text size='xsmall' color='brand'>Connect a wallet</Text>}
+                      onClick={()=>console.log('still to implement')}
+                      hoverIndicator='brand-transparent'
+                    /> 
+                  )
                 },
               ]}
               />

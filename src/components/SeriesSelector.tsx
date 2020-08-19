@@ -14,6 +14,8 @@ import { SeriesContext } from '../contexts/SeriesContext';
 import YieldSeriesSummary from './YieldSeriesSummary';
 // import YieldSeries from '../../components/YieldSeries';
 
+import AprBadge from './AprBadge';
+
 interface ISeriesSelectorProps {
   activeView:string;
   close:any;
@@ -45,10 +47,6 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
   React.useEffect(() => {
     !isLoading && setSeriesList(seriesData);
   }, [ seriesState ]);
-
-  // React.useEffect(() => {
-  //   !state.isLoading && setSeriesList(state.deployedSeries);
-  // }, [ state.isLoading ]);
 
   return (
     <Layer
@@ -103,25 +101,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
             pad='medium'
           >
 
-            {  ( activeSeries && !Number.isFinite(parseFloat(activeSeries.yieldAPR_)) ) ? 
-              <Box 
-                round 
-                border='all'
-                direction='row'
-                pad={{ horizontal:'small' }}
-                align='center'
-                background='orange'
-              >
-                <Text size='xxsmall'>
-                  { activeView.toUpperCase() === 'BORROW'? 'Temporarily Unavailable': 'Temporarily Unavailable' }         
-                </Text>
-              </Box>
-              :
-              <Box>
-                <Text alignSelf='start' size='medium' color='brand'>
-                  {activeSeries.yieldAPR_}%
-                </Text>
-              </Box>}
+            <AprBadge activeView={activeView} />
 
             <Box>
               <Text alignSelf='start' size='medium' color='brand'>
@@ -157,7 +137,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
             <Box
               key={x.name}
               id={x.name}
-              ref={(el:any) => {refs.current[i] = el;}}
+              // ref={(el:any) => {refs.current[i] = el;}}
             >
               <Box 
                 direction='row' 
@@ -190,7 +170,6 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
           </Box>
         </Box>
       </Box>
-
     </Layer>
   );
 };

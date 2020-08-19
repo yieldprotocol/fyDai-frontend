@@ -142,17 +142,16 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
           <InfoGrid entries={[
             {
               label: 'Current Collateral',
-              visible: true,
+              visible: !!account,
               active: true,
               loading: !!account && !ethPosted_ && depositPending && ethPosted_ !== 0,     
               value: ethPosted_ ? `${ethPosted_.toFixed(4)} Eth` : '0 Eth',
               valuePrefix: null,
               valueExtra: null, 
             },
-
             {
               label: 'Collateralization Ratio',
-              visible: true,
+              visible: !!account,
               active: collateralPercent_ > 0,
               loading: !!account && !ethPosted_ && depositPending && ethPosted_ !== 0,            
               value: (collateralPercent_ && (collateralPercent_ !== 0))? `${collateralPercent_}%`: '',
@@ -161,7 +160,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
             },
             {
               label: 'Ratio after Deposit',
-              visible: true,
+              visible: !!account,
               active: inputValue,
               loading: !!account && !ethPosted_ && depositPending && ethPosted_ !== 0,           
               value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
@@ -192,6 +191,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
             </Text>
           </Box>
 
+          { ethPosted_ > 0 &&
           <Box alignSelf='end'>
             <Box
               round
@@ -200,13 +200,12 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
               pad={{ horizontal:'small', vertical:'small' }}
               justify='center'
             >
-
               <Box direction='row' gap='small'>
                 <Text size='xsmall' color='text-weak'> alternatively, withdraw collateral</Text>
                 <ArrowRight color='text-weak' />
               </Box>
             </Box>
-          </Box>
+          </Box>}
        
         </Box>}   
         { postEthActive && !txActive && <ApprovalPending /> } 
