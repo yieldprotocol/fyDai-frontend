@@ -31,7 +31,7 @@ function AprBadge({ activeView, series }:IAprBadgeProps) {
           <Box 
             background={series.seriesColor}
             round='xlarge'  
-            pad={{ horizontal:'small' }} 
+            pad={{ horizontal:'small', vertical:'none' }} 
             align='center'
             justify='center'
           >
@@ -41,7 +41,7 @@ function AprBadge({ activeView, series }:IAprBadgeProps) {
             round
             border='all'
             direction='row'
-            pad={{ horizontal:'small' }}
+            pad={{ horizontal:'small', vertical:'none' }}
             align='center'
           >
             <Text size='xxsmall'>
@@ -56,12 +56,12 @@ function AprBadge({ activeView, series }:IAprBadgeProps) {
           round
           border='all'
           direction='row'
-          pad={{ horizontal:'small' }}
+          pad={{ horizontal:'small', vertical:'none' }}
           align='center'
           background='orange'
         >
           <Text size='xxsmall'>
-            Temporarily unavailable           
+            Unavailable      
           </Text>
         </Box>}  
     </>
