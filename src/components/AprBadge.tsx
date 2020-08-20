@@ -3,27 +3,33 @@ import moment from 'moment';
 import { Box, Text, ThemeContext, ResponsiveContext, Button } from 'grommet';
 
 import { SeriesContext } from '../contexts/SeriesContext';
+import { IYieldSeries } from '../types';
 
-function AprBadge({ activeView }:any) {
+interface IAprBadgeProps {
+  activeView: string;
+  series: IYieldSeries;
+}
 
-  const { state: seriesState } = useContext(SeriesContext);
-  const { activeSeries } = seriesState; 
+function AprBadge({ activeView, series }:IAprBadgeProps) {
 
-  const [ seriesApr, setSeriesApr ] = useState<string>(activeSeries && `${activeSeries.yieldAPR_} %`);
+  // const { state: seriesState } = useContext(SeriesContext);
+  // const { activeSeries } = seriesState;
+
+  const [ seriesApr, setSeriesApr ] = useState<string>(`${series.yieldAPR_} %`);
 
   /* Set Series description/display name */
   React.useEffect(()=>{
-    activeSeries && setSeriesApr(moment(activeSeries.maturity*1000).format('MMM \'YY'));
-    activeSeries && Number.isFinite(parseFloat(activeSeries.yieldAPR_)) && 
-      ( async () => setSeriesApr( `${activeSeries.yieldAPR_} %`) )();
-  }, [ activeSeries ]);
+    setSeriesApr(moment(series.maturity*1000).format('MMM \'YY'));
+    Number.isFinite(parseFloat(series.yieldAPR_||'')) && 
+      ( async () => setSeriesApr( `${series.yieldAPR_} %`) )();
+  }, [ series ]);
 
   return (
     <>
-      {Number.isFinite(parseFloat(activeSeries.yieldAPR_)) && 
-        ( activeSeries?.isMature === false ?         
+      {Number.isFinite(parseFloat(series.yieldAPR_||'')) && 
+        ( series?.isMature === false ?         
           <Box 
-            background={activeSeries.seriesColor}
+            background={series.seriesColor}
             round='xlarge'  
             pad={{ horizontal:'small' }} 
             align='center'
@@ -41,11 +47,11 @@ function AprBadge({ activeView }:any) {
             <Text size='xxsmall'>
               Matured        
             </Text>
-          </Box>)} 
+          </Box>)}
 
-      { activeSeries?.isMature === false && 
+      { series?.isMature === false && 
         activeView === 'borrow' && 
-        !Number.isFinite(parseFloat(activeSeries.yieldAPR_)) &&                  
+        !Number.isFinite(parseFloat(series.yieldAPR_||'')) &&                  
         <Box 
           round
           border='all'
