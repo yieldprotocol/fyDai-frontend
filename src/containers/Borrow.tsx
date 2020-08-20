@@ -6,6 +6,7 @@ import { Keyboard, Box, Button, TextInput, Text, ThemeContext, ResponsiveContext
 import { ScaleLoader } from 'react-spinners';
 
 import { 
+  FiClock as Clock,
   FiHelpCircle as Help,
 } from 'react-icons/fi';
 
@@ -84,7 +85,9 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
 
   /* flags */ 
   const [ hasDelegated, setHasDelegated] = React.useState<boolean>(activeSeries?.hasDelegatedController || true);
+
   const [ borrowPending, setBorrowPending ] = React.useState<boolean>(false);
+  const [ delegationPending, setDelegationPending ] = useState<boolean>(false);
 
   /* token balances and values */
   const [ inputValue, setInputValue ] = React.useState<any>(borrowAmount || undefined);
@@ -95,7 +98,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
   const [ approved, setApproved ] = React.useState<any>(0);
   const [ daiApproved, setDaiApproved ] = React.useState<any>(0);
 
-  const [ txActive ] = useTxActive(['borrow', 'buy', 'delegation']);
+  const [ txActive ] = useTxActive(['BORROW', 'BUY', 'DELEGATION']);
 
   const borrowProcedure = async (value:number, autoSell:boolean=true) => {
 
@@ -113,6 +116,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
   };
 
   const delegateProcedure = async () => {
+    setDelegationPending(true);
     // TODO uncomment the following lines if not using auto sell?
     // await addPoolDelegate(activeSeries.poolAddress, activeSeries.yDaiAddress);
     // const res = await checkPoolDelegate(activeSeries.poolAddress, activeSeries.yDaiAddress);
@@ -120,15 +124,52 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
     const res = await checkControllerDelegate(deployedContracts.Controller, activeSeries.daiProxyAddress);
     setHasDelegated(res);
     await seriesActions.updateActiveSeries();
+    setDelegationPending(false);
   };
 
-  /* ADVANCED SETTINGS setting approval limit */
-  const approveProcedure = async (value:number) => {
-    await approveToken(activeSeries.yDaiAddress, activeSeries.marketAddress, value);
-    const approvedYDai = await userAllowance(activeSeries.yDaiAddress, activeSeries.marketAddress);
-    setApproved( approvedYDai ); // TODO convert to Dai somehow
-  };
-  
+  /* 
+  * Handle input changes:
+  * 1. dai to yDai conversion and get APR (yDai needed to compare with the approved allowance)
+  * 2. calcalute yield APR
+  * 3. calculate estimated collateralisation ration
+  */
+  useEffect(() => {
+     
+    activeSeries && inputValue > 0 && ( async () => {
+      const newRatio = estimateRatio(position.ethPosted_, ( position.debtValue_+ parseFloat(inputValue)) ); 
+      newRatio && setEstRatio(newRatio.toFixed(0));
+      const preview = await previewPoolTx('buyDai', activeSeries.poolAddress, inputValue);
+      if (!preview.isZero()) {
+        setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
+        setAPR( yieldAPR( ethers.utils.parseEther(inputValue.toString()), preview, activeSeries.maturity ) );      
+        setWarningMsg(null);
+        setErrorMsg(null);
+      } else {
+        /* if the market doesnt have liquidity just estimate from rate */
+        const rate = await previewPoolTx('buyDai', activeSeries.poolAddress, 1);
+        setYDaiValue(inputValue* parseFloat((ethers.utils.formatEther(rate))) );
+        setBorrowDisabled(true);
+        setErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
+      }
+    })();
+  }, [inputValue, activeSeries]);
+
+  /* check delegation status on series change */
+  useEffect(() => {
+    activeSeries && ( async ()=>{
+      setHasDelegated(activeSeries.hasDelegatedController);
+    })();
+  }, [ activeSeries ]);
+    
+  /* Handle borrow disabling deposits */
+  useEffect(()=>{
+    (
+      !account ||
+      !hasDelegated || 
+      (inputValue && inputValue>0)
+    )? setBorrowDisabled(true): setBorrowDisabled(false);
+  }, [ inputValue, hasDelegated ]);
+
   /* Handle collateralisation ratio exceptions and warnings */
   useEffect(()=>{
     if (estRatio && estRatio <= 1.5) {
@@ -147,52 +188,6 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
     }
   }, [ estRatio ]);
 
-
-  /* 
-  * Handle input changes:
-  * 1. dai to yDai conversion and get APR (yDai needed to compare with the approved allowance)
-  * 2. calcalute yield APR
-  * 3. calculate estimated collateralisation ration
-  */
-  useEffect(() => {
-     
-    activeSeries && inputValue > 0 && ( async () => {
-
-      const newRatio = estimateRatio(position.ethPosted_, ( position.debtValue_+ parseFloat(inputValue)) ); 
-      newRatio && setEstRatio(newRatio.toFixed(0));
-
-      const preview = await previewPoolTx('buyDai', activeSeries.poolAddress, inputValue);
-      if (!preview.isZero()) {
-        setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
-        setAPR( yieldAPR( ethers.utils.parseEther(inputValue.toString()), preview, activeSeries.maturity ) );      
-        setWarningMsg(null);
-        setErrorMsg(null);
-      } else {
-        /* if the market doesnt have liquidity just estimate from rate */
-        const rate = await previewPoolTx('buyDai', activeSeries.poolAddress, 1);
-        setYDaiValue(inputValue* parseFloat((ethers.utils.formatEther(rate))) );
-        setBorrowDisabled(true);
-        setErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
-      }
-
-    })();
-
-  }, [inputValue]);
-
-  /* ADVANCED SETTINGS Handle yDai to Dai conversion for the approved Dai */
-  useEffect(() => {
-    approved && ( async () => {
-      const preview = await previewPoolTx('SellYDai', activeSeries.poolAddress, approved);
-      if (!preview.isZero()) {
-        setDaiApproved( parseFloat(ethers.utils.formatEther(preview)) );
-      } else {
-        /* market doesn't have liquidity - estimate from a rate */
-        const rate = await previewPoolTx('SellYDai', activeSeries.poolAddress, 1);
-        setDaiApproved( approved*parseFloat(ethers.utils.formatEther(rate)) );
-      }
-    })();
-  }, [ approved ]);
-
   /* Handle input execption logic */
   useEffect(() => {
     if ( inputValue && ( inputValue > maximumDai ) ) {
@@ -208,30 +203,29 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
     }
   }, [ inputValue ]);
 
-  /* Borrow button disabling logic */
-  // TODO split out advanced setting approval logic
-  useEffect(()=>{
-    if (!hasDelegated) {
-      setBorrowDisabled(true);
-    // } else if (approved < yDaiValue) {
-    //   setBorrowDisabled(true);
-    } else if (!(inputValue) || inputValue===0) {
-      setBorrowDisabled(true);
-    } else {
-      setBorrowDisabled(false);
-    }
-  }, [ approved, inputValue, yDaiValue, hasDelegated ]);
 
+  /* ADVANCED SETTINGS setting approval limit. */
+  const approveProcedure = async (value:number) => { 
+    await approveToken(activeSeries.yDaiAddress, activeSeries.marketAddress, value);
+    const approvedYDai = await userAllowance(activeSeries.yDaiAddress, activeSeries.marketAddress);
+    setApproved( approvedYDai ); // TODO convert to Dai somehow
+  };
 
+  /* ADVANCED SETTINGS Handle yDai to Dai conversion for the approved Dai */
   useEffect(() => {
-    console.log(activeSeries);
-    activeSeries && ( async ()=>{
-      // TODO split out advanced approval settings for optimization
-      const approvedAmount = await userAllowance(activeSeries.yDaiAddress, activeSeries.poolAddress);
-      setApproved( parseFloat(approvedAmount.toString()));
-      setHasDelegated(activeSeries.hasDelegatedController);
+    approved && ( async () => {
+      const preview = await previewPoolTx('SellYDai', activeSeries.poolAddress, approved);
+      if (!preview.isZero()) {
+        setDaiApproved( parseFloat(ethers.utils.formatEther(preview)) );
+      } else {
+        /* market doesn't have liquidity - estimate from a rate */
+        const rate = await previewPoolTx('SellYDai', activeSeries.poolAddress, 1);
+        setDaiApproved( approved*parseFloat(ethers.utils.formatEther(rate)) );
+      }
     })();
-  }, [ activeSeries ]);
+  }, [ approved ]);
+
+
 
   return (
     <Keyboard 
@@ -250,128 +244,165 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
             <InfoGrid entries={[
               {
                 label: 'Current Debt',
-                visible: !!account,
+                visible: !!account && activeSeries && !activeSeries?.isMature || (activeSeries?.isMature && activeSeries?.ethDebtYDai_ > 0 ),
                 active: true,
-                loading: borrowPending,     
+                loading: borrowPending,    
                 value: activeSeries?.ethDebtYDai_? `${activeSeries.ethDebtYDai_.toFixed(2)} DAI`: '0 DAI',
                 valuePrefix: null,
                 valueExtra: null, 
               },
-
               {
                 label: 'Max Borrowing Power',
-                visible: !!account,
+                visible: activeSeries && !activeSeries.isMature  && !!account,
                 active: maximumDai,
                 loading: borrowPending,           
                 value: maximumDai ? `${maximumDai.toFixed(2)} DAI`: '',
                 valuePrefix: 'Approx.',
                 valueExtra: null,
               },
-            ]}
-            />
-      
-            {account && !hasDelegated && 
-            <OnceOffAuthorize
-              authProcedure={delegateProcedure} 
-              authMsg='Allow Yield trade on your behalf' 
-              txPending={txActive?.type === 'DELEGATION'}  
-            />}
-
-            <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to borrow</Text>
-
-            <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={borrowDisabled}>
-              <TextInput
-                type="number"
-                placeholder={screenSize !== 'small' ? 'Enter the amount of DAI to borrow': 'DAI'} 
-                value={inputValue || ''}
-                // disabled={depositDisabled}
-                plain
-                onChange={(event:any) => setInputValue(event.target.value)}
-                icon={<DaiMark />}
-              />
-            </InputWrap>
-
-            <InfoGrid entries={[
               {
-                label: 'Estimated APR',
-                visible: true,
-                active: inputValue,
-                loading: false,     
-                value: APR?`${APR.toFixed(2)}%`: `${activeSeries? activeSeries.yieldAPR_: ''}%`,
-                valuePrefix: null,
-                valueExtra: null, 
-              },
-              {
-                label: 'Approx. DAI owed at maturity',
-                visible: true,
-                active: inputValue,
-                loading: false,           
-                value: `${yDaiValue.toFixed(2)} DAI`,
-                valuePrefix: null,
-              // valueExtra: () => (
-              //   <Text size='xxsmall'>
-              //     {activeSeries && Moment(activeSeries.maturity_).format('DD MMMM YYYY')}
-              //   </Text>
-              // ),
-              },
-
-              {
-                label: 'Ratio after Borrow',
-                visible: !!account,
-                active: inputValue,
-                loading: false,            
-                value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
-                valuePrefix: 'Approx.',
-                valueExtra: () => (
-                  <Text color='red' size='small'> 
-                    { inputValue && estRatio && ( (collateralPercent_- estRatio) !== 0) && `(- ${(collateralPercent_- estRatio).toFixed(0)}%)` }
-                  </Text>
-                )
-              },
-              {
-                label: 'Like what you see?',
-                visible: !account,
-                active: inputValue,
-                loading: false,            
+                label: 'Repay Debt',
+                visible: !!account && activeSeries?.isMature && activeSeries?.ethDebtYDai_ > 0,
+                active: true,
+                loading: false,    
                 value: '',
                 valuePrefix: null,
                 valueExtra: () => (
                   <Button
                     color='brand-transparent'
-                    label={<Text size='xsmall' color='brand'>Connect a wallet</Text>}
+                    label={<Text size='xsmall' color='brand'>Repay debt</Text>}
                     onClick={()=>console.log('still to implement')}
                     hoverIndicator='brand-transparent'
                   /> 
-                )
+                ),
               },
-
             ]}
-            />
+            />     
+            {account && !hasDelegated && !activeSeries?.isMature &&
+            <OnceOffAuthorize
+              authProcedure={delegateProcedure} 
+              authMsg='Allow Yield trade on your behalf'
+              awaitingApproval={delegationPending && !txActive}
+              txPending={txActive?.type === 'DELEGATION'}  
+            />}
+            { activeSeries && !activeSeries.isMature? 
+              <>
+                <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to borrow</Text>
 
-            { account &&          
-            <Box
-              fill='horizontal'
-              round='small' 
-              background={!(inputValue>0) || borrowDisabled ? 'brand-transparent' : 'brand'} 
-              onClick={()=>borrowProcedure(inputValue)} 
+                <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={borrowDisabled}>
+                  <TextInput
+                    type="number"
+                    placeholder={screenSize !== 'small' ? 'Enter the amount of DAI to borrow': 'DAI'} 
+                    value={inputValue || ''}
+                // disabled={depositDisabled}
+                    plain
+                    onChange={(event:any) => setInputValue(event.target.value)}
+                    icon={<DaiMark />}
+                  />
+                </InputWrap>
+
+                <InfoGrid entries={[
+                  {
+                    label: 'Estimated APR',
+                    visible: true,
+                    active: inputValue,
+                    loading: false,     
+                    value: APR?`${APR.toFixed(2)}%`: `${activeSeries? activeSeries.yieldAPR_: ''}%`,
+                    valuePrefix: null,
+                    valueExtra: null, 
+                  },
+                  {
+                    label: 'Approx. DAI owed at maturity',
+                    visible: true,
+                    active: inputValue,
+                    loading: false,           
+                    value: `${yDaiValue.toFixed(2)} DAI`,
+                    valuePrefix: null,
+                  // valueExtra: () => (
+                  //   <Text size='xxsmall'>
+                  //     {activeSeries && Moment(activeSeries.maturity_).format('DD MMMM YYYY')}
+                  //   </Text>
+                  // ),
+                  },
+
+                  {
+                    label: 'Ratio after Borrow',
+                    visible: !!account,
+                    active: inputValue,
+                    loading: false,            
+                    value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
+                    valuePrefix: 'Approx.',
+                    valueExtra: () => (
+                      <Text color='red' size='small'> 
+                        { inputValue && estRatio && ( (collateralPercent_- estRatio) !== 0) && `(- ${(collateralPercent_- estRatio).toFixed(0)}%)` }
+                      </Text>
+                    )
+                  },
+                  {
+                    label: 'Like what you see?',
+                    visible: !account,
+                    active: inputValue,
+                    loading: false,            
+                    value: '',
+                    valuePrefix: null,
+                    valueExtra: () => (
+                      <Button
+                        color='brand-transparent'
+                        label={<Text size='xsmall' color='brand'>Connect a wallet</Text>}
+                        onClick={()=>console.log('still to implement')}
+                        hoverIndicator='brand-transparent'
+                      /> 
+                    )
+                  },
+
+                ]}
+                />
+
+                { account &&          
+                <Box
+                  fill='horizontal'
+                  round='small' 
+                  background={!(inputValue>0) || borrowDisabled ? 'brand-transparent' : 'brand'} 
+                  onClick={()=>borrowProcedure(inputValue)} 
             // onClick={()=>borrowProcedure(inputValue)}
-              align='center'
-              pad='small'
-            >
-              <Text 
-                weight='bold'
-                size='large'
-                color={!(inputValue>0) || borrowDisabled ? 'text-xweak' : 'text'}
-              >
-                {`Borrow ${inputValue || ''} DAI`}
-              </Text>
-            </Box>}
+                  align='center'
+                  pad='small'
+                >
+                  <Text 
+                    weight='bold'
+                    size='large'
+                    color={!(inputValue>0) || borrowDisabled ? 'text-xweak' : 'text'}
+                  >
+                    {`Borrow ${inputValue || ''} DAI`}
+                  </Text>
+                </Box>}
+
+              </>
+              : 
+
+              <Box 
+                gap='medium' 
+                margin={{ vertical:'large' }}  
+                pad='medium'     
+                round='small'
+                fill='horizontal'
+                border='all'
+              >    
+                <Box direction='row' gap='small' align='center' fill>          
+                  <Box>
+                    <Clock />
+                  </Box>
+                  <Box> 
+                    <Text size='xlarge' color='brand' weight='bold'>This series has matured.</Text>         
+                  </Box>
+                </Box>             
+              </Box>}
 
           </Box>
         </Box> }
 
         { borrowActive && !txActive && <ApprovalPending /> } 
-        { txActive && <TransactionPending msg={`You borrowed ${inputValue} DAI.`} tx={txActive} /> }
+        { txActive && txActive !== 'DELEGATION' && <TransactionPending msg={`You borrowed ${inputValue} DAI.`} tx={txActive} /> }
       </>
     </Keyboard>
   );

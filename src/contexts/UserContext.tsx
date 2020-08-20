@@ -183,6 +183,7 @@ const UserProvider = ({ children }: any) => {
       maxDaiAvailable_ : utils.wadToHuman(maxDaiAvailable),
     };
 
+    console.log('User updated:');
     console.log({ ...values, ...parsedValues } );
     dispatch( { type: 'updatePosition', payload: { ...values, ...parsedValues } } );
     return { ...values, ...parsedValues };

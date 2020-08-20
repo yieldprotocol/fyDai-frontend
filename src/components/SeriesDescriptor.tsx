@@ -52,7 +52,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps, children:any) {
             <ScaleLoader color={theme?.global?.colors['brand-transparent'].dark} height='13' /> :
             <Box direction='row' gap='small'> 
               
-              <AprBadge activeView={activeView} />
+              <AprBadge activeView={activeView} series={activeSeries} />
 
               <Text color='brand' size='large'>            
                 { activeSeries.displayName }
