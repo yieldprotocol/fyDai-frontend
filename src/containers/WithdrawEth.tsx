@@ -1,18 +1,14 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { Box, Layer, Button, Keyboard, TextInput, Text, CheckBox } from 'grommet';
 import { 
-  FiInfo as Info,
   FiArrowLeft as ArrowLeft,
 } from 'react-icons/fi';
-import { FaEthereum as Ethereum } from 'react-icons/fa';
-import { SeriesContext } from '../contexts/SeriesContext';
+
 import { YieldContext } from '../contexts/YieldContext';
 import { UserContext } from '../contexts/UserContext';
 
-import { useProxy, useController, useMath } from '../hooks';
+import { useProxy, useController, useMath, useTxActive } from '../hooks';
 
-import { NotifyContext } from '../contexts/NotifyContext';
-import InlineAlert from '../components/InlineAlert';
 import OnceOffAuthorize from '../components/OnceOffAuthorize';
 import ApprovalPending from '../components/ApprovalPending';
 import TransactionPending from '../components/TransactionPending';
@@ -37,7 +33,6 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
     debtValue_,
   } = position;
 
-
   const [ estRatio, setEstRatio ] = useState<any>();
   const [ estDecrease, setEstDecrease ] = useState<any>();
 
@@ -46,67 +41,44 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
   const [ hasDelegated, setHasDelegated ] = useState<boolean>( delegations.ethProxy || false);
 
   const [ withdrawDisabled, setWithdrawDisabled ] = useState<boolean>(false);
+  const [ withdrawPending, setWithdrawPending ] = useState<boolean>(false);
+  const [ delegationPending, setDelegationPending ] = useState<boolean>(false);
+
   const [ indicatorColor, setIndicatorColor ] = useState<string>('brand');
+
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
 
   const { withdrawEth, withdrawEthActive }  = useProxy();
   const { addControllerDelegate, checkControllerDelegate } = useController();
   const { estCollRatio: estimateRatio } = useMath();
+  const [ txActive ] = useTxActive(['WITHDRAW', 'DELEGATION']);
 
   const withdrawProcedure = async (value:number) => {
-    if (!withdrawDisabled && inputValue>0 && hasDelegated ) {
+    if ( !withdrawDisabled ) {
+      setWithdrawPending(true);
       await withdrawEth(deployedContracts.EthProxy, value);
       userActions.updatePosition();
+      setWithdrawPending(false);
       close();
     }
   };
 
   const delegateProcedure = async () => {
+    setDelegationPending(true);
     await addControllerDelegate(deployedContracts.Controller, deployedContracts.EthProxy);
     const res = await checkControllerDelegate(deployedContracts.Controller, deployedContracts.EthProxy);
     setHasDelegated(res);
+    setDelegationPending(false);
   };
 
-  // TODO: maybe split into a custom hook
-  const { state: { pendingTxs } } = React.useContext(NotifyContext);
-
-  const [txActive, setTxActive] = React.useState<any>(null);
-  useEffect(()=>{
-    setTxActive(pendingTxs.find((x:any)=> ( x.type === 'WITHDRAW' || x.type === 'APPROVAL')));
-  }, [ pendingTxs ]);
-
+  /* Calculate maximum available to withdraw */
   useEffect(()=>{
     setMaxWithdraw(ethPosted_ - ethLocked_);
   }, [ethPosted_, ethLocked_]);
 
-  /* show warnings and errors with collateralisation ratio levels */
+  /* Calculate collateralization Ratio based on input */ 
   useEffect(()=>{
-
-    if (estRatio < 150) {
-      setWithdrawDisabled(true);
-      setIndicatorColor('red');
-      setWarningMsg(null);
-      setErrorMsg('You are not allowed to withdraw below the collateralization ratio'); 
-    } else if (estRatio >= 150 && estRatio < 250 ) {
-      setIndicatorColor('orange');
-      setErrorMsg(null);
-      setWarningMsg('Your collateralisation ration will put you at risk of liquidation');
-    } else {
-      setWithdrawDisabled(false);
-      setIndicatorColor('brand');
-      setWarningMsg(null);
-      setErrorMsg(null);
-    }
-  }, [ estRatio ]);
-
-  useEffect(()=>{
-
-    if ( (inputValue > maxWithdraw) ){
-      setWithdrawDisabled(true);
-    } else { 
-      setWithdrawDisabled(false);
-    }
     if ( (ethPosted_ > inputValue) && inputValue && debtValue_) {
       const newRatio = estimateRatio((ethPosted_- parseFloat(inputValue)), debtValue_); 
       if (newRatio) {
@@ -116,6 +88,32 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
       }
     }
   }, [ inputValue ]);
+
+  /* handle withdraw disabled */
+  useEffect(()=>{
+    ( 
+      inputValue > maxWithdraw || 
+      !hasDelegated || 
+      estRatio < 150
+    )? setWithdrawDisabled(true) : setWithdrawDisabled(false);
+  }, [ inputValue, estRatio ]);
+
+  /* show warnings and errors with collateralisation ratio levels and inputs */
+  useEffect(()=>{
+    if (estRatio < 150 || inputValue > maxWithdraw ) {
+      setIndicatorColor('red');
+      setWarningMsg(null);
+      setErrorMsg('You are not allowed to withdraw below the collateralization ratio'); 
+    } else if (estRatio >= 150 && estRatio < 250 ) {
+      setIndicatorColor('orange');
+      setErrorMsg(null);
+      setWarningMsg('Your collateralisation ration will put you at risk of liquidation');
+    } else {   
+      setIndicatorColor('brand');
+      setWarningMsg(null);
+      setErrorMsg(null);
+    }
+  }, [ estRatio, inputValue ]);
 
   /* startup effects, if any */
   useEffect(()=>{
@@ -131,7 +129,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
         target='document'
       >
         <>
-          { !txActive && !withdrawEthActive && 
+          { !txActive && !withdrawPending && 
           <Box 
             width={{ max:'750px' }}
             alignSelf='center'
@@ -148,6 +146,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
             <OnceOffAuthorize 
               authProcedure={delegateProcedure}
               authMsg='Authorise ETH withdrawals'
+              awaitingApproval={delegationPending && !txActive}
               txPending={txActive?.type === 'DELEGATION'}
             />}
 
@@ -155,7 +154,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
               <TextInput
                 type="number"
                 placeholder='ETH'
-                disabled={withdrawEthActive}
+                disabled={!hasDelegated}
                 value={inputValue || ''}
                 plain
                 onChange={(event:any) => setInputValue(event.target.value)}
@@ -163,6 +162,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
               />
               <Button 
                 label='Max'
+                disabled={!hasDelegated}
                 color='brand-transparent'
                 onClick={()=>setInputValue(maxWithdraw)}
                 hoverIndicator='brand-transparent'
@@ -173,7 +173,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
               {
                 label: 'Max withdraw',
                 visible: true,
-                active: true,
+                active: hasDelegated,
                 loading: false, 
                 value: ethPosted_ ? `${maxWithdraw.toFixed(2)} Eth` : '-',
                 valuePrefix: null,
@@ -218,22 +218,50 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
                 round
                 onClick={()=>close()}
                 hoverIndicator='brand-transparent'
-          // border='all'
+                // border='all'
                 pad={{ horizontal:'small', vertical:'small' }}
                 justify='center'
               >
                 <Box direction='row' gap='small' align='center'>
                   <ArrowLeft color='text-weak' />
-                  <Text size='xsmall' color='text-weak'> { !withdrawEthActive? 'cancel, and go back.': 'go back'}  </Text>
+                  <Text size='xsmall' color='text-weak'> { !withdrawPending? 'cancel, and go back.': 'go back'}  </Text>
                 </Box>
               </Box>
             </Box>
-        
-
-
+            
           </Box>}
-          { withdrawEthActive && !txActive && <ApprovalPending /> }
-          { txActive && <TransactionPending msg={`You made a withdrawal of ${inputValue} Eth.`} tx={txActive} /> }
+
+          { withdrawPending && !txActive && <ApprovalPending /> }
+          
+          { txActive && 
+            txActive.type !== 'DELEGATION' && 
+            <Box 
+              width={{ max:'750px' }}
+              alignSelf='center'
+              fill
+              background='background-front'
+              round='small'
+              pad='large'
+              gap='medium'
+              justify='between'
+            > 
+              <TransactionPending msg={`You made a withdrawal of ${inputValue} Eth.`} tx={txActive} />
+              <Box alignSelf='start'>
+                <Box
+                  round
+                  onClick={()=>close()}
+                  hoverIndicator='brand-transparent'
+                // border='all'
+                  pad={{ horizontal:'small', vertical:'small' }}
+                  justify='center'
+                >
+                  <Box direction='row' gap='small' align='center'>
+                    <ArrowLeft color='text-weak' />
+                    <Text size='xsmall' color='text-weak'> { !withdrawPending? 'cancel, and go back.': 'go back'}  </Text>
+                  </Box>
+                </Box>
+              </Box>
+            </Box>}
         </>
       </Keyboard>
     </Layer>

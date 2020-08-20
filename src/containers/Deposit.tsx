@@ -47,8 +47,10 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
   const [ inputValue, setInputValue ] = useState<any>(depositAmount || undefined);
   const [ estRatio, setEstRatio ] = useState<any>(0);
   const [ withdrawOpen, setWithdrawOpen ] = useState<boolean>(false);
+
   const [ depositPending, setDepositPending ] = useState<boolean>(true);
   const [ depositDisabled, setDepositDisabled ] = useState<boolean>(false);
+
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
 
@@ -70,17 +72,17 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
 
   const { postEth, postEthActive }  = useProxy();
   const { estCollRatio: estimateRatio } = useMath();
-  const [ txActive ] = useTxActive(['Deposit']);
+  const [ txActive ] = useTxActive(['DEPOSIT', 'WITHDRAW']);
   const { account } = useSignerAccount();
 
   /* Steps required to deposit and update values */
   const depositProcedure = async (value:number) => {
-    if ( inputValue>0 && !depositDisabled ) {
+    if ( !depositDisabled ) {
       setDepositPending(true);
       await postEth(deployedContracts.EthProxy, value);
       await userActions.updatePosition();
       setDepositPending(false);
-      setActiveView('BORROW');
+      // setActiveView('BORROW');
     }
   };
 
@@ -91,33 +93,39 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
       const newRatio = estimateRatio((ethPosted_+ parseFloat(inputValue)), debtValue_); 
       newRatio && setEstRatio(newRatio.toFixed(0));
     }
-
     /* 2. Input errors and warnings */
     if ( inputValue && ( inputValue > ethBalance_) ) {
-      setDepositDisabled(true);
       setWarningMsg(null);
       setErrorMsg('That amount exceeds your available ETH balance'); 
     } else if (inputValue && (inputValue === ethBalance_) ) {
       setErrorMsg(null);
       setWarningMsg('If you deposit all your ETH you may not be able to make any further transactions!');
     } else {
-      setDepositDisabled(false);
       setWarningMsg(null);
       setErrorMsg(null);
     }
   }, [inputValue]);
 
-  return (
+  /* Handle deposit disabling deposits */
+  useEffect(()=>{   
+    (
+      !account || 
+      ethBalance_ <= 0 || 
+      txActive ||
+      (inputValue && inputValue>0 && inputValue > ethBalance_)      
+    ) ? setDepositDisabled(true) : setDepositDisabled(false);
+  }, [inputValue]);
 
+  return (
     <Keyboard 
       onEsc={() => setInputValue(undefined)}
-      onEnter={()=>depositProcedure(inputValue)}
+      onEnter={()=> depositProcedure(inputValue)}
       target='document'
     >
       <>
         { withdrawOpen && <WithdrawEth close={()=>setWithdrawOpen(false)} /> }
         
-        { !txActive &&
+        { (!txActive || txActive?.type === 'WITHDRAW') &&
         <Box gap='small'>
           <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to deposit</Text>
 
@@ -133,6 +141,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
             />
             <Button
               color='brand-transparent'
+              disabled={ethBalance_=== 0}
               label={<Text size='xsmall' color='brand'> { (screenSize !== 'small' && !modalView) ? 'Deposit Maximum': 'Max'}</Text>}
               onClick={()=>setInputValue(ethBalance_)}
               hoverIndicator='brand-transparent'
@@ -144,7 +153,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
               label: 'Current Collateral',
               visible: !!account,
               active: true,
-              loading: !!account && !ethPosted_ && depositPending && ethPosted_ !== 0,     
+              loading: (!ethPosted_ && depositPending && ethPosted_ !== 0) || txActive?.type ==='WITHDRAW',     
               value: ethPosted_ ? `${ethPosted_.toFixed(4)} Eth` : '0 Eth',
               valuePrefix: null,
               valueExtra: null, 
@@ -153,7 +162,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
               label: 'Collateralization Ratio',
               visible: !!account && collateralPercent_ > 0,
               active: collateralPercent_ > 0,
-              loading: !!account && !ethPosted_ && depositPending && ethPosted_ !== 0,            
+              loading: !ethPosted_ && depositPending && ethPosted_ !== 0,            
               value: (collateralPercent_ && (collateralPercent_ !== 0))? `${collateralPercent_}%`: '',
               valuePrefix: null,
               valueExtra: null, 
@@ -162,7 +171,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
               label: 'Ratio after Deposit',
               visible: !!account && collateralPercent_ > 0,
               active: inputValue,
-              loading: !!account && !ethPosted_ && depositPending && ethPosted_ !== 0,           
+              loading: !ethPosted_ && depositPending && ethPosted_ !== 0,           
               value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
               valuePrefix: 'Approx.',
               valueExtra: () => (
@@ -209,7 +218,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
        
         </Box>}   
         { postEthActive && !txActive && <ApprovalPending /> } 
-        { txActive && <TransactionPending msg={`You deposited ${inputValue} Eth.`} tx={txActive} /> }
+        { txActive && txActive.type !== 'WITHDRAW' && <TransactionPending msg={`You deposited ${inputValue} Eth.`} tx={txActive} /> }
       </>
     </Keyboard>
   );
