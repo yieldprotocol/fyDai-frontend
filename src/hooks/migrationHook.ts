@@ -1,7 +1,5 @@
 import React from 'react';
 import { ethers, BigNumber }  from 'ethers';
-import { NotifyContext } from '../contexts/NotifyContext';
-// import { ConnectionContext } from '../contexts/ConnectionContext';
 import { useSignerAccount } from './connectionHooks';
 
 import Migration from '../contracts/Migrations.json';
@@ -23,10 +21,7 @@ export const useMigrations = () => {
 
   // const { state: { signer, account } } = React.useContext(ConnectionContext);
   const { provider, fallbackProvider, signer, account } = useSignerAccount();
-
   const { abi: migrationAbi } = Migration;
-  const  { dispatch }  = React.useContext<any>(NotifyContext);
-
   const [migrationAddress, setMigrationsAddress] = React.useState<string>(process.env.REACT_APP_MIGRATION || '');
   
   React.useEffect(()=>{
