@@ -22,9 +22,7 @@ const ApprovalPending = React.forwardRef( (props, ref) => {
         <Text weight='bold'>Transaction pending approval.</Text>
 
         <Text>Please check your wallet/provider to confirm the transaction.</Text>
-
-        <Text>Please check your wallet/provider to confirm the transaction.</Text>
-        
+       
         {/* <Button
           label="Toggle gutter size"
           // onClick={() => setGutter(gutter === 'small' ? 'xsmall' : 'small')}
