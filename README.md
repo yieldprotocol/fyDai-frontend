@@ -1,7 +1,8 @@
 # yDai-frontend
 Front end for yDai 
 
-### Start a new locally served ganache instance to test the frontend UI > 
+
+### Start a new locally served ganache instance to test the frontend UI:  
 
 1. Clone the yDai repositiory: https://github.com/yieldprotocol/yDai.git  (working commit: bfd4cbe4cee392c4e09b84849a4983c1c1a6b788 ):  
 `git clone https://github.com/yieldprotocol/yDai.git`  
@@ -27,7 +28,7 @@ Front end for yDai
 Output: 'Market Initiated' on success. 
 
 
-### Clone in and Run the frontend in a development server
+### Run the frontend on a development server: 
 
 1. Clone this repository  
 `git clone https://github.com/yieldprotocol/yDai-frontend.git`
@@ -35,13 +36,25 @@ Output: 'Market Initiated' on success.
 2. In a new console, Install and launch the development server:  
 `yarn && yarn start`  
 *possibly required* : Setting the migration contract (when using custom mnemonic to start ganache check migration address on startup):  
-`REACT_APP_MIGRATION = '0xAC172aca69D11D28DFaadbdEa57B01f697b34158' && yarn start`  - if using linux/mac  
-`($env:REACT_APP_MIGRATION = '0xF4909eDC42bdA8eFCdF179B1C6ECBb00719e541a') -and (yarn start)`  - if using windows powershell  
+`REACT_APP_MIGRATION_1337 = '0xAC172aca69D11D28DFaadbdEa57B01f697b34158' && yarn start`  - if using linux/mac  
+`($env:REACT_APP_MIGRATION_1337 = '0xF4909eDC42bdA8eFCdF179B1C6ECBb00719e541a') -and (yarn start)`  - if using windows powershell  
 `set "REACT_APP_NOT_SECRET_CODE=abcdef" && npm start` - if using windows cmd.exe  
 *for optimised build* :  
 `REACT_APP_MIGRATION = '0xAC172aca69D11D28DFaadbdEa57B01f697b34158' && yarn build`  - if using linux/mac  
 `($env:REACT_APP_MIGRATION = '0xF4909eDC42bdA8eFCdF179B1C6ECBb00719e541a') -and (yarn build)`  - if using windows powershell  
 `set "REACT_APP_NOT_SECRET_CODE=abcdef" && yarn build` - if using windows cmd.exe
 
-NB: Make sure you reset your metamask on every reload of the blockchain.  
+### Supported networks:
+
+1. Ganache localhost --default  
+Chain id: 1337  
+Migrations contract address: Based on mnemonic of your choice  
+**NB. Change/override .env variable `REACT_APP_MIGRATION_1337` with the migration address**
+
+2. Rinkeby
+Chain ID: 4  
+Migrations contract address: '0x08475B228575eFCb2e5d71E1B737deCeEdf21Db8'
+
+### Known Gotchas
+1. Make sure you reset your metamask on every reload of the blockchain.  
 *metamask > advanced settings > reset*

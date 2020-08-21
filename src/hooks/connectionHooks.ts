@@ -126,7 +126,7 @@ export function useConnection() {
     activate: fallbackActivate,
   } = useWeb3React('fallback');
 
-  /* web3 initiate automatically irrespective of state */
+  /* try web3 initiate automatically irrespective of state */
   const [activatingConnector, setActivatingConnector] = React.useState<any>();
   React.useEffect(() => {
     if (activatingConnector && activatingConnector === connector) {
@@ -143,7 +143,18 @@ export function useConnection() {
       fallbackConnector && console.log('fallback connected via RPC to chain:', fallbackChainId);
     })();
   }, [fallbackConnector]);
-  
+
+  /* Watch the injected chain and match the fallbackProvider accordingly */
+  React.useEffect(() => {
+    if ( chainId && chainId !== fallbackChainId ) {
+      localStorage.clear();
+      console.log('Network Changed to ', chainId, ' changing fallback provider, accordlingly.');
+      // @ts-ignore
+      fallbackConnector.changeChainId(chainId);
+    }
+  }, [ chainId ]);
+
+  /* handle changing connector */
   const handleSelectConnector = async (_connection: any) => {
     await activate(    
       _connection, 

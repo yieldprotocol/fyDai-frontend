@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { ethers } from 'ethers';
-import { Box, Button, Layer, CheckBox, TextInput, Text, Keyboard } from 'grommet';
+import { Box, Button, Layer, CheckBox, TextInput, Text, Keyboard, ThemeContext } from 'grommet';
 import { 
   FiInfo as Info,
   FiArrowLeft as ArrowLeft,
@@ -13,6 +13,7 @@ import { UserContext } from '../contexts/UserContext';
 
 import InputWrap from '../components/InputWrap';
 import DaiMark from '../components/logos/DaiMark';
+import { ScaleLoader } from 'react-spinners';
 
 
 interface IWithDrawDaiProps {
@@ -36,6 +37,8 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
   const [ yDaiValue, setYDaiValue ] = React.useState<number>(0);
 
   const [ withdrawDisabled, setWithdrawDisabled ] = useState<boolean>(true);
+  const [ withdrawPending, setWithdrawPending] = useState<boolean>(false);
+
   const [ indicatorColor, setIndicatorColor ] = useState<string>('brand');
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
@@ -44,16 +47,21 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
   const { userAllowance } = useYDai();
   const { approveToken, approveActive } = useToken();
 
-  const withdrawProcedure = async (value:number) => {
+  const theme:any = React.useContext(ThemeContext);
 
+  const withdrawProcedure = async (value:number) => {
     if ( inputValue>0 && !withdrawDisabled ) {
+      setWithdrawPending(true);
       await buyDai(
         activeSeries.poolAddress,
         inputValue,
         0 // transaction queue value
       );
-      await userActions.updatePosition();
-      await seriesActions.updateActiveSeries();
+      await Promise.all([
+        userActions.updatePosition(),
+        seriesActions.updateActiveSeries()
+      ]);
+      setWithdrawPending(true);
       close();
     }
   };
@@ -136,17 +144,20 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
               />
             </InputWrap>
 
-            <Box>
-              <CheckBox 
-                reverse
-                // value={true}
-                checked={!inputValue || ( approved >= inputValue )}
-                disabled={!inputValue || ( approved >= inputValue )}
-                onChange={()=>approveProcedure(yDaiValue)}
-                label={(approved >= yDaiValue) ? 
-                  `~${daiApproved.toFixed(2)} Dai unlocked (${approved.toFixed(2) || '' } yDai)` 
-                  : `Unlock ${inputValue || ''} Dai`}
-              />
+            <Box margin='medium'>
+              {approveActive || approved === undefined ?             
+                <ScaleLoader color={theme?.global?.colors['brand-transparent'].dark} height='13' />
+                : <CheckBox
+                  reverse
+                  checked={approved && !inputValue || ( approved >= inputValue )}
+                  disabled={!inputValue || ( approved >= inputValue )}
+                  onChange={()=>approveProcedure(inputValue)}
+                  label={            
+                  (approved >= inputValue) ? 
+                    `~${daiApproved.toFixed(2)} Dai unlocked (${approved.toFixed(2) || '' } yDai)` 
+                    : `Unlock ${inputValue || ''} Dai`
+                }
+                />}
             </Box>
 
             <Box

@@ -240,6 +240,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
 
             <SeriesDescriptor activeView='borrow' />
 
+            { hasDelegated &&
             <InfoGrid entries={[
               {
                 label: 'Current Debt',
@@ -276,7 +277,8 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
                 ),
               },
             ]}
-            />     
+            /> } 
+              
             {account && !hasDelegated && !activeSeries?.isMature &&
             <OnceOffAuthorize
               authProcedure={delegateProcedure} 
@@ -286,7 +288,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
             />}
 
             { activeSeries && !activeSeries?.isMature && 
-              <>
+              <Box gap='medium' align='center' fill='horizontal'>
                 <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to borrow</Text>
 
                 <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={borrowDisabled}>
@@ -338,7 +340,8 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
                         inputValue &&
                         estRatio &&
                         ( (collateralPercent_- estRatio) > 0) &&
-                        `(-${(collateralPercent_-estRatio).toFixed(0)}%)`}
+                        `(-${(collateralPercent_-estRatio).toFixed(0)}%)`
+}
                       </Text>
                     )
                   },
@@ -380,7 +383,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
                     {`Borrow ${inputValue || ''} DAI`}
                   </Text>
                 </Box>}
-              </>}
+              </Box>}
             { activeSeries && activeSeries.isMature &&
               <Box 
                 gap='medium' 

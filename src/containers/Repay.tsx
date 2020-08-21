@@ -77,8 +77,10 @@ function Repay({ repayAmount }:IRepayProps) {
       await repay(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value, 'Dai' );
       setApproved(await getTokenAllowance(deployedContracts.Dai, deployedContracts.Treasury, 'Dai'));
       setInputValue('');
-      await userActions.updatePosition();
-      await seriesActions.updateActiveSeries(); // or, await seriesActions.updateSeries([activeSeries]);
+      await Promise.all([
+        userActions.updatePosition(),
+        seriesActions.updateActiveSeries()
+      ]);
       setRepayPending(false);
     }
   };
@@ -165,7 +167,7 @@ function Repay({ repayAmount }:IRepayProps) {
                 label: 'Current Debt',
                 visible: !!account,
                 active: true,
-                loading: false,     
+                loading: repayPending,     
                 value: activeSeries?.ethDebtYDai_? `${activeSeries.ethDebtYDai_.toFixed(2)} DAI`: 'O DAI',
                 valuePrefix: null,
                 valueExtra: null, 
@@ -174,7 +176,7 @@ function Repay({ repayAmount }:IRepayProps) {
                 label: 'DAI balance',
                 visible: !!account,
                 active: true,
-                loading: false,            
+                loading: repayPending,            
                 value: daiBalance_?`${daiBalance_.toFixed(2)} DAI`: '-',
                 valuePrefix: null,
                 valueExtra: null,
@@ -202,7 +204,7 @@ function Repay({ repayAmount }:IRepayProps) {
             </InputWrap>
       
             <> 
-              <Box>
+              <Box margin='medium'>
                 {approveActive || approved === undefined ?             
                   <ScaleLoader color={theme?.global?.colors['brand-transparent'].dark} height='13' />
                   : <CheckBox

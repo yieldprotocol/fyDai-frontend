@@ -272,12 +272,11 @@ const YieldProvider = ({ children }: any) => {
     dispatch({ type: 'isLoading', payload: false });
   };
 
-  /* Init app and re-init app on change of user and/or network  */
+  /* Init app and re-init app on change of fallback provider network  */
   React.useEffect(() => {
     // provider && (async () => initContext() )();
-    !provider && fallbackProvider && (async () => initContext() )();
-    
-  }, [ fallbackProvider, chainId, account ]);
+    fallbackProvider && (async () => initContext() )();
+  }, [ fallbackProvider ]);
 
   const actions = {
     // updateUserData: () =>
