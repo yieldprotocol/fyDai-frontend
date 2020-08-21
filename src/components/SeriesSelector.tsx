@@ -122,19 +122,18 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
                   </Box>
 
                   <Box fill='horizontal' direction='row' justify='between' gap='small'>
-                    <Box fill align={screenSize==='small'?'end':undefined}>
-                      <Text size='medium' color='brand'>
+                    <Box fill align={screenSize==='small'?'start':'start'}>
+                      <Text size={screenSize} color='brand'>
                         {x.displayName}
                       </Text>
                     </Box>
-
-                    <Box fill align={screenSize==='small'?'end':undefined}>
-                      <Text size='medium' color='brand'>
+                    <Box fill align={screenSize==='small'?'end':undefined} >
+                      <Text size={screenSize} color='brand'>
                         {activeView.toUpperCase() === 'BORROW'? 
                           x.ethDebtYDai_.toFixed(2) :
                           x.yDaiBalance_.toFixed(2)}
                       </Text>
-                    </Box>
+                    </Box>                 
                   </Box>
 
                   { screenSize !== 'small' && 

@@ -1,5 +1,6 @@
 import React from 'react';
-import { Box, Text, Tabs, Tab } from 'grommet';
+import { Box, Button, Text, Tabs, Tab, ResponsiveContext } from 'grommet';
+import { useSignerAccount } from '../hooks';
 
 interface IActionSelectorProps {
   setActiveView: any;
@@ -7,6 +8,10 @@ interface IActionSelectorProps {
 }
 
 function ActionSelector({ setActiveView, activeView }:IActionSelectorProps) {
+
+  const screenSize = React.useContext(ResponsiveContext);
+  const { account } = useSignerAccount();
+  
   return (
     <Box
       direction="row"
@@ -34,7 +39,7 @@ function ActionSelector({ setActiveView, activeView }:IActionSelectorProps) {
           justify="between"
           gap="small"
         >
-          <Text size="xsmall" weight="bold">
+          <Text size="small" weight="bold">
             1. Add Collateral
           </Text>
           {/* {position.ethPosted>0 && <CheckCircle color="green" />} */}
@@ -49,7 +54,7 @@ function ActionSelector({ setActiveView, activeView }:IActionSelectorProps) {
           elevation={activeView === 'BORROW' ? 'small' : undefined}
           onClick={() => setActiveView('BORROW')}
         >
-          <Text size="xsmall" weight="bold">
+          <Text size="small" weight="bold">
             2. Borrow DAI
           </Text>
         </Box>
@@ -59,12 +64,21 @@ function ActionSelector({ setActiveView, activeView }:IActionSelectorProps) {
           pad={{ horizontal: 'large', vertical: 'xsmall' }}
           background={activeView === 'REPAY' ? 'background-front' : undefined}
           elevation={activeView === 'REPAY' ? 'small' : undefined}
-          onClick={() => setActiveView('REPAY')}
+          onClick={account?() => setActiveView('REPAY'):()=>{console.log('connect a wallet')}}
         >
-          <Text size="xsmall" weight="bold">
+          <Text size="small" weight="bold" color={account?undefined:'text-weak'}>
             3. Repay DAI Debt
           </Text>
         </Box>
+
+        {false&& !account && 
+        <Button
+          color='brand-transparent'
+          label={<Text size='xsmall' color='brand'>Connect a wallet</Text>}
+          onClick={()=>console.log('still to implement')}
+          hoverIndicator='brand-transparent'
+        />}
+
       </Box>
     </Box>
   );
