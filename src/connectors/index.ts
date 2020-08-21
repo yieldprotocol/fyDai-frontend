@@ -9,17 +9,17 @@ import { TorusConnector } from '@web3-react/torus-connector';
 const POLLING_INTERVAL = 12000;
 
 const RPC_URLS: { [chainId: number]: string } = {
-  1: 'https://mainnet.infura.io/v3/9dbb21faf34448c9af1f3047c45b15df', // process.env.RPC_URL_1 as string,
-  4: 'https://rinkeby.infura.io/v3/9dbb21faf34448c9af1f3047c45b15df', // process.env.RPC_URL_4 as string
-  1337: 'http://localhost:8545'
+  1: 'https://mainnet.infura.io/v3/9dbb21faf34448c9af1f3047c45b15df', // process.env.REACT_APP_RPC_URL_1 as string,
+  4: 'https://rinkeby.infura.io/v3/9dbb21faf34448c9af1f3047c45b15df', // process.env.REACT_APP_RPC_URL_4 as string
+  1337: 'http://localhost:8545' // process.env.REACT_APP_RPC_LOCAL as string
 };
 
-export const injected = new InjectedConnector({ supportedChainIds: [4] });
+export const injected = new InjectedConnector({ supportedChainIds: [1337] });
 // export const injected = new InjectedConnector({ supportedChainIds: [1, 4, 1337] });
 
 export const network = new NetworkConnector({
   urls: { 1: RPC_URLS[1], 4: RPC_URLS[4], 1337: RPC_URLS[1337], },
-  defaultChainId: 4
+  defaultChainId: 1337
 });
 
 export const walletlink = new WalletLinkConnector({

@@ -22,6 +22,7 @@ import NotifyLayer from './containers/layers/NotifyLayer';
 // TODO: remove testLayer for prod
 import TestLayer from './containers/layers/TestLayer';
 import SeriesSelector from './components/SeriesSelector';
+import YieldMark from './components/logos/YieldMark';
 
 
 const ThemedApp = () => {
@@ -63,10 +64,6 @@ const App = (props:any) => {
     setShowAccountLayer(false);
     setShowConnectLayer(true);
   };
-
-  React.useEffect(()=> {
-    console.log('migration address: ', process.env.REACT_APP_MIGRATION);
-  }, []);
 
   React.useEffect(()=> {
     library && (async () => console.log(await library.getSigner()))();
@@ -150,7 +147,7 @@ const App = (props:any) => {
         >
           <Nav 
             direction="row"
-            background="background"
+            background="background-mid"
             
             round={{ corner:'top', size:'small' }}
             elevation='small'
@@ -158,7 +155,7 @@ const App = (props:any) => {
             pad="medium"
             justify='evenly'
           >
-            <Box>=</Box>
+            <Box><YieldMark /></Box>
             <Box>Collateral</Box>
             <Box>Borrow</Box>
             <Box>Repay</Box>         

@@ -141,7 +141,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
             />
             <Button
               color='brand-transparent'
-              disabled={ethBalance_=== 0}
+              disabled={!account || ethBalance_=== 0}
               label={<Text size='xsmall' color='brand'> { (screenSize !== 'small' && !modalView) ? 'Deposit Maximum': 'Max'}</Text>}
               onClick={()=>setInputValue(ethBalance_)}
               hoverIndicator='brand-transparent'
@@ -180,25 +180,42 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
                 </Text>
               )
             },
+            {
+              label: 'Want to deposit collateral?',
+              visible: !account && inputValue,
+              active: inputValue,
+              loading: false,            
+              value: '',
+              valuePrefix: null,
+              valueExtra: () => (
+                <Button
+                  color={inputValue? 'brand': 'brand-transparent'}
+                  label={<Text size='xsmall' color='brand'>Connect a wallet</Text>}
+                  onClick={()=>console.log('still to implement')}
+                  hoverIndicator='brand-transparent'
+                /> 
+              )
+            },
           ]}
           />
 
-          <Box
-            fill='horizontal'
-            round='small'
-            background={( !(inputValue>0) || depositDisabled) ? 'brand-transparent' : 'brand'}
-            onClick={()=>depositProcedure(inputValue)}
-            align='center'
-            pad='small'
-          >
-            <Text
-              weight='bold'
-              size='large'
-              color={( !(inputValue>0) || depositDisabled) ? 'text-xweak' : 'text'}
+          { account &&
+            <Box
+              fill='horizontal'
+              round='small'
+              background={( !(inputValue>0) || depositDisabled) ? 'brand-transparent' : 'brand'}
+              onClick={()=>depositProcedure(inputValue)}
+              align='center'
+              pad='small'
             >
-              {`Deposit ${inputValue || ''} Eth`}
-            </Text>
-          </Box>
+              <Text
+                weight='bold'
+                size='large'
+                color={( !(inputValue>0) || depositDisabled) ? 'text-xweak' : 'text'}
+              >
+                {`Deposit ${inputValue || ''} Eth`}
+              </Text>
+            </Box>}
 
           { ethPosted_ > 0 &&
           <Box alignSelf='end'>

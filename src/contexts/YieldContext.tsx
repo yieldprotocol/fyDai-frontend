@@ -91,7 +91,7 @@ const YieldProvider = ({ children }: any) => {
   // const { state: { account, chainId, provider } } = React.useContext(ConnectionContext);
   const { account, provider, fallbackProvider } = useSignerAccount();
   
-  const { chainId } = useWeb3React();
+  const { chainId } = useWeb3React('fallback');
   // const { active: fallbackActive } = useWeb3React('fallback');
 
   const { dispatch: notifyDispatch } = React.useContext(NotifyContext);
@@ -131,9 +131,9 @@ const YieldProvider = ({ children }: any) => {
     ];
 
     try {
-      if (!cachedContracts || forceUpdate) {
+      if (chainId && !cachedContracts || forceUpdate) {
 
-        const contractAddrs = await getAddresses(contractList);
+        const contractAddrs = await getAddresses(contractList, chainId);
         _deployedContracts = Object.fromEntries(contractAddrs);
         window.localStorage.removeItem('deployedContracts');
         setCachedContracts(_deployedContracts);
@@ -143,9 +143,9 @@ const YieldProvider = ({ children }: any) => {
         _deployedContracts = cachedContracts;
       }
 
-      if (!cachedSeries || forceUpdate) {
+      if (chainId && !cachedSeries || forceUpdate) {
         // TODO: better implementation of iterating through series (possibly a list length from contracts function?)
-        const _list = await getAddresses(['yDai0', 'yDai1', 'yDai2', 'yDai3']);
+        const _list = await getAddresses(['yDai0', 'yDai1', 'yDai2', 'yDai3'], chainId);
         const _seriesList = Array.from(_list.values());
 
         await Promise.all(
@@ -154,7 +154,7 @@ const YieldProvider = ({ children }: any) => {
             const name = await callTx(x, 'YDai', 'name', []);
             const maturity = (await callTx(x, 'YDai', 'maturity', [])).toNumber();
 
-            const _peripheralAddrs = await getAddresses([ `${name}-Pool`, `${name}-DaiProxy`] );     
+            const _peripheralAddrs = await getAddresses([ `${name}-Pool`, `${name}-DaiProxy`], chainId);     
             const poolAddress = _peripheralAddrs.get(`${name}-Pool`);
             const daiProxyAddress = _peripheralAddrs.get(`${name}-DaiProxy`);
             
