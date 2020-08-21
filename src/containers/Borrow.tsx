@@ -135,7 +135,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
   */
   useEffect(() => {
      
-    activeSeries && inputValue > 0 && ( async () => {
+    activeSeries && parseFloat(inputValue) > 0 && ( async () => {
       const newRatio = estimateRatio(position.ethPosted_, ( position.debtValue_+ parseFloat(inputValue)) ); 
       newRatio && setEstRatio(newRatio.toFixed(0));
       const preview = await previewPoolTx('buyDai', activeSeries.poolAddress, inputValue);
@@ -164,10 +164,11 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
   /* Handle borrow disabling deposits */
   useEffect(()=>{
     (
-      !account ||
-      !hasDelegated || 
-      (inputValue && inputValue>0)
-    )? setBorrowDisabled(true): setBorrowDisabled(false);
+      account &&
+      hasDelegated &&
+      inputValue && 
+      parseInt(inputValue, 10) !== 0
+    )? setBorrowDisabled(false): setBorrowDisabled(true);
   }, [ inputValue, hasDelegated ]);
 
   /* Handle collateralisation ratio exceptions and warnings */
@@ -224,8 +225,6 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
       }
     })();
   }, [ approved ]);
-
-
 
   return (
     <Keyboard 
@@ -285,7 +284,8 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
               awaitingApproval={delegationPending && !txActive}
               txPending={txActive?.type === 'DELEGATION'}  
             />}
-            { activeSeries && !activeSeries.isMature? 
+
+            { activeSeries && !activeSeries?.isMature && 
               <>
                 <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to borrow</Text>
 
@@ -334,20 +334,24 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
                     valuePrefix: 'Approx.',
                     valueExtra: () => (
                       <Text color='red' size='small'> 
-                        { inputValue && estRatio && ( (collateralPercent_- estRatio) !== 0) && `(- ${(collateralPercent_- estRatio).toFixed(0)}%)` }
+                        { 
+                        inputValue &&
+                        estRatio &&
+                        ( (collateralPercent_- estRatio) > 0) &&
+                        `(-${(collateralPercent_-estRatio).toFixed(0)}%)`}
                       </Text>
                     )
                   },
                   {
                     label: 'Like what you see?',
-                    visible: !account,
+                    visible: !account && inputValue,
                     active: inputValue,
                     loading: false,            
                     value: '',
                     valuePrefix: null,
                     valueExtra: () => (
                       <Button
-                        color='brand-transparent'
+                        color={inputValue? 'brand': 'brand-transparent'}
                         label={<Text size='xsmall' color='brand'>Connect a wallet</Text>}
                         onClick={()=>console.log('still to implement')}
                         hoverIndicator='brand-transparent'
@@ -362,7 +366,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
                 <Box
                   fill='horizontal'
                   round='small' 
-                  background={!(inputValue>0) || borrowDisabled ? 'brand-transparent' : 'brand'} 
+                  background={borrowDisabled ? 'brand-transparent' : 'brand'} 
                   onClick={()=>borrowProcedure(inputValue)} 
             // onClick={()=>borrowProcedure(inputValue)}
                   align='center'
@@ -371,15 +375,13 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
                   <Text 
                     weight='bold'
                     size='large'
-                    color={!(inputValue>0) || borrowDisabled ? 'text-xweak' : 'text'}
+                    color={borrowDisabled ? 'text-xweak' : 'text'}
                   >
                     {`Borrow ${inputValue || ''} DAI`}
                   </Text>
                 </Box>}
-
-              </>
-              : 
-
+              </>}
+            { activeSeries && activeSeries.isMature &&
               <Box 
                 gap='medium' 
                 margin={{ vertical:'large' }}  
