@@ -60,7 +60,7 @@ export const useMaker = () => {
 
   // const { state : { account, chainId, provider } } = React.useContext(ConnectionContext);
 
-  const { signer, provider, account, altProvider, voidSigner } = useSignerAccount();
+  const { signer, provider, account, fallbackProvider, voidSigner } = useSignerAccount();
 
   // const { account, chainId, library } = useWeb3React();
   const [openVaultActive, setOpenVaultActive] = React.useState<boolean>(false);

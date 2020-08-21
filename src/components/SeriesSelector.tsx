@@ -1,5 +1,5 @@
 import React from 'react';
-import { Anchor, Text, Box, Layer, Header, ResponsiveContext } from 'grommet';
+import { Anchor, Text, Box, Layer, Header, ResponsiveContext, Button } from 'grommet';
 import { 
   FiInfo as Info,
   FiArrowLeft as ArrowLeft,
@@ -14,6 +14,9 @@ import { SeriesContext } from '../contexts/SeriesContext';
 import YieldSeriesSummary from './YieldSeriesSummary';
 // import YieldSeries from '../../components/YieldSeries';
 
+import AprBadge from './AprBadge';
+import Loading from './Loading';
+
 interface ISeriesSelectorProps {
   activeView:string;
   close:any;
@@ -23,7 +26,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
 
   const [showMore, setShowMore] = React.useState<boolean>(false);
   const [openIndex, setOpenIndex] = React.useState<number | null >(null);
-  const [seriesList, setSeriesList] = React.useState<IYieldSeries[]>([]);
+  // const [seriesList, setSeriesList] = React.useState<IYieldSeries[]>([]);
   const screenSize = React.useContext(ResponsiveContext);
   
   // const refsArray = React.useRef([]);
@@ -42,14 +45,6 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
     close();
   };
 
-  React.useEffect(() => {
-    !isLoading && setSeriesList(seriesData);
-  }, [ seriesState ]);
-
-  // React.useEffect(() => {
-  //   !state.isLoading && setSeriesList(state.deployedSeries);
-  // }, [ state.isLoading ]);
-
   return (
     <Layer
       onClickOutside={()=>close()}
@@ -65,6 +60,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
         gap='medium'
         width={screenSize !== 'small'? { max:'750px', min:'640px' }: {}}
       >
+
         <Box gap='medium'>
           <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Choose a series</Text>
           <Text alignSelf='start' size='medium' color='text-weak'>Select a series from the list below</Text>
@@ -73,107 +69,93 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
         <Box 
           gap='none'
         >
-          <Box direction='row' justify='between' pad='medium'>
-            <Box>
-              <Text alignSelf='start' size='medium' color='text-weak'>APR</Text>
+          <Box 
+            direction='row'
+            pad='medium'
+            fill='horizontal'
+            justify='between'
+            gap='small'
+          >
+            <Box basis={screenSize==='small'?'30%':'20%'}>
+              <Text size='small' color='text-weak'>APR</Text>
             </Box>
-            <Box>
-              <Text alignSelf='start' size='medium' color='text-weak'>SERIES NAME</Text>
+
+            <Box fill='horizontal' direction='row' justify='between' gap='small'>
+
+              <Box fill align={screenSize==='small'?'end':undefined}>
+                <Text size='small' color='text-weak'>SERIES NAME</Text>
+              </Box>
+
+              <Box fill align={screenSize==='small'?'end':undefined}>
+                <Text size='small' color='text-weak'>
+                  { activeView.toUpperCase() === 'BORROW'? 'DAI DEBT' : 'BALANCE' }               
+                </Text>
+              </Box>
+
             </Box>
-            <Box>
-              <Text alignSelf='start' size='medium' color='text-weak'>
-                { activeView.toUpperCase() === 'BORROW'? 'DEBT' : 'BALANCE' }               
-              </Text>
-            </Box>
-            <Box>
-              <Text alignSelf='start' size='medium' color='text-weak'>SELECT</Text>
-            </Box>
+
+            { screenSize !== 'small' && 
+              <Box direction='row' justify='end' basis='25%'>
+                <Text size='small' color='text-weak'> </Text>
+              </Box>}
           </Box>
 
-          {isLoading && 'Loading'}
-          {activeSeries && 
+          <Loading condition={isLoading} size='large'>
+            { [...seriesData.values() ].map((x:any, i:any) => {       
+              const _key = i;
+              return ( 
+                <Box
+                  key={_key}
+                  direction='row' 
+                  justify='between'
+                  onClick={()=>handleSelectSeries(x.maturity)}
+                  hoverIndicator='background-mid'
+                  border='top'
+                  fill='horizontal'
+                  pad='medium'
+                  gap='small'
+                >
+                  <Box basis={screenSize==='small'?'30%':'20%'} align='center'>
+                    <Box direction='row'>
+                      <AprBadge activeView={activeView} series={x} />
+                    </Box>
+                  </Box>
 
-          <Box
-            direction='row' 
-            justify='between'
-            onClick={()=>handleSelectSeries(activeSeries.maturity)}
-            hoverIndicator='background-mid'
-            border='top'
-            fill
-            pad='medium'
-          >
+                  <Box fill='horizontal' direction='row' justify='between' gap='small'>
+                    <Box fill align={screenSize==='small'?'start':'start'}>
+                      <Text size={screenSize} color='brand'>
+                        {x.displayName}
+                      </Text>
+                    </Box>
+                    <Box fill align={screenSize==='small'?'end':undefined} >
+                      <Text size={screenSize} color='brand'>
+                        {activeView.toUpperCase() === 'BORROW'? 
+                          x.ethDebtYDai_.toFixed(2) :
+                          x.yDaiBalance_.toFixed(2)}
+                      </Text>
+                    </Box>                 
+                  </Box>
 
-            {  ( activeSeries && !Number.isFinite(parseFloat(activeSeries.yieldAPR_)) ) ? 
-              <Box 
-                round 
-                border='all'
-                direction='row'
-                pad={{ horizontal:'small' }}
-                align='center'
-                background='orange'
-              >
-                <Text size='xxsmall'>
-                  { activeView.toUpperCase() === 'BORROW'? 'Temporarily Unavailable': 'Temporarily Unavailable' }         
-                </Text>
-              </Box>
-              :
-              <Box>
-                <Text alignSelf='start' size='medium' color='brand'>
-                  {activeSeries.yieldAPR_}%
-                </Text>
-              </Box>}
+                  { screenSize !== 'small' && 
+                  <Box basis='25%' direction='row' justify='end'>
+                    { activeSeries && activeSeries.maturity === x.maturity ? 
+                      <Button 
+                        primary
+                        label='Selected'
+                        icon={<Check />}
+                      /> : 
+                      <Button 
+                        secondary
+                        label='Select'
+                      />}
+                  </Box>}
+                </Box>
+              );     
+            })}
 
-            <Box>
-              <Text alignSelf='start' size='medium' color='brand'>
-                {activeSeries.displayName}
-              </Text>
-            </Box>
-            <Box>
-              <Text alignSelf='start' size='medium' color='brand'>
-                {activeView.toUpperCase() === 'BORROW'? 
-                  activeSeries.ethDebtYDai_.toFixed(2) :
-                  activeSeries.yDaiBalance_.toFixed(2)} Dai
-              </Text>
-            </Box>
-            <Box>
-              <Box 
-                round
-                background='brand'
-                pad={{ horizontal:'medium', vertical:'xsmall' }}
-                direction='row'
-                gap='xsmall'
-                align='center'
-              >
-                <Text> Selected </Text>
-                <Check />
-              </Box>
-            </Box>
-          </Box>}
+          </Loading>        
         </Box>
 
-        {/* {seriesData.forEach((x:any, i:number) => {
-          console.log(x)
-          return (
-            <Box
-              key={x.name}
-              id={x.name}
-              ref={(el:any) => {refs.current[i] = el;}}
-            >
-              <Box 
-                direction='row' 
-                justify='between'
-                gap='xsmall'
-                onClick={()=>console.log(x)}
-                hoverIndicator='background-mid'
-              >
-                <Box> {x.yieldPercent_}</Box>
-                <Box> {x.displayName} </Box>
-                <Box> {x.wethDebtDai_} </Box>
-                <Box> 'ACTION'</Box>
-              </Box>
-            </Box>
-          );
-        })} */}
         <Box alignSelf='start'>
           <Box
             round
@@ -190,7 +172,6 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
           </Box>
         </Box>
       </Box>
-
     </Layer>
   );
 };

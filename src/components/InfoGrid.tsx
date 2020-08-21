@@ -26,18 +26,18 @@ function InfoGrid({ entries }:IInfoGridProps) {
       {entries.map((x:any, i:number) => {
         const _key = i;
         const ValueExtra = x.valueExtra; 
-        return (
-          <Box key={_key}>
-            { x.visible &&
+        if (x.visible) {
+          return (
+            <Box key={_key}>         
               <Box 
                 pad='small' 
-                align='center'
+                align='start'
               >
                 <Box gap='small' align='center'>
                   <Text wordBreak='keep-all' color='text-weak' size='xxsmall'>{x.label}</Text>            
                   <Loading condition={x.loading} size='small'>
                     <Box direction='row-responsive' gap='small'>
-                      { x.valuePrefix && <Text color={x.active ? 'brand':'brand-transparent'} size='xxsmall'>{x.valuePrefix}</Text> }
+                      { x.valuePrefix && screenSize !== 'small' && <Text color={x.active ? 'brand':'brand-transparent'} size='xxsmall'>{x.valuePrefix}</Text> }
                       <Text color={x.active? 'brand':'brand-transparent'} weight='bold' size='medium'> 
                         {x.value}
                       </Text>
@@ -45,9 +45,10 @@ function InfoGrid({ entries }:IInfoGridProps) {
                     </Box> 
                   </Loading>
                 </Box> 
-              </Box>}
-          </Box>
-        );
+              </Box>
+            </Box>
+          );
+        }
       })}
     </Grid>
   );

@@ -78,7 +78,7 @@ const UserProvider = ({ children }: any) => {
 
   const { dispatch: notifyDispatch } = React.useContext(NotifyContext);
   const { state: yieldState } = React.useContext(YieldContext);
-  const { deployedContracts, deployedSeries, yieldData } = yieldState;
+  const { deployedContracts, deployedSeries } = yieldState;
 
   const { account, provider } = useSignerAccount();
   const { chainId } = useWeb3React();
@@ -183,6 +183,7 @@ const UserProvider = ({ children }: any) => {
       maxDaiAvailable_ : utils.wadToHuman(maxDaiAvailable),
     };
 
+    console.log('User updated:');
     console.log({ ...values, ...parsedValues } );
     dispatch( { type: 'updatePosition', payload: { ...values, ...parsedValues } } );
     return { ...values, ...parsedValues };
@@ -400,7 +401,7 @@ const UserProvider = ({ children }: any) => {
 
   /* Init user context and re-init on any user and/or network change */
   React.useEffect(() => {
-    !yieldState.isLoading && (async () => initUserContext())();
+    account && !yieldState.isLoading && (async () => initUserContext())();
   }, [ chainId, account, yieldState.isLoading ]);
 
   const actions = {

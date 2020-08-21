@@ -22,6 +22,7 @@ import NotifyLayer from './containers/layers/NotifyLayer';
 // TODO: remove testLayer for prod
 import TestLayer from './containers/layers/TestLayer';
 import SeriesSelector from './components/SeriesSelector';
+import YieldMark from './components/logos/YieldMark';
 
 
 const ThemedApp = () => {
@@ -36,14 +37,12 @@ const ThemedApp = () => {
       <App 
         darkMode={darkMode}
         setDarkMode={setDarkMode}
-
         partyMode={partyMode}
         setPartyMode={setPartyMode}
       />     
     </Grommet>
   );
 };
-
 
 const App = (props:any) => {
 
@@ -67,26 +66,16 @@ const App = (props:any) => {
   };
 
   React.useEffect(()=> {
-    console.log('migration address: ', process.env.REACT_APP_MIGRATION);
-  }, []);
-
-  React.useEffect(()=> {
     library && (async () => console.log(await library.getSigner()))();
   }, [account]);
 
   React.useEffect(()=> {
-
     if (screenSize === 'small') { 
       setColumnsWidth(['0%', 'auto', '0%']);
     } else {
       setColumnsWidth(['5%', 'auto', '5%']);
     }
-    console.log(screenSize);
-
   }, [screenSize]);
-
-
-  // const columnsWidth = ['5%', 'auto', '5%'];
 
   return (
 
@@ -158,7 +147,7 @@ const App = (props:any) => {
         >
           <Nav 
             direction="row"
-            background="background"
+            background="background-mid"
             
             round={{ corner:'top', size:'small' }}
             elevation='small'
@@ -166,10 +155,10 @@ const App = (props:any) => {
             pad="medium"
             justify='evenly'
           >
-            <Box>=</Box>
+            <Box><YieldMark /></Box>
+            <Box>Collateral</Box>
             <Box>Borrow</Box>
-            <Box>Lend</Box>
-            <Box>Pool</Box>           
+            <Box>Repay</Box>         
           </Nav>
         </Layer>}
     </div>

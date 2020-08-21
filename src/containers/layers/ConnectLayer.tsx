@@ -23,9 +23,11 @@ import {
   useEagerConnect,
   useInactiveListener,
   useWeb3React,
+  useConnection,
+  useCachedState 
 } from '../../hooks';
 
-import { injected, trezor, walletlink, torus, ledger } from '../../connectors';
+import { network, injected, trezor, walletlink, torus, ledger } from '../../connectors';
 
 import metamaskImage from '../../assets/images/providers/metamask.png';
 import trezorImage from '../../assets/images/providers/trezor.png';
@@ -33,43 +35,12 @@ import walletlinkImage from '../../assets/images/providers/walletlink.png';
 import torusImage from '../../assets/images/providers/torus.png';
 // import noConnectionImage from '../assets/images/noconnection.png';
 
-function getErrorMessage(error: Error) {
-  if (error instanceof NoEthereumProviderError) {
-    return 'No Ethereum browser extension detected, install MetaMask on desktop or visit from a dApp browser on mobile.';
-  }
-  if (error instanceof UnsupportedChainIdError) {
-    return "You're connected to an unsupported network.";
-  }
-  if (
-    error instanceof UserRejectedRequestErrorInjected // ||
-    // error instanceof UserRejectedRequestErrorWalletConnect ||
-    // error instanceof UserRejectedRequestErrorFrame
-  ) {
-    return 'Please authorize this website to access your Ethereum account.';
-  }
-  console.error(error);
-  return 'An unknown error occurred. Check the console for more details.';
-}
+import { NotifyContext } from '../../contexts/NotifyContext';
 
-const ConnectLayer = (props: any) => {
+const ConnectLayer = ({ open, closeLayer }: any) => {
   const screenSize = React.useContext(ResponsiveContext);
 
-  const { connector, activate } = useWeb3React();
-  const { open, closeLayer } = props;
-
-  /* web3 initiate */
-  const [activatingConnector, setActivatingConnector] = React.useState<any>();
-  React.useEffect(() => {
-    if (activatingConnector && activatingConnector === connector) {
-      setActivatingConnector(undefined);
-    }
-  }, [activatingConnector, connector]);
-  const triedEager = useEagerConnect();
-  useInactiveListener(!triedEager || !!activatingConnector);
-  const handleSelectConnector = async (_connection: any) => {
-    await activate(_connection, console.log);
-    closeLayer();
-  };
+  const { handleSelectConnector } = useConnection();
 
   const connectorList = [
     { name: 'Metamask', image: metamaskImage, connection: injected },
@@ -112,7 +83,7 @@ const ConnectLayer = (props: any) => {
               {connectorList.map((x) => (
                 <Button
                   hoverIndicator="border"
-                  onClick={() => handleSelectConnector(x.connection)}
+                  onClick={() => { handleSelectConnector(x.connection); closeLayer();}}
                   label={x.name}
                   color="border"
                   fill="horizontal"

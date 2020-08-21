@@ -1,6 +1,6 @@
 /* Connection hook web3React */
 import { useWeb3React } from '@web3-react/core';
-import { useEagerConnect, useInactiveListener, useConnectorImage, useSignerAccount } from './connectionHooks';
+import { useEagerConnect, useInactiveListener, useConnectorImage, useSignerAccount, useConnection } from './connectionHooks';
 
 /* General app hooks */
 import { useCachedState, useDebounce, useTxActive } from './appHooks';
@@ -44,6 +44,7 @@ export {
   useInactiveListener,
   useConnectorImage,
   useSignerAccount, 
+  useConnection,
 
   useTimeTravel, 
 };

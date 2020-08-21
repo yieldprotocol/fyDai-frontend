@@ -108,23 +108,23 @@
   "bytecode": "0x608060405234801561001057600080fd5b5060006100246001600160e01b0361007316565b600080546001600160a01b0319166001600160a01b0383169081178255604051929350917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0908290a350610077565b3390565b610418806100866000396000f3fe608060405234801561001057600080fd5b50600436106100575760003560e01c8063715018a61461005c57806380f5a440146100665780638da5cb5b1461008c578063b9181611146100b0578063f2fde38b146100ea575b600080fd5b610064610110565b005b6100646004803603602081101561007c57600080fd5b50356001600160a01b03166101c4565b61009461028a565b604080516001600160a01b039092168252519081900360200190f35b6100d6600480360360208110156100c657600080fd5b50356001600160a01b0316610299565b604080519115158252519081900360200190f35b6100646004803603602081101561010057600080fd5b50356001600160a01b03166102ae565b6101186103b8565b6000546001600160a01b0390811691161461017a576040805162461bcd60e51b815260206004820181905260248201527f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e6572604482015290519081900360640190fd5b600080546040516001600160a01b03909116907f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0908390a3600080546001600160a01b0319169055565b6101cc6103b8565b6000546001600160a01b0390811691161461022e576040805162461bcd60e51b815260206004820181905260248201527f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e6572604482015290519081900360640190fd5b6001600160a01b038116600081815260016020818152604092839020805460ff1916909217909155815192835290517f6a7c5f28ea564fafc8b079663a2a9b9d26fe735d97c97611484ce044f40a16e29281900390910190a150565b6000546001600160a01b031690565b60016020526000908152604090205460ff1681565b6102b66103b8565b6000546001600160a01b03908116911614610318576040805162461bcd60e51b815260206004820181905260248201527f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e6572604482015290519081900360640190fd5b6001600160a01b03811661035d5760405162461bcd60e51b81526004018080602001828103825260268152602001806103bd6026913960400191505060405180910390fd5b600080546040516001600160a01b03808516939216917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e091a3600080546001600160a01b0319166001600160a01b0392909216919091179055565b339056fe4f776e61626c653a206e6577206f776e657220697320746865207a65726f2061646472657373a2646970667358221220e1e1547040716f0571e8592e0506a77e179bc9f7f5e4cd51087754f295145e3c64736f6c634300060a0033",
   "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100575760003560e01c8063715018a61461005c57806380f5a440146100665780638da5cb5b1461008c578063b9181611146100b0578063f2fde38b146100ea575b600080fd5b610064610110565b005b6100646004803603602081101561007c57600080fd5b50356001600160a01b03166101c4565b61009461028a565b604080516001600160a01b039092168252519081900360200190f35b6100d6600480360360208110156100c657600080fd5b50356001600160a01b0316610299565b604080519115158252519081900360200190f35b6100646004803603602081101561010057600080fd5b50356001600160a01b03166102ae565b6101186103b8565b6000546001600160a01b0390811691161461017a576040805162461bcd60e51b815260206004820181905260248201527f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e6572604482015290519081900360640190fd5b600080546040516001600160a01b03909116907f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0908390a3600080546001600160a01b0319169055565b6101cc6103b8565b6000546001600160a01b0390811691161461022e576040805162461bcd60e51b815260206004820181905260248201527f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e6572604482015290519081900360640190fd5b6001600160a01b038116600081815260016020818152604092839020805460ff1916909217909155815192835290517f6a7c5f28ea564fafc8b079663a2a9b9d26fe735d97c97611484ce044f40a16e29281900390910190a150565b6000546001600160a01b031690565b60016020526000908152604090205460ff1681565b6102b66103b8565b6000546001600160a01b03908116911614610318576040805162461bcd60e51b815260206004820181905260248201527f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e6572604482015290519081900360640190fd5b6001600160a01b03811661035d5760405162461bcd60e51b81526004018080602001828103825260268152602001806103bd6026913960400191505060405180910390fd5b600080546040516001600160a01b03808516939216917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e091a3600080546001600160a01b0319166001600160a01b0392909216919091179055565b339056fe4f776e61626c653a206e6577206f776e657220697320746865207a65726f2061646472657373a2646970667358221220e1e1547040716f0571e8592e0506a77e179bc9f7f5e4cd51087754f295145e3c64736f6c634300060a0033",
   "immutableReferences": {},
-  "sourceMap": "689:530:17:-:0;;;824:34;;;;;;;;;-1:-1:-1;865:17:46;885:12;-1:-1:-1;;;;;885:10:46;:12;:::i;:::-;907:6;:18;;-1:-1:-1;;;;;;907:18:46;-1:-1:-1;;;;;907:18:46;;;;;;;940:43;;907:18;;-1:-1:-1;907:18:46;940:43;;907:6;;940:43;831:159;689:530:17;;590:104:45;677:10;590:104;:::o;689:530:17:-;;;;;;;",
-  "deployedSourceMap": "689:530:17:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1689:145:46;;;:::i;:::-;;1087:129:17;;;;;;;;;;;;;;;;-1:-1:-1;1087:129:17;-1:-1:-1;;;;;1087:129:17;;:::i;1066:77:46:-;;;:::i;:::-;;;;-1:-1:-1;;;;;1066:77:46;;;;;;;;;;;;;;773:42:17;;;;;;;;;;;;;;;;-1:-1:-1;773:42:17;-1:-1:-1;;;;;773:42:17;;:::i;:::-;;;;;;;;;;;;;;;;;;1983:240:46;;;;;;;;;;;;;;;;-1:-1:-1;1983:240:46;-1:-1:-1;;;;;1983:240:46;;:::i;1689:145::-;1280:12;:10;:12::i;:::-;1270:6;;-1:-1:-1;;;;;1270:6:46;;;:22;;;1262:67;;;;;-1:-1:-1;;;1262:67:46;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1795:1:::1;1779:6:::0;;1758:40:::1;::::0;-1:-1:-1;;;;;1779:6:46;;::::1;::::0;1758:40:::1;::::0;1795:1;;1758:40:::1;1825:1;1808:19:::0;;-1:-1:-1;;;;;;1808:19:46::1;::::0;;1689:145::o;1087:129:17:-;1280:12:46;:10;:12::i;:::-;1270:6;;-1:-1:-1;;;;;1270:6:46;;;:22;;;1262:67;;;;;-1:-1:-1;;;1262:67:46;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;1150:16:17;::::1;;::::0;;;1169:4:::1;1150:16;::::0;;;;;;;;:23;;-1:-1:-1;;1150:23:17::1;::::0;;::::1;::::0;;;1189:19;;;;;;;::::1;::::0;;;;;;;;::::1;1087:129:::0;:::o;1066:77:46:-;1104:7;1130:6;-1:-1:-1;;;;;1130:6:46;1066:77;:::o;773:42:17:-;;;;;;;;;;;;;;;:::o;1983:240:46:-;1280:12;:10;:12::i;:::-;1270:6;;-1:-1:-1;;;;;1270:6:46;;;:22;;;1262:67;;;;;-1:-1:-1;;;1262:67:46;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;2071:22:46;::::1;2063:73;;;;-1:-1:-1::0;;;2063:73:46::1;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2172:6;::::0;;2151:38:::1;::::0;-1:-1:-1;;;;;2151:38:46;;::::1;::::0;2172:6;::::1;::::0;2151:38:::1;::::0;::::1;2199:6;:17:::0;;-1:-1:-1;;;;;;2199:17:46::1;-1:-1:-1::0;;;;;2199:17:46;;;::::1;::::0;;;::::1;::::0;;1983:240::o;590:104:45:-;677:10;590:104;:::o",
+  "sourceMap": "689:530:17:-:0;;;824:34;;;;;;;;;-1:-1:-1;865:17:47;885:12;-1:-1:-1;;;;;885:10:47;:12;:::i;:::-;907:6;:18;;-1:-1:-1;;;;;;907:18:47;-1:-1:-1;;;;;907:18:47;;;;;;;940:43;;907:18;;-1:-1:-1;907:18:47;940:43;;907:6;;940:43;831:159;689:530:17;;590:104:46;677:10;590:104;:::o;689:530:17:-;;;;;;;",
+  "deployedSourceMap": "689:530:17:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1689:145:47;;;:::i;:::-;;1087:129:17;;;;;;;;;;;;;;;;-1:-1:-1;1087:129:17;-1:-1:-1;;;;;1087:129:17;;:::i;1066:77:47:-;;;:::i;:::-;;;;-1:-1:-1;;;;;1066:77:47;;;;;;;;;;;;;;773:42:17;;;;;;;;;;;;;;;;-1:-1:-1;773:42:17;-1:-1:-1;;;;;773:42:17;;:::i;:::-;;;;;;;;;;;;;;;;;;1983:240:47;;;;;;;;;;;;;;;;-1:-1:-1;1983:240:47;-1:-1:-1;;;;;1983:240:47;;:::i;1689:145::-;1280:12;:10;:12::i;:::-;1270:6;;-1:-1:-1;;;;;1270:6:47;;;:22;;;1262:67;;;;;-1:-1:-1;;;1262:67:47;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1795:1:::1;1779:6:::0;;1758:40:::1;::::0;-1:-1:-1;;;;;1779:6:47;;::::1;::::0;1758:40:::1;::::0;1795:1;;1758:40:::1;1825:1;1808:19:::0;;-1:-1:-1;;;;;;1808:19:47::1;::::0;;1689:145::o;1087:129:17:-;1280:12:47;:10;:12::i;:::-;1270:6;;-1:-1:-1;;;;;1270:6:47;;;:22;;;1262:67;;;;;-1:-1:-1;;;1262:67:47;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;1150:16:17;::::1;;::::0;;;1169:4:::1;1150:16;::::0;;;;;;;;:23;;-1:-1:-1;;1150:23:17::1;::::0;;::::1;::::0;;;1189:19;;;;;;;::::1;::::0;;;;;;;;::::1;1087:129:::0;:::o;1066:77:47:-;1104:7;1130:6;-1:-1:-1;;;;;1130:6:47;1066:77;:::o;773:42:17:-;;;;;;;;;;;;;;;:::o;1983:240:47:-;1280:12;:10;:12::i;:::-;1270:6;;-1:-1:-1;;;;;1270:6:47;;;:22;;;1262:67;;;;;-1:-1:-1;;;1262:67:47;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;2071:22:47;::::1;2063:73;;;;-1:-1:-1::0;;;2063:73:47::1;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2172:6;::::0;;2151:38:::1;::::0;-1:-1:-1;;;;;2151:38:47;;::::1;::::0;2172:6;::::1;::::0;2151:38:::1;::::0;::::1;2199:6;:17:::0;;-1:-1:-1;;;;;;2199:17:47::1;-1:-1:-1::0;;;;;2199:17:47;;;::::1;::::0;;;::::1;::::0;;1983:240::o;590:104:46:-;677:10;590:104;:::o",
   "source": "// SPDX-License-Identifier: GPL-3.0-or-later\r\npragma solidity ^0.6.10;\r\nimport \"@openzeppelin/contracts/access/Ownable.sol\";\r\n\r\n\r\n/**\r\n * @dev Orchestrated allows to define static access control between multiple contracts.\r\n * This contract would be used as a parent contract of any contract that needs to restrict access to some methods,\r\n * which would be marked with the `onlyOrchestrated modifier.\r\n * During deployment, the contract deployer (`owner`) can register any contracts that have privileged access by calling `orchestrate`.\r\n * Once deployment is completed, `owner` can call `transferOwnership(address(0))` to avoid any more contracts ever gaining privileged access.\r\n */\r\n\r\ncontract Orchestrated is Ownable {\r\n    event GrantedAccess(address access);\r\n\r\n    mapping(address => bool) public authorized;\r\n\r\n    constructor () public Ownable() {}\r\n\r\n    /// @dev Restrict usage to authorized users\r\n    modifier onlyOrchestrated(string memory err) {\r\n        require(authorized[msg.sender], err);\r\n        _;\r\n    }\r\n\r\n    /// @dev Add user to the authorized users list\r\n    function orchestrate(address user) public onlyOwner {\r\n        authorized[user] = true;\r\n        emit GrantedAccess(user);\r\n    }\r\n}\r\n",
   "sourcePath": "C:\\Users\\bruce\\dev\\yield\\yDai\\contracts\\helpers\\Orchestrated.sol",
   "ast": {
     "absolutePath": "/C/Users/bruce/dev/yield/yDai/contracts/helpers/Orchestrated.sol",
     "exportedSymbols": {
       "Orchestrated": [
-        9404
+        9465
       ]
     },
-    "id": 9405,
+    "id": 9466,
     "license": "GPL-3.0-or-later",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 9351,
+        "id": 9412,
         "literals": [
           "solidity",
           "^",
@@ -137,10 +137,10 @@
       {
         "absolutePath": "@openzeppelin/contracts/access/Ownable.sol",
         "file": "@openzeppelin/contracts/access/Ownable.sol",
-        "id": 9352,
+        "id": 9413,
         "nodeType": "ImportDirective",
-        "scope": 9405,
-        "sourceUnit": 25912,
+        "scope": 9466,
+        "sourceUnit": 26114,
         "src": "72:52:17",
         "symbolAliases": [],
         "unitAlias": ""
@@ -152,38 +152,38 @@
             "arguments": null,
             "baseName": {
               "contractScope": null,
-              "id": 9354,
+              "id": 9415,
               "name": "Ownable",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 25911,
+              "referencedDeclaration": 26113,
               "src": "714:7:17",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_Ownable_$25911",
+                "typeIdentifier": "t_contract$_Ownable_$26113",
                 "typeString": "contract Ownable"
               }
             },
-            "id": 9355,
+            "id": 9416,
             "nodeType": "InheritanceSpecifier",
             "src": "714:7:17"
           }
         ],
         "contractDependencies": [
-          25802,
-          25911
+          26004,
+          26113
         ],
         "contractKind": "contract",
         "documentation": {
-          "id": 9353,
+          "id": 9414,
           "nodeType": "StructuredDocumentation",
           "src": "130:555:17",
           "text": " @dev Orchestrated allows to define static access control between multiple contracts.\n This contract would be used as a parent contract of any contract that needs to restrict access to some methods,\n which would be marked with the `onlyOrchestrated modifier.\n During deployment, the contract deployer (`owner`) can register any contracts that have privileged access by calling `orchestrate`.\n Once deployment is completed, `owner` can call `transferOwnership(address(0))` to avoid any more contracts ever gaining privileged access."
         },
         "fullyImplemented": true,
-        "id": 9404,
+        "id": 9465,
         "linearizedBaseContracts": [
-          9404,
-          25911,
-          25802
+          9465,
+          26113,
+          26004
         ],
         "name": "Orchestrated",
         "nodeType": "ContractDefinition",
@@ -191,22 +191,22 @@
           {
             "anonymous": false,
             "documentation": null,
-            "id": 9359,
+            "id": 9420,
             "name": "GrantedAccess",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 9358,
+              "id": 9419,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 9357,
+                  "id": 9418,
                   "indexed": false,
                   "mutability": "mutable",
                   "name": "access",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 9359,
+                  "scope": 9420,
                   "src": "749:14:17",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -215,7 +215,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 9356,
+                    "id": 9417,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "749:7:17",
@@ -236,12 +236,12 @@
           {
             "constant": false,
             "functionSelector": "b9181611",
-            "id": 9363,
+            "id": 9424,
             "mutability": "mutable",
             "name": "authorized",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 9404,
+            "scope": 9465,
             "src": "773:42:17",
             "stateVariable": true,
             "storageLocation": "default",
@@ -250,9 +250,9 @@
               "typeString": "mapping(address => bool)"
             },
             "typeName": {
-              "id": 9362,
+              "id": 9423,
               "keyType": {
-                "id": 9360,
+                "id": 9421,
                 "name": "address",
                 "nodeType": "ElementaryTypeName",
                 "src": "781:7:17",
@@ -268,7 +268,7 @@
                 "typeString": "mapping(address => bool)"
               },
               "valueType": {
-                "id": 9361,
+                "id": 9422,
                 "name": "bool",
                 "nodeType": "ElementaryTypeName",
                 "src": "792:4:17",
@@ -283,29 +283,29 @@
           },
           {
             "body": {
-              "id": 9368,
+              "id": 9429,
               "nodeType": "Block",
               "src": "856:2:17",
               "statements": []
             },
             "documentation": null,
-            "id": 9369,
+            "id": 9430,
             "implemented": true,
             "kind": "constructor",
             "modifiers": [
               {
                 "arguments": [],
-                "id": 9366,
+                "id": 9427,
                 "modifierName": {
                   "argumentTypes": null,
-                  "id": 9365,
+                  "id": 9426,
                   "name": "Ownable",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 25911,
+                  "referencedDeclaration": 26113,
                   "src": "846:7:17",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_type$_t_contract$_Ownable_$25911_$",
+                    "typeIdentifier": "t_type$_t_contract$_Ownable_$26113_$",
                     "typeString": "type(contract Ownable)"
                   }
                 },
@@ -317,18 +317,18 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 9364,
+              "id": 9425,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "836:2:17"
             },
             "returnParameters": {
-              "id": 9367,
+              "id": 9428,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "856:0:17"
             },
-            "scope": 9404,
+            "scope": 9465,
             "src": "824:34:17",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -336,7 +336,7 @@
           },
           {
             "body": {
-              "id": 9383,
+              "id": 9444,
               "nodeType": "Block",
               "src": "960:67:17",
               "statements": [
@@ -348,23 +348,23 @@
                         "argumentTypes": null,
                         "baseExpression": {
                           "argumentTypes": null,
-                          "id": 9375,
+                          "id": 9436,
                           "name": "authorized",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 9363,
+                          "referencedDeclaration": 9424,
                           "src": "979:10:17",
                           "typeDescriptions": {
                             "typeIdentifier": "t_mapping$_t_address_$_t_bool_$",
                             "typeString": "mapping(address => bool)"
                           }
                         },
-                        "id": 9378,
+                        "id": 9439,
                         "indexExpression": {
                           "argumentTypes": null,
                           "expression": {
                             "argumentTypes": null,
-                            "id": 9376,
+                            "id": 9437,
                             "name": "msg",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
@@ -375,7 +375,7 @@
                               "typeString": "msg"
                             }
                           },
-                          "id": 9377,
+                          "id": 9438,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
@@ -402,11 +402,11 @@
                       },
                       {
                         "argumentTypes": null,
-                        "id": 9379,
+                        "id": 9440,
                         "name": "err",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 9372,
+                        "referencedDeclaration": 9433,
                         "src": "1003:3:17",
                         "typeDescriptions": {
                           "typeIdentifier": "t_string_memory_ptr",
@@ -425,7 +425,7 @@
                           "typeString": "string memory"
                         }
                       ],
-                      "id": 9374,
+                      "id": 9435,
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
@@ -439,7 +439,7 @@
                         "typeString": "function (bool,string memory) pure"
                       }
                     },
-                    "id": 9380,
+                    "id": 9441,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -454,39 +454,39 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 9381,
+                  "id": 9442,
                   "nodeType": "ExpressionStatement",
                   "src": "971:36:17"
                 },
                 {
-                  "id": 9382,
+                  "id": 9443,
                   "nodeType": "PlaceholderStatement",
                   "src": "1018:1:17"
                 }
               ]
             },
             "documentation": {
-              "id": 9370,
+              "id": 9431,
               "nodeType": "StructuredDocumentation",
               "src": "866:43:17",
               "text": "@dev Restrict usage to authorized users"
             },
-            "id": 9384,
+            "id": 9445,
             "name": "onlyOrchestrated",
             "nodeType": "ModifierDefinition",
             "overrides": null,
             "parameters": {
-              "id": 9373,
+              "id": 9434,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 9372,
+                  "id": 9433,
                   "mutability": "mutable",
                   "name": "err",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 9384,
+                  "scope": 9445,
                   "src": "941:17:17",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -495,7 +495,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 9371,
+                    "id": 9432,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "941:6:17",
@@ -516,14 +516,14 @@
           },
           {
             "body": {
-              "id": 9402,
+              "id": 9463,
               "nodeType": "Block",
               "src": "1139:77:17",
               "statements": [
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 9396,
+                    "id": 9457,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -532,25 +532,25 @@
                       "argumentTypes": null,
                       "baseExpression": {
                         "argumentTypes": null,
-                        "id": 9392,
+                        "id": 9453,
                         "name": "authorized",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 9363,
+                        "referencedDeclaration": 9424,
                         "src": "1150:10:17",
                         "typeDescriptions": {
                           "typeIdentifier": "t_mapping$_t_address_$_t_bool_$",
                           "typeString": "mapping(address => bool)"
                         }
                       },
-                      "id": 9394,
+                      "id": 9455,
                       "indexExpression": {
                         "argumentTypes": null,
-                        "id": 9393,
+                        "id": 9454,
                         "name": "user",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 9387,
+                        "referencedDeclaration": 9448,
                         "src": "1161:4:17",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
@@ -573,7 +573,7 @@
                     "rightHandSide": {
                       "argumentTypes": null,
                       "hexValue": "74727565",
-                      "id": 9395,
+                      "id": 9456,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -594,7 +594,7 @@
                       "typeString": "bool"
                     }
                   },
-                  "id": 9397,
+                  "id": 9458,
                   "nodeType": "ExpressionStatement",
                   "src": "1150:23:17"
                 },
@@ -604,11 +604,11 @@
                     "arguments": [
                       {
                         "argumentTypes": null,
-                        "id": 9399,
+                        "id": 9460,
                         "name": "user",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 9387,
+                        "referencedDeclaration": 9448,
                         "src": "1203:4:17",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
@@ -623,18 +623,18 @@
                           "typeString": "address"
                         }
                       ],
-                      "id": 9398,
+                      "id": 9459,
                       "name": "GrantedAccess",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 9359,
+                      "referencedDeclaration": 9420,
                       "src": "1189:13:17",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_event_nonpayable$_t_address_$returns$__$",
                         "typeString": "function (address)"
                       }
                     },
-                    "id": 9400,
+                    "id": 9461,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -649,33 +649,33 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 9401,
+                  "id": 9462,
                   "nodeType": "EmitStatement",
                   "src": "1184:24:17"
                 }
               ]
             },
             "documentation": {
-              "id": 9385,
+              "id": 9446,
               "nodeType": "StructuredDocumentation",
               "src": "1035:46:17",
               "text": "@dev Add user to the authorized users list"
             },
             "functionSelector": "80f5a440",
-            "id": 9403,
+            "id": 9464,
             "implemented": true,
             "kind": "function",
             "modifiers": [
               {
                 "arguments": null,
-                "id": 9390,
+                "id": 9451,
                 "modifierName": {
                   "argumentTypes": null,
-                  "id": 9389,
+                  "id": 9450,
                   "name": "onlyOwner",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 25860,
+                  "referencedDeclaration": 26062,
                   "src": "1129:9:17",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$__$",
@@ -690,17 +690,17 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 9388,
+              "id": 9449,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 9387,
+                  "id": 9448,
                   "mutability": "mutable",
                   "name": "user",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 9403,
+                  "scope": 9464,
                   "src": "1108:12:17",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -709,7 +709,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 9386,
+                    "id": 9447,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "1108:7:17",
@@ -726,19 +726,19 @@
               "src": "1107:14:17"
             },
             "returnParameters": {
-              "id": 9391,
+              "id": 9452,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "1139:0:17"
             },
-            "scope": 9404,
+            "scope": 9465,
             "src": "1087:129:17",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "public"
           }
         ],
-        "scope": 9405,
+        "scope": 9466,
         "src": "689:530:17"
       }
     ],
@@ -748,15 +748,15 @@
     "absolutePath": "/C/Users/bruce/dev/yield/yDai/contracts/helpers/Orchestrated.sol",
     "exportedSymbols": {
       "Orchestrated": [
-        9404
+        9465
       ]
     },
-    "id": 9405,
+    "id": 9466,
     "license": "GPL-3.0-or-later",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 9351,
+        "id": 9412,
         "literals": [
           "solidity",
           "^",
@@ -769,10 +769,10 @@
       {
         "absolutePath": "@openzeppelin/contracts/access/Ownable.sol",
         "file": "@openzeppelin/contracts/access/Ownable.sol",
-        "id": 9352,
+        "id": 9413,
         "nodeType": "ImportDirective",
-        "scope": 9405,
-        "sourceUnit": 25912,
+        "scope": 9466,
+        "sourceUnit": 26114,
         "src": "72:52:17",
         "symbolAliases": [],
         "unitAlias": ""
@@ -784,38 +784,38 @@
             "arguments": null,
             "baseName": {
               "contractScope": null,
-              "id": 9354,
+              "id": 9415,
               "name": "Ownable",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 25911,
+              "referencedDeclaration": 26113,
               "src": "714:7:17",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_Ownable_$25911",
+                "typeIdentifier": "t_contract$_Ownable_$26113",
                 "typeString": "contract Ownable"
               }
             },
-            "id": 9355,
+            "id": 9416,
             "nodeType": "InheritanceSpecifier",
             "src": "714:7:17"
           }
         ],
         "contractDependencies": [
-          25802,
-          25911
+          26004,
+          26113
         ],
         "contractKind": "contract",
         "documentation": {
-          "id": 9353,
+          "id": 9414,
           "nodeType": "StructuredDocumentation",
           "src": "130:555:17",
           "text": " @dev Orchestrated allows to define static access control between multiple contracts.\n This contract would be used as a parent contract of any contract that needs to restrict access to some methods,\n which would be marked with the `onlyOrchestrated modifier.\n During deployment, the contract deployer (`owner`) can register any contracts that have privileged access by calling `orchestrate`.\n Once deployment is completed, `owner` can call `transferOwnership(address(0))` to avoid any more contracts ever gaining privileged access."
         },
         "fullyImplemented": true,
-        "id": 9404,
+        "id": 9465,
         "linearizedBaseContracts": [
-          9404,
-          25911,
-          25802
+          9465,
+          26113,
+          26004
         ],
         "name": "Orchestrated",
         "nodeType": "ContractDefinition",
@@ -823,22 +823,22 @@
           {
             "anonymous": false,
             "documentation": null,
-            "id": 9359,
+            "id": 9420,
             "name": "GrantedAccess",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 9358,
+              "id": 9419,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 9357,
+                  "id": 9418,
                   "indexed": false,
                   "mutability": "mutable",
                   "name": "access",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 9359,
+                  "scope": 9420,
                   "src": "749:14:17",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -847,7 +847,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 9356,
+                    "id": 9417,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "749:7:17",
@@ -868,12 +868,12 @@
           {
             "constant": false,
             "functionSelector": "b9181611",
-            "id": 9363,
+            "id": 9424,
             "mutability": "mutable",
             "name": "authorized",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 9404,
+            "scope": 9465,
             "src": "773:42:17",
             "stateVariable": true,
             "storageLocation": "default",
@@ -882,9 +882,9 @@
               "typeString": "mapping(address => bool)"
             },
             "typeName": {
-              "id": 9362,
+              "id": 9423,
               "keyType": {
-                "id": 9360,
+                "id": 9421,
                 "name": "address",
                 "nodeType": "ElementaryTypeName",
                 "src": "781:7:17",
@@ -900,7 +900,7 @@
                 "typeString": "mapping(address => bool)"
               },
               "valueType": {
-                "id": 9361,
+                "id": 9422,
                 "name": "bool",
                 "nodeType": "ElementaryTypeName",
                 "src": "792:4:17",
@@ -915,29 +915,29 @@
           },
           {
             "body": {
-              "id": 9368,
+              "id": 9429,
               "nodeType": "Block",
               "src": "856:2:17",
               "statements": []
             },
             "documentation": null,
-            "id": 9369,
+            "id": 9430,
             "implemented": true,
             "kind": "constructor",
             "modifiers": [
               {
                 "arguments": [],
-                "id": 9366,
+                "id": 9427,
                 "modifierName": {
                   "argumentTypes": null,
-                  "id": 9365,
+                  "id": 9426,
                   "name": "Ownable",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 25911,
+                  "referencedDeclaration": 26113,
                   "src": "846:7:17",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_type$_t_contract$_Ownable_$25911_$",
+                    "typeIdentifier": "t_type$_t_contract$_Ownable_$26113_$",
                     "typeString": "type(contract Ownable)"
                   }
                 },
@@ -949,18 +949,18 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 9364,
+              "id": 9425,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "836:2:17"
             },
             "returnParameters": {
-              "id": 9367,
+              "id": 9428,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "856:0:17"
             },
-            "scope": 9404,
+            "scope": 9465,
             "src": "824:34:17",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -968,7 +968,7 @@
           },
           {
             "body": {
-              "id": 9383,
+              "id": 9444,
               "nodeType": "Block",
               "src": "960:67:17",
               "statements": [
@@ -980,23 +980,23 @@
                         "argumentTypes": null,
                         "baseExpression": {
                           "argumentTypes": null,
-                          "id": 9375,
+                          "id": 9436,
                           "name": "authorized",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 9363,
+                          "referencedDeclaration": 9424,
                           "src": "979:10:17",
                           "typeDescriptions": {
                             "typeIdentifier": "t_mapping$_t_address_$_t_bool_$",
                             "typeString": "mapping(address => bool)"
                           }
                         },
-                        "id": 9378,
+                        "id": 9439,
                         "indexExpression": {
                           "argumentTypes": null,
                           "expression": {
                             "argumentTypes": null,
-                            "id": 9376,
+                            "id": 9437,
                             "name": "msg",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
@@ -1007,7 +1007,7 @@
                               "typeString": "msg"
                             }
                           },
-                          "id": 9377,
+                          "id": 9438,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
@@ -1034,11 +1034,11 @@
                       },
                       {
                         "argumentTypes": null,
-                        "id": 9379,
+                        "id": 9440,
                         "name": "err",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 9372,
+                        "referencedDeclaration": 9433,
                         "src": "1003:3:17",
                         "typeDescriptions": {
                           "typeIdentifier": "t_string_memory_ptr",
@@ -1057,7 +1057,7 @@
                           "typeString": "string memory"
                         }
                       ],
-                      "id": 9374,
+                      "id": 9435,
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
@@ -1071,7 +1071,7 @@
                         "typeString": "function (bool,string memory) pure"
                       }
                     },
-                    "id": 9380,
+                    "id": 9441,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1086,39 +1086,39 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 9381,
+                  "id": 9442,
                   "nodeType": "ExpressionStatement",
                   "src": "971:36:17"
                 },
                 {
-                  "id": 9382,
+                  "id": 9443,
                   "nodeType": "PlaceholderStatement",
                   "src": "1018:1:17"
                 }
               ]
             },
             "documentation": {
-              "id": 9370,
+              "id": 9431,
               "nodeType": "StructuredDocumentation",
               "src": "866:43:17",
               "text": "@dev Restrict usage to authorized users"
             },
-            "id": 9384,
+            "id": 9445,
             "name": "onlyOrchestrated",
             "nodeType": "ModifierDefinition",
             "overrides": null,
             "parameters": {
-              "id": 9373,
+              "id": 9434,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 9372,
+                  "id": 9433,
                   "mutability": "mutable",
                   "name": "err",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 9384,
+                  "scope": 9445,
                   "src": "941:17:17",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -1127,7 +1127,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 9371,
+                    "id": 9432,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "941:6:17",
@@ -1148,14 +1148,14 @@
           },
           {
             "body": {
-              "id": 9402,
+              "id": 9463,
               "nodeType": "Block",
               "src": "1139:77:17",
               "statements": [
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 9396,
+                    "id": 9457,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1164,25 +1164,25 @@
                       "argumentTypes": null,
                       "baseExpression": {
                         "argumentTypes": null,
-                        "id": 9392,
+                        "id": 9453,
                         "name": "authorized",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 9363,
+                        "referencedDeclaration": 9424,
                         "src": "1150:10:17",
                         "typeDescriptions": {
                           "typeIdentifier": "t_mapping$_t_address_$_t_bool_$",
                           "typeString": "mapping(address => bool)"
                         }
                       },
-                      "id": 9394,
+                      "id": 9455,
                       "indexExpression": {
                         "argumentTypes": null,
-                        "id": 9393,
+                        "id": 9454,
                         "name": "user",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 9387,
+                        "referencedDeclaration": 9448,
                         "src": "1161:4:17",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
@@ -1205,7 +1205,7 @@
                     "rightHandSide": {
                       "argumentTypes": null,
                       "hexValue": "74727565",
-                      "id": 9395,
+                      "id": 9456,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -1226,7 +1226,7 @@
                       "typeString": "bool"
                     }
                   },
-                  "id": 9397,
+                  "id": 9458,
                   "nodeType": "ExpressionStatement",
                   "src": "1150:23:17"
                 },
@@ -1236,11 +1236,11 @@
                     "arguments": [
                       {
                         "argumentTypes": null,
-                        "id": 9399,
+                        "id": 9460,
                         "name": "user",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 9387,
+                        "referencedDeclaration": 9448,
                         "src": "1203:4:17",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
@@ -1255,18 +1255,18 @@
                           "typeString": "address"
                         }
                       ],
-                      "id": 9398,
+                      "id": 9459,
                       "name": "GrantedAccess",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 9359,
+                      "referencedDeclaration": 9420,
                       "src": "1189:13:17",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_event_nonpayable$_t_address_$returns$__$",
                         "typeString": "function (address)"
                       }
                     },
-                    "id": 9400,
+                    "id": 9461,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1281,33 +1281,33 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 9401,
+                  "id": 9462,
                   "nodeType": "EmitStatement",
                   "src": "1184:24:17"
                 }
               ]
             },
             "documentation": {
-              "id": 9385,
+              "id": 9446,
               "nodeType": "StructuredDocumentation",
               "src": "1035:46:17",
               "text": "@dev Add user to the authorized users list"
             },
             "functionSelector": "80f5a440",
-            "id": 9403,
+            "id": 9464,
             "implemented": true,
             "kind": "function",
             "modifiers": [
               {
                 "arguments": null,
-                "id": 9390,
+                "id": 9451,
                 "modifierName": {
                   "argumentTypes": null,
-                  "id": 9389,
+                  "id": 9450,
                   "name": "onlyOwner",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 25860,
+                  "referencedDeclaration": 26062,
                   "src": "1129:9:17",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$__$",
@@ -1322,17 +1322,17 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 9388,
+              "id": 9449,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 9387,
+                  "id": 9448,
                   "mutability": "mutable",
                   "name": "user",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 9403,
+                  "scope": 9464,
                   "src": "1108:12:17",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -1341,7 +1341,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 9386,
+                    "id": 9447,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "1108:7:17",
@@ -1358,19 +1358,19 @@
               "src": "1107:14:17"
             },
             "returnParameters": {
-              "id": 9391,
+              "id": 9452,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "1139:0:17"
             },
-            "scope": 9404,
+            "scope": 9465,
             "src": "1087:129:17",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "public"
           }
         ],
-        "scope": 9405,
+        "scope": 9466,
         "src": "689:530:17"
       }
     ],
@@ -1382,7 +1382,7 @@
   },
   "networks": {},
   "schemaVersion": "3.2.3",
-  "updatedAt": "2020-08-03T09:57:49.930Z",
+  "updatedAt": "2020-08-19T15:24:08.745Z",
   "devdoc": {
     "details": "Orchestrated allows to define static access control between multiple contracts. This contract would be used as a parent contract of any contract that needs to restrict access to some methods, which would be marked with the `onlyOrchestrated modifier. During deployment, the contract deployer (`owner`) can register any contracts that have privileged access by calling `orchestrate`. Once deployment is completed, `owner` can call `transferOwnership(address(0))` to avoid any more contracts ever gaining privileged access.",
     "methods": {

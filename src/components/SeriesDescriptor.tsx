@@ -1,10 +1,14 @@
 import React, { useState, useContext } from 'react';
-import { Box, Text, ThemeContext } from 'grommet';
+import { Box, Text, ThemeContext, ResponsiveContext, Button, Stack } from 'grommet';
+
+import { FiLayers as ChangeSeries } from 'react-icons/fi';
 
 import { ScaleLoader } from 'react-spinners';
 import { SeriesContext } from '../contexts/SeriesContext';
 
 import SeriesSelector from './SeriesSelector';
+import Loading from './Loading';
+import AprBadge from './AprBadge';
 
 interface ISeriesDescriptorProps {
   activeView: string;
@@ -16,18 +20,12 @@ function SeriesDescriptor( props: ISeriesDescriptorProps, children:any) {
   const { activeView, minified } = props;
 
   const theme:any = React.useContext(ThemeContext);
+  const screenSize = React.useContext(ResponsiveContext);
+
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { activeSeries } = seriesState; 
 
   const [ selectorOpen, setSelectorOpen ] = useState<boolean>(false);
-  const [ description, setDescription ] = useState<string>( activeSeries?.displayName || '');
-
-  /* Set Series description/display name */
-  React.useEffect(()=>{
-    activeSeries && setDescription(activeSeries.displayName);
-    activeSeries && Number.isFinite(parseFloat(activeSeries.yieldAPR_)) &&
-      setDescription(`${activeSeries.yieldAPR_}% ${activeSeries.displayName}`);
-  }, [ activeSeries ]);
 
   return (
     <>
@@ -40,7 +38,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps, children:any) {
       >
         <Box 
           round='xsmall'
-          background='brand-transparent'
+          background='background-mid'
           border='all'
           onClick={()=>setSelectorOpen(true)}
         // hoverIndicator='brand'
@@ -51,56 +49,51 @@ function SeriesDescriptor( props: ISeriesDescriptorProps, children:any) {
           justify='between'
         >
           { !activeSeries ? 
-            <ScaleLoader color={theme?.global?.colors['brand-transparent'].dark} height='13' /> : 
-            <Text color='brand' size='large'>
-              { description }
-            </Text>}
+            <ScaleLoader color={theme?.global?.colors['brand-transparent'].dark} height='13' /> :
+            <Box direction='row' gap='small'> 
+              
+              <AprBadge activeView={activeView} series={activeSeries} />
 
-          {
-            activeSeries?.isMature === false && 
-            activeView === 'borrow' && 
-            !Number.isFinite(parseFloat(activeSeries.yieldAPR_)) &&        
-            <Box 
-              round
-              border='all'
-              direction='row'
-              pad={{ horizontal:'small' }}
-              align='center'
-              background='orange'
-            >
-              <Text size='xxsmall'>
-                Limited Liquidity            
+              <Text color='brand' size='large'>            
+                { activeSeries.displayName }
               </Text>
+
+              {/* { activeSeries?.isMature === false && 
+                 activeView === 'borrow' && 
+                  !Number.isFinite(parseFloat(activeSeries.yieldAPR_)) &&                  
+                  <Box 
+                    round
+                    border='all'
+                    direction='row'
+                    pad={{ horizontal:'small' }}
+                    align='center'
+                    background='orange'
+                  >
+                    <Text size='xxsmall'>
+                      Limited Liquidity            
+                    </Text>
+                  </Box>}            */}
             </Box>}
 
-          { activeSeries?.isMature === true && 
-            !Number.isFinite(parseFloat(activeSeries.yieldAPR_)) &&        
-            <Box 
-              round
-              border='all'
-              direction='row'
-              pad={{ horizontal:'small' }}
-              align='center'
-            >
-              <Text size='xxsmall'>
-                Matured Series         
-              </Text>
-            </Box>}
-        </Box>
-
-        <Box justify='center'>
-          <Box
-            round
+          <Button
+            color='brand-transparent'
+            label={(screenSize !== 'small' ) ?
+            
+              <Box align='center' direction='row' gap='small'>
+                <ChangeSeries />
+                <Text size='xsmall' color='brand'>
+                  Change Series              
+                </Text>
+              </Box>
+              : 
+              <Box align='center'>
+                <ChangeSeries />
+              </Box>}
             onClick={()=>setSelectorOpen(true)}
             hoverIndicator='brand-transparent'
-            border='all'
-            // border={{ color:'brand' }}
-            pad={{ horizontal:'small', vertical:'small' }}
-            justify='center'
-          >
-            <Text size='xsmall'>Change series</Text>
-          </Box>
+          />
         </Box>
+
       </Box>
     </>
   );

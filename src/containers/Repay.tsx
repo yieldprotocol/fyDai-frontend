@@ -1,6 +1,6 @@
 import React, { useEffect, useContext } from 'react';
 import { ethers } from 'ethers';
-import { Box, Button, Image, Select, TextInput, Text, Heading, Collapsible, CheckBox,  ThemeContext, } from 'grommet';
+import { Box, Button, TextInput, Text, ResponsiveContext, CheckBox,  ThemeContext, Keyboard, } from 'grommet';
 import { 
   FiInfo as Info,
   FiHelpCircle as Help,
@@ -15,14 +15,16 @@ import InlineAlert from '../components/InlineAlert';
 import OnceOffAuthorize from '../components/OnceOffAuthorize';
 import ApprovalPending from '../components/ApprovalPending';
 import TransactionPending from '../components/TransactionPending';
+import DaiMark from '../components/logos/DaiMark';
 
 import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
 import { NotifyContext } from '../contexts/NotifyContext';
 import { UserContext } from '../contexts/UserContext';
 
-import { useController, usePool, useBalances, useProxy, useTxActive, useToken } from '../hooks';
+import { useController, usePool, useBalances, useProxy, useTxActive, useToken, useSignerAccount } from '../hooks';
 import InfoGrid from '../components/InfoGrid';
+import InputWrap from '../components/InputWrap';
 
 interface IRepayProps {
   repayAmount?:any
@@ -38,6 +40,7 @@ function Repay({ repayAmount }:IRepayProps) {
   const { daiBalance_ } = userState.position;
 
   const theme:any = useContext(ThemeContext);
+  const screenSize = React.useContext(ResponsiveContext);
 
   const { 
     previewPoolTx,
@@ -62,20 +65,24 @@ function Repay({ repayAmount }:IRepayProps) {
   const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
 
   const [ txActive ] = useTxActive(['repay']);
+  const { account } = useSignerAccount();
 
   const repayProcedure = async (value:number) => {
-    setRepayPending(true);
 
-    /* repay using proxy */
-    // await repayUsingExactDai(activeSeries.daiProxyAddress, 'ETH-A', activeSeries.maturity, yDaiValue, value);
-
-    /* direct repay without proxy */
-    await repay(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value, 'Dai' );
-    setApproved(await getTokenAllowance(deployedContracts.Dai, deployedContracts.Treasury, 'Dai'));
-    setInputValue('');
-    await userActions.updatePosition();
-    await seriesActions.updateActiveSeries(); // or, await seriesActions.updateSeries([activeSeries]);
-    setRepayPending(false);
+    if (inputValue>0 && !repayDisabled) {
+      setRepayPending(true);
+      /* repay using proxy */
+      // await repayUsingExactDai(activeSeries.daiProxyAddress, 'ETH-A', activeSeries.maturity, yDaiValue, value);
+      /* direct repay without proxy */
+      await repay(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value, 'Dai' );
+      setApproved(await getTokenAllowance(deployedContracts.Dai, deployedContracts.Treasury, 'Dai'));
+      setInputValue('');
+      await Promise.all([
+        userActions.updatePosition(),
+        seriesActions.updateActiveSeries()
+      ]);
+      setRepayPending(false);
+    }
   };
 
   const delegateProcedure = async () => {
@@ -98,7 +105,7 @@ function Repay({ repayAmount }:IRepayProps) {
   useEffect(() => {
     if ( inputValue  && daiBalance_ && ( inputValue > daiBalance_ ) ) {
       setWarningMsg(null);
-      setErrorMsg('That amount exceeds the amount of Dai in your wallet'); 
+      setErrorMsg('That amount exceeds the amount of DAI in your wallet'); 
     } else {
       setWarningMsg(null);
       setErrorMsg(null);
@@ -142,128 +149,103 @@ function Repay({ repayAmount }:IRepayProps) {
   }, [ activeSeries ]);
 
   return (
-    <>
-      { !txActive &&
-      <Box flex='grow' justify='between'>
-        <Box gap='medium' align='center' fill='horizontal'>
-          <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Selected series</Text>
+    <Keyboard 
+      onEsc={() => setInputValue(undefined)}
+      onEnter={()=> repayProcedure(inputValue)}
+      target='document'
+    >
+      <>
+        { !txActive &&
+        <Box flex='grow' justify='between'>
+          <Box gap='medium' align='center' fill='horizontal'>
+            <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Selected series</Text>
 
-          <SeriesDescriptor activeView='borrow' />
+            <SeriesDescriptor activeView='borrow' />
 
-          {/* {!hasDelegated && 
-            <OnceOffAuthorize
-              authProcedure={delegateProcedure} 
-              authMsg='Allow Pool to trade on your behalf' 
-              txPending={txActive?.type === 'DELEGATION'}  
-          />} */}
+            <InfoGrid entries={[
+              {
+                label: 'Current Debt',
+                visible: !!account,
+                active: true,
+                loading: repayPending,     
+                value: activeSeries?.ethDebtYDai_? `${activeSeries.ethDebtYDai_.toFixed(2)} DAI`: 'O DAI',
+                valuePrefix: null,
+                valueExtra: null, 
+              },
+              {
+                label: 'DAI balance',
+                visible: !!account,
+                active: true,
+                loading: repayPending,            
+                value: daiBalance_?`${daiBalance_.toFixed(2)} DAI`: '-',
+                valuePrefix: null,
+                valueExtra: null,
+              },
+            ]}
+            />
 
-          <InfoGrid entries={[
-            {
-              label: 'Current Debt',
-              visible: true,
-              active: true,
-              loading: false,     
-              value: activeSeries?.ethDebtYDai_? `${activeSeries.ethDebtYDai_.toFixed(2)} Dai`: 'O Dai',
-              valuePrefix: null,
-              valueExtra: null, 
-            },
-            {
-              label: 'Dai balance',
-              visible: true,
-              active: true,
-              loading: false,            
-              value: daiBalance_?`${daiBalance_.toFixed(2)} Dai`: '-',
-              valuePrefix: null,
-              valueExtra: null,
-            },
-          ]}
-          />
-
-          <Box fill gap='medium' margin={{ vertical:'large' }}>
             <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to Repay</Text>
-            <Box
-              direction='row-responsive'
-              fill='horizontal'
-              gap='small'
-              align='center'
-            >
-              <Box 
-                round='small'
-                // background='brand-transparent'
-                border='all'
-                direction='row'
-                fill='horizontal'
-                pad='small'
-                flex
-              >
-                <TextInput
-                  type="number"
-                  placeholder='Enter the amount of Dai to Repay'
-                  value={inputValue || ''}
-                  // disabled={repayDisabled}
-                  plain
-                  onChange={(event:any) => setInputValue(event.target.value)}
-                />
-              </Box>
 
-              <Box justify='center'>
-                <Box
-                  round
-                  onClick={()=>setInputValue(daiBalance_)}
-                  hoverIndicator='brand-transparent'
-                  border='all'
-              // border={{ color:'brand' }}
-                  pad={{ horizontal:'small', vertical:'small' }}
-                  justify='center'
-                >
-                  <Text size='xsmall'>Repay max</Text>
-                </Box>
-              </Box>
-            </Box>
-          </Box>
-
-          <InlineAlert warnMsg={warningMsg} errorMsg={errorMsg} />
+            <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={repayDisabled}>
+              <TextInput
+                type="number"
+                placeholder={screenSize !== 'small' ? 'Enter the amount of DAI to Repay': 'DAI'}
+                value={inputValue || ''}
+                plain
+                onChange={(event:any) => setInputValue(event.target.value)}
+                icon={<DaiMark />}
+              />
+              <Button 
+                label={<Text size='xsmall' color='brand'> {screenSize !== 'small' ? 'Repay Maximum': 'Max'}</Text>}
+                color='brand-transparent'
+                onClick={()=>setInputValue(daiBalance_)}
+                hoverIndicator='brand-transparent'
+              />
+            </InputWrap>
       
-          <Box>
-            {approveActive || approved === undefined ?             
-              <ScaleLoader color={theme?.global?.colors['brand-transparent'].dark} height='13' />
-              : <CheckBox
-                reverse
-                checked={approved && !inputValue || ( approved >= inputValue )}
-                disabled={!inputValue || ( approved >= inputValue )}
-                onChange={()=>approveProcedure(inputValue)}
-                label={            
+            <> 
+              <Box margin='medium'>
+                {approveActive || approved === undefined ?             
+                  <ScaleLoader color={theme?.global?.colors['brand-transparent'].dark} height='13' />
+                  : <CheckBox
+                    reverse
+                    checked={approved && !inputValue || ( approved >= inputValue )}
+                    disabled={!inputValue || ( approved >= inputValue )}
+                    onChange={()=>approveProcedure(inputValue)}
+                    label={            
                   (approved >= inputValue) ? 
-                    `Repayments are unlocked for up to ${approved.toFixed(2) || '' } Dai` 
-                    : `Unlock repayments of ${inputValue || ''} Dai` 
+                    `Repayments are unlocked for up to ${approved.toFixed(2) || '' } DAI` 
+                    : `Unlock repayments of ${inputValue || ''} DAI` 
                 }
-              />}
+                  />}
+              </Box>
+
+              <Box
+                fill='horizontal'
+                round='small'
+                background={repayDisabled ? 'brand-transparent' : 'brand'}
+                onClick={()=>repayProcedure(inputValue)}
+                align='center'
+                pad='small'
+              >
+                <Text 
+                  weight='bold'
+                  size='large'
+                  color={repayDisabled ? 'text-xweak' : 'text'}
+                >
+                  {`Repay ${inputValue || ''} DAI`}
+                </Text>
+              </Box>
+            </>
+            
           </Box>
+        </Box>}
 
-          <Box
-            fill='horizontal'
-            round='small'
-            background={repayDisabled ? 'brand-transparent' : 'brand'}
-            onClick={repayDisabled ? ()=>{}:()=>repayProcedure(inputValue)}
-            // onClick={()=>repayProcedure(inputValue)}
-            align='center'
-            pad='small'
-          >
-            <Text 
-              weight='bold'
-              size='large'
-              color={repayDisabled ? 'text-xweak' : 'text'}
-            >
-              {`Repay ${inputValue || ''} Dai`}
-            </Text>
-          </Box>
-        </Box>
-      </Box>}
+        { repayActive && !txActive && <ApprovalPending /> } 
+        { txActive && <TransactionPending msg={`You made a repayment of ${inputValue} DAI.`} tx={txActive} /> }
 
-      { repayActive && !txActive && <ApprovalPending /> } 
-      { txActive && <TransactionPending msg={`You made a repayment of ${inputValue} Dai.`} tx={txActive} /> }
-
-    </>
+      </>
+    </Keyboard>
   );
 }
 

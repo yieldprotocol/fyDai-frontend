@@ -9,7 +9,6 @@ import TestERC20 from '../contracts/TestERC20.json';
 import { useSignerAccount } from './connectionHooks';
 // ethers.errors.setLogLevel('error');
 
-
 /**
  * Hook for interacting with the yield 'CRONTROLLER' Contract
  * @returns { function } post
@@ -276,7 +275,7 @@ export const useController = () => {
       return;
     }
     /* Transaction reporting & tracking */
-    dispatch({ type: 'txPending', payload:{ tx, message: 'Pending once-off approval of Eth withdrawals ...', type:'DELEGATION' } } );
+    dispatch({ type: 'txPending', payload:{ tx, message: 'Pending once-off delegation...', type:'DELEGATION' } } );
     await tx.wait();
     dispatch({ type: 'txComplete', payload:{ tx } } );
   };

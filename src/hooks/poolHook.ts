@@ -17,7 +17,7 @@ import YDai from '../contracts/YDai.json';
  */
 export const usePool = () => {
   // const { state: { provider, signer, account } } = React.useContext(ConnectionContext);
-  const { provider, signer, account } = useSignerAccount();
+  const { fallbackProvider, provider, signer, account } = useSignerAccount();
 
   const { abi: marketAbi } = Pool;
   const  { dispatch }  = React.useContext<any>(NotifyContext);
@@ -235,29 +235,29 @@ export const usePool = () => {
     poolAddress: string,
     amount: number,
   ): Promise<BigNumber> => {
+
+    const type=txType.toUpperCase();
     const parsedAmount = ethers.utils.parseEther(amount.toString());
     const marketAddr = ethers.utils.getAddress(poolAddress);
-    const contract = new ethers.Contract( marketAddr, marketAbi, provider );
-    let result;
-
+    // TODO > check the || provider  . might get buggy
+    const contract = new ethers.Contract( marketAddr, marketAbi, fallbackProvider||provider);
     try {
-      switch (txType.toUpperCase()) {
+      switch (type) {
         case 'BUYDAI':
-          result = await contract.buyDaiPreview(parsedAmount); break;
+          return await contract.buyDaiPreview(parsedAmount);
         case 'SELLDAI': 
-          result = await contract.sellDaiPreview(parsedAmount); break;
+          return await contract.sellDaiPreview(parsedAmount);
         case 'BUYYDAI':
-          result = await contract.buyYDaiPreview(parsedAmount); break;
+          return await contract.buyYDaiPreview(parsedAmount);
         case 'SELLYDAI':
-          result = await contract.sellYDaiPreview(parsedAmount); break;
-        default : result = BigNumber.from('0'); break;
+          return await contract.sellYDaiPreview(parsedAmount);
+        default: 
+          return BigNumber.from('0');
       }
     } catch (e) {
       console.log('Error:', e);
-      result = BigNumber.from('0');
+      return BigNumber.from('0');
     }
-
-    return result;
   };
 
   /**

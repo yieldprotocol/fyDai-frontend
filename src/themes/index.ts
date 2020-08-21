@@ -256,7 +256,9 @@ export const yieldTheme = {
       }
     `,
   },
-  TextInput: {},
+  TextInput: {
+
+  },
   collapsible: {
     minSpeed: '100',
   },
@@ -271,12 +273,29 @@ export const yieldTheme = {
   button: {
     border: {
       width: '1px',
-      radius: '8px',
+      radius: '20px',
     },
     padding: {
       vertical: '0px',
       horizontal: '8px',
     },
+    // @ts-ignore
+    extend: () => css`
+        white-space: nowrap
+      `
+    // default: {
+    //   padding: {
+    //     vertical: '0px',
+    //     horizontal: '50px',
+    //   },
+    //   border: {
+    //     width: '1px',
+    //     radius: '20px',
+    //     color: 'brand-transparent',
+    //     'textColor': 'brand-transparent',
+    //   },
+    //   hoverIndicator:'brand-transparent',
+    // },
   },
   checkBox: {
     check: {

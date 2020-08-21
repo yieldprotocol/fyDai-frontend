@@ -19,6 +19,7 @@ import Deposit from './Deposit';
 
 import TxHistory from '../components/TxHistory';
 import Loading from '../components/Loading';
+import InfoGrid from '../components/InfoGrid';
 
 interface DashBorrowProps {
   // borrowFn:any
@@ -43,18 +44,21 @@ const DashBorrow = (props:DashBorrowProps) => {
   } = position;
 
   return (
-    <Box gap='small'>
+    <Box gap='small' pad='xsmall'>
       { addCollateral && 
-        <Layer onClickOutside={()=>setAddCollateral(false)}>
+        <Layer 
+          onClickOutside={()=>setAddCollateral(false)}
+          onEsc={()=>setAddCollateral(false)}
+        >
           <Box
             width={{ max:'750px' }}
             alignSelf='center'
-            fill='horizontal'
+            fill
             background='background-front'
             round='small'
             pad='large'
           >
-            <Deposit setActiveView={()=>null} />
+            <Deposit setActiveView={()=>null} modalView={true} />
           </Box>
         </Layer>}
       <Text color='text-weak' size='xsmall'>Overview </Text>
@@ -71,25 +75,28 @@ const DashBorrow = (props:DashBorrowProps) => {
           align='center'
           basis='2/3'
         >
-          <Box gap='small'>
-            <Text color='text-weak' size='xxsmall'> Collateral </Text>
-            <Loading condition={!ethPosted_ && ethPosted_ !== 0} size='medium'>
-              <Text color='brand' weight='bold' size='large'> { ethPosted_? `${ethPosted_.toFixed(2)} Eth`: '0 Eth' }</Text>
-            </Loading>
-          </Box>
+          <InfoGrid entries={[
+            {
+              label: 'Collateral Posted',
+              visible: true,
+              active: true,
+              loading: !ethPosted_ && ethPosted_ !== 0,     
+              value: ethPosted_ ? `${ethPosted_.toFixed(4)} Eth` : '0 Eth',
+              valuePrefix: null,
+              valueExtra: null, 
+            },
 
-          <Box gap='small'>
-            <Text color='text-weak' size='xxsmall'> Collateralization </Text>
-            <Loading condition={!ethPosted_ && ethPosted_ !== 0} size='medium'>
-              <Text color='brand' weight='bold' size='large'> { collateralPercent_? `${collateralPercent_.toFixed(2)} %`: '' } </Text>
-            </Loading>
-            { collateralPercent_ === 0 && 
-              <Box direction='row'>
-                <Text color='brand-transparent' size='xxsmall'>
-                  'No Dai has been borrowed yet.'
-                </Text>
-              </Box>}
-          </Box>
+            {
+              label: 'Collateralization Ratio',
+              visible: true,
+              active: collateralPercent_ > 0,
+              loading: !ethPosted_ && ethPosted_ !== 0,            
+              value: (collateralPercent_ && (collateralPercent_ !== 0))? `${collateralPercent_}%`: '',
+              valuePrefix: null,
+              valueExtra: null, 
+            },
+          ]}
+          />
           {!addCollateral? <PlusCircle size='25' color='brand' onClick={()=>setAddCollateral(!addCollateral)} />
             :
           <Left size='25' color='brand' onClick={()=>setAddCollateral(!addCollateral)} />}
@@ -98,20 +105,25 @@ const DashBorrow = (props:DashBorrowProps) => {
         <Box
           basis='1/3'
           background='background-front'
-          fill='horizontal'
           round='small'
-          pad='large'
-          // elevation='medium'
+          // direction='row'
+          // fill='horizontal'
+          // justify='center'
           border
-
         >
-          <Box gap='small'>
-            <Text color='text-weak' size='xxsmall'> Current Total Debt Value </Text>
-            <Box direction='row' gap='small'>
-              <Text color='brand' size='xsmall'> Approx.</Text>
-              <Text color='brand' weight='bold' size='large'> { debtValue_? ` ${debtValue_.toFixed(2)} Dai`: '-' }</Text>
-            </Box>
-          </Box>
+          <InfoGrid entries={[
+            {
+              label: 'Current Total Debt Value',
+              visible: true,
+              active: true,
+              loading: !ethPosted_ && ethPosted_ !== 0,     
+              value: debtValue_? ` ${debtValue_.toFixed(2)} Dai`: '-',
+              valuePrefix: 'Approx.',
+              valueExtra: null, 
+            }
+
+          ]}
+          />
         </Box>
       </Box>
 

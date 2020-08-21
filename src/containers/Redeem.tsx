@@ -1,11 +1,6 @@
 import React from 'react';
 import { Box, Button, Image, Select, TextInput, Text, Heading, Collapsible } from 'grommet';
 import { 
-  FiCheckCircle, 
-  FiInfo as Info,
-  FiHelpCircle as Help,
-  FiChevronDown as CaretDown,
-  FiSettings as SettingsGear,
   FiClock as Clock,
 } from 'react-icons/fi';
 

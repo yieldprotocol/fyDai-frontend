@@ -17,6 +17,7 @@ import TxHistory from '../components/TxHistory';
 import { UserContext } from '../contexts/UserContext';
 
 import { usePool } from '../hooks';
+import InfoGrid from '../components/InfoGrid';
 
 interface DashLendProps {
   // borrowFn:any
@@ -43,8 +44,8 @@ const DashLend = () => {
   const [ currentValue, setCurrentValue ] = React.useState<number>(0);
 
   React.useEffect(() => {
-    console.log(position)
-    activeSeries && ( async ()=> {
+    console.log(position);
+    activeSeries.yDaiBalance_>0 && ( async ()=> {
       const preview = await previewPoolTx('SellYDai', activeSeries.poolAddress, activeSeries.yDaiBalance_);
       setCurrentValue( parseFloat(ethers.utils.formatEther(preview)));
     })();
@@ -52,6 +53,7 @@ const DashLend = () => {
 
   return (
     <Box gap='small' direction='row'>
+
       <Box basis='1/3' flex gap='small'> 
         <Text color='text-weak' size='xsmall'>Your Positions </Text>
         <Box
@@ -75,7 +77,7 @@ const DashLend = () => {
             {/* <Box><Text color='text-weak' size='xsmall'>ACTION</Text></Box> */}
             {/* <Box /> */}
           </Box>
-          
+         
           {activeSeries && 
           <Box
             direction='row' 
@@ -106,14 +108,40 @@ const DashLend = () => {
       </Box>
 
       <Box gap='small'>
+
         <Text color='text-weak' size='xsmall'>Overview </Text>
+
+
+        <InfoGrid entries={[
+          {
+            label: 'Current Collateral',
+            visible: true,
+            active: true,
+            loading: !ethPosted_ && ethPosted_ !== 0,     
+            value: ethPosted_ ? `${ethPosted_.toFixed(4)} Eth` : '0 Eth',
+            valuePrefix: null,
+            valueExtra: null, 
+          },
+
+          {
+            label: 'Collateralization Ratio',
+            visible: true,
+            active: collateralPercent_ > 0,
+            loading: !ethPosted_ &&  ethPosted_ !== 0,            
+            value: (collateralPercent_ && (collateralPercent_ !== 0))? `${collateralPercent_}%`: '',
+            valuePrefix: null,
+            valueExtra: null, 
+          },
+        ]}
+        />
+
         <Box gap='small' direction='row-responsive' fill='horizontal' justify='between' margin={{ bottom:'large' }}>  
           <Box
             background='background-front'
             fill='horizontal'
             round='small'
             pad='large'
-          // elevation='medium'
+            // elevation='medium'
             border
           >
             <Box direction='row' gap='small'>
@@ -146,10 +174,14 @@ const DashLend = () => {
           </Box>
         </Box>
 
+
+
         <Box basis='2/3' gap='small' fill>
           <Text color='text-weak' size='xsmall'>Your History</Text>    
           <TxHistory filterTerms={[ 'Bought', 'Sold' ]} view='lend' /> 
         </Box>
+
+
       </Box>
     </Box>
 

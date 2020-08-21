@@ -89,8 +89,10 @@ const initState = {
 const YieldProvider = ({ children }: any) => {
   const [state, dispatch] = React.useReducer(reducer, initState);
   // const { state: { account, chainId, provider } } = React.useContext(ConnectionContext);
-  const { account, provider } = useSignerAccount();
-  const { chainId } = useWeb3React();
+  const { account, provider, fallbackProvider } = useSignerAccount();
+  
+  const { chainId } = useWeb3React('fallback');
+  // const { active: fallbackActive } = useWeb3React('fallback');
 
   const { dispatch: notifyDispatch } = React.useContext(NotifyContext);
 
@@ -99,7 +101,6 @@ const YieldProvider = ({ children }: any) => {
   const [cachedSeries, setCachedSeries] = useCachedState('deployedSeries', null);
   const [cachedFeed, setCachedFeed] = useCachedState('lastFeed', null);
 
-  const [ loadRetried, setLoadRetried ] = React.useState<boolean>(false);
 
   /* hook declarations */
   const [ callTx ] = useCallTx();
@@ -130,21 +131,21 @@ const YieldProvider = ({ children }: any) => {
     ];
 
     try {
-      if (!cachedContracts || forceUpdate) {
+      if (chainId && !cachedContracts || forceUpdate) {
 
-        const contractAddrs = await getAddresses(contractList);
+        const contractAddrs = await getAddresses(contractList, chainId);
         _deployedContracts = Object.fromEntries(contractAddrs);
-
         window.localStorage.removeItem('deployedContracts');
         setCachedContracts(_deployedContracts);
         console.log('Contract addresses updated:', _deployedContracts);
+
       } else {
         _deployedContracts = cachedContracts;
       }
 
-      if (!cachedSeries || forceUpdate) {
+      if (chainId && !cachedSeries || forceUpdate) {
         // TODO: better implementation of iterating through series (possibly a list length from contracts function?)
-        const _list = await getAddresses(['yDai0', 'yDai1', 'yDai2', 'yDai3']);
+        const _list = await getAddresses(['yDai0', 'yDai1', 'yDai2', 'yDai3'], chainId);
         const _seriesList = Array.from(_list.values());
 
         await Promise.all(
@@ -153,7 +154,7 @@ const YieldProvider = ({ children }: any) => {
             const name = await callTx(x, 'YDai', 'name', []);
             const maturity = (await callTx(x, 'YDai', 'maturity', [])).toNumber();
 
-            const _peripheralAddrs = await getAddresses([ `${name}-Pool`, `${name}-DaiProxy`] );     
+            const _peripheralAddrs = await getAddresses([ `${name}-Pool`, `${name}-DaiProxy`], chainId);     
             const poolAddress = _peripheralAddrs.get(`${name}-Pool`);
             const daiProxyAddress = _peripheralAddrs.get(`${name}-DaiProxy`);
             
@@ -177,10 +178,10 @@ const YieldProvider = ({ children }: any) => {
       } else {
         _deployedSeries.push(...cachedSeries);
       }
-    } catch (e) {
-      
-      !loadRetried && _getProtocolAddrs(true);
-      loadRetried && notifyDispatch({
+    } catch (e) {     
+      // !loadRetried && _getProtocolAddrs(true);
+      // loadRetried && 
+      notifyDispatch({
         type: 'fatal',
         payload: { message: 'Error finding Yield Protocol addresses: Please check you are on a supported network.' },
       });
@@ -221,8 +222,7 @@ const YieldProvider = ({ children }: any) => {
   
   const _getYieldData = async (deployedContracts: any): Promise<any> => {
     const _yieldData: any = {};
-    _yieldData.ethPosted = await collateralPosted(deployedContracts.Controller, 'ETH-A');
-    // parse data if required.
+    // _yieldData.ethPosted = await collateralPosted(deployedContracts.Controller, 'ETH-A');
     return {
       ..._yieldData,
     };
@@ -244,7 +244,7 @@ const YieldProvider = ({ children }: any) => {
     // TODO: add event listener for AMM
   };
 
-  const initContext = async (networkId: number | string) => {
+  const initContext = async () => {
     /* Init start */
     dispatch({ type: 'isLoading', payload: true });
 
@@ -272,10 +272,11 @@ const YieldProvider = ({ children }: any) => {
     dispatch({ type: 'isLoading', payload: false });
   };
 
-  /* Init app and re-init app on change of user and/or network  */
+  /* Init app and re-init app on change of fallback provider network  */
   React.useEffect(() => {
-    chainId && (async () => initContext(chainId))();
-  }, [ chainId, account ]);
+    // provider && (async () => initContext() )();
+    fallbackProvider && (async () => initContext() )();
+  }, [ fallbackProvider ]);
 
   const actions = {
     // updateUserData: () =>
