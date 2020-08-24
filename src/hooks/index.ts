@@ -21,6 +21,8 @@ import { useProxy } from './proxyHook';
 import { usePool } from './poolHook';
 import { useMigrations } from './migrationHook';
 
+import { useLiquidityProxy } from './liquidityProxyHook';
+
 export {
   usePool,
   useTxActive,
@@ -29,6 +31,8 @@ export {
   useSendTx,
   useCallTx,
   useBalances,
+
+  useLiquidityProxy,
 
   useProxy,
   useController,

@@ -8,33 +8,28 @@ import {
 import { FaEthereum as Ethereum } from 'react-icons/fa';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
-import { usePool, useYDai, useToken } from '../hooks';
+import { usePool, useYDai, useToken, useSignerAccount } from '../hooks';
 import { UserContext } from '../contexts/UserContext';
 
 import InputWrap from '../components/InputWrap';
 import DaiMark from '../components/logos/DaiMark';
-import { ScaleLoader } from 'react-spinners';
+import InfoGrid from '../components/InfoGrid';
 
-
-interface IWithDrawDaiProps {
+interface IRemoveLiquidityProps {
   close?: any;
 }
 
-const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
+const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
 
   const { state: yieldState, actions: yieldActions } = useContext(YieldContext);
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { activeSeries  } = seriesState;
-
   const { state: userState, actions: userActions } = useContext(UserContext);
 
-  const [ maxWithdraw, setMaxWithdraw ] = useState<number>(0);
+  const { account } = useSignerAccount();
+  
+  const [ maxRemove, setMaxRemove ] = useState<number>(0);
   const [ inputValue, setInputValue ] = useState<any>();
-
-  const [ approved, setApproved ] = React.useState<any>(0);
-  const [ daiApproved, setDaiApproved ] = React.useState<any>(0);
-
-  const [ yDaiValue, setYDaiValue ] = React.useState<number>(0);
 
   const [ removeLiquidityDisabled, setRemoveLiquidityDisabled ] = useState<boolean>(true);
   const [ removeLiquidityPending, setRemoveLiquidityPending] = useState<boolean>(false);
@@ -42,20 +37,16 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
 
-  const { buyDai, previewPoolTx }  = usePool();
-  const { userAllowance } = useYDai();
-  const { approveToken, approveActive } = useToken();
-
   const theme:any = React.useContext(ThemeContext);
 
+
+  /* Remove Liquidity sequence */
   const removeLiquidityProcedure = async (value:number) => {
     if ( inputValue>0 && !removeLiquidityDisabled ) {
       setRemoveLiquidityPending(true);
-      await buyDai(
-        activeSeries.poolAddress,
-        inputValue,
-        0 // transaction queue value
-      );
+
+      console.log('removeing liquidity');
+
       await Promise.all([
         userActions.updatePosition(),
         seriesActions.updateActiveSeries()
@@ -65,47 +56,39 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
     }
   };
 
-  const approveProcedure = async (value:number) => {
-    await approveToken(activeSeries.yDaiAddress, activeSeries.poolAddress, value);
-    const approvedYDai = await userAllowance(activeSeries.yDaiAddress, activeSeries.poolAddress);
-    setApproved( approvedYDai ); // TODO convert to Dai somehow
-  };
-
-  const checkMaxWithdraw = async () =>{
-    const preview = await previewPoolTx('sellYDai', activeSeries.poolAddress, activeSeries.yDaiBalance_);
-    console.log(parseFloat(ethers.utils.formatEther(preview)));
-    setMaxWithdraw( parseFloat(ethers.utils.formatEther(preview)) );
-    return parseFloat(ethers.utils.formatEther(preview));
-  };
-
+  
+  /* handle value calculations based on input changes */
   useEffect(() => {
-    activeSeries && checkMaxWithdraw();
-  }, [activeSeries, inputValue]);
-
-  useEffect(() => {
-    approved && ( async () => {
-      const preview = await previewPoolTx('SellYDai', activeSeries.poolAddress, approved);
-      setDaiApproved( parseFloat(ethers.utils.formatEther(preview)) );
+    inputValue && ( async () => {
     })();
-  }, [ approved ]);
+  }, [inputValue]);
 
-  /* Borrow button disabling logic */
+  /* handle warnings input errors */
+  // useEffect(() => {
+  //   if ( inputValue && ( inputValue > daiBalance_ ) ) {
+  //     setAddLiquidityDisabled(true);
+  //     setWarningMsg(null);
+  //     setErrorMsg('That amount exceeds the amount of DAI you have'); 
+  //   } else {
+  //     // setLendDisabled(false);
+  //     setWarningMsg(null);
+  //     setErrorMsg(null);
+  //   }
+  // }, [ inputValue ]);
+
+  /* Remove Liquidity disabling logic */
   useEffect(()=>{
-    if (approved < yDaiValue) {
-      setRemoveLiquidityDisabled(true);
-    } else if (!(inputValue) || inputValue===0) {
+    if (
+      !account ||
+      !inputValue || 
+      parseInt(inputValue, 10)===0  
+    ) {
       setRemoveLiquidityDisabled(true);
     } else {
       setRemoveLiquidityDisabled(false);
     }
-  }, [ approved, inputValue, yDaiValue ]);
+  }, [ inputValue ]);
 
-  useEffect(() => {
-    activeSeries && inputValue && ( async () => {
-      const preview = await previewPoolTx('buyDai', activeSeries.poolAddress, inputValue);
-      setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
-    })();
-  }, [inputValue]);
 
   return (
     <Layer onClickOutside={()=>close()}>
@@ -138,26 +121,57 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
               <Button 
                 label='Max'
                 color='brand-transparent'
-                onClick={()=>setInputValue( maxWithdraw || checkMaxWithdraw() )}
+                onClick={()=>setInputValue( maxRemove )}
                 hoverIndicator='brand-transparent'
               />
             </InputWrap>
 
-            {/* <Box margin='medium'>
-              {approveActive || approved === undefined ?             
-                <ScaleLoader color={theme?.global?.colors['brand-transparent'].dark} height='13' />
-                : <CheckBox
-                  reverse
-                  checked={approved && !inputValue || ( approved >= inputValue )}
-                  disabled={!inputValue || ( approved >= inputValue )}
-                  onChange={()=>approveProcedure(inputValue)}
-                  label={            
-                  (approved >= inputValue) ? 
-                    `~${daiApproved.toFixed(2)} Dai unlocked (${approved.toFixed(2) || '' } yDai)` 
-                    : `Unlock ${inputValue || ''} Dai`
-                }
-                />}
-            </Box> */}
+            <InfoGrid entries={[
+              {
+                label: 'Token Balance',
+                visible: true,
+                active: inputValue,
+                loading: false,     
+                value: '1000',
+                valuePrefix: null,
+                valueExtra: null, 
+              },
+              {
+                label: 'Share of the Pool After withdraw',
+                visible: true,
+                active: inputValue,
+                loading: false,           
+                value: '0.02%',
+                valuePrefix: null,
+                valueExtra: null,
+              },
+              {
+                label: 'Expected Dai to Receive',
+                visible: true,
+                active: inputValue,
+                loading: false,           
+                value: '34 DAI',
+                valuePrefix: null,
+                valueExtra: null,
+              },
+              {
+                label: 'Like what you see?',
+                visible: false,
+                active: inputValue,
+                loading: false,            
+                value: '',
+                valuePrefix: null,
+                valueExtra: () => (
+                  <Button
+                    color='brand-transparent'
+                    label={<Text size='xsmall' color='brand'>Connect a wallet</Text>}
+                    onClick={()=>console.log('still to implement')}
+                    hoverIndicator='brand-transparent'
+                  /> 
+                )
+              },
+            ]}
+            />
 
             <Box
               fill='horizontal'
@@ -181,7 +195,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
                 round
                 onClick={()=>close()}
                 hoverIndicator='brand-transparent'
-          // border='all'
+                // border='all'
                 pad={{ horizontal:'small', vertical:'small' }}
                 justify='center'
               >
@@ -198,6 +212,6 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
   );
 };
 
-WithdrawDai.defaultProps={ close:null };
+RemoveLiquidity.defaultProps={ close:null };
 
-export default WithdrawDai;
+export default RemoveLiquidity;

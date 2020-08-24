@@ -8,6 +8,9 @@ import { NotifyContext } from '../contexts/NotifyContext';
 import EthProxy from '../contracts/EthProxy.json';
 import DaiProxy from '../contracts/DaiProxy.json';
 
+// import YieldProxy from '../contracts/YieldProxy.json';
+// import LiquidityProxy from '../contracts/LiquidityProxy.json';
+
 import { useSignerAccount } from './connectionHooks';
 
 // ethers.errors.setLogLevel('error');
@@ -207,8 +210,7 @@ export const useProxy = () => {
     const contract = new ethers.Contract( daiProxyAddr, daiProxyAbi, signer );
     try {
       console.log('gas est:', ( await contract.estimateGas.repayMinimumYDaiDebtForDai( collatType, parsedMaturity, toAddr, parsedYDai, parsedDai, overrides )).toString());
-      console.log('dry-run:', ( await contract.callStatic.repayMinimumYDaiDebtForDai( collatType, parsedMaturity, toAddr, parsedYDai, parsedDai, overrides )).toString());
-      
+      console.log('dry-run:', ( await contract.callStatic.repayMinimumYDaiDebtForDai( collatType, parsedMaturity, toAddr, parsedYDai, parsedDai, overrides )).toString());     
       tx = await contract.repayMinimumYDaiDebtForDai( collatType, parsedMaturity, toAddr, parsedYDai, parsedDai, overrides );
     } catch (e) {
       console.log(e);
@@ -225,12 +227,15 @@ export const useProxy = () => {
     return tx;
   };
 
+
   return {
     postEth, postEthActive,
     withdrawEth, withdrawEthActive,
 
     borrowUsingExactDai, borrowActive,
     repayUsingExactDai, repayActive,
+    
+    
 
   } as const;
 };

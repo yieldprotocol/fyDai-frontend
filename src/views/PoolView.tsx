@@ -23,7 +23,7 @@ const PoolView = () => {
         pad='large'
         gap='medium'
       >
-        <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Selected pool</Text>
+        <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Selected Pool</Text>
         <SeriesDescriptor activeView='pool' />
         <Pool /> 
       </Box>
