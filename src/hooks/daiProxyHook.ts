@@ -5,7 +5,6 @@ import * as utils from '../utils';
 
 import { NotifyContext } from '../contexts/NotifyContext';
 
-import EthProxy from '../contracts/EthProxy.json';
 import DaiProxy from '../contracts/DaiProxy.json';
 
 // import YieldProxy from '../contracts/YieldProxy.json';
@@ -23,12 +22,11 @@ import { useSignerAccount } from './connectionHooks';
  * @returns { function } withdraw
  * @returns { boolean } withdrawActive
  */
-export const useProxy = () => {
+export const useDaiProxy = () => {
 
   // const { state: { signer, account } } = React.useContext(ConnectionContext);
   const { signer, provider, account } = useSignerAccount();
 
-  const { abi: ethProxyAbi } = EthProxy;
   const { abi: daiProxyAbi } = DaiProxy;
 
   const  { dispatch }  = React.useContext<any>(NotifyContext);
@@ -37,82 +35,6 @@ export const useProxy = () => {
 
   const [ borrowActive, setBorrowActive ] = React.useState<boolean>(false);
   const [ repayActive, setRepayActive ] = React.useState<boolean>(false);
-
-  /**
-   * Posts collateral (ETH) via ethProxy
-   * @param {string} ethProxyAddress address of the proxy
-   * @param {number | BigNumber} amount amount of ETH to post (in normal human numbers or in Wei as a BigNumber)
-   * @note if BigNumber is used make sure it is in WEI
-   */
-  const postEth = async (
-    ethProxyAddress:string,
-    amount:number | BigNumber,
-  ) => {
-    let tx:any;
-    /* Processing and sanitizing input */
-    const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(amount.toString());
-    const fromAddr = account && ethers.utils.getAddress(account);
-    const toAddr = fromAddr;
-    const ethProxyAddr = ethers.utils.getAddress(ethProxyAddress);
-
-    /* Contract interaction */
-    setPostEthActive(true);
-    const contract = new ethers.Contract( ethProxyAddr, ethProxyAbi, signer );
-    try {
-      tx = await contract.post(toAddr, parsedAmount, { value: parsedAmount });
-    } catch (e) {
-      dispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed. See console.', type:'error' } } );
-      // eslint-disable-next-line no-console
-      console.log(e.message);
-      setPostEthActive(false);
-      return;
-    }
-    /* Transaction reporting & tracking */
-    dispatch({ type: 'txPending', payload:{ tx, message: `Deposit of ${amount} ETH pending...`, type:'DEPOSIT' } } );
-    await tx.wait();
-    setPostEthActive(false);
-    dispatch({ type: 'txComplete', payload:{ tx, message:`Deposit of ${amount} ETH complete` } } );
-    // eslint-disable-next-line consistent-return
-    return tx;
-
-  };
-
-  /**
-   * Withdraws ETH collateral directly (no wrapping of WETH required).
-   * (May require authorization once.  )
-   * @param {string} ethProxyAddress address of the proxy
-   * @param {number|BigNumber} amount amount of ETH to withdraw (in normal human numbers or in Wei as a BigNumber)
-   * @note if BigNumber is used make sure it is in WEI
-   */
-  const withdrawEth = async (
-    ethProxyAddress:string,
-    amount:number|BigNumber
-  ) => {
-    let tx:any;
-    /* Processing and sanitizing input */
-    const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(amount.toString());
-    const fromAddr = account && ethers.utils.getAddress(account);
-    const toAddr = fromAddr;
-    const ethProxyAddr = ethers.utils.getAddress(ethProxyAddress);
-
-    /* Contract interaction */
-    setWithdrawEthActive(true);
-    const contract = new ethers.Contract( ethProxyAddr, ethProxyAbi, signer );
-    try {
-      tx = await contract.withdraw(toAddr, parsedAmount);
-    } catch (e) {
-      dispatch({ type: 'notify', payload:{ message:'Error Withdrawing funds', type:'error' } } );
-      setWithdrawEthActive(false);
-      return;
-    }
-    /* Transaction reporting & tracking */
-    dispatch({ type: 'txPending', payload:{ tx, message: `Withdraw of ${amount} pending...`, type:'WITHDRAW' } } );
-    await tx.wait();
-    setWithdrawEthActive(false);
-    dispatch({ type: 'txComplete', payload:{ tx, message:`Withdrawal of ${amount} complete.` } } );
-    // eslint-disable-next-line consistent-return
-    return tx;
-  };
 
   /**
    * @dev Borrow yDai from Controller and sell it immediately for Dai, for a maximum yDai debt.
@@ -229,8 +151,6 @@ export const useProxy = () => {
 
 
   return {
-    postEth, postEthActive,
-    withdrawEth, withdrawEthActive,
 
     borrowUsingExactDai, borrowActive,
     repayUsingExactDai, repayActive,

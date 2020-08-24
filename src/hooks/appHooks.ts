@@ -5,7 +5,6 @@ import { NotifyContext } from '../contexts/NotifyContext';
 export const useTxActive = (typeList:string[]) => {
   const { state: { pendingTxs } } = React.useContext(NotifyContext);
   const [txActive, setTxActive] = React.useState<any>(null);
-
   const upperTypeList = typeList.map( (x:any) => x.toUpperCase() );
 
   React.useEffect(()=>{
