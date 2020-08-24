@@ -91,11 +91,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
 
   /* Borrow button disabling logic */
   useEffect(()=>{
-    if (
-      !account
-      approved < yDaiValue ||
-      
-      ) {
+    if (approved < yDaiValue) {
       setRemoveLiquidityDisabled(true);
     } else if (!(inputValue) || inputValue===0) {
       setRemoveLiquidityDisabled(true);
@@ -115,7 +111,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
     <Layer onClickOutside={()=>close()}>
       <Keyboard 
         onEsc={() => { inputValue? setInputValue(undefined): close();}}
-        onEnter={()=> withdrawProcedure(inputValue)}
+        onEnter={()=> removeLiquidityProcedure(inputValue)}
         target='document'
       >
         <>
