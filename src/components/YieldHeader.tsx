@@ -64,10 +64,10 @@ const YieldHeader = (props: any) => {
       disabled: false,
     },
     {
-      link: 'AMM',
+      link: 'POOL',
       text: 'Pool',
       id: 3,
-      disabled: true,
+      disabled: false,
     },
   ]);
 

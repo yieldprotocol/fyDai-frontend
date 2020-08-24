@@ -36,10 +36,9 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
 
   const [ yDaiValue, setYDaiValue ] = React.useState<number>(0);
 
-  const [ withdrawDisabled, setWithdrawDisabled ] = useState<boolean>(true);
-  const [ withdrawPending, setWithdrawPending] = useState<boolean>(false);
+  const [ removeLiquidityDisabled, setRemoveLiquidityDisabled ] = useState<boolean>(true);
+  const [ removeLiquidityPending, setRemoveLiquidityPending] = useState<boolean>(false);
 
-  const [ indicatorColor, setIndicatorColor ] = useState<string>('brand');
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
 
@@ -49,9 +48,9 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
 
   const theme:any = React.useContext(ThemeContext);
 
-  const withdrawProcedure = async (value:number) => {
-    if ( inputValue>0 && !withdrawDisabled ) {
-      setWithdrawPending(true);
+  const removeLiquidityProcedure = async (value:number) => {
+    if ( inputValue>0 && !removeLiquidityDisabled ) {
+      setRemoveLiquidityPending(true);
       await buyDai(
         activeSeries.poolAddress,
         inputValue,
@@ -61,7 +60,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
         userActions.updatePosition(),
         seriesActions.updateActiveSeries()
       ]);
-      setWithdrawPending(true);
+      setRemoveLiquidityPending(true);
       close();
     }
   };
@@ -92,12 +91,16 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
 
   /* Borrow button disabling logic */
   useEffect(()=>{
-    if (approved < yDaiValue) {
-      setWithdrawDisabled(true);
+    if (
+      !account
+      approved < yDaiValue ||
+      
+      ) {
+      setRemoveLiquidityDisabled(true);
     } else if (!(inputValue) || inputValue===0) {
-      setWithdrawDisabled(true);
+      setRemoveLiquidityDisabled(true);
     } else {
-      setWithdrawDisabled(false);
+      setRemoveLiquidityDisabled(false);
     }
   }, [ approved, inputValue, yDaiValue ]);
 
@@ -126,7 +129,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
             gap='medium'
           >
             <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Remove Liquidity</Text>
-            <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={withdrawDisabled}>
+            <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={removeLiquidityDisabled}>
               <TextInput
                 type="number"
                 placeholder='DAI'
@@ -144,7 +147,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
               />
             </InputWrap>
 
-            <Box margin='medium'>
+            {/* <Box margin='medium'>
               {approveActive || approved === undefined ?             
                 <ScaleLoader color={theme?.global?.colors['brand-transparent'].dark} height='13' />
                 : <CheckBox
@@ -158,20 +161,20 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
                     : `Unlock ${inputValue || ''} Dai`
                 }
                 />}
-            </Box>
+            </Box> */}
 
             <Box
               fill='horizontal'
               round='small'
-              background={( !(inputValue>0) || withdrawDisabled) ? 'brand-transparent' : 'brand'}
-              onClick={()=> withdrawProcedure(inputValue)}
+              background={( !(inputValue>0) || removeLiquidityDisabled) ? 'brand-transparent' : 'brand'}
+              onClick={()=> removeLiquidityProcedure(inputValue)}
               align='center'
               pad='small'
             >
               <Text
                 weight='bold'
                 size='large'
-                color={( !(inputValue>0) || withdrawDisabled) ? 'text-xweak' : 'text'}
+                color={( !(inputValue>0) || removeLiquidityDisabled) ? 'text-xweak' : 'text'}
               >
                 {`Withdraw ${inputValue || ''} Dai`}
               </Text>

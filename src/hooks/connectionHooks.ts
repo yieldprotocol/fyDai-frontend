@@ -192,7 +192,6 @@ export function useConnection() {
   return { handleSelectConnector, handleErrorMessage };
 }
 
-
 export function useSignerAccount() {
   const { library: provider, account } = useWeb3React();
   const { library: altProvider } = useWeb3React('fallback');

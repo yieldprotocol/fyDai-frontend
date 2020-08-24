@@ -29,6 +29,7 @@ import InputWrap from '../components/InputWrap';
 import DaiMark from '../components/logos/DaiMark';
 import ApprovalPending from '../components/ApprovalPending';
 import TransactionPending from '../components/TransactionPending';
+import Approval from '../components/Approval';
 
 
 interface ILendProps {
@@ -284,6 +285,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
                 }
                 />}
             </Box>
+            {/* <Approval inputValue={inputValue} approved={approved} approveProcedure={approveProcedure} />  */}
 
             <Box
               fill='horizontal'

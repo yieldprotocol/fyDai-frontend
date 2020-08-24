@@ -28,10 +28,6 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
   const [openIndex, setOpenIndex] = React.useState<number | null >(null);
   // const [seriesList, setSeriesList] = React.useState<IYieldSeries[]>([]);
   const screenSize = React.useContext(ResponsiveContext);
-  
-  // const refsArray = React.useRef([]);
-  // const elementsRef = React.useRef(seriesList.map(() => createRef()));
-  // TODO: convert to reducer if get more
 
   // const { state } = React.useContext( YieldContext );
 
@@ -39,6 +35,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
 
   const { isLoading, activeSeries, seriesData } = seriesState; 
   const { setActiveSeries } = seriesActions;
+
 
   const handleSelectSeries = (seriesMaturity: number) => {
     setActiveSeries(seriesMaturity);
