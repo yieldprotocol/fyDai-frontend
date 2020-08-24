@@ -20,7 +20,7 @@ import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
   
-import { usePool, useBalances, useMath, useToken, useSignerAccount, useTxActive } from '../hooks';
+import { usePool, useBalances, useMath, useToken, useSignerAccount, useTxActive, useLiquidityProxy } from '../hooks';
 import InputWrap from '../components/InputWrap';
 import DaiMark from '../components/logos/DaiMark';
 import ApprovalPending from '../components/ApprovalPending';
@@ -32,7 +32,7 @@ interface IPoolProps {
   // lendAmount?:any
 }
   
-const Pool = ({ }:IPoolProps) => {
+const Pool = (props:IPoolProps) => {
   
   const { state: yieldState, actions: yieldActions } = React.useContext(YieldContext);
   const { deployedContracts } = yieldState;
@@ -48,39 +48,34 @@ const Pool = ({ }:IPoolProps) => {
 
   const theme:any = React.useContext(ThemeContext);
   const screenSize = React.useContext(ResponsiveContext);
-  
-  // const { borrow, borrowActive }  = useController();
 
-  const { sellDai, previewPoolTx, sellActive }  = usePool();
-  const { approveToken, approveActive } = useToken();
-  const { getTokenAllowance } = useBalances();
+  const { addLiquidity, addLiquidityActive} = useLiquidityProxy();
+
   const { yieldAPR } = useMath();
+
   const { account } = useSignerAccount();
   
   const [ inputValue, setInputValue ] = React.useState<any>();
+
   const [ addLiquidityDisabled, setAddLiquidityDisabled ] = React.useState<boolean>(false);
   const [ addLiquidityPending, setAddLiquidityPending ] = useState<boolean>(false);
 
-  const [ approved, setApproved ] = React.useState<any>(0);
   const [ removeLiquidityOpen, setRemoveLiquidityOpen ] = useState<boolean>(false);
-
-  const [ APR, setAPR ] = React.useState<number>();
-  const [ yDaiValue, setYDaiValue ] = React.useState<number>(0);
-  const [ currentValue, setCurrentValue ] = React.useState<number>(0);
   
   const [ warningMsg, setWarningMsg] = React.useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
 
   const [ txActive ] = useTxActive(['SELL']);
   
+
+  /* Add Liquidity sequence */ 
   const addLiquidityProcedure = async (value:number) => { 
     if (!addLiquidityDisabled ) {
       setAddLiquidityPending(true);
-      await sellDai(
-        activeSeries.poolAddress,
-        inputValue,
-        0 // transaction queue value
-      );
+
+      // await addLiquidity( );
+      console.log('liquididty added actioned');
+
       setInputValue('');
       await Promise.all([
         userActions.updatePosition(),
@@ -90,19 +85,13 @@ const Pool = ({ }:IPoolProps) => {
     }   
   };
 
-  const approveProcedure = async (value:number) => {
-    await approveToken(deployedContracts.Dai, activeSeries.poolAddress, value);
-    setApproved(await getTokenAllowance(deployedContracts.Dai, activeSeries.poolAddress, 'Dai'));
-  };
-
+  /* handle value calculations based on input changes */
   useEffect(() => {
-    activeSeries && !(activeSeries.isMature) && inputValue && ( async () => {
-      const preview = await previewPoolTx('sellDai', activeSeries.poolAddress, inputValue);
-      setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
-      setAPR( yieldAPR( ethers.utils.parseEther(inputValue.toString()), preview, activeSeries.maturity ) );
+    inputValue && ( async () => {
     })();
   }, [inputValue]);
   
+  /* handle warnings input errors */
   // useEffect(() => {
   //   if ( inputValue && ( inputValue > daiBalance_ ) ) {
   //     setAddLiquidityDisabled(true);
@@ -115,7 +104,7 @@ const Pool = ({ }:IPoolProps) => {
   //   }
   // }, [ inputValue ]);
 
-  /* Lend button disabling logic */
+  /* Add liquidity disabling logic */
   useEffect(()=>{
     if (
       !account ||
@@ -157,7 +146,7 @@ const Pool = ({ }:IPoolProps) => {
               visible: !!account,
               active: true,
               loading: addLiquidityPending,     
-              value: activeSeries && `${activeSeries?.yDaiBalance_.toFixed(2)} DAI` || '-',
+              value: '1000',
               valuePrefix: null,
               valueExtra: null, 
             },
@@ -166,12 +155,12 @@ const Pool = ({ }:IPoolProps) => {
               visible: !!account,
               active: true,
               loading: addLiquidityPending,           
-              value: currentValue!==0?`${currentValue.toFixed(2)} DAI`: '-',
+              value: '0.03%',
               valuePrefix: null,
               valueExtra: null,
             },
             {
-              label: 'current DAI value',
+              label: 'Current DAI value',
               visible: !!account,
               active: true,
               loading: addLiquidityPending,            
@@ -183,7 +172,6 @@ const Pool = ({ }:IPoolProps) => {
           />
 
           <Box fill gap='medium'>
-
             <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Add liquidity</Text>
             <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={addLiquidityDisabled}>
               <TextInput
@@ -196,7 +184,7 @@ const Pool = ({ }:IPoolProps) => {
               />
               {account &&
                 <Button 
-                  label={<Text size='xsmall' color='brand'> {screenSize !== 'small' ? 'Lend Maximum': 'Max'}</Text>}
+                  label={<Text size='xsmall' color='brand'> {screenSize !== 'small' ? 'Add Maximum': 'Max'}</Text>}
                   color='brand-transparent'
                   onClick={()=>setInputValue(daiBalance_)}
                   hoverIndicator='brand-transparent'
@@ -218,7 +206,7 @@ const Pool = ({ }:IPoolProps) => {
                 visible: true,
                 active: inputValue,
                 loading: false,           
-                value: '0.03%',
+                value: '0.04%',
                 valuePrefix: null,
                 valueExtra: null,
               },
@@ -244,7 +232,6 @@ const Pool = ({ }:IPoolProps) => {
   
           { account && !activeSeries?.isMature && 
           <Box gap='small' fill='horizontal' align='center'>
-
             <Box
               fill='horizontal'
               round='small'
@@ -272,7 +259,7 @@ const Pool = ({ }:IPoolProps) => {
                 justify='center'
               >
                 <Box direction='row' gap='small'>
-                  <Text size='xsmall' color='text-weak'> Alternatively, remove Liquidity from this series</Text>
+                  <Text size='xsmall' color='text-weak'> alternatively, Remove Liquidity from this series</Text>
                   <ArrowRight color='text-weak' />
                 </Box>
               </Box>
@@ -280,7 +267,7 @@ const Pool = ({ }:IPoolProps) => {
           </Box>}
         </Box>}
 
-        { sellActive && !txActive && <ApprovalPending /> } 
+        { addLiquidityActive && !txActive && <ApprovalPending /> } 
         { txActive && <TransactionPending msg={`You added ${inputValue} DAI to the pool.`} tx={txActive} /> }
       </>
     </Keyboard>

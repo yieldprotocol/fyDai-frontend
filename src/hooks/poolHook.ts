@@ -7,7 +7,6 @@ import { useSignerAccount } from './connectionHooks';
 // import { YieldContext } from '../contexts/YieldContext';
 
 import Pool from '../contracts/Pool.json';
-import YDai from '../contracts/YDai.json';
 
 /**
  * Hook for interacting with the yield 'Pool' Contract
@@ -299,7 +298,7 @@ export const usePool = () => {
    * Call function no gas
    * 
    * @param {string} poolAddress address of the market in question.
-   * @param {string} delegateAddress address of the ethProxy (contract getting approved). 
+   * @param {string} delegateAddress address of the Proxy (contract getting approved). 
    * 
    * @returns {Promise<boolean>} approved ?
    */
@@ -323,14 +322,17 @@ export const usePool = () => {
   };
 
   return {
-    checkPoolDelegate,
-    addPoolDelegate,
-    previewPoolTx, 
+    
     sellYDai,
     buyYDai,
     sellDai,
     buyDai, 
     sellActive, 
     buyActive,
+
+    checkPoolDelegate,
+    addPoolDelegate,
+    previewPoolTx, 
+
   } as const;
 };
