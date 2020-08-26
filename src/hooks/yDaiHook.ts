@@ -16,7 +16,6 @@ export const useYDai = () => {
 
   // const { state: { signer, account } } = React.useContext(ConnectionContext);
   const { provider, signer, account } = useSignerAccount();
-
   const { abi: yDaiAbi } = YDai;
   const  { dispatch }  = React.useContext<any>(NotifyContext);
   const [ redeemActive, setRedeemActive ] = React.useState<boolean>(false);
@@ -67,11 +66,11 @@ export const useYDai = () => {
     if (account) {
       const fromAddr = account && ethers.utils.getAddress(account);
       const yDaiAddr = ethers.utils.getAddress(yDaiAddress);
-      const marketAddr = ethers.utils.getAddress(poolAddress);
+      const poolAddr = ethers.utils.getAddress(poolAddress);
       const contract = new ethers.Contract( yDaiAddr, yDaiAbi, provider );
       let res;
       try {
-        res = await contract.allowance(fromAddr, marketAddr);
+        res = await contract.allowance(fromAddr, poolAddr);
       }  catch (e) {
         console.log(e);
         res = BigNumber.from('0');

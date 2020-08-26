@@ -186,7 +186,7 @@ export const useTimeTravel = () => {
   const [ timestamp, setTimestamp ] = React.useState<number|null>(null);
 
   React.useEffect(()=>{
-    ( async () => {
+    provider && ( async () => {
       const { timestamp: ts } = await provider.getBlock(await provider.blockNumber);
       setTimestamp(ts);
     })();

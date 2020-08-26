@@ -154,7 +154,7 @@ const YieldProvider = ({ children }: any) => {
             const name = await callTx(x, 'YDai', 'name', []);
             const maturity = (await callTx(x, 'YDai', 'maturity', [])).toNumber();
 
-            const _peripheralAddrs = await getAddresses([ `${name}-Pool`, `${name}-DaiProxy`, `${name}-LiquidityProxy`], chainId);     
+            const _peripheralAddrs = await getAddresses([ `${name}-Pool`, `${name}-LiquidityProxy`], chainId);     
             const poolAddress = _peripheralAddrs.get(`${name}-Pool`);
             // const daiProxyAddress = _peripheralAddrs.get(`${name}-DaiProxy`);
             const liquidityProxyAddress = _peripheralAddrs.get(`${name}-LiquidityProxy`);

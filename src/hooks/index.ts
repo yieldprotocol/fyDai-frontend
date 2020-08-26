@@ -23,6 +23,8 @@ import { useMigrations } from './migrationHook';
 
 import { useLiquidityProxy } from './liquidityProxyHook';
 
+import { useAuth } from './authHook';
+
 export {
   usePool,
   useTxActive,
@@ -31,6 +33,8 @@ export {
   useSendTx,
   useCallTx,
   useBalances,
+
+  useAuth,
 
   useLiquidityProxy,
 

@@ -6,9 +6,8 @@ import * as utils from '../utils';
 import { YieldContext } from './YieldContext';
 import { UserContext } from './UserContext';
 
-import { useCallTx, useMath, usePool, useSignerAccount, useWeb3React, useController } from '../hooks';
+import { useCallTx, useMath, usePool, useSignerAccount, useWeb3React, useController, useToken } from '../hooks';
 import { IYieldSeries } from '../types';
-
 
 const SeriesContext = React.createContext<any>({});
 
@@ -55,8 +54,10 @@ const SeriesProvider = ({ children }:any) => {
   const { state: yieldState } = React.useContext(YieldContext);
   const { feedData, deployedContracts } = yieldState;
 
-  const { previewPoolTx, checkPoolDelegate }  = usePool();
-  const { checkControllerDelegate }  = useController();
+  const { previewPoolTx, checkPoolDelegate } = usePool();
+  const { checkControllerDelegate } = useController();
+  const { getBalance } = useToken();
+
   const [ callTx ] = useCallTx();
   const { yieldAPR }  = useMath();
 
@@ -113,15 +114,17 @@ const SeriesProvider = ({ children }:any) => {
       seriesArr.map( async (x:any, i:number) => {
         const _rates = rates.get(x.maturity);
         console.log(_rates.sellYDai.toString());
+        console.log(x);
         _seriesData.push(x);
         try {
           _seriesData[i].hasDelegatedPool = account? await checkPoolDelegate(x.poolAddress, x.yDaiAddress): null;
-          _seriesData[i].hasDelegatedController = account? await checkControllerDelegate(deployedContracts.Controller, x.daiProxyAddress): null;
+          // _seriesData[i].hasDelegatedController = account? await checkControllerDelegate(deployedContracts.Controller, x.daiProxyAddress): null;
           _seriesData[i].isMature = await callTx(x.yDaiAddress, 'YDai', 'isMature', []);
+          _seriesData[i].yieldAPR = yieldAPR(_rates.sellYDai, ethers.utils.parseEther('1'), x.maturity);
           _seriesData[i].yDaiBalance = account? await callTx(x.yDaiAddress, 'YDai', 'balanceOf', [account]): BigNumber.from('0') ;
           _seriesData[i].ethDebtYDai = account? await callTx(deployedContracts.Controller, 'Controller', 'debtYDai', [utils.ETH, x.maturity, account]): BigNumber.from('0');
           _seriesData[i].ethDebtDai = account? utils.mulRay( _seriesData[i].ethDebtYDai, _rates.sellYDai): BigNumber.from('0');
-          _seriesData[i].yieldAPR = yieldAPR(_rates.sellYDai, ethers.utils.parseEther('1'), x.maturity);
+          _seriesData[i].poolTokens = account? BigNumber.from('0') : BigNumber.from('0'); // getBalance(x.liquidityProxyAddress, 'ERC20')
         } catch (e) {
           console.log(`Could not load account positions data: ${e}`);
         }
@@ -135,6 +138,7 @@ const SeriesProvider = ({ children }:any) => {
           yDaiBalance_: parseFloat(ethers.utils.formatEther(x.yDaiBalance.toString())),
           ethDebtYDai_: parseFloat(ethers.utils.formatEther(x.ethDebtYDai.toString())),
           ethDebtDai_: parseFloat(ethers.utils.formatEther(x.ethDebtDai.toString())),
+          poolTokens_: parseFloat(ethers.utils.formatEther(x.poolTokens.toString())),
           yieldAPR_: x.yieldAPR.toFixed(2),
         }
       );
@@ -148,23 +152,25 @@ const SeriesProvider = ({ children }:any) => {
   // Get the Positions data for a series list
   const updateSeriesList = async (seriesArr:IYieldSeries[], force:boolean) => {
     let filteredSeriesArr;
-    if (force !== true) {
-      filteredSeriesArr = seriesArr.filter(x => !state.seriesData.has(x.maturity));
+
+    if (force) {
+      filteredSeriesArr = seriesArr;     
     } else {
-      filteredSeriesArr = seriesArr;
+      filteredSeriesArr = seriesArr.filter(x => !state.seriesData.has(x.maturity));    
     }
+
     if ( !yieldState.isLoading && filteredSeriesArr.length > 0) {
       dispatch({ type:'isLoading', payload: true });
 
       /* Get series rates and update */
       const rates = await _getRates(filteredSeriesArr);
       
-      /* Build/re-build series map */
+      /* Build/re-build series map with data */
       const seriesMap:any = await _getSeriesData(filteredSeriesArr, rates);
           
       /* set the active series */
       if (!state.activeSeries) {
-        /* if no active series or , set it to the first entry of the map. */
+        /* if no active series or, set it to the first entry of the map. */
         dispatch({ type:'setActiveSeries', payload: seriesMap.entries().next().value[1] });
       } else if (seriesArr.length===1 ){
         /* if there was only one series updated set that one as the active series */
@@ -173,32 +179,21 @@ const SeriesProvider = ({ children }:any) => {
         // other situation catch
         dispatch({ type:'setActiveSeries', payload: seriesMap.entries().next().value[1] });
       }
-
       dispatch({ type:'isLoading', payload: false });
 
       console.log('Series Updated:' );
-      console.log(filteredSeriesArr);
+      console.log(seriesMap);
 
     } else {
       console.log('Positions exist... Force fetch if required');
     }
   };
 
-  React.useEffect( () => {
-    !userState.isLoading &&
-    !yieldState.isLoading &&
-    console.log('triggered series update');
-    // ( async () => {
-    //   await updateSeriesList(yieldState.deployedSeries, false);
-    // })();
-  }, [ userState.balances ]);
-
   /* Init series context and re-init on any user and/or network change */
   React.useEffect( () => {
     (provider || fallbackProvider) && !yieldState.isLoading && ( async () => {
       await updateSeriesList(yieldState.deployedSeries, false);
     })();
-
   }, [ provider, fallbackProvider, chainId, account, yieldState.isLoading ]);
 
   const actions = {

@@ -79,10 +79,6 @@ export const useEvents = () => {
     const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), provider);
     const filter = contract.filters[filterEvent](...filterArgs);
     const logs = await contract.queryFilter( filter, block, 'latest');
-    // Console.log the values for testing:
-    // logs.forEach((log:any) => {
-    //   console.log(log);
-    // });
     return logs;
   };
 

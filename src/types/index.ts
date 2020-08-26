@@ -8,11 +8,15 @@ export interface IYieldSeries {
   isMature: boolean;
   poolAddress: string;
   yDaiAddress: string;
+  liquidityProxyAddress: string;
 
   yDaiBalance_: number;
   yDaiBalance: BigNumber;
 
-  symbol?:string;
+  poolTokens?:  BigNumber;
+  poolTokens_?: number;
+
+  symbol?: string;
   id?: string;
   currentValue?: any;
   seriesColor?: string;
