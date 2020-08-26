@@ -51,15 +51,15 @@
     "absolutePath": "/C/Users/bruce/dev/yield/yDai/contracts/external/maker/lib.sol",
     "exportedSymbols": {
       "LibNote": [
-        6962
+        6966
       ]
     },
-    "id": 6963,
+    "id": 6967,
     "license": "GPL-3.0-or-later",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 6945,
+        "id": 6949,
         "literals": [
           "solidity",
           "^",
@@ -76,9 +76,9 @@
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 6962,
+        "id": 6966,
         "linearizedBaseContracts": [
-          6962
+          6966
         ],
         "name": "LibNote",
         "nodeType": "ContractDefinition",
@@ -86,22 +86,22 @@
           {
             "anonymous": true,
             "documentation": null,
-            "id": 6957,
+            "id": 6961,
             "name": "LogNote",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 6956,
+              "id": 6960,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 6947,
+                  "id": 6951,
                   "indexed": true,
                   "mutability": "mutable",
                   "name": "sig",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 6957,
+                  "scope": 6961,
                   "src": "779:21:10",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -110,7 +110,7 @@
                     "typeString": "bytes4"
                   },
                   "typeName": {
-                    "id": 6946,
+                    "id": 6950,
                     "name": "bytes4",
                     "nodeType": "ElementaryTypeName",
                     "src": "779:6:10",
@@ -124,13 +124,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 6949,
+                  "id": 6953,
                   "indexed": true,
                   "mutability": "mutable",
                   "name": "usr",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 6957,
+                  "scope": 6961,
                   "src": "811:21:10",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -139,7 +139,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 6948,
+                    "id": 6952,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "811:7:10",
@@ -154,13 +154,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 6951,
+                  "id": 6955,
                   "indexed": true,
                   "mutability": "mutable",
                   "name": "arg1",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 6957,
+                  "scope": 6961,
                   "src": "843:22:10",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -169,7 +169,7 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 6950,
+                    "id": 6954,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
                     "src": "843:7:10",
@@ -183,13 +183,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 6953,
+                  "id": 6957,
                   "indexed": true,
                   "mutability": "mutable",
                   "name": "arg2",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 6957,
+                  "scope": 6961,
                   "src": "876:22:10",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -198,7 +198,7 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 6952,
+                    "id": 6956,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
                     "src": "876:7:10",
@@ -212,13 +212,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 6955,
+                  "id": 6959,
                   "indexed": false,
                   "mutability": "mutable",
                   "name": "data",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 6957,
+                  "scope": 6961,
                   "src": "909:22:10",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -227,7 +227,7 @@
                     "typeString": "bytes"
                   },
                   "typeName": {
-                    "id": 6954,
+                    "id": 6958,
                     "name": "bytes",
                     "nodeType": "ElementaryTypeName",
                     "src": "909:5:10",
@@ -246,24 +246,24 @@
           },
           {
             "body": {
-              "id": 6960,
+              "id": 6964,
               "nodeType": "Block",
               "src": "971:20:10",
               "statements": [
                 {
-                  "id": 6959,
+                  "id": 6963,
                   "nodeType": "PlaceholderStatement",
                   "src": "982:1:10"
                 }
               ]
             },
             "documentation": null,
-            "id": 6961,
+            "id": 6965,
             "name": "note",
             "nodeType": "ModifierDefinition",
             "overrides": null,
             "parameters": {
-              "id": 6958,
+              "id": 6962,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "971:0:10"
@@ -273,7 +273,7 @@
             "visibility": "internal"
           }
         ],
-        "scope": 6963,
+        "scope": 6967,
         "src": "731:263:10"
       }
     ],
@@ -283,15 +283,15 @@
     "absolutePath": "/C/Users/bruce/dev/yield/yDai/contracts/external/maker/lib.sol",
     "exportedSymbols": {
       "LibNote": [
-        6962
+        6966
       ]
     },
-    "id": 6963,
+    "id": 6967,
     "license": "GPL-3.0-or-later",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 6945,
+        "id": 6949,
         "literals": [
           "solidity",
           "^",
@@ -308,9 +308,9 @@
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 6962,
+        "id": 6966,
         "linearizedBaseContracts": [
-          6962
+          6966
         ],
         "name": "LibNote",
         "nodeType": "ContractDefinition",
@@ -318,22 +318,22 @@
           {
             "anonymous": true,
             "documentation": null,
-            "id": 6957,
+            "id": 6961,
             "name": "LogNote",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 6956,
+              "id": 6960,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 6947,
+                  "id": 6951,
                   "indexed": true,
                   "mutability": "mutable",
                   "name": "sig",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 6957,
+                  "scope": 6961,
                   "src": "779:21:10",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -342,7 +342,7 @@
                     "typeString": "bytes4"
                   },
                   "typeName": {
-                    "id": 6946,
+                    "id": 6950,
                     "name": "bytes4",
                     "nodeType": "ElementaryTypeName",
                     "src": "779:6:10",
@@ -356,13 +356,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 6949,
+                  "id": 6953,
                   "indexed": true,
                   "mutability": "mutable",
                   "name": "usr",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 6957,
+                  "scope": 6961,
                   "src": "811:21:10",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -371,7 +371,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 6948,
+                    "id": 6952,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "811:7:10",
@@ -386,13 +386,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 6951,
+                  "id": 6955,
                   "indexed": true,
                   "mutability": "mutable",
                   "name": "arg1",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 6957,
+                  "scope": 6961,
                   "src": "843:22:10",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -401,7 +401,7 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 6950,
+                    "id": 6954,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
                     "src": "843:7:10",
@@ -415,13 +415,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 6953,
+                  "id": 6957,
                   "indexed": true,
                   "mutability": "mutable",
                   "name": "arg2",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 6957,
+                  "scope": 6961,
                   "src": "876:22:10",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -430,7 +430,7 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 6952,
+                    "id": 6956,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
                     "src": "876:7:10",
@@ -444,13 +444,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 6955,
+                  "id": 6959,
                   "indexed": false,
                   "mutability": "mutable",
                   "name": "data",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 6957,
+                  "scope": 6961,
                   "src": "909:22:10",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -459,7 +459,7 @@
                     "typeString": "bytes"
                   },
                   "typeName": {
-                    "id": 6954,
+                    "id": 6958,
                     "name": "bytes",
                     "nodeType": "ElementaryTypeName",
                     "src": "909:5:10",
@@ -478,24 +478,24 @@
           },
           {
             "body": {
-              "id": 6960,
+              "id": 6964,
               "nodeType": "Block",
               "src": "971:20:10",
               "statements": [
                 {
-                  "id": 6959,
+                  "id": 6963,
                   "nodeType": "PlaceholderStatement",
                   "src": "982:1:10"
                 }
               ]
             },
             "documentation": null,
-            "id": 6961,
+            "id": 6965,
             "name": "note",
             "nodeType": "ModifierDefinition",
             "overrides": null,
             "parameters": {
-              "id": 6958,
+              "id": 6962,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "971:0:10"
@@ -505,7 +505,7 @@
             "visibility": "internal"
           }
         ],
-        "scope": 6963,
+        "scope": 6967,
         "src": "731:263:10"
       }
     ],
@@ -517,7 +517,7 @@
   },
   "networks": {},
   "schemaVersion": "3.2.3",
-  "updatedAt": "2020-08-24T15:06:41.077Z",
+  "updatedAt": "2020-08-26T07:47:57.164Z",
   "devdoc": {
     "methods": {}
   },
