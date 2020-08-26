@@ -13,7 +13,7 @@ import * as utils from '../../utils';
 import ProfileButton from '../../components/ProfileButton';
 import { NotifyContext } from '../../contexts/NotifyContext';
 
-import { useSendTx, useCallTx, useController, useProxy, useTimeTravel } from '../../hooks';
+import { useSendTx, useCallTx, useController, useProxy, useAuth, useTimeTravel } from '../../hooks';
 
 import { YieldContext } from '../../contexts/YieldContext';
 import { SeriesContext } from '../../contexts/SeriesContext';
@@ -51,6 +51,9 @@ const TestLayer = (props:any) => {
   const [ callTx ]  = useCallTx();
 
   const { advanceTimeAndBlock, takeSnapshot, revertToSnapshot, revertToT0, block, timestamp } = useTimeTravel(); 
+
+
+  const { yieldAuth } = useAuth();
   
   const { 
     post,
@@ -300,7 +303,6 @@ const TestLayer = (props:any) => {
 
         <Box direction='row' justify='between' border='all' pad='small' gap='small'>
           SnapShot and revert : 
-
           <Button 
             label='take snapshot' 
             primary
@@ -326,6 +328,28 @@ const TestLayer = (props:any) => {
 
 
         NB: dont forget to reset metamask after any timetravelling!!
+
+
+        <Box direction='row' justify='between' border='all' pad='small' gap='small'>
+          Permit sign testing : 
+          <Button 
+            label='yieldAuth' 
+            primary
+            onClick={async ()=> {
+              await yieldAuth();
+            }}
+          />
+
+          <Button 
+            label='poolAuth' 
+            primary
+            onClick={async ()=> {
+              await yieldAuth();
+            }}
+          />
+
+
+        </Box>
 
         <Footer pad='medium' gap='xsmall' direction='row' justify='between' align='center'>
           <Box round>
