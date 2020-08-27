@@ -60,46 +60,49 @@ const EIP712Domain = [
   { name: 'verifyingContract', type: 'address' },
 ];
 
-const PERMIT_TYPEHASH = keccak256(
-  toUtf8Bytes('Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)')
-);
-const createTypedDaiData = (message: DaiPermitMessage, domain: IDomain) => {
-  const typedData = {
-    types: {
-      EIP712Domain,
-      Permit: [
-        { name: 'holder', type: 'address' },
-        { name: 'spender', type: 'address' },
-        { name: 'nonce', type: 'uint256' },
-        { name: 'expiry', type: 'uint256' },
-        { name: 'allowed', type: 'bool' },
-      ],
-    },
-    primaryType: 'Permit',
-    domain,
-    message,
-  };
-  return typedData;
-};
+// const PERMIT_TYPEHASH = keccak256(
+//   toUtf8Bytes('Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)')
+// );
+// const createTypedDaiData = (message: DaiPermitMessage, domain: IDomain) => {
+//   const typedData = {
+//     types: {
+//       EIP712Domain,
+//       Permit: [
+//         { name: 'holder', type: 'address' },
+//         { name: 'spender', type: 'address' },
+//         { name: 'nonce', type: 'uint256' },
+//         { name: 'expiry', type: 'uint256' },
+//         { name: 'allowed', type: 'bool' },
+//       ],
+//     },
+//     primaryType: 'Permit',
+//     domain,
+//     message,
+//   };
+//   return typedData;
+// };
 
-const createTypedERC2612Data = (message: ERC2612PermitMessage, domain: IDomain) => {
-  const typedData = {
-    types: {
-      EIP712Domain,
-      Permit: [
-        { name: 'owner', type: 'address' },
-        { name: 'spender', type: 'address' },
-        { name: 'value', type: 'uint256' },
-        { name: 'nonce', type: 'uint256' },
-        { name: 'deadline', type: 'uint256' },
-      ],
-    },
-    primaryType: 'Permit',
-    domain,
-    message,
-  };
-  return typedData;
-};
+// const createTypedERC2612Data = (message: ERC2612PermitMessage, domain: IDomain) => {
+//   const typedData = {
+//     types: {
+//       EIP712Domain,
+//       Permit: [
+//         { name: 'owner', type: 'address' },
+//         { name: 'spender', type: 'address' },
+//         { name: 'value', type: 'uint256' },
+//         { name: 'nonce', type: 'uint256' },
+//         { name: 'deadline', type: 'uint256' },
+//       ],
+//     },
+//     primaryType: 'Permit',
+//     domain,
+//     message,
+//   };
+//   return typedData;
+// };
+
+
+
 
 // const SIGNATURE_TYPEHASH = keccak256(
 //   toUtf8Bytes('Signature(address user,address delegate,uint256 nonce,uint256 deadline)')
@@ -198,15 +201,14 @@ export const useAuth = () => {
       [fromAddr, createTypedDelegableData(msg, domain)],
     );
 
-
     console.log(daiPermitSig);
     console.log(controllerSig);
 
-    let tx:any;
-
+    
     /**
      * Contract interaction
      * */
+    let tx:any;
     try {
       tx = await proxyContract.onboard(fromAddr, daiPermitSig, controllerSig);
     } catch (e) {
