@@ -20,7 +20,7 @@ import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
   
-import { usePool, useBalances, useMath, useToken, useSignerAccount, useTxActive, useLiquidityProxy } from '../hooks';
+import { usePool, useBalances, useMath, useToken, useSignerAccount, useTxActive, useProxy } from '../hooks';
 import InputWrap from '../components/InputWrap';
 import DaiMark from '../components/logos/DaiMark';
 import ApprovalPending from '../components/ApprovalPending';
@@ -49,7 +49,7 @@ const Pool = (props:IPoolProps) => {
   const theme:any = React.useContext(ThemeContext);
   const screenSize = React.useContext(ResponsiveContext);
 
-  const { addLiquidity, addLiquidityActive} = useLiquidityProxy();
+  const { addLiquidity, addLiquidityActive } = useProxy();
 
   const { yieldAPR } = useMath();
 

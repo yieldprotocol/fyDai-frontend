@@ -72,7 +72,7 @@ function Repay({ repayAmount }:IRepayProps) {
     if (inputValue>0 && !repayDisabled) {
       setRepayPending(true);
       /* repay using proxy */
-      // await repayUsingExactDai(activeSeries.daiProxyAddress, 'ETH-A', activeSeries.maturity, yDaiValue, value);
+      // await repayUsingExactDai(activeSeries.yieldProxyAddress, 'ETH-A', activeSeries.maturity, yDaiValue, value);
       /* direct repay without proxy */
       await repay(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value, 'Dai' );
       setApproved(await getTokenAllowance(deployedContracts.Dai, deployedContracts.Treasury, 'Dai'));
@@ -89,16 +89,16 @@ function Repay({ repayAmount }:IRepayProps) {
     // TODO uncomment the following lines if not using auto sell?
     await addPoolDelegate(activeSeries.poolAddress, activeSeries.yDaiAddress);
     const res = await checkPoolDelegate(activeSeries.poolAddress, activeSeries.yDaiAddress);
-    // await addPoolDelegate(activeSeries.poolAddress, activeSeries.daiProxyAddress);
-    // const res = await checkPoolDelegate(activeSeries.poolAddress, activeSeries.daiProxyAddress);
+    // await addPoolDelegate(activeSeries.poolAddress, activeSeries.yieldProxyAddress);
+    // const res = await checkPoolDelegate(activeSeries.poolAddress, activeSeries.yieldProxyAddress);
     setHasDelegated(res);
   };
 
   const approveProcedure = async (value:number) => {
     await approveToken(deployedContracts.Dai, deployedContracts.Treasury, value);
     setApproved(await getTokenAllowance(deployedContracts.Dai, deployedContracts.Treasury, 'Dai'));
-    // await approveToken(deployedContracts.Dai, activeSeries.daiProxyAddress, value);
-    // setApproved(await getTokenAllowance(deployedContracts.Dai, activeSeries.daiProxyAddress, 'Dai'));
+    // await approveToken(deployedContracts.Dai, activeSeries.yieldProxyAddress, value);
+    // setApproved(await getTokenAllowance(deployedContracts.Dai, activeSeries.yieldProxyAddress, 'Dai'));
   };
 
   /* Input warning and error logic */ 
@@ -142,7 +142,7 @@ function Repay({ repayAmount }:IRepayProps) {
 
   useEffect(() => {
     ( async ()=>{
-      // activeSeries && setApproved(await getTokenAllowance(deployedContracts.Dai, activeSeries.daiProxyAddress, 'Dai'));
+      // activeSeries && setApproved(await getTokenAllowance(deployedContracts.Dai, activeSeries.yieldProxyAddress, 'Dai'));
       activeSeries && setApproved(await getTokenAllowance(deployedContracts.Dai, deployedContracts.Treasury, 'Dai'));
       activeSeries && setHasDelegated(activeSeries.hasDelegatedPool);
     })();

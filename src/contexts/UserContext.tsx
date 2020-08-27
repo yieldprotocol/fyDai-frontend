@@ -194,7 +194,7 @@ const UserProvider = ({ children }: any) => {
    */
   const _getDelegations = async () => {
     const _delegations:any={};
-    _delegations.ethProxy = await callTx( deployedContracts.Controller, 'Controller', 'delegated', [account, deployedContracts.EthProxy]);
+    _delegations.yieldProxy = await callTx( deployedContracts.Controller, 'Controller', 'delegated', [account, deployedContracts.YieldProxy]);
     dispatch( { type: 'updateDelegations', payload: _delegations });
     return _delegations;
   };

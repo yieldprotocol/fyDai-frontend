@@ -5,7 +5,6 @@ import { NotifyContext } from '../contexts/NotifyContext';
 // import { ConnectionContext } from '../contexts/ConnectionContext';
 import { useSignerAccount } from './connectionHooks';
 // import { YieldContext } from '../contexts/YieldContext';
-
 import Pool from '../contracts/Pool.json';
 
 /**
@@ -18,7 +17,8 @@ export const usePool = () => {
   // const { state: { provider, signer, account } } = React.useContext(ConnectionContext);
   const { fallbackProvider, provider, signer, account } = useSignerAccount();
 
-  const { abi: marketAbi } = Pool;
+  const { abi: poolAbi } = Pool;
+
   const  { dispatch }  = React.useContext<any>(NotifyContext);
   const [ approveActive, setApproveActive ] = React.useState<boolean>(false);
   const [ sellActive, setSellActive ] = React.useState<boolean>(false);
@@ -51,7 +51,7 @@ export const usePool = () => {
     /// @param from Wallet providing the yDai being sold. Must have approved the operator with `market.addDelegate(operator)`.
     /// @param to Wallet receiving the chai being bought
     /// @param yDaiIn Amount of yDai being sold that will be taken from the user's wallet
-    const contract = new ethers.Contract( marketAddr, marketAbi, signer );
+    const contract = new ethers.Contract( marketAddr, poolAbi, signer );
     try {
       tx = await contract.sellYDai(fromAddr, toAddr, parsedAmount, overrides);
     } catch (e) {
@@ -97,7 +97,7 @@ export const usePool = () => {
     /// @param from Wallet providing the chai being sold. Must have approved the operator with `market.addDelegate(operator)`.
     /// @param to Wallet receiving the yDai being bought
     /// @param yDaiOut Amount of yDai being bought that will be deposited in `to` wallet
-    const contract = new ethers.Contract( marketAddr, marketAbi, signer );
+    const contract = new ethers.Contract( marketAddr, poolAbi, signer );
     try {
       tx = await contract.buyYDai(fromAddr, toAddr, parsedAmount, overrides);
     } catch (e) {
@@ -143,7 +143,7 @@ export const usePool = () => {
     /// @param from Wallet providing the chai being sold. Must have approved the operator with `market.addDelegate(operator)`.
     /// @param to Wallet receiving the yDai being bought
     /// @param chaiIn Amount of chai being sold that will be taken from the user's wallet
-    const contract = new ethers.Contract( marketAddr, marketAbi, signer );
+    const contract = new ethers.Contract( marketAddr, poolAbi, signer );
     try {
       // tx = await contract.sellDai(fromAddr, toAddr, parsedAmount, await overrides);
       tx = await contract.sellDai(fromAddr, toAddr, parsedAmount, overrides);
@@ -193,7 +193,7 @@ export const usePool = () => {
     /// @param from Wallet providing the yDai being sold. Must have approved the operator with `market.addDelegate(operator)`.
     /// @param to Wallet receiving the chai being bought
     /// @param chaiOut Amount of chai being bought that will be deposited in `to` wallet
-    const contract = new ethers.Contract( marketAddr, marketAbi, signer );
+    const contract = new ethers.Contract( marketAddr, poolAbi, signer );
     try {
       console.log('gas est:', ( await contract.estimateGas.buyDai(fromAddr, toAddr, parsedAmount, overrides )).toString());
       console.log('dry-run:', ( await contract.callStatic.buyDai(fromAddr, toAddr, parsedAmount, overrides )).toString());
@@ -237,9 +237,9 @@ export const usePool = () => {
 
     const type=txType.toUpperCase();
     const parsedAmount = ethers.utils.parseEther(amount.toString());
-    const marketAddr = ethers.utils.getAddress(poolAddress);
+    const poolAddr = ethers.utils.getAddress(poolAddress);
     // TODO > check the || provider  . might get buggy
-    const contract = new ethers.Contract( marketAddr, marketAbi, fallbackProvider||provider);
+    const contract = new ethers.Contract( poolAddr, poolAbi, fallbackProvider||provider);
     try {
       switch (type) {
         case 'BUYDAI':
@@ -275,7 +275,7 @@ export const usePool = () => {
     /* Contract interaction */
     const contract = new ethers.Contract(
       marketAddr,
-      marketAbi,
+      poolAbi,
       signer
     );
     try {
@@ -310,7 +310,7 @@ export const usePool = () => {
     const delegateAddr = ethers.utils.getAddress(delegateAddress);
     const marketAddr = ethers.utils.getAddress(poolAddress);
 
-    const contract = new ethers.Contract( marketAddr, marketAbi, provider);
+    const contract = new ethers.Contract( marketAddr, poolAbi, provider);
     let res;
     try {
       res = await contract.delegated(fromAddr, delegateAddr);

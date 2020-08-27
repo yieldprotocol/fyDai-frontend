@@ -104,7 +104,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
 
     if (account && inputValue>0 && !borrowDisabled) {
       setBorrowPending(true); 
-      autoSell && await borrowUsingExactDai( activeSeries.daiProxyAddress, 'ETH-A', activeSeries.maturity, yDaiValue, value);
+      autoSell && await borrowUsingExactDai( activeSeries.yieldProxyAddress, 'ETH-A', activeSeries.maturity, yDaiValue, value);
       !autoSell && await borrow(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value);
       setInputValue('');
       await Promise.all([
@@ -120,8 +120,8 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
     // TODO uncomment the following lines if not using auto sell?
     // await addPoolDelegate(activeSeries.poolAddress, activeSeries.yDaiAddress);
     // const res = await checkPoolDelegate(activeSeries.poolAddress, activeSeries.yDaiAddress);
-    await addControllerDelegate(deployedContracts.Controller, activeSeries.daiProxyAddress);
-    const res = await checkControllerDelegate(deployedContracts.Controller, activeSeries.daiProxyAddress);
+    await addControllerDelegate(deployedContracts.Controller, activeSeries.yieldProxyAddress);
+    const res = await checkControllerDelegate(deployedContracts.Controller, activeSeries.yieldProxyAddress);
     setHasDelegated(res);
     await seriesActions.updateActiveSeries();
     setDelegationPending(false);

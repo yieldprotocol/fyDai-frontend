@@ -79,7 +79,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
   const depositProcedure = async (value:number) => {
     if ( !depositDisabled ) {
       setDepositPending(true);
-      await postEth(deployedContracts.EthProxy, value);
+      await postEth(deployedContracts.YieldProxy, value);
       await userActions.updatePosition();
       setDepositPending(false);
       // setActiveView('BORROW');

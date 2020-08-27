@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 
 import { ethers, BigNumber }  from 'ethers';
@@ -27,20 +28,20 @@ export const useEthProxy = () => {
   // const { state: { signer, account } } = React.useContext(ConnectionContext);
   const { signer, provider, account } = useSignerAccount();
 
-  const { abi: ethProxyAbi } = EthProxy;
+  const { abi: yieldProxyAbi } = EthProxy;
 
   const  { dispatch }  = React.useContext<any>(NotifyContext);
   const [ postEthActive, setPostEthActive ] = React.useState<boolean>(false);
   const [ withdrawEthActive, setWithdrawEthActive ] = React.useState<boolean>(false);
 
   /**
-   * Posts collateral (ETH) via ethProxy
-   * @param {string} ethProxyAddress address of the proxy
+   * Posts collateral (ETH) via yieldProxy
+   * @param {string} yieldProxyAddress address of the proxy
    * @param {number | BigNumber} amount amount of ETH to post (in normal human numbers or in Wei as a BigNumber)
    * @note if BigNumber is used make sure it is in WEI
    */
   const postEth = async (
-    ethProxyAddress:string,
+    yieldProxyAddress:string,
     amount:number | BigNumber,
   ) => {
     let tx:any;
@@ -48,11 +49,11 @@ export const useEthProxy = () => {
     const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(amount.toString());
     const fromAddr = account && ethers.utils.getAddress(account);
     const toAddr = fromAddr;
-    const ethProxyAddr = ethers.utils.getAddress(ethProxyAddress);
+    const yieldProxyAddr = ethers.utils.getAddress(yieldProxyAddress);
 
     /* Contract interaction */
     setPostEthActive(true);
-    const contract = new ethers.Contract( ethProxyAddr, ethProxyAbi, signer );
+    const contract = new ethers.Contract( yieldProxyAddr, yieldProxyAbi, signer );
     try {
       tx = await contract.post(toAddr, parsedAmount, { value: parsedAmount });
     } catch (e) {
@@ -75,12 +76,12 @@ export const useEthProxy = () => {
   /**
    * Withdraws ETH collateral directly (no wrapping of WETH required).
    * (May require authorization once.  )
-   * @param {string} ethProxyAddress address of the proxy
+   * @param {string} yieldProxyAddress address of the proxy
    * @param {number|BigNumber} amount amount of ETH to withdraw (in normal human numbers or in Wei as a BigNumber)
    * @note if BigNumber is used make sure it is in WEI
    */
   const withdrawEth = async (
-    ethProxyAddress:string,
+    yieldProxyAddress:string,
     amount:number|BigNumber
   ) => {
     let tx:any;
@@ -88,11 +89,11 @@ export const useEthProxy = () => {
     const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(amount.toString());
     const fromAddr = account && ethers.utils.getAddress(account);
     const toAddr = fromAddr;
-    const ethProxyAddr = ethers.utils.getAddress(ethProxyAddress);
+    const yieldProxyAddr = ethers.utils.getAddress(yieldProxyAddress);
 
     /* Contract interaction */
     setWithdrawEthActive(true);
-    const contract = new ethers.Contract( ethProxyAddr, ethProxyAbi, signer );
+    const contract = new ethers.Contract( yieldProxyAddr, yieldProxyAbi, signer );
     try {
       tx = await contract.withdraw(toAddr, parsedAmount);
     } catch (e) {

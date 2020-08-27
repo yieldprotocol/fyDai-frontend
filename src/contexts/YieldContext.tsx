@@ -123,10 +123,10 @@ const YieldProvider = ({ children }: any) => {
       'Treasury',
       'Chai',
       'Dai',
-      'WethJoin',
+      // 'WethJoin',
       'Vat',
       'Weth',
-      'EthProxy',
+      'YieldProxy',
       'Liquidations',
     ];
 
@@ -153,22 +153,20 @@ const YieldProvider = ({ children }: any) => {
 
             const name = await callTx(x, 'YDai', 'name', []);
             const maturity = (await callTx(x, 'YDai', 'maturity', [])).toNumber();
-
-            const _peripheralAddrs = await getAddresses([ `${name}-Pool`, `${name}-LiquidityProxy`], chainId);     
-            const poolAddress = _peripheralAddrs.get(`${name}-Pool`);
-            // const daiProxyAddress = _peripheralAddrs.get(`${name}-DaiProxy`);
-            const liquidityProxyAddress = _peripheralAddrs.get(`${name}-LiquidityProxy`);
+            const isMature = await callTx(x, 'YDai', 'isMature', []);
+            const _peripheralAddrs = await getAddresses([ `${name}-Pool` ], chainId);     
+            const poolAddress = _peripheralAddrs.get(`${name}-Pool`);          
+            // const yieldProxyAddress = _peripheralAddrs.get(`${name}-DaiProxy`);
+            // const liquidityProxyAddress = _peripheralAddrs.get(`${name}-LiquidityProxy`);
             
             return {
               yDaiAddress: x,
               name,
               maturity,
               poolAddress,
-              // daiProxyAddress,
-              liquidityProxyAddress,
-
               maturity_: new Date(maturity * 1000),
-              isMature: new Date() > new Date(maturity * 1000), 
+              isMature,
+              // isMature: new Date() > new Date(maturity * 1000), 
               displayName: moment(maturity * 1000).format('MMMM YYYY'),
               seriesColor: seriesColors[i],
             };

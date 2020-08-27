@@ -177,12 +177,12 @@ const TestLayer = (props:any) => {
               <Box gap='small'>
                 Test Approvals (not all reqd.):
 
-                <Button primary label='controller addDelegate:EthProxy' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />             
-                <Button primary label='controller addDelegate:DaiProxy[0]' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedSeries[0].daiProxyAddress], utils.toWei('0'))} />
+                <Button primary label='controller addDelegate:EthProxy' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedContracts.YieldProxy], utils.toWei('0'))} />             
+                <Button primary label='controller addDelegate:DaiProxy[0]' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedSeries[0].yieldProxyAddress], utils.toWei('0'))} />
 
                 <Button primary label='pool[0] addDelegate: yDai[0]' onClick={()=> sendTx(deployedSeries[0].poolAddress, 'Pool', 'addDelegate', [deployedSeries[0].yDaiAddress], utils.toWei('0'))} />
-                <Button primary label='pool[0] addDelegate: ethProxy[0]' onClick={()=> sendTx(deployedSeries[0].poolAddress, 'Pool', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />
-                <Button primary label='Pool[0] addDelegate: daiProxy[0]' onClick={()=> sendTx(deployedSeries[0].poolAddress, 'Pool', 'addDelegate', [deployedSeries[0].daiProxyAddress], utils.toWei('0'))} />
+                <Button primary label='pool[0] addDelegate: yieldProxy[0]' onClick={()=> sendTx(deployedSeries[0].poolAddress, 'Pool', 'addDelegate', [deployedContracts.YieldProxy], utils.toWei('0'))} />
+                <Button primary label='Pool[0] addDelegate: yieldProxy[0]' onClick={()=> sendTx(deployedSeries[0].poolAddress, 'Pool', 'addDelegate', [deployedSeries[0].yieldProxyAddress], utils.toWei('0'))} />
 
               </Box>
             }
@@ -191,8 +191,8 @@ const TestLayer = (props:any) => {
             flow === 'MARKET' &&
               <Box gap='small'>
                 Pool:
-                <Button primary label='Check buy Rate' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />
-                <Button primary label='Pool (for each market)' onClick={()=> sendTx(deployedContracts.Pool, 'Controller', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />
+                <Button primary label='Check buy Rate' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedContracts.YieldProxy], utils.toWei('0'))} />
+                <Button primary label='Pool (for each market)' onClick={()=> sendTx(deployedContracts.Pool, 'Controller', 'addDelegate', [deployedContracts.YieldProxy], utils.toWei('0'))} />
               </Box>
             }
 
@@ -200,9 +200,9 @@ const TestLayer = (props:any) => {
             <Box gap='small'>
 
               New ETH direct deposit/withdraw: 
-              <Button label='Post ETH Collateral via proxy 1.5' disabled={postActive} onClick={()=> postEth(deployedContracts.EthProxy, 1.5)} />
-              <Button primary label='controller addDelegate:EthProxy' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />             
-              <Button label='Withdraw ETH via proxy 1.5)' onClick={()=> withdrawEth(deployedContracts.EthProxy, 1.5 )} />
+              <Button label='Post ETH Collateral via proxy 1.5' disabled={postActive} onClick={()=> postEth(deployedContracts.YieldProxy, 1.5)} />
+              <Button primary label='controller addDelegate:EthProxy' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedContracts.YieldProxy], utils.toWei('0'))} />             
+              <Button label='Withdraw ETH via proxy 1.5)' onClick={()=> withdrawEth(deployedContracts.YieldProxy, 1.5 )} />
               <Button label='6.1 Repay 0.5 eth/weth debt in yDai' onClick={()=> repay(deployedContracts.Controller, 'ETH-A', yieldState.deployedSeries[0].maturity, 0.5, 'YDAI' )} />
               <Button label='( 6.2 Repay 0.5 eth/weth debt in Dai) ' onClick={()=> repay(deployedContracts.Controller, 'ETH-A', yieldState.deployedSeries[0].maturity, 0.5, 'DAI' )} />
             

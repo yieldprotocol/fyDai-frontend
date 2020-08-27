@@ -16,8 +16,7 @@ import DaiJoin from '../contracts/DaiJoin.json';
 import Chai from '../contracts/Chai.json';
 import Vat from '../contracts/Vat.json';
 import Pot from '../contracts/Pot.json';
-import EthProxy from '../contracts/EthProxy.json';
-import DaiProxy from '../contracts/DaiProxy.json';
+import YieldProxy from '../contracts/YieldProxy.json';
 import Migrations from '../contracts/Migrations.json';
 import Pool from '../contracts/Pool.json';
 
@@ -33,8 +32,7 @@ const contractMap = new Map<string, any>([
   ['DaiJoin', DaiJoin.abi],
   ['Vat', Vat.abi],
   ['Pot', Pot.abi],
-  ['EthProxy', EthProxy.abi],
-  ['DaiProxy', DaiProxy.abi],
+  ['YieldProxy', YieldProxy.abi],
   ['Migrations', Migrations.abi],
   ['Pool', Pool.abi],
 ]);

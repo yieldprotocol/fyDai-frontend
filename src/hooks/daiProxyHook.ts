@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import React from 'react';
 
 import { ethers, BigNumber }  from 'ethers';
@@ -5,7 +7,8 @@ import * as utils from '../utils';
 
 import { NotifyContext } from '../contexts/NotifyContext';
 
-import DaiProxy from '../contracts/DaiProxy.json';
+
+import YieldProxy from '../contracts/YieldProxy.json';
 
 // import YieldProxy from '../contracts/YieldProxy.json';
 // import LiquidityProxy from '../contracts/LiquidityProxy.json';
@@ -27,9 +30,10 @@ export const useDaiProxy = () => {
   // const { state: { signer, account } } = React.useContext(ConnectionContext);
   const { signer, provider, account } = useSignerAccount();
 
-  const { abi: daiProxyAbi } = DaiProxy;
+  const { abi: yieldProxyAbi } = YieldProxy;
 
   const  { dispatch }  = React.useContext<any>(NotifyContext);
+
   const [ postEthActive, setPostEthActive ] = React.useState<boolean>(false);
   const [ withdrawEthActive, setWithdrawEthActive ] = React.useState<boolean>(false);
 
@@ -40,7 +44,7 @@ export const useDaiProxy = () => {
    * @dev Borrow yDai from Controller and sell it immediately for Dai, for a maximum yDai debt.
    * Must have approved the operator with `controller.addDelegate(controllerDai.address)`.
    * 
-   * @param {string} daiProxyAddress address of series market proxy
+   * @param {string} yieldProxyAddress address of series market proxy
    * @param {string} collateralType type of collateral eg. 'ETH-A'
    * @param {number} maturity Maturity of an added series. unix timestamp
    * @param {number} maximumYDai Maximum amount of YDai to borrow. 
@@ -50,7 +54,7 @@ export const useDaiProxy = () => {
    *
    */
   const borrowUsingExactDai = async (
-    daiProxyAddress: string, 
+    yieldProxyAddress: string, 
     collateralType: string,
     maturity: number,
     maximumYDai: number, 
@@ -63,7 +67,7 @@ export const useDaiProxy = () => {
     };
     const parsedDai = ethers.utils.parseEther(daiToBorrow.toString());
     const parsedYDai = ethers.utils.parseEther(maximumYDai.toString());
-    const daiProxyAddr = ethers.utils.getAddress(daiProxyAddress);
+    const yieldProxyAddr = ethers.utils.getAddress(yieldProxyAddress);
     const collatType = ethers.utils.formatBytes32String(collateralType);
 
     const fromAddr = account && ethers.utils.getAddress(account);
@@ -72,7 +76,7 @@ export const useDaiProxy = () => {
 
     setBorrowActive(true);
 
-    const contract = new ethers.Contract( daiProxyAddr, daiProxyAbi, signer );
+    const contract = new ethers.Contract( yieldProxyAddr, yieldProxyAbi, signer );
     try {
       // console.log('gas est:', ( await contract.estimateGas.borrowDaiForMaximumYDai(fromAddr, toAddr, parsedAmount, overrides )).toString());
       // console.log('dry-run:', ( await contract.callStatic.borrowDaiForMaximumYDai(fromAddr, toAddr, parsedAmount, overrides )).toString());
@@ -97,7 +101,7 @@ export const useDaiProxy = () => {
    * @dev Repay an amount of yDai debt in Controller using a given amount of Dai exchanged for yDai at pool rates, with a minimum of yDai debt required to be paid.
    * Must have approved the operator with `controller.addDelegate(controllerDai.address)`.
    * 
-   * @param {string} daiProxyAddress address of series market proxy
+   * @param {string} yieldProxyAddress address of series market proxy
    * @param {string} collateralType type of collateral eg. 'ETH-A'
    * @param {number} maturity Maturity of an added series. unix timestamp
    * @param {number} minimumYDaiRepayment  minimumYDaiRepayment Minimum amount of yDai debt to repay.
@@ -107,7 +111,7 @@ export const useDaiProxy = () => {
    *
    */
   const repayUsingExactDai = async (
-    daiProxyAddress: string, 
+    yieldProxyAddress: string, 
     collateralType: string,
     maturity: number,
     minimumYDaiRepayment: number, 
@@ -121,7 +125,7 @@ export const useDaiProxy = () => {
 
     const parsedDai = ethers.utils.parseEther(repaymentInDai.toString());   
     const parsedYDai = ethers.utils.parseEther(minimumYDaiRepayment.toString());
-    const daiProxyAddr = ethers.utils.getAddress(daiProxyAddress);
+    const yieldProxyAddr = ethers.utils.getAddress(yieldProxyAddress);
     const collatType = ethers.utils.formatBytes32String(collateralType);
     const fromAddr = account && ethers.utils.getAddress(account);
     const toAddr = account && ethers.utils.getAddress(account);
@@ -129,7 +133,7 @@ export const useDaiProxy = () => {
 
     setBorrowActive(true);
 
-    const contract = new ethers.Contract( daiProxyAddr, daiProxyAbi, signer );
+    const contract = new ethers.Contract(  yieldProxyAddr, yieldProxyAbi, signer );
     try {
       console.log('gas est:', ( await contract.estimateGas.repayMinimumYDaiDebtForDai( collatType, parsedMaturity, toAddr, parsedYDai, parsedDai, overrides )).toString());
       console.log('dry-run:', ( await contract.callStatic.repayMinimumYDaiDebtForDai( collatType, parsedMaturity, toAddr, parsedYDai, parsedDai, overrides )).toString());     
@@ -153,9 +157,7 @@ export const useDaiProxy = () => {
   return {
 
     borrowUsingExactDai, borrowActive,
-    repayUsingExactDai, repayActive,
-    
-    
+    repayUsingExactDai, repayActive,  
 
   } as const;
 };

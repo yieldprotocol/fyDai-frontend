@@ -286,7 +286,7 @@ export const useController = () => {
    * Call function no gas
    * 
    * @param {string} controllerAddress address of the controller.
-   * @param {string} delegateAddress address of the delegate to be checked (ethProxy contract getting approved). 
+   * @param {string} delegateAddress address of the delegate to be checked (yieldProxy contract getting approved). 
    * 
    * @returns {Promise<boolean>} approved ?
    */

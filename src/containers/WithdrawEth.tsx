@@ -38,7 +38,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
 
   const [ maxWithdraw, setMaxWithdraw ] = useState<number>(0);
   const [ inputValue, setInputValue ] = useState<any>();
-  const [ hasDelegated, setHasDelegated ] = useState<boolean>( delegations.ethProxy || false);
+  const [ hasDelegated, setHasDelegated ] = useState<boolean>( delegations.yieldProxy || false);
 
   const [ withdrawDisabled, setWithdrawDisabled ] = useState<boolean>(false);
   const [ withdrawPending, setWithdrawPending ] = useState<boolean>(false);
@@ -57,7 +57,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
   const withdrawProcedure = async (value:number) => {
     if ( !withdrawDisabled ) {
       setWithdrawPending(true);
-      await withdrawEth(deployedContracts.EthProxy, value);
+      await withdrawEth(deployedContracts.YieldProxy, value);
       userActions.updatePosition();
       setWithdrawPending(false);
       close();
@@ -66,8 +66,8 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
 
   const delegateProcedure = async () => {
     setDelegationPending(true);
-    await addControllerDelegate(deployedContracts.Controller, deployedContracts.EthProxy);
-    const res = await checkControllerDelegate(deployedContracts.Controller, deployedContracts.EthProxy);
+    await addControllerDelegate(deployedContracts.Controller, deployedContracts.YieldProxy);
+    const res = await checkControllerDelegate(deployedContracts.Controller, deployedContracts.YieldProxy);
     setHasDelegated(res);
     setDelegationPending(false);
   };
