@@ -11,6 +11,7 @@ const migrationAddrs = new Map([
   [1, process.env.REACT_APP_MIGRATION_1],
   [4, process.env.REACT_APP_MIGRATION_4 ],
   [1337, process.env.REACT_APP_MIGRATION_1337 ], // '0xAC172aca69D11D28DFaadbdEa57B01f697b34158'
+  [31337, process.env.REACT_APP_MIGRATION_31337 ],
 ]);
 
 /**

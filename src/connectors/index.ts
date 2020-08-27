@@ -11,15 +11,15 @@ const POLLING_INTERVAL = 12000;
 const RPC_URLS: { [chainId: number]: string } = {
   1: 'https://mainnet.infura.io/v3/9dbb21faf34448c9af1f3047c45b15df', // process.env.REACT_APP_RPC_URL_1 as string,
   4: 'https://rinkeby.infura.io/v3/9dbb21faf34448c9af1f3047c45b15df', // process.env.REACT_APP_RPC_URL_4 as string
-  1337: 'http://localhost:8545' // process.env.REACT_APP_RPC_LOCAL as string
+  31337: 'http://localhost:8545' // process.env.REACT_APP_RPC_LOCAL as string
 };
 
-export const injected = new InjectedConnector({ supportedChainIds: [1337] });
+export const injected = new InjectedConnector({ supportedChainIds: [31337] });
 // export const injected = new InjectedConnector({ supportedChainIds: [1, 4, 1337] });
 
 export const network = new NetworkConnector({
-  urls: { 1: RPC_URLS[1], 4: RPC_URLS[4], 1337: RPC_URLS[1337], },
-  defaultChainId: 1337
+  urls: { 1: RPC_URLS[1], 4: RPC_URLS[4], 31337: RPC_URLS[31337], },
+  defaultChainId: 31337
 });
 
 export const walletlink = new WalletLinkConnector({
