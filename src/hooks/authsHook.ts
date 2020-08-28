@@ -14,6 +14,7 @@ import Controller from '../contracts/Controller.json';
 import Dai from '../contracts/TestDai.json';
 // import ERC20Permit from '../contracts/ERC20Permit.json';
 import YDai from '../contracts/YDai.json';
+import Pool from '../contracts/Pool.json';
 
 import YieldProxy from '../contracts/YieldProxy.json';
 import AccountLayer from '../containers/layers/AccountLayer';
@@ -78,6 +79,10 @@ const createTypedDaiData = (message: DaiPermitMessage, domain: IDomain) => {
   return JSON.stringify(typedData);
 };
 
+console.log( keccak256(
+  toUtf8Bytes('Permit(address holder,address spender,uint256 nonce,uint256 expiry,bool allowed)')
+) );
+
 
 const createTypedERC2612Data = (message: ERC2612PermitMessage, domain: IDomain) => {
   const typedData = {
@@ -127,7 +132,7 @@ export const useAuth = () => {
   const fromAddr = account && ethers.utils.getAddress(account);
 
   const controllerContract = new ethers.Contract( controllerAddr, Controller.abi, provider);
-  const daiContract = new ethers.Contract( daiAddr, Dai.abi, signer);
+  const daiContract = new ethers.Contract( daiAddr, Dai.abi, provider);
   const proxyContract = new ethers.Contract( proxyAddr, YieldProxy.abi, signer);
 
   const sendForSig = (_provider: any, method: string, params?: any[]) => new Promise<any>((resolve, reject) => {
@@ -164,13 +169,8 @@ export const useAuth = () => {
 
     // @ts-ignore
     const result = await signDaiPermit(provider.provider, daiAddr, fromAddr, proxyAddr);
-
-
-    await daiContract.permit(fromAddr, proxyAddr, result.expiry, result.nonce, true, result.v, result.r, result.s);
-
-    const { r, s, v } = result;
-    const daiPermitSig = ethers.utils.joinSignature({ r, s, v });
-
+    const daiPermitSig = ethers.utils.joinSignature(result);
+    // await daiContract.permit(fromAddr, proxyAddr, result.expiry, result.nonce, true, result.v, result.r, result.s);
 
     // const daiNonce = await daiContract.nonces(fromAddr);
     // const daiName = await daiContract.name();
@@ -246,10 +246,90 @@ export const useAuth = () => {
    * 
    * 
    */
-  const poolAuth = (
+  const poolAuth = async (
     yDaiAddress:string,
     poolAddress:string
   ) => {
+    const poolContract = new ethers.Contract( poolAddress, Pool.abi, provider); 
+    const yDaiContract = new ethers.Contract( yDaiAddress, YDai.abi, provider);
+    
+    const daiNonce = (await daiContract.nonces(fromAddr)).toString();
+    const daiName = await daiContract.name();
+
+    console.log(daiAddr);
+
+    // @ts-ignore
+    const dResult = await signDaiPermit(provider.provider, daiAddr, fromAddr, poolAddress);
+    const daiSig = ethers.utils.joinSignature(dResult);
+
+    // const pMsg: DaiPermitMessage = {
+    //   // @ts-ignore
+    //   holder: fromAddr,
+    //   spender: poolAddress,
+    //   nonce: daiNonce.toHexString(),
+    //   expiry: MAX_INT,
+    //   allowed: true,
+    // };
+    // const pDomain: IDomain = {
+    //   name: daiName,
+    //   version: '1',
+    //   chainId: (await provider.getNetwork()).chainId,
+    //   verifyingContract: daiAddr,
+    // };
+    // const daiSig = await sendForSig(
+    //   provider.provider, 
+    //   'eth_signTypedData_v4', 
+    //   [fromAddr, createTypedDaiData(pMsg, pDomain)],
+    // );
+
+    // @ts-ignore
+    const yResult = await signERC2612Permit(provider.provider, yDaiAddress, fromAddr, proxyAddr, MAX_INT);
+    const yDaiSig = ethers.utils.joinSignature(yResult);
+
+    /**
+     * 
+     * Pool delegation 
+     * 
+     * */
+    const poolNonce = await poolContract.signatureCount(fromAddr);
+    const msg: IDelegableMessage = {
+      // @ts-ignore
+      user: fromAddr,
+      delegate: proxyAddr,
+      nonce: poolNonce.toHexString(),
+      deadline: MAX_INT,
+    };
+    const domain: IDomain = {
+      name: 'Yield',
+      version: '1',
+      chainId: (await provider.getNetwork()).chainId,
+      verifyingContract: poolAddress,
+    };
+    const poolSig = await sendForSig(
+      provider.provider, 
+      'eth_signTypedData_v4', 
+      [fromAddr, createTypedDelegableData(msg, domain)],
+    );
+
+
+    /**
+     * Contract interaction
+     * */
+    let tx:any;
+    try {
+      tx = await proxyContract.authorizePool(poolAddress, fromAddr, daiSig, yDaiSig, poolSig);
+    } catch (e) {
+      console.log(e);
+      return;
+    }
+
+    /* Transaction reporting & tracking */
+    await tx.wait();
+    console.log(tx);
+    // eslint-disable-next-line consistent-return
+    return tx;
+
+
 
 
   };

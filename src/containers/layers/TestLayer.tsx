@@ -53,7 +53,7 @@ const TestLayer = (props:any) => {
   const { advanceTimeAndBlock, takeSnapshot, revertToSnapshot, revertToT0, block, timestamp } = useTimeTravel(); 
 
 
-  const { yieldAuth } = useAuth();
+  const { yieldAuth, poolAuth } = useAuth();
   
   const { 
     post,
@@ -344,7 +344,7 @@ const TestLayer = (props:any) => {
             label='poolAuth' 
             primary
             onClick={async ()=> {
-              await yieldAuth();
+              await poolAuth(deployedSeries[0].yDaiAddress, deployedSeries[0].poolAddress);
             }}
           />
 
