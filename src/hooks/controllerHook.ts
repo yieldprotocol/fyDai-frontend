@@ -1,13 +1,11 @@
 import React from 'react';
 import { ethers, BigNumber }  from 'ethers';
-import { useWeb3React } from '@web3-react/core';
 
 import { NotifyContext } from '../contexts/NotifyContext';
 import Controller from '../contracts/Controller.json';
 import TestERC20 from '../contracts/TestERC20.json';
 
 import { useSignerAccount } from './connectionHooks';
-// ethers.errors.setLogLevel('error');
 
 /**
  * Hook for interacting with the yield 'CRONTROLLER' Contract
@@ -35,8 +33,19 @@ export const useController = () => {
   const [ repayActive, setRepayActive ] = React.useState<boolean>(false);
   const [ approveActive, setApproveActive ] = React.useState<boolean>(false);
 
+  /* Notification Helpers */
+  const txComplete = (tx:any) => {
+    dispatch({ type: 'txComplete', payload:{ tx } } );
+  }; 
+  const handleTxError = (msg:string, tx: any, e:any) => {
+    // eslint-disable-next-line no-console
+    console.log(e.message);
+    dispatch({ type: 'notify', payload:{ message: msg, type:'error' } } );
+    txComplete(tx);
+  };
+
   /**
-   * Posts wrapped collateral (Weth or Chai)
+   * Posts 'wrapped' collateral (Weth or Chai) - not ETH directly.
    * @param {string} controllerAddress address of the Controller (remnant of older protocol)
    * @param {string} collateral 'ETH-A' || 'CHAI'
    * @param {number} amount amount of collateral to post (in normal human numbers)
@@ -70,11 +79,11 @@ export const useController = () => {
     dispatch({ type: 'txPending', payload:{ tx, message: `Deposit of ${amount} pending...`, type:'DEPOSIT' } } );
     await tx.wait();
     setPostActive(false);
-    dispatch({ type: 'txComplete', payload:{ tx, message:`Deposit of ${amount} complete` } } );
+    dispatch({ type: 'txComplete', payload:{ tx } } );
   };
 
   /**
-   * Withdraws wrapped collateral (Weth or Chai) - not ETH directly.
+   * Withdraws 'wrapped' collateral (Weth or Chai) - not ETH directly.
    * @param {string} controllerAddress address of the Controller (remnant of older protocol)
    * @param {string} collateral 'ETH-A' || 'CHAI'
    * @param {number} amount to withdraw (in human understandable numbers)
@@ -108,7 +117,7 @@ export const useController = () => {
     dispatch({ type: 'txPending', payload:{ tx, message: `Withdraw of ${amount} pending...`, type:'WITHDRAW' } } );
     await tx.wait();
     setWithdrawActive(false);
-    dispatch({ type: 'txComplete', payload:{ tx, message:`Withdrawal of ${amount} complete.` } } );
+    dispatch({ type: 'txComplete', payload:{ tx } } );
   };
 
   /**
@@ -122,7 +131,6 @@ export const useController = () => {
     controllerAddress:string,
     collateral:string,
     maturity:string,
-    // to:string,
     amount:number
   ) => {
     let tx:any;
@@ -133,7 +141,6 @@ export const useController = () => {
     const fromAddr = account && ethers.utils.getAddress(account);
     const controllerAddr = ethers.utils.getAddress(controllerAddress);
     const collateralBytes = ethers.utils.formatBytes32String(collateral);
-
     const matdate = maturity;
 
     /* Contract interaction */
@@ -142,8 +149,7 @@ export const useController = () => {
     try {
       tx = await contract.borrow(collateralBytes, matdate, fromAddr, toAddr, parsedAmount);
     } catch (e) {
-      dispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed.', type:'error' } } );
-      dispatch({ type: 'txComplete', payload:{ tx } } );
+      handleTxError('Transaction was aborted or it failed.', tx, e );
       setBorrowActive(false);
       return;
     }
@@ -168,7 +174,6 @@ export const useController = () => {
     controllerAddress:string,
     collateral:string,
     maturity:string,
-    // from:string,
     amount:number,
     type:string,
   ) => {
@@ -180,11 +185,9 @@ export const useController = () => {
     const controllerAddr = ethers.utils.getAddress(controllerAddress);
     const typeCaps = type.toUpperCase();
     const collateralBytes = ethers.utils.formatBytes32String(collateral);
-
     /* Contract interaction */
     setRepayActive(true);
     const contract = new ethers.Contract( controllerAddr, controllerAbi, signer );
-
     try {
       if (typeCaps === 'YDAI') {
         tx = await contract.repayYDai(collateralBytes, maturity, fromAddr, toAddr, parsedAmount);
@@ -192,8 +195,7 @@ export const useController = () => {
         tx = await contract.repayDai(collateralBytes, maturity, fromAddr, toAddr, parsedAmount);
       }
     } catch (e) {
-      dispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed.', type:'error' } } );
-      dispatch({ type: 'txComplete', payload:{ tx } } );
+      handleTxError('Transaction was aborted or it failed.', tx, e );
       setRepayActive(false);
       return;
     }
@@ -208,7 +210,7 @@ export const useController = () => {
   };
 
   /**
-   * Approve the controller to transact with ETH-A (or other) token.
+   * LEGACY: Approve the controller to transact with ETH-A (or other) token.
    * (Not strictly a Controller Contract function. But associated enough to keep in here.)
    * @param {string} tokenAddress address of the token to approve. 
    * @param {string} controllerAddress address of the controller. 
@@ -225,7 +227,6 @@ export const useController = () => {
     const parsedAmount = ethers.utils.parseEther(amount.toString());
     const controllerAddr = ethers.utils.getAddress(controllerAddress);
     const tokenAddr = ethers.utils.getAddress(tokenAddress);
-    
     /* Contract interaction */
     setApproveActive(true);
     const contract = new ethers.Contract(
@@ -236,8 +237,8 @@ export const useController = () => {
     try {
       tx = await contract.approve(controllerAddr, parsedAmount);
     } catch (e) {
-      dispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed.', type:'error' } } );
-      dispatch({ type: 'txComplete', payload:{ tx } } );      setApproveActive(false);
+      handleTxError('Transaction was aborted or it failed.', tx, e );    
+      setApproveActive(false);
       return;
     }
     /* Transaction reporting & tracking */
@@ -248,7 +249,7 @@ export const useController = () => {
   };
 
   /**
-   * Delegate a 3rd party to act on behalf of the user in the Controller
+   * LEGACY: Delegate a 3rd party to act on behalf of the user in the Controller
    * @param {string} controllerAddress address of the market in question.
    * @param {string} delegatedAddress address of the contract/entity getting delegated (in this case: ethproxy)
    */
@@ -269,9 +270,7 @@ export const useController = () => {
     try {
       tx = await contract.addDelegate(delegatedAddr);
     } catch (e) {
-      dispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed.', type:'error' } } );
-      dispatch({ type: 'txComplete', payload:{ tx } } );
-      console.log(e);
+      handleTxError('Transaction was aborted or it failed.', tx, e );
       return;
     }
     /* Transaction reporting & tracking */
@@ -281,14 +280,11 @@ export const useController = () => {
   };
 
   /**
-   * Check to see if an account (user) has delegated a contract/3rd Party for the controller.
-   * 
-   * Call function no gas
-   * 
+   * @dev Checks to see if an account (user) has delegated a contract/3rd Party for the controller.
    * @param {string} controllerAddress address of the controller.
    * @param {string} delegateAddress address of the delegate to be checked (yieldProxy contract getting approved). 
-   * 
-   * @returns {Promise<boolean>} approved ?
+   * @returns {Promise<boolean>} promise > approved or not
+   * @note call function
    */
   const checkControllerDelegate = async (
     controllerAddress:string,
@@ -302,6 +298,7 @@ export const useController = () => {
     try {
       res = await contract.delegated(fromAddr, delegateAddr);
     }  catch (e) {
+      // eslint-disable-next-line no-console
       console.log(e);
       res = false;
     }
@@ -309,14 +306,11 @@ export const useController = () => {
   };
 
   /**
-   * Gets the value of collateral posted to the Yield protocol.
-   * 
-   * Call function no gas
-   * 
+   * @dev Returns the value of collateral posted to the Yield protocol.
    * @param {string} controllerAddress address of the controller.
    * @param {string} collateralType collateral type to check (eg. ETH-A)
-   * 
-   * @returns {BigNumber} amount collateral depositied (in Wei)
+   * @returns {Promise<BigNumber>} amount collateral depositied (in Wei)
+   * @note call function
    */
   const collateralPosted = async (
     controllerAddress:string,
@@ -330,22 +324,19 @@ export const useController = () => {
     try {
       res = await contract.posted(collType, accAddr );
     }  catch (e) {
+      // eslint-disable-next-line no-console
       console.log(e);
       res = false;
     }
     return res;
   };
 
-
   /**
-   * Gets the amount of collateral locked in borrowing operations.
-   * 
-   * Call function no gas
-   * 
+   * @dev Gets the amount of collateral locked in borrowing operations.
    * @param {string} controllerAddress address of the controller.
    * @param {string} collateralType collateral type to check (eg. ETH-A)
-   * 
-   * @returns {BigNumber} amount collateral depositied (in Wei)
+   * @returns {Promise<BigNumber>} amount collateral locked (in Wei)
+   * @note call function
    */
   const collateralLocked = async (
     controllerAddress:string,
@@ -359,6 +350,7 @@ export const useController = () => {
     try {
       res = await contract.locked(collType, accAddr );
     }  catch (e) {
+      // eslint-disable-next-line no-console
       console.log(e);
       res = false;
     }
@@ -366,14 +358,11 @@ export const useController = () => {
   };
 
   /**
-   * Borrowing power (in dai) of a user for a specific series and collateral
-   * 
-   * Call function no gas
-   * 
+   * @dev Borrowing power (in dai) of a user for a specific series and collateral
    * @param {string} controllerAddress address of the controller.
    * @param {string} collateralType collateral type to check (eg. ETH-A)
-   * 
-   * @returns {BigNumber} amount Dai (in Wei)
+   * @returns {Promise<BigNumber>} amount Dai (in Wei)
+   * @note call function
    */
   const borrowingPower = async (
     controllerAddress:string,
@@ -387,6 +376,7 @@ export const useController = () => {
     try {
       res = await contract.powerOf(collType, accAddr);
     }  catch (e) {
+      // eslint-disable-next-line no-console
       console.log(e);
       res = false;
     }
@@ -394,17 +384,13 @@ export const useController = () => {
   };
 
   /**
-   *  Dai debt of a series
-   *  
-   * After maturity, the Dai debt of a position grows according to either the stability fee (for WETH collateral) or the Dai Saving Rate (for Chai collateral).
-   * 
-   * Call function no gas
-   * 
+   * @dev get the DAI debt of a series
+   * @note After maturity, the Dai debt of a position grows according to either the stability fee (for WETH collateral) or the Dai Saving Rate (for Chai collateral).
    * @param {string} controllerAddress address of the controller.
    * @param {string} collateralType collateral type to check (eg. ETH-A)
-   *  @param maturity Maturity of an added series
-   * 
-   * @returns {BigNumber} amount Dai (in Wei)
+   * @param maturity Maturity of an added series
+   * @returns {Promise<BigNumber>} amount Dai (in Wei)
+   * @note call function 
    */
   const debtDai = async (
     controllerAddress:string,
@@ -419,6 +405,7 @@ export const useController = () => {
     try {
       res = await contract.debtDai(collType,  maturity, accAddr);
     }  catch (e) {
+      // eslint-disable-next-line no-console
       console.log(e);
       res = false;
     }
@@ -427,14 +414,11 @@ export const useController = () => {
 
 
   /**
-   * Total debt of an user across all series, in Dai
-   * 
-   * Call function no gas
-   * 
+   * @dev Total debt of an user across ALL series, in DAI
    * @param {string} controllerAddress address of the controller.
    * @param {string} collateralType collateral type to check (eg. ETH-A)
-   * 
-   * @returns {BigNumber} amount Dai (in Wei)
+   * @returns {Promise<BigNumber>} amount Dai (in Wei)
+   * @note call function
    */
   const totalDebtDai = async (
     controllerAddress:string,
@@ -448,6 +432,7 @@ export const useController = () => {
     try {
       res = await contract.totalDebtDai(collType, accAddr);
     }  catch (e) {
+      // eslint-disable-next-line no-console
       console.log(e);
       res = false;
     }
