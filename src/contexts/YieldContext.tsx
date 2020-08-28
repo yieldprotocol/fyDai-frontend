@@ -2,20 +2,19 @@ import React from 'react';
 import { ethers } from 'ethers';
 import moment from 'moment';
 
+import { useWeb3React } from '@web3-react/core';
 import * as utils from '../utils';
-
 import { NotifyContext } from './NotifyContext';
-import {
-  useCallTx,
-  useCachedState,
-  useBalances,
-  useEvents,
-  useSignerAccount,
-  useWeb3React,
-  useMath,
-  useMigrations,
-  useController,
-} from '../hooks';
+
+import { useCachedState, } from '../hooks/appHooks';
+import { useCallTx } from '../hooks/chainHooks';
+import { useController } from '../hooks/controllerHook';
+import { useEvents } from '../hooks/eventHooks';
+import { useSignerAccount } from '../hooks/connectionHooks';
+
+// TODO: fix these cyclic errors
+import { useMigrations } from '../hooks/migrationHook';
+import { useMath } from '../hooks/mathHooks';
 
 const YieldContext = React.createContext<any>({});
 
@@ -48,8 +47,6 @@ const contractList = [
   'YieldProxy',
   'Liquidations',
 ];
-
-
 
 // reducer
 function reducer(state: any, action: any) {
@@ -133,7 +130,6 @@ const YieldProvider = ({ children }: any) => {
   
     try {
       if (chainId && !cachedContracts || forceUpdate) {
-
         const contractAddrs = await getAddresses(contractList, chainId);
         _deployedContracts = Object.fromEntries(contractAddrs);
         window.localStorage.removeItem('deployedContracts');

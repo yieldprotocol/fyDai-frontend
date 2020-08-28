@@ -67,7 +67,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
     checkPoolDelegate
   }  = usePool();
 
-  const { borrowUsingExactDai, borrowActive } = useProxy();
+  const { borrowDai, borrowActive } = useProxy();
   const { approveToken, approveActive } = useToken();
   const { userAllowance } = useYDai();
   const { 
@@ -104,7 +104,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
 
     if (account && inputValue>0 && !borrowDisabled) {
       setBorrowPending(true); 
-      autoSell && await borrowUsingExactDai( activeSeries.yieldProxyAddress, 'ETH-A', activeSeries.maturity, yDaiValue, value);
+      autoSell && await borrowDai( activeSeries.yieldProxyAddress, 'ETH-A', activeSeries.maturity, yDaiValue, value);
       !autoSell && await borrow(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value);
       setInputValue('');
       await Promise.all([

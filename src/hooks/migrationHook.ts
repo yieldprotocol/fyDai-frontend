@@ -1,9 +1,9 @@
 import React from 'react';
 import { ethers, BigNumber }  from 'ethers';
+import { useWeb3React } from '@web3-react/core';
 import { useSignerAccount } from './connectionHooks';
 
 import Migration from '../contracts/Migrations.json';
-import { useWeb3React } from '.';
 
 // ethers.errors.setLogLevel('error');
 

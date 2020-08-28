@@ -47,10 +47,12 @@ function Repay({ repayAmount }:IRepayProps) {
     addPoolDelegate,
     checkPoolDelegate
   }  = usePool(); 
+  
   const { getTokenAllowance }  = useBalances();
   const { approveToken, approveActive } = useToken();
   const { repay, repayActive }  = useController();
-  const { repayUsingExactDai } = useProxy();
+
+  const { repayDaiDebt } = useProxy();
 
   const [ inputValue, setInputValue ] = React.useState<any>();
   const [ yDaiValue, setYDaiValue ] = React.useState<any>();
