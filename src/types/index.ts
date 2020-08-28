@@ -77,6 +77,7 @@ export interface INotification {
   fatalOpen?: boolean,
   fatalMsg?: string,
   pendingTxs?: any,
+  requestedSigs?: any,
 }
 
 export interface IYieldAccount {}
