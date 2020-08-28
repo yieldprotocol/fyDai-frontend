@@ -2,7 +2,7 @@ import React from 'react';
 import { ethers, BigNumber  }  from 'ethers';
 
 import { keccak256, defaultAbiCoder, toUtf8Bytes, solidityPack } from 'ethers/lib/utils';
-import { signDaiPermit, signERC2612Permit }  from 'eth-permit';
+import { signDaiPermit, signERC2612Permit } from 'eth-permit';
 
 import * as utils from '../utils';
 
@@ -19,39 +19,14 @@ import Pool from '../contracts/Pool.json';
 import YieldProxy from '../contracts/YieldProxy.json';
 import AccountLayer from '../containers/layers/AccountLayer';
 
+import {
+  IDelegableMessage,
+  DaiPermitMessage,
+  ERC2612PermitMessage,
+  IDomain 
+} from '../types';
+
 const MAX_INT = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
-
-// import Controller from '../contracts/Controller.json';
-
-interface IDelegableMessage {
-  user: string;
-  delegate: string;
-  nonce: number | string;
-  deadline: number | string;
-}
-
-interface DaiPermitMessage {
-  holder: string;
-  spender: string;
-  nonce: number;
-  expiry: number | string;
-  allowed?: boolean;
-}
-
-interface ERC2612PermitMessage {
-  owner: string;
-  spender: string;
-  value: number | string;
-  nonce: number | string;
-  deadline: number | string;
-}
-
-interface IDomain {
-  name: string;
-  version: string;
-  chainId: number;
-  verifyingContract: string;
-}
 
 const EIP712Domain = [
   { name: 'name', type: 'string' },
@@ -59,49 +34,6 @@ const EIP712Domain = [
   { name: 'chainId', type: 'uint256' },
   { name: 'verifyingContract', type: 'address' },
 ];
-
-const createTypedDaiData = (message: DaiPermitMessage, domain: IDomain) => {
-  const typedData = {
-    types: {
-      EIP712Domain,
-      Permit: [
-        { name: 'holder', type: 'address' },
-        { name: 'spender', type: 'address' },
-        { name: 'nonce', type: 'uint256' },
-        { name: 'expiry', type: 'uint256' },
-        { name: 'allowed', type: 'bool' },
-      ],
-    },
-    primaryType: 'Permit',
-    domain,
-    message,
-  };
-  return JSON.stringify(typedData);
-};
-
-console.log( keccak256(
-  toUtf8Bytes('Permit(address holder,address spender,uint256 nonce,uint256 expiry,bool allowed)')
-) );
-
-
-const createTypedERC2612Data = (message: ERC2612PermitMessage, domain: IDomain) => {
-  const typedData = {
-    types: {
-      EIP712Domain,
-      Permit: [
-        { name: 'owner', type: 'address' },
-        { name: 'spender', type: 'address' },
-        { name: 'value', type: 'uint256' },
-        { name: 'nonce', type: 'uint256' },
-        { name: 'deadline', type: 'uint256' },
-      ],
-    },
-    primaryType: 'Permit',
-    domain,
-    message,
-  };
-  return JSON.stringify(typedData);
-};
 
 const createTypedDelegableData = (message: IDelegableMessage, domain: IDomain) => {
   const typedData = {
@@ -121,18 +53,26 @@ const createTypedDelegableData = (message: IDelegableMessage, domain: IDomain) =
   return JSON.stringify(typedData);
 };
 
+const auths = new Map([
+  [1, 'Allow the yield Proxy contract to interact with the Yield protocol on your behalf'],
+  [2, 'Allow the yield Proxy contract to interact with DAI on your behalf'],
+  [3, 'Allow the yield Proxy contract to interact with this series on your behalf'],
+  [4, 'Allow the yield Pool to trade DAI on your behalf for this series'],
+  [5, 'Allow the yield Pool to trade yDAI on your behalf for this series'],
+]);
 
 export const useAuth = () => {
 
   const { account, provider, signer } = useSignerAccount();
   const { state: { deployedContracts } } = React.useContext(YieldContext);
+  const { dispatch } = React.useContext(NotifyContext);
+  
   const controllerAddr = ethers.utils.getAddress(deployedContracts.Controller);
   const daiAddr = ethers.utils.getAddress(deployedContracts.Dai);
   const proxyAddr = ethers.utils.getAddress(deployedContracts.YieldProxy);
   const fromAddr = account && ethers.utils.getAddress(account);
 
   const controllerContract = new ethers.Contract( controllerAddr, Controller.abi, provider);
-  const daiContract = new ethers.Contract( daiAddr, Dai.abi, provider);
   const proxyContract = new ethers.Contract( proxyAddr, YieldProxy.abi, signer);
 
   const sendForSig = (_provider: any, method: string, params?: any[]) => new Promise<any>((resolve, reject) => {
@@ -156,48 +96,13 @@ export const useAuth = () => {
 
   /**
    * 
-   *  Once off Yield Controller and Dai authorization
+   *  Once off Yield Controller and Dai authorizations
    * 
    */
   const yieldAuth = async ( ) => {
 
     /**
-     * 
-     * Dai permit yieldProxy 
-     * 
-     * */
-
-    // @ts-ignore
-    const result = await signDaiPermit(provider.provider, daiAddr, fromAddr, proxyAddr);
-    const daiPermitSig = ethers.utils.joinSignature(result);
-    // await daiContract.permit(fromAddr, proxyAddr, result.expiry, result.nonce, true, result.v, result.r, result.s);
-
-    // const daiNonce = await daiContract.nonces(fromAddr);
-    // const daiName = await daiContract.name();
-
-    // const pMsg: DaiPermitMessage = {
-    //   holder: fromAddr||'',
-    //   spender: proxyAddr,
-    //   nonce: daiNonce.toHexString(),
-    //   expiry: MAX_INT,
-    //   allowed: true,
-    // };
-    // const pDomain: IDomain = {
-    //   name: daiName,
-    //   version: '1',
-    //   chainId: (await provider.getNetwork()).chainId,
-    //   verifyingContract: daiAddr,
-    // };
-    // const daiPermitSig = await sendForSig(
-    //   provider.provider, 
-    //   'eth_signTypedData_v4', 
-    //   [fromAddr, createTypedDaiData(pMsg, pDomain)],
-    // );
-
-    /**
-     * 
-     * controller delegation
-     * 
+     * yieldProxy | Controller delegation
      * */
     const controllerNonce = await controllerContract.signatureCount(fromAddr);
     const msg: IDelegableMessage = {
@@ -213,17 +118,26 @@ export const useAuth = () => {
       chainId: (await provider.getNetwork()).chainId,
       verifyingContract: controllerAddr,
     };
+
+    dispatch({ type: 'sigRequested', payload: auths.get(1) });
     const controllerSig = await sendForSig(
       provider.provider, 
       'eth_signTypedData_v4', 
       [fromAddr, createTypedDelegableData(msg, domain)],
     );
-
-    console.log(daiPermitSig);
-    console.log(controllerSig);
+    dispatch({ type: 'signed', payload: auths.get(1) });
 
     /**
-     * Contract interaction
+     * Dai permit yieldProxy 
+     * */
+    dispatch({ type: 'sigRequested', payload: auths.get(2) });
+    // @ts-ignore
+    const result = await signDaiPermit(provider.provider, daiAddr, fromAddr, proxyAddr);
+    const daiPermitSig = ethers.utils.joinSignature(result);
+    dispatch({ type: 'signed', payload: auths.get(2) });
+
+    /**
+     * Send Permits and delegations 
      * */
     let tx:any;
     try {
@@ -232,64 +146,26 @@ export const useAuth = () => {
       console.log(e);
       return;
     }
-
-    /* Transaction reporting & tracking */
     await tx.wait();
-    console.log(tx);
     // eslint-disable-next-line consistent-return
     return tx;
   };
 
-
   /**
    * 
-   * 
+   * Auths, Delegations and permits required for Pool interactions
    * 
    */
   const poolAuth = async (
     yDaiAddress:string,
     poolAddress:string
   ) => {
-    const poolContract = new ethers.Contract( poolAddress, Pool.abi, provider); 
-    const yDaiContract = new ethers.Contract( yDaiAddress, YDai.abi, provider);
-    
-    const daiNonce = (await daiContract.nonces(fromAddr)).toString();
-    const daiName = await daiContract.name();
-
-    console.log(daiAddr);
-
-    // @ts-ignore
-    const dResult = await signDaiPermit(provider.provider, daiAddr, fromAddr, poolAddress);
-    const daiSig = ethers.utils.joinSignature(dResult);
-
-    // const pMsg: DaiPermitMessage = {
-    //   // @ts-ignore
-    //   holder: fromAddr,
-    //   spender: poolAddress,
-    //   nonce: daiNonce.toHexString(),
-    //   expiry: MAX_INT,
-    //   allowed: true,
-    // };
-    // const pDomain: IDomain = {
-    //   name: daiName,
-    //   version: '1',
-    //   chainId: (await provider.getNetwork()).chainId,
-    //   verifyingContract: daiAddr,
-    // };
-    // const daiSig = await sendForSig(
-    //   provider.provider, 
-    //   'eth_signTypedData_v4', 
-    //   [fromAddr, createTypedDaiData(pMsg, pDomain)],
-    // );
-
-    // @ts-ignore
-    const yResult = await signERC2612Permit(provider.provider, yDaiAddress, fromAddr, proxyAddr, MAX_INT);
-    const yDaiSig = ethers.utils.joinSignature(yResult);
+    const poolContract = new ethers.Contract( poolAddress, Pool.abi, provider);
+    // const daiNonce = await daiContract.nonces(fromAddr);
+    // const daiName = await daiContract.name();
 
     /**
-     * 
-     * Pool delegation 
-     * 
+     * YieldProxy | Pool delegation 
      * */
     const poolNonce = await poolContract.signatureCount(fromAddr);
     const msg: IDelegableMessage = {
@@ -305,12 +181,31 @@ export const useAuth = () => {
       chainId: (await provider.getNetwork()).chainId,
       verifyingContract: poolAddress,
     };
+    dispatch({ type: 'sigRequested', payload: auths.get(3) });
     const poolSig = await sendForSig(
       provider.provider, 
       'eth_signTypedData_v4', 
       [fromAddr, createTypedDelegableData(msg, domain)],
     );
+    dispatch({ type: 'signed', payload: auths.get(3) });
 
+    /**
+     * Dai permit pool
+     */
+    dispatch({ type: 'sigRequested', payload: auths.get(4) });
+    // @ts-ignore
+    const dResult = await signDaiPermit(provider.provider, daiAddr, fromAddr, poolAddress);
+    const daiSig = ethers.utils.joinSignature(dResult);
+    dispatch({ type: 'signed', payload: auths.get(4) });
+
+    /**
+     * yDAi permit pool
+     */
+    dispatch({ type: 'sigRequested', payload: auths.get(5) });
+    // @ts-ignore
+    const yResult = await signERC2612Permit(provider.provider, yDaiAddress, fromAddr, proxyAddr, MAX_INT);
+    const yDaiSig = ethers.utils.joinSignature(yResult);
+    dispatch({ type: 'signed', payload: auths.get(5) });
 
     /**
      * Contract interaction
@@ -328,9 +223,6 @@ export const useAuth = () => {
     console.log(tx);
     // eslint-disable-next-line consistent-return
     return tx;
-
-
-
 
   };
 

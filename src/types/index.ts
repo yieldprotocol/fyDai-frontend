@@ -82,3 +82,34 @@ export interface INotification {
 export interface IYieldAccount {}
 
 export interface IMakerVault {}
+
+
+export interface IDelegableMessage {
+  user: string;
+  delegate: string;
+  nonce: number | string;
+  deadline: number | string;
+}
+
+export interface DaiPermitMessage {
+  holder: string;
+  spender: string;
+  nonce: number;
+  expiry: number | string;
+  allowed?: boolean;
+}
+
+export interface ERC2612PermitMessage {
+  owner: string;
+  spender: string;
+  value: number | string;
+  nonce: number | string;
+  deadline: number | string;
+}
+
+export interface IDomain {
+  name: string;
+  version: string;
+  chainId: number;
+  verifyingContract: string;
+}

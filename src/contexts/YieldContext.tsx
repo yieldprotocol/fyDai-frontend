@@ -38,6 +38,19 @@ const seriesColors = [
   '#607d8b',
 ];
 
+const contractList = [
+  'Controller',
+  'Treasury',
+  'Chai',
+  'Dai',
+  'Vat',
+  'Weth',
+  'YieldProxy',
+  'Liquidations',
+];
+
+
+
 // reducer
 function reducer(state: any, action: any) {
   switch (action.type) {
@@ -117,19 +130,7 @@ const YieldProvider = ({ children }: any) => {
   ): Promise<any[]> => {
     const _deployedSeries: any[] = [];
     let _deployedContracts: any;
-    
-    const contractList = [
-      'Controller',
-      'Treasury',
-      'Chai',
-      'Dai',
-      // 'WethJoin',
-      'Vat',
-      'Weth',
-      'YieldProxy',
-      'Liquidations',
-    ];
-
+  
     try {
       if (chainId && !cachedContracts || forceUpdate) {
 
@@ -155,9 +156,7 @@ const YieldProvider = ({ children }: any) => {
             const maturity = (await callTx(x, 'YDai', 'maturity', [])).toNumber();
             const isMature = await callTx(x, 'YDai', 'isMature', []);
             const _peripheralAddrs = await getAddresses([ `${name}-Pool` ], chainId);     
-            const poolAddress = _peripheralAddrs.get(`${name}-Pool`);          
-            // const yieldProxyAddress = _peripheralAddrs.get(`${name}-DaiProxy`);
-            // const liquidityProxyAddress = _peripheralAddrs.get(`${name}-LiquidityProxy`);
+            const poolAddress = _peripheralAddrs.get(`${name}-Pool`);
             
             return {
               yDaiAddress: x,
