@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { Box, Text, ThemeContext, ResponsiveContext, Button, Stack } from 'grommet';
+import { Box, Text, ThemeContext, ResponsiveContext, Button} from 'grommet';
 
 import { FiLayers as ChangeSeries } from 'react-icons/fi';
 
@@ -7,22 +7,22 @@ import { ScaleLoader } from 'react-spinners';
 import { SeriesContext } from '../contexts/SeriesContext';
 
 import SeriesSelector from './SeriesSelector';
-import Loading from './Loading';
 import AprBadge from './AprBadge';
 
 interface ISeriesDescriptorProps {
   activeView: string;
-  minified?: boolean;  
+  minified?: boolean;
+  children?:any;
 }
 
-function SeriesDescriptor( props: ISeriesDescriptorProps, children:any) {
+function SeriesDescriptor( props: ISeriesDescriptorProps ) {
 
-  const { activeView, minified } = props;
+  const { activeView, minified, children } = props;
 
   const theme:any = React.useContext(ThemeContext);
   const screenSize = React.useContext(ResponsiveContext);
 
-  const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
+  const { state: seriesState } = useContext(SeriesContext);
   const { activeSeries } = seriesState; 
 
   const [ selectorOpen, setSelectorOpen ] = useState<boolean>(false);
@@ -41,7 +41,6 @@ function SeriesDescriptor( props: ISeriesDescriptorProps, children:any) {
           background='background-mid'
           border='all'
           onClick={()=>setSelectorOpen(true)}
-        // hoverIndicator='brand'
           direction='row'
           fill
           pad='small'
@@ -50,29 +49,11 @@ function SeriesDescriptor( props: ISeriesDescriptorProps, children:any) {
         >
           { !activeSeries ? 
             <ScaleLoader color={theme?.global?.colors['brand-transparent'].dark} height='13' /> :
-            <Box direction='row' gap='small'> 
-              
+            <Box direction='row' gap='small'>             
               <AprBadge activeView={activeView} series={activeSeries} />
-
               <Text color='brand' size='large'>            
                 { activeSeries.displayName }
               </Text>
-
-              {/* { activeSeries?.isMature === false && 
-                 activeView === 'borrow' && 
-                  !Number.isFinite(parseFloat(activeSeries.yieldAPR_)) &&                  
-                  <Box 
-                    round
-                    border='all'
-                    direction='row'
-                    pad={{ horizontal:'small' }}
-                    align='center'
-                    background='orange'
-                  >
-                    <Text size='xxsmall'>
-                      Limited Liquidity            
-                    </Text>
-                  </Box>}            */}
             </Box>}
 
           <Button
@@ -95,10 +76,11 @@ function SeriesDescriptor( props: ISeriesDescriptorProps, children:any) {
         </Box>
 
       </Box>
+      { children }
     </>
   );
 }
 
-SeriesDescriptor.defaultProps={ minified:false };
+SeriesDescriptor.defaultProps={ minified:false, children:null };
 
 export default SeriesDescriptor; 
