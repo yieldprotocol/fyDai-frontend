@@ -1,81 +1,62 @@
 import React, { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 import Moment from 'moment';
-import { Box, Button, Keyboard, TextInput, Text, CheckBox, ResponsiveContext, ThemeContext } from 'grommet';
+import { Box, Button, Keyboard, TextInput, Text, ResponsiveContext } from 'grommet';
 
 import { 
-  FiCheckCircle,
-  FiInfo as Info,
-  FiHelpCircle as Help,
-  FiChevronDown as CaretDown,
-  FiAlertTriangle as Warning,
   FiArrowRight as ArrowRight,
 } from 'react-icons/fi';
+import DaiMark from '../components/logos/DaiMark';
+
+import { SeriesContext } from '../contexts/SeriesContext';
+import { UserContext } from '../contexts/UserContext';
+
+import { 
+  useSignerAccount,
+  useTxActive,
+  useProxy
+} from '../hooks';
 
 import RemoveLiquidity from './RemoveLiquidity';
 
 import InfoGrid from '../components/InfoGrid';
-
-import { YieldContext } from '../contexts/YieldContext';
-import { SeriesContext } from '../contexts/SeriesContext';
-import { UserContext } from '../contexts/UserContext';
-  
-import { usePool, useBalances, useMath, useToken, useSignerAccount, useTxActive, useProxy } from '../hooks';
 import InputWrap from '../components/InputWrap';
-import DaiMark from '../components/logos/DaiMark';
 import ApprovalPending from '../components/ApprovalPending';
 import TransactionPending from '../components/TransactionPending';
-import Approval from '../components/Approval';
-
 
 interface IPoolProps {
   // lendAmount?:any
 }
   
 const Pool = (props:IPoolProps) => {
-  
-  const { state: yieldState, actions: yieldActions } = React.useContext(YieldContext);
-  const { deployedContracts } = yieldState;
-
   const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
-  const { isLoading, activeSeries } = seriesState;
-
+  const { activeSeries } = seriesState;
   const { state: userState, actions: userActions } = React.useContext(UserContext);
-  const {
-    daiBalance_,
-    ethBorrowingPower_: maximumDai
-  } = userState.position;
-
-  const theme:any = React.useContext(ThemeContext);
+  const { daiBalance_ } = userState.position;
   const screenSize = React.useContext(ResponsiveContext);
 
   const { addLiquidity, addLiquidityActive } = useProxy();
-
-  const { yieldAPR } = useMath();
+  // const { getPoolTokens,  } = usePool();
 
   const { account } = useSignerAccount();
-  
+  const [ txActive ] = useTxActive(['SELL']);
+
+  const [ hasDelegated, setHasDelegated ] = useState<boolean>(true);
+
   const [ inputValue, setInputValue ] = React.useState<any>();
+
+  const [ removeLiquidityOpen, setRemoveLiquidityOpen ] = useState<boolean>(false);
 
   const [ addLiquidityDisabled, setAddLiquidityDisabled ] = React.useState<boolean>(false);
   const [ addLiquidityPending, setAddLiquidityPending ] = useState<boolean>(false);
-
-  const [ removeLiquidityOpen, setRemoveLiquidityOpen ] = useState<boolean>(false);
-  
   const [ warningMsg, setWarningMsg] = React.useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
-
-  const [ txActive ] = useTxActive(['SELL']);
   
-
   /* Add Liquidity sequence */ 
   const addLiquidityProcedure = async (value:number) => { 
     if (!addLiquidityDisabled ) {
       setAddLiquidityPending(true);
-
-      // await addLiquidity( );
-      console.log('liquididty added actioned');
-
+      await addLiquidity( activeSeries, value );
       setInputValue('');
       await Promise.all([
         userActions.updatePosition(),
@@ -88,47 +69,32 @@ const Pool = (props:IPoolProps) => {
   /* handle value calculations based on input changes */
   useEffect(() => {
     inputValue && ( async () => {
+
     })();
   }, [inputValue]);
   
-  /* handle warnings input errors */
-  // useEffect(() => {
-  //   if ( inputValue && ( inputValue > daiBalance_ ) ) {
-  //     setAddLiquidityDisabled(true);
-  //     setWarningMsg(null);
-  //     setErrorMsg('That amount exceeds the amount of DAI you have'); 
-  //   } else {
-  //     // setLendDisabled(false);
-  //     setWarningMsg(null);
-  //     setErrorMsg(null);
-  //   }
-  // }, [ inputValue ]);
-
   /* Add liquidity disabling logic */
   useEffect(()=>{
-    if (
+    (
+      !daiBalance_ ||
+      inputValue > daiBalance_ ||  
       !account ||
-      !inputValue || 
-      parseInt(inputValue, 10)===0  
-    ) {
-      setAddLiquidityDisabled(true);
+      !hasDelegated ||
+      !inputValue ||
+      parseInt(inputValue, 10) === 0
+    )? setAddLiquidityDisabled(true): setAddLiquidityDisabled(false);
+  }, [ inputValue, hasDelegated ]);
+
+  /* handle warnings input errors */
+  useEffect(() => {
+    if ( inputValue && ( inputValue > daiBalance_ ) ) {
+      setWarningMsg(null);
+      setErrorMsg('That amount exceeds the amount of DAI you have'); 
     } else {
-      setAddLiquidityDisabled(false);
+      setWarningMsg(null);
+      setErrorMsg(null);
     }
   }, [ inputValue ]);
-
-  // /* handle active series loads and changes */
-  // useEffect(() => {
-  //   account && activeSeries && activeSeries.yDaiBalance_ && !(activeSeries.isMature) && ( async () => {
-  //     const preview = await previewPoolTx('SellYDai', activeSeries.poolAddress, activeSeries.yDaiBalance_);
-  //     console.log(preview);
-  //     setCurrentValue( parseFloat(ethers.utils.formatEther(preview)));
-  //   })();
-  //   ( async ()=>{
-  //     account && activeSeries && setApproved(await getTokenAllowance(deployedContracts.Dai, activeSeries.poolAddress, 'Dai'));
-  //     console.log(activeSeries);
-  //   })();
-  // }, [ activeSeries, account ]);
 
   return (
     <Keyboard 
@@ -146,7 +112,7 @@ const Pool = (props:IPoolProps) => {
               visible: !!account,
               active: true,
               loading: addLiquidityPending,     
-              value: '1000',
+              value: activeSeries?.poolTokens_.toFixed(2),
               valuePrefix: null,
               valueExtra: null, 
             },
@@ -155,7 +121,7 @@ const Pool = (props:IPoolProps) => {
               visible: !!account,
               active: true,
               loading: addLiquidityPending,           
-              value: '0.03%',
+              value: activeSeries?.poolPercent_.toFixed(2),
               valuePrefix: null,
               valueExtra: null,
             },
