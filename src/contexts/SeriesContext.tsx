@@ -59,7 +59,7 @@ const SeriesProvider = ({ children }:any) => {
   const { getBalance } = useToken();
 
   const [ callTx ] = useCallTx();
-  const { yieldAPR }  = useMath();
+  const { yieldAPR, poolPercent }  = useMath();
 
 
   /* Get the yield market rates for a particular set of series */
@@ -114,22 +114,19 @@ const SeriesProvider = ({ children }:any) => {
     await Promise.all(
       seriesArr.map( async (x:any, i:number) => {
         const _rates = rates.get(x.maturity);
-        console.log(_rates.sellYDai.toString());
-        console.log(x);
         _seriesData.push(x);
         try {
           _seriesData[i].hasDelegatedPool = account? await checkPoolDelegate(x.poolAddress, deployedContracts.YieldProxy): null;
-
           // _seriesData[i].hasPermitedDai = account? await checkPoolDelegate(x.poolAddress, deployedContracts.YieldProxy): null;
           // _seriesData[i].hasPermitedyDai = account? await checkPoolDelegate(x.poolAddress, deployedContracts.YieldProxy): null;
-
           // _seriesData[i].hasDelegatedController = account? await checkControllerDelegate(deployedContracts.Controller, x.yieldProxyAddress): null;         
           _seriesData[i].isMature = await callTx(x.yDaiAddress, 'YDai', 'isMature', []);
           _seriesData[i].yieldAPR = yieldAPR(_rates.sellYDai, ethers.utils.parseEther('1'), x.maturity);
+          _seriesData[i].totalSupply = await callTx(x.poolAddress, 'Pool', 'totalSupply', []);
           _seriesData[i].yDaiBalance = account? await callTx(x.yDaiAddress, 'YDai', 'balanceOf', [account]): BigNumber.from('0') ;
           _seriesData[i].ethDebtYDai = account? await callTx(deployedContracts.Controller, 'Controller', 'debtYDai', [utils.ETH, x.maturity, account]): BigNumber.from('0');
           _seriesData[i].ethDebtDai = account? utils.mulRay( _seriesData[i].ethDebtYDai, _rates.sellYDai): BigNumber.from('0');
-          _seriesData[i].poolTokens = account? BigNumber.from('0') : BigNumber.from('0'); // getBalance(x.liquidityProxyAddress, 'ERC20')
+          _seriesData[i].poolTokens = account? await callTx(x.poolAddress, 'Pool', 'balanceOf', [account]): BigNumber.from('0') ;     
         } catch (e) {
           console.log(`Could not load account positions data: ${e}`);
         }
@@ -140,10 +137,12 @@ const SeriesProvider = ({ children }:any) => {
       return acc.set(
         x.maturity,
         { ...x,
+          totalSupply_: parseFloat(ethers.utils.formatEther(x.totalSupply.toString())),
           yDaiBalance_: parseFloat(ethers.utils.formatEther(x.yDaiBalance.toString())),
           ethDebtYDai_: parseFloat(ethers.utils.formatEther(x.ethDebtYDai.toString())),
           ethDebtDai_: parseFloat(ethers.utils.formatEther(x.ethDebtDai.toString())),
           poolTokens_: parseFloat(ethers.utils.formatEther(x.poolTokens.toString())),
+          poolPercent_: poolPercent(x.totalSupply, x.poolTokens),
           yieldAPR_: x.yieldAPR.toFixed(2),
         }
       );

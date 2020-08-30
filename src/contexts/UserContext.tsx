@@ -2,22 +2,19 @@ import React from 'react';
 import { ethers, BigNumber } from 'ethers';
 import moment from 'moment';
 
+import { useWeb3React } from '@web3-react/core';
+
 import * as utils from '../utils';
 
 import { NotifyContext } from './NotifyContext';
 import { YieldContext } from './YieldContext';
 
-import {
-  useCallTx,
-  useCachedState,
-  useBalances,
-  useEvents,
-  useSignerAccount,
-  useWeb3React,
-  useMath,
-  useController,
-  useMigrations,
-} from '../hooks';
+import { useBalances, useCallTx } from '../hooks/chainHooks';
+import { useMath } from '../hooks/mathHooks'; 
+import { useCachedState, } from '../hooks/appHooks';
+import { useController } from '../hooks/controllerHook';
+import { useEvents } from '../hooks/eventHooks';
+import { useSignerAccount } from '../hooks/connectionHooks';
 
 const UserContext = React.createContext<any>({});
 
@@ -68,7 +65,9 @@ const initState = {
     items:[],
   },
   authorizations:{},
-  preferences:{},
+  preferences:{
+    slippage: 0.005 // default === 0.5%
+  },
   makerData:{},
 };
 
@@ -323,7 +322,7 @@ const UserProvider = ({ children }: any) => {
    */
   const _getPreferences = async () => {
     console.log('dont forget to add in the preferences' );
-    dispatch( { type: 'updatePreferences', payload: {} });
+    // dispatch( { type: 'updatePreferences', payload: { slippage:0.005 } });
     return {};
   };
 
