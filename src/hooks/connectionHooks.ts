@@ -16,6 +16,7 @@ import torusImage from '../assets/images/providers/torus.png';
 import noConnectionImage from '../assets/images/providers/noconnection.png';
 import { NotifyContext } from '../contexts/NotifyContext';
 
+
 export function useEagerConnect() {
   const { activate, active } = useWeb3React();
   const [tried, setTried] = React.useState(false);
@@ -40,9 +41,9 @@ export function useEagerConnect() {
   return tried;
 }
 
+
 export function useInactiveListener(suppress: boolean = false) {
   const { active, error, activate } = useWeb3React();
-
   const { chainId: fallbackChainId } = useWeb3React('fallback');
 
   // eslint-disable-next-line consistent-return
@@ -84,6 +85,7 @@ export function useInactiveListener(suppress: boolean = false) {
   }, [active, error, suppress, activate]);
 }
 
+
 // TODO: get rid of this
 export function useConnectorImage() {
   const { connector } = useWeb3React();
@@ -111,9 +113,7 @@ export function useConnectorImage() {
 
 
 export function useConnection() {
-
   const { dispatch: notifyDispatch } = React.useContext(NotifyContext);
-  
   const { 
     chainId,
     connector,
@@ -191,6 +191,7 @@ export function useConnection() {
 
   return { handleSelectConnector, handleErrorMessage };
 }
+
 
 export function useSignerAccount() {
   const { library: provider, account } = useWeb3React();

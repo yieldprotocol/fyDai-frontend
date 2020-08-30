@@ -21,11 +21,8 @@ import { useSignerAccount } from './connectionHooks';
  * @returns { boolean } approveActive
  */
 export const useController = () => {
-
   const { abi: controllerAbi } = Controller;
-  // const { state: { provider, signer, account } } = React.useContext(ConnectionContext);
   const { signer, provider, account } = useSignerAccount();
-
   const  { dispatch }  = React.useContext<any>(NotifyContext);
   const [ postActive, setPostActive ] = React.useState<boolean>(false);
   const [ withdrawActive, setWithdrawActive ] = React.useState<boolean>(false);
@@ -55,9 +52,7 @@ export const useController = () => {
     collateral:string,
     amount:number
   ) => {
-    let tx:any;
     /* Processing and sanitizing input */
-    // console.log(ethers.utils.parseEther(amount.toString()));
     const parsedAmount = ethers.utils.parseEther(amount.toString());
     const fromAddr = account && ethers.utils.getAddress(account);
     const toAddr = fromAddr;
@@ -65,21 +60,20 @@ export const useController = () => {
     const collateralBytes = ethers.utils.formatBytes32String(collateral);
 
     /* Contract interaction */
+    let tx:any;
     setPostActive(true);
     const contract = new ethers.Contract( controllerAddr, controllerAbi, signer );
     try {
       tx = await contract.post(collateralBytes, fromAddr, toAddr, parsedAmount);
     } catch (e) {
-      dispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed.', type:'error' } } );
-      console.log(e);
+      handleTxError('Transaction was aborted or it failed.', tx, e);
       setPostActive(false);
       return;
     }
-    /* Transaction reporting & tracking */
     dispatch({ type: 'txPending', payload:{ tx, message: `Deposit of ${amount} pending...`, type:'DEPOSIT' } } );
     await tx.wait();
     setPostActive(false);
-    dispatch({ type: 'txComplete', payload:{ tx } } );
+    txComplete(tx);
   };
 
   /**
@@ -93,8 +87,6 @@ export const useController = () => {
     collateral:string,
     amount:number
   ) => {
-    let tx:any;
-
     /* Processing and sanitizing input */
     const parsedAmount = ethers.utils.parseEther(amount.toString());
     const fromAddr = account && ethers.utils.getAddress(account);
@@ -103,29 +95,31 @@ export const useController = () => {
     const collateralBytes = ethers.utils.formatBytes32String(collateral);
 
     /* Contract interaction */
+    let tx:any;
     setWithdrawActive(true);
     const contract = new ethers.Contract( controllerAddr, controllerAbi, signer );
     try {
       tx = await contract.withdraw(collateralBytes, fromAddr, toAddr, parsedAmount);
     } catch (e) {
-      dispatch({ type: 'notify', payload:{ message:'Error Withdrawing funds', type:'error' } } );
-      console.log(e);
+      handleTxError('Error Withdrawing funds', tx, e);
       setWithdrawActive(false);
       return;
     }
-    /* Transaction reporting & tracking */
     dispatch({ type: 'txPending', payload:{ tx, message: `Withdraw of ${amount} pending...`, type:'WITHDRAW' } } );
     await tx.wait();
     setWithdrawActive(false);
-    dispatch({ type: 'txComplete', payload:{ tx } } );
+    txComplete(tx);
   };
 
   /**
-   * Borrow yDai with available, posted collateral.
+   * Borrow yDai with available, posted collateral directly (any type of collateral).
+   * @note Direct transaction with no pool trading (doesn't automatically sell yDai for Dai)
+   * 
    * @param {string} controllerAddress address of the Controller
    * @param {string} collateral 'ETH-A' || 'CHAI' (use ETH-A for ETH collateral)
    * @param {string} maturity UNIX timestamp as a string
    * @param { number } amount borrow amount (in human understandable numbers)
+   * 
    */
   const borrow = async (
     controllerAddress:string,
@@ -133,8 +127,6 @@ export const useController = () => {
     maturity:string,
     amount:number
   ) => {
-    let tx:any;
-
     /* Processing and sanitizing input */
     const parsedAmount = ethers.utils.parseEther(amount.toString());
     const toAddr = account && ethers.utils.getAddress(account);
@@ -144,6 +136,7 @@ export const useController = () => {
     const matdate = maturity;
 
     /* Contract interaction */
+    let tx:any;
     setBorrowActive(true);
     const contract = new ethers.Contract( controllerAddr, controllerAbi, signer );
     try {
@@ -153,17 +146,18 @@ export const useController = () => {
       setBorrowActive(false);
       return;
     }
-    /* Transaction reporting & tracking */
     dispatch({ type: 'txPending', payload:{ tx, message: `Borrowing of ${amount} pending...`, type:'BORROW' } } );
     await tx.wait();
     setBorrowActive(false);
-    dispatch({ type: 'txComplete', payload:{ tx } } );
+    txComplete(tx);
     // eslint-disable-next-line consistent-return
     return tx;
   };
 
   /**
-   * Repay yDai debt with either Dai or YDai.
+   * Repay yDai debt directly with either Dai or YDai.
+   * @note Direct transaction with no pool trading.
+   * 
    * @param {string} controllerAddress address of the Controller
    * @param {string} collateral 'ETH-A' || 'CHAI' (use ETH-A for ETH collateral pool)
    * @param {string} maturity UNIX timestamp as a string
@@ -177,7 +171,6 @@ export const useController = () => {
     amount:number,
     type:string,
   ) => {
-    let tx:any;
     /* Processing and sanitizing input */
     const parsedAmount = ethers.utils.parseEther(amount.toString());
     const fromAddr = account && ethers.utils.getAddress(account);
@@ -185,7 +178,9 @@ export const useController = () => {
     const controllerAddr = ethers.utils.getAddress(controllerAddress);
     const typeCaps = type.toUpperCase();
     const collateralBytes = ethers.utils.formatBytes32String(collateral);
+
     /* Contract interaction */
+    let tx:any;
     setRepayActive(true);
     const contract = new ethers.Contract( controllerAddr, controllerAbi, signer );
     try {
@@ -199,35 +194,35 @@ export const useController = () => {
       setRepayActive(false);
       return;
     }
-    /* Transaction reporting & tracking */
     dispatch({ type: 'txPending', payload:{ tx, message: `Repayment of ${amount} pending...`, type:'REPAY' } } );
     await tx.wait();
     setRepayActive(false);
-    dispatch({ type: 'txComplete', payload:{ tx } } );
+    txComplete(tx);
     // eslint-disable-next-line consistent-return
     return tx;
-
   };
 
   /**
    * LEGACY: Approve the controller to transact with ETH-A (or other) token.
    * (Not strictly a Controller Contract function. But associated enough to keep in here.)
+   * can use the tokenHook to perform the same function. 
+   * 
    * @param {string} tokenAddress address of the token to approve. 
    * @param {string} controllerAddress address of the controller. 
    * @param {number} amount to approve (in human understandable numbers)
    */
-  // TODO remove this if not used
   const approveController = async (
     tokenAddress:string,
     controllerAddress:string,
     amount:number
   ) => {
-    let tx:any;
     /* Processing and sanitizing input */
     const parsedAmount = ethers.utils.parseEther(amount.toString());
     const controllerAddr = ethers.utils.getAddress(controllerAddress);
     const tokenAddr = ethers.utils.getAddress(tokenAddress);
+
     /* Contract interaction */
+    let tx:any;
     setApproveActive(true);
     const contract = new ethers.Contract(
       tokenAddr,
@@ -241,11 +236,10 @@ export const useController = () => {
       setApproveActive(false);
       return;
     }
-    /* Transaction reporting & tracking */
     dispatch({ type: 'txPending', payload:{ tx, message: `Token approval of ${amount} pending...` } } );
     await tx.wait();
     setApproveActive(false);
-    dispatch({ type: 'txComplete', payload:{ tx } } );  
+    txComplete(tx); 
   };
 
   /**
@@ -257,11 +251,12 @@ export const useController = () => {
     controllerAddress:string,
     delegatedAddress:string,
   ) => {
-    let tx:any;
     /* Processing and sanitizing input */
     const controllerAddr = ethers.utils.getAddress(controllerAddress);
     const delegatedAddr = ethers.utils.getAddress(delegatedAddress);
+    
     /* Contract interaction */
+    let tx:any;
     const contract = new ethers.Contract(
       controllerAddr,
       controllerAbi,
@@ -276,7 +271,7 @@ export const useController = () => {
     /* Transaction reporting & tracking */
     dispatch({ type: 'txPending', payload:{ tx, message: 'Pending once-off delegation...', type:'DELEGATION' } } );
     await tx.wait();
-    dispatch({ type: 'txComplete', payload:{ tx } } );
+    txComplete(tx);
   };
 
   /**

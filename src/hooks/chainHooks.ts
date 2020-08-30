@@ -37,7 +37,7 @@ const contractMap = new Map<string, any>([
   ['Pool', Pool.abi],
 ]);
 
-// TODO: Sanitize all inputs NB!!
+// TODO: Sanitize all inputs!!
 /**
  * SendTx is a generic function to interact with any contract.
  * Primarily used for development/testing, or for once off interactions with a contract.
@@ -49,7 +49,6 @@ export const useSendTx = () => {
   // const { state: { signer, account } } = React.useContext(ConnectionContext);
   const { signer, account } = useSignerAccount();
   const [ sendTxActive, setSendTxActive ] = React.useState<boolean>();
-
   /**
    * Send a transaction ()
    * @param {string} contractAddress address of the contract to send to.
@@ -90,7 +89,6 @@ export const useCallTx = () => {
 
   // const { state: { provider, altProvider } } = React.useContext(ConnectionContext);
   const { signer, provider, account, fallbackProvider, voidSigner } = useSignerAccount();
-
   const [ callTxActive, setCallTxActive ] = React.useState<boolean>();
   /**
    * Get data from the blockchain via provider (no signer reqd)

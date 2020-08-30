@@ -3,15 +3,8 @@ import { ethers, BigNumber  }  from 'ethers';
 import { keccak256, defaultAbiCoder, toUtf8Bytes, solidityPack } from 'ethers/lib/utils';
 import { signDaiPermit, signERC2612Permit } from 'eth-permit';
 
-import * as utils from '../utils';
-
-import { useSignerAccount } from '.';
-import { NotifyContext } from '../contexts/NotifyContext';
-import { YieldContext } from '../contexts/YieldContext';
-
 import Controller from '../contracts/Controller.json';
 import Pool from '../contracts/Pool.json';
-
 import YieldProxy from '../contracts/YieldProxy.json';
 
 import {
@@ -20,6 +13,12 @@ import {
   DaiPermitMessage,
   ERC2612PermitMessage,
 } from '../types';
+
+import { NotifyContext } from '../contexts/NotifyContext';
+import { YieldContext } from '../contexts/YieldContext';
+
+import { useSignerAccount } from './connectionHooks';
+
 
 const MAX_INT = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
 const EIP712Domain = [
@@ -55,7 +54,6 @@ const auths = new Map([
 ]);
 
 export const useAuth = () => {
-
   const { account, provider, signer } = useSignerAccount();
   const { state: { deployedContracts } } = React.useContext(YieldContext);
   const { dispatch } = React.useContext(NotifyContext);
@@ -78,7 +76,6 @@ export const useAuth = () => {
       if (err) {
         reject(err);
       } else if (result.error) {
-        console.error(result.error);
         reject(result.error);
       } else {
         resolve(result.result);
@@ -87,116 +84,155 @@ export const useAuth = () => {
     _provider.sendAsync( payload, callback );
   });
 
+  /* Notification Helpers */
+  const txComplete = (tx:any) => {
+    dispatch({ type: 'txComplete', payload:{ tx } } );
+  }; 
+  const handleTxError = (msg:string, tx: any, e:any) => {
+    // eslint-disable-next-line no-console
+    console.log(e.message);
+    dispatch({ type: 'notify', payload:{ message: msg, type:'error' } } );
+    txComplete(tx);
+  };
+  const handleSignError = (e:any) =>{
+    // eslint-disable-next-line no-console
+    console.log(e);
+    dispatch({ type: 'requestSigs', payload:[] });
+  };
+
   /**
    *  Once off Yield Controller and Dai authorizations
    */
   const yieldAuth = async ( ) => {
+    let controllerSig:any;
+    let daiPermitSig:any;
 
     dispatch({ type: 'requestSigs', payload:[ auths.get(1), auths.get(2) ] });
-
-    /* yieldProxy | Controller delegation */
-    const controllerNonce = await controllerContract.signatureCount(fromAddr);
-    const msg: IDelegableMessage = {
+ 
+    try {     
+      /* yieldProxy | Controller delegation */ 
+      const controllerNonce = await controllerContract.signatureCount(fromAddr);
+      const msg: IDelegableMessage = {
       // @ts-ignore
-      user: fromAddr,
-      delegate: proxyAddr,
-      nonce: controllerNonce.toHexString(),
-      deadline: MAX_INT,
-    };
-    const domain: IDomain = {
-      name: 'Yield',
-      version: '1',
-      chainId: (await provider.getNetwork()).chainId,
-      verifyingContract: controllerAddr,
-    };
+        user: fromAddr,
+        delegate: proxyAddr,
+        nonce: controllerNonce.toHexString(),
+        deadline: MAX_INT,
+      };
+      const domain: IDomain = {
+        name: 'Yield',
+        version: '1',
+        chainId: (await provider.getNetwork()).chainId,
+        verifyingContract: controllerAddr,
+      };
 
-    const controllerSig = await sendForSig(
-      provider.provider, 
-      'eth_signTypedData_v4', 
-      [fromAddr, createTypedDelegableData(msg, domain)],
-    );
-    dispatch({ type: 'signed', payload: auths.get(1) });
+      controllerSig = await sendForSig(
+        provider.provider, 
+        'eth_signTypedData_v4', 
+        [fromAddr, createTypedDelegableData(msg, domain)],
+      );
+      dispatch({ type: 'signed', payload: auths.get(1) });
 
-    /* Dai permit yieldProxy */
-    // @ts-ignore
-    const result = await signDaiPermit(provider.provider, daiAddr, fromAddr, proxyAddr);
-    const daiPermitSig = ethers.utils.joinSignature(result);
-    dispatch({ type: 'signed', payload: auths.get(2) });
+      /* Dai permit yieldProxy */
+      // @ts-ignore
+      const result = await signDaiPermit(provider.provider, daiAddr, fromAddr, proxyAddr);
+      daiPermitSig = ethers.utils.joinSignature(result);
+      dispatch({ type: 'signed', payload: auths.get(2) });
+
+    } catch (e) {
+      handleSignError(e);
+      return;
+    }
 
     /* Broadcast signatures */
     let tx:any;
     try {
       tx = await proxyContract.onboard(fromAddr, daiPermitSig, controllerSig);
     } catch (e) {
-      console.log(e);
+      handleTxError('Error authorsiing contracts', tx, e);
       return;
     }
     dispatch({ type: 'txPending', payload: { tx, message: 'Yield Authorization pending...', type:'AUTH' } });
     await tx.wait();
-    dispatch({ type: 'txComplete',  payload:{ tx } });
+    txComplete(tx);
     dispatch({ type: 'requestSigs', payload:[] });
     // eslint-disable-next-line consistent-return
     return tx;
   };
 
+
   /**
-   * Series/Pool authorisations required.
+   * Series/Pool authorisations that are required for each series.
+   * 
+   * @param yDaiAddress series yDai address to be authorised
+   * @param poolAddress series pool address to be authorised
+   * 
    */
   const poolAuth = async (
     yDaiAddress:string,
     poolAddress:string
   ) => {
-
+    /* Sanitise input */
     const poolContract = new ethers.Contract( poolAddress, Pool.abi, provider);
+    const yDaiAddr = ethers.utils.getAddress(yDaiAddress);
+    const poolAddr = ethers.utils.getAddress(poolAddress);
+    let poolSig;
+    let daiSig;
+    let yDaiSig;
 
     dispatch({ type: 'requestSigs', payload:[ auths.get(3), auths.get(4), auths.get(5) ] });
     
+    try {
     /* YieldProxy | Pool delegation */
-    const poolNonce = await poolContract.signatureCount(fromAddr);
-    const msg: IDelegableMessage = {
+      const poolNonce = await poolContract.signatureCount(fromAddr);
+      const msg: IDelegableMessage = {
       // @ts-ignore
-      user: fromAddr,
-      delegate: proxyAddr,
-      nonce: poolNonce.toHexString(),
-      deadline: MAX_INT,
-    };
-    const domain: IDomain = {
-      name: 'Yield',
-      version: '1',
-      chainId: (await provider.getNetwork()).chainId,
-      verifyingContract: poolAddress,
-    };
-    const poolSig = await sendForSig(
-      provider.provider, 
-      'eth_signTypedData_v4', 
-      [fromAddr, createTypedDelegableData(msg, domain)],
-    );
-    dispatch({ type: 'signed', payload: auths.get(3) });
+        user: fromAddr,
+        delegate: proxyAddr,
+        nonce: poolNonce.toHexString(),
+        deadline: MAX_INT,
+      };
+      const domain: IDomain = {
+        name: 'Yield',
+        version: '1',
+        chainId: (await provider.getNetwork()).chainId,
+        verifyingContract: poolAddr,
+      };
+      poolSig = await sendForSig(
+        provider.provider, 
+        'eth_signTypedData_v4', 
+        [fromAddr, createTypedDelegableData(msg, domain)],
+      );
+      dispatch({ type: 'signed', payload: auths.get(3) });
 
-    /* Dai permit pool */
-    // @ts-ignore
-    const dResult = await signDaiPermit(provider.provider, daiAddr, fromAddr, poolAddress);
-    const daiSig = ethers.utils.joinSignature(dResult);
-    dispatch({ type: 'signed', payload: auths.get(4) });
+      /* Dai permit pool */
+      // @ts-ignore
+      const dResult = await signDaiPermit(provider.provider, daiAddr, fromAddr, poolAddr);
+      daiSig = ethers.utils.joinSignature(dResult);
+      dispatch({ type: 'signed', payload: auths.get(4) });
 
-    /* yDAi permit pool */
-    // @ts-ignore
-    const yResult = await signERC2612Permit(provider.provider, yDaiAddress, fromAddr, proxyAddr, MAX_INT);
-    const yDaiSig = ethers.utils.joinSignature(yResult);
-    dispatch({ type: 'signed', payload: auths.get(5) });
+      /* yDAi permit pool */
+      // @ts-ignore
+      const yResult = await signERC2612Permit(provider.provider, yDaiAddr, fromAddr, proxyAddr, MAX_INT);
+      yDaiSig = ethers.utils.joinSignature(yResult);
+      dispatch({ type: 'signed', payload: auths.get(5) });
+
+    } catch (e) {
+      handleSignError(e);
+      return;
+    }
 
     /* Broadcast signatures */
     let tx:any;
     try {
-      tx = await proxyContract.authorizePool(poolAddress, fromAddr, daiSig, yDaiSig, poolSig);
+      tx = await proxyContract.authorizePool(poolAddr, fromAddr, daiSig, yDaiSig, poolSig);
     } catch (e) {
-      console.log(e);
+      handleTxError('Error authorsiing contracts', tx, e);
       return;
     }
     dispatch({ type: 'txPending', payload: { tx, message: 'Authorization pending...', type:'AUTH' } });
     await tx.wait();
-    console.log(tx);
-    dispatch({ type: 'txComplete',  payload:{ tx } });
+    txComplete(tx);
     dispatch({ type: 'requestSigs', payload:[] });
     // eslint-disable-next-line consistent-return
     return tx;

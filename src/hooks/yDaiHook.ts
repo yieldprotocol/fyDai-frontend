@@ -21,7 +21,7 @@ export const useYDai = () => {
   const [ redeemActive, setRedeemActive ] = React.useState<boolean>(false);
 
   /**
-   * Redeems yDai for dai after maturity
+   * @dev Redeems yDai for dai after maturity
    * @param {string} yDaiAddress address of the yDai series to redeem from.
    * @param {BigNumber} amount in exact yDai available to burn
    */
@@ -48,15 +48,13 @@ export const useYDai = () => {
     dispatch({ type: 'txPending', payload:{ tx, message: `Redeeming ${amount} pending...`, type:'REDEEM' } } );
     await tx.wait();
     setRedeemActive(false);
-    dispatch({ type: 'txComplete', payload:{ tx, message:`Redeeming ${amount} complete.` } } );
+    dispatch({ type: 'txComplete', payload:{ tx } } );
   };
 
   /**
-   * User yDai token allowance
-   * 
-   * @param {string} yDaiAddress address of the yDai series to redeem from.
-   * @param {string} poolAddress address of the yDai series to redeem from.
-   * 
+   * @dev User yDai token allowance
+   * @param {string} yDaiAddress address of the yDai series .
+   * @param {string} poolAddress address of the pool.
    * @returns {number} allowance amount
    */
   const userAllowance = async (
@@ -82,16 +80,13 @@ export const useYDai = () => {
   };
 
   /**
-   * yDai Series is Mature or not
-   * 
-   * @param {string} yDaiAddress address of the yDai series to redeem from.
-   * 
-   * @returns {boolean} allowance amount
+   * @dev yDai Series is Mature or not?
+   * @param {string} yDaiAddress address of the yDai series to check.
+   * @returns {boolean}
    */
   const isMature = async (
     yDaiAddress:string,
   ) => {
-    const fromAddr = account && ethers.utils.getAddress(account);
     const yDaiAddr = ethers.utils.getAddress(yDaiAddress);
     const contract = new ethers.Contract( yDaiAddr, yDaiAbi, provider );
     let res;

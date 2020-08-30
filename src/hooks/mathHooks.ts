@@ -9,15 +9,15 @@ import { YieldContext } from '../contexts/YieldContext'; // TODO sort out this c
  * 
  * ( not really 'hooks' - but beneficial to keep app logic together.)
  * 
- * @returns { function } addEventListner
- * @returns { function } removeEventListener
+ * @returns { function } collPrice 
+ * @returns { function } collValue 
  * @returns { function } getEvents
+ * 
  */
 export const useMath = () => {
-
   const { state: { feedData } } = React.useContext(YieldContext);
-
-  const [ilks, setIlks] = React.useState<any>();
+  const [ ilks, setIlks ] = React.useState<any>();
+  
   React.useEffect(()=>{
     feedData.ilks && setIlks(feedData.ilks);
   }, [feedData]);
@@ -45,7 +45,7 @@ export const useMath = () => {
    * Calculates value of debt (yDaiDebt at maturity or Dai) at current DAI price
    * the rate used is the rate and spot price of Dai.
    * @param {BigNumber} _amount yDai amount (= amount of Dai at maturity)
-   * @returns
+   * @returns 
    */
   const debtValAdj = (_amount:BigNumber ) => {
     // this would require a DAI/USD (ratio fluctuations? ) but maybe just assume it will be 1 at maturity?
@@ -158,12 +158,12 @@ export const useMath = () => {
   /**
    * Annualised Yield Rate
    *
-   * @param { BigNumber } _rate // current [Dai] price per unit y[Dai].
-   * @param { BigNumber } _return // y[Dai] amount/price at maturity.
-   * @param { number } _maturity  // date of maturity 
-   * @param { number } _fromDate // ***optional*** start date - defaults to now(). 
+   * @param { BigNumber } _rate // current [Dai] price per unit y[Dai]
+   * @param { BigNumber } _return // y[Dai] amount/price at maturity
+   * @param { number } _maturity  // date of maturity
+   * @param { number } _fromDate // ***optional*** start date - defaults to now()
    * 
-   * @returns { number }
+   * @returns { number } human readable number.
    */
   const yieldAPR =(
     _rate: BigNumber,
@@ -179,7 +179,6 @@ export const useMath = () => {
     const apr = Math.pow(priceRatio, powRatio) - 1;
 
     return apr;
-
   };
 
   return {

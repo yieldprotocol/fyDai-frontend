@@ -16,6 +16,7 @@ import Pot from '../contracts/Pot.json';
 import YieldProxy from '../contracts/YieldProxy.json';
 import Pool from '../contracts/Pool.json';
 
+// TODO abstract this out to a higher level
 const contractMap = new Map<string, any>([
   ['YDai', YDai.abi],
   ['Controller', Controller.abi],
