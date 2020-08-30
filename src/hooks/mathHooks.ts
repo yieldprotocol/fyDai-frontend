@@ -156,6 +156,24 @@ export const useMath = () => {
   };
 
   /**
+   * Percentage holding of the Pool 
+   *
+   * @param { BigNumber } _supply // current [Dai] price per unit y[Dai]
+   * @param { BigNumber } _balance// y[Dai] amount/price at maturity
+   * 
+   * @returns { number } human readable number as a percent.
+   */
+  const poolPercent =(
+    _supply: BigNumber,
+    _balance: BigNumber,
+  )=> {
+    if (!_supply.isZero()) {
+      return  ( parseFloat(ethers.utils.formatEther(_balance)) / parseFloat(ethers.utils.formatEther(_supply)))*100;
+    }
+    return 0;
+  };
+
+  /**
    * Annualised Yield Rate
    *
    * @param { BigNumber } _rate // current [Dai] price per unit y[Dai]
@@ -178,11 +196,12 @@ export const useMath = () => {
     const powRatio = 1 / propOfYear;
     const apr = Math.pow(priceRatio, powRatio) - 1;
 
-    return apr;
+    return apr*100;
   };
 
   return {
     yieldAPR,
+    poolPercent,
     collValue,
     collPrice,
     debtValAdj,
