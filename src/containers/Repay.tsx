@@ -50,9 +50,9 @@ function Repay({ repayAmount }:IRepayProps) {
   
   const { getTokenAllowance }  = useBalances();
   const { approveToken, approveActive } = useToken();
-  const { repay, repayActive }  = useController();
+  const { repay }  = useController();
 
-  const { repayDaiDebt } = useProxy();
+  const { repayDaiDebt, repayActive } = useProxy();
 
   const [ inputValue, setInputValue ] = React.useState<any>();
   const [ yDaiValue, setYDaiValue ] = React.useState<any>();
@@ -61,7 +61,6 @@ function Repay({ repayAmount }:IRepayProps) {
   const [ repayDisabled, setRepayDisabled ] = React.useState<boolean>(true);
 
   const [ hasDelegated, setHasDelegated ] = React.useState<any>(0);
-  const [ approved, setApproved ] = React.useState<any>();
 
   const [ warningMsg, setWarningMsg] = React.useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
@@ -72,12 +71,9 @@ function Repay({ repayAmount }:IRepayProps) {
   const repayProcedure = async (value:number) => {
 
     if (inputValue>0 && !repayDisabled) {
-      setRepayPending(true);
+      setRepayPending(true); 
       /* repay using proxy */
-      // await repayUsingExactDai(activeSeries.yieldProxyAddress, 'ETH-A', activeSeries.maturity, yDaiValue, value);
-      /* direct repay without proxy */
-      await repay(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value, 'Dai' );
-      setApproved(await getTokenAllowance(deployedContracts.Dai, deployedContracts.Treasury, 'Dai'));
+      await repayDaiDebt(deployedContracts.YieldProxy, activeSeries.poolAddress, 'ETH-A', activeSeries.maturity, 1, value);
       setInputValue('');
       await Promise.all([
         userActions.updatePosition(),
@@ -85,22 +81,6 @@ function Repay({ repayAmount }:IRepayProps) {
       ]);
       setRepayPending(false);
     }
-  };
-
-  const delegateProcedure = async () => {
-    // TODO uncomment the following lines if not using auto sell?
-    await addPoolDelegate(activeSeries.poolAddress, activeSeries.yDaiAddress);
-    const res = await checkPoolDelegate(activeSeries.poolAddress, activeSeries.yDaiAddress);
-    // await addPoolDelegate(activeSeries.poolAddress, activeSeries.yieldProxyAddress);
-    // const res = await checkPoolDelegate(activeSeries.poolAddress, activeSeries.yieldProxyAddress);
-    setHasDelegated(res);
-  };
-
-  const approveProcedure = async (value:number) => {
-    await approveToken(deployedContracts.Dai, deployedContracts.Treasury, value);
-    setApproved(await getTokenAllowance(deployedContracts.Dai, deployedContracts.Treasury, 'Dai'));
-    // await approveToken(deployedContracts.Dai, activeSeries.yieldProxyAddress, value);
-    // setApproved(await getTokenAllowance(deployedContracts.Dai, activeSeries.yieldProxyAddress, 'Dai'));
   };
 
   /* Input warning and error logic */ 
@@ -133,20 +113,17 @@ function Repay({ repayAmount }:IRepayProps) {
 
   /* Repay button disabling logic */
   useEffect(()=>{
-    if (approved < inputValue) {
-      setRepayDisabled(true);
-    } else if (!(inputValue) || inputValue===0 || !daiBalance_) {
+    if (!(inputValue) || inputValue===0 || !daiBalance_) {
       setRepayDisabled(true);
     } else {
       setRepayDisabled(false);
     }
-  }, [ approved, inputValue ]);
+  }, [ inputValue ]);
 
   useEffect(() => {
     ( async ()=>{
-      // activeSeries && setApproved(await getTokenAllowance(deployedContracts.Dai, activeSeries.yieldProxyAddress, 'Dai'));
-      activeSeries && setApproved(await getTokenAllowance(deployedContracts.Dai, deployedContracts.Treasury, 'Dai'));
-      activeSeries && setHasDelegated(activeSeries.hasDelegatedPool);
+      // activeSeries && setApproved(await getTokenAllowance(deployedContracts.Dai, deployedContracts.Treasury, 'Dai'));
+      // activeSeries && setHasDelegated(activeSeries.hasDelegatedPool);
     })();
   }, [ activeSeries ]);
 
@@ -206,22 +183,6 @@ function Repay({ repayAmount }:IRepayProps) {
             </InputWrap>
       
             <> 
-              <Box margin='medium'>
-                {approveActive || approved === undefined ?             
-                  <ScaleLoader color={theme?.global?.colors['brand-transparent'].dark} height='13' />
-                  : <CheckBox
-                    reverse
-                    checked={approved && !inputValue || ( approved >= inputValue )}
-                    disabled={!inputValue || ( approved >= inputValue )}
-                    onChange={()=>approveProcedure(inputValue)}
-                    label={            
-                  (approved >= inputValue) ? 
-                    `Repayments are unlocked for up to ${approved.toFixed(2) || '' } DAI` 
-                    : `Unlock repayments of ${inputValue || ''} DAI` 
-                }
-                  />}
-              </Box>
-
               <Box
                 fill='horizontal'
                 round='small'
@@ -238,8 +199,7 @@ function Repay({ repayAmount }:IRepayProps) {
                   {`Repay ${inputValue || ''} DAI`}
                 </Text>
               </Box>
-            </>
-            
+            </>            
           </Box>
         </Box>}
 

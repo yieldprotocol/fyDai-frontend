@@ -5,7 +5,7 @@ import { Keyboard, Box, Button, TextInput, Text, ThemeContext, ResponsiveContext
 
 import { ScaleLoader } from 'react-spinners';
 
-import { 
+import {
   FiClock as Clock,
   FiHelpCircle as Help,
 } from 'react-icons/fi';
@@ -84,7 +84,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
   const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
 
   /* flags */ 
-  const [ hasDelegated, setHasDelegated] = React.useState<boolean>(activeSeries?.hasDelegatedController || true);
+  const [ hasDelegated, setHasDelegated] = React.useState<boolean>(true);
 
   const [ borrowPending, setBorrowPending ] = React.useState<boolean>(false);
   const [ delegationPending, setDelegationPending ] = useState<boolean>(false);
@@ -101,10 +101,9 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
   const [ txActive ] = useTxActive(['BORROW', 'BUY', 'DELEGATION']);
 
   const borrowProcedure = async (value:number, autoSell:boolean=true) => {
-
     if (account && inputValue>0 && !borrowDisabled) {
-      setBorrowPending(true); 
-      autoSell && await borrowDai( activeSeries.yieldProxyAddress, 'ETH-A', activeSeries.maturity, yDaiValue, value);
+      setBorrowPending(true);
+      autoSell && await borrowDai(deployedContracts.YieldProxy, activeSeries.poolAddress, 'ETH-A', activeSeries.maturity, yDaiValue, value);
       !autoSell && await borrow(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value);
       setInputValue('');
       await Promise.all([
@@ -115,17 +114,17 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
     }
   };
 
-  const delegateProcedure = async () => {
-    setDelegationPending(true);
-    // TODO uncomment the following lines if not using auto sell?
-    // await addPoolDelegate(activeSeries.poolAddress, activeSeries.yDaiAddress);
-    // const res = await checkPoolDelegate(activeSeries.poolAddress, activeSeries.yDaiAddress);
-    await addControllerDelegate(deployedContracts.Controller, activeSeries.yieldProxyAddress);
-    const res = await checkControllerDelegate(deployedContracts.Controller, activeSeries.yieldProxyAddress);
-    setHasDelegated(res);
-    await seriesActions.updateActiveSeries();
-    setDelegationPending(false);
-  };
+  // const delegateProcedure = async () => {
+  //   setDelegationPending(true);
+  //   // TODO uncomment the following lines if not using auto sell?
+  //   // await addPoolDelegate(activeSeries.poolAddress, activeSeries.yDaiAddress);
+  //   // const res = await checkPoolDelegate(activeSeries.poolAddress, activeSeries.yDaiAddress);
+  //   await addControllerDelegate(deployedContracts.Controller, activeSeries.yieldProxyAddress);
+  //   const res = await checkControllerDelegate(deployedContracts.Controller, activeSeries.yieldProxyAddress);
+  //   setHasDelegated(res);
+  //   await seriesActions.updateActiveSeries();
+  //   setDelegationPending(false);
+  // };
 
   /* 
   * Handle input changes:
@@ -133,8 +132,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
   * 2. calcalute yield APR
   * 3. calculate estimated collateralisation ration
   */
-  useEffect(() => {
-     
+  useEffect(() => {   
     activeSeries && parseFloat(inputValue) > 0 && ( async () => {
       const newRatio = estimateRatio(position.ethPosted_, ( position.debtValue_+ parseFloat(inputValue)) ); 
       newRatio && setEstRatio(newRatio.toFixed(0));
@@ -157,7 +155,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
   /* check delegation status on series change */
   useEffect(() => {
     activeSeries && ( async ()=>{
-      setHasDelegated(activeSeries.hasDelegatedController);
+      // setHasDelegated(activeSeries.hasDelegatedController);
     })();
   }, [ activeSeries ]);
     
@@ -203,14 +201,6 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
       setErrorMsg(null);
     }
   }, [ inputValue ]);
-
-
-  /* ADVANCED SETTINGS setting approval limit. */
-  const approveProcedure = async (value:number) => { 
-    await approveToken(activeSeries.yDaiAddress, activeSeries.marketAddress, value);
-    const approvedYDai = await userAllowance(activeSeries.yDaiAddress, activeSeries.marketAddress);
-    setApproved( approvedYDai ); // TODO convert to Dai somehow
-  };
 
   /* ADVANCED SETTINGS Handle yDai to Dai conversion for the approved Dai */
   useEffect(() => {
@@ -279,13 +269,13 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
             ]}
             /> } 
               
-            {account && !hasDelegated && !activeSeries?.isMature &&
+            {/* {account && !hasDelegated && !activeSeries?.isMature &&
             <OnceOffAuthorize
               authProcedure={delegateProcedure} 
               authMsg='Allow Yield trade on your behalf'
               awaitingApproval={delegationPending && !txActive}
               txPending={txActive?.type === 'DELEGATION'}  
-            />}
+            />} */}
 
             { activeSeries && !activeSeries?.isMature && 
               <Box gap='medium' align='center' fill='horizontal'>
@@ -336,12 +326,10 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
                     valuePrefix: 'Approx.',
                     valueExtra: () => (
                       <Text color='red' size='small'> 
-                        { 
-                        inputValue &&
+                        { inputValue &&
                         estRatio &&
                         ( (collateralPercent_- estRatio) > 0) &&
-                        `(-${(collateralPercent_-estRatio).toFixed(0)}%)`
-}
+                        `(-${(collateralPercent_-estRatio).toFixed(0)}%)` }
                       </Text>
                     )
                   },

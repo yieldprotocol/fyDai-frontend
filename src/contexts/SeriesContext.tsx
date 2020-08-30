@@ -118,8 +118,12 @@ const SeriesProvider = ({ children }:any) => {
         console.log(x);
         _seriesData.push(x);
         try {
-          _seriesData[i].hasDelegatedPool = account? await checkPoolDelegate(x.poolAddress, x.yDaiAddress): null;
-          // _seriesData[i].hasDelegatedController = account? await checkControllerDelegate(deployedContracts.Controller, x.yieldProxyAddress): null;
+          _seriesData[i].hasDelegatedPool = account? await checkPoolDelegate(x.poolAddress, deployedContracts.YieldProxy): null;
+
+          // _seriesData[i].hasPermitedDai = account? await checkPoolDelegate(x.poolAddress, deployedContracts.YieldProxy): null;
+          // _seriesData[i].hasPermitedyDai = account? await checkPoolDelegate(x.poolAddress, deployedContracts.YieldProxy): null;
+
+          // _seriesData[i].hasDelegatedController = account? await checkControllerDelegate(deployedContracts.Controller, x.yieldProxyAddress): null;         
           _seriesData[i].isMature = await callTx(x.yDaiAddress, 'YDai', 'isMature', []);
           _seriesData[i].yieldAPR = yieldAPR(_rates.sellYDai, ethers.utils.parseEther('1'), x.maturity);
           _seriesData[i].yDaiBalance = account? await callTx(x.yDaiAddress, 'YDai', 'balanceOf', [account]): BigNumber.from('0') ;

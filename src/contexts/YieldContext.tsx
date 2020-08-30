@@ -14,7 +14,6 @@ import { useSignerAccount } from '../hooks/connectionHooks';
 
 // TODO: fix these cyclic errors
 import { useMigrations } from '../hooks/migrationHook';
-import { useMath } from '../hooks/mathHooks';
 
 const YieldContext = React.createContext<any>({});
 
@@ -130,7 +129,7 @@ const YieldProvider = ({ children }: any) => {
   
     try {
       if (chainId && !cachedContracts || forceUpdate) {
-        const contractAddrs = await getAddresses(contractList, chainId);
+        const contractAddrs = await getAddresses(contractList);
         _deployedContracts = Object.fromEntries(contractAddrs);
         window.localStorage.removeItem('deployedContracts');
         setCachedContracts(_deployedContracts);
@@ -142,7 +141,7 @@ const YieldProvider = ({ children }: any) => {
 
       if (chainId && !cachedSeries || forceUpdate) {
         // TODO: better implementation of iterating through series (possibly a list length from contracts function?)
-        const _list = await getAddresses(['yDai0', 'yDai1', 'yDai2', 'yDai3'], chainId);
+        const _list = await getAddresses(['yDai0', 'yDai1', 'yDai2', 'yDai3']);
         const _seriesList = Array.from(_list.values());
 
         await Promise.all(
@@ -151,7 +150,7 @@ const YieldProvider = ({ children }: any) => {
             const name = await callTx(x, 'YDai', 'name', []);
             const maturity = (await callTx(x, 'YDai', 'maturity', [])).toNumber();
             const isMature = await callTx(x, 'YDai', 'isMature', []);
-            const _peripheralAddrs = await getAddresses([ `${name}-Pool` ], chainId);     
+            const _peripheralAddrs = await getAddresses([ `${name}-Pool` ]);
             const poolAddress = _peripheralAddrs.get(`${name}-Pool`);
             
             return {

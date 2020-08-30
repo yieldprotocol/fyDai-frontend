@@ -38,7 +38,8 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
 
   const [ maxWithdraw, setMaxWithdraw ] = useState<number>(0);
   const [ inputValue, setInputValue ] = useState<any>();
-  const [ hasDelegated, setHasDelegated ] = useState<boolean>( delegations.yieldProxy || false);
+
+  const [ hasDelegated, setHasDelegated ] = useState<boolean>( true );
 
   const [ withdrawDisabled, setWithdrawDisabled ] = useState<boolean>(false);
   const [ withdrawPending, setWithdrawPending ] = useState<boolean>(false);
@@ -50,7 +51,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
 
   const { withdrawEth, withdrawEthActive }  = useProxy();
-  const { addControllerDelegate, checkControllerDelegate } = useController();
+  // const { addControllerDelegate, checkControllerDelegate } = useController();
   const { estCollRatio: estimateRatio } = useMath();
   const [ txActive ] = useTxActive(['WITHDRAW', 'DELEGATION']);
 
@@ -62,14 +63,6 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
       setWithdrawPending(false);
       close();
     }
-  };
-
-  const delegateProcedure = async () => {
-    setDelegationPending(true);
-    await addControllerDelegate(deployedContracts.Controller, deployedContracts.YieldProxy);
-    const res = await checkControllerDelegate(deployedContracts.Controller, deployedContracts.YieldProxy);
-    setHasDelegated(res);
-    setDelegationPending(false);
   };
 
   /* Calculate maximum available to withdraw */
@@ -142,13 +135,13 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
           >        
             <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to withdraw</Text>
         
-            {!hasDelegated &&
+            {/* {!hasDelegated &&
             <OnceOffAuthorize 
               authProcedure={delegateProcedure}
               authMsg='Authorise ETH withdrawals'
               awaitingApproval={delegationPending && !txActive}
               txPending={txActive?.type === 'DELEGATION'}
-            />}
+            />} */}
 
             <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={withdrawDisabled}>
               <TextInput
