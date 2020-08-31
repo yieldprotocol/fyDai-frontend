@@ -145,7 +145,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
               label: 'Current Collateral',
               visible: !!account,
               active: true,
-              loading: (!ethPosted_ && depositPending && ethPosted_ !== 0) || txActive?.type ==='WITHDRAW',     
+              loading: (depositPending && ethPosted_ !== 0) || txActive?.type ==='WITHDRAW',     
               value: ethPosted_ ? `${ethPosted_.toFixed(4)} Eth` : '0 Eth',
               valuePrefix: null,
               valueExtra: null, 

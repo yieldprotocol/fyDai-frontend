@@ -122,6 +122,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
   /* Handle borrow disabling deposits */
   useEffect(()=>{
     (
+      position.ethPosted_ <= 0 ||
       estRatio <= 1.5 ||
       !account ||
       !hasDelegated ||
@@ -147,10 +148,10 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
 
   /* Handle input exception logic */
   useEffect(() => {
-    if ( inputValue && ( inputValue > maximumDai ) ) {
+    if ( position.ethPosted_>0 && inputValue && ( inputValue > maximumDai ) ) {
       setWarningMsg(null);
       setErrorMsg('That amount exceeds the amount of Dai you can borrow based on your collateral'); 
-    } else if (inputValue && ( inputValue > Math.round(maximumDai-1) ) ) {
+    } else if (position.ethPosted_>0 && inputValue && ( inputValue > Math.round(maximumDai-1) ) ) {
       setErrorMsg(null);
       setWarningMsg('If you borrow right up to your maximum allowance, there is high probability you will be liquidated!');
     } else {
@@ -256,7 +257,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
 
                   {
                     label: 'Ratio after Borrow',
-                    visible: !!account,
+                    visible: !!account && position.ethPosted_>0,
                     active: inputValue,
                     loading: false,            
                     value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
@@ -286,7 +287,22 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
                       /> 
                     )
                   },
-
+                  {
+                    label: 'Like what you see?',
+                    visible: inputValue>0 && !!account && position.ethPosted <= 0,
+                    active: inputValue,
+                    loading: false,            
+                    value: '',
+                    valuePrefix: null,
+                    valueExtra: () => (
+                      <Button
+                        color={inputValue? 'brand': 'brand-transparent'}
+                        label={<Text size='xsmall' color='brand'>Deposit collateral</Text>}
+                        onClick={()=>console.log('still to implement')}
+                        hoverIndicator='brand-transparent'
+                      /> 
+                    )
+                  },
                 ]}
                 />
 
