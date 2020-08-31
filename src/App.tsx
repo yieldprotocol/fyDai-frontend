@@ -4,8 +4,6 @@ import { Grommet, base, Grid, Main, Box, ResponsiveContext, Nav, Layer } from 'g
 import { deepMerge } from 'grommet/utils';
 import { yieldTheme } from './themes';
 
-import { useWeb3React } from './hooks';
-
 import Dashboard from './views/Dashboard';
 import BorrowView from './views/BorrowView';
 import LendView from './views/LendView';
@@ -13,7 +11,6 @@ import PoolView from './views/PoolView';
 
 import YieldHeader from './components/YieldHeader';
 import YieldFooter from './components/YieldFooter';
-// import YieldSidebar from './components/YieldSidebar';
 
 import ConnectLayer from './containers/layers/ConnectLayer';
 import AccountLayer from './containers/layers/AccountLayer';
@@ -23,7 +20,6 @@ import NotifyLayer from './containers/layers/NotifyLayer';
 import TestLayer from './containers/layers/TestLayer';
 import SeriesSelector from './components/SeriesSelector';
 import YieldMark from './components/logos/YieldMark';
-
 
 const ThemedApp = () => {
   const [darkMode, setDarkMode] = React.useState(false);
@@ -45,12 +41,8 @@ const ThemedApp = () => {
 };
 
 const App = (props:any) => {
-
-  // TODO: Better connection error supporting
-  const { connector, library, chainId, account, activate, deactivate, active, error } = useWeb3React();
-
   // TODO Switch out for react router
-  const [activeView, setActiveView] = React.useState<string>('POOL');
+  const [activeView, setActiveView] = React.useState<string>('BORROW');
 
   const [showConnectLayer, setShowConnectLayer] = React.useState<boolean>(false);
   const [showAccountLayer, setShowAccountLayer] = React.useState<boolean>(false);
@@ -66,10 +58,6 @@ const App = (props:any) => {
   };
 
   React.useEffect(()=> {
-    library && (async () => console.log(await library.getSigner()))();
-  }, [account]);
-
-  React.useEffect(()=> {
     if (screenSize === 'small') { 
       setColumnsWidth(['0%', 'auto', '0%']);
     } else {
@@ -78,7 +66,6 @@ const App = (props:any) => {
   }, [screenSize]);
 
   return (
-
     <div className="App">
       <NotifyLayer />
       <ConnectLayer open={showConnectLayer} closeLayer={() => setShowConnectLayer(false)} />

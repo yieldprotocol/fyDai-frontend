@@ -279,16 +279,18 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
                     value: '',
                     valuePrefix: null,
                     valueExtra: () => (
-                      <Button
-                        color={inputValue? 'brand': 'brand-transparent'}
-                        label={<Text size='xsmall' color='brand'>Connect a wallet</Text>}
-                        onClick={()=>console.log('still to implement')}
-                        hoverIndicator='brand-transparent'
-                      /> 
+                      <Box >
+                        <Button
+                          color={inputValue? 'brand': 'brand-transparent'}
+                          label={<Text size='xsmall' color='brand'>Connect a wallet</Text>}
+                          onClick={()=>console.log('still to implement')}
+                          hoverIndicator='brand-transparent'
+                        /> 
+                      </Box>
                     )
                   },
                   {
-                    label: 'Like what you see?',
+                    label: 'Want to borrow Dai?',
                     visible: inputValue>0 && !!account && position.ethPosted <= 0,
                     active: inputValue,
                     loading: false,            
@@ -339,7 +341,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
                     <Clock />
                   </Box>
                   <Box> 
-                    <Text size='xlarge' color='brand' weight='bold'>This series has matured.</Text>         
+                    <Text size='small' color='brand'> This series has matured.</Text>         
                   </Box>
                 </Box>             
               </Box>}

@@ -107,7 +107,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
 
   /* handle exceptions, errors and warnings */
   useEffect(() => {
-    if ( inputValue && inputValue > daiBalance_ ) {
+    if ( !!account && inputValue && inputValue > daiBalance_  ) {
       setWarningMsg(null);
       setErrorMsg('That amount exceeds the amount of Dai you have'); 
     } else {
@@ -208,7 +208,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
                 },
                 {
                   label: 'Like what you see?',
-                  visible: !account,
+                  visible: !account && inputValue>0,
                   active: inputValue,
                   loading: false,            
                   value: '',
@@ -246,6 +246,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
               </Text>
             </Box>
 
+            { currentValue > 0 &&
             <Box alignSelf='end'>
               <Box
                 round
@@ -259,7 +260,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
                   <ArrowRight color='text-weak' />
                 </Box>
               </Box>
-            </Box>          
+            </Box> }         
           </Box>}
 
           {/* If the series is mature show the redeem view */}

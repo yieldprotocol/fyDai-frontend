@@ -173,7 +173,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
               )
             },
             {
-              label: 'Want to deposit collateral?',
+              label: 'First connect a wallet!',
               visible: !account && inputValue,
               active: inputValue,
               loading: false,            

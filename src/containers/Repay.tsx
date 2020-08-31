@@ -133,7 +133,7 @@ function Repay({ repayAmount }:IRepayProps) {
                 visible: !!account,
                 active: true,
                 loading: repayPending,     
-                value: activeSeries?.ethDebtYDai_? `${activeSeries.ethDebtYDai_.toFixed(2)} DAI`: 'O DAI',
+                value: activeSeries?.ethDebtYDai_? `${activeSeries.ethDebtYDai_.toFixed(2)} DAI`: '0 DAI',
                 valuePrefix: null,
                 valueExtra: null, 
               },
@@ -199,13 +199,16 @@ function Repay({ repayAmount }:IRepayProps) {
                 fill='horizontal'
                 border='all'
               >    
-                <Box direction='row' gap='small' align='center' fill>          
-                  <Box>
-                    <Check />
+                <Box direction='row' justify='center' fill>          
+                  <Box direction='row' gap='small' align='center'>
+                    <Box>
+                      <Check />
+                    </Box>
+                    <Box> 
+                      <Text size='small' color='brand'>You do not have any debt in this series.</Text>         
+                    </Box>
                   </Box>
-                  <Box align='center'> 
-                    <Text size='xlarge' color='brand' weight='bold'>You do not have any debt in this series.</Text>         
-                  </Box>
+                  {/* <Button label='borrow Dai from this series' /> */}
                 </Box>             
               </Box>}            
           </Box>

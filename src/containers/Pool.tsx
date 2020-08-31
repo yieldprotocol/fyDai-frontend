@@ -47,7 +47,7 @@ const Pool = (props:IPoolProps) => {
 
   const [ removeLiquidityOpen, setRemoveLiquidityOpen ] = useState<boolean>(false);
 
-  const [ addLiquidityDisabled, setAddLiquidityDisabled ] = React.useState<boolean>(false);
+  const [ addLiquidityDisabled, setAddLiquidityDisabled ] = React.useState<boolean>(true);
   const [ addLiquidityPending, setAddLiquidityPending ] = useState<boolean>(false);
   const [ warningMsg, setWarningMsg] = React.useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
@@ -142,7 +142,7 @@ const Pool = (props:IPoolProps) => {
             <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={addLiquidityDisabled}>
               <TextInput
                 type="number"
-                placeholder={screenSize !== 'small' ? 'Enter the amount of Dai to add': 'DAI'}
+                placeholder={screenSize !== 'small' ? 'Enter the amount of Dai Liquidity to add': 'DAI'}
                 value={inputValue || ''}
                 plain
                 onChange={(event:any) => setInputValue(event.target.value)}
@@ -178,7 +178,7 @@ const Pool = (props:IPoolProps) => {
               },
               {
                 label: 'Like what you see?',
-                visible: !account,
+                visible: !account && inputValue>0,
                 active: inputValue,
                 loading: false,            
                 value: '',
@@ -201,20 +201,21 @@ const Pool = (props:IPoolProps) => {
             <Box
               fill='horizontal'
               round='small'
-              background={( !(inputValue>0) || addLiquidityDisabled) ? 'brand-transparent' : 'brand'}
-              onClick={(!(inputValue>0) || addLiquidityDisabled)? ()=>{}:()=>addLiquidityProcedure(inputValue)}
+              background={ addLiquidityDisabled ? 'brand-transparent' : 'brand'}
+              onClick={ ()=>addLiquidityProcedure(inputValue)}
               align='center'
               pad='small'
             >
               <Text 
                 weight='bold'
                 size='large'
-                color={( !(inputValue>0) || addLiquidityDisabled) ? 'text-xweak' : 'text'}
+                color={ addLiquidityDisabled ? 'text-xweak' : 'text'}
               >
                 {`Supply ${inputValue || ''} DAI`}
               </Text>
             </Box>
 
+            { activeSeries?.poolTokens_>0 &&
             <Box alignSelf='end'>
               <Box
                 round
@@ -229,7 +230,7 @@ const Pool = (props:IPoolProps) => {
                   <ArrowRight color='text-weak' />
                 </Box>
               </Box>
-            </Box> 
+            </Box> }
           </Box>}
         </Box>}
 

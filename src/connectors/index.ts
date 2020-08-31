@@ -14,8 +14,7 @@ const RPC_URLS: { [chainId: number]: string } = {
   31337: 'http://localhost:8545' // process.env.REACT_APP_RPC_LOCAL as string
 };
 
-export const injected = new InjectedConnector({ supportedChainIds: [31337] });
-// export const injected = new InjectedConnector({ supportedChainIds: [1, 4, 1337] });
+export const injected = new InjectedConnector({ supportedChainIds: [1, 4, 31337] });
 
 export const network = new NetworkConnector({
   urls: { 1: RPC_URLS[1], 4: RPC_URLS[4], 31337: RPC_URLS[31337], },
