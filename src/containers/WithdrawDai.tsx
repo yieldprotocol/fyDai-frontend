@@ -100,7 +100,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
             pad='large'
             gap='medium'
           >
-            <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Reclaim Dai</Text>
+            <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to close</Text>
             <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={withdrawDisabled}>
               <TextInput
                 type="number"
@@ -131,7 +131,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
                 size='large'
                 color={withdrawDisabled ? 'text-xweak' : 'text'}
               >
-                {`Withdraw ${inputValue || ''} Dai`}
+                {`Reclaim ${inputValue || ''} Dai`}
               </Text>
             </Box>
 

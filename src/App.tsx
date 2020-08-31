@@ -20,6 +20,7 @@ import NotifyLayer from './containers/layers/NotifyLayer';
 import TestLayer from './containers/layers/TestLayer';
 import SeriesSelector from './components/SeriesSelector';
 import YieldMark from './components/logos/YieldMark';
+import AuthsLayer from './containers/layers/AuthsLayer';
 
 const ThemedApp = () => {
   const [darkMode, setDarkMode] = React.useState(false);
@@ -43,9 +44,12 @@ const ThemedApp = () => {
 const App = (props:any) => {
   // TODO Switch out for react router
   const [activeView, setActiveView] = React.useState<string>('BORROW');
+  const [accountView, setAccountView] = React.useState<string>('ACCOUNT');
 
   const [showConnectLayer, setShowConnectLayer] = React.useState<boolean>(false);
   const [showAccountLayer, setShowAccountLayer] = React.useState<boolean>(false);
+  const [showAuthsLayer, setShowAuthsLayer] = React.useState<boolean>(false);
+
   const [showSeriesLayer, setShowSeriesLayer] = React.useState<boolean>(false);
   const [showTestLayer, setShowTestLayer] = React.useState<boolean>(false);
 
@@ -68,14 +72,18 @@ const App = (props:any) => {
   return (
     <div className="App">
       <NotifyLayer />
-      <ConnectLayer open={showConnectLayer} closeLayer={() => setShowConnectLayer(false)} />
+      <AuthsLayer open={showAuthsLayer} closeLayer={() => setShowAuthsLayer(false)} />
+      <ConnectLayer view={accountView} open={showConnectLayer} closeLayer={() => setShowConnectLayer(false)} />
+      
       { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
       { showSeriesLayer  && <SeriesSelector activeView='borrow' close={()=>setShowSeriesLayer(false)} /> }
       { showAccountLayer &&
       <AccountLayer
+        view={accountView}
         closeLayer={() => setShowAccountLayer(false)}
         changeWallet={() => changeConnection()}
       /> }
+
       <Box direction="row" height={{ min: '100%' }}>
         <Box flex height='100%'>
 

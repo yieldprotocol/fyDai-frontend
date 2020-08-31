@@ -256,7 +256,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
                 justify='center'
               >
                 <Box direction='row' gap='small'>
-                  <Text size='xsmall' color='text-weak'> Alternatively, reclaim Dai from this series</Text>
+                  <Text size='xsmall' color='text-weak'> Alternatively, close your position in this series</Text>
                   <ArrowRight color='text-weak' />
                 </Box>
               </Box>

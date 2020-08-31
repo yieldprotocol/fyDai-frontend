@@ -159,16 +159,7 @@ const Pool = (props:IPoolProps) => {
 
             <InfoGrid entries={[
               {
-                label: 'Current Rate',
-                visible: true,
-                active: inputValue,
-                loading: false,     
-                value: '5%',
-                valuePrefix: null,
-                valueExtra: null, 
-              },
-              {
-                label: 'Share of the Pool',
+                label: 'Share of the Pool after adding liquidity',
                 visible: true,
                 active: inputValue,
                 loading: false,           

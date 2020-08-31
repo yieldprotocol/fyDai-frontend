@@ -1,18 +1,18 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { ethers } from 'ethers';
-import { Box, Button, Layer, CheckBox, TextInput, Text, Keyboard, ThemeContext } from 'grommet';
+import { Box, Button, Layer, TextInput, Text, Keyboard, ThemeContext } from 'grommet';
 import { 
-  FiInfo as Info,
   FiArrowLeft as ArrowLeft,
 } from 'react-icons/fi';
-import { FaEthereum as Ethereum } from 'react-icons/fa';
+import YieldMark from '../components/logos/YieldMark';
+
 import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
-import { usePool, useYDai, useToken, useSignerAccount } from '../hooks';
 import { UserContext } from '../contexts/UserContext';
 
+import { useSignerAccount, useProxy } from '../hooks';
+
 import InputWrap from '../components/InputWrap';
-import DaiMark from '../components/logos/DaiMark';
 import InfoGrid from '../components/InfoGrid';
 
 interface IRemoveLiquidityProps {
@@ -27,6 +27,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
   const { state: userState, actions: userActions } = useContext(UserContext);
 
   const { account } = useSignerAccount();
+  const { removeLiquidity } = useProxy();
   
   const [ maxRemove, setMaxRemove ] = useState<number>(0);
   const [ inputValue, setInputValue ] = useState<any>();
@@ -37,16 +38,12 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
 
-  const theme:any = React.useContext(ThemeContext);
-
 
   /* Remove Liquidity sequence */
   const removeLiquidityProcedure = async (value:number) => {
-    if ( inputValue>0 && !removeLiquidityDisabled ) {
+    if ( !removeLiquidityDisabled ) {
       setRemoveLiquidityPending(true);
-
-      console.log('removeing liquidity');
-
+      await removeLiquidity(activeSeries, value, 1);
       await Promise.all([
         userActions.updatePosition(),
         seriesActions.updateActiveSeries()
@@ -56,7 +53,6 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
     }
   };
 
-  
   /* handle value calculations based on input changes */
   useEffect(() => {
     inputValue && ( async () => {
@@ -111,12 +107,11 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
             <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={removeLiquidityDisabled}>
               <TextInput
                 type="number"
-                placeholder='DAI'
-                // disabled={withdrawDisabled}
+                placeholder='Tokens to remove'
                 value={inputValue || ''}
                 plain
                 onChange={(event:any) => setInputValue(event.target.value)}
-                icon={<DaiMark />}
+                icon={<YieldMark />}
               />
               <Button 
                 label='Max'
@@ -176,7 +171,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
             <Box
               fill='horizontal'
               round='small'
-              background={( !(inputValue>0) || removeLiquidityDisabled) ? 'brand-transparent' : 'brand'}
+              background={removeLiquidityDisabled ? 'brand-transparent' : 'brand'}
               onClick={()=> removeLiquidityProcedure(inputValue)}
               align='center'
               pad='small'
@@ -184,9 +179,9 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
               <Text
                 weight='bold'
                 size='large'
-                color={( !(inputValue>0) || removeLiquidityDisabled) ? 'text-xweak' : 'text'}
+                color={removeLiquidityDisabled ? 'text-xweak' : 'text'}
               >
-                {`Withdraw ${inputValue || ''} Dai`}
+                {`Remove ${inputValue || ''} token`}
               </Text>
             </Box>
 
@@ -195,7 +190,6 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
                 round
                 onClick={()=>close()}
                 hoverIndicator='brand-transparent'
-                // border='all'
                 pad={{ horizontal:'small', vertical:'small' }}
                 justify='center'
               >
