@@ -189,14 +189,15 @@ export const useMath = () => {
     _maturity:number,
     _fromDate:number= (Math.round(new Date().getTime() / 1000)), // if not provided, defaults to current time.
   )=> {
-    const secsToMaturity = _maturity - _fromDate;
-    const propOfYear = secsToMaturity/utils.SECONDS_PER_YEAR;
-
-    const priceRatio = parseFloat(ethers.utils.formatEther(_return)) / parseFloat(ethers.utils.formatEther(_rate));
-    const powRatio = 1 / propOfYear;
-    const apr = Math.pow(priceRatio, powRatio) - 1;
-
-    return apr*100;
+    if(_maturity > Math.round(new Date().getTime() / 1000) ) {
+      const secsToMaturity = _maturity - _fromDate;
+      const propOfYear = secsToMaturity/utils.SECONDS_PER_YEAR;
+      const priceRatio = parseFloat(ethers.utils.formatEther(_return)) / parseFloat(ethers.utils.formatEther(_rate));
+      const powRatio = 1 / propOfYear;
+      const apr = Math.pow(priceRatio, powRatio) - 1;
+      return apr*100;
+    }
+    return 0;
   };
 
   return {

@@ -146,10 +146,9 @@ const YieldProvider = ({ children }: any) => {
 
         await Promise.all(
           _seriesList.map(async (x: string, i: number) => {
-
+            
             const name = await callTx(x, 'YDai', 'name', []);
             const maturity = (await callTx(x, 'YDai', 'maturity', [])).toNumber();
-            const isMature = await callTx(x, 'YDai', 'isMature', []);
             const _peripheralAddrs = await getAddresses([ `${name}-Pool` ]);
             const poolAddress = _peripheralAddrs.get(`${name}-Pool`);
             
@@ -159,8 +158,7 @@ const YieldProvider = ({ children }: any) => {
               maturity,
               poolAddress,
               maturity_: new Date(maturity * 1000),
-              isMature,
-              // isMature: new Date() > new Date(maturity * 1000), 
+              // isMature: new Date() > new Date(maturity * 1000),
               displayName: moment(maturity * 1000).format('MMMM YYYY'),
               seriesColor: seriesColors[i],
             };

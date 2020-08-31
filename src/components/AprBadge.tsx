@@ -11,59 +11,58 @@ interface IAprBadgeProps {
 }
 
 function AprBadge({ activeView, series }:IAprBadgeProps) {
-
-  // const { state: seriesState } = useContext(SeriesContext);
-  // const { activeSeries } = seriesState;
-
   const [ seriesApr, setSeriesApr ] = useState<string>(`${series.yieldAPR_} %`);
+  const [ seriesMature, setSeriesMature ] = useState<boolean>(false);
 
   /* Set Series description/display name */
   React.useEffect(()=>{
     setSeriesApr(moment(series.maturity*1000).format('MMM \'YY'));
     Number.isFinite(parseFloat(series.yieldAPR_||'')) && 
       ( async () => setSeriesApr( `${series.yieldAPR_} %`) )();
+    setSeriesMature(series.isMature);
   }, [ series ]);
 
   return (
     <>
-      {Number.isFinite(parseFloat(series.yieldAPR_||'')) && 
-        ( series?.isMature === false ?         
-          <Box 
-            background={series.seriesColor}
-            round='xlarge'  
-            pad={{ horizontal:'small', vertical:'none' }} 
-            align='center'
-            justify='center'
-          >
-            <Text size='xxsmall'> { seriesApr } </Text>  
-          </Box> :
+      { seriesMature === true &&      
+      <Box 
+        round
+        border='all'
+        direction='row'
+        pad={{ horizontal:'small', vertical:'none' }}
+        align='center'
+      >
+        <Text size='xxsmall'>
+          Matured        
+        </Text>
+      </Box>}
+
+      { seriesMature === false &&
+      <Box 
+        background={series.seriesColor}
+        round='xlarge'  
+        pad={{ horizontal:'small', vertical:'none' }} 
+        align='center'
+        justify='center'
+      >
+        <Text size='xxsmall'> { seriesApr } </Text>  
+      </Box>}
+
+      {/* { seriesMature === false && 
+          activeView !== 'borrow' &&
           <Box 
             round
             border='all'
             direction='row'
             pad={{ horizontal:'small', vertical:'none' }}
             align='center'
+            background='orange'
           >
             <Text size='xxsmall'>
-              Matured        
+              Unavailable      
             </Text>
-          </Box>)}
+          </Box>} */}
 
-      { series?.isMature === false && 
-        activeView === 'borrow' && 
-        !Number.isFinite(parseFloat(series.yieldAPR_||'')) &&                  
-        <Box 
-          round
-          border='all'
-          direction='row'
-          pad={{ horizontal:'small', vertical:'none' }}
-          align='center'
-          background='orange'
-        >
-          <Text size='xxsmall'>
-            Unavailable      
-          </Text>
-        </Box>}  
     </>
   );
 }

@@ -225,6 +225,8 @@ export const useProxy = () => {
     const collatType = ethers.utils.formatBytes32String(collateralType);
     const toAddr = account && ethers.utils.getAddress(account);
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
+    const yDaiAddr = ethers.utils.getAddress(series.yDaiAddress);
+
     const parsedMaturity = series.maturity.toString();
     // const minYDai = ethers.utils.parseEther(minimumYDaiRepayment.toString());
 
@@ -239,11 +241,21 @@ export const useProxy = () => {
 
     let tx:any;
     setRepayActive(true);
+
     try {
       // console.log('gas est:', ( await proxyContract.estimateGas.repayMinimumYDaiDebtForDai(poolAddr, collatType, parsedMaturity, toAddr, parsedYDai, parsedDai, overrides )).toString());
-      // console.log('dry-run:', ( await proxyContract.callStatic.repayMinimumYDaiDebtForDai(poolAddr, collatType, parsedMaturity, toAddr, parsedYDai, parsedDai, overrides )).toString());     
-      tx = await proxyContract.repayMinimumYDaiDebtForDai(poolAddr, collatType, parsedMaturity, toAddr, minYDai, dai, overrides );
+      // console.log('dry-run:', ( await proxyContract.callStatic.repayMinimumYDaiDebtForDai(poolAddr, collatType, parsedMaturity, toAddr, parsedYDai, parsedDai, overrides )).toString());           
+      tx = await proxyContract.repayMinimumYDaiDebtForDai(
+        poolAddr,
+        collatType,
+        parsedMaturity,
+        toAddr,
+        minYDai,
+        dai,
+        overrides );
+    
     } catch (e) {
+      console.log(e);
       handleTxError('Error Repaying Dai', tx, e);
       setRepayActive(false);
       return;
