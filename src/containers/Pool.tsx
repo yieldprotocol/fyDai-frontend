@@ -89,7 +89,7 @@ const Pool = (props:IPoolProps) => {
   useEffect(() => {
     if ( inputValue && ( inputValue > daiBalance_ ) ) {
       setWarningMsg(null);
-      setErrorMsg('That amount exceeds the amount of DAI you have'); 
+      setErrorMsg('That amount exceeds the amount of Dai you have'); 
     } else {
       setWarningMsg(null);
       setErrorMsg(null);
@@ -126,7 +126,7 @@ const Pool = (props:IPoolProps) => {
               valueExtra: null,
             },
             {
-              label: 'Current DAI value',
+              label: 'Current Dai value',
               visible: !!account,
               active: true,
               loading: addLiquidityPending,            
@@ -142,7 +142,7 @@ const Pool = (props:IPoolProps) => {
             <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={addLiquidityDisabled}>
               <TextInput
                 type="number"
-                placeholder={screenSize !== 'small' ? 'Enter the amount of DAI to add': 'DAI'}
+                placeholder={screenSize !== 'small' ? 'Enter the amount of Dai to add': 'DAI'}
                 value={inputValue || ''}
                 plain
                 onChange={(event:any) => setInputValue(event.target.value)}

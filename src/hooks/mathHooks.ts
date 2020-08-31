@@ -42,7 +42,7 @@ export const useMath = () => {
   };
 
   /**
-   * Calculates value of debt (yDaiDebt at maturity or Dai) at current DAI price
+   * Calculates value of debt (yDaiDebt at maturity or Dai) at current Dai price
    * the rate used is the rate and spot price of Dai.
    * @param {BigNumber} _amount yDai amount (= amount of Dai at maturity)
    * @returns 
@@ -54,7 +54,7 @@ export const useMath = () => {
 
   /**
    * Calculates the collateralisation ratio 
-   * ETH collat value and DAI debt value (in USD)
+   * ETH collat value and Dai debt value (in USD)
    *
    * @param {BigNumber} _collateralValue (wei/wad precision)
    * @param {BigNumber} _debtValue (wei/wad precision)

@@ -55,7 +55,7 @@ function ActionSelector({ setActiveView, activeView }:IActionSelectorProps) {
           onClick={() => setActiveView('BORROW')}
         >
           <Text size="small" weight="bold">
-            2. Borrow DAI
+            2. Borrow Dai
           </Text>
         </Box>
 
@@ -67,7 +67,7 @@ function ActionSelector({ setActiveView, activeView }:IActionSelectorProps) {
           onClick={account?() => setActiveView('REPAY'):()=>{console.log('connect a wallet')}}
         >
           <Text size="small" weight="bold" color={account?undefined:'text-weak'}>
-            3. Repay DAI Debt
+            3. Repay Dai Debt
           </Text>
         </Box>
 

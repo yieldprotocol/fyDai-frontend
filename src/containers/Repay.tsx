@@ -92,7 +92,7 @@ function Repay({ repayAmount }:IRepayProps) {
   useEffect(() => {
     if ( inputValue  && daiBalance_ && ( inputValue > daiBalance_ ) ) {
       setWarningMsg(null);
-      setErrorMsg('That amount exceeds the amount of DAI in your wallet'); 
+      setErrorMsg('That amount exceeds the amount of Dai in your wallet'); 
     } else {
       setWarningMsg(null);
       setErrorMsg(null);
@@ -129,7 +129,7 @@ function Repay({ repayAmount }:IRepayProps) {
                 valueExtra: null, 
               },
               {
-                label: 'DAI balance',
+                label: 'Dai balance',
                 visible: !!account,
                 active: true,
                 loading: repayPending,            
@@ -145,7 +145,7 @@ function Repay({ repayAmount }:IRepayProps) {
             <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={repayDisabled}>
               <TextInput
                 type="number"
-                placeholder={screenSize !== 'small' ? 'Enter the amount of DAI to Repay': 'DAI'}
+                placeholder={screenSize !== 'small' ? 'Enter the amount of Dai to Repay': 'DAI'}
                 value={inputValue || ''}
                 plain
                 onChange={(event:any) => setInputValue(event.target.value)}

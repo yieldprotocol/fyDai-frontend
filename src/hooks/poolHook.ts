@@ -141,11 +141,11 @@ export const usePool = () => {
     try {
       tx = await contract.sellDai(fromAddr, toAddr, parsedAmount, overrides);
     } catch (e) {
-      handleTxError('Error Selling DAI', tx, e);
+      handleTxError('Error Selling Dai', tx, e);
       setSellActive(false);
       return;
     }
-    dispatch({ type: 'txPending', payload:{ tx, message: `Selling DAI ${daiIn} pending...`, type:'SELL' } } );
+    dispatch({ type: 'txPending', payload:{ tx, message: `Selling ${daiIn} DAI pending...`, type:'SELL' } } );
     await tx.wait();
     setSellActive(false);
     txComplete(tx);
@@ -188,7 +188,7 @@ export const usePool = () => {
     try {
       tx = await contract.buyDai(fromAddr, toAddr, parsedAmount, overrides );
     } catch (e) {
-      handleTxError('Error Buying DAI', tx, e);
+      handleTxError('Error Buying Dai', tx, e);
       setBuyActive(false);
       return;
     }

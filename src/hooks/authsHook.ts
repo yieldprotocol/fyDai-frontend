@@ -47,10 +47,10 @@ const createTypedDelegableData = (message: IDelegableMessage, domain: IDomain) =
 
 const auths = new Map([
   [1, { id: 1, desc:'Allow the yield Proxy contract to interact with the Yield protocol on your behalf' }],
-  [2, { id: 2, desc:'Allow the yield Proxy contract to interact with DAI on your behalf' }],
+  [2, { id: 2, desc:'Allow the yield Proxy contract to interact with Dai on your behalf' }],
   [3, { id: 3, desc:'Allow the yield Proxy contract to interact with this series on your behalf' }],
-  [4, { id: 4, desc:'Allow the yield Pool to trade DAI on your behalf for this series' }],
-  [5, { id: 5, desc:'Allow the yield Pool to trade yDAI on your behalf for this series' }],
+  [4, { id: 4, desc:'Allow the yield Pool to trade Dai on your behalf for this series' }],
+  [5, { id: 5, desc:'Allow the yield Pool to trade yDai on your behalf for this series' }],
 ]);
 
 export const useAuth = () => {

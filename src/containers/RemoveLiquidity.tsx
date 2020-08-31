@@ -68,7 +68,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
   //   if ( inputValue && ( inputValue > daiBalance_ ) ) {
   //     setAddLiquidityDisabled(true);
   //     setWarningMsg(null);
-  //     setErrorMsg('That amount exceeds the amount of DAI you have'); 
+  //     setErrorMsg('That amount exceeds the amount of Dai you have'); 
   //   } else {
   //     // setLendDisabled(false);
   //     setWarningMsg(null);

@@ -109,7 +109,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
   useEffect(() => {
     if ( inputValue && inputValue > daiBalance_ ) {
       setWarningMsg(null);
-      setErrorMsg('That amount exceeds the amount of DAI you have'); 
+      setErrorMsg('That amount exceeds the amount of Dai you have'); 
     } else {
       setWarningMsg(null);
       setErrorMsg(null);
@@ -149,7 +149,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
             },
 
             {
-              label: 'DAI balance',
+              label: 'Dai balance',
               visible: !!account,
               active: true,
               loading: lendPending,            
@@ -167,7 +167,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
               <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={lendDisabled}>
                 <TextInput
                   type="number"
-                  placeholder={screenSize !== 'small' ? 'Enter the amount of DAI to lend': 'DAI'}
+                  placeholder={screenSize !== 'small' ? 'Enter the amount of Dai to lend': 'DAI'}
                   value={inputValue || ''}
                   plain
                   onChange={(event:any) => setInputValue(event.target.value)}
@@ -193,7 +193,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
                   valueExtra: null, 
                 },
                 {
-                  label: 'Approx. DAI received at maturity',
+                  label: 'Approx. Dai received at maturity',
                   visible: true,
                   active: inputValue,
                   loading: false,           

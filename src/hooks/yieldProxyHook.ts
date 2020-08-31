@@ -190,7 +190,7 @@ export const useProxy = () => {
     try {
       tx = await proxyContract.borrowDaiForMaximumYDai( poolAddr, utils.ETH, parsedMaturity, toAddr, maxYDai, dai, overrides );
     } catch (e) {
-      handleTxError('Error Borrowing DAI', tx, e);
+      handleTxError('Error Borrowing Dai', tx, e);
       setBorrowActive(false);
       return;
     }
@@ -244,7 +244,7 @@ export const useProxy = () => {
       // console.log('dry-run:', ( await proxyContract.callStatic.repayMinimumYDaiDebtForDai(poolAddr, collatType, parsedMaturity, toAddr, parsedYDai, parsedDai, overrides )).toString());     
       tx = await proxyContract.repayMinimumYDaiDebtForDai(poolAddr, collatType, parsedMaturity, toAddr, minYDai, dai, overrides );
     } catch (e) {
-      handleTxError('Error Repaying DAI', tx, e);
+      handleTxError('Error Repaying Dai', tx, e);
       setRepayActive(false);
       return;
     }

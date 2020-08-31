@@ -379,7 +379,7 @@ export const useController = () => {
   };
 
   /**
-   * @dev get the DAI debt of a series
+   * @dev get the Dai debt of a series
    * @note After maturity, the Dai debt of a position grows according to either the stability fee (for WETH collateral) or the Dai Saving Rate (for Chai collateral).
    * @param {string} controllerAddress address of the controller.
    * @param {string} collateralType collateral type to check (eg. ETH-A)
@@ -409,7 +409,7 @@ export const useController = () => {
 
 
   /**
-   * @dev Total debt of an user across ALL series, in DAI
+   * @dev Total debt of an user across ALL series, in Dai
    * @param {string} controllerAddress address of the controller.
    * @param {string} collateralType collateral type to check (eg. ETH-A)
    * @returns {Promise<BigNumber>} amount Dai (in Wei)

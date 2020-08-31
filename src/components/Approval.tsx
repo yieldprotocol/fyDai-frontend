@@ -20,7 +20,7 @@ function Approval({ inputValue, approved, approveProcedure }:any) {
           onChange={()=>approveProcedure(inputValue)}
           label={            
         (approved >= inputValue) ? 
-          `${approved.toFixed(2) || '' } DAI are unlocked.` 
+          `${approved.toFixed(2) || '' } Dai are unlocked.` 
           : `Unlock ${inputValue || ''} DAI`
       }
         />}

@@ -135,7 +135,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
     if (estRatio && estRatio <= 1.5) {
       // setBorrowDisabled(true);
       setWarningMsg(null);
-      setErrorMsg('That amount exceeds the amount of DAI you can borrow based on your collateral'); 
+      setErrorMsg('That amount exceeds the amount of Dai you can borrow based on your collateral'); 
     } else if (estRatio > 1.5 && estRatio < 2.0 ) {
       setErrorMsg(null);
       setWarningMsg('Borrowing that much will put you at risk of liquidation');
@@ -149,7 +149,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
   useEffect(() => {
     if ( inputValue && ( inputValue > maximumDai ) ) {
       setWarningMsg(null);
-      setErrorMsg('That amount exceeds the amount of DAI you can borrow based on your collateral'); 
+      setErrorMsg('That amount exceeds the amount of Dai you can borrow based on your collateral'); 
     } else if (inputValue && ( inputValue > Math.round(maximumDai-1) ) ) {
       setErrorMsg(null);
       setWarningMsg('If you borrow right up to your maximum allowance, there is high probability you will be liquidated!');
@@ -222,7 +222,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
                 <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={borrowDisabled}>
                   <TextInput
                     type="number"
-                    placeholder={screenSize !== 'small' ? 'Enter the amount of DAI to borrow': 'DAI'} 
+                    placeholder={screenSize !== 'small' ? 'Enter the amount of Dai to borrow': 'DAI'} 
                     value={inputValue || ''}
                     plain
                     onChange={(event:any) => setInputValue(event.target.value)}
@@ -241,7 +241,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
                     valueExtra: null, 
                   },
                   {
-                    label: 'Approx. DAI owed at maturity',
+                    label: 'Approx. Dai owed at maturity',
                     visible: true,
                     active: inputValue,
                     loading: false,           
