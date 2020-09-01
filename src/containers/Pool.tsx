@@ -8,13 +8,15 @@ import {
 } from 'react-icons/fi';
 import DaiMark from '../components/logos/DaiMark';
 
+import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
 
 import { 
   useSignerAccount,
   useTxActive,
-  useProxy
+  useProxy,
+  useToken
 } from '../hooks';
 
 import RemoveLiquidity from './RemoveLiquidity';
@@ -29,6 +31,7 @@ interface IPoolProps {
 }
   
 const Pool = (props:IPoolProps) => {
+  const { state: { deployedContracts } } = React.useContext(YieldContext);
   const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
   const { activeSeries } = seriesState;
   const { state: userState, actions: userActions } = React.useContext(UserContext);
@@ -36,7 +39,7 @@ const Pool = (props:IPoolProps) => {
   const screenSize = React.useContext(ResponsiveContext);
 
   const { addLiquidity, addLiquidityActive } = useProxy();
-  // const { getPoolTokens,  } = usePool();
+  const { getBalance } = useToken();
 
   const { account } = useSignerAccount();
   const [ txActive ] = useTxActive(['SELL']);
@@ -69,7 +72,10 @@ const Pool = (props:IPoolProps) => {
   /* handle value calculations based on input changes */
   useEffect(() => {
     inputValue && ( async () => {
-
+      // const bnInp = ethers.utils.parseEther(inputValue)
+      // const daiReserves = await getBalance(deployedContracts.Dai, 'Dai', activeSeries.poolAddress);
+      // const yDaiReserves = await getBalance(activeSeries.yDaiAddress, 'YDai', activeSeries.poolAddress);
+      // const tokens = bnInp.mul(daiReserves).div(yDaiReserves.add(daiReserves));
     })();
   }, [inputValue]);
   
@@ -126,7 +132,7 @@ const Pool = (props:IPoolProps) => {
               valueExtra: null,
             },
             {
-              label: 'Current Dai value',
+              label: 'Current Dai Balance',
               visible: !!account,
               active: true,
               loading: addLiquidityPending,            

@@ -271,7 +271,9 @@ export const usePool = () => {
    * 
    * @param {string} txType string represnting transaction type //TODO tyescript it out
    * @param {string} poolAddress address of the yDai series to redeem from.
-   * @param {number} amount input to preview
+   * @param {number | BigNumber} amount input to preview
+   * 
+   * @note NB NB if in BigNumber must be in wei
    *  
    * @returns {BigNumber} BigNumber in WEI/WAD precision - Dai or yDai (call dependent)
    * 
@@ -280,11 +282,11 @@ export const usePool = () => {
   const previewPoolTx = async (
     txType: string,
     poolAddress: string,
-    amount: number,
+    amount: number | BigNumber,
   ): Promise<BigNumber> => {
 
     const type=txType.toUpperCase();
-    const parsedAmount = ethers.utils.parseEther(amount.toString());
+    const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(amount.toString());
     const poolAddr = ethers.utils.getAddress(poolAddress);
     // TODO > check the || provider. might get buggy
     const contract = new ethers.Contract( poolAddr, poolAbi, fallbackProvider||provider);

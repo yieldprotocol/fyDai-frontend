@@ -11,6 +11,8 @@ import { UserContext } from '../contexts/UserContext';
 
 import { useSignerAccount } from './connectionHooks';
 import { usePool } from './poolHook';
+import { useMath } from './mathHooks';
+import { useToken } from './tokenHook';
 
 import { IYieldSeries } from '../types';
 
@@ -40,6 +42,8 @@ export const useProxy = () => {
 
   const { signer, provider, account } = useSignerAccount();
   const { previewPoolTx } = usePool();
+  const { splitDaiLiquidity } = useMath();
+  const { getBalance } = useToken();
 
   const { abi: yieldProxyAbi } = YieldProxy;
   
@@ -288,16 +292,20 @@ export const useProxy = () => {
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const parsedDaiUsed = BigNumber.isBigNumber(daiUsed)? daiUsed : ethers.utils.parseEther(daiUsed.toString());
 
-    /* calculate expected trade values and factor in slippage */
-    // const yDaiSellRate = await previewPoolTx('sellYDai', poolAddr, BigNumber.from('1'));
-    // const maxYDai = valueWithSlippage(yDaiExpected, true);
-    const maxYDai = ethers.utils.parseEther('1000000');
+    /* calculate minimum expected yDai value and factor in slippage */
+    const daiReserves = await getBalance(deployedContracts.Dai, 'Dai', poolAddr);
+    const yDaiReserves = await getBalance(series.yDaiAddress, 'YDai', poolAddr);
+    const [ ,yDaiSplit ] = splitDaiLiquidity( parsedDaiUsed, daiReserves, yDaiReserves );
+    const maxYDai = await previewPoolTx('sellDai', poolAddr, yDaiSplit);
+    const maxYDaiWithSlippage = valueWithSlippage(maxYDai);
+
+    console.log(maxYDaiWithSlippage.toString());
 
     /* Contract interaction */
     let tx:any;
     setAddLiquidityActive(true);
     try {
-      tx = await proxyContract.addLiquidity(poolAddr, parsedDaiUsed, maxYDai );
+      tx = await proxyContract.addLiquidity(poolAddr, parsedDaiUsed, maxYDaiWithSlippage );
     } catch (e) {
       handleTxError('Error Adding liquidity', tx, e);
       setAddLiquidityActive(false);
@@ -335,8 +343,10 @@ export const useProxy = () => {
     /* calculate expected trade values and factor in slippage */
     // const yDaiExpected = await previewPoolTx('selldai', poolAddr, daiUsed);
     // const minDai = valueWithSlippage(yDaiExpected, true);
-    const minDai = ethers.utils.parseEther(minimumDai.toString());
 
+    // const minDai = ethers.utils.parseEther(minimumDai.toString());
+    const minDai = 1;
+    
     /* Contract interaction */
     let tx:any;
     setRemoveLiquidityActive(true);

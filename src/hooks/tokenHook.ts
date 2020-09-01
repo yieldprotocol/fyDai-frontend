@@ -53,18 +53,20 @@ export function useToken() {
    * Get the user account balance of ETH  (omit args) or an ERC20token (provide args)
    * 
    * @param {string} tokenAddr address of the Token, *optional, omit for ETH
-   * @param {string} abi abi of the token (probably ERC20 in most cases) *optional, omit for ETH
+   * @param {string} contractName abi of the token (probably ERC20 in most cases) *optional, omit for ETH
+   *  @param {string} queryAddress what address to query *optional, omit for ETH DEFAULTS to current user
    * 
    * @returns {BigNumber} ETH in Wei or token balance.
    */
-  const getBalance = async (tokenAddr:string|null=null, contractName:string|null=null) => {
+  const getBalance = async (tokenAddr:string|null=null, contractName:string|null=null, queryAddress:string|null=null) => {  
     if (!!provider && !!account ) {
+      const addrToCheck = queryAddress || account;
       if (tokenAddr && contractName) {
         const contract = new ethers.Contract(tokenAddr, contractMap.get(contractName), provider );
-        const balance = await contract.balanceOf(account);
+        const balance = await contract.balanceOf(addrToCheck);
         return balance;
       }
-      return provider.getBalance(account);
+      return provider.getBalance(addrToCheck);
     } return ethers.BigNumber.from('0');
   };
 

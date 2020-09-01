@@ -116,7 +116,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
               <Button 
                 label='Max'
                 color='brand-transparent'
-                onClick={()=>setInputValue( maxRemove )}
+                onClick={()=>setInputValue( activeSeries?.poolTokens_ )}
                 hoverIndicator='brand-transparent'
               />
             </InputWrap>
@@ -125,15 +125,15 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
               {
                 label: 'Token Balance',
                 visible: true,
-                active: inputValue,
+                active: true,
                 loading: false,     
-                value: '1000',
+                value: activeSeries?.poolTokens_.toFixed(2),
                 valuePrefix: null,
                 valueExtra: null, 
               },
               {
                 label: 'Share of the Pool After withdraw',
-                visible: true,
+                visible: false,
                 active: inputValue,
                 loading: false,           
                 value: '0.02%',
@@ -142,7 +142,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
               },
               {
                 label: 'Expected Dai to Receive',
-                visible: true,
+                visible: false,
                 active: inputValue,
                 loading: false,           
                 value: '34 DAI',
@@ -167,7 +167,6 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
               },
             ]}
             />
-
             <Box
               fill='horizontal'
               round='small'
@@ -181,7 +180,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
                 size='large'
                 color={removeLiquidityDisabled ? 'text-xweak' : 'text'}
               >
-                {`Remove ${inputValue || ''} token`}
+                {`Remove ${inputValue || ''} tokens`}
               </Text>
             </Box>
 

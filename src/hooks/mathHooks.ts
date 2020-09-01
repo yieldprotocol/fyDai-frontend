@@ -178,27 +178,22 @@ export const useMath = () => {
   };
 
   /**
-   * Token Dai Value
-   *
-   * @param { BigNumber } _supply // current [Dai] price per unit y[Dai]
-   * @param { BigNumber } _daiReserves// Dai amount
+   * Split a certain amount of Dai liquidity into its yDai and Dai components
    * 
-   * @param { BigNumber } _rate// yDai/Dai market rate
+   * @param {BigNumber} daiAmount // amount dai to split
+   * @param { BigNumber } _daiReserves// Dai reserves
+   * @param { BigNumber } _yDaiReserves// yDai reservers
    * 
-   * @returns { number } human readable number as a percent.
+   * @returns  [ BigNumber, BigNumber ] returns an array of [dai, yDai] 
    */
-  const tokenValue =(
-    _supply: BigNumber,
+  const splitDaiLiquidity =(
+    _daiAmount: BigNumber,
     _daiReserves: BigNumber,
-    _rate:BigNumber, 
+    _yDaiReserves: BigNumber,
   )=> {
-    if (!_supply.isZero()) {
-      
-
-    }
-
-    return 0;
-
+    const daiPortion = _daiAmount.mul(_daiReserves).div(_yDaiReserves.add(_daiReserves));
+    const yDaiPortion = _daiAmount.sub(daiPortion);
+    return [daiPortion, yDaiPortion];
   };
 
   /**
@@ -231,6 +226,8 @@ export const useMath = () => {
   return {
     yieldAPR,
     poolPercent,
+    splitDaiLiquidity,
+
     collValue,
     collPrice,
     debtValAdj,
