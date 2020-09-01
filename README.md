@@ -33,12 +33,14 @@ Output: 'Market Initiated' on success.
 2. In a new console, Install and launch the development server:  
 `yarn && yarn start`  
 *possibly required* : Setting the migration contract (when using custom mnemonic to start ganache check migration address on startup):  
+
 `REACT_APP_MIGRATION_31337 = '0xsomemigrationcontractaddress' && yarn start`  - if using linux/mac  
 `($env:REACT_APP_MIGRATION_31337 = '0xsomemigrationcontractaddress') -and (yarn start)`  - if using windows powershell  
  
 *for optimised build* :  
 `REACT_APP_MIGRATION_31337 = '0xsomemigrationcontractaddress' && yarn build`  - if using linux/mac  
 `($env:REACT_APP_MIGRATION_31337 = '0xsomemigrationcontractaddress') -and (yarn build)`  - if using windows powershell  
+
 `set "REACT_APP_NOT_SECRET_CODE=abcdef" && yarn build` - if using windows cmd.exe
 
 *NB: if you have issues, try editing  the .env file manually with the migrations addresses before running yarn start*
