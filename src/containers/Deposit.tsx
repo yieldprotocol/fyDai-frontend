@@ -41,6 +41,7 @@ interface DepositProps {
 const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
   const { state: userState, actions: userActions } = useContext(UserContext);
   const {
+    isLoading,
     ethBalance_,
     ethPosted_,
     collateralPercent_,
@@ -58,7 +59,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
   const [ estRatio, setEstRatio ] = useState<any>(0);
 
   const [ withdrawOpen, setWithdrawOpen ] = useState<boolean>(false);
-  const [ depositPending, setDepositPending ] = useState<boolean>(true);
+  const [ depositPending, setDepositPending ] = useState<boolean>(false);
   const [ depositDisabled, setDepositDisabled ] = useState<boolean>(true);
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
@@ -145,10 +146,10 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
               label: 'Current Collateral',
               visible: !!account,
               active: true,
-              loading: (depositPending && ethPosted_ !== 0) || txActive?.type ==='WITHDRAW',     
+              loading: depositPending || txActive?.type ==='WITHDRAW',     
               value: ethPosted_ ? `${ethPosted_.toFixed(4)} Eth` : '0 Eth',
               valuePrefix: null,
-              valueExtra: null, 
+              valueExtra: null,
             },
             {
               label: 'Collateralization Ratio',

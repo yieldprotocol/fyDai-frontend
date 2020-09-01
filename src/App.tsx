@@ -43,7 +43,7 @@ const ThemedApp = () => {
 
 const App = (props:any) => {
   // TODO Switch out for react router
-  const [activeView, setActiveView] = React.useState<string>('BORROW');
+  const [activeView, setActiveView] = React.useState<string>('POOL');
   const [accountView, setAccountView] = React.useState<string>('ACCOUNT');
 
   const [showConnectLayer, setShowConnectLayer] = React.useState<boolean>(false);

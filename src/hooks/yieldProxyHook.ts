@@ -289,7 +289,7 @@ export const useProxy = () => {
     const parsedDaiUsed = BigNumber.isBigNumber(daiUsed)? daiUsed : ethers.utils.parseEther(daiUsed.toString());
 
     /* calculate expected trade values and factor in slippage */
-    // const yDaiExpected = await previewPoolTx('selldai', poolAddr, daiUsed);
+    // const yDaiSellRate = await previewPoolTx('sellYDai', poolAddr, BigNumber.from('1'));
     // const maxYDai = valueWithSlippage(yDaiExpected, true);
     const maxYDai = ethers.utils.parseEther('1000000');
 
@@ -327,22 +327,21 @@ export const useProxy = () => {
     tokens:number|BigNumber,
     minimumDai:number|BigNumber,
   ) => {
-
     /* Processing and sanitizing input */
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const { isMature } = series;
-    const parsedTokens = BigNumber.isBigNumber(tokens)? tokens : BigNumber.from(tokens);
+    const parsedTokens = BigNumber.isBigNumber(tokens)? tokens : ethers.utils.parseEther(tokens.toString());
 
     /* calculate expected trade values and factor in slippage */
     // const yDaiExpected = await previewPoolTx('selldai', poolAddr, daiUsed);
     // const minDai = valueWithSlippage(yDaiExpected, true);
-    const minDai = minimumDai;
+    const minDai = ethers.utils.parseEther(minimumDai.toString());
 
     /* Contract interaction */
     let tx:any;
     setRemoveLiquidityActive(true);
     try {
-      if (isMature) {
+      if (!isMature) {
         tx = await proxyContract.removeLiquidityEarly(poolAddr, parsedTokens, minDai);
       } else {
         tx = await proxyContract.removeLiquidityMature(poolAddr, tokens);

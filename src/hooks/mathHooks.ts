@@ -148,7 +148,11 @@ export const useMath = () => {
    * @param {number} _liquidationRatio eg. 1.5
    * @returns {BigNumber} in wei/wad precision
    */
-  const daiAvailable =(_collateralValue:BigNumber, _debtValue:BigNumber, _liquidationRatio:number) =>{
+  const daiAvailable = (
+    _collateralValue:BigNumber, 
+    _debtValue:BigNumber, 
+    _liquidationRatio:number
+  ) =>{
     const maxSafeDebtValue = utils.divRay(_collateralValue, utils.toRay(_liquidationRatio));
     const _max = _debtValue.lt(maxSafeDebtValue) ? maxSafeDebtValue.sub(_debtValue) : BigNumber.from('0');
     console.log('max debt:', ethers.utils.formatEther(_max).toString());
@@ -171,6 +175,30 @@ export const useMath = () => {
       return  ( parseFloat(ethers.utils.formatEther(_balance)) / parseFloat(ethers.utils.formatEther(_supply)))*100;
     }
     return 0;
+  };
+
+  /**
+   * Token Dai Value
+   *
+   * @param { BigNumber } _supply // current [Dai] price per unit y[Dai]
+   * @param { BigNumber } _daiReserves// Dai amount
+   * 
+   * @param { BigNumber } _rate// yDai/Dai market rate
+   * 
+   * @returns { number } human readable number as a percent.
+   */
+  const tokenValue =(
+    _supply: BigNumber,
+    _daiReserves: BigNumber,
+    _rate:BigNumber, 
+  )=> {
+    if (!_supply.isZero()) {
+      
+
+    }
+
+    return 0;
+
   };
 
   /**
