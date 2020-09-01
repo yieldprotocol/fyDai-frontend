@@ -66,6 +66,8 @@ export const useAuth = () => {
   const daiAddr = ethers.utils.getAddress(deployedContracts.Dai);
   const fromAddr = account && ethers.utils.getAddress(account);
 
+  const [authActive, setAuthActive] = React.useState<boolean>(false);
+
   const sendForSig = (_provider: any, method: string, params?: any[]) => new Promise<any>((resolve, reject) => {
     const payload = {
       method,
@@ -92,12 +94,14 @@ export const useAuth = () => {
     // eslint-disable-next-line no-console
     console.log(e.message);
     dispatch({ type: 'notify', payload:{ message: msg, type:'error' } } );
+    setAuthActive(false);
     txComplete(tx);
   };
   const handleSignError = (e:any) =>{
     // eslint-disable-next-line no-console
     console.log(e);
     dispatch({ type: 'requestSigs', payload:[] });
+    setAuthActive(false);
   };
 
   /**
@@ -107,8 +111,8 @@ export const useAuth = () => {
     let controllerSig:any;
     let daiPermitSig:any;
 
+    setAuthActive(true);
     dispatch({ type: 'requestSigs', payload:[ auths.get(1), auths.get(2) ] });
- 
     try {     
       /* yieldProxy | Controller delegation */ 
       const controllerNonce = await controllerContract.signatureCount(fromAddr);
@@ -180,6 +184,7 @@ export const useAuth = () => {
     let daiSig;
     let yDaiSig;
 
+    setAuthActive(true);
     dispatch({ type: 'requestSigs', payload:[ auths.get(3), auths.get(4), auths.get(5) ] });
     
     try {
@@ -227,7 +232,7 @@ export const useAuth = () => {
     try {
       tx = await proxyContract.authorizePool(poolAddr, fromAddr, daiSig, yDaiSig, poolSig);
     } catch (e) {
-      handleTxError('Error authorsiing contracts', tx, e);
+      handleTxError('Error authorizing contracts', tx, e);
       return;
     }
     dispatch({ type: 'txPending', payload: { tx, message: 'Authorization pending...', type:'AUTH' } });
@@ -241,6 +246,7 @@ export const useAuth = () => {
   return {
     yieldAuth,
     poolAuth,
+    authActive
   };
 
 };

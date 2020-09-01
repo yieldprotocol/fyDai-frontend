@@ -32,7 +32,7 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
   const [ allSigned, setAllSigned ] = React.useState<boolean>(false);
   
   const { account } = useSignerAccount();
-  const { yieldAuth, poolAuth } = useAuth();
+  const { yieldAuth, poolAuth, authActive } = useAuth();
   const [ txActive ] = useTxActive(['AUTH']);
 
   const authProcedure = async () => {
@@ -77,7 +77,7 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
         />        
       </Box>}
 
-      { authPending && 
+      { authActive && 
       <Layer> 
         <Box 
           round
@@ -90,17 +90,34 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
             const iKey = i;
             return ( 
               <Box key={iKey} gap='small' direction='row' justify='between' fill>
-                <Box basis='10'> <Text size='xsmall'>{i+1}.</Text> </Box>
-                <Box basis='60'> <Text size='xsmall'>{x.desc} </Text> </Box>
-                <Box basis='30'> { x.signed?
-                  <Box animation='zoomIn'><Check /></Box>
-                  : 
-                  <Clock />}
+                <Box basis='10'> 
+                  <Text 
+                    size='xsmall'
+                    color={x.signed?'green':undefined}
+                  >
+                    {i+1}.
+                  </Text>
+                </Box>
+                
+                <Box basis='60'> 
+                  <Text 
+                    size='xsmall'
+                    color={x.signed?'green':undefined}
+                  >
+                    {x.desc}
+                  </Text>
+                </Box>
+
+                <Box basis='30'> { !x.signed ? 
+                  <Clock /> :
+                  <Box animation='zoomIn'>
+                    <Check color='green' />
+                  </Box>}
                 </Box>
               </Box>
             );
           })}
-          {!txActive && allSigned && <Text size='xsmall' weight='bold'> Finally, confirm sending the signatures to Yield in a transaction.</Text>}
+          { !txActive && allSigned && <Text size='xsmall' weight='bold'> Finally, confirm sending the signatures to Yield in a transaction.</Text>}
           { txActive && <Text size='xsmall' weight='bold'> Submitting your signed authorisations ... transaction pending.</Text> }
         </Box>
       </Layer>}
