@@ -23,6 +23,7 @@ import InputWrap from '../components/InputWrap';
 import ApprovalPending from '../components/ApprovalPending';
 import TransactionPending from '../components/TransactionPending';
 import InfoGrid from '../components/InfoGrid';
+import Authorization from '../components/Authorization';
 
 interface IBorrowProps {
   borrowAmount?:number|null;
@@ -34,7 +35,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
   const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
   const { activeSeries } = seriesState; 
   const { state: userState, actions: userActions } = React.useContext(UserContext);
-  const { position } = userState;
+  const { position, authorizations: { hasDelegatedProxy } } = userState;
   const { 
     maxDaiAvailable_: maximumDai,
     collateralPercent_,
@@ -55,13 +56,10 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
   const { account } = useSignerAccount();
 
   /* internal component state */
+  const [ borrowPending, setBorrowPending ] = React.useState<boolean>(false);
   const [ borrowDisabled, setBorrowDisabled ] = React.useState<boolean>(true);
   const [ warningMsg, setWarningMsg] = React.useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
-
-  /* flags */ 
-  const [ hasDelegated, setHasDelegated] = React.useState<boolean>(true);
-  const [ borrowPending, setBorrowPending ] = React.useState<boolean>(false);
 
   /* token balances and values */
   const [ inputValue, setInputValue ] = React.useState<any>(borrowAmount || undefined);
@@ -125,11 +123,11 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
       position.ethPosted_ <= 0 ||
       estRatio <= 1.5 ||
       !account ||
-      !hasDelegated ||
+      !hasDelegatedProxy ||
       !inputValue || 
       parseInt(inputValue, 10) === 0
     )? setBorrowDisabled(true): setBorrowDisabled(false);
-  }, [ inputValue, hasDelegated, estRatio ]);
+  }, [ inputValue, hasDelegatedProxy, estRatio ]);
 
   /* Handle collateralisation ratio exceptions and warnings */
   useEffect(()=>{
@@ -175,7 +173,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
 
             <SeriesDescriptor activeView='borrow' />
 
-            { hasDelegated &&
+            { hasDelegatedProxy &&
               <InfoGrid entries={[
                 {
                   label: 'Current Debt',
@@ -279,7 +277,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
                     value: '',
                     valuePrefix: null,
                     valueExtra: () => (
-                      <Box >
+                      <Box>
                         <Button
                           color={inputValue? 'brand': 'brand-transparent'}
                           label={<Text size='xsmall' color='brand'>Connect a wallet</Text>}

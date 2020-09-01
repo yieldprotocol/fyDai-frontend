@@ -97,6 +97,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
                   justify='between'
                   onClick={()=>handleSelectSeries(x.maturity)}
                   hoverIndicator='background-mid'
+                  background={activeSeries.maturity === x.maturity ?'background-mid':undefined}
                   border='top'
                   fill='horizontal'
                   pad='medium'

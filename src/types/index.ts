@@ -9,7 +9,8 @@ export interface IYieldSeries {
   poolAddress: string;
   yDaiAddress: string;
   liquidityProxyAddress: string;
-
+  hasDelegatedPool: boolean;
+  
   yDaiBalance_: number;
   yDaiBalance: BigNumber;
 

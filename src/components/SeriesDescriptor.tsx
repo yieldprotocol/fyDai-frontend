@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { Box, Text, ThemeContext, ResponsiveContext, Button} from 'grommet';
+import { Box, Text, ThemeContext, ResponsiveContext, Button } from 'grommet';
 
 import { FiLayers as ChangeSeries } from 'react-icons/fi';
 
@@ -8,6 +8,7 @@ import { SeriesContext } from '../contexts/SeriesContext';
 
 import SeriesSelector from './SeriesSelector';
 import AprBadge from './AprBadge';
+import Authorization from './Authorization';
 
 interface ISeriesDescriptorProps {
   activeView: string;
@@ -76,6 +77,22 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
         </Box>
 
       </Box>
+
+      { activeSeries?.hasDelegatedPool === false && 
+      <Box 
+        fill='horizontal'
+        margin={{ vertical:'small' }}
+      >
+        <Box 
+          round='xsmall'
+          border='all'
+          pad='small' 
+          fill
+        >
+          <Authorization series={activeSeries} />
+        </Box>
+      </Box>} 
+         
       { children }
     </>
   );

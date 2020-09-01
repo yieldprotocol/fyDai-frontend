@@ -9,6 +9,7 @@ import Lend from '../containers/Lend';
 
 import PageHeader from '../components/PageHeader';
 import SeriesDescriptor from '../components/SeriesDescriptor';
+import Authorization from '../components/Authorization';
 
 
 interface LendProps {
