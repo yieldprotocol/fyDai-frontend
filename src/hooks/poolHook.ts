@@ -5,6 +5,7 @@ import Pool from '../contracts/Pool.json';
 
 import { NotifyContext } from '../contexts/NotifyContext';
 import { useSignerAccount } from './connectionHooks';
+import { IYieldSeries } from '../types';
 
 /**
  * Hook for interacting with the yield 'Pool' Contract
@@ -270,7 +271,7 @@ export const usePool = () => {
    * sellDai -> Returns how much yDai would be obtained by selling x Dai
    * 
    * @param {string} txType string represnting transaction type //TODO tyescript it out
-   * @param {string} poolAddress address of the yDai series to redeem from.
+   * @param {IYieldSeries} series yDai series to redeem from.
    * @param {number | BigNumber} amount input to preview
    * 
    * @note NB NB if in BigNumber must be in wei
@@ -281,32 +282,39 @@ export const usePool = () => {
    */
   const previewPoolTx = async (
     txType: string,
-    poolAddress: string,
+    series: IYieldSeries,
     amount: number | BigNumber,
   ): Promise<BigNumber> => {
 
     const type=txType.toUpperCase();
     const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(amount.toString());
-    const poolAddr = ethers.utils.getAddress(poolAddress);
-    // TODO > check the || provider. might get buggy
-    const contract = new ethers.Contract( poolAddr, poolAbi, fallbackProvider||provider);
-    try {
-      switch (type) {
-        case 'BUYDAI':
-          return await contract.buyDaiPreview(parsedAmount);
-        case 'SELLDAI': 
-          return await contract.sellDaiPreview(parsedAmount);
-        case 'BUYYDAI':
-          return await contract.buyYDaiPreview(parsedAmount);
-        case 'SELLYDAI':
-          return await contract.sellYDaiPreview(parsedAmount);
-        default: 
-          return BigNumber.from('0');
+    const poolAddr = ethers.utils.getAddress(series.poolAddress);
+    const mature = series.isMature;
+
+    const contract = new ethers.Contract( poolAddr, poolAbi, fallbackProvider);
+
+    let value;
+    if (!mature) {
+      try { 
+        switch (type) {
+          case 'BUYDAI':
+            value = await contract.buyDaiPreview(parsedAmount); break;
+          case 'SELLDAI': 
+            value = await contract.sellDaiPreview(parsedAmount); break;
+          case 'BUYYDAI':
+            value = await contract.buyYDaiPreview(parsedAmount); break;
+          case 'SELLYDAI':
+            value = await contract.sellYDaiPreview(parsedAmount); break;
+          default: 
+            value = BigNumber.from('0'); break;
+        }
+      } catch (e) {
+        // console.log('Error:', e);
+        return BigNumber.from('0');
       }
-    } catch (e) {
-      console.log('Error:', e);
-      return BigNumber.from('0');
-    }
+      return value;
+    } 
+    return BigNumber.from('0');
   };
 
   return {  

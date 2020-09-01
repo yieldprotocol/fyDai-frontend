@@ -91,7 +91,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
       txActive ||
       !account ||
       !inputValue ||
-      parseInt(inputValue, 10) === 0     
+      parseFloat(inputValue) === 0    
     ) ? setDepositDisabled(true) : setDepositDisabled(false);
   }, [inputValue]);
 

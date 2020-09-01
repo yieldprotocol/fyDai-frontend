@@ -72,13 +72,16 @@ const SeriesProvider = ({ children }:any) => {
         sellDai -> Returns how much yDai would be obtained by selling 1 Dai
     */
     const _ratesData = await Promise.all(
+
       seriesArr.map( async (x:any, i:number) => {
+
         // TODO fix this when all markets are operational => x.market (not seriesArr[0].market )
+
         const [ sellYDai, buyYDai, sellDai, buyDai ] = await Promise.all([
-          await previewPoolTx('sellYDai', seriesArr[0].poolAddress, 1),
-          await previewPoolTx('buyYDai', seriesArr[0].poolAddress, 1),
-          await previewPoolTx('sellDai', seriesArr[0].poolAddress, 1),
-          await previewPoolTx('buyDai', seriesArr[0].poolAddress, 1)
+          await previewPoolTx('sellYDai', seriesArr[i], 1),
+          await previewPoolTx('buyYDai', seriesArr[i], 1),
+          await previewPoolTx('sellDai', seriesArr[i], 1),
+          await previewPoolTx('buyDai', seriesArr[i], 1)
         ]);
 
         return {
@@ -119,8 +122,9 @@ const SeriesProvider = ({ children }:any) => {
           _seriesData[i].hasDelegatedPool = account? await checkPoolDelegate(x.poolAddress, deployedContracts.YieldProxy): null;
           // _seriesData[i].hasPermitedDai = account? await checkPoolDelegate(x.poolAddress, deployedContracts.YieldProxy): null;
           // _seriesData[i].hasPermitedyDai = account? await checkPoolDelegate(x.poolAddress, deployedContracts.YieldProxy): null;
-          // _seriesData[i].hasDelegatedController = account? await checkControllerDelegate(deployedContracts.Controller, x.yieldProxyAddress): null;         
-          _seriesData[i].isMature = await callTx(x.yDaiAddress, 'YDai', 'isMature', []);
+          // _seriesData[i].hasDelegatedController = account? await checkControllerDelegate(deployedContracts.Controller, x.yieldProxyAddress): null;
+
+          _seriesData[i].isMature = ( new Date().getTime() > x.maturity*1000 );
           _seriesData[i].yieldAPR = yieldAPR(_rates.sellYDai, ethers.utils.parseEther('1'), x.maturity);
           _seriesData[i].totalSupply = await callTx(x.poolAddress, 'Pool', 'totalSupply', []);
           _seriesData[i].yDaiBalance = account? await callTx(x.yDaiAddress, 'YDai', 'balanceOf', [account]): BigNumber.from('0') ;

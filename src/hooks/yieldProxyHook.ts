@@ -186,7 +186,7 @@ export const useProxy = () => {
     };
 
     /* calculate  expected trade values and factor in slippage */
-    const yDaiExpected = await previewPoolTx('buydai', poolAddr, daiToBorrow);
+    const yDaiExpected = await previewPoolTx('buydai', series, daiToBorrow);
     const maxYDai = valueWithSlippage(yDaiExpected);
 
     let tx:any;
@@ -240,7 +240,7 @@ export const useProxy = () => {
     };
 
     /* calculate expected trade values and factor in slippage */
-    const yDaiExpected = await previewPoolTx('selldai', poolAddr, repaymentInDai);
+    const yDaiExpected = await previewPoolTx('selldai', series, repaymentInDai);
     const minYDai = valueWithSlippage(yDaiExpected, true);
 
     let tx:any;
@@ -296,7 +296,7 @@ export const useProxy = () => {
     const daiReserves = await getBalance(deployedContracts.Dai, 'Dai', poolAddr);
     const yDaiReserves = await getBalance(series.yDaiAddress, 'YDai', poolAddr);
     const [ ,yDaiSplit ] = splitDaiLiquidity( parsedDaiUsed, daiReserves, yDaiReserves );
-    const maxYDai = await previewPoolTx('sellDai', poolAddr, yDaiSplit);
+    const maxYDai = await previewPoolTx('sellDai', series, yDaiSplit);
     const maxYDaiWithSlippage = valueWithSlippage(maxYDai);
 
     console.log(maxYDaiWithSlippage.toString());
@@ -390,7 +390,7 @@ export const useProxy = () => {
     const toAddr = account && ethers.utils.getAddress(account);
 
     /* calculate expected trade values and factor in slippage */
-    const yDaiExpected = await previewPoolTx('selldai', poolAddr, daiIn);
+    const yDaiExpected = await previewPoolTx('selldai', series, daiIn);
     const minYDaiOut = valueWithSlippage(yDaiExpected, true);
 
     /* Contract interaction */
@@ -426,7 +426,7 @@ export const useProxy = () => {
     const toAddr = account && ethers.utils.getAddress(account);
 
     /* calculate expected trade values and factor in slippage */
-    const yDaiExpected = await previewPoolTx('buydai', poolAddr, daiOut);
+    const yDaiExpected = await previewPoolTx('buydai', series, daiOut);
     const maxYDaiIn = valueWithSlippage(yDaiExpected);
 
     /* Contract interaction */

@@ -121,21 +121,21 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
   useEffect(()=>{
     (
       position.ethPosted_ <= 0 ||
-      estRatio <= 1.5 ||
+      estRatio <= 2 ||
       !account ||
       !hasDelegatedProxy ||
       !inputValue || 
-      parseInt(inputValue, 10) === 0
+      parseFloat(inputValue) === 0
     )? setBorrowDisabled(true): setBorrowDisabled(false);
   }, [ inputValue, hasDelegatedProxy, estRatio ]);
 
   /* Handle collateralisation ratio exceptions and warnings */
   useEffect(()=>{
-    if (estRatio && estRatio <= 1.5) {
+    if (estRatio && estRatio <= 2) {
       // setBorrowDisabled(true);
       setWarningMsg(null);
       setErrorMsg('That amount exceeds the amount of Dai you can borrow based on your collateral'); 
-    } else if (estRatio > 1.5 && estRatio < 2.0 ) {
+    } else if (estRatio > 2 && estRatio < 2.5 ) {
       setErrorMsg(null);
       setWarningMsg('Borrowing that much will put you at risk of liquidation');
     } else {

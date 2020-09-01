@@ -77,7 +77,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
     if (
       !account ||
       !inputValue || 
-      parseInt(inputValue, 10)===0  
+      parseFloat(inputValue) === 0
     ) {
       setRemoveLiquidityDisabled(true);
     } else {

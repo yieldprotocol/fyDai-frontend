@@ -93,7 +93,7 @@ function Repay({ repayAmount }:IRepayProps) {
       !account ||
       !hasDelegated ||
       !inputValue ||
-      parseInt(inputValue, 10) === 0
+      parseFloat(inputValue) === 0
     )? setRepayDisabled(true): setRepayDisabled(false);
   }, [ inputValue, hasDelegated ]);
 

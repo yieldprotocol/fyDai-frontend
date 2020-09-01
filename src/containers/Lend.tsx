@@ -100,7 +100,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
       !account ||
       !hasDelegated ||
       !inputValue || 
-      parseInt(inputValue, 10) === 0
+      parseFloat(inputValue) === 0
     )? setLendDisabled(true): setLendDisabled(false);
   }, [ inputValue, hasDelegated ]);
 

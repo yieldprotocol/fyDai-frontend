@@ -72,7 +72,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
       !account ||
       !hasDelegated ||
       !inputValue || 
-      parseInt(inputValue, 10) === 0
+      parseFloat(inputValue) === 0
     ) ? setWithdrawDisabled(true): setWithdrawDisabled(false);
   }, [ inputValue, hasDelegated ]);
 

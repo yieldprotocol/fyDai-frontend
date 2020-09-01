@@ -68,7 +68,7 @@ const Redeem  = ({ close }:IRedeemProps)  => {
               <Clock />
             </Box>
             <Box> 
-              <Text size='xlarge' color='brand' weight='bold'>This series has matured.</Text>         
+              <Text size='small' color='brand'> This series has matured.</Text>         
             </Box>
           </Box>
           <Box

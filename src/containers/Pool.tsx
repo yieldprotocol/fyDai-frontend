@@ -87,7 +87,7 @@ const Pool = (props:IPoolProps) => {
       !account ||
       !hasDelegated ||
       !inputValue ||
-      parseInt(inputValue, 10) === 0
+      parseFloat(inputValue) === 0
     )? setAddLiquidityDisabled(true): setAddLiquidityDisabled(false);
   }, [ inputValue, hasDelegated ]);
 

@@ -89,6 +89,7 @@ export const useAuth = () => {
   /* Notification Helpers */
   const txComplete = (tx:any) => {
     dispatch({ type: 'txComplete', payload:{ tx } } );
+    setAuthActive(false);
   }; 
   const handleTxError = (msg:string, tx: any, e:any) => {
     // eslint-disable-next-line no-console
@@ -158,8 +159,9 @@ export const useAuth = () => {
     }
     dispatch({ type: 'txPending', payload: { tx, message: 'Authorization pending...', type:'AUTH' } });
     await tx.wait();
-    txComplete(tx);
     dispatch({ type: 'requestSigs', payload:[] });
+    txComplete(tx);
+
     // eslint-disable-next-line consistent-return
     return tx;
   };
@@ -237,8 +239,9 @@ export const useAuth = () => {
     }
     dispatch({ type: 'txPending', payload: { tx, message: 'Authorization pending...', type:'AUTH' } });
     await tx.wait();
-    txComplete(tx);
+
     dispatch({ type: 'requestSigs', payload:[] });
+    txComplete(tx);
     // eslint-disable-next-line consistent-return
     return tx;
   };
