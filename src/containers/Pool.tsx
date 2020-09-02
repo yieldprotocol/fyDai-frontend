@@ -1,284 +1,243 @@
 import React, { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 import Moment from 'moment';
-import { Box, Button, Select, Image, TextInput, Text, CheckBox, Collapsible, RangeInput } from 'grommet';
+import { Box, Button, Keyboard, TextInput, Text, ResponsiveContext } from 'grommet';
 
 import { 
-  FiCheckCircle,
-  FiInfo as Info,
-  FiHelpCircle as Help,
-  FiChevronDown as CaretDown,
-  FiAlertTriangle as Warning,
   FiArrowRight as ArrowRight,
 } from 'react-icons/fi';
-  
-import SeriesDescriptor from '../components/SeriesDescriptor';
+import DaiMark from '../components/logos/DaiMark';
 
-import WithdrawDai from './WithdrawDai';
 import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
-  
-import { usePool, useBalances, useMath, useToken } from '../hooks';
-import InlineAlert from '../components/InlineAlert';
 
-  
-const Pool = (props:any) => {
-  
-  const { state: yieldState, actions: yieldActions } = React.useContext(YieldContext);
-  const { deployedContracts } = yieldState;
+import { 
+  useSignerAccount,
+  useTxActive,
+  useProxy,
+  useToken
+} from '../hooks';
 
+import RemoveLiquidity from './RemoveLiquidity';
+
+import InfoGrid from '../components/InfoGrid';
+import InputWrap from '../components/InputWrap';
+import ApprovalPending from '../components/ApprovalPending';
+import TransactionPending from '../components/TransactionPending';
+
+interface IPoolProps {
+  // lendAmount?:any
+}
+  
+const Pool = (props:IPoolProps) => {
+  const { state: { deployedContracts } } = React.useContext(YieldContext);
   const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
-  const { isLoading, activeSeries } = seriesState;
-
+  const { activeSeries } = seriesState;
   const { state: userState, actions: userActions } = React.useContext(UserContext);
-  const {
-    daiBalance_,
-    ethBorrowingPower_: maximumDai
-  } = userState.position;
-  
-  // const { borrow, borrowActive }  = useController();
+  const { daiBalance_ } = userState.position;
+  const screenSize = React.useContext(ResponsiveContext);
 
-  const { sellDai, previewPoolTx }  = usePool();
-  const { approveToken, approveActive } = useToken();
-  const { getTokenAllowance } = useBalances();
-  const { yieldAPR } = useMath();
-  
+  const { addLiquidity, addLiquidityActive } = useProxy();
+  const { getBalance } = useToken();
+
+  const { account } = useSignerAccount();
+  const [ txActive ] = useTxActive(['SELL']);
+
+  const [ hasDelegated, setHasDelegated ] = useState<boolean>(true);
+
   const [ inputValue, setInputValue ] = React.useState<any>();
-  const [ lendDisabled, setLendDisabled ] = React.useState<boolean>(false);
 
-  const [ approved, setApproved ] = React.useState<any>(0);
+  const [ removeLiquidityOpen, setRemoveLiquidityOpen ] = useState<boolean>(false);
 
-  const [ sellOpen, setSellOpen ] = useState<boolean>(false);
-
-  const [ APR, setAPR ] = React.useState<number>();
-  const [ yDaiValue, setYDaiValue ] = React.useState<number>(0);
-  const [ currentValue, setCurrentValue ] = React.useState<number>(0);
-  
+  const [ addLiquidityDisabled, setAddLiquidityDisabled ] = React.useState<boolean>(true);
+  const [ addLiquidityPending, setAddLiquidityPending ] = useState<boolean>(false);
   const [ warningMsg, setWarningMsg] = React.useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
   
-  const lendProcedure = async (value:number) => {
-    await sellDai(
-      activeSeries.poolAddress,
-      inputValue,
-      0 // transaction queue value
-    );
-    setInputValue('');
-    await userActions.updatePosition();
-    await seriesActions.updateActiveSeries(); // or, await seriesActions.updateSeries([activeSeries]);
+  /* Add Liquidity sequence */ 
+  const addLiquidityProcedure = async (value:number) => { 
+    if (!addLiquidityDisabled ) {
+      setAddLiquidityPending(true);
+      await addLiquidity( activeSeries, value );
+      setInputValue('');
+      await Promise.all([
+        userActions.updatePosition(),
+        seriesActions.updateActiveSeries()
+      ]);
+      setAddLiquidityPending(false);
+    }   
   };
 
-  const approveProcedure = async (value:number) => {
-    await approveToken(deployedContracts.Dai, activeSeries.poolAddress, value);
-    setApproved(await getTokenAllowance(deployedContracts.Dai, activeSeries.poolAddress, 'Dai'));
-  };
-
+  /* handle value calculations based on input changes */
   useEffect(() => {
-    activeSeries && inputValue && ( async () => {
-      const preview = await previewPoolTx('sellDai', activeSeries.poolAddress, inputValue);
-      setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
-      setAPR( yieldAPR( ethers.utils.parseEther(inputValue.toString()), preview, activeSeries.maturity ) );
+    inputValue && ( async () => {
+      // const bnInp = ethers.utils.parseEther(inputValue)
+      // const daiReserves = await getBalance(deployedContracts.Dai, 'Dai', activeSeries.poolAddress);
+      // const yDaiReserves = await getBalance(activeSeries.yDaiAddress, 'YDai', activeSeries.poolAddress);
+      // const tokens = bnInp.mul(daiReserves).div(yDaiReserves.add(daiReserves));
     })();
   }, [inputValue]);
   
+  /* Add liquidity disabling logic */
+  useEffect(()=>{
+    (
+      !daiBalance_ ||
+      inputValue > daiBalance_ ||  
+      !account ||
+      !hasDelegated ||
+      !inputValue ||
+      parseFloat(inputValue) === 0
+    )? setAddLiquidityDisabled(true): setAddLiquidityDisabled(false);
+  }, [ inputValue, hasDelegated ]);
+
+  /* handle warnings input errors */
   useEffect(() => {
     if ( inputValue && ( inputValue > daiBalance_ ) ) {
-      setLendDisabled(true);
       setWarningMsg(null);
       setErrorMsg('That amount exceeds the amount of Dai you have'); 
     } else {
-      // setLendDisabled(false);
       setWarningMsg(null);
       setErrorMsg(null);
     }
   }, [ inputValue ]);
 
-  /* Lend button disabling logic */
-  useEffect(()=>{
-    if (approved < inputValue) {
-      setLendDisabled(true);
-    } else if (!(inputValue) || inputValue===0) {
-      setLendDisabled(true);
-    } else {
-      setLendDisabled(false);
-    }
-  }, [ approved, inputValue ]);
-
-  useEffect(() => {
-    activeSeries && ( async ()=> {
-      const preview = await previewPoolTx('SellYDai', activeSeries.poolAddress, activeSeries.yDaiBalance_);
-      setCurrentValue( parseFloat(ethers.utils.formatEther(preview)));
-    })();
-  }, [ activeSeries, ]);
-  
-  useEffect(() => {
-    ( async ()=>{
-      activeSeries && setApproved(await getTokenAllowance(deployedContracts.Dai, activeSeries.poolAddress, 'Dai'));
-      console.log(activeSeries);
-    })();
-  }, [ activeSeries ]);
-  
   return (
-    <>
-      { sellOpen && <WithdrawDai close={()=>setSellOpen(false)} /> }
-      <Box flex='grow' justify='between'>
-        <Box gap='medium' align='center' fill='horizontal'>
-          <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Selected series</Text>
+    <Keyboard 
+      onEsc={() => setInputValue(undefined)}
+      onEnter={()=> addLiquidityProcedure(inputValue)}
+      target='document'
+    >
+      <>
+        { removeLiquidityOpen && <RemoveLiquidity close={()=>setRemoveLiquidityOpen(false)} /> }
+        { txActive?.type !== 'SELL' &&
+        <Box flex='grow' gap='small' align='center' fill='horizontal'>
+          <InfoGrid entries={[
+            {
+              label: 'Your Pool Tokens',
+              visible: !!account,
+              active: true,
+              loading: addLiquidityPending,     
+              value: activeSeries?.poolTokens_.toFixed(2),
+              valuePrefix: null,
+              valueExtra: null, 
+            },
+            {
+              label: 'Your Pool share',
+              visible: !!account,
+              active: true,
+              loading: addLiquidityPending,           
+              value: activeSeries?.poolPercent_.toFixed(2),
+              valuePrefix: null,
+              valueExtra: null,
+            },
+            {
+              label: 'Current Dai Balance',
+              visible: !!account,
+              active: true,
+              loading: addLiquidityPending,            
+              value: daiBalance_?`${daiBalance_.toFixed(2)} DAI`: '0 DAI',
+              valuePrefix: null,
+              valueExtra: null,
+            },
+          ]}
+          />
 
-          <SeriesDescriptor activeView='lend' />
-
-          <Box fill gap='small' pad={{ horizontal:'medium' }}>
-            <Box fill direction='row-responsive' justify='start' gap='large'>
-              <Box gap='small'>
-                <Box direction='row' gap='small'>
-                  <Text color='text-weak' size='xsmall'>Holdings Value at Maturity</Text>
-                  <Help />
-                </Box>
-                <Text color='brand' weight='bold' size='medium'> {activeSeries && `${activeSeries?.yDaiBalance_.toFixed(2)} Dai` || '-'} </Text>
-              </Box>
-
-              <Box gap='small'>
-                <Box direction='row' gap='small'>
-                  <Text color='text-weak' size='xsmall'>Current Value</Text>
-                  <Help />
-                </Box>
-                <Text color='brand' weight='bold' size='medium'> {currentValue!==0?`${currentValue.toFixed(2)} Dai`: '-'} </Text>
-              </Box>
-            </Box>
-
-          </Box>
-  
-          <Box fill gap='medium' margin={{ vertical:'large' }}>
-            <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to lend</Text>
-            <Box
-              direction='row-responsive'
-              fill='horizontal'
-              gap='small'
-              align='center'
-            >
-              <Box 
-                round='small'
-                // background='brand-transparent'
-                border='all'
-                direction='row'
-                fill='horizontal'
-                pad='small'
-                flex
-              >
-                <TextInput
-                  type="number"
-                  placeholder='Enter the amount of Dai to lend'
-                  value={inputValue || ''}
-                  plain
-                  onChange={(event:any) => setInputValue(event.target.value)}
-              // icon={<Text alignSelf='start' size='xsmall'>Eth</Text>}
-                  // icon={<Ethereum />}
-                />
-              </Box>
-
-              <Box justify='center'>
-                <Box
-                  round
+          <Box fill gap='medium'>
+            <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Add liquidity</Text>
+            <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={addLiquidityDisabled}>
+              <TextInput
+                type="number"
+                placeholder={screenSize !== 'small' ? 'Enter the amount of Dai Liquidity to add': 'DAI'}
+                value={inputValue || ''}
+                plain
+                onChange={(event:any) => setInputValue(event.target.value)}
+                icon={<DaiMark />}
+              />
+              {account &&
+                <Button 
+                  label={<Text size='xsmall' color='brand'> {screenSize !== 'small' ? 'Add Maximum': 'Max'}</Text>}
+                  color='brand-transparent'
                   onClick={()=>setInputValue(daiBalance_)}
                   hoverIndicator='brand-transparent'
-                  border='all'
-                  // border={{ color:'brand' }}
-                  pad={{ horizontal:'small', vertical:'small' }}
-                  justify='center'
-                >
-                  <Text size='xsmall'>Use max</Text>
-                </Box>
-              </Box>
-            </Box>
+                />}
+            </InputWrap>
 
-            <Box fill gap='small' pad={{ horizontal:'medium' }}>
-
-              <Box fill direction='row-responsive' justify='between'>
-                <Box gap='small'>
-                  <Box direction='row' gap='small'>
-                    <Text color='text-weak' size='xsmall'>Estimated APR</Text>
-                    <Help />
-                  </Box>                
-                  <Text color={!inputValue? 'brand-transparent':'brand'} weight='bold' size='medium'> 
-                    {APR && APR.toFixed(2)}%                  
-                  </Text>
-                </Box>
-
-                <Box gap='small'>
-                  <Box direction='row' gap='small'>
-                    <Text color='text-weak' size='xsmall'>Approx. Dai received at maturity</Text>
-                    <Help />
-                  </Box>
-                  <Text color={!inputValue? 'brand-transparent':'brand'} weight='bold' size='medium'> 
-                    { yDaiValue.toFixed(2) } Dai on {activeSeries && Moment(activeSeries.maturity_).format('DD MMMM YYYY')}
-                  </Text>
-                </Box>
-
-                <Box gap='small'>
-                  <Box direction='row' gap='small'>
-                    <Text color='text-weak' size='xsmall'>Wallet Dai balance</Text>
-                    <Help />
-                  </Box>
-                  <Text color='brand' weight='bold' size='medium'> {daiBalance_?`${daiBalance_.toFixed(2)} Dai`: '-'} </Text>
-                </Box>         
-              </Box>
-              <Box fill direction='row-responsive' justify='between'>
-                {/* next block */}
-              </Box>
-            </Box>
-          </Box>
-  
-          <InlineAlert warnMsg={warningMsg} errorMsg={errorMsg} />
-
-          <Box>
-            <CheckBox 
-              reverse
-              // value={true}
-              checked={!inputValue || ( approved >= inputValue )}
-              disabled={!inputValue || ( approved >= inputValue )}
-              onChange={()=>approveProcedure(inputValue)}
-              label={(approved >= inputValue) ? 
-                `Lending unlocked for up to ${approved.toFixed(2) || '' } Dai` 
-                : `Unlock lending of ${inputValue || ''} Dai`}
+            <InfoGrid entries={[
+              {
+                label: 'Share of the Pool after adding liquidity',
+                visible: true,
+                active: inputValue,
+                loading: false,           
+                value: '0.04%',
+                valuePrefix: null,
+                valueExtra: null,
+              },
+              {
+                label: 'Like what you see?',
+                visible: !account && inputValue>0,
+                active: inputValue,
+                loading: false,            
+                value: '',
+                valuePrefix: null,
+                valueExtra: () => (
+                  <Button
+                    color='brand-transparent'
+                    label={<Text size='xsmall' color='brand'>Connect a wallet</Text>}
+                    onClick={()=>console.log('still to implement')}
+                    hoverIndicator='brand-transparent'
+                  /> 
+                )
+              },
+            ]}
             />
-          </Box>
+          </Box> 
   
-          <Box
-            fill='horizontal'
-            round='small'
-            background={( !(inputValue>0) || lendDisabled) ? 'brand-transparent' : 'brand'}
-            onClick={(!(inputValue>0) || lendDisabled)? ()=>{}:()=>lendProcedure(inputValue)}
-            align='center'
-            pad='small'
-          >
-            <Text 
-              weight='bold'
-              size='large'
-              color={( !(inputValue>0) || lendDisabled) ? 'text-xweak' : 'text'}
-            >
-              {`Lend ${inputValue || ''} Dai`}
-            </Text>
-          </Box>
-          <Box alignSelf='end'>
+          { account && !activeSeries?.isMature() && 
+          <Box gap='small' fill='horizontal' align='center'>
             <Box
-              round
-              onClick={()=>setSellOpen(true)}
-              hoverIndicator='brand-transparent'
-          // border='all'
-              pad={{ horizontal:'small', vertical:'small' }}
-              justify='center'
+              fill='horizontal'
+              round='small'
+              background={ addLiquidityDisabled ? 'brand-transparent' : 'brand'}
+              onClick={ ()=>addLiquidityProcedure(inputValue)}
+              align='center'
+              pad='small'
             >
-              <Box direction='row' gap='small'>
-                <Text size='xsmall' color='text-weak'> Alternatively, withdraw Dai from this series</Text>
-                <ArrowRight color='text-weak' />
-              </Box>
+              <Text 
+                weight='bold'
+                size='large'
+                color={ addLiquidityDisabled ? 'text-xweak' : 'text'}
+              >
+                {`Supply ${inputValue || ''} DAI`}
+              </Text>
             </Box>
-          </Box>
-        </Box>
-      </Box>
-    </>
+
+            { activeSeries?.poolTokens_>0 &&
+            <Box alignSelf='end'>
+              <Box
+                round
+                onClick={()=>setRemoveLiquidityOpen(true)}
+                hoverIndicator='brand-transparent'
+                // border='all'
+                pad={{ horizontal:'small', vertical:'small' }}
+                justify='center'
+              >
+                <Box direction='row' gap='small'>
+                  <Text size='xsmall' color='text-weak'> alternatively, Remove Liquidity from this series</Text>
+                  <ArrowRight color='text-weak' />
+                </Box>
+              </Box>
+            </Box> }
+          </Box>}
+        </Box>}
+
+        { addLiquidityActive && !txActive && <ApprovalPending /> } 
+        { txActive && <TransactionPending msg={`You added ${inputValue} DAI to the pool.`} tx={txActive} /> }
+      </>
+    </Keyboard>
   );
 };
+
+Pool.defaultProps={ lendAmount:null };
 
 export default Pool;

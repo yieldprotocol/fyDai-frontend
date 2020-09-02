@@ -49,7 +49,7 @@ const YieldHeader = (props: any) => {
       link: 'DASHBOARD',
       text: 'Dashboard',
       id: 0,
-      disabled: false,
+      disabled: true,
     },
     {
       link: 'BORROW',
@@ -64,10 +64,10 @@ const YieldHeader = (props: any) => {
       disabled: false,
     },
     {
-      link: 'AMM',
+      link: 'POOL',
       text: 'Pool',
       id: 3,
-      disabled: true,
+      disabled: false,
     },
   ]);
 

@@ -9,6 +9,7 @@ import Lend from '../containers/Lend';
 
 import PageHeader from '../components/PageHeader';
 import SeriesDescriptor from '../components/SeriesDescriptor';
+import Authorization from '../components/Authorization';
 
 
 interface LendProps {
@@ -43,10 +44,9 @@ const LendView = ({ activeView: activeViewFromProp  }:LendProps) => {
       >
         <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Selected series</Text>
         <SeriesDescriptor activeView='lend' />
-        { activeSeries?.isMature === false  && <Lend /> }
-        { activeSeries?.isMature === true && <Redeem /> }
-        
-        {/* <Redeem /> */}
+        { activeSeries?.isMature() === false  && <Lend /> }
+        { activeSeries?.isMature() === true && <Redeem /> }
+
       </Box>
     </>
   );

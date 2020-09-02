@@ -13,9 +13,10 @@ import DaiJoin from '../contracts/DaiJoin.json';
 import Chai from '../contracts/Chai.json';
 import Vat from '../contracts/Vat.json';
 import Pot from '../contracts/Pot.json';
-import EthProxy from '../contracts/EthProxy.json';
+import YieldProxy from '../contracts/YieldProxy.json';
 import Pool from '../contracts/Pool.json';
 
+// TODO abstract this out to a higher level
 const contractMap = new Map<string, any>([
   ['YDai', YDai.abi],
   ['Controller', Controller.abi],
@@ -26,7 +27,7 @@ const contractMap = new Map<string, any>([
   ['DaiJoin', DaiJoin.abi],
   ['Vat', Vat.abi],
   ['Pot', Pot.abi],
-  ['EthProxy', EthProxy.abi],
+  ['YieldProxy', YieldProxy.abi],
   ['Pool', Pool.abi],
 ]);
 
@@ -79,10 +80,6 @@ export const useEvents = () => {
     const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), provider);
     const filter = contract.filters[filterEvent](...filterArgs);
     const logs = await contract.queryFilter( filter, block, 'latest');
-    // Console.log the values for testing:
-    // logs.forEach((log:any) => {
-    //   console.log(log);
-    // });
     return logs;
   };
 

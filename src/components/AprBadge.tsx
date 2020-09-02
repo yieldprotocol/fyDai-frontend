@@ -2,8 +2,14 @@ import React, { useState, useContext } from 'react';
 import moment from 'moment';
 import { Box, Text, ThemeContext, ResponsiveContext, Button } from 'grommet';
 
+import {
+  FiClock as Clock,
+  FiAlertTriangle as Warning,
+} from 'react-icons/fi';
+
 import { SeriesContext } from '../contexts/SeriesContext';
 import { IYieldSeries } from '../types';
+import SeriesSelector from './SeriesSelector';
 
 interface IAprBadgeProps {
   activeView: string;
@@ -11,59 +17,61 @@ interface IAprBadgeProps {
 }
 
 function AprBadge({ activeView, series }:IAprBadgeProps) {
-
-  // const { state: seriesState } = useContext(SeriesContext);
-  // const { activeSeries } = seriesState;
-
   const [ seriesApr, setSeriesApr ] = useState<string>(`${series.yieldAPR_} %`);
+  const [ seriesMature, setSeriesMature ] = useState<boolean>(series.isMature());
 
   /* Set Series description/display name */
   React.useEffect(()=>{
+    setSeriesMature(series.isMature());
     setSeriesApr(moment(series.maturity*1000).format('MMM \'YY'));
-    Number.isFinite(parseFloat(series.yieldAPR_||'')) && 
-      ( async () => setSeriesApr( `${series.yieldAPR_} %`) )();
+    series.poolState?.active && ( async () => setSeriesApr( `${series.yieldAPR_} %`) )(); 
   }, [ series ]);
 
   return (
     <>
-      {Number.isFinite(parseFloat(series.yieldAPR_||'')) && 
-        ( series?.isMature === false ?         
-          <Box 
-            background={series.seriesColor}
-            round='xlarge'  
-            pad={{ horizontal:'small', vertical:'none' }} 
-            align='center'
-            justify='center'
-          >
-            <Text size='xxsmall'> { seriesApr } </Text>  
-          </Box> :
+      { seriesMature === true &&      
+      <Box 
+        round
+        border='all'
+        direction='row'
+        pad={{ horizontal:'small', vertical:'none' }}
+        align='center'
+        gap='small'
+      >
+        <Clock />
+        <Text size='xxsmall'>  
+          Mature       
+        </Text>
+      </Box>}
+
+      { seriesMature === false && 
+        series.poolState?.active === true && 
+        <Box 
+          background={series.seriesColor}
+          round='xlarge'  
+          pad={{ horizontal:'small', vertical:'none' }} 
+          align='center'
+          justify='center'
+        >
+          <Text size='xxsmall'> { seriesApr } </Text>  
+        </Box>}
+
+      { seriesMature === false &&
+        series.poolState?.active === false &&
           <Box 
             round
             border='all'
             direction='row'
             pad={{ horizontal:'small', vertical:'none' }}
             align='center'
+            background='orange'
+            gap='small'
           >
+            <Warning />
             <Text size='xxsmall'>
-              Matured        
+              {series.poolState.reason} 
             </Text>
-          </Box>)}
-
-      { series?.isMature === false && 
-        activeView === 'borrow' && 
-        !Number.isFinite(parseFloat(series.yieldAPR_||'')) &&                  
-        <Box 
-          round
-          border='all'
-          direction='row'
-          pad={{ horizontal:'small', vertical:'none' }}
-          align='center'
-          background='orange'
-        >
-          <Text size='xxsmall'>
-            Unavailable      
-          </Text>
-        </Box>}  
+          </Box>}
     </>
   );
 }

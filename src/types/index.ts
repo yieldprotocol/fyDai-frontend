@@ -5,14 +5,25 @@ export interface IYieldSeries {
   displayName: string;
   maturity: number;
   maturity_: Date;
-  isMature: boolean;
+  
   poolAddress: string;
   yDaiAddress: string;
+  liquidityProxyAddress: string;
+  hasDelegatedPool: boolean;
 
+  isMature: any; // function typeScript this out
+  
   yDaiBalance_: number;
   yDaiBalance: BigNumber;
 
-  symbol?:string;
+  totalSupply?: BigNumber;
+  totalSupply_?: number;
+  poolTokens?:  BigNumber;
+  poolTokens_?: number;
+
+  poolState?: any; // TODO type this
+
+  symbol?: string;
   id?: string;
   currentValue?: any;
   seriesColor?: string;
@@ -20,6 +31,7 @@ export interface IYieldSeries {
   wethDebtDai_?: number;
   wethDebtYDai?: BigNumber;
   wethDebtYDai_?: number;
+
   yieldAPR?: number;
   yieldAPR_?: string;
 }
@@ -73,8 +85,40 @@ export interface INotification {
   fatalOpen?: boolean,
   fatalMsg?: string,
   pendingTxs?: any,
+  requestedSigs?: any,
 }
 
 export interface IYieldAccount {}
 
 export interface IMakerVault {}
+
+
+export interface IDelegableMessage {
+  user: string;
+  delegate: string;
+  nonce: number | string;
+  deadline: number | string;
+}
+
+export interface DaiPermitMessage {
+  holder: string;
+  spender: string;
+  nonce: number;
+  expiry: number | string;
+  allowed?: boolean;
+}
+
+export interface ERC2612PermitMessage {
+  owner: string;
+  spender: string;
+  value: number | string;
+  nonce: number | string;
+  deadline: number | string;
+}
+
+export interface IDomain {
+  name: string;
+  version: string;
+  chainId: number;
+  verifyingContract: string;
+}

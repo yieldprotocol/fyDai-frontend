@@ -13,7 +13,7 @@ import * as utils from '../../utils';
 import ProfileButton from '../../components/ProfileButton';
 import { NotifyContext } from '../../contexts/NotifyContext';
 
-import { useSendTx, useCallTx, useController, useProxy, useTimeTravel } from '../../hooks';
+import { useSendTx, useCallTx, useController, useProxy, useAuth, useTimeTravel } from '../../hooks';
 
 import { YieldContext } from '../../contexts/YieldContext';
 import { SeriesContext } from '../../contexts/SeriesContext';
@@ -51,6 +51,9 @@ const TestLayer = (props:any) => {
   const [ callTx ]  = useCallTx();
 
   const { advanceTimeAndBlock, takeSnapshot, revertToSnapshot, revertToT0, block, timestamp } = useTimeTravel(); 
+
+
+  const { yieldAuth, poolAuth } = useAuth();
   
   const { 
     post,
@@ -174,12 +177,12 @@ const TestLayer = (props:any) => {
               <Box gap='small'>
                 Test Approvals (not all reqd.):
 
-                <Button primary label='controller addDelegate:EthProxy' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />             
-                <Button primary label='controller addDelegate:DaiProxy[0]' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedSeries[0].daiProxyAddress], utils.toWei('0'))} />
+                <Button primary label='controller addDelegate:EthProxy' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedContracts.YieldProxy], utils.toWei('0'))} />             
+                <Button primary label='controller addDelegate:DaiProxy[0]' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedSeries[0].yieldProxyAddress], utils.toWei('0'))} />
 
                 <Button primary label='pool[0] addDelegate: yDai[0]' onClick={()=> sendTx(deployedSeries[0].poolAddress, 'Pool', 'addDelegate', [deployedSeries[0].yDaiAddress], utils.toWei('0'))} />
-                <Button primary label='pool[0] addDelegate: ethProxy[0]' onClick={()=> sendTx(deployedSeries[0].poolAddress, 'Pool', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />
-                <Button primary label='Pool[0] addDelegate: daiProxy[0]' onClick={()=> sendTx(deployedSeries[0].poolAddress, 'Pool', 'addDelegate', [deployedSeries[0].daiProxyAddress], utils.toWei('0'))} />
+                <Button primary label='pool[0] addDelegate: yieldProxy[0]' onClick={()=> sendTx(deployedSeries[0].poolAddress, 'Pool', 'addDelegate', [deployedContracts.YieldProxy], utils.toWei('0'))} />
+                <Button primary label='Pool[0] addDelegate: yieldProxy[0]' onClick={()=> sendTx(deployedSeries[0].poolAddress, 'Pool', 'addDelegate', [deployedSeries[0].yieldProxyAddress], utils.toWei('0'))} />
 
               </Box>
             }
@@ -188,8 +191,8 @@ const TestLayer = (props:any) => {
             flow === 'MARKET' &&
               <Box gap='small'>
                 Pool:
-                <Button primary label='Check buy Rate' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />
-                <Button primary label='Pool (for each market)' onClick={()=> sendTx(deployedContracts.Pool, 'Controller', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />
+                <Button primary label='Check buy Rate' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedContracts.YieldProxy], utils.toWei('0'))} />
+                <Button primary label='Pool (for each market)' onClick={()=> sendTx(deployedContracts.Pool, 'Controller', 'addDelegate', [deployedContracts.YieldProxy], utils.toWei('0'))} />
               </Box>
             }
 
@@ -197,9 +200,9 @@ const TestLayer = (props:any) => {
             <Box gap='small'>
 
               New ETH direct deposit/withdraw: 
-              <Button label='Post ETH Collateral via proxy 1.5' disabled={postActive} onClick={()=> postEth(deployedContracts.EthProxy, 1.5)} />
-              <Button primary label='controller addDelegate:EthProxy' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedContracts.EthProxy], utils.toWei('0'))} />             
-              <Button label='Withdraw ETH via proxy 1.5)' onClick={()=> withdrawEth(deployedContracts.EthProxy, 1.5 )} />
+              <Button label='Post ETH Collateral via proxy 1.5' disabled={postActive} onClick={()=> postEth(1.5)} />
+              <Button primary label='controller addDelegate:EthProxy' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedContracts.YieldProxy], utils.toWei('0'))} />             
+              <Button label='Withdraw ETH via proxy 1.5)' onClick={()=> withdrawEth(1.5 )} />
               <Button label='6.1 Repay 0.5 eth/weth debt in yDai' onClick={()=> repay(deployedContracts.Controller, 'ETH-A', yieldState.deployedSeries[0].maturity, 0.5, 'YDAI' )} />
               <Button label='( 6.2 Repay 0.5 eth/weth debt in Dai) ' onClick={()=> repay(deployedContracts.Controller, 'ETH-A', yieldState.deployedSeries[0].maturity, 0.5, 'DAI' )} />
             
@@ -300,7 +303,6 @@ const TestLayer = (props:any) => {
 
         <Box direction='row' justify='between' border='all' pad='small' gap='small'>
           SnapShot and revert : 
-
           <Button 
             label='take snapshot' 
             primary
@@ -326,6 +328,28 @@ const TestLayer = (props:any) => {
 
 
         NB: dont forget to reset metamask after any timetravelling!!
+
+
+        <Box direction='row' justify='between' border='all' pad='small' gap='small'>
+          Permit sign testing : 
+          <Button 
+            label='yieldAuth' 
+            primary
+            onClick={async ()=> {
+              await yieldAuth();
+            }}
+          />
+
+          <Button 
+            label='poolAuth' 
+            primary
+            onClick={async ()=> {
+              await poolAuth(deployedSeries[0].yDaiAddress, deployedSeries[0].poolAddress);
+            }}
+          />
+
+
+        </Box>
 
         <Footer pad='medium' gap='xsmall' direction='row' justify='between' align='center'>
           <Box round>

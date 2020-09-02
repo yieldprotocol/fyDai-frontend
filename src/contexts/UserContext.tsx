@@ -2,22 +2,19 @@ import React from 'react';
 import { ethers, BigNumber } from 'ethers';
 import moment from 'moment';
 
+import { useWeb3React } from '@web3-react/core';
+
 import * as utils from '../utils';
 
 import { NotifyContext } from './NotifyContext';
 import { YieldContext } from './YieldContext';
 
-import {
-  useCallTx,
-  useCachedState,
-  useBalances,
-  useEvents,
-  useSignerAccount,
-  useWeb3React,
-  useMath,
-  useController,
-  useMigrations,
-} from '../hooks';
+import { useBalances, useCallTx } from '../hooks/chainHooks';
+import { useMath } from '../hooks/mathHooks'; 
+import { useCachedState, } from '../hooks/appHooks';
+import { useController } from '../hooks/controllerHook';
+import { useEvents } from '../hooks/eventHooks';
+import { useSignerAccount } from '../hooks/connectionHooks';
 
 const UserContext = React.createContext<any>({});
 
@@ -35,10 +32,10 @@ function reducer(state: any, action: any) {
         ...state,
         position: action.payload,
       };
-    case 'updateDelegations':
+    case 'updateAuthorizations':
       return {
         ...state,
-        delegations: action.payload,
+        authorizations: action.payload,
       };
     case 'updateTxHistory':
       return {
@@ -67,8 +64,10 @@ const initState = {
     lastBlock: 0, 
     items:[],
   },
-  delegations:{},
-  preferences:{},
+  authorizations:{},
+  preferences:{
+    slippage: 0.005 // default === 0.5%
+  },
   makerData:{},
 };
 
@@ -96,6 +95,7 @@ const UserProvider = ({ children }: any) => {
     collateralLocked,
     totalDebtDai,
     borrowingPower,
+    checkControllerDelegate,
   } = useController();
 
   const {
@@ -182,7 +182,6 @@ const UserProvider = ({ children }: any) => {
       // minSafeCollateral_ : utils.wadToHuman(minSafeCollateral),
       maxDaiAvailable_ : utils.wadToHuman(maxDaiAvailable),
     };
-
     console.log('User updated:');
     console.log({ ...values, ...parsedValues } );
     dispatch( { type: 'updatePosition', payload: { ...values, ...parsedValues } } );
@@ -192,13 +191,14 @@ const UserProvider = ({ children }: any) => {
   /**
    * @dev gets confirmation of contracts that the user has delegated to operate on thier behalf.
    */
-  const _getDelegations = async () => {
-    const _delegations:any={};
-    _delegations.ethProxy = await callTx( deployedContracts.Controller, 'Controller', 'delegated', [account, deployedContracts.EthProxy]);
-    dispatch( { type: 'updateDelegations', payload: _delegations });
-    return _delegations;
+  const _getAuthorizations = async () => {
+    const _auths:any={};
+    _auths.hasDelegatedProxy = await checkControllerDelegate(deployedContracts.Controller, deployedContracts.YieldProxy);
+    // _auths.hasPermittedDai = await checkControllerDelegate(deployedContracts.Controller, deployedContracts.YieldProxy);
+    dispatch( { type: 'updateAuthorizations', payload: _auths });
+    console.log(_auths);
+    return _auths;
   };
-
 
   /**
    * @dev gets user balances from required tokens,and ETH native.
@@ -299,6 +299,7 @@ const UserProvider = ({ children }: any) => {
     ];
 
     const _payload = {
+      account,
       lastBlock: _lastBlock,
       items: txHistory ? [...txHistory.items, ...updatedHistory] : [...updatedHistory]
     };
@@ -309,7 +310,7 @@ const UserProvider = ({ children }: any) => {
   };
 
   /**
-   * @dev gets user Maker data if available.
+   * @dev Gets user Maker data if available.
    */
   const _getMakerData = async () => {
     const urn = await callTx(deployedContracts.Vat, 'Vat', 'urns', [ utils.ETH, account ]);
@@ -317,68 +318,14 @@ const UserProvider = ({ children }: any) => {
     return {};
   };
 
-
   /**
-   * @dev gets preferences.
+   * @dev Gets preferences from cache.
    */
   const _getPreferences = async () => {
     console.log('dont forget to add in the preferences' );
-
-    dispatch( { type: 'updatePreferences', payload: {} });
+    // dispatch( { type: 'updatePreferences', payload: { slippage:0.005 } });
     return {};
   };
-
-
-  // /**
-  //  * @dev gets user balances from required tokens,and ETH native.
-  //  */
-  // const _getUserData = async (
-  //   _deployedContracts: any,
-  //   _deployedSeries: any,
-  //   forceUpdate: boolean
-  // ): Promise<any> => {
-  //   const _userData: any = {};
-
-  //   /* parse and return user data */
-  //   return {
-  //     ..._userData,
-  //     ethBalance_: parseFloat(
-  //       ethers.utils.formatEther(_userData.ethBalance.toString())
-  //     ),
-  //     daiBalance_: parseFloat(
-  //       ethers.utils.formatEther(_userData.daiBalance.toString())
-  //     ),
-  //     ethPosted_: parseFloat(
-  //       ethers.utils.formatEther(_userData.ethPosted.toString())
-  //     ),
-  //     txHistory: {
-  //       ...txHistory,
-  //       items: txHistory?.items,
-  //     },
-  //     urn: {
-  //       ..._userData.urn,
-  //       // art_: utils.rayToHuman(_userData.urn.art),
-  //       // ink_: utils.rayToHuman(_userData.urn.ink),
-  //     },
-  //     preferences,
-  //   };
-  // };
-
-  // const _addListeners = async (_deployedContracts: any) => {
-  //   // Add Maker rate/spot changes
-  //   provider &&
-  //     addEventListener(
-  //       _deployedContracts.Vat,
-  //       'Vat',
-  //       'LogNote',
-  //       [],
-  //       (x: any) => {
-  //         console.log('MAKER listener', x);
-  //         // dispatch({ type:'updateFeedData', payload: {...feedData, feedData.ilks })
-  //       }
-  //     );
-  //   // TODO: add event listener for AMM
-  // };
 
   const initUserContext = async () => {
     /* Init start */
@@ -386,7 +333,7 @@ const UserProvider = ({ children }: any) => {
     // TODO: look at splitting these up cleverly, in particular makerData.
     await Promise.all([
       _getPosition(),
-      _getDelegations(),
+      _getAuthorizations(),
       _getTxHistory(),
       _getPreferences(),
       _getMakerData(),
@@ -396,13 +343,19 @@ const UserProvider = ({ children }: any) => {
     dispatch({ type: 'isLoading', payload: false });
   };
 
-  // React.useEffect(()=>{  
-  // },[])
+  React.useEffect(()=>{
+    // init everytime or change
+    account && !yieldState.isLoading && initUserContext();
 
-  /* Init user context and re-init on any user and/or network change */
-  React.useEffect(() => {
-    account && !yieldState.isLoading && (async () => initUserContext())();
-  }, [ chainId, account, yieldState.isLoading ]);
+    // if user has changed recache the history
+    const hist = JSON.parse( (localStorage.getItem('txHistory') || '{}') );
+    if ( !yieldState.isLoading && account && (hist?.account !== account) ) {
+      localStorage.removeItem('txHistory');
+      _getTxHistory(true);
+      console.log('history updating cos of user change');
+    }
+
+  }, [ account, yieldState.isLoading ]);
 
   const actions = {
     updateHistory: () => _getTxHistory(),

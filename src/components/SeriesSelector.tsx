@@ -1,18 +1,11 @@
 import React from 'react';
-import { Anchor, Text, Box, Layer, Header, ResponsiveContext, Button } from 'grommet';
+import { Text, Box, Layer, ResponsiveContext, Button } from 'grommet';
 import { 
-  FiInfo as Info,
   FiArrowLeft as ArrowLeft,
   FiCheck as Check,
 } from 'react-icons/fi';
 
-import { IYieldSeries } from '../types';
-import { YieldContext } from '../contexts/YieldContext';
-
 import { SeriesContext } from '../contexts/SeriesContext';
-
-import YieldSeriesSummary from './YieldSeriesSummary';
-// import YieldSeries from '../../components/YieldSeries';
 
 import AprBadge from './AprBadge';
 import Loading from './Loading';
@@ -24,21 +17,16 @@ interface ISeriesSelectorProps {
 
 const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
 
-  const [showMore, setShowMore] = React.useState<boolean>(false);
-  const [openIndex, setOpenIndex] = React.useState<number | null >(null);
-  // const [seriesList, setSeriesList] = React.useState<IYieldSeries[]>([]);
   const screenSize = React.useContext(ResponsiveContext);
-  
-  // const refsArray = React.useRef([]);
-  // const elementsRef = React.useRef(seriesList.map(() => createRef()));
-  // TODO: convert to reducer if get more
-
-  // const { state } = React.useContext( YieldContext );
-
   const { state: seriesState, actions: seriesActions } = React.useContext( SeriesContext );
-
   const { isLoading, activeSeries, seriesData } = seriesState; 
   const { setActiveSeries } = seriesActions;
+
+  const viewMap = new Map([
+    ['BORROW', { head: 'DEBT', field: 'ethDebtYDai_' }],
+    ['LEND', { head: 'BALANCE', field: 'yDaiBalance_' }],
+    ['POOL', { head: 'POOL PERCENTAGE', field: 'poolPercent_' }],
+  ]);
 
   const handleSelectSeries = (seriesMaturity: number) => {
     setActiveSeries(seriesMaturity);
@@ -60,7 +48,6 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
         gap='medium'
         width={screenSize !== 'small'? { max:'750px', min:'640px' }: {}}
       >
-
         <Box gap='medium'>
           <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Choose a series</Text>
           <Text alignSelf='start' size='medium' color='text-weak'>Select a series from the list below</Text>
@@ -88,10 +75,9 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
 
               <Box fill align={screenSize==='small'?'end':undefined}>
                 <Text size='small' color='text-weak'>
-                  { activeView.toUpperCase() === 'BORROW'? 'DAI DEBT' : 'BALANCE' }               
+                  { viewMap.get(activeView.toUpperCase())?.head }         
                 </Text>
               </Box>
-
             </Box>
 
             { screenSize !== 'small' && 
@@ -103,6 +89,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
           <Loading condition={isLoading} size='large'>
             { [...seriesData.values() ].map((x:any, i:any) => {       
               const _key = i;
+              const field = viewMap.get(activeView.toUpperCase())?.field || '';
               return ( 
                 <Box
                   key={_key}
@@ -110,6 +97,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
                   justify='between'
                   onClick={()=>handleSelectSeries(x.maturity)}
                   hoverIndicator='background-mid'
+                  background={activeSeries.maturity === x.maturity ?'background-mid':undefined}
                   border='top'
                   fill='horizontal'
                   pad='medium'
@@ -127,11 +115,9 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
                         {x.displayName}
                       </Text>
                     </Box>
-                    <Box fill align={screenSize==='small'?'end':undefined} >
+                    <Box fill align={screenSize==='small'?'end':undefined}>
                       <Text size={screenSize} color='brand'>
-                        {activeView.toUpperCase() === 'BORROW'? 
-                          x.ethDebtYDai_.toFixed(2) :
-                          x.yDaiBalance_.toFixed(2)}
+                        {x[field].toFixed(2)}
                       </Text>
                     </Box>                 
                   </Box>

@@ -7,18 +7,35 @@ import {
 } from '@web3-react/injected-connector';
 
 import { useWeb3React, UnsupportedChainIdError } from '@web3-react/core';
-import { injected, trezor, walletlink, torus, network, ledger } from '../connectors';
+import { NetworkConnector } from '@web3-react/network-connector';
+
+import { injected, trezor, walletlink, torus } from '../connectors';
 
 import injectedImage from '../assets/images/providers/metamask.png';
 import trezorImage from '../assets/images/providers/trezor.png';
 import walletlinkImage from '../assets/images/providers/walletlink.png';
 import torusImage from '../assets/images/providers/torus.png';
 import noConnectionImage from '../assets/images/providers/noconnection.png';
+
 import { NotifyContext } from '../contexts/NotifyContext';
 
-export function useEagerConnect() {
-  const { activate, active } = useWeb3React();
-  const [tried, setTried] = React.useState(false);
+import { useCachedState } from './appHooks';
+
+const defaultChainId = 4;
+const urls = { 
+  1: process.env.REACT_APP_RPC_URL_1 as string, 
+  4: process.env.REACT_APP_RPC_URL_4 as string,
+  1337: process.env.REACT_APP_RPC_URL_31337 as string,
+  31337: process.env.REACT_APP_RPC_URL_31337 as string, 
+};
+
+const useEagerConnect = () => {
+  const { activate, active, chainId } = useWeb3React();
+  const { activate: activateFallback } = useWeb3React('fallback');
+  const [ cachedChainId, setCachedChainId ] = useCachedState('cache_chainId', null);
+
+  const [ tried, setTried ] = React.useState(false);
+  const { handleErrorMessage } = useWeb3Errors();
 
   React.useEffect(() => {
     injected.isAuthorized().then((isAuthorized: boolean) => {
@@ -30,20 +47,25 @@ export function useEagerConnect() {
         setTried(true);
       }
     });
-  }, []); // intentionally only running on mount (make sure it's only mounted once :))
-  // if the connection worked, wait until we get confirmation of that to flip the flag
+  }, []); 
+
   React.useEffect(() => {
     if (!tried && active) {
       setTried(true);
+      ( cachedChainId !== chainId ) && localStorage.clear();
+      console.log('Web3 connected (eagerly ). Now, connecting fallback provider with same chainId');
+      activateFallback( new NetworkConnector({ urls, defaultChainId: chainId }), (e) => handleErrorMessage(e));
+      setCachedChainId(chainId);
     }
   }, [tried, active]);
   return tried;
-}
+};
 
-export function useInactiveListener(suppress: boolean = false) {
-  const { active, error, activate } = useWeb3React();
+const useInactiveListener = (suppress: boolean = false) => {
+  const { active, error, activate, account: _account, chainId: _chainId } = useWeb3React();
+  const { handleErrorMessage } = useWeb3Errors();
 
-  const { chainId: fallbackChainId } = useWeb3React('fallback');
+  const [ cachedChainId, setCachedChainId ] = useCachedState('cache_chainId', null);
 
   // eslint-disable-next-line consistent-return
   React.useEffect((): any => {
@@ -51,22 +73,51 @@ export function useInactiveListener(suppress: boolean = false) {
     if (ethereum && ethereum.on && !active && !error && !suppress) {
       const handleConnect = () => {
         console.log("Handling 'connect' event");
-        activate(injected);
+        // activate(injected);
+        if ((cachedChainId !== _chainId) && active) {
+          console.log('chainId changed');
+          // localStorage.clear();
+          // // eslint-disable-next-line no-restricted-globals
+          // location.reload();
+        }
       };
-      const handleChainChanged = (chainId: string | number) => {
-        console.log("Handling 'chainChanged' event with payload", chainId);
-        activate(injected);
-      };
+
       const handleAccountsChanged = (accounts: string[]) => {
         console.log("Handling 'accountsChanged' event with payload", accounts);
         if (accounts.length > 0) {
-          activate(injected);
+          // activate(injected);
+          // if ( cachedAddress !== accounts[0] ){
+          //   console.log('ACCOUNT cahnge actions')
+          //   localStorage.clear();
+          //   // eslint-disable-next-line no-restricted-globals
+          //   location.reload();
+          // }
         }
       };
+
       const handleNetworkChanged = (networkId: string | number) => {
-        console.log("Handling 'networkChanged' event with payload", networkId);
-        activate(injected);
+        console.log("Handling 'network!Changed' event with payload", networkId);
+        // activate(injected);
+        if ((cachedChainId !== networkId) && active){
+          console.log('NETWORK cahnge actions');
+          // localStorage.clear();
+          // // eslint-disable-next-line no-restricted-globals
+          // location.reload();
+        }
       };
+
+      const handleChainChanged = (chainId: string | number) => {
+        // (cachedChainId !== chainId) && localStorage.clear();
+        console.log("Handling 'chain!Changed' event with payload", chainId);
+        // activate(injected);
+        if ((cachedChainId !== chainId) && active){
+          console.log('CHAIN cahnge actions');
+          // localStorage.clear();
+          // // eslint-disable-next-line no-restricted-globals
+          // location.reload();
+        }
+      };
+
       ethereum.on('connect', handleConnect);
       ethereum.on('chainChanged', handleChainChanged);
       ethereum.on('accountsChanged', handleAccountsChanged);
@@ -82,6 +133,120 @@ export function useInactiveListener(suppress: boolean = false) {
       };
     }
   }, [active, error, suppress, activate]);
+};
+
+const useFallbackConnect = (triedEager: boolean = false) => {
+  const { active } = useWeb3React();
+  const [ cachedChainId, setCachedChainId ] = useCachedState('cache_chainId', null);
+  const { activate: activateFallback, active: fallbackActive } = useWeb3React('fallback');
+  const { handleErrorMessage } = useWeb3Errors();
+
+  React.useEffect(()=>{
+    if ( triedEager && !active && !fallbackActive ) {        
+      ( cachedChainId !== defaultChainId ) && localStorage.clear();
+      activateFallback( new NetworkConnector({ urls, defaultChainId }), (e) => handleErrorMessage(e));
+      setCachedChainId(defaultChainId);
+    }
+  }, [active, fallbackActive, triedEager ]);
+};
+
+/* useConnection ig the GAteway into the web3 connections */
+export function useConnection() {
+  const { dispatch: notifyDispatch } = React.useContext(NotifyContext);
+  const [ cachedChainId, setCachedChainId ] = useCachedState('cache_chainId', null);
+  const { 
+    connector,
+    activate,
+    chainId,
+  } = useWeb3React();
+  const { handleErrorMessage } = useWeb3Errors();
+
+  /* Try web3 initiate automatically irrespective of state */
+  const [activatingConnector, setActivatingConnector] = React.useState<any>();
+  React.useEffect(() => {
+    if (activatingConnector && activatingConnector === connector) {
+      setActivatingConnector(undefined);
+    }
+  }, [activatingConnector, connector]);
+
+  /* 'Eager' connect checks to see if there is an active web3 browser connection */
+  const triedEager = useEagerConnect();
+  /* Start the fallback provider ( using triedEager as a flag ). NB! This can ONLY connect to the default network before connecting metamask */
+  useFallbackConnect(triedEager || activatingConnector);
+  /* Fire the inactive event listner gets started if eager connect has been tried unsuccessfully - this waits for a web3 browser connection changes */
+  useInactiveListener(!triedEager || !!activatingConnector);
+
+  /* Watch the chain id. If it changes, and if it is different from the previously loaded chainId (stored in the cache), 
+  clear EVERYTHING from cache and reset the app - it will be different info */
+  React.useEffect(()=>{
+    if (chainId && cachedChainId && (cachedChainId !== chainId) ) { 
+      localStorage.clear();
+      // eslint-disable-next-line no-restricted-globals
+      location.reload();
+    };
+  }, [ chainId ]);
+
+  /* handle changing connector */
+  const handleSelectConnector = async (_connection: any) => {
+    await activate(    
+      _connection, 
+      (x) => handleErrorMessage(x)
+    );
+  };
+
+  return { handleSelectConnector };
+}
+
+const useWeb3Errors = ()=> {
+  const { dispatch: notifyDispatch } = React.useContext(NotifyContext);
+  const NO_BROWSER_EXT = 'No Ethereum browser extension detected, install MetaMask on desktop or visit from a dApp browser on mobile.';
+  const UNSUPPORTED_NETWORK = 'Your Wallet or Browser is connected to an unsupported network.';
+  const UNAUTHORISED_SITE = 'Please authorize this website to access your Ethereum account.';
+  const UNKNOWN_ERROR = 'An unknown error occurred. Check the console for more details.';
+
+  const handleErrorMessage = (error: Error) => {
+    if (error instanceof NoEthereumProviderError) {
+      console.log(NO_BROWSER_EXT);
+      notifyDispatch( { type:'notify', payload:{ message: NO_BROWSER_EXT, type: 'info' } });
+      return NO_BROWSER_EXT;
+    }
+    if (error instanceof UnsupportedChainIdError) {
+      console.log(UNSUPPORTED_NETWORK);
+      notifyDispatch( { type:'notify', payload:{ message: UNSUPPORTED_NETWORK, type: 'error' } });
+      return UNSUPPORTED_NETWORK;
+    }
+    if (
+      error instanceof UserRejectedRequestErrorInjected // || error instanceof UserRejectedRequestErrorWalletConnect || error instanceof UserRejectedRequestErrorFrame
+    ) {
+      notifyDispatch( { type:'notify', payload:{ message: UNAUTHORISED_SITE, type: 'info' } });
+      return UNAUTHORISED_SITE;
+    }
+    console.error(error);
+    notifyDispatch( { type:'notify', payload:{ message: UNKNOWN_ERROR, type: 'info' } });
+    return  UNKNOWN_ERROR;
+  };
+  return { handleErrorMessage };
+};
+
+export function useSignerAccount() {
+  const { library: provider, account } = useWeb3React();
+  const { library: altProvider } = useWeb3React('fallback');
+  const [ signer, setSigner ] = React.useState<any>();
+  const [ voidSigner, setVoidSigner ] = React.useState<any>();
+  const [ fallbackProvider, setFallbackProvider ] = React.useState<any>();
+  React.useEffect(()=>{
+    provider && (async () => {
+      setSigner( await provider.getSigner() );
+      account && setVoidSigner( new ethers.VoidSigner( account ));
+    })();
+  }, [account, provider]);
+
+  React.useEffect(()=>{
+    altProvider && (async () => {
+      setFallbackProvider( altProvider );
+    })();
+  }, [account, altProvider]);
+  return { signer, provider, account, voidSigner, fallbackProvider };
 }
 
 // TODO: get rid of this
@@ -107,110 +272,4 @@ export function useConnectorImage() {
     }
   }, [connector]);
   return image;
-}
-
-
-export function useConnection() {
-
-  const { dispatch: notifyDispatch } = React.useContext(NotifyContext);
-  
-  const { 
-    chainId,
-    connector,
-    activate 
-  } = useWeb3React();
-  
-  const { 
-    chainId: fallbackChainId, 
-    connector: fallbackConnector,
-    activate: fallbackActivate,
-  } = useWeb3React('fallback');
-
-  /* try web3 initiate automatically irrespective of state */
-  const [activatingConnector, setActivatingConnector] = React.useState<any>();
-  React.useEffect(() => {
-    if (activatingConnector && activatingConnector === connector) {
-      setActivatingConnector(undefined);
-    }
-  }, [activatingConnector, connector]);
-  const triedEager = useEagerConnect();
-  useInactiveListener(!triedEager || !!activatingConnector);
-  
-  /* Always connect ot Fallback provider */
-  React.useEffect(() => {
-    (async () => { 
-      await fallbackActivate(network, (x) => handleErrorMessage(x));
-      fallbackConnector && console.log('fallback connected via RPC to chain:', fallbackChainId);
-    })();
-  }, [fallbackConnector]);
-
-  /* Watch the injected chain and match the fallbackProvider accordingly */
-  React.useEffect(() => {
-    if ( chainId && chainId !== fallbackChainId ) {
-      localStorage.clear();
-      console.log('Network Changed to ', chainId, ' changing fallback provider, accordlingly.');
-      // @ts-ignore
-      fallbackConnector.changeChainId(chainId);
-    }
-  }, [ chainId ]);
-
-  /* handle changing connector */
-  const handleSelectConnector = async (_connection: any) => {
-    await activate(    
-      _connection, 
-      (x) => handleErrorMessage(x)
-    );
-  };
-
-  const handleErrorMessage = (error: Error) => {
-    const NO_BROWSER_EXT = 'No Ethereum browser extension detected, install MetaMask on desktop or visit from a dApp browser on mobile.';
-    const UNSUPPORTED_NETWORK = 'Your Wallet or Browser is connected to an unsupported network.';
-    const UNAUTHORISED_SITE = 'Please authorize this website to access your Ethereum account.';
-    const UNKNOWN_ERROR = 'An unknown error occurred. Check the console for more details.';
-
-    if (error instanceof NoEthereumProviderError) {
-      console.log(NO_BROWSER_EXT);
-      notifyDispatch( { type:'notify', payload:{ message: NO_BROWSER_EXT, type: 'info' } });
-      return NO_BROWSER_EXT;
-    }
-    if (error instanceof UnsupportedChainIdError) {
-      console.log(UNSUPPORTED_NETWORK);
-      notifyDispatch( { type:'notify', payload:{ message: UNSUPPORTED_NETWORK, type: 'error' } });
-      return UNSUPPORTED_NETWORK;
-    }
-    if (
-      error instanceof UserRejectedRequestErrorInjected // || error instanceof UserRejectedRequestErrorWalletConnect || error instanceof UserRejectedRequestErrorFrame
-    ) {
-      notifyDispatch( { type:'notify', payload:{ message: UNAUTHORISED_SITE, type: 'info' } });
-      return UNAUTHORISED_SITE;
-    }
-    console.error(error);
-    notifyDispatch( { type:'notify', payload:{ message: UNKNOWN_ERROR, type: 'info' } });
-    return  UNKNOWN_ERROR;
-  };
-
-  return { handleSelectConnector, handleErrorMessage };
-}
-
-
-export function useSignerAccount() {
-  const { library: provider, account } = useWeb3React();
-  const { library: altProvider } = useWeb3React('fallback');
-  const [ signer, setSigner ] = React.useState<any>();
-  const [ voidSigner, setVoidSigner ] = React.useState<any>();
-  const [ fallbackProvider, setFallbackProvider ] = React.useState<any>();
-  React.useEffect(()=>{
-    provider && (async () => {
-      setSigner( await provider.getSigner() );
-      account && setVoidSigner( new ethers.VoidSigner( account ));
-    })();
-  }, [account, provider]);
-
-  React.useEffect(()=>{
-    altProvider && (async () => {
-      setFallbackProvider( altProvider );
-    })();
-  }, [account, altProvider]);
-
-  return { signer, provider, account, voidSigner, fallbackProvider };
 }

@@ -32,17 +32,15 @@ const OnceOffAuthorize = ({ awaitingApproval, authProcedure, authMsg, txPending 
       </Box>
 
       {awaitingApproval? 
-        <Text>Waiting for wallet approval...</Text>
+        <Text> Waiting for wallet approval...</Text>
         :
         <Loading condition={txPending && !awaitingApproval} size='small'>
-
           <Button  
             primary
             label={authMsg}
             // hoverIndicator='brand-transparent'
             onClick={()=>authProcedure()}
           />
-
         </Loading>}
     </Box>
   );

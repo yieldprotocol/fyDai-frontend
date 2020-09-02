@@ -1,16 +1,15 @@
 import React from 'react';
-import { ethers, BigNumber }  from 'ethers';
+import { ethers }  from 'ethers';
+import { useWeb3React } from '@web3-react/core';
 import { useSignerAccount } from './connectionHooks';
 
 import Migration from '../contracts/Migrations.json';
-import { useWeb3React } from '.';
-
-// ethers.errors.setLogLevel('error');
 
 const migrationAddrs = new Map([
   [1, process.env.REACT_APP_MIGRATION_1],
   [4, process.env.REACT_APP_MIGRATION_4 ],
-  [1337, process.env.REACT_APP_MIGRATION_1337 ], // '0xAC172aca69D11D28DFaadbdEa57B01f697b34158'
+  [1337, process.env.REACT_APP_MIGRATION_1337 ],
+  [31337, process.env.REACT_APP_MIGRATION_31337 ],
 ]);
 
 /**
@@ -19,8 +18,6 @@ const migrationAddrs = new Map([
  * @returns { boolean } redeemActive
  */
 export const useMigrations = () => {
-
-  // const { state: { signer, account } } = React.useContext(ConnectionContext);
   const { chainId } = useWeb3React('fallback');
   const { fallbackProvider } = useSignerAccount();
   const { abi: migrationAbi } = Migration;
@@ -35,14 +32,11 @@ export const useMigrations = () => {
 
   /**
    * Concurrently fetches Yield Addresses registered with the migrations contract.
-   * 
-   * @param {string[]} contractNameList names address of the yDai series to redeem from.
-   * 
+   * @param {string[]} contractNameList list of contract names registered in the migrations contract.
    * @returns {Map} keyed with contract names
    */
   const getAddresses = async (
     contractNameList:string[],
-    networkId:number|undefined,
   ) => {
     const contract = new ethers.Contract(migrationsAddress, migrationAbi, fallbackProvider );
     const res = new Map<string, string>();

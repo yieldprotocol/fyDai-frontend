@@ -2,8 +2,12 @@ import React from 'react';
 import { Box, Heading, Text, ThemeContext, ResponsiveContext, Image } from 'grommet';
 
 import TipsButton from './TipButtons';
+
+import { SeriesContext } from '../contexts/SeriesContext';
+import { UserContext } from '../contexts/UserContext';
 import logoDark from '../assets/images/logo.svg';
 import logoLight from '../assets/images/logo_light.svg';
+import Authorization from './Authorization';
 
 interface PageHeaderProps {
   tipSecondary?: string;
@@ -13,6 +17,11 @@ interface PageHeaderProps {
 }
 
 const PageHeader = (props: PageHeaderProps) => {
+
+  const { state: { authorizations } } = React.useContext(UserContext);
+  const { hasDelegatedProxy } = authorizations;
+
+  const { state:{ activeSeries } } = React.useContext(SeriesContext);
   const { title, subtitle, tipPrimary, tipSecondary } = props;
   const screenSize = React.useContext(ResponsiveContext);
   const theme = React.useContext<any>(ThemeContext);
@@ -74,9 +83,9 @@ const PageHeader = (props: PageHeaderProps) => {
           min: screenSize === 'small' ? '100%' : '0',
         }}
       >
-        { screenSize !== 'small' && <TipsButton primary={tipPrimary} secondary={tipSecondary} /> } 
+        {hasDelegatedProxy && screenSize !== 'small' && <TipsButton primary={tipPrimary} secondary={tipSecondary} /> }
+        {!hasDelegatedProxy && activeSeries && <Authorization buttonOnly />}
       </Box>
-      
     </Box>
   );
 };

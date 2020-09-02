@@ -16,8 +16,7 @@ import DaiJoin from '../contracts/DaiJoin.json';
 import Chai from '../contracts/Chai.json';
 import Vat from '../contracts/Vat.json';
 import Pot from '../contracts/Pot.json';
-import EthProxy from '../contracts/EthProxy.json';
-import DaiProxy from '../contracts/DaiProxy.json';
+import YieldProxy from '../contracts/YieldProxy.json';
 import Migrations from '../contracts/Migrations.json';
 import Pool from '../contracts/Pool.json';
 
@@ -33,13 +32,12 @@ const contractMap = new Map<string, any>([
   ['DaiJoin', DaiJoin.abi],
   ['Vat', Vat.abi],
   ['Pot', Pot.abi],
-  ['EthProxy', EthProxy.abi],
-  ['DaiProxy', DaiProxy.abi],
+  ['YieldProxy', YieldProxy.abi],
   ['Migrations', Migrations.abi],
   ['Pool', Pool.abi],
 ]);
 
-// TODO: Sanitize all inputs NB!!
+// TODO: Sanitize all inputs!!
 /**
  * SendTx is a generic function to interact with any contract.
  * Primarily used for development/testing, or for once off interactions with a contract.
@@ -51,7 +49,6 @@ export const useSendTx = () => {
   // const { state: { signer, account } } = React.useContext(ConnectionContext);
   const { signer, account } = useSignerAccount();
   const [ sendTxActive, setSendTxActive ] = React.useState<boolean>();
-
   /**
    * Send a transaction ()
    * @param {string} contractAddress address of the contract to send to.
@@ -92,7 +89,6 @@ export const useCallTx = () => {
 
   // const { state: { provider, altProvider } } = React.useContext(ConnectionContext);
   const { signer, provider, account, fallbackProvider, voidSigner } = useSignerAccount();
-
   const [ callTxActive, setCallTxActive ] = React.useState<boolean>();
   /**
    * Get data from the blockchain via provider (no signer reqd)
@@ -186,7 +182,7 @@ export const useTimeTravel = () => {
   const [ timestamp, setTimestamp ] = React.useState<number|null>(null);
 
   React.useEffect(()=>{
-    ( async () => {
+    provider && ( async () => {
       const { timestamp: ts } = await provider.getBlock(await provider.blockNumber);
       setTimestamp(ts);
     })();

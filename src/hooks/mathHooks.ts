@@ -9,15 +9,15 @@ import { YieldContext } from '../contexts/YieldContext'; // TODO sort out this c
  * 
  * ( not really 'hooks' - but beneficial to keep app logic together.)
  * 
- * @returns { function } addEventListner
- * @returns { function } removeEventListener
+ * @returns { function } collPrice 
+ * @returns { function } collValue 
  * @returns { function } getEvents
+ * 
  */
 export const useMath = () => {
-
   const { state: { feedData } } = React.useContext(YieldContext);
-
-  const [ilks, setIlks] = React.useState<any>();
+  const [ ilks, setIlks ] = React.useState<any>();
+  
   React.useEffect(()=>{
     feedData.ilks && setIlks(feedData.ilks);
   }, [feedData]);
@@ -42,10 +42,10 @@ export const useMath = () => {
   };
 
   /**
-   * Calculates value of debt (yDaiDebt at maturity or Dai) at current DAI price
+   * Calculates value of debt (yDaiDebt at maturity or Dai) at current Dai price
    * the rate used is the rate and spot price of Dai.
    * @param {BigNumber} _amount yDai amount (= amount of Dai at maturity)
-   * @returns
+   * @returns 
    */
   const debtValAdj = (_amount:BigNumber ) => {
     // this would require a DAI/USD (ratio fluctuations? ) but maybe just assume it will be 1 at maturity?
@@ -54,7 +54,7 @@ export const useMath = () => {
 
   /**
    * Calculates the collateralisation ratio 
-   * ETH collat value and DAI debt value (in USD)
+   * ETH collat value and Dai debt value (in USD)
    *
    * @param {BigNumber} _collateralValue (wei/wad precision)
    * @param {BigNumber} _debtValue (wei/wad precision)
@@ -148,7 +148,11 @@ export const useMath = () => {
    * @param {number} _liquidationRatio eg. 1.5
    * @returns {BigNumber} in wei/wad precision
    */
-  const daiAvailable =(_collateralValue:BigNumber, _debtValue:BigNumber, _liquidationRatio:number) =>{
+  const daiAvailable = (
+    _collateralValue:BigNumber, 
+    _debtValue:BigNumber, 
+    _liquidationRatio:number
+  ) =>{
     const maxSafeDebtValue = utils.divRay(_collateralValue, utils.toRay(_liquidationRatio));
     const _max = _debtValue.lt(maxSafeDebtValue) ? maxSafeDebtValue.sub(_debtValue) : BigNumber.from('0');
     console.log('max debt:', ethers.utils.formatEther(_max).toString());
@@ -156,14 +160,51 @@ export const useMath = () => {
   };
 
   /**
+   * Percentage holding of the Pool 
+   *
+   * @param { BigNumber } _supply // current [Dai] price per unit y[Dai]
+   * @param { BigNumber } _balance// y[Dai] amount/price at maturity
+   * 
+   * @returns { number } human readable number as a percent.
+   */
+  const poolPercent =(
+    _supply: BigNumber,
+    _balance: BigNumber,
+  )=> {
+    if (!_supply.isZero()) {
+      return  ( parseFloat(ethers.utils.formatEther(_balance)) / parseFloat(ethers.utils.formatEther(_supply)))*100;
+    }
+    return 0;
+  };
+
+  /**
+   * Split a certain amount of Dai liquidity into its yDai and Dai components
+   * 
+   * @param {BigNumber} daiAmount // amount dai to split
+   * @param { BigNumber } _daiReserves// Dai reserves
+   * @param { BigNumber } _yDaiReserves// yDai reservers
+   * 
+   * @returns  [ BigNumber, BigNumber ] returns an array of [dai, yDai] 
+   */
+  const splitDaiLiquidity =(
+    _daiAmount: BigNumber,
+    _daiReserves: BigNumber,
+    _yDaiReserves: BigNumber,
+  )=> {
+    const daiPortion = _daiAmount.mul(_daiReserves).div(_yDaiReserves.add(_daiReserves));
+    const yDaiPortion = _daiAmount.sub(daiPortion);
+    return [daiPortion, yDaiPortion];
+  };
+
+  /**
    * Annualised Yield Rate
    *
-   * @param { BigNumber } _rate // current [Dai] price per unit y[Dai].
-   * @param { BigNumber } _return // y[Dai] amount/price at maturity.
-   * @param { number } _maturity  // date of maturity 
-   * @param { number } _fromDate // ***optional*** start date - defaults to now(). 
+   * @param { BigNumber } _rate // current [Dai] price per unit y[Dai]
+   * @param { BigNumber } _return // y[Dai] amount/price at maturity
+   * @param { number } _maturity  // date of maturity
+   * @param { number } _fromDate // ***optional*** start date - defaults to now()
    * 
-   * @returns { number }
+   * @returns { number } human readable number.
    */
   const yieldAPR =(
     _rate: BigNumber,
@@ -171,19 +212,25 @@ export const useMath = () => {
     _maturity:number,
     _fromDate:number= (Math.round(new Date().getTime() / 1000)), // if not provided, defaults to current time.
   )=> {
-    const secsToMaturity = _maturity - _fromDate;
-    const propOfYear = secsToMaturity/utils.SECONDS_PER_YEAR;
 
-    const priceRatio = parseFloat(ethers.utils.formatEther(_return)) / parseFloat(ethers.utils.formatEther(_rate));
-    const powRatio = 1 / propOfYear;
-    const apr = Math.pow(priceRatio, powRatio) - 1;
-
-    return apr;
-
+    if (
+      _maturity > Math.round(new Date().getTime() / 1000)
+    ) {
+      const secsToMaturity = _maturity - _fromDate;
+      const propOfYear = secsToMaturity/utils.SECONDS_PER_YEAR;
+      const priceRatio = parseFloat(ethers.utils.formatEther(_return)) / parseFloat(ethers.utils.formatEther(_rate));
+      const powRatio = 1 / propOfYear;
+      const apr = Math.pow(priceRatio, powRatio) - 1;
+      return apr*100;
+    }
+    return 0;
   };
 
   return {
     yieldAPR,
+    poolPercent,
+    splitDaiLiquidity,
+
     collValue,
     collPrice,
     debtValAdj,

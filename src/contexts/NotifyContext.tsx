@@ -13,6 +13,7 @@ const initState = {
   fatalOpen: false,
   fatalMsg: '',
   pendingTxs: [],
+  requestedSigs: [],
 };
 
 function notifyReducer(state:INotification, action:IReducerAction) {
@@ -44,6 +45,20 @@ function notifyReducer(state:INotification, action:IReducerAction) {
         ...state,
         pendingTxs: state.pendingTxs.filter( (x:any) => x.tx.hash !== action.payload.tx.hash)
       };
+    case 'requestSigs':
+      return {
+        ...state,
+        requestedSigs: action.payload.map((x:any)=> { return { ...x, signed: false };} ),
+      };
+    case 'signed':
+      return {
+        ...state,
+        requestedSigs: state.requestedSigs.map( (x:any) => {           
+          if ( x.id === action.payload.id) {
+            return { ...x, signed:true };
+          }  return x;  
+        })
+      };
     case '_closeNotify':
       return { ...state, open: false, timerMs: initState.timerMs };
     case '_openNotify':
@@ -66,10 +81,6 @@ const NotifyProvider = ({ children }:any) => {
       }
     })();
   }, [state.open]);
-
-  React.useEffect( () => {
-    console.log(state.pendingTxs);
-  }, [state.pendingTxs]);
 
   return (
     <NotifyContext.Provider value={{ state, dispatch }}>
