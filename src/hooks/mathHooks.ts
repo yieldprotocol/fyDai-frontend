@@ -212,7 +212,10 @@ export const useMath = () => {
     _maturity:number,
     _fromDate:number= (Math.round(new Date().getTime() / 1000)), // if not provided, defaults to current time.
   )=> {
-    if(_maturity > Math.round(new Date().getTime() / 1000) ) {
+
+    if (
+      _maturity > Math.round(new Date().getTime() / 1000)
+    ) {
       const secsToMaturity = _maturity - _fromDate;
       const propOfYear = secsToMaturity/utils.SECONDS_PER_YEAR;
       const priceRatio = parseFloat(ethers.utils.formatEther(_return)) / parseFloat(ethers.utils.formatEther(_rate));

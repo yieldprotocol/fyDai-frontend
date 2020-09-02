@@ -56,7 +56,7 @@ function Repay({ repayAmount }:IRepayProps) {
     if (!repayDisabled) {
       setRepayPending(true); 
 
-      if (!activeSeries?.isMature) {
+      if (!activeSeries?.isMature()) {
         /* repay using proxy */
         await repayDaiDebt(activeSeries, 'ETH-A', 1, value);
       } else {
@@ -75,13 +75,13 @@ function Repay({ repayAmount }:IRepayProps) {
   /* Handle dai to yDai conversion  (needed to set a min yDai value for repayment) */
   useEffect(() => {
     activeSeries && inputValue > 0 && ( async () => {
-      const preview = await previewPoolTx('sellDai', activeSeries.poolAddress, inputValue);
-      if (!preview.isZero()) {
+      const preview = await previewPoolTx('sellDai', activeSeries, inputValue);
+      if (preview && !preview.isZero()) {
         setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
       } else {
         /* if the market doesnt have liquidity just estimate from rate */
-        const rate = await previewPoolTx('sellDai', activeSeries.poolAddress, 1);
-        setYDaiValue(inputValue* parseFloat((ethers.utils.formatEther(rate))) );
+        const rate = await previewPoolTx('sellDai', activeSeries, 1);
+        rate && setYDaiValue(inputValue* parseFloat((ethers.utils.formatEther(rate))) );
       }
     })();
   }, [inputValue]);

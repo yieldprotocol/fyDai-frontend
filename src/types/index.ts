@@ -5,17 +5,23 @@ export interface IYieldSeries {
   displayName: string;
   maturity: number;
   maturity_: Date;
-  isMature: boolean;
+  
   poolAddress: string;
   yDaiAddress: string;
   liquidityProxyAddress: string;
   hasDelegatedPool: boolean;
+
+  isMature: any; // function typeScript this out
   
   yDaiBalance_: number;
   yDaiBalance: BigNumber;
 
+  totalSupply?: BigNumber;
+  totalSupply_?: number;
   poolTokens?:  BigNumber;
   poolTokens_?: number;
+
+  poolState?: any; // TODO type this
 
   symbol?: string;
   id?: string;
@@ -25,6 +31,7 @@ export interface IYieldSeries {
   wethDebtDai_?: number;
   wethDebtYDai?: BigNumber;
   wethDebtYDai_?: number;
+
   yieldAPR?: number;
   yieldAPR_?: string;
 }

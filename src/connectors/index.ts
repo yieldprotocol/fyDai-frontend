@@ -18,7 +18,7 @@ export const injected = new InjectedConnector({ supportedChainIds: [4, 31337] })
 
 export const network = new NetworkConnector({
   urls: { 1: RPC_URLS[1], 4: RPC_URLS[4], 31337: RPC_URLS[31337], },
-  defaultChainId: 4
+  defaultChainId: 31337
 });
 
 export const walletlink = new WalletLinkConnector({

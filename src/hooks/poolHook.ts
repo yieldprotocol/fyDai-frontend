@@ -276,7 +276,7 @@ export const usePool = () => {
    * 
    * @note NB NB if in BigNumber must be in wei
    *  
-   * @returns {BigNumber} BigNumber in WEI/WAD precision - Dai or yDai (call dependent)
+   * @returns {BigNumber| null} BigNumber in WEI/WAD precision - Dai or yDai (call dependent)
    * 
    * @note call function 
    */
@@ -285,17 +285,13 @@ export const usePool = () => {
     series: IYieldSeries,
     amount: number | BigNumber,
   ): Promise<BigNumber> => {
-
     const type=txType.toUpperCase();
     const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(amount.toString());
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
-    const mature = series.isMature;
-
     const contract = new ethers.Contract( poolAddr, poolAbi, fallbackProvider);
-
-    let value;
-    if (!mature) {
-      try { 
+    let value = BigNumber.from('0');
+    try {
+      if ( series.isMature() === false ) {
         switch (type) {
           case 'BUYDAI':
             value = await contract.buyDaiPreview(parsedAmount); break;
@@ -306,15 +302,33 @@ export const usePool = () => {
           case 'SELLYDAI':
             value = await contract.sellYDaiPreview(parsedAmount); break;
           default: 
-            value = BigNumber.from('0'); break;
-        }
-      } catch (e) {
-        // console.log('Error:', e);
-        return BigNumber.from('0');
+            value = await BigNumber.from('0');
+        } 
+        return value; 
       }
       return value;
-    } 
-    return BigNumber.from('0');
+    } catch (e) {
+      // console.log('Pool error:', e)
+      return value;
+    }
+  };
+
+  /**
+   * @dev Checks the health/state of a particular pool
+   *
+   * 
+   * @param {IYieldSeries} series series to check the pool state
+   * @returns {active:boolean, reason:string} status of the pool
+   * 
+   * @note call function 
+   */
+  const checkPoolState = (
+    series: IYieldSeries,
+  ): any => {
+    if ( series.isMature() ) { return { active: false, reason: 'Series is mature' };}
+    if ( series.totalSupply?.isZero() ) { return { active: false, reason: 'Pool not initiated' };}
+    if ( series.yieldAPR && !(Number.isFinite(series.yieldAPR)) ) { return { active: false, reason: 'Limited Liquidity' };}
+    return { active:true, reason:'Pool is operational' };
   };
 
   return {  
@@ -326,6 +340,7 @@ export const usePool = () => {
     buyActive,
 
     checkPoolDelegate,
+    checkPoolState,
     addPoolDelegate,
     previewPoolTx, 
 

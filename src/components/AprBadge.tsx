@@ -2,8 +2,14 @@ import React, { useState, useContext } from 'react';
 import moment from 'moment';
 import { Box, Text, ThemeContext, ResponsiveContext, Button } from 'grommet';
 
+import {
+  FiClock as Clock,
+  FiAlertTriangle as Warning,
+} from 'react-icons/fi';
+
 import { SeriesContext } from '../contexts/SeriesContext';
 import { IYieldSeries } from '../types';
+import SeriesSelector from './SeriesSelector';
 
 interface IAprBadgeProps {
   activeView: string;
@@ -12,14 +18,13 @@ interface IAprBadgeProps {
 
 function AprBadge({ activeView, series }:IAprBadgeProps) {
   const [ seriesApr, setSeriesApr ] = useState<string>(`${series.yieldAPR_} %`);
-  const [ seriesMature, setSeriesMature ] = useState<boolean>(false);
+  const [ seriesMature, setSeriesMature ] = useState<boolean>(series.isMature());
 
   /* Set Series description/display name */
   React.useEffect(()=>{
+    setSeriesMature(series.isMature());
     setSeriesApr(moment(series.maturity*1000).format('MMM \'YY'));
-    Number.isFinite(parseFloat(series.yieldAPR_||'')) && 
-      ( async () => setSeriesApr( `${series.yieldAPR_} %`) )();
-    setSeriesMature(series.isMature);
+    series.poolState?.active && ( async () => setSeriesApr( `${series.yieldAPR_} %`) )(); 
   }, [ series ]);
 
   return (
@@ -31,25 +36,28 @@ function AprBadge({ activeView, series }:IAprBadgeProps) {
         direction='row'
         pad={{ horizontal:'small', vertical:'none' }}
         align='center'
+        gap='small'
       >
-        <Text size='xxsmall'>
-          Matured        
+        <Clock />
+        <Text size='xxsmall'>  
+          Mature       
         </Text>
       </Box>}
 
-      { seriesMature === false &&
-      <Box 
-        background={series.seriesColor}
-        round='xlarge'  
-        pad={{ horizontal:'small', vertical:'none' }} 
-        align='center'
-        justify='center'
-      >
-        <Text size='xxsmall'> { seriesApr } </Text>  
-      </Box>}
+      { seriesMature === false && 
+        series.poolState?.active === true && 
+        <Box 
+          background={series.seriesColor}
+          round='xlarge'  
+          pad={{ horizontal:'small', vertical:'none' }} 
+          align='center'
+          justify='center'
+        >
+          <Text size='xxsmall'> { seriesApr } </Text>  
+        </Box>}
 
-      {/* { seriesMature === false && 
-          activeView !== 'borrow' &&
+      { seriesMature === false &&
+        series.poolState?.active === false &&
           <Box 
             round
             border='all'
@@ -57,12 +65,13 @@ function AprBadge({ activeView, series }:IAprBadgeProps) {
             pad={{ horizontal:'small', vertical:'none' }}
             align='center'
             background='orange'
+            gap='small'
           >
+            <Warning />
             <Text size='xxsmall'>
-              Unavailable      
+              {series.poolState.reason} 
             </Text>
-          </Box>} */}
-
+          </Box>}
     </>
   );
 }
