@@ -104,7 +104,7 @@ const YieldProvider = ({ children }: any) => {
     let _deployedContracts: any;
   
     try {
-      if ( !cachedContracts || (cachedContracts.length !== contractList.length) || forceUpdate) {
+      if ( !cachedContracts || forceUpdate) {
         const contractAddrs = await getAddresses(contractList);
         _deployedContracts = Object.fromEntries(contractAddrs);
         window.localStorage.removeItem('deployedContracts');

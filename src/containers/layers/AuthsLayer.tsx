@@ -20,14 +20,12 @@ import {
   Paragraph,
 } from 'grommet';
 import {
-  useEagerConnect,
-  useInactiveListener,
   useWeb3React,
   useConnection,
   useCachedState 
 } from '../../hooks';
 
-import { network, injected, trezor, walletlink, torus, ledger } from '../../connectors';
+import { injected, trezor, walletlink, torus, ledger } from '../../connectors';
 
 import metamaskImage from '../../assets/images/providers/metamask.png';
 import trezorImage from '../../assets/images/providers/trezor.png';
@@ -38,19 +36,11 @@ import torusImage from '../../assets/images/providers/torus.png';
 import { NotifyContext } from '../../contexts/NotifyContext';
 
 
-
 const AuthsLayer = ({ open, closeLayer }: any) => {
   const screenSize = React.useContext(ResponsiveContext);
   const { state: { requestedSigs }, dispatch } = React.useContext(NotifyContext);
 
-
   const { handleSelectConnector } = useConnection();
-
-
-  React.useEffect(()=>{
-    console.log(requestedSigs);
-  }, [requestedSigs ]);
-
 
   return (
     <>

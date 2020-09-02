@@ -20,15 +20,14 @@ import {
   Paragraph,
 } from 'grommet';
 import {
-  useEagerConnect,
-  useInactiveListener,
+
   useWeb3React,
   useConnection,
   useCachedState, 
   useSignerAccount,
 } from '../../hooks';
 
-import { network, injected, trezor, walletlink, torus, ledger } from '../../connectors';
+import { injected, trezor, walletlink, torus, ledger } from '../../connectors';
 
 import metamaskImage from '../../assets/images/providers/metamask.png';
 import trezorImage from '../../assets/images/providers/trezor.png';

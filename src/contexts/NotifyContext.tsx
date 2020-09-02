@@ -82,10 +82,6 @@ const NotifyProvider = ({ children }:any) => {
     })();
   }, [state.open]);
 
-  React.useEffect( () => {
-    console.log(state.pendingTxs);
-  }, [state.pendingTxs]);
-
   return (
     <NotifyContext.Provider value={{ state, dispatch }}>
       {children}

@@ -299,6 +299,7 @@ const UserProvider = ({ children }: any) => {
     ];
 
     const _payload = {
+      account,
       lastBlock: _lastBlock,
       items: txHistory ? [...txHistory.items, ...updatedHistory] : [...updatedHistory]
     };
@@ -342,13 +343,19 @@ const UserProvider = ({ children }: any) => {
     dispatch({ type: 'isLoading', payload: false });
   };
 
-  // React.useEffect(()=>{  
-  // },[])
+  React.useEffect(()=>{
+    // init everytime or change
+    account && !yieldState.isLoading && initUserContext();
 
-  /* Init user context and re-init on any user and/or network change */
-  React.useEffect(() => {
-    account && !yieldState.isLoading && (async () => initUserContext())();
-  }, [ chainId, account, yieldState.isLoading ]);
+    // if user has changed recache the history
+    const hist = JSON.parse( (localStorage.getItem('txHistory') || '{}') );
+    if ( !yieldState.isLoading && account && (hist?.account !== account) ) {
+      localStorage.removeItem('txHistory');
+      _getTxHistory(true);
+      console.log('history updating cos of user change');
+    }
+
+  }, [ account, yieldState.isLoading ]);
 
   const actions = {
     updateHistory: () => _getTxHistory(),
