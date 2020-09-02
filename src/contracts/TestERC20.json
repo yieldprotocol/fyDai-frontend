@@ -503,9 +503,9 @@
         "contractDependencies": [
           9597,
           10102,
-          27340,
-          28225,
-          28303
+          27308,
+          28193,
+          28271
         ],
         "contractKind": "contract",
         "documentation": null,
@@ -515,9 +515,9 @@
           11104,
           9597,
           10102,
-          28225,
-          28303,
-          27340
+          28193,
+          28271,
+          27308
         ],
         "name": "TestERC20",
         "nodeType": "ContractDefinition",
@@ -590,7 +590,7 @@
                       "name": "_mint",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 28101,
+                      "referencedDeclaration": 28069,
                       "src": "229:5:37",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_address_$_t_uint256_$returns$__$",
@@ -782,7 +782,7 @@
                       "name": "_mint",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 28101,
+                      "referencedDeclaration": 28069,
                       "src": "330:5:37",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_address_$_t_uint256_$returns$__$",
@@ -947,7 +947,7 @@
                       "name": "_burn",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 28157,
+                      "referencedDeclaration": 28125,
                       "src": "425:5:37",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_address_$_t_uint256_$returns$__$",
@@ -1125,9 +1125,9 @@
         "contractDependencies": [
           9597,
           10102,
-          27340,
-          28225,
-          28303
+          27308,
+          28193,
+          28271
         ],
         "contractKind": "contract",
         "documentation": null,
@@ -1137,9 +1137,9 @@
           11104,
           9597,
           10102,
-          28225,
-          28303,
-          27340
+          28193,
+          28271,
+          27308
         ],
         "name": "TestERC20",
         "nodeType": "ContractDefinition",
@@ -1212,7 +1212,7 @@
                       "name": "_mint",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 28101,
+                      "referencedDeclaration": 28069,
                       "src": "229:5:37",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_address_$_t_uint256_$returns$__$",
@@ -1404,7 +1404,7 @@
                       "name": "_mint",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 28101,
+                      "referencedDeclaration": 28069,
                       "src": "330:5:37",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_address_$_t_uint256_$returns$__$",
@@ -1569,7 +1569,7 @@
                       "name": "_burn",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 28157,
+                      "referencedDeclaration": 28125,
                       "src": "425:5:37",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_address_$_t_uint256_$returns$__$",
@@ -1694,7 +1694,7 @@
     "version": "0.6.10+commit.00c0fcaf.Emscripten.clang"
   },
   "networks": {
-    "1337": {
+    "31337": {
       "events": {
         "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925": {
           "anonymous": false,
@@ -1748,12 +1748,12 @@
         }
       },
       "links": {},
-      "address": "0xBd2a11749Ea99de4386Ad27BcD9833aFa3c1D08C",
-      "transactionHash": "0x75decaf30c6909c4042d3753dddee61eb35d86180c6c7c97980566bdee7139bd"
+      "address": "0xc4905364b78a742ccce7B890A89514061E47068D",
+      "transactionHash": "0x5945f418899d15633b912d9c8694d3c87cf0ef924a51e6902a19a0517e0a02bc"
     }
   },
   "schemaVersion": "3.2.3",
-  "updatedAt": "2020-08-26T07:49:07.721Z",
+  "updatedAt": "2020-08-28T08:06:39.945Z",
   "networkType": "ethereum",
   "devdoc": {
     "methods": {
