@@ -8,7 +8,6 @@ import { NotifyContext } from './NotifyContext';
 
 import { useCachedState, } from '../hooks/appHooks';
 import { useCallTx } from '../hooks/chainHooks';
-import { useController } from '../hooks/controllerHook';
 import { useEvents } from '../hooks/eventHooks';
 import { useSignerAccount } from '../hooks/connectionHooks';
 
@@ -17,25 +16,8 @@ import { useMigrations } from '../hooks/migrationHook';
 
 const YieldContext = React.createContext<any>({});
 
-const seriesColors = [
-  '#726a95',
-  '#709fb0',
-  '#a0c1b8',
-  '#f4ebc1',
-  '#3f51b5',
-  '#5677fc',
-  '#03a9f4',
-  '#00bcd4',
-  '#009688',
-  '#259b24',
-  '#8bc34a',
-  '#afb42b',
-  '#ff9800',
-  '#ff5722',
-  '#795548',
-  '#607d8b',
-];
-
+const yDaiList = ['yDai0', 'yDai1', 'yDai2', 'yDai3'];
+const seriesColors = ['#726a95', '#709fb0', '#a0c1b8', '#f4ebc1', '#3f51b5', '#5677fc', '#03a9f4'];
 const contractList = [
   'Controller',
   'Treasury',
@@ -85,7 +67,6 @@ const initState = {
   deployedSeries: [],
   deployedContracts: {},
 
-  // transient
   feedData: {
     ilks: {
       rate: null, // localStorage.getItem(feedData.ilks.EthA.rate)
@@ -97,11 +78,8 @@ const initState = {
 
 const YieldProvider = ({ children }: any) => {
   const [state, dispatch] = React.useReducer(reducer, initState);
-  // const { state: { account, chainId, provider } } = React.useContext(ConnectionContext);
-  const { account, provider, fallbackProvider } = useSignerAccount();
-  
+  const { provider, fallbackProvider } = useSignerAccount();
   const { chainId } = useWeb3React('fallback');
-  // const { active: fallbackActive } = useWeb3React('fallback');
 
   const { dispatch: notifyDispatch } = React.useContext(NotifyContext);
 
@@ -110,12 +88,10 @@ const YieldProvider = ({ children }: any) => {
   const [cachedSeries, setCachedSeries] = useCachedState('deployedSeries', null);
   const [cachedFeed, setCachedFeed] = useCachedState('lastFeed', null);
 
-
   /* hook declarations */
   const [ callTx ] = useCallTx();
-  const { getEventHistory, addEventListener, parseEventList } = useEvents();
+  const { addEventListener } = useEvents();
   const { getAddresses } = useMigrations();
-  const { collateralPosted } = useController();
 
   /**
    * @dev internal fn: Get all public Yield addresses from localStorage (or chain if no cache)
@@ -128,7 +104,7 @@ const YieldProvider = ({ children }: any) => {
     let _deployedContracts: any;
   
     try {
-      if (chainId && !cachedContracts || forceUpdate) {
+      if ( !cachedContracts || (cachedContracts.length !== contractList.length) || forceUpdate) {
         const contractAddrs = await getAddresses(contractList);
         _deployedContracts = Object.fromEntries(contractAddrs);
         window.localStorage.removeItem('deployedContracts');
@@ -139,27 +115,25 @@ const YieldProvider = ({ children }: any) => {
         _deployedContracts = cachedContracts;
       }
 
-      if (chainId && !cachedSeries || forceUpdate) {
+      if (!cachedSeries || (cachedSeries.length !== yDaiList.length) || forceUpdate) {
         // TODO: better implementation of iterating through series (possibly a list length from contracts function?)
-        const _list = await getAddresses(['yDai0', 'yDai1', 'yDai2', 'yDai3']);
+        const _list = await getAddresses(yDaiList);
         const _seriesList = Array.from(_list.values());
 
         await Promise.all(
           _seriesList.map(async (x: string, i: number) => {
-            
             const name = await callTx(x, 'YDai', 'name', []);
-            const maturity = (await callTx(x, 'YDai', 'maturity', [])).toNumber();
+            const maturity = await callTx(x, 'YDai', 'maturity', []);
             const _peripheralAddrs = await getAddresses([ `${name}-Pool` ]);
             const poolAddress = _peripheralAddrs.get(`${name}-Pool`);
-            
             return {
               yDaiAddress: x,
               name,
-              maturity,
+              maturity: maturity.toNumber(),
               poolAddress,
               maturity_: new Date(maturity * 1000),
               displayName: moment(maturity * 1000).format('MMMM YYYY'),
-              seriesColor: seriesColors[i],
+              seriesColor: seriesColors[i], 
             };
           })
         ).then((res: any) => _deployedSeries.push(...res));
