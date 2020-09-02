@@ -78,18 +78,18 @@ const Lend = ({ lendAmount }:ILendProps) => {
 
   /* Handle input changes */
   useEffect(() => {
-    activeSeries && !(activeSeries.isMature) && inputValue && ( async () => {
-      const preview = await previewPoolTx('sellDai', activeSeries.poolAddress, inputValue);
-      setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
-      setAPR( yieldAPR( ethers.utils.parseEther(inputValue.toString()), preview, activeSeries.maturity ) );
+    activeSeries && !(activeSeries.isMature()) && inputValue && ( async () => {
+      const preview = await previewPoolTx('sellDai', activeSeries, inputValue);
+      preview && setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
+      preview && setAPR( yieldAPR( ethers.utils.parseEther(inputValue.toString()), preview, activeSeries.maturity ) );
     })();
   }, [inputValue]);
 
   /* handle active series loads and changes */
   useEffect(() => {
-    account && activeSeries && activeSeries.yDaiBalance_ && !(activeSeries.isMature) && ( async () => {
-      const preview = await previewPoolTx('SellYDai', activeSeries.poolAddress, activeSeries.yDaiBalance_);
-      setCurrentValue( parseFloat(ethers.utils.formatEther(preview)));
+    account && activeSeries && activeSeries.yDaiBalance_ && !(activeSeries.isMature()) && ( async () => {
+      const preview = await previewPoolTx('SellYDai', activeSeries, activeSeries.yDaiBalance_);
+      preview && setCurrentValue( parseFloat(ethers.utils.formatEther(preview)));
     })();
   }, [ activeSeries, account ]);
   
@@ -161,7 +161,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
           />
 
           {/* If the series has NOT matured, show the lending input */}
-          { !activeSeries?.isMature &&
+          { !activeSeries?.isMature() &&
             <Box fill gap='medium'>
               <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to lend</Text>
               <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={lendDisabled}>
@@ -226,7 +226,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
               />
             </Box>}
   
-          { account && !activeSeries?.isMature && 
+          { account && !activeSeries?.isMature() && 
           <Box gap='small' fill='horizontal' align='center'>
 
             <Box
@@ -264,7 +264,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
           </Box>}
 
           {/* If the series is mature show the redeem view */}
-          { activeSeries?.isMature &&
+          { activeSeries?.isMature() &&
           <Box fill gap='medium' margin={{ vertical:'large' }}>
             <Redeem />
           </Box>}

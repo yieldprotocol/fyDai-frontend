@@ -46,8 +46,8 @@ const DashLend = () => {
   React.useEffect(() => {
     console.log(position);
     activeSeries.yDaiBalance_>0 && ( async ()=> {
-      const preview = await previewPoolTx('SellYDai', activeSeries.poolAddress, activeSeries.yDaiBalance_);
-      setCurrentValue( parseFloat(ethers.utils.formatEther(preview)));
+      const preview = await previewPoolTx('SellYDai', activeSeries, activeSeries.yDaiBalance_);
+      preview && setCurrentValue( parseFloat(ethers.utils.formatEther(preview)));
     })();
   }, [ activeSeries, ]);
 

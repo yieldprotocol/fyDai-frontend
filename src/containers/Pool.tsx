@@ -193,7 +193,7 @@ const Pool = (props:IPoolProps) => {
             />
           </Box> 
   
-          { account && !activeSeries?.isMature && 
+          { account && !activeSeries?.isMature() && 
           <Box gap='small' fill='horizontal' align='center'>
             <Box
               fill='horizontal'

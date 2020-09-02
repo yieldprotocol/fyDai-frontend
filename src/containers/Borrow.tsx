@@ -94,16 +94,16 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
     activeSeries && parseFloat(inputValue) > 0 && ( async () => {
       const newRatio = estimateRatio(position.ethPosted_, ( position.debtValue_+ parseFloat(inputValue)) ); 
       newRatio && setEstRatio(newRatio.toFixed(0));
-      const preview = await previewPoolTx('buyDai', activeSeries.poolAddress, inputValue);
-      if (!preview.isZero()) {
+      const preview = await previewPoolTx('buyDai', activeSeries, inputValue);
+      if (preview && !preview.isZero()) {
         setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
         setAPR( yieldAPR( ethers.utils.parseEther(inputValue.toString()), preview, activeSeries.maturity ) );      
         setWarningMsg(null);
         setErrorMsg(null);
       } else {
         /* if the market doesnt have liquidity just estimate from rate */
-        const rate = await previewPoolTx('buyDai', activeSeries.poolAddress, 1);
-        setYDaiValue(inputValue* parseFloat((ethers.utils.formatEther(rate))) );
+        const rate = await previewPoolTx('buyDai', activeSeries, 1);
+        rate && setYDaiValue(inputValue* parseFloat((ethers.utils.formatEther(rate))));
         setBorrowDisabled(true);
         setErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
       }
@@ -177,7 +177,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
               <InfoGrid entries={[
                 {
                   label: 'Current Debt',
-                  visible: !!account && activeSeries && !activeSeries?.isMature || (activeSeries?.isMature && activeSeries?.ethDebtYDai_ > 0 ),
+                  visible: !!account && activeSeries && !activeSeries?.isMature() || (activeSeries?.isMature() && activeSeries?.ethDebtYDai_ > 0 ),
                   active: true,
                   loading: borrowPending,    
                   value: activeSeries?.ethDebtYDai_? `${activeSeries.ethDebtYDai_.toFixed(2)} DAI`: '0 DAI',
@@ -186,7 +186,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
                 },
                 {
                   label: 'Max Borrowing Power',
-                  visible: activeSeries && !activeSeries.isMature  && !!account,
+                  visible: activeSeries && !activeSeries.isMature()  && !!account,
                   active: maximumDai,
                   loading: borrowPending,           
                   value: maximumDai ? `${maximumDai.toFixed(2)} DAI`: '',
@@ -195,7 +195,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
                 },
                 {
                   label: 'Repay Debt',
-                  visible: !!account && activeSeries?.isMature && activeSeries?.ethDebtYDai_ > 0,
+                  visible: !!account && activeSeries?.isMature() && activeSeries?.ethDebtYDai_ > 0,
                   active: true,
                   loading: false,    
                   value: '',
@@ -214,7 +214,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
 
             {/* </SeriesDescriptor> */}
 
-            { activeSeries && !activeSeries?.isMature && 
+            { activeSeries && !activeSeries?.isMature() && 
               <Box gap='medium' align='center' fill='horizontal'>
                 <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to borrow</Text>
 
@@ -325,7 +325,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
                 </Box>}
               </Box>}
 
-            { activeSeries && activeSeries.isMature &&
+            { activeSeries && activeSeries.isMature() &&
               <Box 
                 gap='medium' 
                 margin={{ vertical:'large' }}  
