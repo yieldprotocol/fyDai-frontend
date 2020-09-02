@@ -75,12 +75,12 @@ function Repay({ repayAmount }:IRepayProps) {
   /* Handle dai to yDai conversion  (needed to set a min yDai value for repayment) */
   useEffect(() => {
     activeSeries && inputValue > 0 && ( async () => {
-      const preview = await previewPoolTx('sellDai', activeSeries.poolAddress, inputValue);
+      const preview = await previewPoolTx('sellDai', activeSeries, inputValue);
       if (!preview.isZero()) {
         setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
       } else {
         /* if the market doesnt have liquidity just estimate from rate */
-        const rate = await previewPoolTx('sellDai', activeSeries.poolAddress, 1);
+        const rate = await previewPoolTx('sellDai', activeSeries, 1);
         setYDaiValue(inputValue* parseFloat((ethers.utils.formatEther(rate))) );
       }
     })();

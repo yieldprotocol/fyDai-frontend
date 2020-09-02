@@ -185,7 +185,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
                   valueExtra: null, 
                 },
                 {
-                  label: 'Max Borrowing Power',
+                  label: 'Max Debt',
                   visible: activeSeries && !activeSeries.isMature  && !!account,
                   active: maximumDai,
                   loading: borrowPending,           
