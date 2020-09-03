@@ -35,7 +35,7 @@ const TransactionPending = ({ msg, tx }:TransactionPendingProps) => {
             border='all'
             // background='brand'
             hoverIndicator='brand-transparent'
-            onClick={()=>console.log(tx)}
+            onClick={()=>{ window.open( `https://rinkeby.etherscan.io/tx/${tx.tx.hash}`, '_blank');}} 
             align='center'
             pad='small'
           >
