@@ -42,9 +42,11 @@ const Redeem  = ({ close }:IRedeemProps)  => {
     }
   };
 
+  
+
   /* redeem button disabled logic */ 
   React.useEffect( () => {
-    if ( activeSeries?.yDaiBalance_.toFixed(4) > 0 ){
+    if ( activeSeries?.yDaiBalance_ > 0 ){
       setRedeemDisabled(false);
     }
     setRedeemDisabled(true);

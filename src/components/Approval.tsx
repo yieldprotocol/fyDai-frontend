@@ -1,6 +1,5 @@
 import React from 'react';
 import { Box, CheckBox, ThemeContext } from 'grommet';
-import { ScaleLoader } from 'react-spinners';
 
 import { useToken } from '../hooks';
 
@@ -12,8 +11,10 @@ function Approval({ inputValue, approved, approveProcedure }:any) {
   return (
     <Box margin='medium'>
       {approveActive || approved === undefined ?             
-        <ScaleLoader color={theme?.global?.colors['brand-transparent'].dark} height='13' />
-        : <CheckBox
+        <>
+          loading
+        
+        </>: <CheckBox
           reverse
           checked={approved && !inputValue || ( approved >= inputValue )}
           disabled={!inputValue || ( approved >= inputValue )}

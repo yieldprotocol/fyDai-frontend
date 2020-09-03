@@ -166,7 +166,7 @@ function Repay({ repayAmount }:IRepayProps) {
                   <Button 
                     label={<Text size='xsmall' color='brand'> {screenSize !== 'small' ? 'Repay Maximum': 'Max'}</Text>}
                     color='brand-transparent'
-                    onClick={()=>setInputValue(daiBalance_)}
+                    onClick={()=>setInputValue(activeSeries?.ethDebtYDai_)}
                     hoverIndicator='brand-transparent'
                   />
                 </InputWrap>

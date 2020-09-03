@@ -9,6 +9,7 @@ import { SeriesContext } from '../contexts/SeriesContext';
 import SeriesSelector from './SeriesSelector';
 import AprBadge from './AprBadge';
 import Authorization from './Authorization';
+import Loading from './Loading';
 
 interface ISeriesDescriptorProps {
   activeView: string;
@@ -48,14 +49,15 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
           flex
           justify='between'
         >
-          { !activeSeries ? 
-            <ScaleLoader color={theme?.global?.colors['brand-transparent'].dark} height='13' /> :
+          <Loading condition={!activeSeries} size='small'>
+            {activeSeries &&
             <Box direction='row' gap='small'>             
               <AprBadge activeView={activeView} series={activeSeries} />
               <Text color='brand' size='large'>            
-                { activeSeries.displayName }
+                { activeSeries?.displayName }
               </Text>
             </Box>}
+          </Loading>
 
           <Button
             color='brand-transparent'
@@ -78,7 +80,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
 
       </Box>
 
-      { activeSeries?.hasDelegatedPool === false && 
+      { !(activeSeries?.isMature()) &&  activeSeries?.hasDelegatedPool === false && 
       <Box 
         fill='horizontal'
         margin={{ vertical:'small' }}
