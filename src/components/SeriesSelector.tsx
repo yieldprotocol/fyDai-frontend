@@ -87,7 +87,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
           </Box>
 
           <Loading condition={isLoading} size='large'>
-            { [...seriesData.values() ].map((x:any, i:any) => {       
+            { !isLoading && [...seriesData.values() ].map((x:any, i:any) => {       
               const _key = i;
               const field = viewMap.get(activeView.toUpperCase())?.field || '';
               return ( 
