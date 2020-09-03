@@ -38,6 +38,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
   const { position, authorizations: { hasDelegatedProxy } } = userState;
   const { 
     maxDaiAvailable_: maximumDai,
+    ethBorrowingPower_,
     collateralPercent_,
   } = position;
 
@@ -98,8 +99,6 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
       if (preview && !preview.isZero()) {
         setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
         setAPR( yieldAPR( ethers.utils.parseEther(inputValue.toString()), preview, activeSeries.maturity ) );      
-        setWarningMsg(null);
-        setErrorMsg(null);
       } else {
         /* if the market doesnt have liquidity just estimate from rate */
         const rate = await previewPoolTx('buyDai', activeSeries, 1);
@@ -122,34 +121,34 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
     (
       position.ethPosted_ <= 0 ||
       estRatio <= 2 ||
+      inputValue >= ethBorrowingPower_ ||
       !account ||
       !hasDelegatedProxy ||
-      !inputValue || 
+      !inputValue ||
       parseFloat(inputValue) === 0
     )? setBorrowDisabled(true): setBorrowDisabled(false);
   }, [ inputValue, hasDelegatedProxy, estRatio ]);
 
   /* Handle collateralisation ratio exceptions and warnings */
-  useEffect(()=>{
-    if (estRatio && estRatio <= 2) {
-      // setBorrowDisabled(true);
-      setWarningMsg(null);
-      setErrorMsg('That amount exceeds the amount of Dai you can borrow based on your collateral'); 
-    } else if (estRatio > 2 && estRatio < 2.5 ) {
-      setErrorMsg(null);
-      setWarningMsg('Borrowing that much will put you at risk of liquidation');
-    } else {
-      setWarningMsg(null);
-      setErrorMsg(null);
-    }
-  }, [ estRatio ]);
+  // useEffect(()=>{
+  //   if (estRatio && estRatio <= 2) {
+  //     setErrorMsg('That amount exceeds the amount of Dai you can borrow based on your collateral');
+  //     setWarningMsg(null);
+  //   } else if (estRatio > 2 && estRatio < 2.5 ) {
+  //     setWarningMsg('Borrowing that much will put you at risk of liquidation');
+  //     setErrorMsg(null);
+  //   } else {
+  //     setWarningMsg(null);
+  //     setErrorMsg(null);
+  //   }
+  // }, [ estRatio ]);
 
   /* Handle input exception logic */
   useEffect(() => {
-    if ( position.ethPosted_>0 && inputValue && ( inputValue > maximumDai ) ) {
+    if ( inputValue && parseFloat(inputValue) >= ethBorrowingPower_ ) {
       setWarningMsg(null);
       setErrorMsg('That amount exceeds the amount of Dai you can borrow based on your collateral'); 
-    } else if (position.ethPosted_>0 && inputValue && ( inputValue > Math.round(maximumDai-1) ) ) {
+    } else if (inputValue && ( inputValue > Math.round(ethBorrowingPower_- ethBorrowingPower_*0.05 ) ) ) {
       setErrorMsg(null);
       setWarningMsg('If you borrow right up to your maximum allowance, there is high probability you will be liquidated!');
     } else {
@@ -187,9 +186,9 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
                 {
                   label: 'Max Borrowing Power',
                   visible: activeSeries && !activeSeries.isMature()  && !!account,
-                  active: maximumDai,
-                  loading: borrowPending,           
-                  value: maximumDai ? `${maximumDai.toFixed(2)} DAI`: '',
+                  active: ethBorrowingPower_,
+                  loading: borrowPending,
+                  value: ethBorrowingPower_ ? `${ethBorrowingPower_.toFixed(2)} DAI`: '',           
                   valuePrefix: 'Approx.',
                   valueExtra: null,
                 },

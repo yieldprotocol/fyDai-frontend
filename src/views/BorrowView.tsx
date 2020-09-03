@@ -21,7 +21,7 @@ const BorrowView = ({
 }: BorrowProps) => {
   
   const [ activeView, setActiveView ] = React.useState<string>( 
-    activeViewFromProps || 'COLLATERAL'
+    activeViewFromProps || 'BORROW'
   );
 
   return (

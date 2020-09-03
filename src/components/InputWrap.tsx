@@ -19,10 +19,9 @@ import { FaEthereum as Ethereum } from 'react-icons/fa';
 import InlineAlert from './InlineAlert';
 
 interface IInputProps {
-  disabled: boolean,
-  warningMsg?: string|null;
-  errorMsg?: string|null;
-
+  warningMsg: string|null;
+  errorMsg: string|null;
+  disabled?: boolean,
   children:any;
 }
 
@@ -75,6 +74,6 @@ function InputWrap( { warningMsg, errorMsg, disabled, children }: IInputProps) {
   );
 }
 
-InputWrap.defaultProps = { warningMsg:null, errorMsg:null };
+InputWrap.defaultProps = { disabled:false };
 
 export default InputWrap;
