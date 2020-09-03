@@ -9,6 +9,7 @@ import { SeriesContext } from '../contexts/SeriesContext';
 
 import AprBadge from './AprBadge';
 import Loading from './Loading';
+import { IYieldSeries } from '../types';
 
 interface ISeriesSelectorProps {
   activeView:string;
@@ -22,6 +23,9 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
   const { isLoading, activeSeries, seriesData } = seriesState; 
   const { setActiveSeries } = seriesActions;
 
+  const [sortedList, setSortedList] = React.useState<IYieldSeries[]>(seriesData);
+
+
   const viewMap = new Map([
     ['BORROW', { head: 'DEBT', field: 'ethDebtYDai_' }],
     ['LEND', { head: 'BALANCE', field: 'yDaiBalance_' }],
@@ -32,6 +36,17 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
     setActiveSeries(seriesMaturity);
     close();
   };
+
+  React.useEffect(()=>{
+
+
+  },[])
+
+  const seriesSorted = () => {
+
+    return seriesData 
+  }
+
 
   return (
     <Layer
