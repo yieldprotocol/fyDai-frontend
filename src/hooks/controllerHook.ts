@@ -6,6 +6,7 @@ import Controller from '../contracts/Controller.json';
 import TestERC20 from '../contracts/TestERC20.json';
 
 import { useSignerAccount } from './connectionHooks';
+import { useTxHelpers } from './appHooks';
 
 /**
  * Hook for interacting with the yield 'CRONTROLLER' Contract
@@ -30,16 +31,7 @@ export const useController = () => {
   const [ repayActive, setRepayActive ] = React.useState<boolean>(false);
   const [ approveActive, setApproveActive ] = React.useState<boolean>(false);
 
-  /* Notification Helpers */
-  const txComplete = (tx:any) => {
-    dispatch({ type: 'txComplete', payload:{ tx } } );
-  }; 
-  const handleTxError = (msg:string, tx: any, e:any) => {
-    // eslint-disable-next-line no-console
-    console.log(e.message);
-    dispatch({ type: 'notify', payload:{ message: msg, type:'error' } } );
-    txComplete(tx);
-  };
+  const { handleTx, handleTxError } = useTxHelpers();
 
   /**
    * Posts 'wrapped' collateral (Weth or Chai) - not ETH directly.
@@ -71,9 +63,8 @@ export const useController = () => {
       return;
     }
     dispatch({ type: 'txPending', payload:{ tx, message: `Deposit of ${amount} pending...`, type:'DEPOSIT' } } );
-    await tx.wait();
+    await handleTx(tx);
     setPostActive(false);
-    txComplete(tx);
   };
 
   /**
@@ -106,9 +97,8 @@ export const useController = () => {
       return;
     }
     dispatch({ type: 'txPending', payload:{ tx, message: `Withdraw of ${amount} pending...`, type:'WITHDRAW' } } );
-    await tx.wait();
+    await handleTx(tx);
     setWithdrawActive(false);
-    txComplete(tx);
   };
 
   /**
@@ -147,11 +137,8 @@ export const useController = () => {
       return;
     }
     dispatch({ type: 'txPending', payload:{ tx, message: `Borrowing of ${amount} pending...`, type:'BORROW' } } );
-    await tx.wait();
+    await handleTx(tx);
     setBorrowActive(false);
-    txComplete(tx);
-    // eslint-disable-next-line consistent-return
-    return tx;
   };
 
   /**
@@ -195,11 +182,8 @@ export const useController = () => {
       return;
     }
     dispatch({ type: 'txPending', payload:{ tx, message: `Repayment of ${amount} pending...`, type:'REPAY' } } );
-    await tx.wait();
+    await handleTx(tx);
     setRepayActive(false);
-    txComplete(tx);
-    // eslint-disable-next-line consistent-return
-    return tx;
   };
 
   /**
@@ -237,9 +221,8 @@ export const useController = () => {
       return;
     }
     dispatch({ type: 'txPending', payload:{ tx, message: `Token approval of ${amount} pending...` } } );
-    await tx.wait();
+    await handleTx(tx);
     setApproveActive(false);
-    txComplete(tx); 
   };
 
   /**
@@ -270,8 +253,7 @@ export const useController = () => {
     }
     /* Transaction reporting & tracking */
     dispatch({ type: 'txPending', payload:{ tx, message: 'Pending once-off delegation...', type:'DELEGATION' } } );
-    await tx.wait();
-    txComplete(tx);
+    await handleTx(tx);
   };
 
   /**

@@ -14,6 +14,44 @@ export const useTxActive = (typeList:string[]) => {
   return [txActive] as const; 
 };
 
+export const useTxHelpers = () => { 
+
+  const  { dispatch }  = React.useContext<any>(NotifyContext);
+
+  /* Notification Helpers */
+  const txComplete = (tx:any) => {
+    dispatch({ type: 'txComplete', payload:{ tx } } );
+  };
+  
+  const handleTxError = (msg:string, tx: any, e:any) => {
+    // eslint-disable-next-line no-console
+    console.log(e.message);
+    dispatch({ type: 'notify', payload:{ message: msg, type:'error' } } );
+    txComplete(tx);
+  };
+  
+  const handleTx = async (tx:any) => {
+    await tx.wait()
+      .then((receipt:any) => {
+        dispatch({ type: 'txComplete', payload:{ tx } } );
+        txComplete(tx);
+        console.log(receipt);  
+      }, ( error:any ) => {
+        // tease out the reason for the error here. 
+        handleTxError('error', tx, error);
+        // This is entered if the status of the receipt is failure
+        // return error.checkCall() .then((err:any) => {
+        //   console.log('Error', err);
+        //   handleTxError('error', tx, err);
+        // });
+      });
+  };
+  
+  return { handleTx, txComplete, handleTxError };
+
+};
+
+
 /* Simple Hook for caching retrieved data */
 export const useCachedState = (key:string, initialValue:any) => {
   // const genKey = `${chainId}_${key}` || key;

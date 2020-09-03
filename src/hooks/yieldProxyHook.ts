@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { ethers, BigNumber }  from 'ethers';
+
 import * as utils from '../utils';
 
 import YieldProxy from '../contracts/YieldProxy.json';
@@ -15,6 +16,7 @@ import { useMath } from './mathHooks';
 import { useToken } from './tokenHook';
 
 import { IYieldSeries } from '../types';
+import { useTxHelpers } from './appHooks';
 
 /**
  * Hook for interacting with the Yield Proxy Contract.
@@ -45,6 +47,8 @@ export const useProxy = () => {
   const { splitDaiLiquidity } = useMath();
   const { getBalance } = useToken();
 
+  const { handleTx, handleTxError } = useTxHelpers();
+
   const { abi: yieldProxyAbi } = YieldProxy;
   
   const  { dispatch }  = React.useContext<any>(NotifyContext);
@@ -63,18 +67,8 @@ export const useProxy = () => {
   const [ buyActive, setBuyActive ] = React.useState<boolean>(false);
   const [ sellActive, setSellActive ] = React.useState<boolean>(false);
 
-  /* Notification Helpers */
-  const txComplete = (tx:any) => {
-    dispatch({ type: 'txComplete', payload:{ tx } } );
-  }; 
-  const handleTxError = (msg:string, tx: any, e:any) => {
-    // eslint-disable-next-line no-console
-    console.log(e.message);
-    dispatch({ type: 'notify', payload:{ message: msg, type:'error' } } );
-    txComplete(tx);
-  };
 
-  // TODO: deal with big number rather
+  // TODO: deal with big number rather also, put htis out in a hook
   const valueWithSlippage = (value:BigNumber, minimise:boolean=false ) => {
     const slippageAsRay = utils.toRay(slippage);
     const slippageAmount = utils.mulRay(value, slippageAsRay);
@@ -111,18 +105,14 @@ export const useProxy = () => {
     try {
       tx = await proxyContract.post(toAddr, { value: parsedAmount }); 
     } catch (e) {
-      handleTxError('Error depositing ETH', tx, e );   
+      handleTxError('Error depositing ETH', tx, e ); 
       setPostEthActive(false);
       return;
     }
     dispatch({ type: 'txPending', payload:{ tx, message: `Deposit of ${amount} ETH pending...`, type:'DEPOSIT' } } );
-    await tx.wait();
+    await handleTx(tx);
     setPostEthActive(false);
-    txComplete(tx);
-    // eslint-disable-next-line consistent-return
-    return tx;
   };
-
 
   /**
    * @dev Withdraw ETH collateral via YieldProxy
@@ -147,11 +137,8 @@ export const useProxy = () => {
       return;
     }
     dispatch({ type: 'txPending', payload:{ tx, message: `Withdraw of ${amount} ETH pending...`, type:'WITHDRAW' } } );
-    await tx.wait();
+    await handleTx(tx);
     setWithdrawEthActive(false);
-    txComplete(tx);
-    // eslint-disable-next-line consistent-return
-    return tx;
   };
 
 
@@ -197,8 +184,8 @@ export const useProxy = () => {
       return;
     } 
 
-    let tx:any;
     setBorrowActive(true);
+    let tx:any;
     try {
       tx = await proxyContract.borrowDaiForMaximumYDai( poolAddr, utils.ETH, parsedMaturity, toAddr, maxYDai, dai, overrides ); 
     } catch (e) {
@@ -207,11 +194,8 @@ export const useProxy = () => {
       return;
     }
     dispatch({ type: 'txPending', payload:{ tx, message: `Borrowing ${daiToBorrow} Dai pending...`, type:'BORROW' } } );
-    await tx.wait();
+    await handleTx(tx);
     setBorrowActive(false);
-    txComplete(tx);
-    // eslint-disable-next-line consistent-return
-    return tx;
   };
 
 
@@ -238,7 +222,6 @@ export const useProxy = () => {
     const toAddr = account && ethers.utils.getAddress(account);
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const yDaiAddr = ethers.utils.getAddress(series.yDaiAddress);
-
     const parsedMaturity = series.maturity.toString();
     // const minYDai = ethers.utils.parseEther(minimumYDaiRepayment.toString());
 
@@ -261,9 +244,8 @@ export const useProxy = () => {
       return;
     } 
 
-    let tx:any;
     setRepayActive(true);
-
+    let tx:any;
     try {
       // console.log('gas est:', ( await proxyContract.estimateGas.repayMinimumYDaiDebtForDai(poolAddr, collatType, parsedMaturity, toAddr, parsedYDai, parsedDai, overrides )).toString());
       // console.log('dry-run:', ( await proxyContract.callStatic.repayMinimumYDaiDebtForDai(poolAddr, collatType, parsedMaturity, toAddr, parsedYDai, parsedDai, overrides )).toString());           
@@ -274,8 +256,7 @@ export const useProxy = () => {
         toAddr,
         minYDai,
         dai,
-        overrides );
-    
+        overrides );  
     } catch (e) {
       console.log(e);
       handleTxError('Error Repaying Dai', tx, e);
@@ -283,11 +264,8 @@ export const useProxy = () => {
       return;
     }
     dispatch({ type: 'txPending', payload:{ tx, message: `Repaying ${repaymentInDai} Dai pending...`, type:'REPAY' } } );
-    await tx.wait();
+    handleTx(tx);
     setRepayActive(false);
-    txComplete(tx);
-    // eslint-disable-next-line consistent-return
-    return tx;
   };
 
 
@@ -341,11 +319,8 @@ export const useProxy = () => {
       return;
     }
     dispatch({ type: 'txPending', payload:{ tx, message: `Adding ${daiUsed} DAI liquidity pending...`, type:'ADD_LIQUIDITY' } } );
-    await tx.wait();
+    await handleTx(tx);
     setAddLiquidityActive(false);
-    txComplete(tx);
-    // eslint-disable-next-line consistent-return
-    return tx;
   };
 
   /**
@@ -391,11 +366,8 @@ export const useProxy = () => {
       return;
     }
     dispatch({ type: 'txPending', payload:{ tx, message: `Removing ${tokens} DAI liquidity pending...`, type:'REMOVE_LIQUIDITY' } } );
-    await tx.wait();
+    await handleTx(tx);
     setRemoveLiquidityActive(false);
-    txComplete(tx);
-    // eslint-disable-next-line consistent-return
-    return tx;
   };
 
 
@@ -443,11 +415,8 @@ export const useProxy = () => {
       return;
     }
     dispatch({ type: 'txPending', payload:{ tx, message: `Selling ${daiIn} DAI pending...`, type:'SELL' } } );
-    await tx.wait();
+    await handleTx(tx);
     setSellActive(false);
-    txComplete(tx);
-    // eslint-disable-next-line consistent-return
-    return tx;
   };
 
   /**
@@ -490,14 +459,11 @@ export const useProxy = () => {
       return;
     }
     dispatch({ type: 'txPending', payload:{ tx, message: `Buying back ${daiOut} DAI pending...`, type:'BUY' } } );
-    await tx.wait();
+    await handleTx(tx);
     setBuyActive(false);
-    txComplete(tx);
-    // eslint-disable-next-line consistent-return
-    return tx;
   };
 
-  // TODO Add these two only if required
+  // TODO Add these two ONLY if required
   const sellYDai = () => {};
   const buyYDai = () => {};
 

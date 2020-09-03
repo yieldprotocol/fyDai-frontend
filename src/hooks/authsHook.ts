@@ -18,6 +18,7 @@ import { NotifyContext } from '../contexts/NotifyContext';
 import { YieldContext } from '../contexts/YieldContext';
 
 import { useSignerAccount } from './connectionHooks';
+import { useTxHelpers } from './appHooks';
 
 
 const MAX_INT = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
@@ -68,6 +69,8 @@ export const useAuth = () => {
 
   const [authActive, setAuthActive] = React.useState<boolean>(false);
 
+  const { handleTx, handleTxError } = useTxHelpers();
+
   const sendForSig = (_provider: any, method: string, params?: any[]) => new Promise<any>((resolve, reject) => {
     const payload = {
       method,
@@ -86,18 +89,6 @@ export const useAuth = () => {
     _provider.sendAsync( payload, callback );
   });
 
-  /* Notification Helpers */
-  const txComplete = (tx:any) => {
-    dispatch({ type: 'txComplete', payload:{ tx } } );
-    setAuthActive(false);
-  }; 
-  const handleTxError = (msg:string, tx: any, e:any) => {
-    // eslint-disable-next-line no-console
-    console.log(e.message);
-    dispatch({ type: 'notify', payload:{ message: msg, type:'error' } } );
-    setAuthActive(false);
-    txComplete(tx);
-  };
   const handleSignError = (e:any) =>{
     // eslint-disable-next-line no-console
     console.log(e);
@@ -154,16 +145,14 @@ export const useAuth = () => {
     try {
       tx = await proxyContract.onboard(fromAddr, daiPermitSig, controllerSig);
     } catch (e) {
-      handleTxError('Error authorsiing contracts', tx, e);
+      handleTxError('Error authorizing contracts', tx, e);
+      setAuthActive(false);
       return;
     }
     dispatch({ type: 'txPending', payload: { tx, message: 'Authorization pending...', type:'AUTH' } });
-    await tx.wait();
+    await handleTx(tx);
     dispatch({ type: 'requestSigs', payload:[] });
-    txComplete(tx);
-
-    // eslint-disable-next-line consistent-return
-    return tx;
+    setAuthActive(false);
   };
 
 
@@ -235,15 +224,13 @@ export const useAuth = () => {
       tx = await proxyContract.authorizePool(poolAddr, fromAddr, daiSig, yDaiSig, poolSig);
     } catch (e) {
       handleTxError('Error authorizing contracts', tx, e);
+      setAuthActive(false);
       return;
     }
     dispatch({ type: 'txPending', payload: { tx, message: 'Authorization pending...', type:'AUTH' } });
-    await tx.wait();
-
+    await handleTx(tx);
     dispatch({ type: 'requestSigs', payload:[] });
-    txComplete(tx);
-    // eslint-disable-next-line consistent-return
-    return tx;
+    setAuthActive(false);
   };
 
   return {
