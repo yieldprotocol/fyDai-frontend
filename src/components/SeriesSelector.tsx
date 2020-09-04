@@ -23,7 +23,9 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
   const { isLoading, activeSeries, seriesData } = seriesState; 
   const { setActiveSeries } = seriesActions;
 
-  const [sortedList, setSortedList] = React.useState<IYieldSeries[]>(seriesData);
+  const [sortedList, setSortedList] = React.useState<any>(seriesData);
+  const [firstSort, setFirstSort] = React.useState<any>('');
+  const [secondSort, setSecondSort] = React.useState<any>('');
 
 
   const viewMap = new Map([
@@ -37,16 +39,27 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
     close();
   };
 
+  /* filter by isMature, then sort by maturity date  */
   React.useEffect(()=>{
 
+    const sortedActive = new Map([...seriesData.entries()]
+      .filter((x:any)=> !(x[1].isMature()) )
+      .sort()
+    );
+    const sortedMature = new Map([...seriesData.entries()]
+      .filter((x:any)=> x[1].isMature() )
+      .sort(
+        (a:any, b:any)=>{
+          return ( a[0]>b[0] ? 0:-1 );
+        }
+      )
+    );
+    const mergedMap = new Map([...sortedActive, ...sortedMature]);
+    setSortedList(mergedMap);
 
-  },[])
+    // setSortedList(seriesData);
 
-  const seriesSorted = () => {
-
-    return seriesData 
-  }
-
+  }, [seriesData]);
 
   return (
     <Layer
@@ -102,9 +115,10 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
           </Box>
 
           <Loading condition={isLoading} size='large'>
-            { !isLoading && [...seriesData.values() ].map((x:any, i:any) => {       
+            { !isLoading && [...sortedList.values() ].map((x:any, i:any) => {       
               const _key = i;
               const field = viewMap.get(activeView.toUpperCase())?.field || '';
+
               return ( 
                 <Box
                   key={_key}

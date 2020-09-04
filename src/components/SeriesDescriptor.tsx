@@ -3,7 +3,6 @@ import { Box, Text, ThemeContext, ResponsiveContext, Button } from 'grommet';
 
 import { FiLayers as ChangeSeries } from 'react-icons/fi';
 
-import { ScaleLoader } from 'react-spinners';
 import { SeriesContext } from '../contexts/SeriesContext';
 
 import SeriesSelector from './SeriesSelector';

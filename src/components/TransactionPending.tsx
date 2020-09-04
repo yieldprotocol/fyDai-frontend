@@ -25,21 +25,21 @@ const TransactionPending = ({ msg, tx }:TransactionPendingProps) => {
         >
           <Text>{msg}</Text>
           <Text>Your transaction is pending: </Text>
-          <Text size='xsmall'> { tx.tx.hash } </Text>
 
           <RingLoader color={theme?.global?.colors?.brand.dark || 'grey'} />
 
+
+          <Text size='xsmall'> { tx.tx.hash } </Text>
           <Box 
-            fill='horizontal'
             round='small'
             border='all'
-            // background='brand'
             hoverIndicator='brand-transparent'
             onClick={()=>{ window.open( `https://rinkeby.etherscan.io/tx/${tx.tx.hash}`, '_blank');}} 
             align='center'
-            pad='small'
+            pad={{horizontal:'large'}}
           >
             <Text
+              size='xsmall'
               weight='bold'
             >
               View on Etherscan
