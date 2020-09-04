@@ -37,8 +37,8 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
   const { state: userState, actions: userActions } = React.useContext(UserContext);
   const { position, authorizations: { hasDelegatedProxy } } = userState;
   const { 
-    maxDaiAvailable_: maximumDai,
-    ethBorrowingPower_,
+    maxDaiAvailable_,
+    // ethBorrowingPower_,
     collateralPercent_,
   } = position;
 
@@ -121,7 +121,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
     (
       position.ethPosted_ <= 0 ||
       estRatio <= 2 ||
-      inputValue >= ethBorrowingPower_ ||
+      inputValue >= maxDaiAvailable_ ||
       !account ||
       !hasDelegatedProxy ||
       !inputValue ||
@@ -145,10 +145,10 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
 
   /* Handle input exception logic */
   useEffect(() => {
-    if ( inputValue && parseFloat(inputValue) >= ethBorrowingPower_ ) {
+    if ( inputValue && parseFloat(inputValue) >= maxDaiAvailable_ ) {
       setWarningMsg(null);
       setErrorMsg('That amount exceeds the amount of Dai you can borrow based on your collateral'); 
-    } else if (inputValue && ( inputValue > Math.round(ethBorrowingPower_- ethBorrowingPower_*0.05 ) ) ) {
+    } else if (inputValue && ( inputValue > Math.round(maxDaiAvailable_- maxDaiAvailable_*0.05 ) ) ) {
       setErrorMsg(null);
       setWarningMsg('If you borrow right up to your maximum allowance, there is high probability you will be liquidated!');
     } else {
@@ -186,9 +186,9 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
                 {
                   label: 'Max Borrowing Power',
                   visible: activeSeries && !activeSeries.isMature()  && !!account,
-                  active: ethBorrowingPower_,
+                  active: maxDaiAvailable_,
                   loading: borrowPending,
-                  value: ethBorrowingPower_ ? `${ethBorrowingPower_.toFixed(2)} DAI`: '',           
+                  value: maxDaiAvailable_ ? `${maxDaiAvailable_.toFixed(2)} DAI`: '',           
                   valuePrefix: 'Approx.',
                   valueExtra: null,
                 },
