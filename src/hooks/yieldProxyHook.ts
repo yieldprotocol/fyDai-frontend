@@ -172,21 +172,12 @@ export const useProxy = () => {
       gasLimit: BigNumber.from('300000')
     };
 
-    /* Calculate expected trade values and factor in slippage */
-    let maxYDai;
-    try {
-      const yDaiExpected = await previewPoolTx('buydai', series, daiToBorrow);
-      if (yDaiExpected) { 
-        maxYDai = valueWithSlippage(yDaiExpected);
-      }
-    } catch (e) {
-      console.log(e);
-      return;
-    } 
-
     setBorrowActive(true);
     let tx:any;
     try {
+      /* Calculate expected trade values and factor in slippage */
+      const maxYDai = valueWithSlippage(await previewPoolTx('buydai', series, daiToBorrow));
+
       tx = await proxyContract.borrowDaiForMaximumYDai( poolAddr, utils.ETH, parsedMaturity, toAddr, maxYDai, dai, overrides ); 
     } catch (e) {
       handleTxError('Error Borrowing Dai', tx, e);
@@ -230,26 +221,15 @@ export const useProxy = () => {
       gasLimit: BigNumber.from('300000')
     };
 
-    /* calculate expected trade values and factor in slippage */
-    // const yDaiExpected = await previewPoolTx('selldai', series, repaymentInDai);
-    // const minYDai = valueWithSlippage(yDaiExpected, true);
-    let minYDai;
-    try {
-      const yDaiExpected = await previewPoolTx('selldai', series, repaymentInDai);
-      if (yDaiExpected) { 
-        minYDai = valueWithSlippage(yDaiExpected, true);
-      }
-    } catch (e) {
-      console.log(e);
-      return;
-    } 
-
     setRepayActive(true);
     let tx:any;
     try {
       // console.log('gas est:', ( await proxyContract.estimateGas.repayMinimumYDaiDebtForDai(poolAddr, collatType, parsedMaturity, toAddr, parsedYDai, parsedDai, overrides )).toString());
       // console.log('dry-run:', ( await proxyContract.callStatic.repayMinimumYDaiDebtForDai(poolAddr, collatType, parsedMaturity, toAddr, parsedYDai, parsedDai, overrides )).toString());           
       
+      /* calculate expected trade values and factor in slippage */
+      const minYDai = valueWithSlippage(await previewPoolTx('selldai', series, repaymentInDai), true);
+
       tx = await proxyContract.repayMinimumYDaiDebtForDai(
         poolAddr,
         collatType,
@@ -292,17 +272,17 @@ export const useProxy = () => {
     /* calculate minimum expected yDai value and factor in slippage */
     const daiReserves = await getBalance(deployedContracts.Dai, 'Dai', poolAddr);
     const yDaiReserves = await getBalance(series.yDaiAddress, 'YDai', poolAddr);
-    const [ ,yDaiSplit ] = splitDaiLiquidity( parsedDaiUsed, daiReserves, yDaiReserves );
+    const [ , yDaiSplit ] = splitDaiLiquidity( parsedDaiUsed, daiReserves, yDaiReserves );
 
     /* Contract interaction */
     let tx:any;
     setAddLiquidityActive(true);
     try {
       /* Calculate expected trade values and factor in slippage */
-      // const maxYDai = valueWithSlippage(await previewPoolTx('sellDai', series, yDaiSplit)); 
+      const maxYDai = valueWithSlippage(await previewPoolTx('sellDai', series, yDaiSplit)); 
 
       // testing 
-      const maxYDai = ethers.utils.parseEther('1000000');
+      // const maxYDai = ethers.utils.parseEther('1000000');
 
       tx = await proxyContract.addLiquidity(poolAddr, parsedDaiUsed, maxYDai );
     } catch (e) {
@@ -342,7 +322,7 @@ export const useProxy = () => {
     try {
       if (!isMature()) {
         /* calculate expected trade values and factor in slippage */
-        // const minDai = valueWithSlippage(await previewPoolTx('selldai', poolAddr, daiUsed), true)
+        // const minDai = valueWithSlippage(await previewPoolTx('selldai', series, daiUsed), true);
 
         // testing with slippage etc. 
         const minDai = ethers.utils.parseEther('0');
@@ -386,11 +366,10 @@ export const useProxy = () => {
     setSellActive(true);
     try {
       /* calculate expected trade values and factor in slippage */
-      // const minYDaiOut = valueWithSlippage( await previewPoolTx('selldai', series, daiIn), true );
+      const minYDaiOut = valueWithSlippage( await previewPoolTx('selldai', series, daiIn), true );
 
-      console.log(ethers.utils.parseEther('0').toString());
       // temp min for testing */
-      const minYDaiOut = ethers.utils.parseEther('0');
+      // const minYDaiOut = ethers.utils.parseEther('0');
 
       tx = await proxyContract.sellDai(poolAddr, toAddr, parsedDaiIn, minYDaiOut); 
     } catch (e) {
@@ -423,10 +402,10 @@ export const useProxy = () => {
     try {
 
       /* calculate expected trade values and factor in slippage */
-      // const maxYDaiIn = valueWithSlippage( await previewPoolTx('buydai', series, daiOut) );
+      const maxYDaiIn = valueWithSlippage( await previewPoolTx('buydai', series, daiOut) );
 
       // temp max bignumber for testing */
-      const maxYDaiIn = ethers.utils.parseEther('1000000');
+      // const maxYDaiIn = ethers.utils.parseEther('1000000');
 
       tx = await proxyContract.buyDai(poolAddr, toAddr, parsedDaiOut, maxYDaiIn);
     } catch (e) {
