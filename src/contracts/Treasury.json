@@ -23638,7 +23638,7 @@
     }
   },
   "schemaVersion": "3.2.3",
-  "updatedAt": "2020-09-02T12:15:34.955Z",
+  "updatedAt": "2020-09-04T15:12:38.230Z",
   "networkType": "ethereum",
   "devdoc": {
     "details": "Treasury manages asset transfers between all contracts in the Yield Protocol and other external contracts such as Chai and MakerDAO. Treasury doesn't have any transactional functions available for regular users. All transactional methods are to be available only for orchestrated contracts. Treasury will ensure that all Weth is always stored as collateral in MAkerDAO. Treasury will use all Dai to pay off system debt in MakerDAO first, and if there is no system debt the surplus Dai will be wrapped as Chai. Treasury will use any Chai it holds when requested to provide Dai. If there isn't enough Chai, it will borrow Dai from MakerDAO.",
