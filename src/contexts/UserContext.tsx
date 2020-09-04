@@ -144,7 +144,7 @@ const UserProvider = ({ children }: any) => {
     const collateralRatio = collRatio(collateralValue, ethTotalDebtDai);
     const collateralPercent = collPercent(collateralRatio);
     // const minSafeCollateral = minSafeColl( ethTotalDebtDai, 1.5, collateralPrice);
-    const safeBorrowingPower = daiAvailable( collateralValue, ethTotalDebtDai, 2);
+    const maxDaiAvailable = daiAvailable( collateralValue, ethTotalDebtDai, 2);
 
     const values = {
       ethBalance, 
@@ -160,7 +160,7 @@ const UserProvider = ({ children }: any) => {
       collateralRatio,
       collateralPercent,
       // minSafeCollateral,
-      safeBorrowingPower,
+      maxDaiAvailable,
       // collateralAmount
     };
 
@@ -180,7 +180,7 @@ const UserProvider = ({ children }: any) => {
       collateralPercent_ : parseFloat(collateralPercent.toString()),
       // collateralAmount_ : utils.wadToHuman(collateralAmount),
       // minSafeCollateral_ : utils.wadToHuman(minSafeCollateral),
-      safeBorrowingPower_ : utils.wadToHuman(safeBorrowingPower),
+      maxDaiAvailable_ : utils.wadToHuman(maxDaiAvailable),
     };
     console.log('User updated:');
     console.log({ ...values, ...parsedValues } );

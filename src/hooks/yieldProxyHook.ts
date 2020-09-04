@@ -237,7 +237,7 @@ export const useProxy = () => {
     try {
       const yDaiExpected = await previewPoolTx('selldai', series, repaymentInDai);
       if (yDaiExpected) { 
-        minYDai = valueWithSlippage(yDaiExpected);
+        minYDai = valueWithSlippage(yDaiExpected, true);
       }
     } catch (e) {
       console.log(e);
@@ -264,7 +264,7 @@ export const useProxy = () => {
       return;
     }
     dispatch({ type: 'txPending', payload:{ tx, message: `Repaying ${repaymentInDai} Dai pending...`, type:'REPAY' } } );
-    handleTx(tx);
+    await handleTx(tx);
     setRepayActive(false);
   };
 

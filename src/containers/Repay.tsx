@@ -54,21 +54,28 @@ function Repay({ repayAmount }:IRepayProps) {
 
   const repayProcedure = async (value:number) => {
     if (!repayDisabled) {
-      setRepayPending(true); 
+      setRepayPending(true);
 
-      if (!activeSeries?.isMature()) {
+      if ( !(activeSeries?.isMature()) ) {
         /* repay using proxy */
         await repayDaiDebt(activeSeries, 'ETH-A', 1, value);
+        setInputValue('');
+        await Promise.all([
+          userActions.updatePosition(),
+          seriesActions.updateActiveSeries()
+        ]);
+        setRepayPending(false);
       } else {
-        /* repay directly */
+      /* repay directly */
         await repay(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value, 'DAI');
+        setInputValue('');
+        await Promise.all([
+          userActions.updatePosition(),
+          seriesActions.updateActiveSeries()
+        ]);
+        setRepayPending(false);
       }
-      setInputValue('');
-      await Promise.all([
-        userActions.updatePosition(),
-        seriesActions.updateActiveSeries()
-      ]);
-      setRepayPending(false);
+
     }
   };
 
