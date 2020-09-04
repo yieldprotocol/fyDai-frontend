@@ -362,6 +362,7 @@ const UserProvider = ({ children }: any) => {
     rebuildHistory: () => _getTxHistory(true),
 
     updatePosition: () => _getPosition(),
+    updateAuthorizations: () => _getAuthorizations(),
 
     updateMakerData: () => console.log('makerData update'),
     updatePreferences: () => console.log('makerData update'),

@@ -6,6 +6,7 @@ import {
   FiCircle as Circle,
   FiClock as Clock,
   FiUnlock as Unlock,
+  FiArrowLeft as ArrowLeft, 
   FiAlertTriangle as Warning,
 } from 'react-icons/fi';
 
@@ -26,8 +27,9 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
   const { hasDelegatedProxy } = authorizations;
   const { actions: seriesActions } = React.useContext(SeriesContext);
 
+  // flags 
   const [ authPending, setAuthPending ] = React.useState<boolean>(false);
-
+  const [ layerOpen, setLayerOpen ] = React.useState<boolean>(true);
   const [ allSigned, setAllSigned ] = React.useState<boolean>(false);
   
   const { account } = useSignerAccount();
@@ -39,11 +41,20 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
     !series && await yieldAuth();
     series && await poolAuth(series.yDaiAddress, series.poolAddress);
     await Promise.all([
-      userActions.updatePosition(),
+      userActions.updateAuthorizations(),
       seriesActions.updateActiveSeries()
     ]);
     setAuthPending(false);
   };
+
+  const closeAuth = () => {
+    setLayerOpen(false);
+  };
+
+  /* manage layer open /closed by watching authActive */
+  React.useEffect(()=>{
+    authActive && setLayerOpen(true);
+  }, [authActive]);
 
   React.useEffect(()=>{
     const _allSigned = requestedSigs.reduce((acc:boolean, nextItem:any)=> {
@@ -76,8 +87,8 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
           />        
         </Box>}
 
-      { authActive && 
-        <Layer> 
+      { authActive && layerOpen &&
+        <Layer onClickOutside={()=>closeAuth()}> 
           <Box 
             round
             background='background'
@@ -119,6 +130,21 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
             { !txActive && allSigned && <Text size='xsmall' weight='bold'> Finally, confirm sending the signatures to Yield in a transaction.</Text>}
             { txActive && <Text size='xsmall' weight='bold'> Submitting your signed authorisations ... transaction pending.</Text> }
           </Box>
+          { authPending &&
+          <Box alignSelf='start'>
+            <Box
+              round
+              onClick={()=>closeAuth()}
+              hoverIndicator='brand-transparent'
+              pad={{ horizontal:'small', vertical:'small' }}
+              justify='center'
+            >
+              <Box direction='row' gap='small' align='center'>
+                <ArrowLeft color='text-weak' />
+                <Text size='xsmall' color='text-weak'>'close auth dialog and go back to the app'</Text>
+              </Box>
+            </Box>
+          </Box>}
         </Layer>} 
     </>);
 };

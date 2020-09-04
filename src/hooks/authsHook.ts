@@ -16,6 +16,7 @@ import {
 
 import { NotifyContext } from '../contexts/NotifyContext';
 import { YieldContext } from '../contexts/YieldContext';
+import { UserContext } from '../contexts/UserContext';
 
 import { useSignerAccount } from './connectionHooks';
 import { useTxHelpers } from './appHooks';
@@ -58,6 +59,8 @@ export const useAuth = () => {
   const { account, provider, signer } = useSignerAccount();
   const { state: { deployedContracts } } = React.useContext(YieldContext);
   const { dispatch } = React.useContext(NotifyContext);
+
+  const { actions: userActions } = React.useContext(UserContext);
   
   const controllerAddr = ethers.utils.getAddress(deployedContracts.Controller);
   const controllerContract = new ethers.Contract( controllerAddr, Controller.abi, provider);
