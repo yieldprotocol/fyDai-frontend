@@ -395,11 +395,14 @@ export const useProxy = () => {
     let tx:any;
     setSellActive(true);
     try {
+
       /* calculate expected trade values and factor in slippage */
       // const minYDaiOut = valueWithSlippage( 
       //   await previewPoolTx('selldai', series, daiIn), 
       //   true
       // );
+
+      /* temp min for testing */
       const minYDaiOut = BigNumber.from('0');
 
       tx = await proxyContract.sellDai(poolAddr, toAddr, parsedDaiIn, minYDaiOut); 
@@ -427,26 +430,18 @@ export const useProxy = () => {
     const parsedDaiOut = BigNumber.isBigNumber(daiOut)? daiOut : ethers.utils.parseEther(daiOut.toString());
     const toAddr = account && ethers.utils.getAddress(account);
 
-    /* calculate expected trade values and factor in slippage */
-    // const yDaiExpected = await previewPoolTx('buydai', series, daiOut);
-    // const maxYDaiIn = valueWithSlippage(yDaiExpected);
-
-    let maxYDaiIn;
-    try {
-      const yDaiExpected = await previewPoolTx('buydai', series, daiOut);
-      if (yDaiExpected) { 
-        maxYDaiIn = valueWithSlippage(yDaiExpected);
-      }
-    } catch (e) {
-      console.log(e);
-      return;
-    }
-
     /* Contract interaction */
     let tx:any;
     setBuyActive(true);
     try {
-      tx = await proxyContract.buyDai(poolAddr, toAddr, parsedDaiOut, maxYDaiIn); 
+
+      /* calculate expected trade values and factor in slippage */
+      // const maxYDaiIn = valueWithSlippage( await previewPoolTx('buydai', series, daiOut) );
+
+      /* temp max bignumber for testing */
+      const maxYDaiIn = BigNumber.from('1000000');
+
+      tx = await proxyContract.buyDai(poolAddr, toAddr, parsedDaiOut, maxYDaiIn);
     } catch (e) {
       handleTxError('Error buying Dai', tx, e );   
       setBuyActive(false);

@@ -233,7 +233,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
               fill='horizontal'
               round='small'
               background={lendDisabled ? 'brand-transparent' : 'brand'}
-              onClick={lendDisabled ? ()=>{}:()=>lendProcedure(inputValue)}
+              onClick={()=>lendProcedure(inputValue)}
               align='center'
               pad='small'
             >
