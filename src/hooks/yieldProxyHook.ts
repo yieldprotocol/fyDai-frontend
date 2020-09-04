@@ -294,26 +294,17 @@ export const useProxy = () => {
     const yDaiReserves = await getBalance(series.yDaiAddress, 'YDai', poolAddr);
     const [ ,yDaiSplit ] = splitDaiLiquidity( parsedDaiUsed, daiReserves, yDaiReserves );
 
-    // const maxYDai = await previewPoolTx('sellDai', series, yDaiSplit);
-    // const maxYDaiWithSlippage = valueWithSlippage(maxYDai);
-
-    /* Calculate expected trade values and factor in slippage */
-    let maxYDaiWithSlippage;
-    try {
-      const yDaiExpected = await previewPoolTx('sellDai', series, yDaiSplit);
-      if (yDaiExpected) { 
-        maxYDaiWithSlippage = valueWithSlippage(yDaiExpected);
-      }
-    } catch (e) {
-      console.log(e);
-      return;
-    }
-
     /* Contract interaction */
     let tx:any;
     setAddLiquidityActive(true);
     try {
-      tx = await proxyContract.addLiquidity(poolAddr, parsedDaiUsed, maxYDaiWithSlippage );
+      /* Calculate expected trade values and factor in slippage */
+      // const maxYDai = valueWithSlippage(await previewPoolTx('sellDai', series, yDaiSplit)); 
+
+      // testing 
+      const maxYDai = ethers.utils.parseEther('1000000');
+
+      tx = await proxyContract.addLiquidity(poolAddr, parsedDaiUsed, maxYDai );
     } catch (e) {
       handleTxError('Error Adding liquidity', tx, e);
       setAddLiquidityActive(false);
@@ -344,19 +335,18 @@ export const useProxy = () => {
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const { isMature } = series;
     const parsedTokens = BigNumber.isBigNumber(tokens)? tokens : ethers.utils.parseEther(tokens.toString());
-
-    /* calculate expected trade values and factor in slippage */
-    // const yDaiExpected = await previewPoolTx('selldai', poolAddr, daiUsed);
-    // const minDai = valueWithSlippage(yDaiExpected, true);
-
-    // const minDai = ethers.utils.parseEther(minimumDai.toString());
-    const minDai = 1;
     
     /* Contract interaction */
     let tx:any;
     setRemoveLiquidityActive(true);
     try {
       if (!isMature()) {
+        /* calculate expected trade values and factor in slippage */
+        // const minDai = valueWithSlippage(await previewPoolTx('selldai', poolAddr, daiUsed), true)
+
+        // testing with slippage etc. 
+        const minDai = ethers.utils.parseEther('0');
+
         tx = await proxyContract.removeLiquidityEarly(poolAddr, parsedTokens, minDai);
       } else {
         tx = await proxyContract.removeLiquidityMature(poolAddr, tokens);
@@ -380,11 +370,11 @@ export const useProxy = () => {
    * @dev Sell Dai for yDai
    * 
    * @param {IYieldSeries} series series to act on.
-   * @param daiIn Amount of dai being bought
+   * @param daiIn Amount of dai being bought (if in BigNumber make sure its in Wei. )
    * */
   const sellDai = async (  
     series: IYieldSeries,
-    daiIn:number, 
+    daiIn: number| BigNumber, 
   ) => {
     /* Processing and/or sanitizing input */
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
@@ -395,15 +385,12 @@ export const useProxy = () => {
     let tx:any;
     setSellActive(true);
     try {
-
       /* calculate expected trade values and factor in slippage */
-      // const minYDaiOut = valueWithSlippage( 
-      //   await previewPoolTx('selldai', series, daiIn), 
-      //   true
-      // );
+      // const minYDaiOut = valueWithSlippage( await previewPoolTx('selldai', series, daiIn), true );
 
-      /* temp min for testing */
-      const minYDaiOut = BigNumber.from('0');
+      console.log(ethers.utils.parseEther('0').toString());
+      // temp min for testing */
+      const minYDaiOut = ethers.utils.parseEther('0');
 
       tx = await proxyContract.sellDai(poolAddr, toAddr, parsedDaiIn, minYDaiOut); 
     } catch (e) {
@@ -438,8 +425,8 @@ export const useProxy = () => {
       /* calculate expected trade values and factor in slippage */
       // const maxYDaiIn = valueWithSlippage( await previewPoolTx('buydai', series, daiOut) );
 
-      /* temp max bignumber for testing */
-      const maxYDaiIn = BigNumber.from('1000000');
+      // temp max bignumber for testing */
+      const maxYDaiIn = ethers.utils.parseEther('1000000');
 
       tx = await proxyContract.buyDai(poolAddr, toAddr, parsedDaiOut, maxYDaiIn);
     } catch (e) {
