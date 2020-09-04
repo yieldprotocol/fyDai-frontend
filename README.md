@@ -4,9 +4,9 @@ Front end for yDai
 
 ### Start a new locally served ganache instance to test the frontend UI:  
 
-1. Clone the yDai repositiory: https://github.com/yieldprotocol/yDai.git  (working commit: 9b74fbe3993456a13b680a0de4eed4d4902c34ca ):  
+1. Clone the yDai repositiory: https://github.com/yieldprotocol/yDai.git  (working commit: c034d70cf0a3bfa0cc9bcbed474c822115904d31 ):  
 `git clone https://github.com/yieldprotocol/yDai.git`  
-`git reset --hard 9b74fbe3993456a13b680a0de4eed4d4902c34ca`    
+`git reset --hard c034d70cf0a3bfa0cc9bcbed474c822115904d31`    
 ( if you want to revert to the latest yDai, simply: `git pull` )
 
 2. Prepare necessary files ( in yDai root folder ):
