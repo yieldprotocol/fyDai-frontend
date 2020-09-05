@@ -1,8 +1,18 @@
 import React, { forwardRef } from 'react';
 import { Box, Text, Layer, Select } from 'grommet';
 
-
+import { NotifyContext } from '../contexts/NotifyContext';
+ 
 const ApprovalPending = React.forwardRef( (props, ref) => {
+
+  const { state: { requestedSigs } }  = React.useContext(NotifyContext);
+  const [ sigsRequested, setSigsRequested ] = React.useState(false);
+
+  React.useEffect(() =>{
+    console.log(requestedSigs.length);
+    requestedSigs.length ? setSigsRequested(true): setSigsRequested(false) ;
+
+  }, [requestedSigs]);
 
   return (
     <Layer
@@ -12,23 +22,38 @@ const ApprovalPending = React.forwardRef( (props, ref) => {
       // onClickOutside={onClose}
       // onEsc={onClose}
     >
-      <Box 
-        pad="medium"
-        gap="small"
-        width="medium"
-        round
-        background='background-front'
-      >
-        <Text weight='bold'>Transaction pending approval.</Text>
-
-        <Text>Please check your wallet/provider to confirm the transaction.</Text>
-       
-        {/* <Button
-          label="Toggle gutter size"
-          // onClick={() => setGutter(gutter === 'small' ? 'xsmall' : 'small')}
-        />
-        <Button label="Close" onClick={()=>console.log('clicked')} /> */}
-      </Box>
+      {  sigsRequested ? 
+        <Box 
+          pad="medium"
+          gap="small"
+          width="medium"
+          round
+          background='background-front'
+        >
+          <Text weight='bold'>Signature required</Text>
+          <Text>Please check your wallet/provider to sign the permission</Text>            
+          {/* <Button
+                    label="Toggle gutter size"
+                    // onClick={() => setGutter(gutter === 'small' ? 'xsmall' : 'small')}
+                  />
+                  <Button label="Close" onClick={()=>console.log('clicked')} /> */}
+        </Box> 
+        :
+        <Box 
+          pad="medium"
+          gap="small"
+          width="medium"
+          round
+          background='background-front'
+        >
+          <Text weight='bold'>Approval required</Text>
+          <Text>Please check your wallet/provider to approve the transaction</Text>            
+          {/* <Button
+                  label="Toggle gutter size"
+                  // onClick={() => setGutter(gutter === 'small' ? 'xsmall' : 'small')}
+                />
+                <Button label="Close" onClick={()=>console.log('clicked')} /> */}
+        </Box>}
     </Layer>
 
   );

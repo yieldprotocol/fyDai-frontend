@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { ethers, BigNumber }  from 'ethers';
+import { signDaiPermit, signERC2612Permit } from 'eth-permit';
 
 import * as utils from '../utils';
 
@@ -67,6 +68,11 @@ export const useProxy = () => {
   const [ buyActive, setBuyActive ] = React.useState<boolean>(false);
   const [ sellActive, setSellActive ] = React.useState<boolean>(false);
 
+  const auths = new Map([
+    [1, { id: 1, desc:'Get tons of dai from you, whenever we want' }],
+    [2, { id: 2, desc:'Some other auth' }],
+  ]);
+  
 
   // TODO: deal with big number rather also, put htis out in a hook
   const valueWithSlippage = (value:BigNumber, minimise:boolean=false ) => {
@@ -190,13 +196,13 @@ export const useProxy = () => {
   };
 
 
+
   /**
    * @dev Repay an amount of yDai debt in Controller using a given amount of Dai exchanged for yDai at pool rates, with a minimum of yDai debt required to be paid.
-   * Must have approved the operator with `controller.addDelegate(controllerDai.address)`.
+   * Post maturity the user is asked for a signature allowing the treasury access to dai
    * 
    * @param {IYieldSeries} series the yield series to interact with.
    * @param {string} collateralType type of collateral eg. 'ETH-A'
-   * @param {number} minimumYDaiRepayment  minimumYDaiRepayment Minimum amount of yDai debt to repay.
    * @param {number} repaymentInDai Exact amount of Dai that should be spent on the repayment.
    * 
    * @return Amount 
@@ -205,12 +211,12 @@ export const useProxy = () => {
   const repayDaiDebt = async (
     series: IYieldSeries,
     collateralType: string,
-    minimumYDaiRepayment: number, 
     repaymentInDai: number,
   ) => {
     const dai = ethers.utils.parseEther(repaymentInDai.toString());   
     const collatType = ethers.utils.formatBytes32String(collateralType);
     const toAddr = account && ethers.utils.getAddress(account);
+    const fromAddr = account && ethers.utils.getAddress(account);
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const yDaiAddr = ethers.utils.getAddress(series.yDaiAddress);
     const parsedMaturity = series.maturity.toString();
@@ -223,21 +229,51 @@ export const useProxy = () => {
 
     setRepayActive(true);
     let tx:any;
+    let daiPermitSig:any;
     try {
-      // console.log('gas est:', ( await proxyContract.estimateGas.repayMinimumYDaiDebtForDai(poolAddr, collatType, parsedMaturity, toAddr, parsedYDai, parsedDai, overrides )).toString());
-      // console.log('dry-run:', ( await proxyContract.callStatic.repayMinimumYDaiDebtForDai(poolAddr, collatType, parsedMaturity, toAddr, parsedYDai, parsedDai, overrides )).toString());           
-      
-      /* calculate expected trade values and factor in slippage */
-      const minYDai = valueWithSlippage(await previewPoolTx('selldai', series, repaymentInDai), true);
+      console.log(!series.isMature())
 
-      tx = await proxyContract.repayMinimumYDaiDebtForDai(
-        poolAddr,
-        collatType,
-        parsedMaturity,
-        toAddr,
-        minYDai,
-        dai,
-        overrides );  
+      if (series.isMature()) {  
+        try {
+          /* Repay using a signature authorizing treasury */
+          dispatch({ type: 'requestSigs', payload:[ auths.get(1) ] });
+          const result = await signDaiPermit( 
+            provider.provider, 
+            deployedContracts.Dai, 
+            // @ts-ignore
+            fromAddr,
+            deployedContracts.Treasury
+          );
+          daiPermitSig = ethers.utils.joinSignature(result);
+          dispatch({ type: 'signed', payload: auths.get(1) });
+          dispatch({ type: 'requestSigs', payload: [] });
+        } catch (e) { 
+          handleTxError('Error Repaying Dai', tx, e);
+          setRepayActive(false);
+          return;
+        }
+
+        tx = await proxyContract.repayDaiWithSignature(
+          collatType,
+          parsedMaturity,
+          toAddr,
+          dai,
+          daiPermitSig,
+          overrides );
+
+      } else {
+        /* calculate expected trade values and factor in slippage */
+        const minYDai = valueWithSlippage(await previewPoolTx('selldai', series, repaymentInDai), true);
+        tx = await proxyContract.repayMinimumYDaiDebtForDai(
+          poolAddr,
+          collatType,
+          parsedMaturity,
+          toAddr,
+          minYDai,
+          dai,
+          overrides );
+      }      
+      
     } catch (e) {
       console.log(e);
       handleTxError('Error Repaying Dai', tx, e);
