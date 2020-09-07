@@ -87,7 +87,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
 
   /* handle active series loads and changes */
   useEffect(() => {
-    account && activeSeries && activeSeries.yDaiBalance_ && !(activeSeries.isMature()) && ( async () => {
+    account && activeSeries?.yDaiBalance_ && !(activeSeries.isMature()) && ( async () => {
       const preview = await previewPoolTx('SellYDai', activeSeries, activeSeries.yDaiBalance_);
       preview && setCurrentValue( parseFloat(ethers.utils.formatEther(preview)));
     })();
@@ -246,7 +246,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
               </Text>
             </Box>
 
-            { currentValue > 0 &&
+            { activeSeries?.yDaiBalance_ > 0 &&
             <Box alignSelf='end'>
               <Box
                 round

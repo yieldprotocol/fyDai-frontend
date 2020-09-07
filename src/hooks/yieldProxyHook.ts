@@ -69,8 +69,8 @@ export const useProxy = () => {
   const [ sellActive, setSellActive ] = React.useState<boolean>(false);
 
   const auths = new Map([
-    [1, { id: 1, desc:'Get tons of dai from you, whenever we want' }],
-    [2, { id: 2, desc:'Some other auth' }],
+    [1, { id: 1, desc:'Dai > treasury authenticate ' }],
+    [2, { id: 2, desc:'yDai > pool authenticate ' }],
   ]);
   
 
@@ -231,7 +231,7 @@ export const useProxy = () => {
     let tx:any;
     let daiPermitSig:any;
     try {
-      console.log(!series.isMature())
+      console.log(!series.isMature());
 
       if (series.isMature()) {  
         try {
@@ -454,6 +454,71 @@ export const useProxy = () => {
     setBuyActive(false);
   };
 
+  /**
+   * @dev Buy Dai with yDai
+   * @param {IYieldSeries} series yield series to act on.
+   * @param daiOut Amount of dai being bought
+   * */ 
+  const buyDaiWithSignature = async ( 
+    series: IYieldSeries, 
+    daiOut:number,
+  ) => {
+    /* Processing and/or sanitizing input */
+    const poolAddr = ethers.utils.getAddress(series.poolAddress);
+    const yDaiAddr = ethers.utils.getAddress(series.yDaiAddress);
+    const parsedDaiOut = BigNumber.isBigNumber(daiOut)? daiOut : ethers.utils.parseEther(daiOut.toString());
+    const toAddr = account && ethers.utils.getAddress(account);
+    const fromAddr = account && ethers.utils.getAddress(account);
+
+    /* Contract interaction */
+    let tx:any;
+    let yDaiPermitSig:any;
+    setBuyActive(true);
+    try { 
+      /* calculate expected trade values and factor in slippage */
+      const maxYDaiIn = valueWithSlippage( await previewPoolTx('buydai', series, daiOut) );
+      // temp max bignumber for testing */
+      // const maxYDaiIn = ethers.utils.parseEther('1000000');
+
+      /* Get the user signature authorizing yDai to interact with Dai */
+      try {
+        dispatch({ type: 'requestSigs', payload:[ auths.get(2) ] });
+        const result = await signERC2612Permit(
+          provider.provider, 
+          yDaiAddr,
+          // @ts-ignore 
+          fromAddr, 
+          poolAddr);
+
+        yDaiPermitSig = ethers.utils.joinSignature(result);
+        dispatch({ type: 'signed', payload: auths.get(2) });
+        dispatch({ type: 'requestSigs', payload: [] });
+      } catch (e) { 
+        handleTxError('Error Reclaiming Dai', tx, e);
+        setRepayActive(false);
+        return;
+      }
+
+      tx = await proxyContract.buyDaiWithSignature(
+        poolAddr, 
+        toAddr, 
+        parsedDaiOut, 
+        maxYDaiIn, 
+        yDaiPermitSig
+      );
+    } catch (e) {
+      handleTxError('Error buying back Dai', tx, e );   
+      setBuyActive(false);
+      return;
+    }
+    dispatch({ type: 'txPending', payload:{ tx, message: `Buying back ${daiOut} DAI pending...`, type:'BUY' } } );
+    await handleTx(tx);
+    setBuyActive(false);
+  };
+
+
+  // buyDaiWithSignature(address pool, address to, uint128 daiOut, uint128 maxYDaiIn, bytes memory signature)
+
   // TODO Add these two ONLY if required
   const sellYDai = () => {};
   const buyYDai = () => {};
@@ -521,6 +586,7 @@ export const useProxy = () => {
     /* limitPool fns */
     sellDai, sellActive,
     buyDai, buyActive,
+    buyDaiWithSignature,
     // sellYDai, 
     // buyYDai,
 

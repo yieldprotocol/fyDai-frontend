@@ -13,6 +13,7 @@ import { UserContext } from '../contexts/UserContext';
 import { usePool, useProxy, useSignerAccount } from '../hooks';
 
 import InputWrap from '../components/InputWrap';
+import Loading from '../components/Loading';
 
 interface IWithDrawDaiProps {
   close?: any;
@@ -28,22 +29,25 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
   const [ hasDelegated, setHasDelegated ] = useState<boolean>(true);
 
   const { previewPoolTx }  = usePool();
-  const { buyDai, buyActive }  = useProxy();
+  const { buyDai, buyDaiWithSignature, buyActive }  = useProxy();
   const { account } = useSignerAccount();
 
   const [ maxWithdraw, setMaxWithdraw ] = useState<number>(0);
+  const [ isGettingMax, setIsGettingMax ] = useState<boolean>(false);
+
   const [ inputValue, setInputValue ] = useState<any>();
   const [ yDaiValue, setYDaiValue ] = React.useState<number>(0);
 
   const [ withdrawDisabled, setWithdrawDisabled ] = useState<boolean>(true);
   const [ withdrawPending, setWithdrawPending] = useState<boolean>(false);
+
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
 
   const withdrawProcedure = async (value:number) => {
     if ( !withdrawDisabled ) {
       setWithdrawPending(true);
-      await buyDai(
+      await buyDaiWithSignature(
         activeSeries,
         inputValue,
       );
@@ -56,15 +60,17 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
     }
   };
 
-  const checkMaxWithdraw = async () =>{
+  const getMaxWithdraw = async () => {
+    setIsGettingMax(true);
     const preview = await previewPoolTx('sellYDai', activeSeries, activeSeries.yDaiBalance_);
-    preview && setMaxWithdraw( parseFloat(ethers.utils.formatEther(preview)) );
-    return maxWithdraw;
+    setIsGettingMax(false);
+    return parseFloat(ethers.utils.formatEther(preview));   
   };
   
-  useEffect(() => {
-    activeSeries && checkMaxWithdraw();
-  }, [activeSeries, inputValue]);
+  // useEffect(() => {
+  //   activeSeries &&
+  //   (async () => setMaxWithdraw( await getMaxWithdraw() ))();
+  // }, [ activeSeries, inputValue ]);
 
   /* Withdraw DAi button disabling logic */
   useEffect(()=>{
@@ -74,7 +80,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
       !inputValue || 
       parseFloat(inputValue) === 0
     ) ? setWithdrawDisabled(true): setWithdrawDisabled(false);
-  }, [ inputValue, hasDelegated ]);
+  }, [ inputValue, hasDelegated, maxWithdraw, isGettingMax]);
 
   useEffect(() => {
     activeSeries && inputValue && ( async () => {
@@ -113,7 +119,10 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
               <Button 
                 label='Max'
                 color='brand-transparent'
-                onClick={()=>setInputValue( maxWithdraw || checkMaxWithdraw() )}
+                onClick={async ()=>{
+                  const max = await getMaxWithdraw();
+                  max && setInputValue( max );
+                }}
                 hoverIndicator='brand-transparent'
               />
             </InputWrap>
