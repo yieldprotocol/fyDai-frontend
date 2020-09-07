@@ -123,8 +123,8 @@ const UserProvider = ({ children }: any) => {
     ]:any[] = await Promise.all([
       getBalance(), 
       getBalance(deployedContracts.Dai, 'Dai'), 
-      collateralPosted(deployedContracts.Controller, 'ETH-A'),
-      collateralPosted(deployedContracts.Controller, 'CHAI'),
+      collateralPosted('ETH-A'),
+      collateralPosted('CHAI'),
     ]);
 
     const [
@@ -132,9 +132,9 @@ const UserProvider = ({ children }: any) => {
       ethBorrowingPower, 
       ethTotalDebtDai
     ]:any[] = await Promise.all([
-      collateralLocked(deployedContracts.Controller, 'ETH-A'),
-      borrowingPower(deployedContracts.Controller, 'ETH-A'),
-      totalDebtDai(deployedContracts.Controller, 'ETH-A'),
+      collateralLocked('ETH-A'),
+      borrowingPower('ETH-A'),
+      totalDebtDai('ETH-A'),
     ]);
 
     // const collateralAmount = collAmount();
@@ -193,7 +193,7 @@ const UserProvider = ({ children }: any) => {
    */
   const _getAuthorizations = async () => {
     const _auths:any={};
-    _auths.hasDelegatedProxy = await checkControllerDelegate(deployedContracts.Controller, deployedContracts.YieldProxy);
+    _auths.hasDelegatedProxy = await checkControllerDelegate(deployedContracts.YieldProxy);
     // _auths.hasPermittedDai = await checkControllerDelegate(deployedContracts.Controller, deployedContracts.YieldProxy);
     dispatch( { type: 'updateAuthorizations', payload: _auths });
     console.log(_auths);

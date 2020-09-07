@@ -58,7 +58,6 @@ const TestLayer = (props:any) => {
   const { 
     post,
     withdraw,
-    approveController,
     borrow,
     repay,
     repayActive,
@@ -203,8 +202,8 @@ const TestLayer = (props:any) => {
               <Button label='Post ETH Collateral via proxy 1.5' disabled={postActive} onClick={()=> postEth(1.5)} />
               <Button primary label='controller addDelegate:EthProxy' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedContracts.YieldProxy], utils.toWei('0'))} />             
               <Button label='Withdraw ETH via proxy 1.5)' onClick={()=> withdrawEth(1.5 )} />
-              <Button label='6.1 Repay 0.5 eth/weth debt in yDai' onClick={()=> repay(deployedContracts.Controller, 'ETH-A', yieldState.deployedSeries[0].maturity, 0.5, 'YDAI' )} />
-              <Button label='( 6.2 Repay 0.5 eth/weth debt in Dai) ' onClick={()=> repay(deployedContracts.Controller, 'ETH-A', yieldState.deployedSeries[0].maturity, 0.5, 'DAI' )} />
+              <Button label='6.1 Repay 0.5 eth/weth debt in yDai' onClick={()=> repay('ETH-A', yieldState.deployedSeries[0].maturity, 0.5, 'YDAI' )} />
+              <Button label='( 6.2 Repay 0.5 eth/weth debt in Dai) ' onClick={()=> repay('ETH-A', yieldState.deployedSeries[0].maturity, 0.5, 'DAI' )} />
             
             </Box>}
 
@@ -241,14 +240,13 @@ const TestLayer = (props:any) => {
 
   
               Chai deposit and borrow:
-              <Button label='2. Chai approve chaiController 0.5' onClick={()=> approveController(deployedContracts.Chai, deployedContracts.Controller, 0.5 )} />
-              <Button label='3. Post Chai Collateral 0.5' disabled={postActive} onClick={()=> post(deployedContracts.Controller, 'CHAI', 0.5 )} />
-              <Button label='(4. Withdraw 0.5 chai)' onClick={()=> withdraw(deployedContracts.Controller, 'CHAI', 0.5 )} />
-              <Button label='5.Borrow 0.5 with chai' onClick={()=> borrow(deployedContracts.Controller, 'CHAI', deployedSeries[0].maturity, 0.5 )} />
+              <Button label='3. Post Chai Collateral 0.5' disabled={postActive} onClick={()=> post('CHAI', 0.5 )} />
+              <Button label='(4. Withdraw 0.5 chai)' onClick={()=> withdraw('CHAI', 0.5 )} />
+              <Button label='5.Borrow 0.5 with chai' onClick={()=> borrow('CHAI', deployedSeries[0].maturity, 0.5 )} />
 
               Chai repay; 
-              <Button label='(6.1 Repay 0.5 chaidebt in yDai)' onClick={()=> repay(deployedContracts.Controller, 'CHAI', deployedSeries[0].maturity, 0.5, 'YDAI' )} />
-              <Button label=' 6.2 Repay 0.5 chaidebt in Dai ' onClick={()=> repay(deployedContracts.Controller, 'CHAI', deployedSeries[0].maturity, 0.5, 'DAI' )} />
+              <Button label='(6.1 Repay 0.5 chaidebt in yDai)' onClick={()=> repay('CHAI', deployedSeries[0].maturity, 0.5, 'YDAI' )} />
+              <Button label=' 6.2 Repay 0.5 chaidebt in Dai ' onClick={()=> repay('CHAI', deployedSeries[0].maturity, 0.5, 'DAI' )} />
             </Box>}
 
             { flow === 'MATURITY' && 

@@ -13,8 +13,7 @@ import {
   usePool,
   useProxy,
   useTxActive,
-  useSignerAccount, 
-  useController,
+  useSignerAccount,
 } from '../hooks';
 
 import SeriesDescriptor from '../components/SeriesDescriptor';
@@ -39,7 +38,6 @@ function Repay({ repayAmount }:IRepayProps) {
 
   const { previewPoolTx }  = usePool(); 
   const { repayDaiDebt, repayActive } = useProxy();
-  const { repay } = useController();
   const [ txActive ] = useTxActive(['repay']);
   const { account } = useSignerAccount();
 

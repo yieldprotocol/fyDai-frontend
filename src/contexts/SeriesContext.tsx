@@ -55,7 +55,7 @@ const SeriesProvider = ({ children }:any) => {
   const { feedData, deployedContracts } = yieldState;
 
   const { previewPoolTx, checkPoolDelegate, checkPoolState } = usePool();
-  const { checkControllerDelegate, debtDai,  } = useController();
+  const { checkControllerDelegate, debtDai } = useController();
   const { getBalance } = useToken();
 
   const [ callTx ] = useCallTx();
@@ -119,7 +119,7 @@ const SeriesProvider = ({ children }:any) => {
           _seriesData[i].totalSupply = await callTx(x.poolAddress, 'Pool', 'totalSupply', []);
           _seriesData[i].poolTokens = account? await callTx(x.poolAddress, 'Pool', 'balanceOf', [account]): BigNumber.from('0') ;               
           _seriesData[i].hasDelegatedPool = account? await checkPoolDelegate(x.poolAddress, deployedContracts.YieldProxy): null;            
-          _seriesData[i].ethDebtDai = account? await debtDai(deployedContracts.Controller,  'ETH-A', x.maturity ): BigNumber.from('0') ;     
+          _seriesData[i].ethDebtDai = account? await debtDai('ETH-A', x.maturity ): BigNumber.from('0') ;     
           _seriesData[i].ethDebtYDai = account? await callTx(deployedContracts.Controller, 'Controller', 'debtYDai', [utils.ETH, x.maturity, account]): BigNumber.from('0');
           _seriesData[i].yDaiBalance = account? await callTx(x.yDaiAddress, 'YDai', 'balanceOf', [account]): BigNumber.from('0') ;
           _seriesData[i].isMature = ()=>( x.maturity < Math.round(new Date().getTime() / 1000));

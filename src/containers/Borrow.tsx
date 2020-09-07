@@ -75,7 +75,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
     if (!borrowDisabled) {
       setBorrowPending(true);
       autoSell && await borrowDai(activeSeries, 'ETH-A', yDaiValue, value);
-      !autoSell && await borrow(deployedContracts.Controller, 'ETH-A', activeSeries.maturity, value);
+      !autoSell && await borrow('ETH-A', activeSeries.maturity, value);
       setInputValue('');
       await Promise.all([
         userActions.updatePosition(),
