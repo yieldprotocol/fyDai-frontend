@@ -175,7 +175,7 @@ export const useProxy = () => {
 
     const overrides = { 
       // nonce: signer.getTransactionCount().then( (nonce:any) => nonce + queue) 
-      gasLimit: BigNumber.from('300000')
+      // gasLimit: BigNumber.from('300000')
     };
 
     setBorrowActive(true);
@@ -224,7 +224,7 @@ export const useProxy = () => {
 
     const overrides = {
       // nonce: signer.getTransactionCount().then( (nonce:any) => nonce + queue) 
-      gasLimit: BigNumber.from('300000')
+      // gasLimit: BigNumber.from('300000')
     };
 
     setRepayActive(true);
@@ -403,7 +403,6 @@ export const useProxy = () => {
     try {
       /* calculate expected trade values and factor in slippage */
       const minYDaiOut = valueWithSlippage( await previewPoolTx('selldai', series, daiIn), true );
-
       // temp min for testing */
       // const minYDaiOut = ethers.utils.parseEther('0');
 
@@ -436,10 +435,8 @@ export const useProxy = () => {
     let tx:any;
     setBuyActive(true);
     try {
-
       /* calculate expected trade values and factor in slippage */
       const maxYDaiIn = valueWithSlippage( await previewPoolTx('buydai', series, daiOut) );
-
       // temp max bignumber for testing */
       // const maxYDaiIn = ethers.utils.parseEther('1000000');
 

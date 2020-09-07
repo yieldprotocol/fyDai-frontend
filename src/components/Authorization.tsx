@@ -88,7 +88,9 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
         </Box>}
 
       { authActive && layerOpen &&
-        <Layer onClickOutside={()=>closeAuth()}> 
+        <Layer 
+          onClickOutside={()=>closeAuth()}
+        >
           <Box 
             round
             background='background'
@@ -141,7 +143,7 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
             >
               <Box direction='row' gap='small' align='center'>
                 <ArrowLeft color='text-weak' />
-                <Text size='xsmall' color='text-weak'>'close auth dialog and go back to the app'</Text>
+                <Text size='xsmall' color='text-weak'>'close, and go back to the app'</Text>
               </Box>
             </Box>
           </Box>}
