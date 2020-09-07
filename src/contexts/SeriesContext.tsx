@@ -170,27 +170,18 @@ const SeriesProvider = ({ children }:any) => {
       const seriesMap:any = await _getSeriesData(filteredSeriesArr, rates);
           
       /* set the active series */
-      if (!state.activeSeries) {
-
-        /* if no active series or, set it to non-mature series that is maturing soonest. */
-        const unmatureSeries: IYieldSeries[] = Array.from(seriesMap.values());
-        const toSelect = unmatureSeries
-          .filter((x:IYieldSeries)=>!x.isMature())
-          .sort((a:IYieldSeries, b:IYieldSeries)=> { return a.maturity-b.maturity } );
-        dispatch({ type:'setActiveSeries', payload: seriesMap.get(toSelect[0].maturity) });
-        // dispatch({ type:'setActiveSeries', payload: seriesMap.entries().next().value[1] });
-
-      } else if (seriesArr.length===1 ){
+      if (seriesArr.length===1 ){
         /* if there was only one series updated set that one as the active series */
         dispatch({ type:'setActiveSeries', payload: seriesMap.get(seriesArr[0].maturity) });
       } else {
-        // other situation catch
-        dispatch({ type:'setActiveSeries', payload: seriesMap.entries().next().value[1] });
-      }
+        /* if no active series or multiple updated, set it to non-mature series that is maturing soonest. */
+        const unmatureSeries: IYieldSeries[] = Array.from(seriesMap.values());
+        const toSelect = unmatureSeries
+          .filter((x:IYieldSeries)=>!x.isMature())
+          .sort((a:IYieldSeries, b:IYieldSeries)=> a.maturity-b.maturity );
+        dispatch({ type:'setActiveSeries', payload: seriesMap.get(toSelect[0].maturity) });
+      } 
       dispatch({ type:'isLoading', payload: false });
-
-      console.log('Series Updated:' );
-      console.log(seriesMap);
 
     } else {
       console.log('Positions exist... Force fetch if required');
