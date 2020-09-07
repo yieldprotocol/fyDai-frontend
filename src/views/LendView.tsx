@@ -46,6 +46,7 @@ const LendView = ({ activeView: activeViewFromProp  }:LendProps) => {
         <SeriesDescriptor activeView='lend' />
         { activeSeries?.isMature() === false  && <Lend /> }
         { activeSeries?.isMature() === true && <Redeem /> }
+        <Redeem />
 
       </Box>
     </>

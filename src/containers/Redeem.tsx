@@ -22,8 +22,8 @@ const Redeem  = ({ close }:IRedeemProps)  => {
   const { activeSeries } = seriesState;
   const { actions: userActions } = React.useContext(UserContext);
 
-  const [redeemPending, setRedeemPending] = React.useState<boolean>(false);
-  const [redeemDisabled, setRedeemDisabled] = React.useState<boolean>(true);
+  const [ redeemPending, setRedeemPending] = React.useState<boolean>(false);
+  const [ redeemDisabled, setRedeemDisabled] = React.useState<boolean>(true);
   const [ warningMsg, setWarningMsg] = React.useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
 
@@ -42,14 +42,11 @@ const Redeem  = ({ close }:IRedeemProps)  => {
     }
   };
 
-  
-
   /* redeem button disabled logic */ 
   React.useEffect( () => {
-    if ( activeSeries?.yDaiBalance_ > 0 ){
-      setRedeemDisabled(false);
-    }
-    setRedeemDisabled(true);
+    parseFloat(activeSeries?.yDaiBalance_) > 0 ? 
+      setRedeemDisabled(false) 
+      : setRedeemDisabled(true);  
   }, [activeSeries]);
 
   return (
@@ -83,9 +80,9 @@ const Redeem  = ({ close }:IRedeemProps)  => {
             <Text 
               weight='bold'
               size='large'
-              color={(redeemDisabled) ? 'text-xweak' : 'text'}
+              color={redeemDisabled ? 'text-xweak' : 'text'}
             >
-              {`Redeem ${!activeSeries && activeSeries?.yDaiBalance_.toFixed(4) || ''} Dai`}
+              {`Redeem ${activeSeries?.yDaiBalance_.toFixed(4) || ''} Dai`}
             </Text>
           </Box>               
         </Box>}
