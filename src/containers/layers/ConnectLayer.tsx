@@ -63,6 +63,8 @@ const ConnectLayer = ({ open, view, closeLayer }: any) => {
 
   return (
     <>
+
+    
       {open && (
         <Layer
           onClickOutside={() => closeLayer(true)}

@@ -12,12 +12,11 @@ const ApprovalPending = React.forwardRef( (props, ref) => {
   React.useEffect(() =>{
     console.log(requestedSigs.length);
     requestedSigs.length ? setSigsRequested(true): setSigsRequested(false) ;
-
   }, [requestedSigs]);
 
   return (
     <Layer
-      modal={true} 
+      modal={true}
       // position='top'
       // target={ref || undefined}
       // onClickOutside={onClose}
@@ -31,13 +30,9 @@ const ApprovalPending = React.forwardRef( (props, ref) => {
           round
           background='background-front'
         >
-          <Text weight='bold'>Signature required</Text>
+          <Text weight='bold'>A Signature is required</Text>
+          <Text> { requestedSigs[0].desc } </Text>
           <Text>Please check your wallet/provider to sign the permission</Text>            
-          {/* <Button
-                    label="Toggle gutter size"
-                    // onClick={() => setGutter(gutter === 'small' ? 'xsmall' : 'small')}
-                  />
-                  <Button label="Close" onClick={()=>console.log('clicked')} /> */}
         </Box> 
         :
         <Box 
@@ -47,13 +42,8 @@ const ApprovalPending = React.forwardRef( (props, ref) => {
           round
           background='background-front'
         >
-          <Text weight='bold'>Approval required</Text>
+          <Text weight='bold'>Transaction Approval required</Text>
           <Text>Please check your wallet/provider to approve the transaction</Text>            
-          {/* <Button
-                  label="Toggle gutter size"
-                  // onClick={() => setGutter(gutter === 'small' ? 'xsmall' : 'small')}
-                />
-                <Button label="Close" onClick={()=>console.log('clicked')} /> */}
         </Box>}
     </Layer>
 

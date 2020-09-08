@@ -7,9 +7,7 @@ import {
   FiAlertTriangle as Warning,
 } from 'react-icons/fi';
 
-import { SeriesContext } from '../contexts/SeriesContext';
 import { IYieldSeries } from '../types';
-import SeriesSelector from './SeriesSelector';
 
 interface IAprBadgeProps {
   activeView: string;
@@ -62,12 +60,12 @@ function AprBadge({ activeView, series }:IAprBadgeProps) {
             round
             border='all'
             direction='row'
-            pad={{ horizontal:'small', vertical:'none' }}
+            pad={{ horizontal:'xsmall', vertical:'none' }}
             align='center'
             background='orange'
-            gap='small'
+            gap='xsmall'
           >
-            <Warning />
+            <Warning />       
             <Text size='xxsmall'>
               {series.poolState.reason} 
             </Text>

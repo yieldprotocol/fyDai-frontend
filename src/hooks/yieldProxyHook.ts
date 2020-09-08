@@ -248,7 +248,8 @@ export const useProxy = () => {
           dispatch({ type: 'signed', payload: auths.get(1) });
           dispatch({ type: 'requestSigs', payload: [] });
         } catch (e) { 
-          handleTxError('Error Repaying Dai', tx, e);
+          handleTxError('Signing error', tx, e);
+          dispatch({ type: 'requestSigs', payload: [] });
           setRepayActive(false);
           return;
         }
@@ -486,12 +487,12 @@ export const useProxy = () => {
           // @ts-ignore 
           fromAddr, 
           poolAddr);
-
         yDaiPermitSig = ethers.utils.joinSignature(result);
         dispatch({ type: 'signed', payload: auths.get(2) });
         dispatch({ type: 'requestSigs', payload: [] });
       } catch (e) { 
-        handleTxError('Error Reclaiming Dai', tx, e);
+        handleTxError('Signing error', tx, e);
+        dispatch({ type: 'requestSigs', payload: [] });
         setRepayActive(false);
         return;
       }
