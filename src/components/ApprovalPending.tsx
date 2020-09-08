@@ -1,9 +1,10 @@
 import React, { forwardRef } from 'react';
-import { Box, Text, Layer, Select } from 'grommet';
+import { Box, Text, Layer, ResponsiveContext } from 'grommet';
 
 import { NotifyContext } from '../contexts/NotifyContext';
  
 const ApprovalPending = React.forwardRef( (props, ref) => {
+  const screenSize = React.useContext(ResponsiveContext);
 
   const { state: { requestedSigs } }  = React.useContext(NotifyContext);
   const [ sigsRequested, setSigsRequested ] = React.useState(false);
@@ -24,9 +25,9 @@ const ApprovalPending = React.forwardRef( (props, ref) => {
     >
       {  sigsRequested ? 
         <Box 
+          width={screenSize!=='small'?{ min:'600px', max:'750px' }: undefined}
           pad="medium"
           gap="small"
-          width="medium"
           round
           background='background-front'
         >
@@ -40,9 +41,9 @@ const ApprovalPending = React.forwardRef( (props, ref) => {
         </Box> 
         :
         <Box 
+          width={screenSize!=='small'?{ min:'600px', max:'750px' }: undefined}
           pad="medium"
           gap="small"
-          width="medium"
           round
           background='background-front'
         >

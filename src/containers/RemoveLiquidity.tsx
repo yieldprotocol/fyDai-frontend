@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { ethers } from 'ethers';
-import { Box, Button, Layer, TextInput, Text, Keyboard, ThemeContext } from 'grommet';
+import { Box, Button, Layer, TextInput, Text, Keyboard, ThemeContext, ResponsiveContext } from 'grommet';
 import { 
   FiArrowLeft as ArrowLeft,
 } from 'react-icons/fi';
@@ -20,6 +20,8 @@ interface IRemoveLiquidityProps {
 }
 
 const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
+
+  const screenSize = useContext(ResponsiveContext);
 
   const { state: yieldState, actions: yieldActions } = useContext(YieldContext);
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
@@ -96,7 +98,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
       >
         <>
           <Box 
-            width={{ max:'750px' }}
+            width={screenSize!=='small'?{ min:'600px', max:'750px' }: undefined}
             alignSelf='center'
             fill
             background='background-front'

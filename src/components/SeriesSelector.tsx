@@ -74,7 +74,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
         background='background-front'
         pad={{ horizontal: 'medium', vertical:'large' }}
         gap='medium'
-        width={screenSize !== 'small'? { max:'750px', min:'640px' }: {}}
+        width={screenSize!=='small'?{ min:'600px', max:'750px' }: undefined}
       >
         <Box gap='medium'>
           <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Choose a series</Text>

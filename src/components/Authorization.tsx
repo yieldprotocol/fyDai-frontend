@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Button, Layer, Text } from 'grommet';
+import { Box, Button, Layer, Text, ResponsiveContext } from 'grommet';
 
 import { 
   FiCheckCircle as Check,
@@ -22,6 +22,7 @@ interface IAuthorizationProps {
 }
 
 const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => { 
+  const screenSize = React.useContext(ResponsiveContext);
   const { state: { requestedSigs } } = React.useContext(NotifyContext);
   const { state: { authorizations }, actions: userActions } = React.useContext(UserContext);
   const { hasDelegatedProxy } = authorizations;
@@ -92,6 +93,7 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
           onClickOutside={()=>closeAuth()}
         >
           <Box 
+            width={screenSize!=='small'?{ min:'600px', max:'750px' }: undefined}
             round
             background='background'
             pad='large'

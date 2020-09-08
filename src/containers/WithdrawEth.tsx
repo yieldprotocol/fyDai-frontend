@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Box, Layer, Button, Keyboard, TextInput, Text } from 'grommet';
+import { Box, Layer, Button, Keyboard, TextInput, Text, ResponsiveContext } from 'grommet';
 
 import { 
   FiArrowLeft as ArrowLeft,
@@ -19,6 +19,9 @@ interface IWithDrawProps {
 }
 
 const WithdrawEth = ({ close }:IWithDrawProps) => {
+
+  const screenSize = useContext(ResponsiveContext);
+
   const { state: { position }, actions: userActions } = useContext(UserContext);
   const {
     ethPosted_,
@@ -98,18 +101,20 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
   }, [ estRatio, inputValue ]);
 
   return (
-    <Layer onClickOutside={()=>close()}>
+    <Layer 
+      onClickOutside={()=>close()}
+  
+    >
       <Keyboard 
         onEsc={() => { inputValue? setInputValue(undefined): close();}}
         onEnter={()=> withdrawProcedure(inputValue)}
         onBackspace={()=> inputValue && setInputValue(inputValue.toString().slice(0, -1))}
-
         target='document'
       >
         <>
           { !txActive && !withdrawPending && 
           <Box 
-            width={{ max:'750px' }}
+            width={screenSize!=='small'?{ min:'600px', max:'750px' }: undefined}
             alignSelf='center'
             fill
             background='background-front'

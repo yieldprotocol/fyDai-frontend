@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { ethers } from 'ethers';
-import { Box, Button, Layer, TextInput, Text, Keyboard } from 'grommet';
+import { Box, Button, Layer, TextInput, Text, Keyboard, ResponsiveContext } from 'grommet';
 
 import { 
   FiArrowLeft as ArrowLeft,
@@ -21,6 +21,7 @@ interface IWithDrawDaiProps {
 
 const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
 
+  const screenSize = useContext(ResponsiveContext);
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { activeSeries  } = seriesState;
 
@@ -95,12 +96,11 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
         onEsc={() => { inputValue? setInputValue(undefined): close();}}
         onEnter={()=> withdrawProcedure(inputValue)}
         onBackspace={()=> inputValue && setInputValue(inputValue.toString().slice(0, -1))}
-
         target='document'
       >
         <>
           <Box 
-            width={{ max:'750px' }}
+            width={screenSize!=='small'?{ min:'600px', max:'750px' }: undefined}
             alignSelf='center'
             fill
             background='background-front'
