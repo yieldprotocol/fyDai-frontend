@@ -44,7 +44,7 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
       userActions.updateAuthorizations(),
       seriesActions.updateActiveSeries()
     ]);
-    setAuthPending(false);
+    // setAuthPending(false);
   };
 
   const closeAuth = () => {
