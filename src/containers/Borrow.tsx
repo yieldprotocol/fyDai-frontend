@@ -161,6 +161,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
     <Keyboard 
       onEsc={() => setInputValue(undefined)}
       onEnter={()=> borrowProcedure(inputValue)}
+      onBackspace={()=> inputValue && setInputValue(inputValue.toString().slice(0, -1))}
       target='document'   
     >
       <>

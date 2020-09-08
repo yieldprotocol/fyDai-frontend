@@ -109,6 +109,7 @@ function Repay({ repayAmount }:IRepayProps) {
     <Keyboard 
       onEsc={() => setInputValue(undefined)}
       onEnter={()=> repayProcedure(inputValue)}
+      onBackspace={()=> inputValue && setInputValue(inputValue.toString().slice(0, -1))}
       target='document'
     >
       <>

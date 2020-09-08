@@ -106,6 +106,8 @@ const Pool = (props:IPoolProps) => {
     <Keyboard 
       onEsc={() => setInputValue(undefined)}
       onEnter={()=> addLiquidityProcedure(inputValue)}
+      onBackspace={()=> inputValue && setInputValue(inputValue.toString().slice(0, -1))}
+
       target='document'
     >
       <>

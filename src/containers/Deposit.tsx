@@ -113,6 +113,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
     <Keyboard 
       onEsc={() => setInputValue(undefined)}
       onEnter={()=> depositProcedure(inputValue)}
+      onBackspace={()=> inputValue && setInputValue(inputValue.toString().slice(0, -1))}
       target='document'
     >
       <>

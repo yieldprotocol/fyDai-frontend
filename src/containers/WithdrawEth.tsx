@@ -102,6 +102,8 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
       <Keyboard 
         onEsc={() => { inputValue? setInputValue(undefined): close();}}
         onEnter={()=> withdrawProcedure(inputValue)}
+        onBackspace={()=> inputValue && setInputValue(inputValue.toString().slice(0, -1))}
+
         target='document'
       >
         <>

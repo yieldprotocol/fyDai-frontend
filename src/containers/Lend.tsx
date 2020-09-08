@@ -120,6 +120,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
     <Keyboard 
       onEsc={() => setInputValue(undefined)}
       onEnter={()=> lendProcedure(inputValue)}
+      onBackspace={()=> inputValue && setInputValue(inputValue.toString().slice(0, -1))}
       target='document'
     >
       <>

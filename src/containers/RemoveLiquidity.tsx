@@ -91,6 +91,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
       <Keyboard 
         onEsc={() => { inputValue? setInputValue(undefined): close();}}
         onEnter={()=> removeLiquidityProcedure(inputValue)}
+        onBackspace={()=> inputValue && setInputValue(inputValue.toString().slice(0, -1))}
         target='document'
       >
         <>
