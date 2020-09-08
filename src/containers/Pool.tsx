@@ -106,6 +106,8 @@ const Pool = (props:IPoolProps) => {
     <Keyboard 
       onEsc={() => setInputValue(undefined)}
       onEnter={()=> addLiquidityProcedure(inputValue)}
+      onBackspace={()=> inputValue && setInputValue(inputValue.toString().slice(0, -1))}
+
       target='document'
     >
       <>
@@ -147,6 +149,7 @@ const Pool = (props:IPoolProps) => {
             <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Add liquidity</Text>
             <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={addLiquidityDisabled}>
               <TextInput
+                ref={(input:any) => input && !removeLiquidityOpen && input.focus()}
                 type="number"
                 placeholder={screenSize !== 'small' ? 'Enter the amount of Dai Liquidity to add': 'DAI'}
                 value={inputValue || ''}

@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { ethers } from 'ethers';
-import { Box, Button, Layer, TextInput, Text, Keyboard, ThemeContext } from 'grommet';
+import { Box, Button, Layer, TextInput, Text, Keyboard, ThemeContext, ResponsiveContext } from 'grommet';
 import { 
   FiArrowLeft as ArrowLeft,
 } from 'react-icons/fi';
@@ -20,6 +20,8 @@ interface IRemoveLiquidityProps {
 }
 
 const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
+
+  const screenSize = useContext(ResponsiveContext);
 
   const { state: yieldState, actions: yieldActions } = useContext(YieldContext);
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
@@ -91,11 +93,12 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
       <Keyboard 
         onEsc={() => { inputValue? setInputValue(undefined): close();}}
         onEnter={()=> removeLiquidityProcedure(inputValue)}
+        onBackspace={()=> inputValue && setInputValue(inputValue.toString().slice(0, -1))}
         target='document'
       >
         <>
           <Box 
-            width={{ max:'750px' }}
+            width={screenSize!=='small'?{ min:'600px', max:'750px' }: undefined}
             alignSelf='center'
             fill
             background='background-front'
@@ -106,6 +109,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
             <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Remove Liquidity</Text>
             <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={removeLiquidityDisabled}>
               <TextInput
+                ref={(input:any) => input && input.focus()}
                 type="number"
                 placeholder='Tokens to remove'
                 value={inputValue || ''}

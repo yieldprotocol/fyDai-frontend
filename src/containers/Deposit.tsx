@@ -113,6 +113,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
     <Keyboard 
       onEsc={() => setInputValue(undefined)}
       onEnter={()=> depositProcedure(inputValue)}
+      onBackspace={()=> inputValue && setInputValue(inputValue.toString().slice(0, -1))}
       target='document'
     >
       <>
@@ -124,6 +125,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
 
           <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={depositDisabled}>
             <TextInput
+              ref={(input:any) => input && !withdrawOpen && input.focus()}
               type='number'
               placeholder={(screenSize !== 'small' && !modalView) ? 'Enter the ETH amount to deposit': 'ETH'}
               value={inputValue || ''}

@@ -109,6 +109,7 @@ function Repay({ repayAmount }:IRepayProps) {
     <Keyboard 
       onEsc={() => setInputValue(undefined)}
       onEnter={()=> repayProcedure(inputValue)}
+      onBackspace={()=> inputValue && setInputValue(inputValue.toString().slice(0, -1))}
       target='document'
     >
       <>
@@ -148,6 +149,7 @@ function Repay({ repayAmount }:IRepayProps) {
 
                 <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={repayDisabled}>
                   <TextInput
+                    ref={(input:any) => input && input.focus()}
                     type="number"
                     placeholder={screenSize !== 'small' ? 'Enter the amount of Dai to Repay': 'DAI'}
                     value={inputValue || ''}
