@@ -13,6 +13,7 @@ const initState = {
   fatalOpen: false,
   fatalMsg: '',
   pendingTxs: [],
+  lastCompletedTx: null,
   requestedSigs: [],
 };
 
@@ -43,7 +44,8 @@ function notifyReducer(state:INotification, action:IReducerAction) {
     case 'txComplete':
       return {
         ...state,
-        pendingTxs: state.pendingTxs.filter( (x:any) => x.tx.hash !== action.payload.tx.hash)
+        pendingTxs: state.pendingTxs.filter( (x:any) => x.tx.hash !== action.payload.tx.hash),
+        lastCompletedTx: action.payload.tx,
       };
     case 'requestSigs':
       return {
