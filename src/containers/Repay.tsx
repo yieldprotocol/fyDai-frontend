@@ -149,6 +149,7 @@ function Repay({ repayAmount }:IRepayProps) {
 
                 <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={repayDisabled}>
                   <TextInput
+                    ref={(input:any) => input && input.focus()}
                     type="number"
                     placeholder={screenSize !== 'small' ? 'Enter the amount of Dai to Repay': 'DAI'}
                     value={inputValue || ''}

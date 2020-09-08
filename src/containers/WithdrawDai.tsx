@@ -111,6 +111,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
             <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to close</Text>
             <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={withdrawDisabled}>
               <TextInput
+                ref={(input:any) => input && input.focus()}
                 type="number"
                 placeholder='DAI'
                 value={inputValue || ''}
