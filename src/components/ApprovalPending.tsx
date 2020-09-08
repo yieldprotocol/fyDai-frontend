@@ -31,7 +31,6 @@ const ApprovalPending = React.forwardRef( (props, ref) => {
           background='background-front'
         >
           <Text weight='bold'>A Signature is required</Text>
-          <Text> { requestedSigs[0].desc } </Text>
           <Text>Please check your wallet/provider to sign the permission</Text>            
         </Box> 
         :

@@ -55,7 +55,7 @@ const TransactionStatus = () => {
         <Box 
           round='xsmall'
         >
-          {lastCompletedTx.tx.hash}
+          {/* {lastCompletedTx.hash} */}
 
           { pendingTxs.map((x:any, i:number)=>{
             const _key = i; 

@@ -233,7 +233,7 @@ export const useProxy = () => {
     try {
       console.log(!series.isMature());
 
-      if (series.isMature()) {  
+      if (!series.isMature()) {  
         try {
           /* Repay using a signature authorizing treasury */
           dispatch({ type: 'requestSigs', payload:[ auths.get(1) ] });
