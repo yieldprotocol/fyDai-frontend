@@ -133,22 +133,24 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
             })}
             { !txActive && allSigned && <Text size='xsmall' weight='bold'> Finally, confirm sending the signatures to Yield in a transaction.</Text>}
             { txActive && <Text size='xsmall' weight='bold'> Submitting your signed authorisations ... transaction pending.</Text> }
-          </Box>
-          { authPending &&
-          <Box alignSelf='start'>
-            <Box
-              round
-              onClick={()=>closeAuth()}
-              hoverIndicator='brand-transparent'
-              pad={{ horizontal:'small', vertical:'small' }}
-              justify='center'
-            >
-              <Box direction='row' gap='small' align='center'>
-                <ArrowLeft color='text-weak' />
-                <Text size='xsmall' color='text-weak'>'close, and go back to the app'</Text>
+            
+            { authPending && txActive &&
+            <Box alignSelf='start'>
+              <Box
+                round
+                onClick={()=>closeAuth()}
+                hoverIndicator='brand-transparent'
+                pad={{ horizontal:'small', vertical:'small' }}
+                justify='center'
+              >
+                <Box direction='row' gap='small' align='center'>
+                  <ArrowLeft color='text-weak' />
+                  <Text size='xsmall' color='text-weak'>close, and go back to the app</Text>
+                </Box>
               </Box>
-            </Box>
-          </Box>}
+            </Box>}
+
+          </Box>
         </Layer>} 
     </>);
 };

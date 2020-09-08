@@ -70,6 +70,9 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
 
   const [ txActive ] = useTxActive(['BORROW', 'BUY', 'DELEGATION']);
 
+  // const inputRef = React.useRef<HTMLInputElement>(null);
+  // React.useEffect(()=> { inputRef.current && inputRef.current.focus(); }, []);
+
   /* Borrow execution flow */
   const borrowProcedure = async (value:number, autoSell:boolean=true) => {
     if (!borrowDisabled) {
@@ -211,8 +214,6 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
                 },
               ]}
               /> }
-
-            {/* </SeriesDescriptor> */}
 
             { activeSeries && !activeSeries?.isMature() && 
               <Box gap='medium' align='center' fill='horizontal'>
