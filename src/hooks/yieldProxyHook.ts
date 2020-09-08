@@ -15,6 +15,7 @@ import { useSignerAccount } from './connectionHooks';
 import { usePool } from './poolHook';
 import { useMath } from './mathHooks';
 import { useToken } from './tokenHook';
+import { useYDai } from './yDaiHook';
 
 import { IYieldSeries } from '../types';
 import { useTxHelpers } from './appHooks';
@@ -47,6 +48,7 @@ export const useProxy = () => {
   const { previewPoolTx } = usePool();
   const { splitDaiLiquidity } = useMath();
   const { getBalance } = useToken();
+  const { isMature } = useYDai();
 
   const { handleTx, handleTxError } = useTxHelpers();
 
@@ -231,10 +233,11 @@ export const useProxy = () => {
     let tx:any;
     let daiPermitSig:any;
     try {
-      console.log(!series.isMature());
+      console.log( await series.isMature() );
 
-      if (!series.isMature()) {  
+      if ( await isMature(series.yDaiAddress) ) {  
         try {
+          console.log('repay with sig');
           /* Repay using a signature authorizing treasury */
           dispatch({ type: 'requestSigs', payload:[ auths.get(1) ] });
           const result = await signDaiPermit( 
@@ -263,6 +266,7 @@ export const useProxy = () => {
           overrides );
 
       } else {
+        console.log('repay with no signature- before maturity');
         /* calculate expected trade values and factor in slippage */
         const minYDai = valueWithSlippage(await previewPoolTx('selldai', series, repaymentInDai), true);
         tx = await proxyContract.repayMinimumYDaiDebtForDai(
