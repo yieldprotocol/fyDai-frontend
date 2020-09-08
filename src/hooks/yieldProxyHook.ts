@@ -354,14 +354,14 @@ export const useProxy = () => {
   ) => {
     /* Processing and sanitizing input */
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
-    const { isMature } = series;
+    // const { isMature } = series;
     const parsedTokens = BigNumber.isBigNumber(tokens)? tokens : ethers.utils.parseEther(tokens.toString());
-    
+     
     /* Contract interaction */
     let tx:any;
     setRemoveLiquidityActive(true);
     try {
-      if (!isMature()) {
+      if ( !(await isMature(series.yDaiAddress)) ) {
         /* calculate expected trade values and factor in slippage */
         // const minDai = valueWithSlippage(await previewPoolTx('selldai', series, daiUsed), true);
 
