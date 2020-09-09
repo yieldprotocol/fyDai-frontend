@@ -176,8 +176,7 @@ export const useProxy = () => {
     // const maxYDai = ethers.utils.parseEther(maximumYDai.toString());
 
     const overrides = { 
-      // nonce: signer.getTransactionCount().then( (nonce:any) => nonce + queue) 
-      // gasLimit: BigNumber.from('300000')
+      gasLimit: BigNumber.from('300000')
     };
 
     setBorrowActive(true);
@@ -237,7 +236,7 @@ export const useProxy = () => {
 
       if ( await isMature(series.yDaiAddress) ) {  
         try {
-          console.log('repay with sig');
+          console.log('repay with sig- after maturity');
           /* Repay using a signature authorizing treasury */
           dispatch({ type: 'requestSigs', payload:[ auths.get(1) ] });
           const result = await signDaiPermit( 
@@ -262,13 +261,18 @@ export const useProxy = () => {
           parsedMaturity,
           toAddr,
           dai,
-          daiPermitSig,
-          overrides );
+          daiPermitSig, 
+          overrides
+        );
 
       } else {
-        console.log('repay with no signature- before maturity');
+        console.log('repay with no signature - before maturity');
+
         /* calculate expected trade values and factor in slippage */
         const minYDai = valueWithSlippage(await previewPoolTx('selldai', series, repaymentInDai), true);
+        // testing
+        // const minYDai = ethers.utils.parseEther('0');
+
         tx = await proxyContract.repayMinimumYDaiDebtForDai(
           poolAddr,
           collatType,
@@ -310,6 +314,10 @@ export const useProxy = () => {
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const parsedDaiUsed = BigNumber.isBigNumber(daiUsed)? daiUsed : ethers.utils.parseEther(daiUsed.toString());
 
+    const overrides = { 
+      gasLimit: BigNumber.from('300000')
+    };
+
     /* calculate minimum expected yDai value and factor in slippage */
     const daiReserves = await getBalance(deployedContracts.Dai, 'Dai', poolAddr);
     const yDaiReserves = await getBalance(series.yDaiAddress, 'YDai', poolAddr);
@@ -321,11 +329,10 @@ export const useProxy = () => {
     try {
       /* Calculate expected trade values and factor in slippage */
       const maxYDai = valueWithSlippage(await previewPoolTx('sellDai', series, yDaiSplit)); 
-
-      // testing 
+      // testing
       // const maxYDai = ethers.utils.parseEther('1000000');
 
-      tx = await proxyContract.addLiquidity(poolAddr, parsedDaiUsed, maxYDai );
+      tx = await proxyContract.addLiquidity(poolAddr, parsedDaiUsed, maxYDai, overrides);
     } catch (e) {
       handleTxError('Error Adding liquidity', tx, e);
       setAddLiquidityActive(false);
@@ -356,6 +363,10 @@ export const useProxy = () => {
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     // const { isMature } = series;
     const parsedTokens = BigNumber.isBigNumber(tokens)? tokens : ethers.utils.parseEther(tokens.toString());
+
+    const overrides = { 
+      gasLimit: BigNumber.from('300000')
+    };
      
     /* Contract interaction */
     let tx:any;
@@ -368,9 +379,9 @@ export const useProxy = () => {
         // testing with slippage etc. 
         const minDai = ethers.utils.parseEther('0');
 
-        tx = await proxyContract.removeLiquidityEarly(poolAddr, parsedTokens, minDai);
+        tx = await proxyContract.removeLiquidityEarly(poolAddr, parsedTokens, minDai, overrides);
       } else {
-        tx = await proxyContract.removeLiquidityMature(poolAddr, tokens);
+        tx = await proxyContract.removeLiquidityMature(poolAddr, tokens, overrides);
       }
     } catch (e) {
       handleTxError('Error Removing liquidity', tx, e);
@@ -402,6 +413,10 @@ export const useProxy = () => {
     const parsedDaiIn = BigNumber.isBigNumber(daiIn)? daiIn : ethers.utils.parseEther(daiIn.toString());
     const toAddr = account && ethers.utils.getAddress(account);
 
+    const overrides = { 
+      gasLimit: BigNumber.from('300000')
+    };
+
     /* Contract interaction */
     let tx:any;
     setSellActive(true);
@@ -411,7 +426,7 @@ export const useProxy = () => {
       // temp min for testing */
       // const minYDaiOut = ethers.utils.parseEther('0');
 
-      tx = await proxyContract.sellDai(poolAddr, toAddr, parsedDaiIn, minYDaiOut); 
+      tx = await proxyContract.sellDai(poolAddr, toAddr, parsedDaiIn, minYDaiOut, overrides); 
     } catch (e) {
       handleTxError('Error selling', tx, e );   
       setSellActive(false);
@@ -436,6 +451,10 @@ export const useProxy = () => {
     const parsedDaiOut = BigNumber.isBigNumber(daiOut)? daiOut : ethers.utils.parseEther(daiOut.toString());
     const toAddr = account && ethers.utils.getAddress(account);
 
+    const overrides = { 
+      gasLimit: BigNumber.from('300000')
+    };
+
     /* Contract interaction */
     let tx:any;
     setBuyActive(true);
@@ -445,7 +464,7 @@ export const useProxy = () => {
       // temp max bignumber for testing */
       // const maxYDaiIn = ethers.utils.parseEther('1000000');
 
-      tx = await proxyContract.buyDai(poolAddr, toAddr, parsedDaiOut, maxYDaiIn);
+      tx = await proxyContract.buyDai(poolAddr, toAddr, parsedDaiOut, maxYDaiIn, overrides);
     } catch (e) {
       handleTxError('Error buying Dai', tx, e );   
       setBuyActive(false);
@@ -472,6 +491,10 @@ export const useProxy = () => {
     const toAddr = account && ethers.utils.getAddress(account);
     const fromAddr = account && ethers.utils.getAddress(account);
 
+    const overrides = { 
+      gasLimit: BigNumber.from('300000')
+    };
+
     /* Contract interaction */
     let tx:any;
     let yDaiPermitSig:any;
@@ -490,7 +513,8 @@ export const useProxy = () => {
           yDaiAddr,
           // @ts-ignore 
           fromAddr, 
-          poolAddr);
+          poolAddr
+        );
         yDaiPermitSig = ethers.utils.joinSignature(result);
         dispatch({ type: 'signed', payload: auths.get(2) });
         dispatch({ type: 'requestSigs', payload: [] });
@@ -506,7 +530,8 @@ export const useProxy = () => {
         toAddr, 
         parsedDaiOut, 
         maxYDaiIn, 
-        yDaiPermitSig
+        yDaiPermitSig,
+        overrides
       );
     } catch (e) {
       handleTxError('Error buying back Dai', tx, e );   
