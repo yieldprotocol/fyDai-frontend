@@ -111,8 +111,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
         onBackspace={()=> inputValue && setInputValue(inputValue.toString().slice(0, -1))}
         target='document'
       >
-        <>
-          { !txActive && !withdrawPending && 
+        { !txActive && !withdrawPending && 
           <Box 
             width={screenSize!=='small'?{ min:'600px', max:'750px' }: undefined}
             alignSelf='center'
@@ -206,9 +205,9 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
             
           </Box>}
 
-          { withdrawPending && !txActive && <ApprovalPending /> }
+        { withdrawPending && !txActive && <ApprovalPending /> }
           
-          { txActive && 
+        { txActive && 
             txActive.type !== 'DELEGATION' && 
             <Box 
               width={{ max:'750px' }}
@@ -220,7 +219,8 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
               gap='medium'
               justify='between'
             > 
-              <TransactionPending msg={`You made a withdrawal of ${inputValue} Eth.`} tx={txActive} />
+              <TransactionPending msg={`You are withdrawing ${inputValue} ETH`} tx={txActive} />
+              
               <Box alignSelf='start'>
                 <Box
                   round
@@ -236,7 +236,6 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
                 </Box>
               </Box>
             </Box>}
-        </>
       </Keyboard>
     </Layer>
   );

@@ -286,7 +286,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
 
       {/* If there is a transaction active, show the applicable view */}
       { sellActive && !txActive && <ApprovalPending /> } 
-      { txActive && <TransactionPending msg={`You lent ${inputValue} DAI.`} tx={txActive} /> }
+      { txActive && <TransactionPending msg={`You are lending ${inputValue} DAI`} tx={txActive} /> }
     </Keyboard>
   );
 };

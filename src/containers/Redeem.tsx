@@ -95,7 +95,7 @@ const Redeem  = ({ close }:IRedeemProps)  => {
           </Box>               
         </Box>}
         { redeemActive && !txActive && <ApprovalPending /> } 
-        { txActive && <TransactionPending msg={`Redeeming your ${activeSeries?.yDaiBalance_.toFixed(4)} Dai.`} tx={txActive} /> }
+        { txActive && <TransactionPending msg={`You are redeeming ${activeSeries?.yDaiBalance_.toFixed(4)} DAI`} tx={txActive} /> }
       </Box>
     </Box>
   );

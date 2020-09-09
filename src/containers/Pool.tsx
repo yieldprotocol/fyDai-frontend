@@ -247,7 +247,7 @@ const Pool = (props:IPoolProps) => {
       </Box>}
 
       { addLiquidityActive && !txActive && <ApprovalPending /> } 
-      { txActive && <TransactionPending msg={`You added ${inputValue} DAI to the pool.`} tx={txActive} /> }
+      { txActive && <TransactionPending msg={`You are adding ${inputValue} DAI liquidity to the pool.`} tx={txActive} /> }
     </Keyboard>
   );
 };
