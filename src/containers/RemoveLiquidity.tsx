@@ -10,10 +10,12 @@ import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
 import { UserContext } from '../contexts/UserContext';
 
-import { useSignerAccount, useProxy } from '../hooks';
+import { useSignerAccount, useProxy, useTxActive } from '../hooks';
 
 import InputWrap from '../components/InputWrap';
 import InfoGrid from '../components/InfoGrid';
+import ApprovalPending from '../components/ApprovalPending';
+import TransactionPending from '../components/TransactionPending';
 
 interface IRemoveLiquidityProps {
   close?: any;
@@ -30,6 +32,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
 
   const { account } = useSignerAccount();
   const { removeLiquidity } = useProxy();
+  const [ txActive ] = useTxActive(['REMOVE_LIQUIDITY']);
   
   const [ maxRemove, setMaxRemove ] = useState<number>(0);
   const [ inputValue, setInputValue ] = useState<any>();
@@ -96,7 +99,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
         onBackspace={()=> inputValue && setInputValue(inputValue.toString().slice(0, -1))}
         target='document'
       >
-        <>
+        {!txActive && !removeLiquidityPending && 
           <Box 
             width={screenSize!=='small'?{ min:'600px', max:'750px' }: undefined}
             alignSelf='center'
@@ -202,8 +205,36 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
                 </Box>
               </Box>
             </Box>
-          </Box>
-        </>
+          </Box>}
+        { removeLiquidityPending && !txActive && <ApprovalPending /> }   
+        { txActive && 
+          <Box 
+            width={{ max:'750px' }}
+            alignSelf='center'
+            fill
+            background='background-front'
+            round='small'
+            pad='large'
+            gap='medium'
+            justify='between'
+          > 
+            <TransactionPending msg={`You are withdrawing ${inputValue} ETH`} tx={txActive} />
+                
+            <Box alignSelf='start'>
+              <Box
+                round
+                onClick={()=>close()}
+                hoverIndicator='brand-transparent'
+                pad={{ horizontal:'small', vertical:'small' }}
+                justify='center'
+              >
+                <Box direction='row' gap='small' align='center'>
+                  <ArrowLeft color='text-weak' />
+                  <Text size='xsmall' color='text-weak'> { !removeLiquidityPending? 'cancel, and go back.': 'go back'}  </Text>
+                </Box>
+              </Box>
+            </Box>
+          </Box>}
       </Keyboard>
     </Layer>
   );

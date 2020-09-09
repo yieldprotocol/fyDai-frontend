@@ -43,7 +43,7 @@ const Pool = (props:IPoolProps) => {
   const { getBalance } = useToken();
 
   const { account } = useSignerAccount();
-  const [ txActive ] = useTxActive(['SELL']);
+  const [ txActive ] = useTxActive(['ADD_LIQUIDITY', 'REMOVE_LIQUIDITY']);
 
   const [ hasDelegated, setHasDelegated ] = useState<boolean>(true);
 
@@ -115,7 +115,7 @@ const Pool = (props:IPoolProps) => {
         <InfoGrid entries={[
           {
             label: 'Your Pool Tokens',
-            visible: !!account,
+            visible: !!account && txActive?.type !== 'ADD_LIQUIDITY',
             active: true,
             loading: addLiquidityPending,     
             value: activeSeries?.poolTokens_.toFixed(2),
@@ -124,7 +124,7 @@ const Pool = (props:IPoolProps) => {
           },
           {
             label: 'Your Pool share',
-            visible: !!account,
+            visible: !!account && txActive?.type !== 'ADD_LIQUIDITY',
             active: true,
             loading: addLiquidityPending,           
             value: activeSeries?.poolPercent_.toFixed(2),
@@ -133,7 +133,7 @@ const Pool = (props:IPoolProps) => {
           },
           {
             label: 'Current Dai Balance',
-            visible: !!account,
+            visible: !!account && txActive?.type !== 'ADD_LIQUIDITY',
             active: true,
             loading: addLiquidityPending,            
             value: daiBalance_?`${daiBalance_.toFixed(2)} DAI`: '0 DAI',
@@ -142,9 +142,9 @@ const Pool = (props:IPoolProps) => {
           },
         ]}
         /> 
-      </SeriesDescriptor>      
-      { txActive?.type !== 'SELL' &&
+      </SeriesDescriptor>    
 
+      { !txActive &&
       <Box
         width={{ max:'750px' }}
         alignSelf='center'

@@ -432,7 +432,7 @@ export const useProxy = () => {
       setSellActive(false);
       return;
     }
-    dispatch({ type: 'txPending', payload:{ tx, message: `Selling ${daiIn} DAI pending...`, type:'SELL' } } );
+    dispatch({ type: 'txPending', payload:{ tx, message: `Selling ${daiIn} DAI pending...`, type:'SELL_DAI' } } );
     await handleTx(tx);
     setSellActive(false);
   };
@@ -470,7 +470,7 @@ export const useProxy = () => {
       setBuyActive(false);
       return;
     }
-    dispatch({ type: 'txPending', payload:{ tx, message: `Buying back ${daiOut} DAI pending...`, type:'BUY' } } );
+    dispatch({ type: 'txPending', payload:{ tx, message: `Buying back ${daiOut} DAI pending...`, type:'BUY_DAI' } } );
     await handleTx(tx);
     setBuyActive(false);
   };
@@ -538,7 +538,7 @@ export const useProxy = () => {
       setBuyActive(false);
       return;
     }
-    dispatch({ type: 'txPending', payload:{ tx, message: `Buying back ${daiOut} DAI pending...`, type:'BUY' } } );
+    dispatch({ type: 'txPending', payload:{ tx, message: `Buying back ${daiOut} DAI pending...`, type:'BUY_DAI' } } );
     await handleTx(tx);
     setBuyActive(false);
   };

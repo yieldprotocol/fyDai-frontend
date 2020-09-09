@@ -1,8 +1,8 @@
 import React from 'react';
-import { Box, Text, ThemeContext } from 'grommet';
-import { PulseLoader, RingLoader, ScaleLoader } from 'react-spinners';
+import { Box, Text, TextArea, ThemeContext } from 'grommet';
 
-
+import {FiCopy as Copy} from 'react-icons/fi';
+import { ScaleLoader } from 'react-spinners';
 
 interface TransactionPendingProps {
   msg:string;
@@ -12,6 +12,13 @@ interface TransactionPendingProps {
 const TransactionPending = ({ msg, tx }:TransactionPendingProps) => {
 
   const theme:any = React.useContext(ThemeContext); 
+  const txRef = React.useRef<any>(null);
+
+  const handleCopy = () => {
+    console.log(txRef.current); 
+    // txRef.current?.innerText;
+    document.execCommand('copy');
+  };
 
   return (
 
@@ -35,7 +42,6 @@ const TransactionPending = ({ msg, tx }:TransactionPendingProps) => {
         fill='horizontal'
         align='center'
       >  
-        <Text size='xsmall'> { tx.tx.hash } </Text>
         <Box 
           round='small'
           border='all'
@@ -51,6 +57,15 @@ const TransactionPending = ({ msg, tx }:TransactionPendingProps) => {
             View on Etherscan
           </Text>
         </Box>
+      </Box>
+      <Box direction='row' gap='xsmall'>
+        <Text size='xsmall' ref={txRef}> { tx.tx.hash } </Text>
+        <Box
+          onClick={()=>handleCopy()}
+        >
+          <Copy /> 
+        </Box>
+        
       </Box>
     </Box>
   );

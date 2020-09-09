@@ -10,10 +10,12 @@ import DaiMark from '../components/logos/DaiMark';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
 
-import { usePool, useProxy, useSignerAccount } from '../hooks';
+import { usePool, useProxy, useSignerAccount, useTxActive } from '../hooks';
 
 import InputWrap from '../components/InputWrap';
 import Loading from '../components/Loading';
+import TransactionPending from '../components/TransactionPending';
+import ApprovalPending from '../components/ApprovalPending';
 
 interface IWithDrawDaiProps {
   close?: any;
@@ -24,6 +26,8 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
   const screenSize = useContext(ResponsiveContext);
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { activeSeries  } = seriesState;
+
+  const [ txActive ] = useTxActive(['BUY_DAI']);
 
   const { actions: userActions } = useContext(UserContext);
 
@@ -40,14 +44,14 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
   const [ yDaiValue, setYDaiValue ] = React.useState<number>(0);
 
   const [ withdrawDisabled, setWithdrawDisabled ] = useState<boolean>(true);
-  const [ withdrawPending, setWithdrawPending] = useState<boolean>(false);
+  const [ withdrawDaiPending, setWithdrawDaiPending] = useState<boolean>(false);
 
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
 
   const withdrawProcedure = async (value:number) => {
     if ( !withdrawDisabled ) {
-      setWithdrawPending(true);
+      setWithdrawDaiPending(true);
       await buyDaiWithSignature(
         activeSeries,
         inputValue,
@@ -56,7 +60,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
         userActions.updatePosition(),
         seriesActions.updateActiveSeries()
       ]);
-      setWithdrawPending(false);
+      setWithdrawDaiPending(false);
       close();
     }
   };
@@ -98,55 +102,84 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
         onBackspace={()=> inputValue && setInputValue(inputValue.toString().slice(0, -1))}
         target='document'
       >
-        <>
+        { !txActive && !withdrawDaiPending && 
+        <Box 
+          width={screenSize!=='small'?{ min:'600px', max:'750px' }: undefined}
+          alignSelf='center'
+          fill
+          background='background-front'
+          round='small'
+          pad='large'
+          gap='medium'
+        >
+          <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to close</Text>
+          <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={withdrawDisabled}>
+            <TextInput
+              ref={(input:any) => input && input.focus()}
+              type="number"
+              placeholder='DAI'
+              value={inputValue || ''}
+              plain
+              onChange={(event:any) => setInputValue(event.target.value)}
+              icon={<DaiMark />}
+            />
+            <Button 
+              label='Max'
+              color='brand-transparent'
+              onClick={async ()=>{
+                const max = await getMaxWithdraw();
+                max && setInputValue( max );
+              }}
+              hoverIndicator='brand-transparent'
+            />
+          </InputWrap>
+
+          <Box
+            fill='horizontal'
+            round='small'
+            background={withdrawDisabled ? 'brand-transparent' : 'brand'}
+            onClick={()=> withdrawProcedure(inputValue)}
+            align='center'
+            pad='small'
+          >
+            <Text
+              weight='bold'
+              size='large'
+              color={withdrawDisabled ? 'text-xweak' : 'text'}
+            >
+              {`Reclaim ${inputValue || ''} Dai`}
+            </Text>
+          </Box>
+
+          <Box alignSelf='start'>
+            <Box
+              round
+              onClick={()=>close()}
+              hoverIndicator='brand-transparent'
+              pad={{ horizontal:'small', vertical:'small' }}
+              justify='center'
+            >
+              <Box direction='row' gap='small' align='center'>
+                <ArrowLeft color='text-weak' />
+                <Text size='xsmall' color='text-weak'> go back </Text>
+              </Box>
+            </Box>
+          </Box>
+        </Box>}
+        { withdrawDaiPending && !txActive && <ApprovalPending /> }   
+        { txActive && 
           <Box 
-            width={screenSize!=='small'?{ min:'600px', max:'750px' }: undefined}
+            width={{ max:'750px' }}
             alignSelf='center'
             fill
             background='background-front'
             round='small'
             pad='large'
             gap='medium'
-          >
-            <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to close</Text>
-            <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={withdrawDisabled}>
-              <TextInput
-                ref={(input:any) => input && input.focus()}
-                type="number"
-                placeholder='DAI'
-                value={inputValue || ''}
-                plain
-                onChange={(event:any) => setInputValue(event.target.value)}
-                icon={<DaiMark />}
-              />
-              <Button 
-                label='Max'
-                color='brand-transparent'
-                onClick={async ()=>{
-                  const max = await getMaxWithdraw();
-                  max && setInputValue( max );
-                }}
-                hoverIndicator='brand-transparent'
-              />
-            </InputWrap>
-
-            <Box
-              fill='horizontal'
-              round='small'
-              background={withdrawDisabled ? 'brand-transparent' : 'brand'}
-              onClick={()=> withdrawProcedure(inputValue)}
-              align='center'
-              pad='small'
-            >
-              <Text
-                weight='bold'
-                size='large'
-                color={withdrawDisabled ? 'text-xweak' : 'text'}
-              >
-                {`Reclaim ${inputValue || ''} Dai`}
-              </Text>
-            </Box>
-
+            justify='between'
+          > 
+            <TransactionPending msg={`You are withdrawing ${inputValue} ETH`} tx={txActive} />
+                
             <Box alignSelf='start'>
               <Box
                 round
@@ -157,12 +190,11 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
               >
                 <Box direction='row' gap='small' align='center'>
                   <ArrowLeft color='text-weak' />
-                  <Text size='xsmall' color='text-weak'> go back </Text>
+                  <Text size='xsmall' color='text-weak'> { !withdrawDaiPending? 'cancel, and go back.': 'go back'}  </Text>
                 </Box>
               </Box>
             </Box>
-          </Box>
-        </>
+          </Box>}
       </Keyboard>
     </Layer>
   );

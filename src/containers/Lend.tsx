@@ -44,7 +44,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
   const { sellDai, sellActive } = useProxy();
   const { yieldAPR } = useMath();
   const { account } = useSignerAccount();
-  const [ txActive ] = useTxActive(['SELL']);
+  const [ txActive ] = useTxActive(['SELL_DAI']);
 
   const [ hasDelegated, setHasDelegated ] = useState<boolean>(true);
 
@@ -129,7 +129,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
         <InfoGrid entries={[
           {
             label: 'Portfolio Value at Maturity',
-            visible: !!account,
+            visible: !!account && !txActive,
             active: true,
             loading: lendPending,     
             value: activeSeries && `${activeSeries?.yDaiBalance_.toFixed(2)} DAI` || '-',
@@ -138,7 +138,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
           },
           {
             label: 'Current Value',
-            visible: !!account,
+            visible: !!account && !txActive,
             active: true,
             loading: lendPending,           
             value: currentValue!==0?`${currentValue.toFixed(2)} DAI`: '-',
@@ -148,7 +148,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
 
           {
             label: 'Dai balance',
-            visible: !!account,
+            visible: !!account && !txActive,
             active: true,
             loading: lendPending,            
             value: daiBalance_?`${daiBalance_.toFixed(2)} DAI`: '0 DAI',
@@ -160,8 +160,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
       </SeriesDescriptor>
       
       {/* If there is no applicable transaction active, show the lending page */}
-      { txActive?.type !== 'SELL' &&
-
+      { !txActive &&
       <Box
         width={{ max:'750px' }}
         alignSelf='center'

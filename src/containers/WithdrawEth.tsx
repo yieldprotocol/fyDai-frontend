@@ -32,7 +32,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
 
   const { withdrawEth, withdrawEthActive }  = useProxy();
   const { estCollRatio: estimateRatio } = useMath();
-  const [ txActive ] = useTxActive(['WITHDRAW', 'DELEGATION']);
+  const [ txActive ] = useTxActive(['WITHDRAW']);
 
   const [ inputValue, setInputValue ] = useState<any>();
 
@@ -208,34 +208,33 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
         { withdrawPending && !txActive && <ApprovalPending /> }
           
         { txActive && 
-            txActive.type !== 'DELEGATION' && 
-            <Box 
-              width={{ max:'750px' }}
-              alignSelf='center'
-              fill
-              background='background-front'
-              round='small'
-              pad='large'
-              gap='medium'
-              justify='between'
-            > 
-              <TransactionPending msg={`You are withdrawing ${inputValue} ETH`} tx={txActive} />
+        <Box 
+          width={{ max:'750px' }}
+          alignSelf='center'
+          fill
+          background='background-front'
+          round='small'
+          pad='large'
+          gap='medium'
+          justify='between'
+        > 
+          <TransactionPending msg={`You are withdrawing ${inputValue} ETH`} tx={txActive} />
               
-              <Box alignSelf='start'>
-                <Box
-                  round
-                  onClick={()=>close()}
-                  hoverIndicator='brand-transparent'
-                  pad={{ horizontal:'small', vertical:'small' }}
-                  justify='center'
-                >
-                  <Box direction='row' gap='small' align='center'>
-                    <ArrowLeft color='text-weak' />
-                    <Text size='xsmall' color='text-weak'> { !withdrawPending? 'cancel, and go back.': 'go back'}  </Text>
-                  </Box>
-                </Box>
+          <Box alignSelf='start'>
+            <Box
+              round
+              onClick={()=>close()}
+              hoverIndicator='brand-transparent'
+              pad={{ horizontal:'small', vertical:'small' }}
+              justify='center'
+            >
+              <Box direction='row' gap='small' align='center'>
+                <ArrowLeft color='text-weak' />
+                <Text size='xsmall' color='text-weak'> { !withdrawPending? 'cancel, and go back.': 'go back'}  </Text>
               </Box>
-            </Box>}
+            </Box>
+          </Box>
+        </Box>}
       </Keyboard>
     </Layer>
   );
