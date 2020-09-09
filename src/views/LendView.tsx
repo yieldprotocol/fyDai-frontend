@@ -39,16 +39,9 @@ const LendView = ({ activeView: activeViewFromProp  }:LendProps) => {
         fill='horizontal'
         background='background-front'
         round='small'
-        pad='large'
-        gap='medium'
       >
-        <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Selected series</Text>
-        <SeriesDescriptor activeView='lend' />
         { activeSeries?.isMature() === false  && <Lend /> }
         { activeSeries?.isMature() === true && <Redeem /> }
-        TESTING:
-        <Redeem />
-
       </Box>
     </>
   );

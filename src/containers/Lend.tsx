@@ -25,6 +25,7 @@ import InputWrap from '../components/InputWrap';
 import InfoGrid from '../components/InfoGrid';
 import ApprovalPending from '../components/ApprovalPending';
 import TransactionPending from '../components/TransactionPending';
+import SeriesDescriptor from '../components/SeriesDescriptor';
 
 interface ILendProps {
   lendAmount?:any
@@ -123,110 +124,120 @@ const Lend = ({ lendAmount }:ILendProps) => {
       onBackspace={()=> inputValue && setInputValue(inputValue.toString().slice(0, -1))}
       target='document'
     >
-      <>
-        { withdrawDaiOpen && <WithdrawDai close={()=>setWithdrawDaiOpen(false)} /> }
+      { withdrawDaiOpen && <WithdrawDai close={()=>setWithdrawDaiOpen(false)} /> }
+      <SeriesDescriptor activeView='lend'>
+        <InfoGrid entries={[
+          {
+            label: 'Portfolio Value at Maturity',
+            visible: !!account,
+            active: true,
+            loading: lendPending,     
+            value: activeSeries && `${activeSeries?.yDaiBalance_.toFixed(2)} DAI` || '-',
+            valuePrefix: null,
+            valueExtra: null, 
+          },
+          {
+            label: 'Current Value',
+            visible: !!account,
+            active: true,
+            loading: lendPending,           
+            value: currentValue!==0?`${currentValue.toFixed(2)} DAI`: '-',
+            valuePrefix: null,
+            valueExtra: null,
+          },
 
-        {/* If there is no applicable transaction active, show the lending page */}
-        { txActive?.type !== 'SELL' &&
+          {
+            label: 'Dai balance',
+            visible: !!account,
+            active: true,
+            loading: lendPending,            
+            value: daiBalance_?`${daiBalance_.toFixed(2)} DAI`: '0 DAI',
+            valuePrefix: null,
+            valueExtra: null,
+          },
+        ]}
+        />
+      </SeriesDescriptor>
+      
+      {/* If there is no applicable transaction active, show the lending page */}
+      { txActive?.type !== 'SELL' &&
+
+      <Box
+        width={{ max:'750px' }}
+        alignSelf='center'
+        fill='horizontal'
+        background='background-front'
+        round='small'
+        pad='large'
+        gap='medium'
+      >
         <Box flex='grow' gap='small' align='center' fill='horizontal'>
-          <InfoGrid entries={[
-            {
-              label: 'Portfolio Value at Maturity',
-              visible: !!account,
-              active: true,
-              loading: lendPending,     
-              value: activeSeries && `${activeSeries?.yDaiBalance_.toFixed(2)} DAI` || '-',
-              valuePrefix: null,
-              valueExtra: null, 
-            },
-            {
-              label: 'Current Value',
-              visible: !!account,
-              active: true,
-              loading: lendPending,           
-              value: currentValue!==0?`${currentValue.toFixed(2)} DAI`: '-',
-              valuePrefix: null,
-              valueExtra: null,
-            },
-
-            {
-              label: 'Dai balance',
-              visible: !!account,
-              active: true,
-              loading: lendPending,            
-              value: daiBalance_?`${daiBalance_.toFixed(2)} DAI`: '0 DAI',
-              valuePrefix: null,
-              valueExtra: null,
-            },
-          ]}
-          />
-
           {/* If the series has NOT matured, show the lending input */}
           { !activeSeries?.isMature() &&
-            <Box fill gap='medium'>
-              <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to lend</Text>
-              <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={lendDisabled}>
-                <TextInput
-                  ref={(input:any) => input && !withdrawDaiOpen && input.focus()}
-                  type="number"
-                  placeholder={screenSize !== 'small' ? 'Enter the amount of Dai to lend': 'DAI'}
-                  value={inputValue || ''}
-                  plain
-                  onChange={(event:any) => setInputValue(event.target.value)}
-                  icon={<DaiMark />}
-                />
-                {account &&
-                <Button 
-                  label={<Text size='xsmall' color='brand'> {screenSize !== 'small' ? 'Lend Maximum': 'Max'}</Text>}
-                  color='brand-transparent'
-                  onClick={()=>setInputValue(daiBalance_)}
-                  hoverIndicator='brand-transparent'
-                />}
-              </InputWrap>
-
-              <InfoGrid entries={[
-                {
-                  label: 'Estimated APR',
-                  visible: true,
-                  active: inputValue,
-                  loading: false,     
-                  value: APR?`${APR.toFixed(2)}%`: `${activeSeries? activeSeries.yieldAPR_: ''}%`,
-                  valuePrefix: null,
-                  valueExtra: null, 
-                },
-                {
-                  label: 'Approx. Dai received at maturity',
-                  visible: true,
-                  active: inputValue,
-                  loading: false,           
-                  value: `${yDaiValue.toFixed(2)} DAI`,
-                  valuePrefix: null,
-                  valueExtra: null,
-                  //   valueExtra: () => (
-                  //   <Text size='xxsmall'>
-                  //     {activeSeries && Moment(activeSeries.maturity_).format('DD MMMM YYYY')}
-                  //   </Text>
-                  // ),
-                },
-                {
-                  label: 'Like what you see?',
-                  visible: !account && inputValue>0,
-                  active: inputValue,
-                  loading: false,            
-                  value: '',
-                  valuePrefix: null,
-                  valueExtra: () => (
-                    <Button
-                      color='brand-transparent'
-                      label={<Text size='xsmall' color='brand'>Connect a wallet</Text>}
-                      onClick={()=>console.log('still to implement')}
-                      hoverIndicator='brand-transparent'
-                    /> 
-                  )
-                },
-              ]}
+          <Box fill gap='medium'>
+            <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to lend</Text>
+            <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={lendDisabled}>
+              <TextInput
+                ref={(input:any) => input && !withdrawDaiOpen && input.focus()}
+                type="number"
+                placeholder={screenSize !== 'small' ? 'Enter the amount of Dai to lend': 'DAI'}
+                value={inputValue || ''}
+                plain
+                onChange={(event:any) => setInputValue(event.target.value)}
+                icon={<DaiMark />}
               />
-            </Box>}
+              {account &&
+              <Button 
+                label={<Text size='xsmall' color='brand'> {screenSize !== 'small' ? 'Lend Maximum': 'Max'}</Text>}
+                color='brand-transparent'
+                onClick={()=>setInputValue(daiBalance_)}
+                hoverIndicator='brand-transparent'
+              />}
+            </InputWrap>
+
+            <InfoGrid entries={[
+              {
+                label: 'Estimated APR',
+                visible: true,
+                active: inputValue,
+                loading: false,     
+                value: APR?`${APR.toFixed(2)}%`: `${activeSeries? activeSeries.yieldAPR_: ''}%`,
+                valuePrefix: null,
+                valueExtra: null, 
+              },
+              {
+                label: 'Approx. Dai received at maturity',
+                visible: true,
+                active: inputValue,
+                loading: false,           
+                value: `${yDaiValue.toFixed(2)} DAI`,
+                valuePrefix: null,
+                valueExtra: null,
+                //   valueExtra: () => (
+                //   <Text size='xxsmall'>
+                //     {activeSeries && Moment(activeSeries.maturity_).format('DD MMMM YYYY')}
+                //   </Text>
+                // ),
+              },
+              {
+                label: 'Like what you see?',
+                visible: !account && inputValue>0,
+                active: inputValue,
+                loading: false,            
+                value: '',
+                valuePrefix: null,
+                valueExtra: () => (
+                  <Button
+                    color='brand-transparent'
+                    label={<Text size='xsmall' color='brand'>Connect a wallet</Text>}
+                    onClick={()=>console.log('still to implement')}
+                    hoverIndicator='brand-transparent'
+                  /> 
+                )
+              },
+            ]}
+            />
+          </Box>}
   
           { account && !activeSeries?.isMature() && 
           <Box gap='small' fill='horizontal' align='center'>
@@ -270,12 +281,12 @@ const Lend = ({ lendAmount }:ILendProps) => {
           <Box fill gap='medium' margin={{ vertical:'large' }}>
             <Redeem />
           </Box>}
-        </Box>}
+        </Box>
+      </Box>}
 
-        {/* If there is a transaction active, show the applicable view */}
-        { sellActive && !txActive && <ApprovalPending /> } 
-        { txActive && <TransactionPending msg={`You lent ${inputValue} DAI.`} tx={txActive} /> }
-      </>
+      {/* If there is a transaction active, show the applicable view */}
+      { sellActive && !txActive && <ApprovalPending /> } 
+      { txActive && <TransactionPending msg={`You lent ${inputValue} DAI.`} tx={txActive} /> }
     </Keyboard>
   );
 };

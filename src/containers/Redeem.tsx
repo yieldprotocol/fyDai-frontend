@@ -50,7 +50,15 @@ const Redeem  = ({ close }:IRedeemProps)  => {
   }, [activeSeries]);
 
   return (
-    <>
+    <Box
+    width={{ max:'750px' }}
+    alignSelf='center'
+    fill='horizontal'
+    background='background-front'
+    round='small'
+    pad='large'
+    gap='medium'
+  >
       <Box flex='grow' align='center' fill='horizontal'>
         <InlineAlert warnMsg={warningMsg} errorMsg={errorMsg} />
         { txActive?.type !== 'REDEEM' &&
@@ -89,7 +97,7 @@ const Redeem  = ({ close }:IRedeemProps)  => {
         { redeemActive && !txActive && <ApprovalPending /> } 
         { txActive && <TransactionPending msg={`Redeeming your ${activeSeries?.yDaiBalance_.toFixed(4)} Dai.`} tx={txActive} /> }
       </Box>
-    </>
+    </Box>
   );
 };
 

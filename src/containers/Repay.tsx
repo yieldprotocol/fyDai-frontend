@@ -112,35 +112,42 @@ function Repay({ repayAmount }:IRepayProps) {
       onBackspace={()=> inputValue && setInputValue(inputValue.toString().slice(0, -1))}
       target='document'
     >
-      <>
-        { !txActive &&
+      <SeriesDescriptor activeView='borrow'> 
+        <InfoGrid entries={[
+          {
+            label: 'Current Debt',
+            visible: !!account,
+            active: true,
+            loading: repayPending,     
+            value: activeSeries?.ethDebtYDai_? `${activeSeries.ethDebtYDai_.toFixed(2)} DAI`: '0 DAI',
+            valuePrefix: null,
+            valueExtra: null, 
+          },
+          {
+            label: 'Dai balance',
+            visible: !!account,
+            active: true,
+            loading: repayPending,            
+            value: daiBalance_?`${daiBalance_.toFixed(2)} DAI`: '-',
+            valuePrefix: null,
+            valueExtra: null,
+          },
+        ]}
+        />
+      </SeriesDescriptor>
+
+      { !txActive &&
+
+      <Box
+        width={{ max: '750px' }}
+        alignSelf="center"
+        fill
+        background="background-front"
+        round='small'
+        pad="large"
+      >
         <Box flex='grow' justify='between'>
           <Box gap='medium' align='center' fill='horizontal'>
-            <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Selected series</Text>
-
-            <SeriesDescriptor activeView='borrow' />
-
-            <InfoGrid entries={[
-              {
-                label: 'Current Debt',
-                visible: !!account,
-                active: true,
-                loading: repayPending,     
-                value: activeSeries?.ethDebtYDai_? `${activeSeries.ethDebtYDai_.toFixed(2)} DAI`: '0 DAI',
-                valuePrefix: null,
-                valueExtra: null, 
-              },
-              {
-                label: 'Dai balance',
-                visible: !!account,
-                active: true,
-                loading: repayPending,            
-                value: daiBalance_?`${daiBalance_.toFixed(2)} DAI`: '-',
-                valuePrefix: null,
-                valueExtra: null,
-              },
-            ]}
-            />
 
             { (activeSeries?.ethDebtYDai_.toFixed(2) > 0) ?
              
@@ -163,8 +170,7 @@ function Repay({ repayAmount }:IRepayProps) {
                     onClick={()=>setInputValue(activeSeries?.ethDebtYDai_)}
                     hoverIndicator='brand-transparent'
                   />
-                </InputWrap>
-      
+                </InputWrap>    
                 <> 
                   <Box
                     fill='horizontal'
@@ -184,7 +190,7 @@ function Repay({ repayAmount }:IRepayProps) {
                   </Box>
                 </>
               </Box> :
-            
+
               <Box 
                 gap='medium' 
                 margin={{ vertical:'large' }}  
@@ -206,10 +212,10 @@ function Repay({ repayAmount }:IRepayProps) {
                 </Box>             
               </Box>}            
           </Box>
-        </Box>}
-        { repayActive && !txActive && <ApprovalPending /> } 
-        { txActive && <TransactionPending msg={`You made a repayment of ${inputValue} DAI.`} tx={txActive} /> }
-      </>
+        </Box>
+      </Box>}
+      { repayActive && !txActive && <ApprovalPending /> } 
+      { txActive && <TransactionPending msg={`You made a repayment of ${inputValue} DAI.`} tx={txActive} /> }
     </Keyboard>
   );
 }

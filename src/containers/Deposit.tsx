@@ -116,11 +116,17 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
       onBackspace={()=> inputValue && setInputValue(inputValue.toString().slice(0, -1))}
       target='document'
     >
-      <>
-        { withdrawOpen && <WithdrawEth close={()=>setWithdrawOpen(false)} /> }
-        
-        { (!txActive || txActive?.type === 'WITHDRAW') &&
-        <Box gap='small'>
+      { withdrawOpen && <WithdrawEth close={()=>setWithdrawOpen(false)} /> }    
+      { (!txActive || txActive?.type === 'WITHDRAW') &&
+        <Box
+          // width={{ max: '750px' }}
+          alignSelf="center"
+          fill
+          background="background-front"
+          round='small'
+          pad='large'
+          gap='medium'
+        >
           <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to deposit</Text>
 
           <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={depositDisabled}>
@@ -229,9 +235,8 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
           </Box>}
        
         </Box>}
-        { postEthActive && !txActive && <ApprovalPending /> } 
-        { txActive && txActive.type !== 'WITHDRAW' && <TransactionPending msg={`You deposited ${inputValue} Eth.`} tx={txActive} /> }
-      </>
+      { postEthActive && !txActive && <ApprovalPending /> } 
+      { txActive && txActive.type !== 'WITHDRAW' && <TransactionPending msg={`You deposited ${inputValue} Eth.`} tx={txActive} /> }
     </Keyboard>
   );
 };

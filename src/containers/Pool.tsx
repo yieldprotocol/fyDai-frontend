@@ -25,6 +25,7 @@ import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
 import ApprovalPending from '../components/ApprovalPending';
 import TransactionPending from '../components/TransactionPending';
+import SeriesDescriptor from '../components/SeriesDescriptor';
 
 interface IPoolProps {
   // lendAmount?:any
@@ -107,44 +108,54 @@ const Pool = (props:IPoolProps) => {
       onEsc={() => setInputValue(undefined)}
       onEnter={()=> addLiquidityProcedure(inputValue)}
       onBackspace={()=> inputValue && setInputValue(inputValue.toString().slice(0, -1))}
-
       target='document'
     >
-      <>
-        { removeLiquidityOpen && <RemoveLiquidity close={()=>setRemoveLiquidityOpen(false)} /> }
-        { txActive?.type !== 'SELL' &&
-        <Box flex='grow' gap='small' align='center' fill='horizontal'>
-          <InfoGrid entries={[
-            {
-              label: 'Your Pool Tokens',
-              visible: !!account,
-              active: true,
-              loading: addLiquidityPending,     
-              value: activeSeries?.poolTokens_.toFixed(2),
-              valuePrefix: null,
-              valueExtra: null, 
-            },
-            {
-              label: 'Your Pool share',
-              visible: !!account,
-              active: true,
-              loading: addLiquidityPending,           
-              value: activeSeries?.poolPercent_.toFixed(2),
-              valuePrefix: null,
-              valueExtra: null,
-            },
-            {
-              label: 'Current Dai Balance',
-              visible: !!account,
-              active: true,
-              loading: addLiquidityPending,            
-              value: daiBalance_?`${daiBalance_.toFixed(2)} DAI`: '0 DAI',
-              valuePrefix: null,
-              valueExtra: null,
-            },
-          ]}
-          />
+      { removeLiquidityOpen && <RemoveLiquidity close={()=>setRemoveLiquidityOpen(false)} /> }
+      <SeriesDescriptor activeView='pool'> 
+        <InfoGrid entries={[
+          {
+            label: 'Your Pool Tokens',
+            visible: !!account,
+            active: true,
+            loading: addLiquidityPending,     
+            value: activeSeries?.poolTokens_.toFixed(2),
+            valuePrefix: null,
+            valueExtra: null, 
+          },
+          {
+            label: 'Your Pool share',
+            visible: !!account,
+            active: true,
+            loading: addLiquidityPending,           
+            value: activeSeries?.poolPercent_.toFixed(2),
+            valuePrefix: null,
+            valueExtra: null,
+          },
+          {
+            label: 'Current Dai Balance',
+            visible: !!account,
+            active: true,
+            loading: addLiquidityPending,            
+            value: daiBalance_?`${daiBalance_.toFixed(2)} DAI`: '0 DAI',
+            valuePrefix: null,
+            valueExtra: null,
+          },
+        ]}
+        /> 
+      </SeriesDescriptor>      
+      { txActive?.type !== 'SELL' &&
 
+      <Box
+        width={{ max:'750px' }}
+        alignSelf='center'
+        fill='horizontal'
+        background='background-front'
+        round='small'
+        pad='large'
+        gap='medium'
+      >
+        <Box flex='grow' gap='small' align='center' fill='horizontal'>
+          
           <Box fill gap='medium'>
             <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Add liquidity</Text>
             <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={addLiquidityDisabled}>
@@ -158,12 +169,12 @@ const Pool = (props:IPoolProps) => {
                 icon={<DaiMark />}
               />
               {account &&
-                <Button 
-                  label={<Text size='xsmall' color='brand'> {screenSize !== 'small' ? 'Add Maximum': 'Max'}</Text>}
-                  color='brand-transparent'
-                  onClick={()=>setInputValue(daiBalance_)}
-                  hoverIndicator='brand-transparent'
-                />}
+              <Button 
+                label={<Text size='xsmall' color='brand'> {screenSize !== 'small' ? 'Add Maximum': 'Max'}</Text>}
+                color='brand-transparent'
+                onClick={()=>setInputValue(daiBalance_)}
+                hoverIndicator='brand-transparent'
+              />}
             </InputWrap>
 
             <InfoGrid entries={[
@@ -201,15 +212,15 @@ const Pool = (props:IPoolProps) => {
             <Box
               fill='horizontal'
               round='small'
-              background={ addLiquidityDisabled ? 'brand-transparent' : 'brand'}
-              onClick={ ()=>addLiquidityProcedure(inputValue)}
+              background={addLiquidityDisabled ? 'brand-transparent' : 'brand'}
+              onClick={()=>addLiquidityProcedure(inputValue)}
               align='center'
               pad='small'
             >
               <Text 
                 weight='bold'
                 size='large'
-                color={ addLiquidityDisabled ? 'text-xweak' : 'text'}
+                color={addLiquidityDisabled ? 'text-xweak' : 'text'}
               >
                 {`Supply ${inputValue || ''} DAI`}
               </Text>
@@ -232,11 +243,11 @@ const Pool = (props:IPoolProps) => {
               </Box>
             </Box> }
           </Box>}
-        </Box>}
+        </Box>
+      </Box>}
 
-        { addLiquidityActive && !txActive && <ApprovalPending /> } 
-        { txActive && <TransactionPending msg={`You added ${inputValue} DAI to the pool.`} tx={txActive} /> }
-      </>
+      { addLiquidityActive && !txActive && <ApprovalPending /> } 
+      { txActive && <TransactionPending msg={`You added ${inputValue} DAI to the pool.`} tx={txActive} /> }
     </Keyboard>
   );
 };

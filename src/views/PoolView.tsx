@@ -21,11 +21,7 @@ const PoolView = () => {
         fill='horizontal'
         background='background-front'
         round='small'
-        pad='large'
-        gap='medium'
       >
-        <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Selected Pool</Text>
-        <SeriesDescriptor activeView='pool' />
         <Pool /> 
       </Box>
     </>

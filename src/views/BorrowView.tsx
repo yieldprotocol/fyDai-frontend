@@ -49,8 +49,7 @@ const BorrowView = ({
           fill
           background="background-front"
           round='small'
-          pad="large"
-        >
+        > 
           {activeView === 'COLLATERAL' && <Deposit setActiveView={(x:string)=>setActiveView(x.toUpperCase())} />}
           {activeView === 'BORROW' && (
             <Borrow />
