@@ -236,7 +236,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
        
         </Box>}
       { postEthActive && !txActive && <ApprovalPending /> } 
-      { txActive && txActive.type !== 'WITHDRAW' && <TransactionPending msg={`You deposited ${inputValue} Eth.`} tx={txActive} /> }
+      { txActive && txActive.type !== 'WITHDRAW' && <TransactionPending msg={`You are depositing ${inputValue} ETH`} tx={txActive} /> }
     </Keyboard>
   );
 };

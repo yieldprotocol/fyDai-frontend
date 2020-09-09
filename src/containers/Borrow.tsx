@@ -27,9 +27,10 @@ import Authorization from '../components/Authorization';
 
 interface IBorrowProps {
   borrowAmount?:number|null;
+  setActiveView?:any; 
 }
 
-const Borrow = ({ borrowAmount }:IBorrowProps) => {
+const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
   const { state: yieldState } = React.useContext(YieldContext);
   const { deployedContracts } = yieldState;
   const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
@@ -200,7 +201,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
                 <Button
                   color='brand-transparent'
                   label={<Text size='xsmall' color='brand'>Repay debt</Text>}
-                  onClick={()=>console.log('still to implement')}
+                  onClick={() => setActiveView(2)}
                   hoverIndicator='brand-transparent'
                 /> 
               ),
@@ -304,7 +305,7 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
                     <Button
                       color={inputValue? 'brand': 'brand-transparent'}
                       label={<Text size='xsmall' color='brand'>Deposit collateral</Text>}
-                      onClick={()=>console.log('still to implement')}
+                      onClick={() => setActiveView(0)}
                       hoverIndicator='brand-transparent'
                     /> 
                   )
@@ -355,11 +356,11 @@ const Borrow = ({ borrowAmount }:IBorrowProps) => {
 
       {/* If there is a transaction active, show the applicable view */}
       { borrowActive && !txActive && <ApprovalPending /> } 
-      { txActive && <TransactionPending msg={`You borrowed ${inputValue} DAI.`} tx={txActive} /> }
+      { txActive && <TransactionPending msg={`You are borrowing ${inputValue} DAI`} tx={txActive} /> }
     </Keyboard>
   );
 };
 
-Borrow.defaultProps = { borrowAmount: null };
+Borrow.defaultProps = { borrowAmount: null, setActiveView: 1 };
 
 export default Borrow;

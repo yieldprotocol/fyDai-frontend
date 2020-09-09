@@ -1,10 +1,10 @@
 import React from 'react';
-import { Box, Button, Text, Tabs, Tab, ResponsiveContext } from 'grommet';
+import { Box, Button, Text, ResponsiveContext } from 'grommet';
 import { useSignerAccount } from '../hooks';
 
 interface IActionSelectorProps {
   setActiveView: any;
-  activeView: string;
+  activeView: number;
 }
 
 function ActionSelector({ setActiveView, activeView }:IActionSelectorProps) {
@@ -31,10 +31,10 @@ function ActionSelector({ setActiveView, activeView }:IActionSelectorProps) {
           round='small'
           pad={{ horizontal: 'large', vertical: 'xsmall' }}
           background={
-            activeView === 'COLLATERAL' ? 'background-front' : undefined
+            activeView === 0 ? 'background-front' : undefined
           }
-          elevation={activeView === 'COLLATERAL' ? 'small' : undefined}
-          onClick={() => setActiveView('COLLATERAL')}
+          elevation={activeView === 0 ? 'small' : undefined}
+          onClick={() => setActiveView(0)}
           direction="row"
           justify="between"
           gap="small"
@@ -49,10 +49,10 @@ function ActionSelector({ setActiveView, activeView }:IActionSelectorProps) {
           round='small'
           pad={{ horizontal: 'large', vertical: 'xsmall' }}
           background={
-            activeView === 'BORROW' ? 'background-front' : undefined
+            activeView === 1 ? 'background-front' : undefined
           }
-          elevation={activeView === 'BORROW' ? 'small' : undefined}
-          onClick={() => setActiveView('BORROW')}
+          elevation={activeView === 1 ? 'small' : undefined}
+          onClick={() => setActiveView(1)}
         >
           <Text size="small" weight="bold">
             2. Borrow Dai
@@ -62,9 +62,9 @@ function ActionSelector({ setActiveView, activeView }:IActionSelectorProps) {
         <Box
           round='small'
           pad={{ horizontal: 'large', vertical: 'xsmall' }}
-          background={activeView === 'REPAY' ? 'background-front' : undefined}
-          elevation={activeView === 'REPAY' ? 'small' : undefined}
-          onClick={account?() => setActiveView('REPAY'):()=>{console.log('connect a wallet')}}
+          background={activeView === 2 ? 'background-front' : undefined}
+          elevation={activeView === 2 ? 'small' : undefined}
+          onClick={account?() => setActiveView(2):()=>{console.log('connect a wallet')}}
         >
           <Text size="small" weight="bold" color={account?undefined:'text-weak'}>
             3. Repay Dai Debt

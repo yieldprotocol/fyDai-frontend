@@ -24,9 +24,10 @@ import InputWrap from '../components/InputWrap';
 
 interface IRepayProps {
   repayAmount?:any
+  setActiveView?: any;
 }
 
-function Repay({ repayAmount }:IRepayProps) {
+function Repay({ setActiveView, repayAmount }:IRepayProps) {
   const { state: { deployedContracts } } = React.useContext(YieldContext);
   const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
   const { activeSeries } = seriesState;
@@ -215,11 +216,11 @@ function Repay({ repayAmount }:IRepayProps) {
         </Box>
       </Box>}
       { repayActive && !txActive && <ApprovalPending /> } 
-      { txActive && <TransactionPending msg={`You made a repayment of ${inputValue} DAI.`} tx={txActive} /> }
+      { txActive && <TransactionPending msg={`You are repaying ${inputValue} DAI`} tx={txActive} /> }
     </Keyboard>
   );
 }
 
-Repay.defaultProps = { repayAmount:null };
+Repay.defaultProps = { repayAmount:null, setActiveView: 2 };
 
 export default Repay;

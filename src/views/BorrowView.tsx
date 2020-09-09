@@ -13,15 +13,15 @@ import PageHeader from '../components/PageHeader';
 import ActionSelector from '../components/ActionSelector';
 
 interface BorrowProps {
-  activeView?: string;
+  activeView?: number;
 }
 
 const BorrowView = ({
   activeView: activeViewFromProps,
 }: BorrowProps) => {
   
-  const [ activeView, setActiveView ] = React.useState<string>( 
-    activeViewFromProps || 'BORROW'
+  const [ activeView, setActiveView ] = React.useState<number>( 
+    activeViewFromProps || 1
   );
 
   return (
@@ -41,8 +41,7 @@ const BorrowView = ({
         fill
       >
 
-        <ActionSelector activeView={activeView} setActiveView={setActiveView} />
-        
+        <ActionSelector activeView={activeView} setActiveView={setActiveView} />    
         <Box
           width={{ max: '750px' }}
           alignSelf="center"
@@ -50,12 +49,12 @@ const BorrowView = ({
           background="background-front"
           round='small'
         > 
-          {activeView === 'COLLATERAL' && <Deposit setActiveView={(x:string)=>setActiveView(x.toUpperCase())} />}
-          {activeView === 'BORROW' && (
-            <Borrow />
+          {activeView === 0 && <Deposit setActiveView={setActiveView} />}
+          {activeView === 1 && (
+            <Borrow setActiveView={setActiveView} />
           )}
-          {activeView === 'REPAY' && (
-            <Repay />
+          {activeView === 2 && (
+            <Repay setActiveView={setActiveView} />
           )}
         </Box>
       </Box>    
@@ -64,7 +63,7 @@ const BorrowView = ({
 };
 
 BorrowView.defaultProps = {
-  activeView: null,
+  activeView: 1,
 };
 
 export default BorrowView;
