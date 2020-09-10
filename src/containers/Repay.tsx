@@ -117,7 +117,7 @@ function Repay({ setActiveView, repayAmount }:IRepayProps) {
         <InfoGrid entries={[
           {
             label: 'Current Debt',
-            visible: !!account,
+            visible: !!account && !txActive,
             active: true,
             loading: repayPending,     
             value: activeSeries?.ethDebtYDai_? `${activeSeries.ethDebtYDai_.toFixed(2)} DAI`: '0 DAI',
@@ -126,7 +126,7 @@ function Repay({ setActiveView, repayAmount }:IRepayProps) {
           },
           {
             label: 'Dai balance',
-            visible: !!account,
+            visible: !!account && !txActive,
             active: true,
             loading: repayPending,            
             value: daiBalance_?`${daiBalance_.toFixed(2)} DAI`: '-',

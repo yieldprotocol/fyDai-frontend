@@ -78,7 +78,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
   /* Withdraw disabled logic */
   useEffect(()=>{
     ( 
-      estRatio < 200 ||
+      estRatio < 150 ||
       inputValue > maxWithdraw || 
       txActive ||
       !inputValue ||
@@ -88,10 +88,10 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
 
   /* show warnings and errors with collateralisation ratio levels and inputs */
   useEffect(()=>{
-    if (estRatio < 200 || inputValue > maxWithdraw ) {
+    if (estRatio < 150 || inputValue > maxWithdraw ) {
       setWarningMsg(null);
       setErrorMsg('You are not allowed to withdraw below the collateralization ratio'); 
-    } else if (estRatio >= 200 && estRatio < 250 ) {
+    } else if (estRatio >= 150 && estRatio < 200 ) {
       setErrorMsg(null);
       setWarningMsg('Your collateralisation ration will put you at risk of liquidation');
     } else {   

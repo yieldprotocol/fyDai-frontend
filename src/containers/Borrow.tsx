@@ -174,7 +174,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
           <InfoGrid entries={[
             {
               label: 'Current Debt',
-              visible: !!account && activeSeries && !activeSeries?.isMature() || (activeSeries?.isMature() && activeSeries?.ethDebtYDai_ > 0 ),
+              visible: !txActive && !!account && activeSeries && !activeSeries?.isMature() || (activeSeries?.isMature() && activeSeries?.ethDebtYDai_ > 0 ),
               active: true,
               loading: borrowPending,    
               value: activeSeries?.ethDebtYDai_? `${activeSeries.ethDebtYDai_.toFixed(2)} DAI`: '0 DAI',
@@ -183,7 +183,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
             },
             {
               label: 'Max Borrowing Power',
-              visible: activeSeries && !activeSeries.isMature()  && !!account,
+              visible: !txActive && activeSeries && !activeSeries.isMature()  && !!account,
               active: maxDaiAvailable_,
               loading: borrowPending,
               value: maxDaiAvailable_ ? `${maxDaiAvailable_.toFixed(2)} DAI`: '',           
@@ -192,7 +192,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
             },
             {
               label: 'Repay Debt',
-              visible: !!account && activeSeries?.isMature() && activeSeries?.ethDebtYDai_ > 0,
+              visible: !txActive && !!account && activeSeries?.isMature() && activeSeries?.ethDebtYDai_ > 0,
               active: true,
               loading: false,    
               value: '',

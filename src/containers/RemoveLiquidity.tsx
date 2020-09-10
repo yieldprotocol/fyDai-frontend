@@ -49,10 +49,8 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
     if ( !removeLiquidityDisabled ) {
       setRemoveLiquidityPending(true);
       await removeLiquidity(activeSeries, value, 1);
-      await Promise.all([
-        userActions.updatePosition(),
-        seriesActions.updateActiveSeries()
-      ]);
+      userActions.updatePosition();
+      seriesActions.updateActiveSeries();
       setRemoveLiquidityPending(true);
       close();
     }

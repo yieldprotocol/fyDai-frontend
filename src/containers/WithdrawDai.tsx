@@ -56,10 +56,8 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
         activeSeries,
         inputValue,
       );
-      await Promise.all([
-        userActions.updatePosition(),
-        seriesActions.updateActiveSeries()
-      ]);
+      userActions.updatePosition();
+      seriesActions.updateActiveSeries();
       setWithdrawDaiPending(false);
       close();
     }
@@ -166,7 +164,9 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
             </Box>
           </Box>
         </Box>}
-        { withdrawDaiPending && !txActive && <ApprovalPending /> }   
+
+        { withdrawDaiPending && !txActive && <ApprovalPending /> }
+
         { txActive && 
           <Box 
             width={{ max:'750px' }}
