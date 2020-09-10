@@ -21,7 +21,8 @@ import {
   useProxy, 
   useTxActive, 
   useMath, 
-  useSignerAccount 
+  useSignerAccount, 
+  useDebounce
 } from '../hooks';
 
 import WithdrawEth from './WithdrawEth';
@@ -41,7 +42,6 @@ interface DepositProps {
 const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
   const { state: userState, actions: userActions } = useContext(UserContext);
   const {
-    isLoading,
     ethBalance_,
     ethPosted_,
     collateralPercent_,
@@ -56,6 +56,9 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
   const { account } = useSignerAccount();
 
   const [ inputValue, setInputValue ] = useState<any>(depositAmount || undefined);
+  const debouncedInput = useDebounce(inputValue, 500);
+  const [inputRef, setInputRef] = React.useState<any>(null);
+
   const [ estRatio, setEstRatio ] = useState<any>(0);
 
   const [ withdrawOpen, setWithdrawOpen ] = useState<boolean>(false);
@@ -97,23 +100,23 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
 
   /* Handle input exceptions and warnings */
   useEffect(()=>{   
-    if ( inputValue && ( inputValue > ethBalance_) ) {
+    if ( debouncedInput && ( debouncedInput > ethBalance_) ) {
       setWarningMsg(null);
       setErrorMsg('That amount exceeds your available ETH balance'); 
-    } else if (inputValue && (inputValue === ethBalance_) ) {
+    } else if (debouncedInput && (debouncedInput === ethBalance_) ) {
       setErrorMsg(null);
       setWarningMsg('If you deposit all your ETH you may not be able to make any further transactions!');
     } else {
       setWarningMsg(null);
       setErrorMsg(null);
     }
-  }, [inputValue]);
+  }, [debouncedInput]);
 
   return (
     <Keyboard 
       onEsc={() => setInputValue(undefined)}
       onEnter={()=> depositProcedure(inputValue)}
-      onBackspace={()=> inputValue && setInputValue(inputValue.toString().slice(0, -1))}
+      onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
       target='document'
     >
       { withdrawOpen && <WithdrawEth close={()=>setWithdrawOpen(false)} /> }    

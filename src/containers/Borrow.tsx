@@ -15,7 +15,8 @@ import {
   useMath,
   useProxy, 
   useTxActive, 
-  useSignerAccount
+  useSignerAccount, 
+  useDebounce,
 } from '../hooks';
 
 import SeriesDescriptor from '../components/SeriesDescriptor';
@@ -39,14 +40,13 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
   const { position, authorizations: { hasDelegatedProxy } } = userState;
   const { 
     maxDaiAvailable_,
-    // ethBorrowingPower_,
     collateralPercent_,
   } = position;
 
   const screenSize = React.useContext(ResponsiveContext);
 
   const { borrow }  = useController();
-  const { previewPoolTx }  = usePool();
+  const { previewPoolTx, callActive }  = usePool();
   const { 
     borrowDai, 
     borrowActive 
@@ -63,24 +63,28 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
   const [ warningMsg, setWarningMsg] = React.useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
 
-  /* token balances and values */
-  const [ inputValue, setInputValue ] = React.useState<any>(borrowAmount || undefined);
+  /* input values */
+  const [ inputValue, setInputValue ] = React.useState<any|undefined>(borrowAmount || undefined);
+  const debouncedInput = useDebounce(inputValue, 500);
+  const [inputRef, setInputRef] = React.useState<any>(null);
+
+  /* token balances and calculated values */
   const [ yDaiValue, setYDaiValue ] = React.useState<number>(0);
   const [ APR, setAPR ] = React.useState<number>();
   const [ estRatio, setEstRatio ] = React.useState<any>(0);
 
-  const [ txActive ] = useTxActive(['BORROW', 'BUY', 'DELEGATION']);
+  const [ txActive ] = useTxActive(['BORROW', 'BUY' ]);
 
   // const inputRef = React.useRef<HTMLInputElement>(null);
-  // React.useEffect(()=> { inputRef.current && inputRef.current.focus(); }, []);
+  React.useEffect(()=> { console.log(document.activeElement === inputRef); }, [inputRef]);
 
   /* Borrow execution flow */
-  const borrowProcedure = async (value:number, autoSell:boolean=true) => {
-    if (!borrowDisabled) {
+  const borrowProcedure = async (value:number|undefined, autoSell:boolean=true) => {
+    if (value&&value>0 && !borrowDisabled) {
       setBorrowPending(true);
       autoSell && await borrowDai(activeSeries, 'ETH-A', yDaiValue, value);
       !autoSell && await borrow('ETH-A', activeSeries.maturity, value);
-      setInputValue('');
+      setInputValue(undefined);
       await Promise.all([
         userActions.updatePosition(),
         seriesActions.updateActiveSeries()
@@ -90,82 +94,60 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
   };
 
   /* 
-  * Handle input changes:
+  * Handle input (debounced input) changes:
   * 1. dai to yDai conversion and get APR (yDai needed to compare with the approved allowance)
   * 2. calcalute yield APR
   * 3. calculate estimated collateralisation ration
   */
   useEffect(() => {   
-    activeSeries && parseFloat(inputValue) > 0 && ( async () => {
-      const newRatio = estimateRatio(position.ethPosted_, ( position.debtValue_+ parseFloat(inputValue)) ); 
+    activeSeries && debouncedInput>0 && ( async () => {
+      const newRatio = estimateRatio(position.ethPosted_, ( position.debtValue_+ parseFloat(debouncedInput)) ); 
       newRatio && setEstRatio(newRatio.toFixed(0));
-      const preview = await previewPoolTx('buyDai', activeSeries, inputValue);
+      const preview = await previewPoolTx('buyDai', activeSeries, debouncedInput);
       if (preview && !preview.isZero()) {
         setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
-        setAPR( yieldAPR( ethers.utils.parseEther(inputValue.toString()), preview, activeSeries.maturity ) );      
+        setAPR( yieldAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries.maturity ) );      
       } else {
         /* if the market doesnt have liquidity just estimate from rate */
         const rate = await previewPoolTx('buyDai', activeSeries, 1);
-        rate && setYDaiValue(inputValue* parseFloat((ethers.utils.formatEther(rate))));
+        rate && setYDaiValue(debouncedInput* parseFloat((ethers.utils.formatEther(rate))));
         setBorrowDisabled(true);
         setErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
       }
     })();
-  }, [inputValue, activeSeries]);
-
-  /* check delegation status on series change */
-  useEffect(() => {
-    activeSeries && ( async ()=>{
-      // setHasDelegated(activeSeries.hasDelegatedController);
-    })();
-  }, [ activeSeries ]);
+  }, [debouncedInput, activeSeries]);
     
   /* Handle borrow disabling deposits */
   useEffect(()=>{
     (
-      position.ethPosted_ <= 0 ||
-      estRatio <= 2 ||
-      inputValue >= maxDaiAvailable_ ||
       !account ||
       !hasDelegatedProxy ||
-      !inputValue ||
-      parseFloat(inputValue) === 0
+      position.ethPosted_ <= 0 ||
+      estRatio <= 2 ||
+      inputValue >= maxDaiAvailable_||
+      inputValue<=0
     )? setBorrowDisabled(true): setBorrowDisabled(false);
-  }, [ inputValue, hasDelegatedProxy, estRatio ]);
-
-  /* Handle collateralisation ratio exceptions and warnings */
-  // useEffect(()=>{
-  //   if (estRatio && estRatio <= 2) {
-  //     setErrorMsg('That amount exceeds the amount of Dai you can borrow based on your collateral');
-  //     setWarningMsg(null);
-  //   } else if (estRatio > 2 && estRatio < 2.5 ) {
-  //     setWarningMsg('Borrowing that much will put you at risk of liquidation');
-  //     setErrorMsg(null);
-  //   } else {
-  //     setWarningMsg(null);
-  //     setErrorMsg(null);
-  //   }
-  // }, [ estRatio ]);
+  }, [ callActive, inputValue, hasDelegatedProxy, estRatio ]);
 
   /* Handle input exception logic */
   useEffect(() => {
-    if ( inputValue && parseFloat(inputValue) >= maxDaiAvailable_ ) {
+    if ( debouncedInput && debouncedInput >= maxDaiAvailable_ ) {
       setWarningMsg(null);
       setErrorMsg('That amount exceeds the amount of Dai you can borrow based on your collateral'); 
-    } else if (inputValue && ( inputValue > Math.round(maxDaiAvailable_- maxDaiAvailable_*0.05 ) ) ) {
+    } else if (debouncedInput && ( debouncedInput > Math.round(maxDaiAvailable_- maxDaiAvailable_*0.05 ) ) ) {
       setErrorMsg(null);
       setWarningMsg('If you borrow right up to your maximum allowance, there is high probability you will be liquidated!');
     } else {
       setWarningMsg(null);
       setErrorMsg(null);
     }
-  }, [ inputValue ]);
+  }, [ debouncedInput ]);
 
   return (
     <Keyboard 
       onEsc={() => setInputValue(undefined)}
       onEnter={()=> borrowProcedure(inputValue)}
-      onBackspace={()=> inputValue && setInputValue(inputValue.toString().slice(0, -1))}
+      onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
       target='document'   
     >
       <SeriesDescriptor activeView='borrow'>
@@ -226,7 +208,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
 
               <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={borrowDisabled}>
                 <TextInput
-                  ref={(input:any) => input && input.focus()}
+                  ref={(el:any) => {el && el.focus(); setInputRef(el);}} 
                   type="number"
                   placeholder={screenSize !== 'small' ? 'Enter the amount of Dai to borrow': 'DAI'} 
                   value={inputValue || ''}
@@ -240,8 +222,8 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
                 {
                   label: 'Estimated APR',
                   visible: true,
-                  active: inputValue,
-                  loading: false,     
+                  active: !!inputValue&&inputValue>0,
+                  loading: false,    
                   value: APR?`${APR.toFixed(2)}%`: `${activeSeries? activeSeries.yieldAPR_: ''}%`,
                   valuePrefix: null,
                   valueExtra: null, 
@@ -249,8 +231,8 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
                 {
                   label: 'Approx. Dai owed at maturity',
                   visible: true,
-                  active: inputValue,
-                  loading: false,           
+                  active: !!inputValue&&inputValue>0,
+                  loading: false,          
                   value: `${yDaiValue.toFixed(2)} DAI`,
                   valuePrefix: null,
                   // valueExtra: () => (
@@ -263,8 +245,8 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
                 {
                   label: 'Ratio after Borrow',
                   visible: !!account && position.ethPosted_>0,
-                  active: inputValue,
-                  loading: false,            
+                  active: !!inputValue&&inputValue>0,
+                  loading: false,        
                   value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
                   valuePrefix: 'Approx.',
                   valueExtra: () => (
@@ -278,8 +260,8 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
                 },
                 {
                   label: 'Like what you see?',
-                  visible: !account && inputValue,
-                  active: inputValue,
+                  visible: !account && !!inputValue&&inputValue>0,
+                  active: !!inputValue&&inputValue>0,
                   loading: false,            
                   value: '',
                   valuePrefix: null,
@@ -296,8 +278,8 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
                 },
                 {
                   label: 'Want to borrow Dai?',
-                  visible: inputValue>0 && !!account && position.ethPosted <= 0,
-                  active: inputValue,
+                  visible: !!inputValue&&inputValue>0 && !!account && position.ethPosted <= 0,
+                  active: !!inputValue,
                   loading: false,            
                   value: '',
                   valuePrefix: null,

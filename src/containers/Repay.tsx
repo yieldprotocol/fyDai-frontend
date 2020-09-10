@@ -14,6 +14,7 @@ import {
   useProxy,
   useTxActive,
   useSignerAccount,
+  useDebounce,
 } from '../hooks';
 
 import SeriesDescriptor from '../components/SeriesDescriptor';
@@ -43,6 +44,9 @@ function Repay({ setActiveView, repayAmount }:IRepayProps) {
   const { account } = useSignerAccount();
 
   const [ inputValue, setInputValue ] = React.useState<any>();
+  const debouncedInput = useDebounce(inputValue, 500);
+  const [inputRef, setInputRef] = React.useState<any>(null);
+
   const [ yDaiValue, setYDaiValue ] = React.useState<any>();
 
   const [ repayPending, setRepayPending ] = React.useState<boolean>(false);
@@ -67,17 +71,17 @@ function Repay({ setActiveView, repayAmount }:IRepayProps) {
 
   /* Handle dai to yDai conversion  (needed to set a min yDai value for repayment) */
   useEffect(() => {
-    activeSeries && inputValue > 0 && ( async () => {
-      const preview = await previewPoolTx('sellDai', activeSeries, inputValue);
+    activeSeries && debouncedInput > 0 && ( async () => {
+      const preview = await previewPoolTx('sellDai', activeSeries, debouncedInput);
       if (preview && !preview.isZero()) {
         setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
       } else {
         /* if the market doesnt have liquidity just estimate from rate */
         const rate = await previewPoolTx('sellDai', activeSeries, 1);
-        rate && setYDaiValue(inputValue* parseFloat((ethers.utils.formatEther(rate))) );
+        rate && setYDaiValue(debouncedInput* parseFloat((ethers.utils.formatEther(rate))) );
       }
     })();
-  }, [inputValue]);
+  }, [debouncedInput]);
 
   /* Repay disabling logic */
   useEffect(()=>{
@@ -92,14 +96,14 @@ function Repay({ setActiveView, repayAmount }:IRepayProps) {
 
   /* Handle input warnings and errors */ 
   useEffect(() => {
-    if ( inputValue  && daiBalance_ && ( inputValue > daiBalance_ ) ) {
+    if ( debouncedInput  && daiBalance_ && ( debouncedInput > daiBalance_ ) ) {
       setWarningMsg(null);
       setErrorMsg('That amount exceeds the amount of Dai in your wallet'); 
     } else {
       setWarningMsg(null);
       setErrorMsg(null);
     }
-  }, [ inputValue ]);
+  }, [ debouncedInput ]);
 
   useEffect(() => {
     ( async ()=>{
@@ -110,7 +114,7 @@ function Repay({ setActiveView, repayAmount }:IRepayProps) {
     <Keyboard 
       onEsc={() => setInputValue(undefined)}
       onEnter={()=> repayProcedure(inputValue)}
-      onBackspace={()=> inputValue && setInputValue(inputValue.toString().slice(0, -1))}
+      onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
       target='document'
     >
       <SeriesDescriptor activeView='borrow'> 

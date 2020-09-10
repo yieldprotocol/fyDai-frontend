@@ -16,6 +16,7 @@ import {
   useSignerAccount, 
   useTxActive, 
   useProxy,
+  useDebounce,
 } from '../hooks';
 
 import WithdrawDai from './WithdrawDai';
@@ -51,6 +52,9 @@ const Lend = ({ lendAmount }:ILendProps) => {
   const [ withdrawDaiOpen, setWithdrawDaiOpen ] = useState<boolean>(false);
   
   const [ inputValue, setInputValue ] = React.useState<any>();
+  const debouncedInput = useDebounce(inputValue, 500);
+  const [inputRef, setInputRef] = React.useState<any>(null);
+  
   const [ lendDisabled, setLendDisabled ] = React.useState<boolean>(true);
   const [ lendPending, setLendPending ] = useState<boolean>(false);
   const [ warningMsg, setWarningMsg] = React.useState<string|null>(null);
@@ -77,14 +81,14 @@ const Lend = ({ lendAmount }:ILendProps) => {
     }  
   };
 
-  /* Handle input changes */
+  /* Handle input (debounce input) changes */
   useEffect(() => {
-    activeSeries && !(activeSeries.isMature()) && inputValue && ( async () => {
-      const preview = await previewPoolTx('sellDai', activeSeries, inputValue);
+    activeSeries && !(activeSeries.isMature()) && debouncedInput && ( async () => {
+      const preview = await previewPoolTx('sellDai', activeSeries, debouncedInput);
       preview && setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
-      preview && setAPR( yieldAPR( ethers.utils.parseEther(inputValue.toString()), preview, activeSeries.maturity ) );
+      preview && setAPR( yieldAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries.maturity ) );
     })();
-  }, [inputValue]);
+  }, [debouncedInput]);
 
   /* handle active series loads and changes */
   useEffect(() => {
@@ -108,20 +112,20 @@ const Lend = ({ lendAmount }:ILendProps) => {
 
   /* handle exceptions, errors and warnings */
   useEffect(() => {
-    if ( !!account && inputValue && inputValue > daiBalance_  ) {
+    if ( !!account && debouncedInput && debouncedInput> daiBalance_  ) {
       setWarningMsg(null);
       setErrorMsg('That amount exceeds the amount of Dai you have'); 
     } else {
       setWarningMsg(null);
       setErrorMsg(null);
     }
-  }, [ inputValue ]);
+  }, [ debouncedInput ]);
 
   return (
     <Keyboard 
       onEsc={() => setInputValue(undefined)}
       onEnter={()=> lendProcedure(inputValue)}
-      onBackspace={()=> inputValue && setInputValue(inputValue.toString().slice(0, -1))}
+      onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
       target='document'
     >
       { withdrawDaiOpen && <WithdrawDai close={()=>setWithdrawDaiOpen(false)} /> }
@@ -145,7 +149,6 @@ const Lend = ({ lendAmount }:ILendProps) => {
             valuePrefix: null,
             valueExtra: null,
           },
-
           {
             label: 'Dai balance',
             visible: !!account && !txActive,

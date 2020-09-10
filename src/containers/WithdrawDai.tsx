@@ -10,7 +10,7 @@ import DaiMark from '../components/logos/DaiMark';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
 
-import { usePool, useProxy, useSignerAccount, useTxActive } from '../hooks';
+import { usePool, useProxy, useSignerAccount, useTxActive, useDebounce } from '../hooks';
 
 import InputWrap from '../components/InputWrap';
 import Loading from '../components/Loading';
@@ -41,6 +41,9 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
   const [ isGettingMax, setIsGettingMax ] = useState<boolean>(false);
 
   const [ inputValue, setInputValue ] = useState<any>();
+  const debouncedInput = useDebounce(inputValue, 500);
+  const [inputRef, setInputRef] = React.useState<any>(null);
+  
   const [ yDaiValue, setYDaiValue ] = React.useState<number>(0);
 
   const [ withdrawDisabled, setWithdrawDisabled ] = useState<boolean>(true);
@@ -86,18 +89,18 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
   }, [ inputValue, hasDelegated, maxWithdraw, isGettingMax]);
 
   useEffect(() => {
-    activeSeries && inputValue && ( async () => {
-      const preview = await previewPoolTx('buyDai', activeSeries, inputValue);
+    activeSeries && debouncedInput && ( async () => {
+      const preview = await previewPoolTx('buyDai', activeSeries, debouncedInput);
       preview && setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
     })();
-  }, [inputValue]);
+  }, [debouncedInput]);
 
   return (
     <Layer onClickOutside={()=>close()}>
       <Keyboard 
         onEsc={() => { inputValue? setInputValue(undefined): close();}}
         onEnter={()=> withdrawProcedure(inputValue)}
-        onBackspace={()=> inputValue && setInputValue(inputValue.toString().slice(0, -1))}
+        onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
         target='document'
       >
         { !txActive && !withdrawDaiPending && 

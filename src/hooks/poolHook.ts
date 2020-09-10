@@ -17,6 +17,7 @@ export const usePool = () => {
   const  { dispatch }  = React.useContext<any>(NotifyContext);
   const [ sellActive, setSellActive ] = React.useState<boolean>(false);
   const [ buyActive, setBuyActive ] = React.useState<boolean>(false);
+  const [ callActive, setCallActive ] = React.useState<boolean>(false);
 
   const { handleTx, handleTxError } = useTxHelpers();
 
@@ -267,6 +268,7 @@ export const usePool = () => {
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const contract = new ethers.Contract( poolAddr, poolAbi, fallbackProvider);
     let value = BigNumber.from('0');
+    setCallActive(true);
     try {
       if ( series.isMature() === false ) {
         switch (type) {
@@ -281,11 +283,15 @@ export const usePool = () => {
           default: 
             value = await BigNumber.from('0');
         } 
+        console.log('PREVIEW: ', value.toString());
+        setCallActive(false);
         return value; 
       }
+      setCallActive(false);
       return value;
     } catch (e) {
-      // console.log('Pool error:', e)
+      console.log('Pool error:', e);
+      setCallActive(false);
       return value;
     }
   };
@@ -319,7 +325,8 @@ export const usePool = () => {
     checkPoolDelegate,
     checkPoolState,
     addPoolDelegate,
-    previewPoolTx, 
+    previewPoolTx,
+    callActive,
 
   } as const;
 };

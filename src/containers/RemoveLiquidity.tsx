@@ -10,7 +10,7 @@ import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
 import { UserContext } from '../contexts/UserContext';
 
-import { useSignerAccount, useProxy, useTxActive } from '../hooks';
+import { useSignerAccount, useProxy, useTxActive, useDebounce } from '../hooks';
 
 import InputWrap from '../components/InputWrap';
 import InfoGrid from '../components/InfoGrid';
@@ -35,7 +35,10 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
   const [ txActive ] = useTxActive(['REMOVE_LIQUIDITY']);
   
   const [ maxRemove, setMaxRemove ] = useState<number>(0);
+
   const [ inputValue, setInputValue ] = useState<any>();
+  const debouncedInput = useDebounce(inputValue, 500);
+  const [inputRef, setInputRef] = React.useState<any>(null);
 
   const [ removeLiquidityDisabled, setRemoveLiquidityDisabled ] = useState<boolean>(true);
   const [ removeLiquidityPending, setRemoveLiquidityPending] = useState<boolean>(false);
@@ -79,14 +82,14 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
   useEffect(()=>{
     if (
       !account ||
-      !inputValue || 
-      parseFloat(inputValue) === 0
+      !debouncedInput || 
+      parseFloat(debouncedInput) === 0
     ) {
       setRemoveLiquidityDisabled(true);
     } else {
       setRemoveLiquidityDisabled(false);
     }
-  }, [ inputValue ]);
+  }, [ debouncedInput ]);
 
 
   return (
@@ -94,7 +97,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
       <Keyboard 
         onEsc={() => { inputValue? setInputValue(undefined): close();}}
         onEnter={()=> removeLiquidityProcedure(inputValue)}
-        onBackspace={()=> inputValue && setInputValue(inputValue.toString().slice(0, -1))}
+        onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
         target='document'
       >
         {!txActive && !removeLiquidityPending && 

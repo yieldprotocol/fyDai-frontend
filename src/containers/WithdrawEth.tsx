@@ -7,7 +7,7 @@ import {
 import EthMark from '../components/logos/EthMark';
 
 import { UserContext } from '../contexts/UserContext';
-import { useProxy, useMath, useTxActive } from '../hooks';
+import { useProxy, useMath, useTxActive, useDebounce } from '../hooks';
 
 import ApprovalPending from '../components/ApprovalPending';
 import TransactionPending from '../components/TransactionPending';
@@ -35,6 +35,8 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
   const [ txActive ] = useTxActive(['WITHDRAW']);
 
   const [ inputValue, setInputValue ] = useState<any>();
+  const debouncedInput = useDebounce(inputValue, 500);
+  const [inputRef, setInputRef] = React.useState<any>(null);
 
   const [ estRatio, setEstRatio ] = useState<any>();
   const [ estDecrease, setEstDecrease ] = useState<any>();
@@ -88,7 +90,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
 
   /* show warnings and errors with collateralisation ratio levels and inputs */
   useEffect(()=>{
-    if (estRatio < 150 || inputValue > maxWithdraw ) {
+    if (estRatio < 150 || debouncedInput > maxWithdraw ) {
       setWarningMsg(null);
       setErrorMsg('You are not allowed to withdraw below the collateralization ratio'); 
     } else if (estRatio >= 150 && estRatio < 200 ) {
@@ -98,7 +100,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
       setWarningMsg(null);
       setErrorMsg(null);
     }
-  }, [ estRatio, inputValue ]);
+  }, [ estRatio, debouncedInput ]);
 
   return (
     <Layer 
@@ -108,7 +110,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
       <Keyboard 
         onEsc={() => { inputValue? setInputValue(undefined): close();}}
         onEnter={()=> withdrawProcedure(inputValue)}
-        onBackspace={()=> inputValue && setInputValue(inputValue.toString().slice(0, -1))}
+        onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
         target='document'
       >
         { !txActive && !withdrawPending && 

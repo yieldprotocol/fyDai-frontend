@@ -16,7 +16,8 @@ import {
   useSignerAccount,
   useTxActive,
   useProxy,
-  useToken
+  useToken,
+  useDebounce
 } from '../hooks';
 
 import RemoveLiquidity from './RemoveLiquidity';
@@ -48,6 +49,8 @@ const Pool = (props:IPoolProps) => {
   const [ hasDelegated, setHasDelegated ] = useState<boolean>(true);
 
   const [ inputValue, setInputValue ] = React.useState<any>();
+  const debouncedInput = useDebounce(inputValue, 500);
+  const [inputRef, setInputRef] = React.useState<any>(null);
 
   const [ removeLiquidityOpen, setRemoveLiquidityOpen ] = useState<boolean>(false);
 
@@ -72,13 +75,13 @@ const Pool = (props:IPoolProps) => {
 
   /* handle value calculations based on input changes */
   useEffect(() => {
-    inputValue && ( async () => {
+    debouncedInput&& ( async () => {
       // const bnInp = ethers.utils.parseEther(inputValue)
       // const daiReserves = await getBalance(deployedContracts.Dai, 'Dai', activeSeries.poolAddress);
       // const yDaiReserves = await getBalance(activeSeries.yDaiAddress, 'YDai', activeSeries.poolAddress);
       // const tokens = bnInp.mul(daiReserves).div(yDaiReserves.add(daiReserves));
     })();
-  }, [inputValue]);
+  }, [debouncedInput]);
   
   /* Add liquidity disabling logic */
   useEffect(()=>{
@@ -94,20 +97,20 @@ const Pool = (props:IPoolProps) => {
 
   /* handle warnings input errors */
   useEffect(() => {
-    if ( inputValue && ( inputValue > daiBalance_ ) ) {
+    if ( debouncedInput && ( debouncedInput > daiBalance_ ) ) {
       setWarningMsg(null);
       setErrorMsg('That amount exceeds the amount of Dai you have'); 
     } else {
       setWarningMsg(null);
       setErrorMsg(null);
     }
-  }, [ inputValue ]);
+  }, [ debouncedInput ]);
 
   return (
     <Keyboard 
       onEsc={() => setInputValue(undefined)}
       onEnter={()=> addLiquidityProcedure(inputValue)}
-      onBackspace={()=> inputValue && setInputValue(inputValue.toString().slice(0, -1))}
+      onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
       target='document'
     >
       { removeLiquidityOpen && <RemoveLiquidity close={()=>setRemoveLiquidityOpen(false)} /> }
