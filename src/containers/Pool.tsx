@@ -210,7 +210,7 @@ const Pool = (props:IPoolProps) => {
             />
           </Box> 
   
-          { account && !activeSeries?.isMature() && 
+          { account && !activeSeries?.isMature() && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
           <Box gap='small' fill='horizontal' align='center'>
             <Box
               fill='horizontal'
