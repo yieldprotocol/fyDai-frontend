@@ -80,11 +80,11 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
   /* Handle input value changes */
   useEffect(()=>{
     /* 1. Adjust estimated ratio based on input changes */
-    if (inputValue && ethPosted_ && debtValue_) {
-      const newRatio = estimateRatio((ethPosted_+ parseFloat(inputValue)), debtValue_); 
+    if (debouncedInput && ethPosted_ && debtValue_) {
+      const newRatio = estimateRatio((ethPosted_+ parseFloat(debouncedInput)), debtValue_); 
       newRatio && setEstRatio(newRatio.toFixed(0));
     }
-  }, [inputValue]);
+  }, [debouncedInput]);
 
   /* Handle deposit disabling deposits */
   useEffect(()=>{   

@@ -100,14 +100,16 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
     activeSeries && debouncedInput>0 && ( async () => {
       const newRatio = estimateRatio(position.ethPosted_, ( position.debtValue_+ parseFloat(debouncedInput)) ); 
       newRatio && setEstRatio(newRatio.toFixed(0));
+
       const preview = await previewPoolTx('buyDai', activeSeries, debouncedInput);
-      if (!(preview instanceof Error) && !preview.isZero()) {
+      if (!(preview instanceof Error)) {
         setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
         setAPR( yieldAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries.maturity ) );      
       } else {
         /* if the market doesnt have liquidity just estimate from rate */
         const rate = await previewPoolTx('buyDai', activeSeries, 1);
-        !(rate instanceof Error) && setYDaiValue(debouncedInput* parseFloat((ethers.utils.formatEther(rate))));
+        !(rate instanceof Error) && setYDaiValue(debouncedInput*parseFloat((ethers.utils.formatEther(rate))));
+        (rate instanceof Error) && setYDaiValue(0);
         setBorrowDisabled(true);
         setErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
       }
