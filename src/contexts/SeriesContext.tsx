@@ -73,19 +73,20 @@ const SeriesProvider = ({ children }:any) => {
     */
     const _ratesData = await Promise.all(
       seriesArr.map( async (x:IYieldSeries, i:number) => {
+        console.log('rates got')
         const _x = { ...x, isMature: ()=>( x.maturity < Math.round(new Date().getTime() / 1000)) };
         const [ sellYDai, buyYDai, sellDai, buyDai ] = await Promise.all([
           await previewPoolTx('sellYDai', _x, 1),
-          await previewPoolTx('buyYDai', _x, 1),
-          await previewPoolTx('sellDai', _x, 1),
-          await previewPoolTx('buyDai', _x, 1),
+          // await previewPoolTx('buyYDai', _x, 1),
+          // await previewPoolTx('sellDai', _x, 1),
+          // await previewPoolTx('buyDai', _x, 1),
         ]);
         return {
           maturity: x.maturity,
           sellYDai: !(sellYDai instanceof Error)? sellYDai : BigNumber.from('0'),
-          buyYDai: !(buyYDai instanceof Error)? buyYDai : BigNumber.from('0'),
-          sellDai: !(sellDai instanceof Error)? sellDai : BigNumber.from('0'),
-          buyDai: !(buyDai instanceof Error)? buyDai : BigNumber.from('0'),
+          // buyYDai: !(buyYDai instanceof Error)? buyYDai : BigNumber.from('0'),
+          // sellDai: !(sellDai instanceof Error)? sellDai : BigNumber.from('0'),
+          // buyDai: !(buyDai instanceof Error)? buyDai : BigNumber.from('0'),
         };
       })
     );
@@ -95,9 +96,9 @@ const SeriesProvider = ({ children }:any) => {
         x.maturity,
         { ...x,
           sellYDai_: parseFloat(ethers.utils.formatEther(x.sellYDai.toString())),
-          buyYDai_: parseFloat(ethers.utils.formatEther(x.buyYDai.toString())),
-          sellDai_: parseFloat(ethers.utils.formatEther(x.sellDai.toString())),
-          buyDai_: parseFloat(ethers.utils.formatEther(x.buyDai.toString())),
+          // buyYDai_: parseFloat(ethers.utils.formatEther(x.buyYDai.toString())),
+          // sellDai_: parseFloat(ethers.utils.formatEther(x.sellDai.toString())),
+          // buyDai_: parseFloat(ethers.utils.formatEther(x.buyDai.toString())),
         }
       );
     }, state.seriesRates);
