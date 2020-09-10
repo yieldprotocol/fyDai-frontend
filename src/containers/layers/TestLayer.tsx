@@ -168,7 +168,9 @@ const TestLayer = (props:any) => {
             <Box direction='row'>
               <Button primary={flow==='APPROVALS'} label='Approvals' onClick={()=>setFlow('APPROVALS')} style={{ borderRadius:'24px 0px 0px 24px' }} />
               <Button primary={flow==='MARKET'} label='Pool' onClick={()=>setFlow('MARKET')} style={{ borderRadius:'0px 0px 0px 0px' }} />    
-              <Button primary={flow==='MATURITY'} label='Maturity' onClick={()=>setFlow('MATURITY')} style={{ borderRadius:'0px 24px 24px 0px' }} />        
+              <Button primary={flow==='MATURITY'} label='Maturity' onClick={()=>setFlow('MATURITY')} style={{ borderRadius:'0px 24px 24px 0px' }} />  
+
+              <Button primary={flow==='ADD'} label='Add' onClick={()=>setFlow('ADD')} style={{ borderRadius:'0px 24px 24px 0px' }} /> 
             </Box>
 
             {
@@ -207,13 +209,25 @@ const TestLayer = (props:any) => {
             
             </Box>}
 
+            { flow === 'ADD' && 
+            <Box gap='small'>
+
+              WETH CHAI deposit/withdraw: 
+
+              <Button label='1. Approve Wethjoin for 1weth' onClick={()=> sendTx(deployedContracts.Weth, 'Weth', 'approve', [deployedContracts.WethJoin, ethers.BigNumber.from('1')], ethers.BigNumber.from(0) )} />
+              <Button label='2. wethJoin join (take 1weth)' onClick={()=> sendTx(deployedContracts.WethJoin, 'WethJoin', 'join', [account, ethers.BigNumber.from('1')], ethers.BigNumber.from(0) )} />
+
+              <Button label='3. post 0.5 to controller' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'post', [ ethers.utils.formatBytes32String('ETH-A'), account, account, ethers.BigNumber.from('0.5')], utils.toWei('0'))} />
+
+            </Box>}
+
             { flow === 'CHAI' && 
             <Box gap='small'>
               
               Get Dai:
               
-              <Button label='1. Approve Wethjoin for 1weth' onClick={()=> sendTx(deployedContracts.Weth, 'Weth', 'approve', [deployedContracts.WethJoin, wethTokens], ethers.BigNumber.from(0) )} />
-              <Button label='2. wethJoin join (take 1weth)' onClick={()=> sendTx(deployedContracts.WethJoin, 'WethJoin', 'join', [account, wethTokens], ethers.BigNumber.from(0) )} />
+              <Button label='1. Approve Wethjoin for 1weth' onClick={()=> sendTx(deployedContracts.WETH9, 'WETH9', 'approve', [deployedContracts.WethJoin, wethTokens], ethers.BigNumber.from(0) )} />
+              <Button label='2. wethJoin join (take 1weth)' onClick={()=> sendTx(deployedContracts.WethJoin, 'WethJoin', 'join', [account, wethTokens], ethers.BigNumber.from(1) )} />
               <Button label='( x. wethJoin EXit 1weth)' onClick={()=> sendTx(deployedContracts.WethJoin, 'WethJoin', 'exit', [account, wethTokens ], ethers.BigNumber.from(0) )} />
 
               <Button

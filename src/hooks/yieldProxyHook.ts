@@ -325,10 +325,6 @@ export const useProxy = () => {
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const parsedDaiUsed = BigNumber.isBigNumber(daiUsed)? daiUsed : ethers.utils.parseEther(daiUsed.toString());
 
-    const overrides = { 
-      gasLimit: BigNumber.from('300000')
-    };
-
     /* calculate minimum expected yDai value and factor in slippage */
     const daiReserves = await getBalance(deployedContracts.Dai, 'Dai', poolAddr);
     const yDaiReserves = await getBalance(series.yDaiAddress, 'YDai', poolAddr);
@@ -347,9 +343,9 @@ export const useProxy = () => {
         throw(preview);
       }
       // testing
-      // const maxYDai = ethers.utils.parseEther('1000000');
+      // maxYDai = ethers.utils.parseEther('1000000');
 
-      tx = await proxyContract.addLiquidity(poolAddr, parsedDaiUsed, maxYDai, overrides);
+      tx = await proxyContract.addLiquidity(poolAddr, parsedDaiUsed, maxYDai);
     } catch (e) {
       handleTxError('Error Adding liquidity', tx, e);
       setAddLiquidityActive(false);
@@ -380,10 +376,6 @@ export const useProxy = () => {
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     // const { isMature } = series;
     const parsedTokens = BigNumber.isBigNumber(tokens)? tokens : ethers.utils.parseEther(tokens.toString());
-
-    const overrides = { 
-      gasLimit: BigNumber.from('300000')
-    };
      
     /* Contract interaction */
     let tx:any;
@@ -402,9 +394,9 @@ export const useProxy = () => {
         // testing with slippage etc. 
         minDai = ethers.utils.parseEther('0');
 
-        tx = await proxyContract.removeLiquidityEarly(poolAddr, parsedTokens, minDai, overrides);
+        tx = await proxyContract.removeLiquidityEarly(poolAddr, parsedTokens, minDai);
       } else {
-        tx = await proxyContract.removeLiquidityMature(poolAddr, tokens, overrides);
+        tx = await proxyContract.removeLiquidityMature(poolAddr, tokens );
       }
     } catch (e) {
       handleTxError('Error Removing liquidity', tx, e);

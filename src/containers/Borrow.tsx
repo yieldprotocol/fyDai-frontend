@@ -96,7 +96,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
   * 2. calcalute yield APR
   * 3. calculate estimated collateralisation ration
   */
-  useEffect(() => {   
+  useEffect(() => {
     activeSeries && debouncedInput>0 && ( async () => {
       const newRatio = estimateRatio(position.ethPosted_, ( position.debtValue_+ parseFloat(debouncedInput)) ); 
       newRatio && setEstRatio(newRatio.toFixed(0));
@@ -200,8 +200,9 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
         round='small'
         pad="large"
       >
+
         <Box gap='medium' align='center' fill='horizontal'>
-          { activeSeries && !activeSeries?.isMature() && 
+          { activeSeries && !activeSeries?.isMature() && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
             <Box gap='medium' align='center' fill='horizontal'>
               <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to borrow</Text>
 

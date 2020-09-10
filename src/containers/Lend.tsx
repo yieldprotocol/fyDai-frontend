@@ -175,7 +175,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
       >
         <Box flex='grow' gap='small' align='center' fill='horizontal'>
           {/* If the series has NOT matured, show the lending input */}
-          { !activeSeries?.isMature() &&
+          { !activeSeries?.isMature() && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
           <Box fill gap='medium'>
             <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to lend</Text>
             <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={lendDisabled}>
