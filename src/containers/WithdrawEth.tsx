@@ -128,7 +128,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
 
             <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={withdrawDisabled}>
               <TextInput
-                ref={(input:any) => input && input.focus()}
+                ref={(el:any) => {el && el.focus(); setInputRef(el);}} 
                 type="number"
                 placeholder='ETH'
                 disabled={!hasDelegated}

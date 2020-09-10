@@ -180,7 +180,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
             <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to lend</Text>
             <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={lendDisabled}>
               <TextInput
-                ref={(input:any) => input && !withdrawDaiOpen && input.focus()}
+                ref={(el:any) => {el && !withdrawDaiOpen && el.focus(); setInputRef(el);}}
                 type="number"
                 placeholder={screenSize !== 'small' ? 'Enter the amount of Dai to lend': 'DAI'}
                 value={inputValue || ''}

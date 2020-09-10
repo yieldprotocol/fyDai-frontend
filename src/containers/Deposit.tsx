@@ -134,7 +134,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
 
           <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={depositDisabled}>
             <TextInput
-              ref={(input:any) => input && !withdrawOpen && input.focus()}
+              ref={(el:any) => {el && !withdrawOpen && el.focus(); setInputRef(el);}} 
               type='number'
               placeholder={(screenSize !== 'small' && !modalView) ? 'Enter the ETH amount to deposit': 'ETH'}
               value={inputValue || ''}

@@ -163,7 +163,7 @@ const Pool = (props:IPoolProps) => {
             <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Add liquidity</Text>
             <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={addLiquidityDisabled}>
               <TextInput
-                ref={(input:any) => input && !removeLiquidityOpen && input.focus()}
+                ref={(el:any) => {el && !removeLiquidityOpen && el.focus(); setInputRef(el);}} 
                 type="number"
                 placeholder={screenSize !== 'small' ? 'Enter the amount of Dai Liquidity to add': 'DAI'}
                 value={inputValue || ''}
