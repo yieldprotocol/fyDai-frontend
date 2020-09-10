@@ -82,10 +82,10 @@ const SeriesProvider = ({ children }:any) => {
         ]);
         return {
           maturity: x.maturity,
-          sellYDai: sellYDai || BigNumber.from('0'),
-          buyYDai: buyYDai || BigNumber.from('0'),
-          sellDai: sellDai || BigNumber.from('0'),
-          buyDai: buyDai || BigNumber.from('0'),
+          sellYDai: !(sellYDai instanceof Error)? sellYDai : BigNumber.from('0'),
+          buyYDai: !(buyYDai instanceof Error)? buyYDai : BigNumber.from('0'),
+          sellDai: !(sellDai instanceof Error)? sellDai : BigNumber.from('0'),
+          buyDai: !(buyDai instanceof Error)? buyDai : BigNumber.from('0'),
         };
       })
     );

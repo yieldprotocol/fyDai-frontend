@@ -70,7 +70,9 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
     setIsGettingMax(true);
     const preview = await previewPoolTx('sellYDai', activeSeries, activeSeries.yDaiBalance_);
     setIsGettingMax(false);
-    return parseFloat(ethers.utils.formatEther(preview));   
+    if (!(preview instanceof Error)) {
+      return parseFloat(ethers.utils.formatEther(preview)); 
+    }
   };
   
   // useEffect(() => {
@@ -91,7 +93,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
   useEffect(() => {
     activeSeries && debouncedInput && ( async () => {
       const preview = await previewPoolTx('buyDai', activeSeries, debouncedInput);
-      preview && setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
+      !(preview instanceof Error) && setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
     })();
   }, [debouncedInput]);
 

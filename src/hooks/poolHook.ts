@@ -262,7 +262,7 @@ export const usePool = () => {
     txType: string,
     series: IYieldSeries,
     amount: number | BigNumber,
-  ): Promise<BigNumber> => {
+  ): Promise<BigNumber|Error> => {
     const type=txType.toUpperCase();
     const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(amount.toString());
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
@@ -288,11 +288,11 @@ export const usePool = () => {
         return value; 
       }
       setCallActive(false);
-      return value;
+      return value; // assuming that if the series has matured, the rates on whatever trade will be 0. 
     } catch (e) {
-      console.log('Pool error:', e);
+      console.log(e);
       setCallActive(false);
-      return value;
+      return e;
     }
   };
 

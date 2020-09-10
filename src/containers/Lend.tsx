@@ -85,8 +85,8 @@ const Lend = ({ lendAmount }:ILendProps) => {
   useEffect(() => {
     activeSeries && !(activeSeries.isMature()) && debouncedInput && ( async () => {
       const preview = await previewPoolTx('sellDai', activeSeries, debouncedInput);
-      preview && setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
-      preview && setAPR( yieldAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries.maturity ) );
+      !(preview instanceof Error) && setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
+      !(preview instanceof Error) && setAPR( yieldAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries.maturity ) );
     })();
   }, [debouncedInput]);
 
@@ -94,7 +94,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
   useEffect(() => {
     account && activeSeries?.yDaiBalance_ && !(activeSeries.isMature()) && ( async () => {
       const preview = await previewPoolTx('SellYDai', activeSeries, activeSeries.yDaiBalance_);
-      preview && setCurrentValue( parseFloat(ethers.utils.formatEther(preview)));
+      !(preview instanceof Error) && setCurrentValue( parseFloat(ethers.utils.formatEther(preview)));
     })();
   }, [ activeSeries, account ]);
   

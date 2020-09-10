@@ -181,11 +181,16 @@ export const useProxy = () => {
 
     setBorrowActive(true);
     let tx:any;
+    let maxYDai:BigNumber;
     try {
       /* Calculate expected trade values and factor in slippage */
-      const maxYDai = valueWithSlippage(await previewPoolTx('buydai', series, daiToBorrow));
-
-      tx = await proxyContract.borrowDaiForMaximumYDai( poolAddr, utils.ETH, parsedMaturity, toAddr, maxYDai, dai, overrides ); 
+      const preview = await previewPoolTx('buydai', series, daiToBorrow); 
+      if ( !(preview instanceof Error) ) {
+        maxYDai = valueWithSlippage(preview);
+      } else {
+        throw(preview);
+      }
+      tx = await proxyContract.borrowDaiForMaximumYDai( poolAddr, utils.ETH, parsedMaturity, toAddr, maxYDai, dai, overrides );
     } catch (e) {
       handleTxError('Error Borrowing Dai', tx, e);
       setBorrowActive(false);
@@ -231,6 +236,7 @@ export const useProxy = () => {
     setRepayActive(true);
     let tx:any;
     let daiPermitSig:any;
+    let minYDai:BigNumber;
     try {
       console.log( await series.isMature() );
 
@@ -269,7 +275,12 @@ export const useProxy = () => {
         console.log('repay with no signature - before maturity');
 
         /* calculate expected trade values and factor in slippage */
-        const minYDai = valueWithSlippage(await previewPoolTx('selldai', series, repaymentInDai), true);
+        const preview = await previewPoolTx('selldai', series, repaymentInDai);
+        if ( !(preview instanceof Error) ) {
+          minYDai = valueWithSlippage(preview, true);
+        } else {
+          throw(preview);
+        }
         // testing
         // const minYDai = ethers.utils.parseEther('0');
 
@@ -325,10 +336,16 @@ export const useProxy = () => {
 
     /* Contract interaction */
     let tx:any;
+    let maxYDai:BigNumber;
     setAddLiquidityActive(true);
     try {
       /* Calculate expected trade values and factor in slippage */
-      const maxYDai = valueWithSlippage(await previewPoolTx('sellDai', series, yDaiSplit)); 
+      const preview = await previewPoolTx('sellDai', series, yDaiSplit);
+      if ( !(preview instanceof Error) ) {
+        maxYDai = valueWithSlippage(preview);
+      } else {
+        throw(preview);
+      }
       // testing
       // const maxYDai = ethers.utils.parseEther('1000000');
 
@@ -370,14 +387,20 @@ export const useProxy = () => {
      
     /* Contract interaction */
     let tx:any;
+    let minDai:BigNumber;
     setRemoveLiquidityActive(true);
     try {
       if ( !(await isMature(series.yDaiAddress)) ) {
         /* calculate expected trade values and factor in slippage */
-        // const minDai = valueWithSlippage(await previewPoolTx('selldai', series, daiUsed), true);
+        // const preview = await previewPoolTx('selldai', series, daiUsed);
+        // if ( !(preview instanceof Error) ) {
+        //   minDai = valueWithSlippage(preview, true);
+        // } else {
+        //   throw(preview);
+        // }
 
         // testing with slippage etc. 
-        const minDai = ethers.utils.parseEther('0');
+        minDai = ethers.utils.parseEther('0');
 
         tx = await proxyContract.removeLiquidityEarly(poolAddr, parsedTokens, minDai, overrides);
       } else {
@@ -419,10 +442,16 @@ export const useProxy = () => {
 
     /* Contract interaction */
     let tx:any;
+    let minYDaiOut:BigNumber;
     setSellActive(true);
     try {
       /* calculate expected trade values and factor in slippage */
-      const minYDaiOut = valueWithSlippage( await previewPoolTx('selldai', series, daiIn), true );
+      const preview = await previewPoolTx('selldai', series, daiIn);
+      if ( !(preview instanceof Error) ) {
+        minYDaiOut = valueWithSlippage(preview, true);
+      } else {
+        throw(preview);
+      }
       // temp min for testing */
       // const minYDaiOut = ethers.utils.parseEther('0');
 
@@ -457,10 +486,16 @@ export const useProxy = () => {
 
     /* Contract interaction */
     let tx:any;
+    let maxYDaiIn:BigNumber;
     setBuyActive(true);
     try {
       /* calculate expected trade values and factor in slippage */
-      const maxYDaiIn = valueWithSlippage( await previewPoolTx('buydai', series, daiOut) );
+      const preview = await previewPoolTx('buydai', series, daiOut);
+      if ( !(preview instanceof Error) ) {
+        maxYDaiIn = valueWithSlippage(preview);
+      } else {
+        throw(preview);
+      }
       // temp max bignumber for testing */
       // const maxYDaiIn = ethers.utils.parseEther('1000000');
 
@@ -497,11 +532,17 @@ export const useProxy = () => {
 
     /* Contract interaction */
     let tx:any;
+    let maxYDaiIn:BigNumber;
     let yDaiPermitSig:any;
     setBuyActive(true);
     try { 
       /* calculate expected trade values and factor in slippage */
-      const maxYDaiIn = valueWithSlippage( await previewPoolTx('buydai', series, daiOut) );
+      const preview = await previewPoolTx('buydai', series, daiOut);
+      if ( !(preview instanceof Error) ) {
+        maxYDaiIn = valueWithSlippage(preview);
+      } else {
+        throw(preview);
+      }
       // temp max bignumber for testing */
       // const maxYDaiIn = ethers.utils.parseEther('1000000');
 

@@ -73,12 +73,12 @@ function Repay({ setActiveView, repayAmount }:IRepayProps) {
   useEffect(() => {
     activeSeries && debouncedInput > 0 && ( async () => {
       const preview = await previewPoolTx('sellDai', activeSeries, debouncedInput);
-      if (preview && !preview.isZero()) {
+      if (!(preview instanceof Error) && !preview.isZero()) {
         setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
       } else {
         /* if the market doesnt have liquidity just estimate from rate */
         const rate = await previewPoolTx('sellDai', activeSeries, 1);
-        rate && setYDaiValue(debouncedInput* parseFloat((ethers.utils.formatEther(rate))) );
+        !(rate instanceof Error) && setYDaiValue(debouncedInput* parseFloat((ethers.utils.formatEther(rate))) );
       }
     })();
   }, [debouncedInput]);
