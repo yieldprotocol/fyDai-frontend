@@ -5,7 +5,6 @@ import { NotifyContext } from '../contexts/NotifyContext';
 import { YieldContext } from '../contexts/YieldContext';
 
 import Controller from '../contracts/Controller.json';
-import TestERC20 from '../contracts/TestERC20.json';
 
 import { useSignerAccount } from './connectionHooks';
 import { useTxHelpers } from './appHooks';

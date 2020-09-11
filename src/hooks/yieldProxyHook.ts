@@ -202,7 +202,6 @@ export const useProxy = () => {
   };
 
 
-
   /**
    * @dev Repay an amount of yDai debt in Controller using a given amount of Dai exchanged for yDai at pool rates, with a minimum of yDai debt required to be paid.
    * Post maturity the user is asked for a signature allowing the treasury access to dai
@@ -230,7 +229,8 @@ export const useProxy = () => {
 
     const overrides = {
       // nonce: signer.getTransactionCount().then( (nonce:any) => nonce + queue) 
-      // gasLimit: BigNumber.from('300000')
+      // gasLimit: BigNumber.from('500000'),
+      // value: ethers.utils.parseEther('0')
     };
 
     setRepayActive(true);
@@ -245,6 +245,7 @@ export const useProxy = () => {
           console.log('repay with sig- after maturity');
           /* Repay using a signature authorizing treasury */
           dispatch({ type: 'requestSigs', payload:[ auths.get(1) ] });
+
           const result = await signDaiPermit( 
             provider.provider, 
             deployedContracts.Dai, 
@@ -267,8 +268,7 @@ export const useProxy = () => {
           parsedMaturity,
           toAddr,
           dai,
-          daiPermitSig, 
-          overrides
+          daiPermitSig
         );
 
       } else {
@@ -290,8 +290,8 @@ export const useProxy = () => {
           parsedMaturity,
           toAddr,
           minYDai,
-          dai,
-          overrides );
+          dai 
+        );
       }      
       
     } catch (e) {
@@ -325,10 +325,16 @@ export const useProxy = () => {
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const parsedDaiUsed = BigNumber.isBigNumber(daiUsed)? daiUsed : ethers.utils.parseEther(daiUsed.toString());
 
+    const overrides = { 
+      // gasLimit: BigNumber.from('500000')
+    };
+
     /* calculate minimum expected yDai value and factor in slippage */
     const daiReserves = await getBalance(deployedContracts.Dai, 'Dai', poolAddr);
     const yDaiReserves = await getBalance(series.yDaiAddress, 'YDai', poolAddr);
     const [ , yDaiSplit ] = splitDaiLiquidity( parsedDaiUsed, daiReserves, yDaiReserves );
+
+    console.log(ethers.utils.formatEther(daiReserves) );
 
     /* Contract interaction */
     let tx:any;
@@ -342,10 +348,13 @@ export const useProxy = () => {
       } else {
         throw(preview);
       }
+
+      console.log(ethers.utils.formatEther(maxYDai) ); 
+
       // testing
       // maxYDai = ethers.utils.parseEther('1000000');
 
-      tx = await proxyContract.addLiquidity(poolAddr, parsedDaiUsed, maxYDai);
+      tx = await proxyContract.addLiquidity(poolAddr, parsedDaiUsed, maxYDai, overrides);
     } catch (e) {
       handleTxError('Error Adding liquidity', tx, e);
       setAddLiquidityActive(false);
@@ -383,6 +392,7 @@ export const useProxy = () => {
     setRemoveLiquidityActive(true);
     try {
       if ( !(await isMature(series.yDaiAddress)) ) {
+        console.log('removing liquidity BEFORE maturity'); 
         /* calculate expected trade values and factor in slippage */
         // const preview = await previewPoolTx('selldai', series, daiUsed);
         // if ( !(preview instanceof Error) ) {
@@ -393,10 +403,11 @@ export const useProxy = () => {
 
         // testing with slippage etc. 
         minDai = ethers.utils.parseEther('0');
-
         tx = await proxyContract.removeLiquidityEarly(poolAddr, parsedTokens, minDai);
+
       } else {
-        tx = await proxyContract.removeLiquidityMature(poolAddr, tokens );
+        console.log('removing liquidity after maturity'); 
+        tx = await proxyContract.removeLiquidityMature(poolAddr, tokens);
       }
     } catch (e) {
       handleTxError('Error Removing liquidity', tx, e);

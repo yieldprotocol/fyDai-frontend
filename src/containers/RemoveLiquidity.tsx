@@ -219,7 +219,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
             gap='medium'
             justify='between'
           > 
-            <TransactionPending msg={`You are withdrawing ${inputValue} ETH`} tx={txActive} />
+            <TransactionPending msg={`You are removing ${inputValue} liquidity tokens`} tx={txActive} />
                 
             <Box alignSelf='start'>
               <Box
