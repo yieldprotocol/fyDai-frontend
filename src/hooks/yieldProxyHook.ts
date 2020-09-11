@@ -403,7 +403,7 @@ export const useProxy = () => {
 
         // testing with slippage etc. 
         minDai = ethers.utils.parseEther('0');
-        tx = await proxyContract.removeLiquidityEarly(poolAddr, parsedTokens, minDai);
+        tx = await proxyContract.removeLiquidityEarlyDaiPool(poolAddr, parsedTokens, minDai);
 
       } else {
         console.log('removing liquidity after maturity'); 
