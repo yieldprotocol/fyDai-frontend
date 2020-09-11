@@ -290,7 +290,7 @@ export const usePool = () => {
       setCallActive(false);
       return value; // assuming that if the series has matured, the rates on whatever trade will be 0. 
     } catch (e) {
-      console.log(e);
+
       setCallActive(false);
       return e;
     }

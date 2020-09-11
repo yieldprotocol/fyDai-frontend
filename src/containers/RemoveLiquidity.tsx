@@ -51,7 +51,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
   const removeLiquidityProcedure = async (value:number) => {
     if ( !removeLiquidityDisabled ) {
       setRemoveLiquidityPending(true);
-      await removeLiquidity(activeSeries, value, 1);
+      await removeLiquidity(activeSeries, value);
       userActions.updatePosition();
       seriesActions.updateActiveSeries();
       setRemoveLiquidityPending(true);
