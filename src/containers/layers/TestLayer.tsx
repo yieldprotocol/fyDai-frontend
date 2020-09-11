@@ -58,7 +58,6 @@ const TestLayer = (props:any) => {
   const { 
     post,
     withdraw,
-    approveController,
     borrow,
     repay,
     repayActive,
@@ -169,7 +168,9 @@ const TestLayer = (props:any) => {
             <Box direction='row'>
               <Button primary={flow==='APPROVALS'} label='Approvals' onClick={()=>setFlow('APPROVALS')} style={{ borderRadius:'24px 0px 0px 24px' }} />
               <Button primary={flow==='MARKET'} label='Pool' onClick={()=>setFlow('MARKET')} style={{ borderRadius:'0px 0px 0px 0px' }} />    
-              <Button primary={flow==='MATURITY'} label='Maturity' onClick={()=>setFlow('MATURITY')} style={{ borderRadius:'0px 24px 24px 0px' }} />        
+              <Button primary={flow==='MATURITY'} label='Maturity' onClick={()=>setFlow('MATURITY')} style={{ borderRadius:'0px 24px 24px 0px' }} />  
+
+              <Button primary={flow==='ADD'} label='Add' onClick={()=>setFlow('ADD')} style={{ borderRadius:'0px 24px 24px 0px' }} /> 
             </Box>
 
             {
@@ -203,9 +204,21 @@ const TestLayer = (props:any) => {
               <Button label='Post ETH Collateral via proxy 1.5' disabled={postActive} onClick={()=> postEth(1.5)} />
               <Button primary label='controller addDelegate:EthProxy' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedContracts.YieldProxy], utils.toWei('0'))} />             
               <Button label='Withdraw ETH via proxy 1.5)' onClick={()=> withdrawEth(1.5 )} />
-              <Button label='6.1 Repay 0.5 eth/weth debt in yDai' onClick={()=> repay(deployedContracts.Controller, 'ETH-A', yieldState.deployedSeries[0].maturity, 0.5, 'YDAI' )} />
-              <Button label='( 6.2 Repay 0.5 eth/weth debt in Dai) ' onClick={()=> repay(deployedContracts.Controller, 'ETH-A', yieldState.deployedSeries[0].maturity, 0.5, 'DAI' )} />
+              <Button label='6.1 Repay 0.5 eth/weth debt in yDai' onClick={()=> repay('ETH-A', yieldState.deployedSeries[0].maturity, 0.5, 'YDAI' )} />
+              <Button label='( 6.2 Repay 0.5 eth/weth debt in Dai) ' onClick={()=> repay('ETH-A', yieldState.deployedSeries[0].maturity, 0.5, 'DAI' )} />
             
+            </Box>}
+
+            { flow === 'ADD' && 
+            <Box gap='small'>
+
+              WETH CHAI deposit/withdraw: 
+
+              <Button label='1. Approve Wethjoin for 1weth' onClick={()=> sendTx(deployedContracts.Weth, 'Weth', 'approve', [deployedContracts.WethJoin, ethers.BigNumber.from('1')], ethers.BigNumber.from(0) )} />
+              <Button label='2. wethJoin join (take 1weth)' onClick={()=> sendTx(deployedContracts.WethJoin, 'WethJoin', 'join', [account, ethers.BigNumber.from('1')], ethers.BigNumber.from(0) )} />
+
+              <Button label='3. post 0.5 to controller' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'post', [ ethers.utils.formatBytes32String('ETH-A'), account, account, ethers.BigNumber.from('0.5')], utils.toWei('0'))} />
+
             </Box>}
 
             { flow === 'CHAI' && 
@@ -213,8 +226,8 @@ const TestLayer = (props:any) => {
               
               Get Dai:
               
-              <Button label='1. Approve Wethjoin for 1weth' onClick={()=> sendTx(deployedContracts.Weth, 'Weth', 'approve', [deployedContracts.WethJoin, wethTokens], ethers.BigNumber.from(0) )} />
-              <Button label='2. wethJoin join (take 1weth)' onClick={()=> sendTx(deployedContracts.WethJoin, 'WethJoin', 'join', [account, wethTokens], ethers.BigNumber.from(0) )} />
+              <Button label='1. Approve Wethjoin for 1weth' onClick={()=> sendTx(deployedContracts.WETH9, 'WETH9', 'approve', [deployedContracts.WethJoin, wethTokens], ethers.BigNumber.from(0) )} />
+              <Button label='2. wethJoin join (take 1weth)' onClick={()=> sendTx(deployedContracts.WethJoin, 'WethJoin', 'join', [account, wethTokens], ethers.BigNumber.from(1) )} />
               <Button label='( x. wethJoin EXit 1weth)' onClick={()=> sendTx(deployedContracts.WethJoin, 'WethJoin', 'exit', [account, wethTokens ], ethers.BigNumber.from(0) )} />
 
               <Button
@@ -241,14 +254,13 @@ const TestLayer = (props:any) => {
 
   
               Chai deposit and borrow:
-              <Button label='2. Chai approve chaiController 0.5' onClick={()=> approveController(deployedContracts.Chai, deployedContracts.Controller, 0.5 )} />
-              <Button label='3. Post Chai Collateral 0.5' disabled={postActive} onClick={()=> post(deployedContracts.Controller, 'CHAI', 0.5 )} />
-              <Button label='(4. Withdraw 0.5 chai)' onClick={()=> withdraw(deployedContracts.Controller, 'CHAI', 0.5 )} />
-              <Button label='5.Borrow 0.5 with chai' onClick={()=> borrow(deployedContracts.Controller, 'CHAI', deployedSeries[0].maturity, 0.5 )} />
+              <Button label='3. Post Chai Collateral 0.5' disabled={postActive} onClick={()=> post('CHAI', 0.5 )} />
+              <Button label='(4. Withdraw 0.5 chai)' onClick={()=> withdraw('CHAI', 0.5 )} />
+              <Button label='5.Borrow 0.5 with chai' onClick={()=> borrow('CHAI', deployedSeries[0].maturity, 0.5 )} />
 
               Chai repay; 
-              <Button label='(6.1 Repay 0.5 chaidebt in yDai)' onClick={()=> repay(deployedContracts.Controller, 'CHAI', deployedSeries[0].maturity, 0.5, 'YDAI' )} />
-              <Button label=' 6.2 Repay 0.5 chaidebt in Dai ' onClick={()=> repay(deployedContracts.Controller, 'CHAI', deployedSeries[0].maturity, 0.5, 'DAI' )} />
+              <Button label='(6.1 Repay 0.5 chaidebt in yDai)' onClick={()=> repay('CHAI', deployedSeries[0].maturity, 0.5, 'YDAI' )} />
+              <Button label=' 6.2 Repay 0.5 chaidebt in Dai ' onClick={()=> repay('CHAI', deployedSeries[0].maturity, 0.5, 'DAI' )} />
             </Box>}
 
             { flow === 'MATURITY' && 
@@ -346,6 +358,37 @@ const TestLayer = (props:any) => {
             onClick={async ()=> {
               await poolAuth(deployedSeries[0].yDaiAddress, deployedSeries[0].poolAddress);
             }}
+          />
+
+
+        </Box>
+
+        <Box direction='row' justify='between' border='all' pad='small' gap='small'>
+          Pool init : 
+          <Button 
+            label='init pool0' 
+            primary
+            onClick={()=> sendTx(deployedSeries[0].poolAddress, 'Pool', 'init', [ethers.utils.parseEther('1'), {gasLimit:1000000}], ethers.BigNumber.from(0) )}
+          />
+
+          <Button 
+            label='init Pool1' 
+            primary
+            onClick={()=> sendTx(deployedSeries[1].poolAddress, 'Pool', 'init', [ethers.utils.parseEther('1'), {gasLimit:1000000}], ethers.BigNumber.from(0) )}
+          />
+
+          <Button 
+            label='init pool2' 
+            primary
+            onClick={()=> sendTx(deployedSeries[2].poolAddress, 'Pool', 'init', [ethers.utils.parseEther('1'), {gasLimit:1000000}], ethers.BigNumber.from(0) )}
+
+          />
+
+          <Button 
+            label='init pool3' 
+            primary
+            onClick={()=> sendTx(deployedSeries[3].poolAddress, 'Pool', 'init', [ethers.utils.parseEther('1'), {gasLimit:1000000}], ethers.BigNumber.from(0) )}
+
           />
 
 

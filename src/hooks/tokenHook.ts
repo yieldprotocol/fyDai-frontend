@@ -9,7 +9,7 @@ import { useSignerAccount } from './connectionHooks';
 
 import YDai from '../contracts/YDai.json';
 import Controller from '../contracts/Controller.json';
-import TestERC20 from '../contracts/TestERC20.json';
+import TestDai from '../contracts/TestDai.json';
 import WETH9 from '../contracts/WETH9.json';
 import GemJoin from '../contracts/GemJoin.json';
 import DaiJoin from '../contracts/DaiJoin.json';
@@ -19,13 +19,14 @@ import Pot from '../contracts/Pot.json';
 import YieldProxy from '../contracts/YieldProxy.json';
 import Migrations from '../contracts/Migrations.json';
 import Pool from '../contracts/Pool.json';
+import { useTxHelpers } from './appHooks';
 
 // ethers.errors.setLogLevel('error');
 
 const contractMap = new Map<string, any>([
   ['YDai', YDai.abi],
   ['Controller', Controller.abi],
-  ['Dai', TestERC20.abi],
+  ['Dai', TestDai.abi],
   ['Weth', WETH9.abi],
   ['Chai', Chai.abi],
   ['WethJoin', GemJoin.abi],
@@ -48,6 +49,8 @@ export function useToken() {
 
   const  { dispatch }  = React.useContext<any>(NotifyContext);
   const [ approveActive, setApproveActive ] = React.useState<boolean>(false);
+
+  const { handleTx, handleTxError } = useTxHelpers();
 
   /**
    * Get the user account balance of ETH  (omit args) or an ERC20token (provide args)
@@ -125,16 +128,14 @@ export function useToken() {
     try {
       tx = await contract.approve(marketAddr, parsedAmount);
     } catch (e) {
-      dispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed.', type:'error' } } );
-      dispatch({ type: 'txComplete', payload:{ tx } } );
+      handleTxError('Transaction was aborted or it failed.', tx, e);
       setApproveActive(false);
       return;
     }
     /* Transaction reporting & tracking */
     dispatch({ type: 'txPending', payload:{ tx, message: `Token approval of ${amount} pending...` } } );
-    await tx.wait();
+    await handleTx(tx);
     setApproveActive(false);
-    dispatch({ type: 'txComplete', payload:{ tx } } );
   };
 
   return { approveToken, approveActive, getTokenAllowance, getBalance } as const;

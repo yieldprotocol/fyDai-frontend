@@ -61,7 +61,7 @@ function NotifyLayer() {
         margin={{ vertical: 'large', horizontal: 'large' }}
         onEsc={()=>dispatch({ type:'closeNotify' })}
         // responsive={true}
-        // plain
+        // plain  
       >
         <Box
           fill
@@ -72,6 +72,7 @@ function NotifyLayer() {
           elevation="medium"
           pad={{ vertical: 'large', horizontal: 'large' }}
           border={{ color:'red' }}
+          background='background'
         >
           { notificationTypeMap(state.type).icon }
           <Box align="center" direction="row" gap="xsmall">

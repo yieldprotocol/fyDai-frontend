@@ -9,7 +9,7 @@ import { useSignerAccount } from './connectionHooks';
 
 import YDai from '../contracts/YDai.json';
 import Controller from '../contracts/Controller.json';
-import TestERC20 from '../contracts/TestERC20.json';
+import TestDai from '../contracts/TestDai.json';
 import WETH9 from '../contracts/WETH9.json';
 import GemJoin from '../contracts/GemJoin.json';
 import DaiJoin from '../contracts/DaiJoin.json';
@@ -25,7 +25,7 @@ import Pool from '../contracts/Pool.json';
 const contractMap = new Map<string, any>([
   ['YDai', YDai.abi],
   ['Controller', Controller.abi],
-  ['Dai', TestERC20.abi],
+  ['Dai', TestDai.abi],
   ['Weth', WETH9.abi],
   ['Chai', Chai.abi],
   ['WethJoin', GemJoin.abi],

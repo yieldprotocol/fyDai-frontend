@@ -55,7 +55,7 @@ const SeriesProvider = ({ children }:any) => {
   const { feedData, deployedContracts } = yieldState;
 
   const { previewPoolTx, checkPoolDelegate, checkPoolState } = usePool();
-  const { checkControllerDelegate, debtDai,  } = useController();
+  const { checkControllerDelegate, debtDai } = useController();
   const { getBalance } = useToken();
 
   const [ callTx ] = useCallTx();
@@ -73,19 +73,20 @@ const SeriesProvider = ({ children }:any) => {
     */
     const _ratesData = await Promise.all(
       seriesArr.map( async (x:IYieldSeries, i:number) => {
+        console.log('rates got')
         const _x = { ...x, isMature: ()=>( x.maturity < Math.round(new Date().getTime() / 1000)) };
         const [ sellYDai, buyYDai, sellDai, buyDai ] = await Promise.all([
           await previewPoolTx('sellYDai', _x, 1),
-          await previewPoolTx('buyYDai', _x, 1),
-          await previewPoolTx('sellDai', _x, 1),
-          await previewPoolTx('buyDai', _x, 1),
+          // await previewPoolTx('buyYDai', _x, 1),
+          // await previewPoolTx('sellDai', _x, 1),
+          // await previewPoolTx('buyDai', _x, 1),
         ]);
         return {
           maturity: x.maturity,
-          sellYDai: sellYDai || BigNumber.from('0'),
-          buyYDai: buyYDai || BigNumber.from('0'),
-          sellDai: sellDai || BigNumber.from('0'),
-          buyDai: buyDai || BigNumber.from('0'),
+          sellYDai: !(sellYDai instanceof Error)? sellYDai : BigNumber.from('0'),
+          // buyYDai: !(buyYDai instanceof Error)? buyYDai : BigNumber.from('0'),
+          // sellDai: !(sellDai instanceof Error)? sellDai : BigNumber.from('0'),
+          // buyDai: !(buyDai instanceof Error)? buyDai : BigNumber.from('0'),
         };
       })
     );
@@ -95,9 +96,9 @@ const SeriesProvider = ({ children }:any) => {
         x.maturity,
         { ...x,
           sellYDai_: parseFloat(ethers.utils.formatEther(x.sellYDai.toString())),
-          buyYDai_: parseFloat(ethers.utils.formatEther(x.buyYDai.toString())),
-          sellDai_: parseFloat(ethers.utils.formatEther(x.sellDai.toString())),
-          buyDai_: parseFloat(ethers.utils.formatEther(x.buyDai.toString())),
+          // buyYDai_: parseFloat(ethers.utils.formatEther(x.buyYDai.toString())),
+          // sellDai_: parseFloat(ethers.utils.formatEther(x.sellDai.toString())),
+          // buyDai_: parseFloat(ethers.utils.formatEther(x.buyDai.toString())),
         }
       );
     }, state.seriesRates);
@@ -119,7 +120,7 @@ const SeriesProvider = ({ children }:any) => {
           _seriesData[i].totalSupply = await callTx(x.poolAddress, 'Pool', 'totalSupply', []);
           _seriesData[i].poolTokens = account? await callTx(x.poolAddress, 'Pool', 'balanceOf', [account]): BigNumber.from('0') ;               
           _seriesData[i].hasDelegatedPool = account? await checkPoolDelegate(x.poolAddress, deployedContracts.YieldProxy): null;            
-          _seriesData[i].ethDebtDai = account? await debtDai(deployedContracts.Controller,  'ETH-A', x.maturity ): BigNumber.from('0') ;     
+          _seriesData[i].ethDebtDai = account? await debtDai('ETH-A', x.maturity ): BigNumber.from('0') ;     
           _seriesData[i].ethDebtYDai = account? await callTx(deployedContracts.Controller, 'Controller', 'debtYDai', [utils.ETH, x.maturity, account]): BigNumber.from('0');
           _seriesData[i].yDaiBalance = account? await callTx(x.yDaiAddress, 'YDai', 'balanceOf', [account]): BigNumber.from('0') ;
           _seriesData[i].isMature = ()=>( x.maturity < Math.round(new Date().getTime() / 1000));
@@ -170,20 +171,18 @@ const SeriesProvider = ({ children }:any) => {
       const seriesMap:any = await _getSeriesData(filteredSeriesArr, rates);
           
       /* set the active series */
-      if (!state.activeSeries) {
-        /* if no active series or, set it to the first entry of the map. */
-        dispatch({ type:'setActiveSeries', payload: seriesMap.entries().next().value[1] });
-      } else if (seriesArr.length===1 ){
+      if (seriesArr.length===1 ){
         /* if there was only one series updated set that one as the active series */
         dispatch({ type:'setActiveSeries', payload: seriesMap.get(seriesArr[0].maturity) });
       } else {
-        // other situation catch
-        dispatch({ type:'setActiveSeries', payload: seriesMap.entries().next().value[1] });
-      }
+        /* if no active series or multiple updated, set it to non-mature series that is maturing soonest. */
+        const unmatureSeries: IYieldSeries[] = Array.from(seriesMap.values());
+        const toSelect = unmatureSeries
+          .filter((x:IYieldSeries)=>!x.isMature())
+          .sort((a:IYieldSeries, b:IYieldSeries)=> a.maturity-b.maturity );
+        dispatch({ type:'setActiveSeries', payload: seriesMap.get(toSelect[0].maturity) });
+      } 
       dispatch({ type:'isLoading', payload: false });
-
-      console.log('Series Updated:' );
-      console.log(seriesMap);
 
     } else {
       console.log('Positions exist... Force fetch if required');

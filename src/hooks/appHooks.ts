@@ -14,6 +14,44 @@ export const useTxActive = (typeList:string[]) => {
   return [txActive] as const; 
 };
 
+export const useTxHelpers = () => { 
+
+  const  { dispatch }  = React.useContext<any>(NotifyContext);
+
+  /* Notification Helpers */
+  const txComplete = (tx:any) => {
+    dispatch({ type: 'txComplete', payload:{ tx } } );
+  };
+  
+  const handleTxError = (msg:string, tx: any, e:any) => {
+    // eslint-disable-next-line no-console
+    console.log(e.message);
+    dispatch({ type: 'notify', payload:{ message: msg, type:'error' } } );
+    txComplete(tx);
+  };
+  
+  const handleTx = async (tx:any) => {
+    await tx.wait()
+      .then((receipt:any) => {
+        dispatch({ type: 'txComplete', payload:{ tx } } );
+        txComplete(tx);
+        console.log(receipt);  
+      }, ( error:any ) => {
+        // tease out the reason for the error here. 
+        handleTxError('error', tx, error);
+        // This is entered if the status of the receipt is failure
+        // return error.checkCall() .then((err:any) => {
+        //   console.log('Error', err);
+        //   handleTxError('error', tx, err);
+        // });
+      });
+  };
+  
+  return { handleTx, txComplete, handleTxError };
+
+};
+
+
 /* Simple Hook for caching retrieved data */
 export const useCachedState = (key:string, initialValue:any) => {
   // const genKey = `${chainId}_${key}` || key;
@@ -45,6 +83,24 @@ export const useCachedState = (key:string, initialValue:any) => {
   return [storedValue, setValue] as const;
 };
 
-export const useDebounce = () => {
-  console.log('unBoing,..Debounc\'d');
+export const useDebounce = (value:any, delay:number) => {
+  const [debouncedValue, setDebouncedValue] = React.useState(value);
+
+  React.useEffect(
+    () => {
+      // Update debounced value after delay
+      const handler = setTimeout(() => {
+        setDebouncedValue(value);
+      }, delay);
+      // Cancel the timeout if value changes (also on delay change or unmount)
+      // This is how we prevent debounced value from updating if value is changed ...
+      // .. within the delay period. Timeout gets cleared and restarted.
+      return () => {
+        clearTimeout(handler);
+      };
+    },
+    [value, delay] // Only re-call effect if value or delay changes
+  );
+  
+  return debouncedValue;
 };

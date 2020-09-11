@@ -16,7 +16,8 @@ import {
   useSignerAccount,
   useTxActive,
   useProxy,
-  useToken
+  useToken,
+  useDebounce
 } from '../hooks';
 
 import RemoveLiquidity from './RemoveLiquidity';
@@ -25,6 +26,7 @@ import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
 import ApprovalPending from '../components/ApprovalPending';
 import TransactionPending from '../components/TransactionPending';
+import SeriesDescriptor from '../components/SeriesDescriptor';
 
 interface IPoolProps {
   // lendAmount?:any
@@ -42,11 +44,13 @@ const Pool = (props:IPoolProps) => {
   const { getBalance } = useToken();
 
   const { account } = useSignerAccount();
-  const [ txActive ] = useTxActive(['SELL']);
+  const [ txActive ] = useTxActive(['ADD_LIQUIDITY', 'REMOVE_LIQUIDITY']);
 
   const [ hasDelegated, setHasDelegated ] = useState<boolean>(true);
 
   const [ inputValue, setInputValue ] = React.useState<any>();
+  const debouncedInput = useDebounce(inputValue, 500);
+  const [inputRef, setInputRef] = React.useState<any>(null);
 
   const [ removeLiquidityOpen, setRemoveLiquidityOpen ] = useState<boolean>(false);
 
@@ -71,13 +75,13 @@ const Pool = (props:IPoolProps) => {
 
   /* handle value calculations based on input changes */
   useEffect(() => {
-    inputValue && ( async () => {
+    debouncedInput&& ( async () => {
       // const bnInp = ethers.utils.parseEther(inputValue)
       // const daiReserves = await getBalance(deployedContracts.Dai, 'Dai', activeSeries.poolAddress);
       // const yDaiReserves = await getBalance(activeSeries.yDaiAddress, 'YDai', activeSeries.poolAddress);
       // const tokens = bnInp.mul(daiReserves).div(yDaiReserves.add(daiReserves));
     })();
-  }, [inputValue]);
+  }, [debouncedInput]);
   
   /* Add liquidity disabling logic */
   useEffect(()=>{
@@ -93,60 +97,73 @@ const Pool = (props:IPoolProps) => {
 
   /* handle warnings input errors */
   useEffect(() => {
-    if ( inputValue && ( inputValue > daiBalance_ ) ) {
+    if ( debouncedInput && ( debouncedInput > daiBalance_ ) ) {
       setWarningMsg(null);
       setErrorMsg('That amount exceeds the amount of Dai you have'); 
     } else {
       setWarningMsg(null);
       setErrorMsg(null);
     }
-  }, [ inputValue ]);
+  }, [ debouncedInput ]);
 
   return (
     <Keyboard 
       onEsc={() => setInputValue(undefined)}
       onEnter={()=> addLiquidityProcedure(inputValue)}
+      onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
       target='document'
     >
-      <>
-        { removeLiquidityOpen && <RemoveLiquidity close={()=>setRemoveLiquidityOpen(false)} /> }
-        { txActive?.type !== 'SELL' &&
-        <Box flex='grow' gap='small' align='center' fill='horizontal'>
-          <InfoGrid entries={[
-            {
-              label: 'Your Pool Tokens',
-              visible: !!account,
-              active: true,
-              loading: addLiquidityPending,     
-              value: activeSeries?.poolTokens_.toFixed(2),
-              valuePrefix: null,
-              valueExtra: null, 
-            },
-            {
-              label: 'Your Pool share',
-              visible: !!account,
-              active: true,
-              loading: addLiquidityPending,           
-              value: activeSeries?.poolPercent_.toFixed(2),
-              valuePrefix: null,
-              valueExtra: null,
-            },
-            {
-              label: 'Current Dai Balance',
-              visible: !!account,
-              active: true,
-              loading: addLiquidityPending,            
-              value: daiBalance_?`${daiBalance_.toFixed(2)} DAI`: '0 DAI',
-              valuePrefix: null,
-              valueExtra: null,
-            },
-          ]}
-          />
+      { removeLiquidityOpen && <RemoveLiquidity close={()=>setRemoveLiquidityOpen(false)} /> }
+      <SeriesDescriptor activeView='pool'> 
+        <InfoGrid entries={[
+          {
+            label: 'Your Pool Tokens',
+            visible: !!account && txActive?.type !== 'ADD_LIQUIDITY',
+            active: true,
+            loading: addLiquidityPending,     
+            value: activeSeries?.poolTokens_.toFixed(2),
+            valuePrefix: null,
+            valueExtra: null, 
+          },
+          {
+            label: 'Your Pool share',
+            visible: !!account && txActive?.type !== 'ADD_LIQUIDITY',
+            active: true,
+            loading: addLiquidityPending,           
+            value: activeSeries?.poolPercent_.toFixed(2),
+            valuePrefix: null,
+            valueExtra: null,
+          },
+          {
+            label: 'Current Dai Balance',
+            visible: !!account && txActive?.type !== 'ADD_LIQUIDITY',
+            active: true,
+            loading: addLiquidityPending,            
+            value: daiBalance_?`${daiBalance_.toFixed(2)} DAI`: '0 DAI',
+            valuePrefix: null,
+            valueExtra: null,
+          },
+        ]}
+        /> 
+      </SeriesDescriptor>    
 
+      { !txActive &&
+      <Box
+        width={{ max:'750px' }}
+        alignSelf='center'
+        fill='horizontal'
+        background='background-front'
+        round='small'
+        pad='large'
+        gap='medium'
+      >
+        <Box flex='grow' gap='small' align='center' fill='horizontal'>
+          
           <Box fill gap='medium'>
             <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Add liquidity</Text>
             <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={addLiquidityDisabled}>
               <TextInput
+                ref={(el:any) => {el && !removeLiquidityOpen && el.focus(); setInputRef(el);}} 
                 type="number"
                 placeholder={screenSize !== 'small' ? 'Enter the amount of Dai Liquidity to add': 'DAI'}
                 value={inputValue || ''}
@@ -155,12 +172,12 @@ const Pool = (props:IPoolProps) => {
                 icon={<DaiMark />}
               />
               {account &&
-                <Button 
-                  label={<Text size='xsmall' color='brand'> {screenSize !== 'small' ? 'Add Maximum': 'Max'}</Text>}
-                  color='brand-transparent'
-                  onClick={()=>setInputValue(daiBalance_)}
-                  hoverIndicator='brand-transparent'
-                />}
+              <Button 
+                label={<Text size='xsmall' color='brand'> {screenSize !== 'small' ? 'Add Maximum': 'Max'}</Text>}
+                color='brand-transparent'
+                onClick={()=>setInputValue(daiBalance_)}
+                hoverIndicator='brand-transparent'
+              />}
             </InputWrap>
 
             <InfoGrid entries={[
@@ -193,20 +210,20 @@ const Pool = (props:IPoolProps) => {
             />
           </Box> 
   
-          { account && !activeSeries?.isMature() && 
+          { account && !activeSeries?.isMature() && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
           <Box gap='small' fill='horizontal' align='center'>
             <Box
               fill='horizontal'
               round='small'
-              background={ addLiquidityDisabled ? 'brand-transparent' : 'brand'}
-              onClick={ ()=>addLiquidityProcedure(inputValue)}
+              background={addLiquidityDisabled ? 'brand-transparent' : 'brand'}
+              onClick={()=>addLiquidityProcedure(inputValue)}
               align='center'
               pad='small'
             >
               <Text 
                 weight='bold'
                 size='large'
-                color={ addLiquidityDisabled ? 'text-xweak' : 'text'}
+                color={addLiquidityDisabled ? 'text-xweak' : 'text'}
               >
                 {`Supply ${inputValue || ''} DAI`}
               </Text>
@@ -229,11 +246,11 @@ const Pool = (props:IPoolProps) => {
               </Box>
             </Box> }
           </Box>}
-        </Box>}
+        </Box>
+      </Box>}
 
-        { addLiquidityActive && !txActive && <ApprovalPending /> } 
-        { txActive && <TransactionPending msg={`You added ${inputValue} DAI to the pool.`} tx={txActive} /> }
-      </>
+      { addLiquidityActive && !txActive && <ApprovalPending /> } 
+      { txActive && <TransactionPending msg={`You are adding ${inputValue} DAI liquidity to the pool.`} tx={txActive} /> }
     </Keyboard>
   );
 };

@@ -63,6 +63,8 @@ const ConnectLayer = ({ open, view, closeLayer }: any) => {
 
   return (
     <>
+
+    
       {open && (
         <Layer
           onClickOutside={() => closeLayer(true)}
@@ -70,6 +72,7 @@ const ConnectLayer = ({ open, view, closeLayer }: any) => {
           onEsc={() => closeLayer(true)}
         >
           <Box
+            width={screenSize!=='small'?{ min:'600px', max:'750px' }: undefined}
             background="background-front"
             direction="column"
             fill="vertical"

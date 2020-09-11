@@ -85,6 +85,7 @@ export interface INotification {
   fatalOpen?: boolean,
   fatalMsg?: string,
   pendingTxs?: any,
+  lastCompletedTx?: any,
   requestedSigs?: any,
 }
 

@@ -21,7 +21,8 @@ import {
   useProxy, 
   useTxActive, 
   useMath, 
-  useSignerAccount 
+  useSignerAccount, 
+  useDebounce
 } from '../hooks';
 
 import WithdrawEth from './WithdrawEth';
@@ -41,7 +42,6 @@ interface DepositProps {
 const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
   const { state: userState, actions: userActions } = useContext(UserContext);
   const {
-    isLoading,
     ethBalance_,
     ethPosted_,
     collateralPercent_,
@@ -56,6 +56,9 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
   const { account } = useSignerAccount();
 
   const [ inputValue, setInputValue ] = useState<any>(depositAmount || undefined);
+  const debouncedInput = useDebounce(inputValue, 500);
+  const [inputRef, setInputRef] = React.useState<any>(null);
+
   const [ estRatio, setEstRatio ] = useState<any>(0);
 
   const [ withdrawOpen, setWithdrawOpen ] = useState<boolean>(false);
@@ -77,11 +80,11 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
   /* Handle input value changes */
   useEffect(()=>{
     /* 1. Adjust estimated ratio based on input changes */
-    if (inputValue && ethPosted_ && debtValue_) {
-      const newRatio = estimateRatio((ethPosted_+ parseFloat(inputValue)), debtValue_); 
+    if (debouncedInput && ethPosted_ && debtValue_) {
+      const newRatio = estimateRatio((ethPosted_+ parseFloat(debouncedInput)), debtValue_); 
       newRatio && setEstRatio(newRatio.toFixed(0));
     }
-  }, [inputValue]);
+  }, [debouncedInput]);
 
   /* Handle deposit disabling deposits */
   useEffect(()=>{   
@@ -97,33 +100,41 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
 
   /* Handle input exceptions and warnings */
   useEffect(()=>{   
-    if ( inputValue && ( inputValue > ethBalance_) ) {
+    if ( debouncedInput && ( debouncedInput > ethBalance_) ) {
       setWarningMsg(null);
       setErrorMsg('That amount exceeds your available ETH balance'); 
-    } else if (inputValue && (inputValue === ethBalance_) ) {
+    } else if (debouncedInput && (debouncedInput === ethBalance_) ) {
       setErrorMsg(null);
       setWarningMsg('If you deposit all your ETH you may not be able to make any further transactions!');
     } else {
       setWarningMsg(null);
       setErrorMsg(null);
     }
-  }, [inputValue]);
+  }, [debouncedInput]);
 
   return (
     <Keyboard 
       onEsc={() => setInputValue(undefined)}
       onEnter={()=> depositProcedure(inputValue)}
+      onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
       target='document'
     >
-      <>
-        { withdrawOpen && <WithdrawEth close={()=>setWithdrawOpen(false)} /> }
-        
-        { (!txActive || txActive?.type === 'WITHDRAW') &&
-        <Box gap='small'>
+      { withdrawOpen && <WithdrawEth close={()=>setWithdrawOpen(false)} /> }    
+      { (!txActive || txActive?.type === 'WITHDRAW') &&
+        <Box
+          // width={{ max: '750px' }}
+          alignSelf="center"
+          fill
+          background="background-front"
+          round='small'
+          pad='large'
+          gap='medium'
+        >
           <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to deposit</Text>
 
           <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={depositDisabled}>
             <TextInput
+              ref={(el:any) => {el && !withdrawOpen && el.focus(); setInputRef(el);}} 
               type='number'
               placeholder={(screenSize !== 'small' && !modalView) ? 'Enter the ETH amount to deposit': 'ETH'}
               value={inputValue || ''}
@@ -227,9 +238,8 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
           </Box>}
        
         </Box>}
-        { postEthActive && !txActive && <ApprovalPending /> } 
-        { txActive && txActive.type !== 'WITHDRAW' && <TransactionPending msg={`You deposited ${inputValue} Eth.`} tx={txActive} /> }
-      </>
+      { postEthActive && !txActive && <ApprovalPending /> } 
+      { txActive && txActive.type !== 'WITHDRAW' && <TransactionPending msg={`You are depositing ${inputValue} ETH`} tx={txActive} /> }
     </Keyboard>
   );
 };

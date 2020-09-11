@@ -6,6 +6,7 @@ import Pool from '../contracts/Pool.json';
 import { NotifyContext } from '../contexts/NotifyContext';
 import { useSignerAccount } from './connectionHooks';
 import { IYieldSeries } from '../types';
+import { useTxHelpers } from './appHooks';
 
 /**
  * Hook for interacting with the yield 'Pool' Contract
@@ -16,18 +17,9 @@ export const usePool = () => {
   const  { dispatch }  = React.useContext<any>(NotifyContext);
   const [ sellActive, setSellActive ] = React.useState<boolean>(false);
   const [ buyActive, setBuyActive ] = React.useState<boolean>(false);
+  const [ callActive, setCallActive ] = React.useState<boolean>(false);
 
-
-  /* Notification Helpers */
-  const txComplete = (tx:any) => {
-    dispatch({ type: 'txComplete', payload:{ tx } } );
-  }; 
-  const handleTxError = (msg:string, tx: any, e:any) => {
-    // eslint-disable-next-line no-console
-    console.log(e.message);
-    dispatch({ type: 'notify', payload:{ message: msg, type:'error' } } );
-    txComplete(tx);
-  };
+  const { handleTx, handleTxError } = useTxHelpers();
 
   /**
    * @dev Sell yDai for Dai ( Chai )
@@ -63,11 +55,8 @@ export const usePool = () => {
       return;
     }
     dispatch({ type: 'txPending', payload:{ tx, message: `Sell yDai ${yDaiIn} pending...`, type:'SELL' } } );
-    await tx.wait();
+    await handleTx(tx);
     setSellActive(false);
-    txComplete(tx);
-    // eslint-disable-next-line consistent-return
-    return tx;
   };
 
 
@@ -104,11 +93,8 @@ export const usePool = () => {
       return;
     }
     dispatch({ type: 'txPending', payload:{ tx, message: `Buying yDai ${yDaiOut} pending...`, type:'BUY' } } );
-    await tx.wait();
+    await handleTx(tx);
     setSellActive(false);
-    txComplete(tx);
-    // eslint-disable-next-line consistent-return
-    return tx;
   };
 
   /**
@@ -147,11 +133,8 @@ export const usePool = () => {
       return;
     }
     dispatch({ type: 'txPending', payload:{ tx, message: `Selling ${daiIn} DAI pending...`, type:'SELL' } } );
-    await tx.wait();
+    await handleTx(tx);
     setSellActive(false);
-    txComplete(tx);
-    // eslint-disable-next-line consistent-return
-    return tx;
   };
 
 
@@ -194,11 +177,8 @@ export const usePool = () => {
       return;
     }
     dispatch({ type: 'txPending', payload:{ tx, message: `Buying ${daiOut} Dai pending...`, type:'BUY' } } );
-    await tx.wait();
+    await handleTx(tx);
     setBuyActive(false);
-    txComplete(tx);
-    // eslint-disable-next-line consistent-return
-    return tx;
   };
 
   /**
@@ -228,12 +208,10 @@ export const usePool = () => {
     }
     /* Transaction reporting & tracking */
     dispatch({ type: 'txPending', payload:{ tx, message: 'Pending once-off delegation ...', type:'DELEGATION' } } );
-    await tx.wait();
-    txComplete(tx);
+    await handleTx(tx);
   };
 
   
-
   /**
    * @dev Checks to see if an account (user) has delegated a contract/3rd Party for a particular market. 
    * 
@@ -284,12 +262,13 @@ export const usePool = () => {
     txType: string,
     series: IYieldSeries,
     amount: number | BigNumber,
-  ): Promise<BigNumber> => {
+  ): Promise<BigNumber|Error> => {
     const type=txType.toUpperCase();
     const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(amount.toString());
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const contract = new ethers.Contract( poolAddr, poolAbi, fallbackProvider);
     let value = BigNumber.from('0');
+    setCallActive(true);
     try {
       if ( series.isMature() === false ) {
         switch (type) {
@@ -304,12 +283,16 @@ export const usePool = () => {
           default: 
             value = await BigNumber.from('0');
         } 
+        console.log('PREVIEW: ', value.toString());
+        setCallActive(false);
         return value; 
       }
-      return value;
+      setCallActive(false);
+      return value; // assuming that if the series has matured, the rates on whatever trade will be 0. 
     } catch (e) {
-      // console.log('Pool error:', e)
-      return value;
+
+      setCallActive(false);
+      return e;
     }
   };
 
@@ -342,7 +325,8 @@ export const usePool = () => {
     checkPoolDelegate,
     checkPoolState,
     addPoolDelegate,
-    previewPoolTx, 
+    previewPoolTx,
+    callActive,
 
   } as const;
 };

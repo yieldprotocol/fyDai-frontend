@@ -1,11 +1,11 @@
 import React from 'react';
 import { ethers, BigNumber }  from 'ethers';
-import { NotifyContext } from '../contexts/NotifyContext';
-// import { ConnectionContext } from '../contexts/ConnectionContext';
-import { useSignerAccount } from './connectionHooks';
 import YDai from '../contracts/YDai.json';
 
-// ethers.errors.setLogLevel('error');
+import { NotifyContext } from '../contexts/NotifyContext';
+import { useSignerAccount } from './connectionHooks';
+import { useTxHelpers } from './appHooks';
+
 
 /**
  * Hook for interacting with the yield 'YDAI' Contract
@@ -19,6 +19,8 @@ export const useYDai = () => {
   const { abi: yDaiAbi } = YDai;
   const  { dispatch }  = React.useContext<any>(NotifyContext);
   const [ redeemActive, setRedeemActive ] = React.useState<boolean>(false);
+
+  const { handleTx, handleTxError } = useTxHelpers();
 
   /**
    * @dev Redeems yDai for dai after maturity
@@ -41,14 +43,13 @@ export const useYDai = () => {
     try {
       tx = await contract.redeem(fromAddr, toAddr, parsedAmount);
     } catch (e) {
-      dispatch({ type: 'notify', payload:{ message:'Error Redeeming funds.', type:'error' } } );
+      handleTxError('Error Redeeming funds.', tx, e);
       setRedeemActive(false);
       return;
     }
     dispatch({ type: 'txPending', payload:{ tx, message: `Redeeming ${amount} pending...`, type:'REDEEM' } } );
-    await tx.wait();
+    await handleTx(tx);
     setRedeemActive(false);
-    dispatch({ type: 'txComplete', payload:{ tx } } );
   };
 
   /**

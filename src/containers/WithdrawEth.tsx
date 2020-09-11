@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Box, Layer, Button, Keyboard, TextInput, Text } from 'grommet';
+import { Box, Layer, Button, Keyboard, TextInput, Text, ResponsiveContext } from 'grommet';
 
 import { 
   FiArrowLeft as ArrowLeft,
@@ -7,7 +7,7 @@ import {
 import EthMark from '../components/logos/EthMark';
 
 import { UserContext } from '../contexts/UserContext';
-import { useProxy, useMath, useTxActive } from '../hooks';
+import { useProxy, useMath, useTxActive, useDebounce } from '../hooks';
 
 import ApprovalPending from '../components/ApprovalPending';
 import TransactionPending from '../components/TransactionPending';
@@ -19,6 +19,9 @@ interface IWithDrawProps {
 }
 
 const WithdrawEth = ({ close }:IWithDrawProps) => {
+
+  const screenSize = useContext(ResponsiveContext);
+
   const { state: { position }, actions: userActions } = useContext(UserContext);
   const {
     ethPosted_,
@@ -29,9 +32,11 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
 
   const { withdrawEth, withdrawEthActive }  = useProxy();
   const { estCollRatio: estimateRatio } = useMath();
-  const [ txActive ] = useTxActive(['WITHDRAW', 'DELEGATION']);
+  const [ txActive ] = useTxActive(['WITHDRAW']);
 
   const [ inputValue, setInputValue ] = useState<any>();
+  const debouncedInput = useDebounce(inputValue, 500);
+  const [inputRef, setInputRef] = React.useState<any>(null);
 
   const [ estRatio, setEstRatio ] = useState<any>();
   const [ estDecrease, setEstDecrease ] = useState<any>();
@@ -75,7 +80,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
   /* Withdraw disabled logic */
   useEffect(()=>{
     ( 
-      estRatio < 200 ||
+      estRatio < 150 ||
       inputValue > maxWithdraw || 
       txActive ||
       !inputValue ||
@@ -85,29 +90,32 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
 
   /* show warnings and errors with collateralisation ratio levels and inputs */
   useEffect(()=>{
-    if (estRatio < 200 || inputValue > maxWithdraw ) {
+    if (estRatio < 150 || debouncedInput > maxWithdraw ) {
       setWarningMsg(null);
       setErrorMsg('You are not allowed to withdraw below the collateralization ratio'); 
-    } else if (estRatio >= 200 && estRatio < 250 ) {
+    } else if (estRatio >= 150 && estRatio < 200 ) {
       setErrorMsg(null);
       setWarningMsg('Your collateralisation ration will put you at risk of liquidation');
     } else {   
       setWarningMsg(null);
       setErrorMsg(null);
     }
-  }, [ estRatio, inputValue ]);
+  }, [ estRatio, debouncedInput ]);
 
   return (
-    <Layer onClickOutside={()=>close()}>
+    <Layer 
+      onClickOutside={()=>close()}
+  
+    >
       <Keyboard 
         onEsc={() => { inputValue? setInputValue(undefined): close();}}
         onEnter={()=> withdrawProcedure(inputValue)}
+        onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
         target='document'
       >
-        <>
-          { !txActive && !withdrawPending && 
+        { !txActive && !withdrawPending && 
           <Box 
-            width={{ max:'750px' }}
+            width={screenSize!=='small'?{ min:'600px', max:'750px' }: undefined}
             alignSelf='center'
             fill
             background='background-front'
@@ -120,6 +128,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
 
             <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={withdrawDisabled}>
               <TextInput
+                ref={(el:any) => {el && el.focus(); setInputRef(el);}} 
                 type="number"
                 placeholder='ETH'
                 disabled={!hasDelegated}
@@ -198,37 +207,36 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
             
           </Box>}
 
-          { withdrawPending && !txActive && <ApprovalPending /> }
+        { withdrawPending && !txActive && <ApprovalPending /> }
           
-          { txActive && 
-            txActive.type !== 'DELEGATION' && 
-            <Box 
-              width={{ max:'750px' }}
-              alignSelf='center'
-              fill
-              background='background-front'
-              round='small'
-              pad='large'
-              gap='medium'
-              justify='between'
-            > 
-              <TransactionPending msg={`You made a withdrawal of ${inputValue} Eth.`} tx={txActive} />
-              <Box alignSelf='start'>
-                <Box
-                  round
-                  onClick={()=>close()}
-                  hoverIndicator='brand-transparent'
-                  pad={{ horizontal:'small', vertical:'small' }}
-                  justify='center'
-                >
-                  <Box direction='row' gap='small' align='center'>
-                    <ArrowLeft color='text-weak' />
-                    <Text size='xsmall' color='text-weak'> { !withdrawPending? 'cancel, and go back.': 'go back'}  </Text>
-                  </Box>
-                </Box>
+        { txActive && 
+        <Box 
+          width={{ max:'750px' }}
+          alignSelf='center'
+          fill
+          background='background-front'
+          round='small'
+          pad='large'
+          gap='medium'
+          justify='between'
+        > 
+          <TransactionPending msg={`You are withdrawing ${inputValue} ETH`} tx={txActive} />
+              
+          <Box alignSelf='start'>
+            <Box
+              round
+              onClick={()=>close()}
+              hoverIndicator='brand-transparent'
+              pad={{ horizontal:'small', vertical:'small' }}
+              justify='center'
+            >
+              <Box direction='row' gap='small' align='center'>
+                <ArrowLeft color='text-weak' />
+                <Text size='xsmall' color='text-weak'> { !withdrawPending? 'cancel, and go back.': 'go back'}  </Text>
               </Box>
-            </Box>}
-        </>
+            </Box>
+          </Box>
+        </Box>}
       </Keyboard>
     </Layer>
   );

@@ -51,6 +51,7 @@ const AuthsLayer = ({ open, closeLayer }: any) => {
           onEsc={() => closeLayer(true)}
         >
           <Box
+            width={screenSize!=='small'?{ min:'600px', max:'750px' }: undefined}
             background="background-front"
             direction="column"
             fill="vertical"

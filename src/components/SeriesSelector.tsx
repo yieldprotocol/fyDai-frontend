@@ -9,6 +9,7 @@ import { SeriesContext } from '../contexts/SeriesContext';
 
 import AprBadge from './AprBadge';
 import Loading from './Loading';
+import { IYieldSeries } from '../types';
 
 interface ISeriesSelectorProps {
   activeView:string;
@@ -22,6 +23,11 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
   const { isLoading, activeSeries, seriesData } = seriesState; 
   const { setActiveSeries } = seriesActions;
 
+  const [sortedList, setSortedList] = React.useState<any>(seriesData);
+  const [firstSort, setFirstSort] = React.useState<any>('');
+  const [secondSort, setSecondSort] = React.useState<any>('');
+
+
   const viewMap = new Map([
     ['BORROW', { head: 'DEBT', field: 'ethDebtYDai_' }],
     ['LEND', { head: 'BALANCE', field: 'yDaiBalance_' }],
@@ -32,6 +38,28 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
     setActiveSeries(seriesMaturity);
     close();
   };
+
+  /* filter by isMature, then sort by maturity date  */
+  React.useEffect(()=>{
+
+    const sortedActive = new Map([...seriesData.entries()]
+      .filter((x:any)=> !(x[1].isMature()) )
+      .sort()
+    );
+    const sortedMature = new Map([...seriesData.entries()]
+      .filter((x:any)=> x[1].isMature() )
+      .sort(
+        (a:any, b:any)=>{
+          return ( a[0]>b[0] ? 0:-1 );
+        }
+      )
+    );
+    const mergedMap = new Map([...sortedActive, ...sortedMature]);
+    setSortedList(mergedMap);
+
+    // setSortedList(seriesData);
+
+  }, [seriesData]);
 
   return (
     <Layer
@@ -46,7 +74,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
         background='background-front'
         pad={{ horizontal: 'medium', vertical:'large' }}
         gap='medium'
-        width={screenSize !== 'small'? { max:'750px', min:'640px' }: {}}
+        width={screenSize!=='small'?{ min:'600px', max:'750px' }: undefined}
       >
         <Box gap='medium'>
           <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Choose a series</Text>
@@ -87,9 +115,10 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
           </Box>
 
           <Loading condition={isLoading} size='large'>
-            { [...seriesData.values() ].map((x:any, i:any) => {       
+            { !isLoading && [...sortedList.values() ].map((x:any, i:any) => {       
               const _key = i;
               const field = viewMap.get(activeView.toUpperCase())?.field || '';
+
               return ( 
                 <Box
                   key={_key}

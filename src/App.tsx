@@ -77,6 +77,7 @@ const App = (props:any) => {
       
       { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
       { showSeriesLayer  && <SeriesSelector activeView='borrow' close={()=>setShowSeriesLayer(false)} /> }
+      
       { showAccountLayer &&
       <AccountLayer
         view={accountView}
@@ -107,7 +108,7 @@ const App = (props:any) => {
                   pad={{ vertical: 'large' }}
                   fill="horizontal"
                   align="center"
-                > 
+                >
                   {activeView === 'DASHBOARD' && <Dashboard />}
                   {activeView === 'BORROW' && <BorrowView />}
                   {activeView === 'LEND' && <LendView />}

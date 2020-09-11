@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { ethers } from 'ethers';
-import { Box, Button, Layer, TextInput, Text, Keyboard, ThemeContext } from 'grommet';
+import { Box, Button, Layer, TextInput, Text, Keyboard, ThemeContext, ResponsiveContext } from 'grommet';
 import { 
   FiArrowLeft as ArrowLeft,
 } from 'react-icons/fi';
@@ -10,16 +10,20 @@ import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
 import { UserContext } from '../contexts/UserContext';
 
-import { useSignerAccount, useProxy } from '../hooks';
+import { useSignerAccount, useProxy, useTxActive, useDebounce } from '../hooks';
 
 import InputWrap from '../components/InputWrap';
 import InfoGrid from '../components/InfoGrid';
+import ApprovalPending from '../components/ApprovalPending';
+import TransactionPending from '../components/TransactionPending';
 
 interface IRemoveLiquidityProps {
   close?: any;
 }
 
 const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
+
+  const screenSize = useContext(ResponsiveContext);
 
   const { state: yieldState, actions: yieldActions } = useContext(YieldContext);
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
@@ -28,9 +32,13 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
 
   const { account } = useSignerAccount();
   const { removeLiquidity } = useProxy();
+  const [ txActive ] = useTxActive(['REMOVE_LIQUIDITY']);
   
   const [ maxRemove, setMaxRemove ] = useState<number>(0);
+
   const [ inputValue, setInputValue ] = useState<any>();
+  const debouncedInput = useDebounce(inputValue, 500);
+  const [inputRef, setInputRef] = React.useState<any>(null);
 
   const [ removeLiquidityDisabled, setRemoveLiquidityDisabled ] = useState<boolean>(true);
   const [ removeLiquidityPending, setRemoveLiquidityPending] = useState<boolean>(false);
@@ -43,11 +51,9 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
   const removeLiquidityProcedure = async (value:number) => {
     if ( !removeLiquidityDisabled ) {
       setRemoveLiquidityPending(true);
-      await removeLiquidity(activeSeries, value, 1);
-      await Promise.all([
-        userActions.updatePosition(),
-        seriesActions.updateActiveSeries()
-      ]);
+      await removeLiquidity(activeSeries, value);
+      userActions.updatePosition();
+      seriesActions.updateActiveSeries();
       setRemoveLiquidityPending(true);
       close();
     }
@@ -76,14 +82,14 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
   useEffect(()=>{
     if (
       !account ||
-      !inputValue || 
-      parseFloat(inputValue) === 0
+      !debouncedInput || 
+      parseFloat(debouncedInput) === 0
     ) {
       setRemoveLiquidityDisabled(true);
     } else {
       setRemoveLiquidityDisabled(false);
     }
-  }, [ inputValue ]);
+  }, [ debouncedInput ]);
 
 
   return (
@@ -91,11 +97,12 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
       <Keyboard 
         onEsc={() => { inputValue? setInputValue(undefined): close();}}
         onEnter={()=> removeLiquidityProcedure(inputValue)}
+        onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
         target='document'
       >
-        <>
+        {!txActive && !removeLiquidityPending && 
           <Box 
-            width={{ max:'750px' }}
+            width={screenSize!=='small'?{ min:'600px', max:'750px' }: undefined}
             alignSelf='center'
             fill
             background='background-front'
@@ -106,6 +113,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
             <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Remove Liquidity</Text>
             <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={removeLiquidityDisabled}>
               <TextInput
+                ref={(el:any) => {el && el.focus(); setInputRef(el);}} 
                 type="number"
                 placeholder='Tokens to remove'
                 value={inputValue || ''}
@@ -198,8 +206,36 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
                 </Box>
               </Box>
             </Box>
-          </Box>
-        </>
+          </Box>}
+        { removeLiquidityPending && !txActive && <ApprovalPending /> }   
+        { txActive && 
+          <Box 
+            width={{ max:'750px' }}
+            alignSelf='center'
+            fill
+            background='background-front'
+            round='small'
+            pad='large'
+            gap='medium'
+            justify='between'
+          > 
+            <TransactionPending msg={`You are removing ${inputValue} liquidity tokens`} tx={txActive} />
+                
+            <Box alignSelf='start'>
+              <Box
+                round
+                onClick={()=>close()}
+                hoverIndicator='brand-transparent'
+                pad={{ horizontal:'small', vertical:'small' }}
+                justify='center'
+              >
+                <Box direction='row' gap='small' align='center'>
+                  <ArrowLeft color='text-weak' />
+                  <Text size='xsmall' color='text-weak'> { !removeLiquidityPending? 'cancel, and go back.': 'go back'}  </Text>
+                </Box>
+              </Box>
+            </Box>
+          </Box>}
       </Keyboard>
     </Layer>
   );

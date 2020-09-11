@@ -1,6 +1,8 @@
 import React from 'react';
 
 import { ethers, BigNumber }  from 'ethers';
+import { signDaiPermit, signERC2612Permit } from 'eth-permit';
+
 import * as utils from '../utils';
 
 import YieldProxy from '../contracts/YieldProxy.json';
@@ -13,8 +15,10 @@ import { useSignerAccount } from './connectionHooks';
 import { usePool } from './poolHook';
 import { useMath } from './mathHooks';
 import { useToken } from './tokenHook';
+import { useYDai } from './yDaiHook';
 
 import { IYieldSeries } from '../types';
+import { useTxHelpers } from './appHooks';
 
 /**
  * Hook for interacting with the Yield Proxy Contract.
@@ -44,6 +48,9 @@ export const useProxy = () => {
   const { previewPoolTx } = usePool();
   const { splitDaiLiquidity } = useMath();
   const { getBalance } = useToken();
+  const { isMature } = useYDai();
+
+  const { handleTx, handleTxError } = useTxHelpers();
 
   const { abi: yieldProxyAbi } = YieldProxy;
   
@@ -63,18 +70,13 @@ export const useProxy = () => {
   const [ buyActive, setBuyActive ] = React.useState<boolean>(false);
   const [ sellActive, setSellActive ] = React.useState<boolean>(false);
 
-  /* Notification Helpers */
-  const txComplete = (tx:any) => {
-    dispatch({ type: 'txComplete', payload:{ tx } } );
-  }; 
-  const handleTxError = (msg:string, tx: any, e:any) => {
-    // eslint-disable-next-line no-console
-    console.log(e.message);
-    dispatch({ type: 'notify', payload:{ message: msg, type:'error' } } );
-    txComplete(tx);
-  };
+  const auths = new Map([
+    [1, { id: 1, desc:'Dai > treasury authenticate ' }],
+    [2, { id: 2, desc:'yDai > pool authenticate ' }],
+  ]);
+  
 
-  // TODO: deal with big number rather
+  // TODO: deal with big number rather also, put this out in a hook
   const valueWithSlippage = (value:BigNumber, minimise:boolean=false ) => {
     const slippageAsRay = utils.toRay(slippage);
     const slippageAmount = utils.mulRay(value, slippageAsRay);
@@ -84,6 +86,7 @@ export const useProxy = () => {
     return value.add(slippageAmount);
   };
 
+  /* Preset the yieldProxy contract to be used with all fns */
   React.useEffect(()=>{
     deployedContracts.YieldProxy && signer &&
     setProxyContract( new ethers.Contract( 
@@ -111,18 +114,14 @@ export const useProxy = () => {
     try {
       tx = await proxyContract.post(toAddr, { value: parsedAmount }); 
     } catch (e) {
-      handleTxError('Error depositing ETH', tx, e );   
+      handleTxError('Error depositing ETH', tx, e ); 
       setPostEthActive(false);
       return;
     }
     dispatch({ type: 'txPending', payload:{ tx, message: `Deposit of ${amount} ETH pending...`, type:'DEPOSIT' } } );
-    await tx.wait();
+    await handleTx(tx);
     setPostEthActive(false);
-    txComplete(tx);
-    // eslint-disable-next-line consistent-return
-    return tx;
   };
-
 
   /**
    * @dev Withdraw ETH collateral via YieldProxy
@@ -147,11 +146,8 @@ export const useProxy = () => {
       return;
     }
     dispatch({ type: 'txPending', payload:{ tx, message: `Withdraw of ${amount} ETH pending...`, type:'WITHDRAW' } } );
-    await tx.wait();
+    await handleTx(tx);
     setWithdrawEthActive(false);
-    txComplete(tx);
-    // eslint-disable-next-line consistent-return
-    return tx;
   };
 
 
@@ -181,47 +177,38 @@ export const useProxy = () => {
     // const maxYDai = ethers.utils.parseEther(maximumYDai.toString());
 
     const overrides = { 
-      // nonce: signer.getTransactionCount().then( (nonce:any) => nonce + queue) 
       gasLimit: BigNumber.from('300000')
     };
 
-    /* Calculate expected trade values and factor in slippage */
-    let maxYDai;
-    try {
-      const yDaiExpected = await previewPoolTx('buydai', series, daiToBorrow);
-      if (yDaiExpected) { 
-        maxYDai = valueWithSlippage(yDaiExpected);
-      }
-    } catch (e) {
-      console.log(e);
-      return;
-    } 
-
-    let tx:any;
     setBorrowActive(true);
+    let tx:any;
+    let maxYDai:BigNumber;
     try {
-      tx = await proxyContract.borrowDaiForMaximumYDai( poolAddr, utils.ETH, parsedMaturity, toAddr, maxYDai, dai, overrides ); 
+      /* Calculate expected trade values and factor in slippage */
+      const preview = await previewPoolTx('buydai', series, daiToBorrow); 
+      if ( !(preview instanceof Error) ) {
+        maxYDai = valueWithSlippage(preview);
+      } else {
+        throw(preview);
+      }
+      tx = await proxyContract.borrowDaiForMaximumYDai( poolAddr, utils.ETH, parsedMaturity, toAddr, maxYDai, dai );
     } catch (e) {
       handleTxError('Error Borrowing Dai', tx, e);
       setBorrowActive(false);
       return;
     }
     dispatch({ type: 'txPending', payload:{ tx, message: `Borrowing ${daiToBorrow} Dai pending...`, type:'BORROW' } } );
-    await tx.wait();
+    await handleTx(tx);
     setBorrowActive(false);
-    txComplete(tx);
-    // eslint-disable-next-line consistent-return
-    return tx;
   };
 
 
   /**
    * @dev Repay an amount of yDai debt in Controller using a given amount of Dai exchanged for yDai at pool rates, with a minimum of yDai debt required to be paid.
-   * Must have approved the operator with `controller.addDelegate(controllerDai.address)`.
+   * Post maturity the user is asked for a signature allowing the treasury access to dai
    * 
    * @param {IYieldSeries} series the yield series to interact with.
    * @param {string} collateralType type of collateral eg. 'ETH-A'
-   * @param {number} minimumYDaiRepayment  minimumYDaiRepayment Minimum amount of yDai debt to repay.
    * @param {number} repaymentInDai Exact amount of Dai that should be spent on the repayment.
    * 
    * @return Amount 
@@ -230,52 +217,83 @@ export const useProxy = () => {
   const repayDaiDebt = async (
     series: IYieldSeries,
     collateralType: string,
-    minimumYDaiRepayment: number, 
     repaymentInDai: number,
   ) => {
     const dai = ethers.utils.parseEther(repaymentInDai.toString());   
     const collatType = ethers.utils.formatBytes32String(collateralType);
     const toAddr = account && ethers.utils.getAddress(account);
+    const fromAddr = account && ethers.utils.getAddress(account);
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const yDaiAddr = ethers.utils.getAddress(series.yDaiAddress);
-
     const parsedMaturity = series.maturity.toString();
     // const minYDai = ethers.utils.parseEther(minimumYDaiRepayment.toString());
 
-    const overrides = {
-      // nonce: signer.getTransactionCount().then( (nonce:any) => nonce + queue) 
-      gasLimit: BigNumber.from('300000')
-    };
+    // const overrides = {
+    // nonce: signer.getTransactionCount().then( (nonce:any) => nonce + queue) 
+    // gasLimit: BigNumber.from('500000'),
+    // value: ethers.utils.parseEther('0')
+    // };
 
-    /* calculate expected trade values and factor in slippage */
-    // const yDaiExpected = await previewPoolTx('selldai', series, repaymentInDai);
-    // const minYDai = valueWithSlippage(yDaiExpected, true);
-    let minYDai;
-    try {
-      const yDaiExpected = await previewPoolTx('selldai', series, repaymentInDai);
-      if (yDaiExpected) { 
-        minYDai = valueWithSlippage(yDaiExpected);
-      }
-    } catch (e) {
-      console.log(e);
-      return;
-    } 
-
-    let tx:any;
     setRepayActive(true);
-
+    let tx:any;
+    let daiPermitSig:any;
+    let minYDai:BigNumber;
     try {
-      // console.log('gas est:', ( await proxyContract.estimateGas.repayMinimumYDaiDebtForDai(poolAddr, collatType, parsedMaturity, toAddr, parsedYDai, parsedDai, overrides )).toString());
-      // console.log('dry-run:', ( await proxyContract.callStatic.repayMinimumYDaiDebtForDai(poolAddr, collatType, parsedMaturity, toAddr, parsedYDai, parsedDai, overrides )).toString());           
-      tx = await proxyContract.repayMinimumYDaiDebtForDai(
-        poolAddr,
-        collatType,
-        parsedMaturity,
-        toAddr,
-        minYDai,
-        dai,
-        overrides );
-    
+      console.log( await series.isMature() );
+
+      if ( await isMature(series.yDaiAddress) ) {  
+        try {
+          console.log('repay with sig- after maturity');
+          /* Repay using a signature authorizing treasury */
+          dispatch({ type: 'requestSigs', payload:[ auths.get(1) ] });
+
+          const result = await signDaiPermit( 
+            provider.provider, 
+            deployedContracts.Dai, 
+            // @ts-ignore
+            fromAddr,
+            deployedContracts.Treasury
+          );
+          daiPermitSig = ethers.utils.joinSignature(result);
+          dispatch({ type: 'signed', payload: auths.get(1) });
+          dispatch({ type: 'requestSigs', payload: [] });
+        } catch (e) { 
+          handleTxError('Signing error', tx, e);
+          dispatch({ type: 'requestSigs', payload: [] });
+          setRepayActive(false);
+          return;
+        }
+
+        tx = await proxyContract.repayDaiWithSignature(
+          collatType,
+          parsedMaturity,
+          toAddr,
+          dai,
+          daiPermitSig
+        );
+
+      } else {
+        console.log('repay with no signature - before maturity');
+        /* calculate expected trade values and factor in slippage */
+        const preview = await previewPoolTx('selldai', series, repaymentInDai);
+        if ( !(preview instanceof Error) ) {
+          minYDai = valueWithSlippage(preview, true);
+        } else {
+          throw(preview);
+        }
+        // testing
+        // const minYDai = ethers.utils.parseEther('0');
+
+        tx = await proxyContract.repayMinimumYDaiDebtForDai(
+          poolAddr,
+          collatType,
+          parsedMaturity,
+          toAddr,
+          minYDai,
+          dai 
+        );
+      }      
+      
     } catch (e) {
       console.log(e);
       handleTxError('Error Repaying Dai', tx, e);
@@ -283,11 +301,8 @@ export const useProxy = () => {
       return;
     }
     dispatch({ type: 'txPending', payload:{ tx, message: `Repaying ${repaymentInDai} Dai pending...`, type:'REPAY' } } );
-    await tx.wait();
+    await handleTx(tx);
     setRepayActive(false);
-    txComplete(tx);
-    // eslint-disable-next-line consistent-return
-    return tx;
   };
 
 
@@ -310,42 +325,40 @@ export const useProxy = () => {
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const parsedDaiUsed = BigNumber.isBigNumber(daiUsed)? daiUsed : ethers.utils.parseEther(daiUsed.toString());
 
+    // const overrides = { 
+    // gasLimit: BigNumber.from('1000000')
+    // };
+
     /* calculate minimum expected yDai value and factor in slippage */
     const daiReserves = await getBalance(deployedContracts.Dai, 'Dai', poolAddr);
     const yDaiReserves = await getBalance(series.yDaiAddress, 'YDai', poolAddr);
-    const [ ,yDaiSplit ] = splitDaiLiquidity( parsedDaiUsed, daiReserves, yDaiReserves );
-
-    // const maxYDai = await previewPoolTx('sellDai', series, yDaiSplit);
-    // const maxYDaiWithSlippage = valueWithSlippage(maxYDai);
-
-    /* Calculate expected trade values and factor in slippage */
-    let maxYDaiWithSlippage;
-    try {
-      const yDaiExpected = await previewPoolTx('sellDai', series, yDaiSplit);
-      if (yDaiExpected) { 
-        maxYDaiWithSlippage = valueWithSlippage(yDaiExpected);
-      }
-    } catch (e) {
-      console.log(e);
-      return;
-    }
+    const [ , yDaiSplit ] = splitDaiLiquidity( parsedDaiUsed, daiReserves, yDaiReserves );
 
     /* Contract interaction */
     let tx:any;
+    let maxYDai:BigNumber;
     setAddLiquidityActive(true);
     try {
-      tx = await proxyContract.addLiquidity(poolAddr, parsedDaiUsed, maxYDaiWithSlippage );
+      /* Calculate expected trade values and factor in slippage */
+      const preview = await previewPoolTx('sellDai', series, yDaiSplit);
+      if ( !(preview instanceof Error) ) {
+        maxYDai = valueWithSlippage(preview);
+      } else {
+        throw(preview);
+      }
+
+      // testing
+      // maxYDai = ethers.utils.parseEther('1000000');
+
+      tx = await proxyContract.addLiquidity(poolAddr, parsedDaiUsed, maxYDai);
     } catch (e) {
       handleTxError('Error Adding liquidity', tx, e);
       setAddLiquidityActive(false);
       return;
     }
     dispatch({ type: 'txPending', payload:{ tx, message: `Adding ${daiUsed} DAI liquidity pending...`, type:'ADD_LIQUIDITY' } } );
-    await tx.wait();
+    await handleTx(tx);
     setAddLiquidityActive(false);
-    txComplete(tx);
-    // eslint-disable-next-line consistent-return
-    return tx;
   };
 
   /**
@@ -353,7 +366,6 @@ export const useProxy = () => {
    * 
    * @param {IYieldSeries} series series to act on.
    * @param {number|BigNumber} tokens amount of Dai to use to mint liquidity. 
-   * @param {number|BigNumber} minimumDai maximum amount of yDai to be borrowed to mint liquidity.
    * 
    * @note if BigNumber is used make sure it is in WEI
    */
@@ -362,27 +374,36 @@ export const useProxy = () => {
     // removeLiquidityMature(address from, uint256 poolTokens)
     series: IYieldSeries,  
     tokens:number|BigNumber,
-    minimumDai:number|BigNumber,
   ) => {
     /* Processing and sanitizing input */
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
-    const { isMature } = series;
+    // const { isMature } = series;
     const parsedTokens = BigNumber.isBigNumber(tokens)? tokens : ethers.utils.parseEther(tokens.toString());
-
-    /* calculate expected trade values and factor in slippage */
-    // const yDaiExpected = await previewPoolTx('selldai', poolAddr, daiUsed);
-    // const minDai = valueWithSlippage(yDaiExpected, true);
-
-    // const minDai = ethers.utils.parseEther(minimumDai.toString());
-    const minDai = 1;
-    
+     
     /* Contract interaction */
     let tx:any;
+    let minDai:BigNumber;
+    let minYDai:BigNumber;
     setRemoveLiquidityActive(true);
     try {
-      if (!isMature()) {
-        tx = await proxyContract.removeLiquidityEarly(poolAddr, parsedTokens, minDai);
+      if ( !(await isMature(series.yDaiAddress)) ) {
+        console.log('removing liquidity BEFORE maturity'); 
+        /* calculate expected trade values and factor in slippage */
+        // const preview = await previewPoolTx('selldai', series, daiUsed);
+        // if ( !(preview instanceof Error) ) {
+        //   minDai = valueWithSlippage(preview, true);
+        // } else {
+        //   throw(preview);
+        // }
+
+        // testing with slippage etc. 
+        minDai = ethers.utils.parseEther('0');
+        minYDai = ethers.utils.parseEther('0');
+
+        tx = await proxyContract.removeLiquidityEarlyDaiPool(poolAddr, parsedTokens, minDai, minYDai );
+
       } else {
+        console.log('removing liquidity after maturity'); 
         tx = await proxyContract.removeLiquidityMature(poolAddr, tokens);
       }
     } catch (e) {
@@ -391,11 +412,8 @@ export const useProxy = () => {
       return;
     }
     dispatch({ type: 'txPending', payload:{ tx, message: `Removing ${tokens} DAI liquidity pending...`, type:'REMOVE_LIQUIDITY' } } );
-    await tx.wait();
+    await handleTx(tx);
     setRemoveLiquidityActive(false);
-    txComplete(tx);
-    // eslint-disable-next-line consistent-return
-    return tx;
   };
 
 
@@ -407,47 +425,45 @@ export const useProxy = () => {
    * @dev Sell Dai for yDai
    * 
    * @param {IYieldSeries} series series to act on.
-   * @param daiIn Amount of dai being bought
+   * @param daiIn Amount of dai being bought (if in BigNumber make sure its in Wei. )
    * */
   const sellDai = async (  
     series: IYieldSeries,
-    daiIn:number, 
+    daiIn: number| BigNumber, 
   ) => {
     /* Processing and/or sanitizing input */
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const parsedDaiIn = BigNumber.isBigNumber(daiIn)? daiIn : ethers.utils.parseEther(daiIn.toString());
     const toAddr = account && ethers.utils.getAddress(account);
 
-    /* calculate expected trade values and factor in slippage */
-    // const yDaiExpected = await previewPoolTx('selldai', series, daiIn);
-    // const minYDaiOut = valueWithSlippage(yDaiExpected, true);
-    let minYDaiOut;
-    try {
-      const yDaiExpected = await previewPoolTx('selldai', series, daiIn);
-      if (yDaiExpected) { 
-        minYDaiOut = valueWithSlippage(yDaiExpected, true);
-      }
-    } catch (e) {
-      console.log(e);
-      return;
-    }
+    // const overrides = { 
+    //   gasLimit: BigNumber.from('300000')
+    // };
 
     /* Contract interaction */
     let tx:any;
+    let minYDaiOut:BigNumber;
     setSellActive(true);
     try {
-      tx = await proxyContract.sellDai(poolAddr, toAddr, parsedDaiIn, minYDaiOut); 
+      /* calculate expected trade values and factor in slippage */
+      const preview = await previewPoolTx('selldai', series, daiIn);
+      if ( !(preview instanceof Error) ) {
+        minYDaiOut = valueWithSlippage(preview, true);
+      } else {
+        throw(preview);
+      }
+      // temp min for testing */
+      // const minYDaiOut = ethers.utils.parseEther('0');
+
+      tx = await proxyContract.sellDai(poolAddr, toAddr, parsedDaiIn, minYDaiOut ); 
     } catch (e) {
       handleTxError('Error selling', tx, e );   
       setSellActive(false);
       return;
     }
-    dispatch({ type: 'txPending', payload:{ tx, message: `Selling ${daiIn} DAI pending...`, type:'SELL' } } );
-    await tx.wait();
+    dispatch({ type: 'txPending', payload:{ tx, message: `Selling ${daiIn} DAI pending...`, type:'SELL_DAI' } } );
+    await handleTx(tx);
     setSellActive(false);
-    txComplete(tx);
-    // eslint-disable-next-line consistent-return
-    return tx;
   };
 
   /**
@@ -464,40 +480,113 @@ export const useProxy = () => {
     const parsedDaiOut = BigNumber.isBigNumber(daiOut)? daiOut : ethers.utils.parseEther(daiOut.toString());
     const toAddr = account && ethers.utils.getAddress(account);
 
-    /* calculate expected trade values and factor in slippage */
-    // const yDaiExpected = await previewPoolTx('buydai', series, daiOut);
-    // const maxYDaiIn = valueWithSlippage(yDaiExpected);
-
-    let maxYDaiIn;
-    try {
-      const yDaiExpected = await previewPoolTx('buydai', series, daiOut);
-      if (yDaiExpected) { 
-        maxYDaiIn = valueWithSlippage(yDaiExpected);
-      }
-    } catch (e) {
-      console.log(e);
-      return;
-    }
+    // const overrides = { 
+    //   gasLimit: BigNumber.from('300000')
+    // };
 
     /* Contract interaction */
     let tx:any;
+    let maxYDaiIn:BigNumber;
     setBuyActive(true);
     try {
-      tx = await proxyContract.buyDai(poolAddr, toAddr, parsedDaiOut, maxYDaiIn); 
+      /* calculate expected trade values and factor in slippage */
+      const preview = await previewPoolTx('buydai', series, daiOut);
+      if ( !(preview instanceof Error) ) {
+        maxYDaiIn = valueWithSlippage(preview);
+      } else {
+        throw(preview);
+      }
+      // temp max bignumber for testing */
+      // const maxYDaiIn = ethers.utils.parseEther('1000000');
+
+      tx = await proxyContract.buyDai(poolAddr, toAddr, parsedDaiOut, maxYDaiIn );
     } catch (e) {
       handleTxError('Error buying Dai', tx, e );   
       setBuyActive(false);
       return;
     }
-    dispatch({ type: 'txPending', payload:{ tx, message: `Buying back ${daiOut} DAI pending...`, type:'BUY' } } );
-    await tx.wait();
+    dispatch({ type: 'txPending', payload:{ tx, message: `Buying back ${daiOut} DAI pending...`, type:'BUY_DAI' } } );
+    await handleTx(tx);
     setBuyActive(false);
-    txComplete(tx);
-    // eslint-disable-next-line consistent-return
-    return tx;
   };
 
-  // TODO Add these two only if required
+  /**
+   * @dev Buy Dai with yDai
+   * @param {IYieldSeries} series yield series to act on.
+   * @param daiOut Amount of dai being bought
+   * */ 
+  const buyDaiWithSignature = async ( 
+    series: IYieldSeries, 
+    daiOut:number,
+  ) => {
+    /* Processing and/or sanitizing input */
+    const poolAddr = ethers.utils.getAddress(series.poolAddress);
+    const yDaiAddr = ethers.utils.getAddress(series.yDaiAddress);
+    const parsedDaiOut = BigNumber.isBigNumber(daiOut)? daiOut : ethers.utils.parseEther(daiOut.toString());
+    const toAddr = account && ethers.utils.getAddress(account);
+    const fromAddr = account && ethers.utils.getAddress(account);
+
+    // const overrides = { 
+    //   gasLimit: BigNumber.from('300000')
+    // };
+
+    /* Contract interaction */
+    let tx:any;
+    let maxYDaiIn:BigNumber;
+    let yDaiPermitSig:any;
+    setBuyActive(true);
+    try { 
+      /* calculate expected trade values and factor in slippage */
+      const preview = await previewPoolTx('buydai', series, daiOut);
+      if ( !(preview instanceof Error) ) {
+        maxYDaiIn = valueWithSlippage(preview);
+      } else {
+        throw(preview);
+      }
+      // temp max bignumber for testing */
+      // const maxYDaiIn = ethers.utils.parseEther('1000000');
+
+      /* Get the user signature authorizing yDai to interact with Dai */
+      try {
+        dispatch({ type: 'requestSigs', payload:[ auths.get(2) ] });
+        const result = await signERC2612Permit(
+          provider.provider, 
+          yDaiAddr,
+          // @ts-ignore 
+          fromAddr, 
+          poolAddr
+        );
+        yDaiPermitSig = ethers.utils.joinSignature(result);
+        dispatch({ type: 'signed', payload: auths.get(2) });
+        dispatch({ type: 'requestSigs', payload: [] });
+      } catch (e) { 
+        handleTxError('Signing error', tx, e);
+        dispatch({ type: 'requestSigs', payload: [] });
+        setRepayActive(false);
+        return;
+      }
+
+      tx = await proxyContract.buyDaiWithSignature(
+        poolAddr, 
+        toAddr, 
+        parsedDaiOut, 
+        maxYDaiIn, 
+        yDaiPermitSig
+      );
+    } catch (e) {
+      handleTxError('Error buying back Dai', tx, e );   
+      setBuyActive(false);
+      return;
+    }
+    dispatch({ type: 'txPending', payload:{ tx, message: `Buying back ${daiOut} DAI pending...`, type:'BUY_DAI' } } );
+    await handleTx(tx);
+    setBuyActive(false);
+  };
+
+
+  // buyDaiWithSignature(address pool, address to, uint128 daiOut, uint128 maxYDaiIn, bytes memory signature)
+
+  // TODO Add these two ONLY if required
   const sellYDai = () => {};
   const buyYDai = () => {};
 
@@ -564,6 +653,7 @@ export const useProxy = () => {
     /* limitPool fns */
     sellDai, sellActive,
     buyDai, buyActive,
+    buyDaiWithSignature,
     // sellYDai, 
     // buyYDai,
 

@@ -1,8 +1,8 @@
 import React from 'react';
-import { Box, Text, ThemeContext } from 'grommet';
-import { PulseLoader, RingLoader } from 'react-spinners';
+import { Box, Text, TextArea, ThemeContext } from 'grommet';
 
-
+import {FiCopy as Copy} from 'react-icons/fi';
+import { ScaleLoader } from 'react-spinners';
 
 interface TransactionPendingProps {
   msg:string;
@@ -12,40 +12,60 @@ interface TransactionPendingProps {
 const TransactionPending = ({ msg, tx }:TransactionPendingProps) => {
 
   const theme:any = React.useContext(ThemeContext); 
+  const txRef = React.useRef<any>(null);
+
+  const handleCopy = () => {
+    console.log(txRef.current); 
+    // txRef.current?.innerText;
+    document.execCommand('copy');
+  };
 
   return (
-    <Box align='center' flex='grow' justify='between' gap='large'>
-      <Box gap='medium' align='center' fill='horizontal'>
-        <Text size='xlarge' color='brand' weight='bold'>Good One!</Text>
-        <Box
+
+    <Box
+      alignSelf="center"
+      fill
+      background="background-front"
+      round='small'
+      pad="large"
+      align='center'
+      gap='medium'
+    >
+
+      <Text size='xlarge' color='brand' weight='bold'>Transaction pending </Text>
+      <Text>{msg}</Text>
+
+      <ScaleLoader color={theme?.global?.colors?.brand.dark || 'grey'} height='25px' />
+
+      <Box
         // direction='row-responsive'
-          fill='horizontal'
-          gap='large'
+        fill='horizontal'
+        align='center'
+      >  
+        <Box 
+          round='small'
+          border='all'
+          hoverIndicator='brand-transparent'
+          onClick={()=>{ window.open( `https://rinkeby.etherscan.io/tx/${tx.tx.hash}`, '_blank');}} 
           align='center'
+          pad={{ horizontal:'large' }}
         >
-          <Text>{msg}</Text>
-          <Text>Your transaction is pending: </Text>
-          <Text size='xsmall'> { tx.tx.hash } </Text>
-
-          <RingLoader color={theme?.global?.colors?.brand.dark || 'grey'} />
-
-          <Box 
-            fill='horizontal'
-            round='small'
-            border='all'
-            // background='brand'
-            hoverIndicator='brand-transparent'
-            onClick={()=>console.log(tx)}
-            align='center'
-            pad='small'
+          <Text
+            size='xsmall'
+            weight='bold'
           >
-            <Text
-              weight='bold'
-            >
-              View on Etherscan
-            </Text>
-          </Box>
+            View on Etherscan
+          </Text>
         </Box>
+      </Box>
+      <Box direction='row' gap='xsmall'>
+        <Text size='xsmall' ref={txRef}> { tx.tx.hash } </Text>
+        <Box
+          onClick={()=>handleCopy()}
+        >
+          <Copy /> 
+        </Box>
+        
       </Box>
     </Box>
   );
