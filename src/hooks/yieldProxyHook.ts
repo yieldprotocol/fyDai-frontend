@@ -389,6 +389,7 @@ export const useProxy = () => {
     /* Contract interaction */
     let tx:any;
     let minDai:BigNumber;
+    let minYDai:BigNumber;
     setRemoveLiquidityActive(true);
     try {
       if ( !(await isMature(series.yDaiAddress)) ) {
@@ -403,7 +404,9 @@ export const useProxy = () => {
 
         // testing with slippage etc. 
         minDai = ethers.utils.parseEther('0');
-        tx = await proxyContract.removeLiquidityEarlyDaiPool(poolAddr, parsedTokens, minDai);
+        minYDai = ethers.utils.parseEther('0');
+
+        tx = await proxyContract.removeLiquidityEarlyDaiPool(poolAddr, parsedTokens, minDai, minYDai );
 
       } else {
         console.log('removing liquidity after maturity'); 
