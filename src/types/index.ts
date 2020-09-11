@@ -7,14 +7,14 @@ export interface IYieldSeries {
   maturity_: Date;
   
   poolAddress: string;
-  yDaiAddress: string;
+  eDaiAddress: string;
   liquidityProxyAddress: string;
   hasDelegatedPool: boolean;
 
   isMature: any; // function typeScript this out
   
-  yDaiBalance_: number;
-  yDaiBalance: BigNumber;
+  eDaiBalance_: number;
+  eDaiBalance: BigNumber;
 
   totalSupply?: BigNumber;
   totalSupply_?: number;
@@ -29,8 +29,8 @@ export interface IYieldSeries {
   seriesColor?: string;
   wethDebtDai?: BigNumber;
   wethDebtDai_?: number;
-  wethDebtYDai?: BigNumber;
-  wethDebtYDai_?: number;
+  wethDebtEDai?: BigNumber;
+  wethDebtEDai_?: number;
 
   yieldAPR?: number;
   yieldAPR_?: string;
@@ -62,8 +62,8 @@ export interface IUser {
   ethBalance_?: number;
   ethPosted?: BigNumber;
   ethPosted_?: number;
-  totalDebtYDai?: BigNumber;
-  totalDebtYDai_?: number;
+  totalDebtEDai?: BigNumber;
+  totalDebtEDai_?: number;
   ethAvailable?:BigNumber;
   ethAvailable_?:BigNumber;
 }

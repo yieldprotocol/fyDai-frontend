@@ -44,7 +44,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
   const debouncedInput = useDebounce(inputValue, 500);
   const [inputRef, setInputRef] = React.useState<any>(null);
   
-  const [ yDaiValue, setYDaiValue ] = React.useState<number>(0);
+  const [ yDaiValue, setEDaiValue ] = React.useState<number>(0);
 
   const [ withdrawDisabled, setWithdrawDisabled ] = useState<boolean>(true);
   const [ withdrawDaiPending, setWithdrawDaiPending] = useState<boolean>(false);
@@ -68,7 +68,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
 
   const getMaxWithdraw = async () => {
     setIsGettingMax(true);
-    const preview = await previewPoolTx('sellYDai', activeSeries, activeSeries.yDaiBalance_);
+    const preview = await previewPoolTx('sellEDai', activeSeries, activeSeries.eDaiBalance_);
     setIsGettingMax(false);
     if (!(preview instanceof Error)) {
       return parseFloat(ethers.utils.formatEther(preview)); 
@@ -93,7 +93,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
   useEffect(() => {
     activeSeries && debouncedInput && ( async () => {
       const preview = await previewPoolTx('buyDai', activeSeries, debouncedInput);
-      !(preview instanceof Error) && setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
+      !(preview instanceof Error) && setEDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
     })();
   }, [debouncedInput]);
 

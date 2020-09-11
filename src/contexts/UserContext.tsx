@@ -274,17 +274,17 @@ const UserProvider = ({ children }: any) => {
               maturity: parseInt(x.args_[0], 10),
               amount: Math.abs( parseFloat(ethers.utils.formatEther( x.args_[3] )) ),
               dai: x.args[3].abs(),
-              yDai: x.args[4].abs(),
+              eDai: x.args[4].abs(),
               APR: yieldAPR( x.args[3].abs(),  x.args[4].abs(), parseInt(x.args_[0], 10), x.date), 
               dai_: ethers.utils.formatEther( x.args_[3] ),
-              yDai_: ethers.utils.formatEther( x.args_[4] ),
+              eDai_: ethers.utils.formatEther( x.args_[4] ),
             };
           }); 
         });
       return [...acc, ..._seriesHist];
     }, Promise.resolve([]) );
     
-    // TODO : get blocknumber at initialisation of yDaiProtocol instead of using first block(0).
+    // TODO : get blocknumber at initialisation of eDaiProtocol instead of using first block(0).
     console.log(
       'txHistory updated from block:',
           txHistory?.lastBlock + 1 || 0,

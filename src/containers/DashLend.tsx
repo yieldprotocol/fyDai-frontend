@@ -44,8 +44,8 @@ const DashLend = () => {
   const [ currentValue, setCurrentValue ] = React.useState<number>(0);
 
   React.useEffect(() => {
-    activeSeries?.yDaiBalance_>0 && ( async ()=> {
-      const preview = await previewPoolTx('SellYDai', activeSeries, activeSeries.yDaiBalance_);
+    activeSeries?.eDaiBalance_>0 && ( async ()=> {
+      const preview = await previewPoolTx('SellEDai', activeSeries, activeSeries.eDaiBalance_);
       !(preview instanceof Error) && setCurrentValue( parseFloat(ethers.utils.formatEther(preview)));
     })();
   }, [ activeSeries, ]);
@@ -99,7 +99,7 @@ const DashLend = () => {
             </Box>
             <Box>
               <Text alignSelf='start' size='xsmall' color='brand'>
-                {activeSeries?.yDaiBalance_.toFixed(2)}
+                {activeSeries?.eDaiBalance_.toFixed(2)}
               </Text>
             </Box>
           </Box>}           
@@ -167,7 +167,7 @@ const DashLend = () => {
               </Box>
               <Box>
                 <Text color='text-weak' size='xsmall'>Total Value at Maturity</Text> 
-                <Text color='brand' weight='bold' size='large'>{activeSeries?.yDaiBalance_.toFixed(2)}</Text> 
+                <Text color='brand' weight='bold' size='large'>{activeSeries?.eDaiBalance_.toFixed(2)}</Text> 
               </Box>
             </Box>
           </Box>

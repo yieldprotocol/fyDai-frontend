@@ -16,7 +16,7 @@ import { useMigrations } from '../hooks/migrationHook';
 
 const YieldContext = React.createContext<any>({});
 
-const yDaiList = ['yDai0', 'yDai1', 'yDai2', 'yDai3'];
+const eDaiList = ['eDai0', 'eDai1', 'eDai2', 'eDai3'];
 const seriesColors = ['#726a95', '#709fb0', '#a0c1b8', '#f4ebc1', '#3f51b5', '#5677fc', '#03a9f4'];
 const contractList = [
   'Controller',
@@ -115,19 +115,19 @@ const YieldProvider = ({ children }: any) => {
         _deployedContracts = cachedContracts;
       }
 
-      if (!cachedSeries || (cachedSeries.length !== yDaiList.length) || forceUpdate) {
+      if (!cachedSeries || (cachedSeries.length !== eDaiList.length) || forceUpdate) {
         // TODO: better implementation of iterating through series (possibly a list length from contracts function?)
-        const _list = await getAddresses(yDaiList);
+        const _list = await getAddresses(eDaiList);
         const _seriesList = Array.from(_list.values());
 
         await Promise.all(
           _seriesList.map(async (x: string, i: number) => {
-            const name = await callTx(x, 'YDai', 'name', []);
-            const maturity = await callTx(x, 'YDai', 'maturity', []);
+            const name = await callTx(x, 'EDai', 'name', []);
+            const maturity = await callTx(x, 'EDai', 'maturity', []);
             const _peripheralAddrs = await getAddresses([ `${name}-Pool` ]);
             const poolAddress = _peripheralAddrs.get(`${name}-Pool`);
             return {
-              yDaiAddress: x,
+              eDaiAddress: x,
               name,
               maturity: maturity.toNumber(),
               poolAddress,

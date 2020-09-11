@@ -66,25 +66,25 @@ const SeriesProvider = ({ children }:any) => {
   const _getRates = async (seriesArr:IYieldSeries[]) => {
     /* 
       Rates:
-        sellYDai -> Returns how much Dai would be obtained by selling 1 yDai
-        buyDai -> Returns how much yDai would be required to buy 1 Dai
-        buyYDai -> Returns how much Dai would be required to buy 1 yDai
-        sellDai -> Returns how much yDai would be obtained by selling 1 Dai
+        sellEDai -> Returns how much Dai would be obtained by selling 1 eDai
+        buyDai -> Returns how much eDai would be required to buy 1 Dai
+        buyEDai -> Returns how much Dai would be required to buy 1 eDai
+        sellDai -> Returns how much eDai would be obtained by selling 1 Dai
     */
     const _ratesData = await Promise.all(
       seriesArr.map( async (x:IYieldSeries, i:number) => {
         console.log('rates got')
         const _x = { ...x, isMature: ()=>( x.maturity < Math.round(new Date().getTime() / 1000)) };
-        const [ sellYDai, buyYDai, sellDai, buyDai ] = await Promise.all([
-          await previewPoolTx('sellYDai', _x, 1),
-          // await previewPoolTx('buyYDai', _x, 1),
+        const [ sellEDai, buyEDai, sellDai, buyDai ] = await Promise.all([
+          await previewPoolTx('sellEDai', _x, 1),
+          // await previewPoolTx('buyEDai', _x, 1),
           // await previewPoolTx('sellDai', _x, 1),
           // await previewPoolTx('buyDai', _x, 1),
         ]);
         return {
           maturity: x.maturity,
-          sellYDai: !(sellYDai instanceof Error)? sellYDai : BigNumber.from('0'),
-          // buyYDai: !(buyYDai instanceof Error)? buyYDai : BigNumber.from('0'),
+          sellEDai: !(sellEDai instanceof Error)? sellEDai : BigNumber.from('0'),
+          // buyEDai: !(buyEDai instanceof Error)? buyEDai : BigNumber.from('0'),
           // sellDai: !(sellDai instanceof Error)? sellDai : BigNumber.from('0'),
           // buyDai: !(buyDai instanceof Error)? buyDai : BigNumber.from('0'),
         };
@@ -95,8 +95,8 @@ const SeriesProvider = ({ children }:any) => {
       return acc.set(
         x.maturity,
         { ...x,
-          sellYDai_: parseFloat(ethers.utils.formatEther(x.sellYDai.toString())),
-          // buyYDai_: parseFloat(ethers.utils.formatEther(x.buyYDai.toString())),
+          sellEDai_: parseFloat(ethers.utils.formatEther(x.sellEDai.toString())),
+          // buyEDai_: parseFloat(ethers.utils.formatEther(x.buyEDai.toString())),
           // sellDai_: parseFloat(ethers.utils.formatEther(x.sellDai.toString())),
           // buyDai_: parseFloat(ethers.utils.formatEther(x.buyDai.toString())),
         }
@@ -116,13 +116,13 @@ const SeriesProvider = ({ children }:any) => {
         const _rates = rates.get(x.maturity);
         _seriesData.push(x);
         try {
-          _seriesData[i].yieldAPR = yieldAPR(_rates.sellYDai, ethers.utils.parseEther('1'), x.maturity);       
+          _seriesData[i].yieldAPR = yieldAPR(_rates.sellEDai, ethers.utils.parseEther('1'), x.maturity);       
           _seriesData[i].totalSupply = await callTx(x.poolAddress, 'Pool', 'totalSupply', []);
           _seriesData[i].poolTokens = account? await callTx(x.poolAddress, 'Pool', 'balanceOf', [account]): BigNumber.from('0') ;               
           _seriesData[i].hasDelegatedPool = account? await checkPoolDelegate(x.poolAddress, deployedContracts.YieldProxy): null;            
           _seriesData[i].ethDebtDai = account? await debtDai('ETH-A', x.maturity ): BigNumber.from('0') ;     
-          _seriesData[i].ethDebtYDai = account? await callTx(deployedContracts.Controller, 'Controller', 'debtYDai', [utils.ETH, x.maturity, account]): BigNumber.from('0');
-          _seriesData[i].yDaiBalance = account? await callTx(x.yDaiAddress, 'YDai', 'balanceOf', [account]): BigNumber.from('0') ;
+          _seriesData[i].ethDebtEDai = account? await callTx(deployedContracts.Controller, 'Controller', 'debtEDai', [utils.ETH, x.maturity, account]): BigNumber.from('0');
+          _seriesData[i].eDaiBalance = account? await callTx(x.eDaiAddress, 'EDai', 'balanceOf', [account]): BigNumber.from('0') ;
           _seriesData[i].isMature = ()=>( x.maturity < Math.round(new Date().getTime() / 1000));
         } catch (e) {
           console.log(`Could not load account positions data: ${e}`);
@@ -135,8 +135,8 @@ const SeriesProvider = ({ children }:any) => {
         x.maturity,
         { ...x,
           totalSupply_: parseFloat(ethers.utils.formatEther(x.totalSupply.toString())),
-          yDaiBalance_: parseFloat(ethers.utils.formatEther(x.yDaiBalance.toString())),
-          ethDebtYDai_: parseFloat(ethers.utils.formatEther(x.ethDebtYDai.toString())),
+          eDaiBalance_: parseFloat(ethers.utils.formatEther(x.eDaiBalance.toString())),
+          ethDebtEDai_: parseFloat(ethers.utils.formatEther(x.ethDebtEDai.toString())),
           ethDebtDai_: parseFloat(ethers.utils.formatEther(x.ethDebtDai.toString())),
           poolTokens_: parseFloat(ethers.utils.formatEther(x.poolTokens.toString())),
           poolPercent_: poolPercent(x.totalSupply, x.poolTokens),

@@ -69,7 +69,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
   const [inputRef, setInputRef] = React.useState<any>(null);
 
   /* token balances and calculated values */
-  const [ yDaiValue, setYDaiValue ] = React.useState<number>(0);
+  const [ eDaiValue, setEDaiValue ] = React.useState<number>(0);
   const [ APR, setAPR ] = React.useState<number>();
   const [ estRatio, setEstRatio ] = React.useState<any>(0);
 
@@ -79,7 +79,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
   const borrowProcedure = async (value:number|undefined, autoSell:boolean=true) => {
     if (value&&value>0 && !borrowDisabled) {
       setBorrowPending(true);
-      autoSell && await borrowDai(activeSeries, 'ETH-A', yDaiValue, value);
+      autoSell && await borrowDai(activeSeries, 'ETH-A', eDaiValue, value);
       !autoSell && await borrow('ETH-A', activeSeries.maturity, value);
       setInputValue(undefined);
       await Promise.all([
@@ -92,7 +92,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
 
   /* 
   * Handle input (debounced input) changes:
-  * 1. dai to yDai conversion and get APR (yDai needed to compare with the approved allowance)
+  * 1. dai to eDai conversion and get APR (eDai needed to compare with the approved allowance)
   * 2. calcalute yield APR
   * 3. calculate estimated collateralisation ration
   */
@@ -101,15 +101,15 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
       const newRatio = estimateRatio(position.ethPosted_, ( position.debtValue_+ parseFloat(debouncedInput)) ); 
       newRatio && setEstRatio(newRatio.toFixed(0));
 
-      const preview = await previewPoolTx('buyDai', activeSeries, debouncedInput);
+      const preview = await previewPoolTx('bueDai', activeSeries, debouncedInput);
       if (!(preview instanceof Error)) {
-        setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
+        setEDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
         setAPR( yieldAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries.maturity ) );      
       } else {
         /* if the market doesnt have liquidity just estimate from rate */
-        const rate = await previewPoolTx('buyDai', activeSeries, 1);
-        !(rate instanceof Error) && setYDaiValue(debouncedInput*parseFloat((ethers.utils.formatEther(rate))));
-        (rate instanceof Error) && setYDaiValue(0);
+        const rate = await previewPoolTx('bueDai', activeSeries, 1);
+        !(rate instanceof Error) && setEDaiValue(debouncedInput*parseFloat((ethers.utils.formatEther(rate))));
+        (rate instanceof Error) && setEDaiValue(0);
         setBorrowDisabled(true);
         setErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
       }
@@ -155,10 +155,10 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
           <InfoGrid entries={[
             {
               label: 'Current Debt',
-              visible: !txActive && !!account && activeSeries && !activeSeries?.isMature() || (activeSeries?.isMature() && activeSeries?.ethDebtYDai_ > 0 ),
+              visible: !txActive && !!account && activeSeries && !activeSeries?.isMature() || (activeSeries?.isMature() && activeSeries?.ethDebtEDai_ > 0 ),
               active: true,
               loading: borrowPending,    
-              value: activeSeries?.ethDebtYDai_? `${activeSeries.ethDebtYDai_.toFixed(2)} DAI`: '0 DAI',
+              value: activeSeries?.ethDebtEDai_? `${activeSeries.ethDebtEDai_.toFixed(2)} DAI`: '0 DAI',
               valuePrefix: null,
               valueExtra: null, 
             },
@@ -173,7 +173,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
             },
             {
               label: 'Repay Debt',
-              visible: !txActive && !!account && activeSeries?.isMature() && activeSeries?.ethDebtYDai_ > 0,
+              visible: !txActive && !!account && activeSeries?.isMature() && activeSeries?.ethDebtEDai_ > 0,
               active: true,
               loading: false,    
               value: '',
@@ -233,7 +233,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
                   visible: true,
                   active: !!inputValue&&inputValue>0,
                   loading: false,          
-                  value: `${yDaiValue.toFixed(2)} DAI`,
+                  value: `${eDaiValue.toFixed(2)} DAI`,
                   valuePrefix: null,
                   // valueExtra: () => (
                   //   <Text size='xxsmall'>

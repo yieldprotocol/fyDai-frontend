@@ -1,6 +1,6 @@
 import React from 'react';
 import { ethers, BigNumber }  from 'ethers';
-import YDai from '../contracts/YDai.json';
+import EDai from '../contracts/EDai.json';
 
 import { NotifyContext } from '../contexts/NotifyContext';
 import { useSignerAccount } from './connectionHooks';
@@ -12,23 +12,23 @@ import { useTxHelpers } from './appHooks';
  * @returns { function } redeem
  * @returns { boolean } redeemActive
  */
-export const useYDai = () => {
+export const useEDai = () => {
 
   // const { state: { signer, account } } = React.useContext(ConnectionContext);
   const { provider, signer, account } = useSignerAccount();
-  const { abi: yDaiAbi } = YDai;
+  const { abi: eDaiAbi } = EDai;
   const  { dispatch }  = React.useContext<any>(NotifyContext);
   const [ redeemActive, setRedeemActive ] = React.useState<boolean>(false);
 
   const { handleTx, handleTxError } = useTxHelpers();
 
   /**
-   * @dev Redeems yDai for dai after maturity
-   * @param {string} yDaiAddress address of the yDai series to redeem from.
-   * @param {BigNumber} amount in exact yDai available to burn
+   * @dev Redeems eDai for dai after maturity
+   * @param {string} eDaiAddress address of the eDai series to redeem from.
+   * @param {BigNumber} amount in exact eDai available to burn
    */
   const redeem = async (
-    yDaiAddress:string,
+    eDaiAddress:string,
     amount: number
   ) => {
     let tx:any;
@@ -36,10 +36,10 @@ export const useYDai = () => {
     const parsedAmount = amount;
     const fromAddr = account && ethers.utils.getAddress(account);
     const toAddr = fromAddr;
-    const yDaiAddr = ethers.utils.getAddress(yDaiAddress);
+    const eDaiAddr = ethers.utils.getAddress(eDaiAddress);
 
     setRedeemActive(true);
-    const contract = new ethers.Contract( yDaiAddr, yDaiAbi, signer );
+    const contract = new ethers.Contract( eDaiAddr, eDaiAbi, signer );
     try {
       tx = await contract.redeem(fromAddr, toAddr, parsedAmount);
     } catch (e) {
@@ -53,20 +53,20 @@ export const useYDai = () => {
   };
 
   /**
-   * @dev User yDai token allowance
-   * @param {string} yDaiAddress address of the yDai series .
+   * @dev User eDai token allowance
+   * @param {string} eDaiAddress address of the eDai series .
    * @param {string} poolAddress address of the pool.
    * @returns {number} allowance amount
    */
   const userAllowance = async (
-    yDaiAddress:string,
+    eDaiAddress:string,
     poolAddress: string
   ) => {
     if (account) {
       const fromAddr = account && ethers.utils.getAddress(account);
-      const yDaiAddr = ethers.utils.getAddress(yDaiAddress);
+      const eDaiAddr = ethers.utils.getAddress(eDaiAddress);
       const poolAddr = ethers.utils.getAddress(poolAddress);
-      const contract = new ethers.Contract( yDaiAddr, yDaiAbi, provider );
+      const contract = new ethers.Contract( eDaiAddr, eDaiAbi, provider );
       let res;
       try {
         res = await contract.allowance(fromAddr, poolAddr);
@@ -81,15 +81,15 @@ export const useYDai = () => {
   };
 
   /**
-   * @dev yDai Series is Mature or not?
-   * @param {string} yDaiAddress address of the yDai series to check.
+   * @dev eDai Series is Mature or not?
+   * @param {string} eDaiAddress address of the eDai series to check.
    * @returns {boolean}
    */
   const isMature = async (
-    yDaiAddress:string,
+    eDaiAddress:string,
   ) => {
-    const yDaiAddr = ethers.utils.getAddress(yDaiAddress);
-    const contract = new ethers.Contract( yDaiAddr, yDaiAbi, provider );
+    const eDaiAddr = ethers.utils.getAddress(eDaiAddress);
+    const contract = new ethers.Contract( eDaiAddr, eDaiAbi, provider );
     let res;
     try {
       res = await contract.isMature();

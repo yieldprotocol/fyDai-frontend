@@ -22,19 +22,19 @@ export const usePool = () => {
   const { handleTx, handleTxError } = useTxHelpers();
 
   /**
-   * @dev Sell yDai for Dai ( Chai )
+   * @dev Sell eDai for Dai ( Chai )
    * @note NOT limit pool
    * 
-   * @param {string} poolAddress address of the yDai market series
-   * @param {number} yDaiIn Amount of yDai being sold that will be taken from the user's wallet (in human numbers)
+   * @param {string} poolAddress address of the eDai market series
+   * @param {number} eDaiIn Amount of eDai being sold that will be taken from the user's wallet (in human numbers)
    *
    * @return Amount of chai that will be deposited on `to` wallet
    */
-  const sellYDai = async (
+  const sellEDai = async (
     poolAddress:string,
-    yDaiIn: number,
+    eDaiIn: number,
   ) => {
-    const parsedAmount = ethers.utils.parseEther(yDaiIn.toString());
+    const parsedAmount = ethers.utils.parseEther(eDaiIn.toString());
     const fromAddr = account && ethers.utils.getAddress(account);
     const toAddr = fromAddr;
     const marketAddr = ethers.utils.getAddress(poolAddress);
@@ -48,33 +48,33 @@ export const usePool = () => {
     setSellActive(true);
     const contract = new ethers.Contract( marketAddr, poolAbi, signer );
     try {
-      tx = await contract.sellYDai(fromAddr, toAddr, parsedAmount, overrides);
+      tx = await contract.sellEDai(fromAddr, toAddr, parsedAmount, overrides);
     } catch (e) {
-      handleTxError('Error Selling yDai', tx, e);
+      handleTxError('Error Selling eDai', tx, e);
       setSellActive(false);
       return;
     }
-    dispatch({ type: 'txPending', payload:{ tx, message: `Sell yDai ${yDaiIn} pending...`, type:'SELL' } } );
+    dispatch({ type: 'txPending', payload:{ tx, message: `Sell eDai ${eDaiIn} pending...`, type:'SELL' } } );
     await handleTx(tx);
     setSellActive(false);
   };
 
 
   /**
-   * @dev Buy yDai with dai/chai
+   * @dev Buy eDai with dai/chai
    * @note NOT limit pool
    *
-   * @param {string} poolAddress address of the yDai series market.
-   * @param {number} yDaiOut Amount of yDai being bought that will be deposited in `to` wallet
+   * @param {string} poolAddress address of the eDai series market.
+   * @param {number} eDaiOut Amount of eDai being bought that will be deposited in `to` wallet
    * @return Amount of chai/Dai that will be taken from `from` wallet
    */
-  const buyYDai = async (
-    yDaiAddress:string,
+  const buyEDai = async (
+    eDaiAddress:string,
     poolAddress:string,
-    yDaiOut: number
+    eDaiOut: number
   ) => {
-    const parsedAmount = ethers.utils.parseEther(yDaiOut.toString());
-    const fromAddr = ethers.utils.getAddress(yDaiAddress);
+    const parsedAmount = ethers.utils.parseEther(eDaiOut.toString());
+    const fromAddr = ethers.utils.getAddress(eDaiAddress);
     const toAddr = account && ethers.utils.getAddress(account);
     const marketAddr = ethers.utils.getAddress(poolAddress);
     const overrides = { 
@@ -86,25 +86,25 @@ export const usePool = () => {
     setSellActive(true);
     const contract = new ethers.Contract( marketAddr, poolAbi, signer );
     try {
-      tx = await contract.buyYDai(fromAddr, toAddr, parsedAmount, overrides);
+      tx = await contract.buyEDai(fromAddr, toAddr, parsedAmount, overrides);
     } catch (e) {
-      handleTxError('Error Buying yDai', tx, e);
+      handleTxError('Error Buying eDai', tx, e);
       setSellActive(false);
       return;
     }
-    dispatch({ type: 'txPending', payload:{ tx, message: `Buying yDai ${yDaiOut} pending...`, type:'BUY' } } );
+    dispatch({ type: 'txPending', payload:{ tx, message: `Buying eDai ${eDaiOut} pending...`, type:'BUY' } } );
     await handleTx(tx);
     setSellActive(false);
   };
 
   /**
-   * @dev Sell Dai/Chai for yDai
+   * @dev Sell Dai/Chai for eDai
    * @note NOT limit pool
    * 
-   * @param {string} poolAddress address of the yDai series market.
-   * @param {number} daiIn Amount of yDai being bought that will be deposited in `to` wallet
+   * @param {string} poolAddress address of the eDai series market.
+   * @param {number} daiIn Amount of eDai being bought that will be deposited in `to` wallet
    * @param {number} queue The number that this transaction is in the queue. // TODO extend the queue system globally
-   * @return Amount of yDai that will be deposited on `to` wallet
+   * @return Amount of eDai that will be deposited on `to` wallet
    * 
    */
   const sellDai = async (
@@ -139,15 +139,15 @@ export const usePool = () => {
 
 
   /**
-   * @dev Buy Dai/Chai with yDai
+   * @dev Buy Dai/Chai with eDai
    * @note NOT limit pool
    * 
-   * @param {string} yDaiAddress address of the yDai contract.
-   * @param {string} poolAddress address of the yDai series market.
+   * @param {string} eDaiAddress address of the eDai contract.
+   * @param {string} poolAddress address of the eDai series market.
    * @param {number} daiOut Amount of dai/chai being bought that will be deposited in `to` wallet
    * @param {number} queue The number that this transaction is in the queue. // TODO extend the queue system globally
    * 
-   * @return Amount of yDai that will be taken from `from` wallet
+   * @return Amount of eDai that will be taken from `from` wallet
    *
    */
   const buyDai = async (
@@ -243,18 +243,18 @@ export const usePool = () => {
   /**
    * @dev Preview buy/sell transactions
    * 
-   * sellYDai -> Returns how much Dai would be obtained by selling x yDai
-   * buyDai -> Returns how much yDai would be required to buy x Dai
-   * buyYDai -> Returns how much Dai would be required to buy x yDai
-   * sellDai -> Returns how much yDai would be obtained by selling x Dai
+   * sellEDai -> Returns how much Dai would be obtained by selling x eDai
+   * buyDai -> Returns how much eDai would be required to buy x Dai
+   * buyEDai -> Returns how much Dai would be required to buy x eDai
+   * sellDai -> Returns how much eDai would be obtained by selling x Dai
    * 
    * @param {string} txType string represnting transaction type //TODO tyescript it out
-   * @param {IYieldSeries} series yDai series to redeem from.
+   * @param {IYieldSeries} series eDai series to redeem from.
    * @param {number | BigNumber} amount input to preview
    * 
    * @note NB NB if in BigNumber must be in wei
    *  
-   * @returns {BigNumber| null} BigNumber in WEI/WAD precision - Dai or yDai (call dependent)
+   * @returns {BigNumber| null} BigNumber in WEI/WAD precision - Dai or eDai (call dependent)
    * 
    * @note call function 
    */
@@ -277,9 +277,9 @@ export const usePool = () => {
           case 'SELLDAI': 
             value = await contract.sellDaiPreview(parsedAmount); break;
           case 'BUYYDAI':
-            value = await contract.buyYDaiPreview(parsedAmount); break;
+            value = await contract.buyEDaiPreview(parsedAmount); break;
           case 'SELLYDAI':
-            value = await contract.sellYDaiPreview(parsedAmount); break;
+            value = await contract.sellEDaiPreview(parsedAmount); break;
           default: 
             value = await BigNumber.from('0');
         } 
@@ -315,8 +315,8 @@ export const usePool = () => {
   };
 
   return {  
-    sellYDai,
-    buyYDai,
+    sellEDai,
+    buyEDai,
     sellDai,
     buyDai, 
     sellActive, 

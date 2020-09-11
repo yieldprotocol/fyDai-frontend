@@ -61,7 +61,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
   const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
 
   const [ APR, setAPR ] = React.useState<number>();
-  const [ yDaiValue, setYDaiValue ] = React.useState<number>(0);
+  const [ eDaiValue, setEDaiValue ] = React.useState<number>(0);
   const [ currentValue, setCurrentValue ] = React.useState<number>(0);
   
   /* Lend execution flow */
@@ -83,17 +83,17 @@ const Lend = ({ lendAmount }:ILendProps) => {
 
   /* Handle input (debounce input) changes */
   useEffect(() => {
-    activeSeries && !(activeSeries.isMature()) && debouncedInput && ( async () => {
+    activeSeries && !(activeSeries.isMature()) && !!debouncedInput && ( async () => {
       const preview = await previewPoolTx('sellDai', activeSeries, debouncedInput);
-      !(preview instanceof Error) && setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
+      !(preview instanceof Error) && setEDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
       !(preview instanceof Error) && setAPR( yieldAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries.maturity ) );
     })();
-  }, [debouncedInput]);
+  }, [activeSeries, debouncedInput]);
 
   /* handle active series loads and changes */
   useEffect(() => {
-    account && activeSeries?.yDaiBalance_ && !(activeSeries.isMature()) && ( async () => {
-      const preview = await previewPoolTx('SellYDai', activeSeries, activeSeries.yDaiBalance_);
+    account && activeSeries?.eDaiBalance_ && !(activeSeries.isMature()) && ( async () => {
+      const preview = await previewPoolTx('SellEDai', activeSeries, activeSeries.eDaiBalance_);
       !(preview instanceof Error) && setCurrentValue( parseFloat(ethers.utils.formatEther(preview)));
     })();
   }, [ activeSeries, account ]);
@@ -136,7 +136,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
             visible: !!account && !txActive,
             active: true,
             loading: lendPending,     
-            value: activeSeries && `${activeSeries?.yDaiBalance_.toFixed(2)} DAI` || '-',
+            value: activeSeries && `${activeSeries?.eDaiBalance_.toFixed(2)} DAI` || '-',
             valuePrefix: null,
             valueExtra: null, 
           },
@@ -212,7 +212,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
                 visible: true,
                 active: inputValue,
                 loading: false,           
-                value: `${yDaiValue.toFixed(2)} DAI`,
+                value: `${eDaiValue.toFixed(2)} DAI`,
                 valuePrefix: null,
                 valueExtra: null,
                 //   valueExtra: () => (
@@ -261,7 +261,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
               </Text>
             </Box>
 
-            { activeSeries?.yDaiBalance_ > 0 &&
+            { activeSeries?.eDaiBalance_ > 0 &&
             <Box alignSelf='end'>
               <Box
                 round

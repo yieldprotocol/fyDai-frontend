@@ -4,7 +4,7 @@ import { ethers }  from 'ethers';
 
 import { useSignerAccount } from './connectionHooks';
 
-import YDai from '../contracts/YDai.json';
+import EDai from '../contracts/EDai.json';
 import Controller from '../contracts/Controller.json';
 import TestDai from '../contracts/TestDai.json';
 import WETH9 from '../contracts/WETH9.json';
@@ -18,7 +18,7 @@ import Pool from '../contracts/Pool.json';
 
 // TODO abstract this out to a higher level
 const contractMap = new Map<string, any>([
-  ['YDai', YDai.abi],
+  ['EDai', EDai.abi],
   ['Controller', Controller.abi],
   ['Dai', TestDai.abi],
   ['Weth', WETH9.abi],

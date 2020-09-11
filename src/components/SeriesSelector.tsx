@@ -29,8 +29,8 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
 
 
   const viewMap = new Map([
-    ['BORROW', { head: 'DEBT', field: 'ethDebtYDai_' }],
-    ['LEND', { head: 'BALANCE', field: 'yDaiBalance_' }],
+    ['BORROW', { head: 'DEBT', field: 'ethDebtEDai_' }],
+    ['LEND', { head: 'BALANCE', field: 'eDaiBalance_' }],
     ['POOL', { head: 'POOL PERCENTAGE', field: 'poolPercent_' }],
   ]);
 

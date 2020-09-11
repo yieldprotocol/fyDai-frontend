@@ -47,7 +47,7 @@ function Repay({ setActiveView, repayAmount }:IRepayProps) {
   const debouncedInput = useDebounce(inputValue, 500);
   const [inputRef, setInputRef] = React.useState<any>(null);
 
-  const [ yDaiValue, setYDaiValue ] = React.useState<any>();
+  const [ eDaiValue, setEDaiValue ] = React.useState<any>();
 
   const [ repayPending, setRepayPending ] = React.useState<boolean>(false);
   const [ repayDisabled, setRepayDisabled ] = React.useState<boolean>(true);
@@ -69,17 +69,17 @@ function Repay({ setActiveView, repayAmount }:IRepayProps) {
     }
   };
 
-  /* Handle dai to yDai conversion  (needed to set a min yDai value for repayment) */
+  /* Handle dai to eDai conversion  (needed to set a min eDai value for repayment) */
   useEffect(() => {
     activeSeries && debouncedInput > 0 && ( async () => {
       const preview = await previewPoolTx('sellDai', activeSeries, debouncedInput);
       if (!(preview instanceof Error)) {
-        setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
+        setEDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
       } else {
         console.log(preview);
         /* if the market doesnt have liquidity just estimate from rate */
         const rate = await previewPoolTx('sellDai', activeSeries, 1);
-        !(rate instanceof Error) && setYDaiValue(debouncedInput* parseFloat((ethers.utils.formatEther(rate))) );
+        !(rate instanceof Error) && setEDaiValue(debouncedInput* parseFloat((ethers.utils.formatEther(rate))) );
       }
     })();
   }, [debouncedInput]);
@@ -125,7 +125,7 @@ function Repay({ setActiveView, repayAmount }:IRepayProps) {
             visible: !!account && !txActive,
             active: true,
             loading: repayPending,     
-            value: activeSeries?.ethDebtYDai_? `${activeSeries.ethDebtYDai_.toFixed(2)} DAI`: '0 DAI',
+            value: activeSeries?.ethDebtEDai_? `${activeSeries.ethDebtEDai_.toFixed(2)} DAI`: '0 DAI',
             valuePrefix: null,
             valueExtra: null, 
           },
@@ -155,7 +155,7 @@ function Repay({ setActiveView, repayAmount }:IRepayProps) {
         <Box flex='grow' justify='between'>
           <Box gap='medium' align='center' fill='horizontal'>
 
-            { (activeSeries?.ethDebtYDai_.toFixed(2) > 0) ?
+            { (activeSeries?.ethDebtEDai_.toFixed(2) > 0) ?
              
               <Box gap='medium' align='center' fill='horizontal'>
                 <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to Repay</Text>
@@ -173,7 +173,7 @@ function Repay({ setActiveView, repayAmount }:IRepayProps) {
                   <Button 
                     label={<Text size='xsmall' color='brand'> {screenSize !== 'small' ? 'Repay Maximum': 'Max'}</Text>}
                     color='brand-transparent'
-                    onClick={()=>setInputValue(activeSeries?.ethDebtYDai_)}
+                    onClick={()=>setInputValue(activeSeries?.ethDebtEDai_)}
                     hoverIndicator='brand-transparent'
                   />
                 </InputWrap>    

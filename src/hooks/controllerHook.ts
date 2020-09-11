@@ -123,8 +123,8 @@ export const useController = () => {
   };
 
   /**
-   * Borrow yDai with available, posted collateral directly (any type of collateral).
-   * @note Direct transaction with no pool trading (doesn't automatically sell yDai for Dai)
+   * Borrow eDai with available, posted collateral directly (any type of collateral).
+   * @note Direct transaction with no pool trading (doesn't automatically sell eDai for Dai)
    * 
    * @param {string} collateral 'ETH-A' || 'CHAI' (use ETH-A for ETH collateral)
    * @param {string} maturity UNIX timestamp as a string
@@ -159,12 +159,12 @@ export const useController = () => {
   };
 
   /**
-   * Repay yDai debt directly with either Dai or YDai.
+   * Repay eDai debt directly with either Dai or EDai.
    * @note Direct transaction with no pool trading.
    * 
    * @param {string} collateral 'ETH-A' || 'CHAI' (use ETH-A for ETH collateral pool)
    * @param {string} maturity UNIX timestamp as a string
-   * @param {number} amount to repay - either yDai or Dai (in human understandable numbers)
+   * @param {number} amount to repay - either eDai or Dai (in human understandable numbers)
    * @param {string} type 'YDAI' || 'DAI' token used to pay back debt
    */
   const repay = async (
@@ -185,7 +185,7 @@ export const useController = () => {
     setRepayActive(true);
     try {
       if (typeCaps === 'YDAI') {
-        tx = await controllerContract.repayYDai(collateralBytes, maturity, fromAddr, toAddr, parsedAmount);
+        tx = await controllerContract.repayEDai(collateralBytes, maturity, fromAddr, toAddr, parsedAmount);
       } else if (typeCaps === 'DAI') {
         tx = await controllerContract.repayDai(collateralBytes, maturity, fromAddr, toAddr, parsedAmount);
       }

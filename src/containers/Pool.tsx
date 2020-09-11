@@ -78,8 +78,8 @@ const Pool = (props:IPoolProps) => {
     debouncedInput&& ( async () => {
       // const bnInp = ethers.utils.parseEther(inputValue)
       // const daiReserves = await getBalance(deployedContracts.Dai, 'Dai', activeSeries.poolAddress);
-      // const yDaiReserves = await getBalance(activeSeries.yDaiAddress, 'YDai', activeSeries.poolAddress);
-      // const tokens = bnInp.mul(daiReserves).div(yDaiReserves.add(daiReserves));
+      // const eDaiReserves = await getBalance(activeSeries.eDaiAddress, 'EDai', activeSeries.poolAddress);
+      // const tokens = bnInp.mul(daiReserves).div(eDaiReserves.add(daiReserves));
     })();
   }, [debouncedInput]);
   
