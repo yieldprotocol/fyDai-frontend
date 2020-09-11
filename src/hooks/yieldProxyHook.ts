@@ -326,7 +326,7 @@ export const useProxy = () => {
     const parsedDaiUsed = BigNumber.isBigNumber(daiUsed)? daiUsed : ethers.utils.parseEther(daiUsed.toString());
 
     const overrides = { 
-      // gasLimit: BigNumber.from('500000')
+      // gasLimit: BigNumber.from('1000000')
     };
 
     /* calculate minimum expected yDai value and factor in slippage */
