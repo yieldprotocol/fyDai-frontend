@@ -9,7 +9,7 @@ import { useSignerAccount } from './connectionHooks';
 
 import EDai from '../contracts/EDai.json';
 import Controller from '../contracts/Controller.json';
-import TestDai from '../contracts/TestDai.json';
+import Dai from '../contracts/Dai.json';
 import WETH9 from '../contracts/WETH9.json';
 import GemJoin from '../contracts/GemJoin.json';
 import DaiJoin from '../contracts/DaiJoin.json';
@@ -26,7 +26,7 @@ import { useTxHelpers } from './appHooks';
 const contractMap = new Map<string, any>([
   ['EDai', EDai.abi],
   ['Controller', Controller.abi],
-  ['Dai', TestDai.abi],
+  ['Dai', Dai.abi],
   ['Weth', WETH9.abi],
   ['Chai', Chai.abi],
   ['WethJoin', GemJoin.abi],

@@ -8,6 +8,7 @@ import Migration from '../contracts/Migrations.json';
 const migrationAddrs = new Map([
   [1, process.env.REACT_APP_MIGRATION_1],
   [4, process.env.REACT_APP_MIGRATION_4 ],
+  [42, process.env.REACT_APP_MIGRATION_42 ],
   [1337, process.env.REACT_APP_MIGRATION_1337 ],
   [31337, process.env.REACT_APP_MIGRATION_31337 ],
 ]);
