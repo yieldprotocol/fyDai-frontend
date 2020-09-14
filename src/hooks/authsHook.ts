@@ -210,7 +210,7 @@ export const useAuth = () => {
       daiSig = ethers.utils.joinSignature(dResult);
       dispatch({ type: 'signed', payload: auths.get(4) });
 
-      /* yDAi permit proxy */
+      /* eDai permit proxy */
       // @ts-ignore
       const yResult = await signERC2612Permit(provider.provider, eDaiAddr, fromAddr, proxyAddr, MAX_INT);
       eDaiSig = ethers.utils.joinSignature(yResult);

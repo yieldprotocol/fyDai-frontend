@@ -165,7 +165,7 @@ export const useController = () => {
    * @param {string} collateral 'ETH-A' || 'CHAI' (use ETH-A for ETH collateral pool)
    * @param {string} maturity UNIX timestamp as a string
    * @param {number} amount to repay - either eDai or Dai (in human understandable numbers)
-   * @param {string} type 'YDAI' || 'DAI' token used to pay back debt
+   * @param {string} type 'EDAI' || 'DAI' token used to pay back debt
    */
   const repay = async (
     collateral:string,
@@ -184,7 +184,7 @@ export const useController = () => {
     let tx:any;
     setRepayActive(true);
     try {
-      if (typeCaps === 'YDAI') {
+      if (typeCaps === 'EDAI') {
         tx = await controllerContract.repayEDai(collateralBytes, maturity, fromAddr, toAddr, parsedAmount);
       } else if (typeCaps === 'DAI') {
         tx = await controllerContract.repayDai(collateralBytes, maturity, fromAddr, toAddr, parsedAmount);

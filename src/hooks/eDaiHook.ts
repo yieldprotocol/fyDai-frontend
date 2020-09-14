@@ -8,7 +8,7 @@ import { useTxHelpers } from './appHooks';
 
 
 /**
- * Hook for interacting with the yield 'YDAI' Contract
+ * Hook for interacting with the yield 'eDAI' Contract
  * @returns { function } redeem
  * @returns { boolean } redeemActive
  */
