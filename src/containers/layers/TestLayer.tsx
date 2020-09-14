@@ -363,6 +363,37 @@ const TestLayer = (props:any) => {
 
         </Box>
 
+        <Box direction='row' justify='between' border='all' pad='small' gap='small'>
+          Pool init : 
+          <Button 
+            label='init pool0' 
+            primary
+            onClick={()=> sendTx(deployedSeries[0].poolAddress, 'Pool', 'init', [ethers.utils.parseEther('1'), {gasLimit:1000000}], ethers.BigNumber.from(0) )}
+          />
+
+          <Button 
+            label='init Pool1' 
+            primary
+            onClick={()=> sendTx(deployedSeries[1].poolAddress, 'Pool', 'init', [ethers.utils.parseEther('1'), {gasLimit:1000000}], ethers.BigNumber.from(0) )}
+          />
+
+          <Button 
+            label='init pool2' 
+            primary
+            onClick={()=> sendTx(deployedSeries[2].poolAddress, 'Pool', 'init', [ethers.utils.parseEther('1'), {gasLimit:1000000}], ethers.BigNumber.from(0) )}
+
+          />
+
+          <Button 
+            label='init pool3' 
+            primary
+            onClick={()=> sendTx(deployedSeries[3].poolAddress, 'Pool', 'init', [ethers.utils.parseEther('1'), {gasLimit:1000000}], ethers.BigNumber.from(0) )}
+
+          />
+
+
+        </Box>
+
         <Footer pad='medium' gap='xsmall' direction='row' justify='between' align='center'>
           <Box round>
             <Button
