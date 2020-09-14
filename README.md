@@ -4,9 +4,9 @@ Front end for eDai
 
 ### Start a new locally served ganache instance to test the frontend UI:  
 
-1. Clone the eDai repositiory: https://github.com/yieldprotocol/eDai.git  (working commit: c034d70cf0a3bfa0cc9bcbed474c822115904d31 ):  
+1. Clone the eDai repositiory: https://github.com/yieldprotocol/eDai.git  (working commit: fb39fa771258a6634ec8614aafdca8d1d87150c1 ):  
 `git clone https://github.com/yieldprotocol/eDai.git`  
-`git reset --hard c034d70cf0a3bfa0cc9bcbed474c822115904d31`    
+`git reset --hard fb39fa771258a6634ec8614aafdca8d1d87150c1`    
 ( if you want to revert to the latest eDai, simply: `git pull` )
 
 2. Prepare necessary files ( in eDai root folder ):
