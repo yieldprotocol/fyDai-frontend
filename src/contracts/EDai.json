@@ -11928,12 +11928,12 @@
         }
       },
       "links": {},
-      "address": "0x099d9fF8F818290C8b5B7Db5bFca84CEebd2714c",
-      "transactionHash": "0x79dbeefe25bd3888d8919b6f54be3afd6b66de1a2d2ec11f5e9c51defaccd95c"
+      "address": "0x85bdE212E66e2BAE510E44Ed59116c1eC712795b",
+      "transactionHash": "0x081ddd90128a0e167da8953c08b29aa743afab047656c5b400d4bd548c326be6"
     }
   },
   "schemaVersion": "3.2.3",
-  "updatedAt": "2020-09-14T08:50:02.837Z",
+  "updatedAt": "2020-09-14T15:19:02.759Z",
   "networkType": "ethereum",
   "devdoc": {
     "details": "eDai is an eToken targeting Chai. Each eDai contract has a specific maturity time. One eDai is worth one Chai at or after maturity time. At maturity, the eDai can be triggered to mature, which records the current rate and chi from MakerDAO and enables redemption. Redeeming an eDai means burning it, and the contract will retrieve Dai from Treasury equal to one Dai times the growth in chi since maturity. eDai also tracks the MakerDAO stability fee accumulator at the time of maturity, and the growth since. This is not used internally. Minting and burning of eDai is restricted to orchestrated contracts. Redeeming and flash-minting is allowed to anyone.",

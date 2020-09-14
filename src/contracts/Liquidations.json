@@ -18428,12 +18428,12 @@
         }
       },
       "links": {},
-      "address": "0x79dC3dA279A2ADc72210BD00e10951AB9dC70ABc",
-      "transactionHash": "0x6c2bed4a56cd9dd277dd90245c1dd4c7fa2bc5a2bf5c96d2b748c84fb6a7bbfa"
+      "address": "0xF0B4ACda6D679ea22AC5C4fD1973D0d58eA10ec1",
+      "transactionHash": "0xec2f8d932c501ac729177f5149e9e15f4ff31da7cc87feadd887ceb9b7cdc8d5"
     }
   },
   "schemaVersion": "3.2.3",
-  "updatedAt": "2020-09-14T08:49:59.270Z",
+  "updatedAt": "2020-09-14T15:18:58.707Z",
   "networkType": "ethereum",
   "devdoc": {
     "details": "The Liquidations contract allows to liquidate undercollateralized weth vaults in a reverse Dutch auction. Undercollateralized vaults can be liquidated by calling `liquidate`. Collateral from vaults can be bought with Dai using `buy`. Debt and collateral records will be adjusted in the Controller using `controller.grab`. Dai taken in payment will be handed over to Treasury, and collateral assets bought will be taken from Treasury as well. If a vault becomes colalteralized, the liquidation can be stopped with `cancel`.",
