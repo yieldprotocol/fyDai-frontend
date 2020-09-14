@@ -158,78 +158,81 @@ const Pool = (props:IPoolProps) => {
         gap='medium'
       >
         <Box flex='grow' gap='small' align='center' fill='horizontal'>
-          
-          <Box fill gap='medium'>
-            <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Add liquidity</Text>
-            <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={addLiquidityDisabled}>
-              <TextInput
-                ref={(el:any) => {el && !removeLiquidityOpen && el.focus(); setInputRef(el);}} 
-                type="number"
-                placeholder={screenSize !== 'small' ? 'Enter the amount of Dai Liquidity to add': 'DAI'}
-                value={inputValue || ''}
-                plain
-                onChange={(event:any) => setInputValue(event.target.value)}
-                icon={<DaiMark />}
+          { account && !(activeSeries?.isMature()) && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
+          <>
+            <Box fill gap='medium'>
+              <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Add liquidity</Text>
+              <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={addLiquidityDisabled}>
+                <TextInput
+                  ref={(el:any) => {el && !removeLiquidityOpen && el.focus(); setInputRef(el);}} 
+                  type="number"
+                  placeholder={screenSize !== 'small' ? 'Enter the amount of Dai Liquidity to add': 'DAI'}
+                  value={inputValue || ''}
+                  plain
+                  onChange={(event:any) => setInputValue(event.target.value)}
+                  icon={<DaiMark />}
+                />
+                {account &&
+                <Button 
+                  label={<Text size='xsmall' color='brand'> {screenSize !== 'small' ? 'Add Maximum': 'Max'}</Text>}
+                  color='brand-transparent'
+                  onClick={()=>setInputValue(daiBalance_)}
+                  hoverIndicator='brand-transparent'
+                />}
+              </InputWrap>
+
+              <InfoGrid entries={[
+                {
+                  label: 'Share of the Pool after adding liquidity',
+                  visible: true,
+                  active: inputValue,
+                  loading: false,           
+                  value: '0.04%',
+                  valuePrefix: null,
+                  valueExtra: null,
+                },
+                {
+                  label: 'Like what you see?',
+                  visible: !account && inputValue>0,
+                  active: inputValue,
+                  loading: false,            
+                  value: '',
+                  valuePrefix: null,
+                  valueExtra: () => (
+                    <Button
+                      color='brand-transparent'
+                      label={<Text size='xsmall' color='brand'>Connect a wallet</Text>}
+                      onClick={()=>console.log('still to implement')}
+                      hoverIndicator='brand-transparent'
+                    /> 
+                  )
+                },
+              ]}
               />
-              {account &&
-              <Button 
-                label={<Text size='xsmall' color='brand'> {screenSize !== 'small' ? 'Add Maximum': 'Max'}</Text>}
-                color='brand-transparent'
-                onClick={()=>setInputValue(daiBalance_)}
-                hoverIndicator='brand-transparent'
-              />}
-            </InputWrap>
-
-            <InfoGrid entries={[
-              {
-                label: 'Share of the Pool after adding liquidity',
-                visible: true,
-                active: inputValue,
-                loading: false,           
-                value: '0.04%',
-                valuePrefix: null,
-                valueExtra: null,
-              },
-              {
-                label: 'Like what you see?',
-                visible: !account && inputValue>0,
-                active: inputValue,
-                loading: false,            
-                value: '',
-                valuePrefix: null,
-                valueExtra: () => (
-                  <Button
-                    color='brand-transparent'
-                    label={<Text size='xsmall' color='brand'>Connect a wallet</Text>}
-                    onClick={()=>console.log('still to implement')}
-                    hoverIndicator='brand-transparent'
-                  /> 
-                )
-              },
-            ]}
-            />
-          </Box> 
+            </Box> 
+            {/* }
   
-          { account && !activeSeries?.isMature() && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
-          <Box gap='small' fill='horizontal' align='center'>
-            <Box
-              fill='horizontal'
-              round='small'
-              background={addLiquidityDisabled ? 'brand-transparent' : 'brand'}
-              onClick={()=>addLiquidityProcedure(inputValue)}
-              align='center'
-              pad='small'
-            >
-              <Text 
-                weight='bold'
-                size='large'
-                color={addLiquidityDisabled ? 'text-xweak' : 'text'}
+          { account && !(activeSeries?.isMature()) && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) && */}
+            <Box gap='small' fill='horizontal' align='center'>
+              <Box
+                fill='horizontal'
+                round='small'
+                background={addLiquidityDisabled ? 'brand-transparent' : 'brand'}
+                onClick={()=>addLiquidityProcedure(inputValue)}
+                align='center'
+                pad='small'
               >
-                {`Supply ${inputValue || ''} DAI`}
-              </Text>
+                <Text 
+                  weight='bold'
+                  size='large'
+                  color={addLiquidityDisabled ? 'text-xweak' : 'text'}
+                >
+                  {`Supply ${inputValue || ''} DAI`}
+                </Text>
+              </Box>
             </Box>
-
-            { activeSeries?.poolTokens_>0 &&
+          </>}
+          { activeSeries?.poolTokens_>0 &&
             <Box alignSelf='end'>
               <Box
                 round
@@ -240,12 +243,15 @@ const Pool = (props:IPoolProps) => {
                 justify='center'
               >
                 <Box direction='row' gap='small'>
-                  <Text size='xsmall' color='text-weak'> alternatively, Remove Liquidity from this series</Text>
+                  { !(activeSeries?.isMature()) ? 
+                    <Box><Text size='xsmall' color='text-weak'>Remove exisiting Liquidity from this series</Text></Box>
+                    :
+                    <Text size='xsmall' color='text-weak'>alternatively, Remove Liquidity from this series</Text>}
                   <ArrowRight color='text-weak' />
                 </Box>
               </Box>
-            </Box> }
-          </Box>}
+            </Box>}
+
         </Box>
       </Box>}
 

@@ -34,7 +34,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
   const [ hasDelegated, setHasDelegated ] = useState<boolean>(true);
 
   const { previewPoolTx }  = usePool();
-  const { buyDai, buyDaiWithSignature, buyActive }  = useProxy();
+  const { buyDai, buyDaiNoSignature, buyActive }  = useProxy();
   const { account } = useSignerAccount();
 
   const [ maxWithdraw, setMaxWithdraw ] = useState<number>(0);

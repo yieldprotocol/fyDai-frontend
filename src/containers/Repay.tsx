@@ -71,17 +71,17 @@ function Repay({ setActiveView, repayAmount }:IRepayProps) {
 
   /* Handle dai to eDai conversion  (needed to set a min eDai value for repayment) */
   useEffect(() => {
-    activeSeries && debouncedInput > 0 && ( async () => {
+    !(activeSeries?.isMature()) && debouncedInput > 0 && ( async () => {
       const preview = await previewPoolTx('sellDai', activeSeries, debouncedInput);
       if (!(preview instanceof Error)) {
         setEDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
       } else {
-        console.log(preview);
         /* if the market doesnt have liquidity just estimate from rate */
         const rate = await previewPoolTx('sellDai', activeSeries, 1);
         !(rate instanceof Error) && setEDaiValue(debouncedInput* parseFloat((ethers.utils.formatEther(rate))) );
       }
     })();
+
   }, [debouncedInput]);
 
   /* Repay disabling logic */

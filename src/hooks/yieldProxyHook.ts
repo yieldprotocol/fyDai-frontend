@@ -368,8 +368,7 @@ export const useProxy = () => {
    * @dev removes liquidity from a pool
    * 
    * @param {IYieldSeries} series series to act on.
-   * @param {number|BigNumber} tokens amount of Dai to use to mint liquidity. 
-   * @param {number|BigNumber} minimumDai maximum amount of eDai to be borrowed to mint liquidity.
+   * @param {number|BigNumber} tokens amount of tokens to remove. 
    * 
    * @note if BigNumber is used make sure it is in WEI
    */
@@ -381,7 +380,6 @@ export const useProxy = () => {
   ) => {
     /* Processing and sanitizing input */
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
-    // const { isMature } = series;
     const parsedTokens = BigNumber.isBigNumber(tokens)? tokens : ethers.utils.parseEther(tokens.toString());
 
     const overrides = { 
@@ -402,19 +400,19 @@ export const useProxy = () => {
         // if ( !(preview instanceof Error) ) {
         //   minDai = valueWithSlippage(preview, true);
         // } else {
+        //   // testing with slippage etc. 
+        //   // minDai = ethers.utils.parseEther('0');
         //   throw(preview);
         // }
 
-        // testing with slippage etc. 
-
+        // TODO dont use this testing with slippage etc. 
         minDai = ethers.utils.parseEther('0');
         minEDai = ethers.utils.parseEther('0');
         tx = await proxyContract.removeLiquidityEarleDaiPool(poolAddr, parsedTokens, minDai, minEDai );
 
       } else {
-        console.log('removing liquidity AFTER maturity'); 
-
-        tx = await proxyContract.removeLiquidityMature(poolAddr, tokens );
+        console.log('removing liquidity AFTER maturity');
+        tx = await proxyContract.removeLiquidityMature(poolAddr, parsedTokens );
       }
     } catch (e) {
       handleTxError('Error Removing liquidity', tx, e);
@@ -478,11 +476,11 @@ export const useProxy = () => {
   };
 
   /**
-   * @dev Buy Dai with eDai
+   * @dev LEGACY Buy Dai with eDai - USE BUY DAI WITH SIGNATURE
    * @param {IYieldSeries} series yield series to act on.
    * @param daiOut Amount of dai being bought
    * */ 
-  const buyDai = async ( 
+  const buyDaiNoSignature= async ( 
     series: IYieldSeries, 
     daiOut:number,
   ) => {
@@ -529,7 +527,7 @@ export const useProxy = () => {
    * @param {IYieldSeries} series yield series to act on.
    * @param daiOut Amount of dai being bought
    * */ 
-  const buyDaiWithSignature = async ( 
+  const buyDai = async ( 
     series: IYieldSeries, 
     daiOut:number,
   ) => {
@@ -666,8 +664,8 @@ export const useProxy = () => {
     /* limitPool fns */
     sellDai, sellActive,
     buyDai, buyActive,
-    buyDaiWithSignature,
-    // sellEDai, 
+    buyDaiNoSignature,
+    // sellEDai,
     // buyEDai,
 
     /* Splitter fns */

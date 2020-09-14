@@ -114,7 +114,6 @@ const SeriesProvider = ({ children }:any) => {
     await Promise.all(
       seriesArr.map( async (x:any, i:number) => {
         const _rates = rates.get(x.maturity);
-        console.log(_rates.sellEDai);
         _seriesData.push(x);
         try {
           _seriesData[i].yieldAPR = yieldAPR(_rates.sellEDai, ethers.utils.parseEther('1'), x.maturity);       
