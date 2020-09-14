@@ -177,7 +177,7 @@ export const useProxy = () => {
     // const maxEDai = ethers.utils.parseEther(maximumEDai.toString());
 
     const overrides = { 
-      gasLimit: BigNumber.from('300000')
+      gasLimit: BigNumber.from('1000000')
     };
 
     setBorrowActive(true);
@@ -192,7 +192,7 @@ export const useProxy = () => {
         throw(preview);
       }
 
-      tx = await proxyContract.borrowDaiForMaximumEDai( poolAddr, utils.ETH, parsedMaturity, toAddr, maxEDai, dai, overrides );
+      tx = await proxyContract.borrowDaiForMaximumEDai( poolAddr, utils.ETH, parsedMaturity, toAddr, maxEDai, dai );
 
     } catch (e) {
       handleTxError('Error Borrowing Dai', tx, e);
@@ -230,11 +230,11 @@ export const useProxy = () => {
     const parsedMaturity = series.maturity.toString();
     // const minEDai = ethers.utils.parseEther(minimumEDaiRepayment.toString());
 
-    // const overrides = {
-    // nonce: signer.getTransactionCount().then( (nonce:any) => nonce + queue) 
-    // gasLimit: BigNumber.from('500000'),
-    // value: ethers.utils.parseEther('0')
-    // };
+    const overrides = {
+    // nonce: signer.getTransactionCount().then( (nonce:any) => nonce + queue),
+      gasLimit: BigNumber.from('1000000'),
+      value: ethers.utils.parseEther('0')
+    };
 
     setRepayActive(true);
     let tx:any;
@@ -353,7 +353,7 @@ export const useProxy = () => {
       // testing
       // maxEDai = ethers.utils.parseEther('1000000');
 
-      tx = await proxyContract.addLiquidity(poolAddr, parsedDaiUsed, maxEDai, overrides);
+      tx = await proxyContract.addLiquidity(poolAddr, parsedDaiUsed, maxEDai);
     } catch (e) {
       handleTxError('Error Adding liquidity', tx, e);
       setAddLiquidityActive(false);
@@ -414,7 +414,7 @@ export const useProxy = () => {
       } else {
         console.log('removing liquidity AFTER maturity'); 
 
-        tx = await proxyContract.removeLiquidityMature(poolAddr, tokens, overrides);
+        tx = await proxyContract.removeLiquidityMature(poolAddr, tokens );
       }
     } catch (e) {
       handleTxError('Error Removing liquidity', tx, e);
@@ -446,9 +446,9 @@ export const useProxy = () => {
     const parsedDaiIn = BigNumber.isBigNumber(daiIn)? daiIn : ethers.utils.parseEther(daiIn.toString());
     const toAddr = account && ethers.utils.getAddress(account);
 
-    // const overrides = { 
-    //   gasLimit: BigNumber.from('300000')
-    // };
+    const overrides = { 
+      gasLimit: BigNumber.from('1000000')
+    };
 
     /* Contract interaction */
     let tx:any;
@@ -465,7 +465,7 @@ export const useProxy = () => {
       // temp min for testing */
       // const minEDaiOut = ethers.utils.parseEther('0');
 
-      tx = await proxyContract.sellDai(poolAddr, toAddr, parsedDaiIn, minEDaiOut, overrides); 
+      tx = await proxyContract.sellDai(poolAddr, toAddr, parsedDaiIn, minEDaiOut);
 
     } catch (e) {
       handleTxError('Error selling', tx, e );   
@@ -491,9 +491,9 @@ export const useProxy = () => {
     const parsedDaiOut = BigNumber.isBigNumber(daiOut)? daiOut : ethers.utils.parseEther(daiOut.toString());
     const toAddr = account && ethers.utils.getAddress(account);
 
-    // const overrides = { 
-    //   gasLimit: BigNumber.from('300000')
-    // };
+    const overrides = { 
+      gasLimit: BigNumber.from('1000000')
+    };
 
     /* Contract interaction */
     let tx:any;
@@ -509,7 +509,7 @@ export const useProxy = () => {
       }
       // temp max bignumber for testing */
       // const maxEDaiIn = ethers.utils.parseEther('1000000');
-      tx = await proxyContract.buyDai(poolAddr, toAddr, parsedDaiOut, maxEDaiIn, overrides);
+      tx = await proxyContract.buyDai(poolAddr, toAddr, parsedDaiOut, maxEDaiIn);
     } catch (e) {
       handleTxError('Error buying Dai', tx, e );   
       setBuyActive(false);
@@ -536,9 +536,9 @@ export const useProxy = () => {
     const toAddr = account && ethers.utils.getAddress(account);
     const fromAddr = account && ethers.utils.getAddress(account);
 
-    // const overrides = { 
-    //   gasLimit: BigNumber.from('300000')
-    // };
+    const overrides = { 
+      gasLimit: BigNumber.from('1000000')
+    };
 
     /* Contract interaction */
     let tx:any;
@@ -581,8 +581,7 @@ export const useProxy = () => {
         toAddr, 
         parsedDaiOut, 
         maxEDaiIn, 
-        eDaiPermitSig,
-        overrides
+        eDaiPermitSig
       );
     } catch (e) {
       handleTxError('Error buying back Dai', tx, e );   
