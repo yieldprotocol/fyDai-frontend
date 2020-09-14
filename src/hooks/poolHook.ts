@@ -276,9 +276,9 @@ export const usePool = () => {
             value = await contract.buyDaiPreview(parsedAmount); break;
           case 'SELLDAI': 
             value = await contract.sellDaiPreview(parsedAmount); break;
-          case 'BUYYDAI':
+          case 'BUYEDAI':
             value = await contract.buyEDaiPreview(parsedAmount); break;
-          case 'SELLYDAI':
+          case 'SELLEDAI':
             value = await contract.sellEDaiPreview(parsedAmount); break;
           default: 
             value = await BigNumber.from('0');
