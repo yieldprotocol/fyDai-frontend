@@ -101,13 +101,13 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
       const newRatio = estimateRatio(position.ethPosted_, ( position.debtValue_+ parseFloat(debouncedInput)) ); 
       newRatio && setEstRatio(newRatio.toFixed(0));
 
-      const preview = await previewPoolTx('bueDai', activeSeries, debouncedInput);
+      const preview = await previewPoolTx('buyDai', activeSeries, debouncedInput);
       if (!(preview instanceof Error)) {
         setEDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
         setAPR( yieldAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries.maturity ) );      
       } else {
         /* if the market doesnt have liquidity just estimate from rate */
-        const rate = await previewPoolTx('bueDai', activeSeries, 1);
+        const rate = await previewPoolTx('buyDai', activeSeries, 1);
         !(rate instanceof Error) && setEDaiValue(debouncedInput*parseFloat((ethers.utils.formatEther(rate))));
         (rate instanceof Error) && setEDaiValue(0);
         setBorrowDisabled(true);

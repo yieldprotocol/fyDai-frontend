@@ -55,7 +55,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
   const withdrawProcedure = async (value:number) => {
     if ( !withdrawDisabled ) {
       setWithdrawDaiPending(true);
-      await buyDaiWithSignature(
+      await buyDai(
         activeSeries,
         inputValue,
       );

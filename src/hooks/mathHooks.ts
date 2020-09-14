@@ -200,7 +200,7 @@ export const useMath = () => {
    * Annualised Yield Rate
    *
    * @param { BigNumber } _rate // current [Dai] price per unit y[Dai]
-   * @param { BigNumber } _return // y[Dai] amount/price at maturity
+   * @param { BigNumber } _amount // y[Dai] amount at maturity
    * @param { number } _maturity  // date of maturity
    * @param { number } _fromDate // ***optional*** start date - defaults to now()
    * 
@@ -208,7 +208,7 @@ export const useMath = () => {
    */
   const yieldAPR =(
     _rate: BigNumber,
-    _return: BigNumber,
+    _amount: BigNumber,
     _maturity:number,
     _fromDate:number= (Math.round(new Date().getTime() / 1000)), // if not provided, defaults to current time.
   )=> {
@@ -218,7 +218,8 @@ export const useMath = () => {
     ) {
       const secsToMaturity = _maturity - _fromDate;
       const propOfYear = secsToMaturity/utils.SECONDS_PER_YEAR;
-      const priceRatio = parseFloat(ethers.utils.formatEther(_return)) / parseFloat(ethers.utils.formatEther(_rate));
+      const priceRatio = parseFloat(ethers.utils.formatEther(_amount)) / parseFloat(ethers.utils.formatEther(_rate));
+      // const priceRatio = parseFloat(ethers.utils.formatEther( _amount.div(_rate) ));
       const powRatio = 1 / propOfYear;
       const apr = Math.pow(priceRatio, powRatio) - 1;
       return apr*100;

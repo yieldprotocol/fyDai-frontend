@@ -409,7 +409,7 @@ export const useProxy = () => {
 
         minDai = ethers.utils.parseEther('0');
         minEDai = ethers.utils.parseEther('0');
-        tx = await proxyContract.removeLiquidityEarlyDaiPool(poolAddr, parsedTokens, minDai, minEDai );
+        tx = await proxyContract.removeLiquidityEarleDaiPool(poolAddr, parsedTokens, minDai, minEDai );
 
       } else {
         console.log('removing liquidity AFTER maturity'); 
@@ -505,12 +505,16 @@ export const useProxy = () => {
       if ( !(preview instanceof Error) ) {
         maxEDaiIn = valueWithSlippage(preview);
       } else {
-        throw(preview);
+
+        // temp max bignumber for testing */
+        maxEDaiIn = ethers.utils.parseEther('1000000');
+        // throw(preview);
       }
       // temp max bignumber for testing */
       // const maxEDaiIn = ethers.utils.parseEther('1000000');
-      tx = await proxyContract.buyDai(poolAddr, toAddr, parsedDaiOut, maxEDaiIn);
+      tx = await proxyContract.bueDai(poolAddr, toAddr, parsedDaiOut, maxEDaiIn);
     } catch (e) {
+      console.log(e)
       handleTxError('Error buying Dai', tx, e );   
       setBuyActive(false);
       return;
@@ -551,10 +555,10 @@ export const useProxy = () => {
       if ( !(preview instanceof Error) ) {
         maxEDaiIn = valueWithSlippage(preview);
       } else {
+        // temp max bignumber for testing */
+        // maxEDaiIn = ethers.utils.parseEther('1000000');
         throw(preview);
       }
-      // temp max bignumber for testing */
-      // const maxEDaiIn = ethers.utils.parseEther('1000000');
 
       /* Get the user signature authorizing eDai to interact with Dai */
       try {
@@ -576,7 +580,7 @@ export const useProxy = () => {
         return;
       }
 
-      tx = await proxyContract.buyDaiWithSignature(
+      tx = await proxyContract.bueDaiWithSignature(
         poolAddr, 
         toAddr, 
         parsedDaiOut, 
@@ -584,6 +588,7 @@ export const useProxy = () => {
         eDaiPermitSig
       );
     } catch (e) {
+      console.log(e)
       handleTxError('Error buying back Dai', tx, e );   
       setBuyActive(false);
       return;
@@ -593,13 +598,11 @@ export const useProxy = () => {
     setBuyActive(false);
   };
 
-
   // buyDaiWithSignature(address pool, address to, uint128 daiOut, uint128 maxEDaiIn, bytes memory signature)
 
   // TODO Add these two ONLY if required
   const sellEDai = () => {};
   const buyEDai = () => {};
-
 
   /**
    * SPLITTER SECTION
