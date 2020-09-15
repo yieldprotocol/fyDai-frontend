@@ -140,6 +140,9 @@ export const useMath = () => {
     return _debtValue.mul(_liquidationRatio).div(_collateralAmount);
   };
 
+
+  
+
   /**
    * Max amount of Dai that can be borrowed
    *
@@ -178,7 +181,7 @@ export const useMath = () => {
   };
 
   /**
-   * Split a certain amount of Dai liquidity into its eDai and Dai components
+   * Split a certain amount of Dai liquidity into its eDai and Dai componetnts
    * 
    * @param {BigNumber} daiAmount // amount dai to split
    * @param { BigNumber } _daiReserves// Dai reserves

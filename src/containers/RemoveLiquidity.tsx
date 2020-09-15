@@ -36,6 +36,9 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
   
   const [ maxRemove, setMaxRemove ] = useState<number>(0);
 
+  const [newShare, setNewShare] = useState<number>(activeSeries?.poolPercent_);
+  const [calculating, setCalculating] = useState<boolean>(false);
+
   const [ inputValue, setInputValue ] = useState<any>();
   const debouncedInput = useDebounce(inputValue, 500);
   const [inputRef, setInputRef] = React.useState<any>(null);
@@ -59,30 +62,36 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
     }
   };
 
+  const calculateNewShare = async () => {
+    setCalculating(true);
+    const percent = ((activeSeries?.poolTokens_- debouncedInput) / activeSeries.totalSupply_ )*100;
+    setNewShare(percent);
+    setCalculating(false);
+  };
+
   /* handle value calculations based on input changes */
   useEffect(() => {
-    inputValue && ( async () => {
-    })();
-  }, [inputValue]);
+    debouncedInput && calculateNewShare();
+  }, [debouncedInput]);
 
   /* handle warnings input errors */
-  // useEffect(() => {
-  //   if ( inputValue && ( inputValue > daiBalance_ ) ) {
-  //     setAddLiquidityDisabled(true);
-  //     setWarningMsg(null);
-  //     setErrorMsg('That amount exceeds the amount of Dai you have'); 
-  //   } else {
-  //     // setLendDisabled(false);
-  //     setWarningMsg(null);
-  //     setErrorMsg(null);
-  //   }
-  // }, [ inputValue ]);
+  useEffect(() => {
+    if ( debouncedInput && (activeSeries?.poolTokens_- debouncedInput < 0) ) {
+      setWarningMsg(null);
+      setErrorMsg('That amount exceeds the amount of tokens you have'); 
+    } else {
+      // setLendDisabled(false);
+      setWarningMsg(null);
+      setErrorMsg(null);
+    }
+  }, [ debouncedInput ]);
 
   /* Remove Liquidity disabling logic */
   useEffect(()=>{
     if (
       !account ||
-      !debouncedInput || 
+      !debouncedInput ||
+      (activeSeries?.poolTokens_- debouncedInput <= 0) ||
       parseFloat(debouncedInput) === 0
     ) {
       setRemoveLiquidityDisabled(true);
@@ -132,7 +141,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
             <InfoGrid entries={[
               {
                 label: 'Token Balance',
-                visible: true,
+                visible: false,
                 active: true,
                 loading: false,     
                 value: activeSeries?.poolTokens_.toFixed(2),
@@ -141,12 +150,12 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
               },
               {
                 label: 'Share of the Pool After withdraw',
-                visible: false,
+                visible: true,
                 active: inputValue,
-                loading: false,           
-                value: '0.02%',
+                loading: calculating,           
+                value: newShare>=0 ? `${newShare.toFixed(4)}%`: '',
                 valuePrefix: null,
-                valueExtra: null,
+                valueExtra: null, 
               },
               {
                 label: 'Expected Dai to Receive',

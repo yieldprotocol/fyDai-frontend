@@ -43,6 +43,9 @@ const Pool = (props:IPoolProps) => {
   const { addLiquidity, addLiquidityActive } = useProxy();
   const { getBalance } = useToken();
 
+  const [newShare, setNewShare] = useState<number>(activeSeries?.poolPercent_);
+  const [calculating, setCalculating] = useState<boolean>(false);
+
   const { account } = useSignerAccount();
   const [ txActive ] = useTxActive(['ADD_LIQUIDITY', 'REMOVE_LIQUIDITY']);
 
@@ -73,14 +76,19 @@ const Pool = (props:IPoolProps) => {
     }   
   };
 
+  const calculateNewShare = async () => {
+    setCalculating(true);
+    const daiReserves = await getBalance(deployedContracts.Dai, 'Dai', activeSeries.poolAddress);
+    const eDaiReserves = await getBalance(activeSeries.eDaiAddress, 'EDai', activeSeries.poolAddress);
+    const tokens_ = ethers.utils.parseEther(debouncedInput).mul(daiReserves).div(eDaiReserves.add(daiReserves));
+    const percent = (( parseFloat(ethers.utils.formatEther(tokens_)) + activeSeries?.poolTokens_ ) / activeSeries.totalSupply_ )*100;
+    setNewShare(percent);
+    setCalculating(false);
+  };
+
   /* handle value calculations based on input changes */
   useEffect(() => {
-    debouncedInput&& ( async () => {
-      // const bnInp = ethers.utils.parseEther(inputValue)
-      // const daiReserves = await getBalance(deployedContracts.Dai, 'Dai', activeSeries.poolAddress);
-      // const eDaiReserves = await getBalance(activeSeries.eDaiAddress, 'EDai', activeSeries.poolAddress);
-      // const tokens = bnInp.mul(daiReserves).div(eDaiReserves.add(daiReserves));
-    })();
+    debouncedInput && calculateNewShare();
   }, [debouncedInput]);
   
   /* Add liquidity disabling logic */
@@ -121,7 +129,7 @@ const Pool = (props:IPoolProps) => {
             visible: !!account && txActive?.type !== 'ADD_LIQUIDITY',
             active: true,
             loading: addLiquidityPending,     
-            value: activeSeries?.poolTokens_.toFixed(2),
+            value: activeSeries?.poolTokens_.toFixed(4),
             valuePrefix: null,
             valueExtra: null, 
           },
@@ -130,7 +138,7 @@ const Pool = (props:IPoolProps) => {
             visible: !!account && txActive?.type !== 'ADD_LIQUIDITY',
             active: true,
             loading: addLiquidityPending,           
-            value: activeSeries?.poolPercent_.toFixed(2),
+            value: activeSeries?` ${activeSeries?.poolPercent_.toFixed(4)}%`: '',
             valuePrefix: null,
             valueExtra: null,
           },
@@ -186,8 +194,8 @@ const Pool = (props:IPoolProps) => {
                   label: 'Share of the Pool after adding liquidity',
                   visible: true,
                   active: inputValue,
-                  loading: false,           
-                  value: '0.04%',
+                  loading: calculating,           
+                  value: newShare? `${newShare.toFixed(4)}%`: '',
                   valuePrefix: null,
                   valueExtra: null,
                 },
