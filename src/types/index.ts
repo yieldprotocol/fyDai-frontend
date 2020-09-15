@@ -9,7 +9,7 @@ export interface IYieldSeries {
   eDaiAddress: string;
   liquidityProxyAddress: string;
   hasDelegatedPool: boolean;
-  isMature: any; // TODO type this
+  isMature: any; // function typeScript this out
   eDaiBalance_: number;
   eDaiBalance: BigNumber;
   totalSupply?: BigNumber;
@@ -29,20 +29,16 @@ export interface IYieldSeries {
   yieldAPR_?: string;
 }
 
-export interface INotification {
-  message: string;
-  type?: string;
-  callbackAction?: any;
-  callbackCancel?: any;
-  showFor?: number;
-  position?: string;
-  open?: boolean,
-  timerMs?: number,
-  fatalOpen?: boolean,
-  fatalMsg?: string,
-  pendingTxs?: any,
-  lastCompletedTx?: any,
-  requestedSigs?: any,
+export interface IConnection {
+  // TODO get provider types
+  provider: any;     /* a wallet connected provider */
+  altProvider: any;  /* a provider with no connected wallet */
+  // TODO get signer types
+  signer: any;       /* derived from provider if EIP1192 */
+  voidSigner: any;
+  chainId: number|null;   /* official chain number or development number */
+  networkName: string|null; /* network name (eg. Ropsten) */
+  account: string|null;   /* user ethereum address */
 }
 
 export interface IUser {
@@ -58,16 +54,25 @@ export interface IUser {
   ethAvailable_?:BigNumber;
 }
 
-export interface IConnection {
-  // TODO get provider types
-  provider: any;     /* a wallet connected provider */
-  altProvider: any;  /* a provider with no connected wallet */
-  // TODO get signer types
-  signer: any;       /* derived from provider if EIP1192 */
-  voidSigner: any;
-  chainId: number|null;   /* official chain number or development number */
-  networkName: string|null; /* network name (eg. Ropsten) */
-  account: string|null;   /* user ethereum address */
+export interface IReducerAction {
+  type:string,
+  payload?:any,
+}
+
+export interface INotification {
+  message: string;
+  type?: string;
+  callbackAction?: any;
+  callbackCancel?: any;
+  showFor?: number;
+  position?: string;
+  open?: boolean,
+  timerMs?: number,
+  fatalOpen?: boolean,
+  fatalMsg?: string,
+  pendingTxs?: any,
+  lastCompletedTx?: any,
+  requestedSigs?: any,
 }
 
 export interface IDelegableMessage {

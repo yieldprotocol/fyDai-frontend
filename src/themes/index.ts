@@ -1,5 +1,4 @@
 import { css } from 'styled-components';
-import background from '../assets/images/background.png';
 
 export const yieldTheme = {
   name: 'yieldTheme',
