@@ -5,7 +5,6 @@ import { Keyboard, Box, Button, TextInput, Text, ResponsiveContext } from 'gromm
 import { FiClock as Clock } from 'react-icons/fi';
 import DaiMark from '../components/logos/DaiMark';
 
-import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
 
@@ -24,7 +23,6 @@ import InputWrap from '../components/InputWrap';
 import ApprovalPending from '../components/ApprovalPending';
 import TransactionPending from '../components/TransactionPending';
 import InfoGrid from '../components/InfoGrid';
-import Authorization from '../components/Authorization';
 
 interface IBorrowProps {
   borrowAmount?:number|null;
@@ -32,8 +30,7 @@ interface IBorrowProps {
 }
 
 const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
-  const { state: yieldState } = useContext(YieldContext);
-  const { deployedContracts } = yieldState;
+
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { activeSeries } = seriesState; 
   const { state: userState, actions: userActions } = useContext(UserContext);
@@ -45,17 +42,14 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
 
   const screenSize = useContext(ResponsiveContext);
 
+  /* hooks init */
   const { borrow }  = useController();
   const { previewPoolTx, callActive }  = usePool();
-  const { 
-    borrowDai, 
-    borrowActive 
-  } = useProxy();
-  const { 
-    yieldAPR, 
-    estCollRatio: estimateRatio
-  } = useMath();
+  const { borrowDai, borrowActive } = useProxy();
+  const { yieldAPR, estCollRatio: estimateRatio } = useMath();
   const { account } = useSignerAccount();
+
+  const [ txActive ] = useTxActive(['BORROW', 'BUY' ]);
 
   /* internal component state */
   const [ borrowPending, setBorrowPending ] = useState<boolean>(false);
@@ -73,13 +67,11 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
   const [ APR, setAPR ] = useState<number>();
   const [ estRatio, setEstRatio ] = useState<any>(0);
 
-  const [ txActive ] = useTxActive(['BORROW', 'BUY' ]);
-
   /* Borrow execution flow */
   const borrowProcedure = async (value:number|undefined, autoSell:boolean=true) => {
     if (value&&value>0 && !borrowDisabled) {
       setBorrowPending(true);
-      autoSell && await borrowDai(activeSeries, 'ETH-A', eDaiValue, value);
+      autoSell && await borrowDai(activeSeries, 'ETH-A', value);
       !autoSell && await borrow('ETH-A', activeSeries.maturity, value);
       setInputValue(undefined);
       await Promise.all([

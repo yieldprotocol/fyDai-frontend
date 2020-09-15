@@ -1,9 +1,9 @@
-import React, { useEffect, useState, useContext } from 'react';
-
+import { useEffect, useState, useContext } from 'react';
 import { ethers, BigNumber }  from 'ethers';
 import { signDaiPermit, signERC2612Permit } from 'eth-permit';
-
 import * as utils from '../utils';
+
+import { IYieldSeries } from '../types';
 
 import YieldProxy from '../contracts/YieldProxy.json';
 
@@ -16,9 +16,8 @@ import { usePool } from './poolHook';
 import { useMath } from './mathHooks';
 import { useToken } from './tokenHook';
 import { useEDai } from './eDaiHook';
-
-import { IYieldSeries } from '../types';
 import { useTxHelpers } from './appHooks';
+
 
 /**
  * Hook for interacting with the Yield Proxy Contract.
@@ -44,32 +43,30 @@ import { useTxHelpers } from './appHooks';
  */
 export const useProxy = () => {
 
+  /* contexts */
+  const  { dispatch }  = useContext<any>(NotifyContext);
+  const  { state: { deployedContracts } }  = useContext<any>(YieldContext);
+  const  { state: { preferences: { slippage } } }  = useContext<any>(UserContext);
+
+  /* hooks */ 
   const { signer, provider, account } = useSignerAccount();
   const { previewPoolTx } = usePool();
   const { splitDaiLiquidity } = useMath();
   const { getBalance } = useToken();
   const { isMature } = useEDai();
-
   const { handleTx, handleTxError } = useTxHelpers();
-
-  const { abi: yieldProxyAbi } = YieldProxy;
   
-  const  { dispatch }  = useContext<any>(NotifyContext);
-  const  { state: { deployedContracts } }  = useContext<any>(YieldContext);
-  const  { state: { preferences: { slippage } } }  = useContext<any>(UserContext);
-
-  const [ proxyContract, setProxyContract] = useState<any>();
-
+  /* Activity flags */
   const [ postEthActive, setPostEthActive ] = useState<boolean>(false);
   const [ withdrawEthActive, setWithdrawEthActive ] = useState<boolean>(false);
   const [ borrowActive, setBorrowActive ] = useState<boolean>(false);
   const [ repayActive, setRepayActive ] = useState<boolean>(false);
   const [ removeLiquidityActive, setRemoveLiquidityActive ] = useState<boolean>(false);
   const [ addLiquidityActive, setAddLiquidityActive ] = useState<boolean>(false);
-
   const [ buyActive, setBuyActive ] = useState<boolean>(false);
   const [ sellActive, setSellActive ] = useState<boolean>(false);
 
+  /* Temporary signing messages */
   const auths = new Map([
     [1, { id: 1, desc:'Dai > treasury authenticate ' }],
     [2, { id: 2, desc:'eDai > pool authenticate ' }],
@@ -87,11 +84,12 @@ export const useProxy = () => {
   };
 
   /* Preset the yieldProxy contract to be used with all fns */
+  const [ proxyContract, setProxyContract] = useState<any>();
   useEffect(()=>{
     deployedContracts.YieldProxy && signer &&
     setProxyContract( new ethers.Contract( 
       ethers.utils.getAddress(deployedContracts.YieldProxy), 
-      yieldProxyAbi,
+      YieldProxy.abi,
       signer
     ));
   }, [signer, deployedContracts]);
@@ -104,6 +102,7 @@ export const useProxy = () => {
   const postEth = async (
     amount:number | BigNumber,
   ) => {
+
     /* Processing and/or sanitizing input */
     const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(amount.toString());
     const toAddr = account && ethers.utils.getAddress(account); /* 'to' in this case represents the vault to be depositied into within controller */  
@@ -131,6 +130,7 @@ export const useProxy = () => {
   const withdrawEth = async (
     amount:number|BigNumber
   ) => {
+
     /* Processing and sanitizing input */
     const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(amount.toString());
     const toAddr = account && ethers.utils.getAddress(account);
@@ -157,7 +157,6 @@ export const useProxy = () => {
    * 
    * @param {IYieldSeries} series the yield series to interact with.
    * @param {string} collateralType type of collateral eg. 'ETH-A'
-   * @param {number} maximumEDai Maximum amount of EDai to borrow. 
    * @param {number} daiToBorrow Exact amount of Dai that should be obtained.
    * 
    * @return Amount of eDai that will be taken from `from` wallet
@@ -166,13 +165,13 @@ export const useProxy = () => {
   const borrowDai = async (
     series:IYieldSeries,
     collateralType: string,
-    maximumEDai: number,
     daiToBorrow: number,
   ) => {
     const dai = ethers.utils.parseEther(daiToBorrow.toString());
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const toAddr = account && ethers.utils.getAddress(account);
     const parsedMaturity = series.maturity.toString();
+
     const collatType = ethers.utils.formatBytes32String(collateralType);
     // const maxEDai = ethers.utils.parseEther(maximumEDai.toString());
 
@@ -193,7 +192,15 @@ export const useProxy = () => {
         throw(preview);
       }
 
-      tx = await proxyContract.borrowDaiForMaximumEDai( poolAddr, utils.ETH, parsedMaturity, toAddr, maxEDai, dai, overrides );
+      tx = await proxyContract.borrowDaiForMaximumEDai( 
+        poolAddr, 
+        collatType,
+        parsedMaturity, 
+        toAddr, 
+        maxEDai, 
+        dai, 
+        overrides 
+      );
 
     } catch (e) {
       handleTxError('Error Borrowing Dai', tx, e);

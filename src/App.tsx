@@ -4,6 +4,8 @@ import { Grommet, base, Grid, Main, Box, ResponsiveContext, Nav, Layer } from 'g
 import { deepMerge } from 'grommet/utils';
 import { yieldTheme } from './themes';
 
+import { SeriesContext } from './contexts/SeriesContext';
+
 import Dashboard from './views/Dashboard';
 import BorrowView from './views/BorrowView';
 import LendView from './views/LendView';
@@ -48,6 +50,8 @@ const ThemedApp = () => {
 
 const App = (props:any) => {
 
+  const { isLoading } = useContext(SeriesContext);
+
   // TODO Switch out for react router
   const [activeView, setActiveView] = useState<string>('BORROW');
   const [accountView, setAccountView] = useState<string>('ACCOUNT');
@@ -91,6 +95,7 @@ const App = (props:any) => {
           changeWallet={() => changeConnection()}
         />}
 
+
       <Box direction="row" height={{ min: '100%' }}>
         <Box flex height='100%'>
 
@@ -106,6 +111,7 @@ const App = (props:any) => {
               <Box background={{ color: 'background-front' }} />
             </Grid>
 
+            {!isLoading &&
             <Main pad="none" direction="row" flex>
               <Grid fill columns={columnsWidth}>
                 <Box background="background" />
@@ -121,7 +127,7 @@ const App = (props:any) => {
                 </Box>               
                 <Box background="background" />
               </Grid>
-            </Main>
+            </Main>}
               
             <Grid fill columns={columnsWidth}>
               <Box background="background" />

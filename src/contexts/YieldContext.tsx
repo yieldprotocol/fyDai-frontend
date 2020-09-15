@@ -16,7 +16,7 @@ import { useMigrations } from '../hooks/migrationHook';
 
 const YieldContext = React.createContext<any>({});
 
-const eDaiList = ['eDai0', 'eDai1', 'eDai2', 'eDai3'];
+const eDaiList = ['eDai0', 'eDai1', 'eDai2', 'eDai3', 'eDai4'];
 const seriesColors = ['#726a95', '#709fb0', '#a0c1b8', '#f4ebc1', '#3f51b5', '#5677fc', '#03a9f4'];
 const contractList = [
   'Controller',
@@ -66,7 +66,6 @@ const initState = {
   isLoading: true,
   deployedSeries: [],
   deployedContracts: {},
-
   feedData: {
     ilks: {
       rate: null, // localStorage.getItem(feedData.ilks.EthA.rate)
@@ -187,7 +186,6 @@ const YieldProvider = ({ children }: any) => {
   /**
    * @dev get PUBLIC, non-cached, non-user specific yield protocol general data
    */
-  
   const _getYieldData = async (deployedContracts: any): Promise<any> => {
     const _yieldData: any = {};
     // _yieldData.ethPosted = await collateralPosted(deployedContracts.Controller, 'ETH-A');
@@ -213,6 +211,7 @@ const YieldProvider = ({ children }: any) => {
   };
 
   const initContext = async () => {
+    
     /* Init start */
     dispatch({ type: 'isLoading', payload: true });
 
