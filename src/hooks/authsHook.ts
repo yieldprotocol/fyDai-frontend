@@ -188,6 +188,10 @@ export const useAuth = () => {
     let daiSig;
     let eDaiSig;
 
+    const overrides = { 
+      gasLimit: BigNumber.from('1000000')
+    };
+
     setAuthActive(true);
     dispatch({ type: 'requestSigs', payload:[ auths.get(3), auths.get(4), auths.get(5) ] });
     
@@ -234,7 +238,7 @@ export const useAuth = () => {
     /* Broadcast signatures */
     let tx:any;
     try {
-      tx = await proxyContract.authorizePool(poolAddr, fromAddr, daiSig, eDaiSig, poolSig);
+      tx = await proxyContract.authorizePool(poolAddr, fromAddr, daiSig, eDaiSig, poolSig, overrides);
     } catch (e) {
       handleTxError('Error authorizing contracts', tx, e);
       setAuthActive(false);
