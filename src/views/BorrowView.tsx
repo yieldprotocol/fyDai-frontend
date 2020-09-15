@@ -1,16 +1,11 @@
-import React, { useState } from 'react';
-import { Box, Layer } from 'grommet';
-import { FiCheckCircle as CheckCircle } from 'react-icons/fi';
-
-import Deposit from '../containers/Deposit';
-import Borrow from '../containers/Borrow';
-import Repay from '../containers/Repay';
-
-
-import { useSignerAccount } from '../hooks';
-
+import React, { useState, Suspense, lazy } from 'react';
+import { Box } from 'grommet';
 import PageHeader from '../components/PageHeader';
 import ActionSelector from '../components/ActionSelector';
+
+const Deposit = lazy(() => import('../containers/Deposit'));
+const Borrow = lazy(() => import('../containers/Borrow'));
+const Repay = lazy(() => import('../containers/Repay'));
 
 interface BorrowProps {
   activeView?: number;
@@ -32,7 +27,6 @@ const BorrowView = ({
         tipPrimary="Tip: Convert your Maker vault"
         tipSecondary="View more tips"
       />
-
       <Box 
         background="brand-transparent"
         round='small'
@@ -40,7 +34,6 @@ const BorrowView = ({
         width={{ max: '750px' }}
         fill
       >
-
         <ActionSelector activeView={activeView} setActiveView={setActiveView} />    
         <Box
           width={{ max: '750px' }}
@@ -49,12 +42,21 @@ const BorrowView = ({
           background="background-front"
           round='small'
         > 
-          {activeView === 0 && <Deposit setActiveView={setActiveView} />}
+          {activeView === 0 && 
+          <Suspense fallback={<Box>Loading...</Box>}>
+            <Deposit setActiveView={setActiveView} />
+          </Suspense>}
+          
           {activeView === 1 && (
-            <Borrow setActiveView={setActiveView} />
+            <Suspense fallback={<Box>Loading...</Box>}>
+              <Borrow setActiveView={setActiveView} />
+            </Suspense>
+
           )}
           {activeView === 2 && (
-            <Repay setActiveView={setActiveView} />
+            <Suspense fallback={<Box>Loading...</Box>}>
+              <Repay setActiveView={setActiveView} />
+            </Suspense>
           )}
         </Box>
       </Box>    
