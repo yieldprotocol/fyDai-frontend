@@ -27,11 +27,11 @@ interface IInputProps {
 
 function InputWrap( { warningMsg, errorMsg, disabled, children }: IInputProps) {
 
-  const [ border, setBorder ] = React.useState<any>('all');
-  const [ corners, setCorners ] = React.useState<any>('small');
-  const [ animation, setAnimation ] = React.useState<any>(null);
+  const [ border, setBorder ] = useState<any>('all');
+  const [ corners, setCorners ] = useState<any>('small');
+  const [ animation, setAnimation ] = useState<any>(null);
 
-  React.useEffect(()=>{
+  useEffect(()=>{
 
     if (errorMsg || warningMsg) {
       setCorners({ corner:'top', size:'small' });

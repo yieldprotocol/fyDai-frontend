@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React, { useState } from 'react';
 import { Box, Layer } from 'grommet';
 import { FiCheckCircle as CheckCircle } from 'react-icons/fi';
 
@@ -20,7 +20,7 @@ const BorrowView = ({
   activeView: activeViewFromProps,
 }: BorrowProps) => {
   
-  const [ activeView, setActiveView ] = React.useState<number>( 
+  const [ activeView, setActiveView ] = useState<number>( 
     activeViewFromProps || 1
   );
 

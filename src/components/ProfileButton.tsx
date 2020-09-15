@@ -8,7 +8,7 @@ import { useWeb3React } from '../hooks';
 const ProfileButton = ({ action }: any) => {
 
   const [ accLabel, setAccLabel ] = useState<string>('');
-  // const [ connectorImage, setConnectorImage ] = React.useState<string>('');
+  // const [ connectorImage, setConnectorImage ] = useState<string>('');
   const { account } = useWeb3React();
 
   useEffect(()=>{

@@ -20,8 +20,8 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
 
   const { activeView, minified, children } = props;
 
-  const theme:any = React.useContext(ThemeContext);
-  const screenSize = React.useContext(ResponsiveContext);
+  const theme:any = useContext(ThemeContext);
+  const screenSize = useContext(ResponsiveContext);
 
   const { state: seriesState } = useContext(SeriesContext);
   const { activeSeries } = seriesState; 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Box, Button, ResponsiveContext } from 'grommet';
 
 interface TipProps {
@@ -8,7 +8,7 @@ interface TipProps {
 
 const TipButtons = (props: TipProps) => {
   const { secondary, primary } = props;
-  const screenSize = React.useContext(ResponsiveContext);
+  const screenSize = useContext(ResponsiveContext);
 
   return (
     <Box

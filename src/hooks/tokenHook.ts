@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import { ethers, BigNumber }  from 'ethers';
 
@@ -44,11 +44,11 @@ const contractMap = new Map<string, any>([
  * @returns { boolean } getBalance
  */
 export function useToken() {
-  // const { state: { provider, account } } = React.useContext(ConnectionContext);
+  // const { state: { provider, account } } = useContext(ConnectionContext);
   const { signer, provider, account, voidSigner } = useSignerAccount();
 
-  const  { dispatch }  = React.useContext<any>(NotifyContext);
-  const [ approveActive, setApproveActive ] = React.useState<boolean>(false);
+  const  { dispatch }  = useContext<any>(NotifyContext);
+  const [ approveActive, setApproveActive ] = useState<boolean>(false);
 
   const { handleTx, handleTxError } = useTxHelpers();
 

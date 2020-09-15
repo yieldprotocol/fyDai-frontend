@@ -20,8 +20,8 @@ const LendView = ({ activeView: activeViewFromProp  }:LendProps) => {
 
   const [ activeView, setActiveView ] = useState<string|undefined>( activeViewFromProp );
 
-  const { state: yieldState, yieldActions } = React.useContext(YieldContext);
-  const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
+  const { state: yieldState, yieldActions } = useContext(YieldContext);
+  const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
 
   const { isLoading: positionsLoading, seriesData, activeSeries } = seriesState; 
 

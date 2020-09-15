@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 
 import { Grommet, base, Grid, Main, Box, ResponsiveContext, Nav, Layer } from 'grommet';
 import { deepMerge } from 'grommet/utils';
@@ -11,17 +11,16 @@ import PoolView from './views/PoolView';
 
 import YieldHeader from './components/YieldHeader';
 import YieldFooter from './components/YieldFooter';
+import SeriesSelector from './components/SeriesSelector';
+import YieldMark from './components/logos/YieldMark';
 
 import ConnectLayer from './containers/layers/ConnectLayer';
 import AccountLayer from './containers/layers/AccountLayer';
 import NotifyLayer from './containers/layers/NotifyLayer';
+import AuthsLayer from './containers/layers/AuthsLayer';
 
 // TODO: remove testLayer for prod
 import TestLayer from './containers/layers/TestLayer';
-import SeriesSelector from './components/SeriesSelector';
-import YieldMark from './components/logos/YieldMark';
-import AuthsLayer from './containers/layers/AuthsLayer';
-import Splash from './components/Splash';
 
 // const LendView = React.lazy(() => import('./views/LendView'));
 // const PoolView = React.lazy(() => import('./views/PoolView'));
@@ -29,8 +28,8 @@ import Splash from './components/Splash';
 // const Dashboard = React.lazy(() => import('./views/Dashboard'));
 
 const ThemedApp = () => {
-  const [darkMode, setDarkMode] = React.useState(false);
-  const [partyMode, setPartyMode] = React.useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+  const [partyMode, setPartyMode] = useState(false);
   return (
     <Grommet
       theme={deepMerge(base, yieldTheme)}
@@ -50,25 +49,25 @@ const ThemedApp = () => {
 const App = (props:any) => {
 
   // TODO Switch out for react router
-  const [activeView, setActiveView] = React.useState<string>('BORROW');
-  const [accountView, setAccountView] = React.useState<string>('ACCOUNT');
+  const [activeView, setActiveView] = useState<string>('BORROW');
+  const [accountView, setAccountView] = useState<string>('ACCOUNT');
 
-  const [showConnectLayer, setShowConnectLayer] = React.useState<boolean>(false);
-  const [showAccountLayer, setShowAccountLayer] = React.useState<boolean>(false);
-  const [showAuthsLayer, setShowAuthsLayer] = React.useState<boolean>(false);
+  const [showConnectLayer, setShowConnectLayer] = useState<boolean>(false);
+  const [showAccountLayer, setShowAccountLayer] = useState<boolean>(false);
+  const [showAuthsLayer, setShowAuthsLayer] = useState<boolean>(false);
 
-  const [showSeriesLayer, setShowSeriesLayer] = React.useState<boolean>(false);
-  const [showTestLayer, setShowTestLayer] = React.useState<boolean>(false);
+  const [showSeriesLayer, setShowSeriesLayer] = useState<boolean>(false);
+  const [showTestLayer, setShowTestLayer] = useState<boolean>(false);
 
-  const screenSize = React.useContext(ResponsiveContext);
-  const [columnsWidth, setColumnsWidth] = React.useState<string[]>(['5%', 'auto', '5%']);
+  const screenSize = useContext(ResponsiveContext);
+  const [columnsWidth, setColumnsWidth] = useState<string[]>(['5%', 'auto', '5%']);
 
   const changeConnection = () => {
     setShowAccountLayer(false);
     setShowConnectLayer(true);
   };
 
-  React.useEffect(()=> {
+  useEffect(()=> {
     if (screenSize === 'small') { 
       setColumnsWidth(['0%', 'auto', '0%']);
     } else {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { ethers, BigNumber }  from 'ethers';
 
 import { NotifyContext } from '../contexts/NotifyContext';
@@ -25,25 +25,25 @@ import { useTxHelpers } from './appHooks';
 export const useController = () => {
   const { abi: controllerAbi } = Controller;
   const { signer, provider, account } = useSignerAccount();
-  const  { dispatch }  = React.useContext<any>(NotifyContext);
-  const { state : { deployedContracts } } = React.useContext<any>(YieldContext);
+  const  { dispatch }  = useContext<any>(NotifyContext);
+  const { state : { deployedContracts } } = useContext<any>(YieldContext);
 
   // const controllerAddr = ethers.utils.getAddress(deployedContracts.Controller);
 
-  const [ postActive, setPostActive ] = React.useState<boolean>(false);
-  const [ withdrawActive, setWithdrawActive ] = React.useState<boolean>(false);
-  const [ borrowActive, setBorrowActive ] = React.useState<boolean>(false);
-  const [ repayActive, setRepayActive ] = React.useState<boolean>(false);
-  const [ approveActive, setApproveActive ] = React.useState<boolean>(false);
+  const [ postActive, setPostActive ] = useState<boolean>(false);
+  const [ withdrawActive, setWithdrawActive ] = useState<boolean>(false);
+  const [ borrowActive, setBorrowActive ] = useState<boolean>(false);
+  const [ repayActive, setRepayActive ] = useState<boolean>(false);
+  const [ approveActive, setApproveActive ] = useState<boolean>(false);
 
   /* controller contract for txs */
-  const [controllerContract, setControllerContract] = React.useState<any>();
+  const [controllerContract, setControllerContract] = useState<any>();
   /* controller contract for reading, calls */
-  const [controllerProvider, setControllerProvider] = React.useState<any>();
+  const [controllerProvider, setControllerProvider] = useState<any>();
 
   const { handleTx, handleTxError } = useTxHelpers();
 
-  React.useEffect(()=>{
+  useEffect(()=>{
     deployedContracts.Controller && signer &&
     setControllerContract( new ethers.Contract( 
       ethers.utils.getAddress(deployedContracts.Controller), 

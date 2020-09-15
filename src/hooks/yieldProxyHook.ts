@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 
 import { ethers, BigNumber }  from 'ethers';
 import { signDaiPermit, signERC2612Permit } from 'eth-permit';
@@ -54,21 +54,21 @@ export const useProxy = () => {
 
   const { abi: yieldProxyAbi } = YieldProxy;
   
-  const  { dispatch }  = React.useContext<any>(NotifyContext);
-  const  { state: { deployedContracts } }  = React.useContext<any>(YieldContext);
-  const  { state: { preferences: { slippage } } }  = React.useContext<any>(UserContext);
+  const  { dispatch }  = useContext<any>(NotifyContext);
+  const  { state: { deployedContracts } }  = useContext<any>(YieldContext);
+  const  { state: { preferences: { slippage } } }  = useContext<any>(UserContext);
 
-  const [ proxyContract, setProxyContract] = React.useState<any>();
+  const [ proxyContract, setProxyContract] = useState<any>();
 
-  const [ postEthActive, setPostEthActive ] = React.useState<boolean>(false);
-  const [ withdrawEthActive, setWithdrawEthActive ] = React.useState<boolean>(false);
-  const [ borrowActive, setBorrowActive ] = React.useState<boolean>(false);
-  const [ repayActive, setRepayActive ] = React.useState<boolean>(false);
-  const [ removeLiquidityActive, setRemoveLiquidityActive ] = React.useState<boolean>(false);
-  const [ addLiquidityActive, setAddLiquidityActive ] = React.useState<boolean>(false);
+  const [ postEthActive, setPostEthActive ] = useState<boolean>(false);
+  const [ withdrawEthActive, setWithdrawEthActive ] = useState<boolean>(false);
+  const [ borrowActive, setBorrowActive ] = useState<boolean>(false);
+  const [ repayActive, setRepayActive ] = useState<boolean>(false);
+  const [ removeLiquidityActive, setRemoveLiquidityActive ] = useState<boolean>(false);
+  const [ addLiquidityActive, setAddLiquidityActive ] = useState<boolean>(false);
 
-  const [ buyActive, setBuyActive ] = React.useState<boolean>(false);
-  const [ sellActive, setSellActive ] = React.useState<boolean>(false);
+  const [ buyActive, setBuyActive ] = useState<boolean>(false);
+  const [ sellActive, setSellActive ] = useState<boolean>(false);
 
   const auths = new Map([
     [1, { id: 1, desc:'Dai > treasury authenticate ' }],
@@ -87,7 +87,7 @@ export const useProxy = () => {
   };
 
   /* Preset the yieldProxy contract to be used with all fns */
-  React.useEffect(()=>{
+  useEffect(()=>{
     deployedContracts.YieldProxy && signer &&
     setProxyContract( new ethers.Contract( 
       ethers.utils.getAddress(deployedContracts.YieldProxy), 

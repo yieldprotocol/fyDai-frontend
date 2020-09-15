@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { ethers, BigNumber } from 'ethers';
 import moment from 'moment';
 
@@ -75,8 +75,8 @@ const UserProvider = ({ children }: any) => {
 
   const [ state, dispatch ] = React.useReducer(reducer, initState);
 
-  const { dispatch: notifyDispatch } = React.useContext(NotifyContext);
-  const { state: yieldState } = React.useContext(YieldContext);
+  const { dispatch: notifyDispatch } = useContext(NotifyContext);
+  const { state: yieldState } = useContext(YieldContext);
   const { deployedContracts, deployedSeries } = yieldState;
 
   const { account, provider } = useSignerAccount();
@@ -343,7 +343,7 @@ const UserProvider = ({ children }: any) => {
     dispatch({ type: 'isLoading', payload: false });
   };
 
-  React.useEffect(()=>{
+  useEffect(()=>{
     // init everytime or change
     account && !yieldState.isLoading && initUserContext();
 

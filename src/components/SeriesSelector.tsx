@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Text, Box, Layer, ResponsiveContext, Button } from 'grommet';
 import { 
   FiArrowLeft as ArrowLeft,
@@ -18,14 +18,14 @@ interface ISeriesSelectorProps {
 
 const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
 
-  const screenSize = React.useContext(ResponsiveContext);
-  const { state: seriesState, actions: seriesActions } = React.useContext( SeriesContext );
+  const screenSize = useContext(ResponsiveContext);
+  const { state: seriesState, actions: seriesActions } = useContext( SeriesContext );
   const { isLoading, activeSeries, seriesData } = seriesState; 
   const { setActiveSeries } = seriesActions;
 
-  const [sortedList, setSortedList] = React.useState<any>(seriesData);
-  const [firstSort, setFirstSort] = React.useState<any>('');
-  const [secondSort, setSecondSort] = React.useState<any>('');
+  const [sortedList, setSortedList] = useState<any>(seriesData);
+  const [firstSort, setFirstSort] = useState<any>('');
+  const [secondSort, setSecondSort] = useState<any>('');
 
 
   const viewMap = new Map([
@@ -40,7 +40,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
   };
 
   /* filter by isMature, then sort by maturity date  */
-  React.useEffect(()=>{
+  useEffect(()=>{
 
     const sortedActive = new Map([...seriesData.entries()]
       .filter((x:any)=> !(x[1].isMature()) )

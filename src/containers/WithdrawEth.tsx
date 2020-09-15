@@ -36,7 +36,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
 
   const [ inputValue, setInputValue ] = useState<any>();
   const debouncedInput = useDebounce(inputValue, 500);
-  const [inputRef, setInputRef] = React.useState<any>(null);
+  const [inputRef, setInputRef] = useState<any>(null);
 
   const [ estRatio, setEstRatio ] = useState<any>();
   const [ estDecrease, setEstDecrease ] = useState<any>();

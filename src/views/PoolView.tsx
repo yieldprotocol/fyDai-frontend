@@ -1,10 +1,7 @@
-import React from 'react';
-import { Box, Text } from 'grommet';
-
+import React, { useEffect, useState, useContext } from 'react';
+import { Box } from 'grommet';
 import PageHeader from '../components/PageHeader';
-import SeriesDescriptor from '../components/SeriesDescriptor';
 import Pool from '../containers/Pool';
-import Authorization from '../components/Authorization';
 
 const PoolView = () => {
   return (

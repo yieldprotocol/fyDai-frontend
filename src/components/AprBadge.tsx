@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import moment from 'moment';
 import { Box, Text, ThemeContext, ResponsiveContext, Button } from 'grommet';
 
@@ -19,7 +19,7 @@ function AprBadge({ activeView, series }:IAprBadgeProps) {
   const [ seriesMature, setSeriesMature ] = useState<boolean>(series.isMature());
 
   /* Set Series description/display name */
-  React.useEffect(()=>{
+  useEffect(()=>{
     setSeriesMature(series.isMature());
     setSeriesApr(moment(series.maturity*1000).format('MMM \'YY'));
     series.poolState?.active && ( async () => setSeriesApr( `${series.yieldAPR_} %`) )(); 

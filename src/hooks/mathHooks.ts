@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { ethers, BigNumber }  from 'ethers';
 import * as utils from '../utils';
 
@@ -15,10 +15,10 @@ import { YieldContext } from '../contexts/YieldContext'; // TODO sort out this c
  * 
  */
 export const useMath = () => {
-  const { state: { feedData } } = React.useContext(YieldContext);
-  const [ ilks, setIlks ] = React.useState<any>();
+  const { state: { feedData } } = useContext(YieldContext);
+  const [ ilks, setIlks ] = useState<any>();
   
-  React.useEffect(()=>{
+  useEffect(()=>{
     feedData.ilks && setIlks(feedData.ilks);
   }, [feedData]);
 

@@ -1,13 +1,13 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { NotifyContext } from '../contexts/NotifyContext';
 
 /* Simple Hook for checking if a transaction family/families are in process */
 export const useTxActive = (typeList:string[]) => {
-  const { state: { pendingTxs } } = React.useContext(NotifyContext);
-  const [txActive, setTxActive] = React.useState<any>(null);
+  const { state: { pendingTxs } } = useContext(NotifyContext);
+  const [txActive, setTxActive] = useState<any>(null);
   const upperTypeList = typeList.map( (x:any) => x.toUpperCase() );
 
-  React.useEffect(()=>{
+  useEffect(()=>{
     setTxActive(pendingTxs.find( (x:any)=> upperTypeList.includes(x.type) ));
   }, [ pendingTxs ]);
 
@@ -16,7 +16,7 @@ export const useTxActive = (typeList:string[]) => {
 
 export const useTxHelpers = () => { 
 
-  const  { dispatch }  = React.useContext<any>(NotifyContext);
+  const  { dispatch }  = useContext<any>(NotifyContext);
 
   /* Notification Helpers */
   const txComplete = (tx:any) => {
@@ -56,7 +56,7 @@ export const useTxHelpers = () => {
 export const useCachedState = (key:string, initialValue:any) => {
   // const genKey = `${chainId}_${key}` || key;
   const genKey = key;
-  const [storedValue, setStoredValue] = React.useState(
+  const [storedValue, setStoredValue] = useState(
     () => {
       try {
         const item = window.localStorage.getItem(genKey);
@@ -84,9 +84,9 @@ export const useCachedState = (key:string, initialValue:any) => {
 };
 
 export const useDebounce = (value:any, delay:number) => {
-  const [debouncedValue, setDebouncedValue] = React.useState(value);
+  const [debouncedValue, setDebouncedValue] = useState(value);
 
-  React.useEffect(
+  useEffect(
     () => {
       // Update debounced value after delay
       const handler = setTimeout(() => {

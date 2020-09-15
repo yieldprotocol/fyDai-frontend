@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from 'react';
+import React, { useEffect, useContext, useState } from 'react';
 import { ethers } from 'ethers';
 import { Box, Button, TextInput, Text, ResponsiveContext, Keyboard } from 'grommet';
 
@@ -29,31 +29,31 @@ interface IRepayProps {
 }
 
 function Repay({ setActiveView, repayAmount }:IRepayProps) {
-  const { state: { deployedContracts } } = React.useContext(YieldContext);
-  const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
+  const { state: { deployedContracts } } = useContext(YieldContext);
+  const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { activeSeries } = seriesState;
   const { state: userState, actions: userActions } = useContext(UserContext);
   const { daiBalance_ } = userState.position;
-  const screenSize = React.useContext(ResponsiveContext);
+  const screenSize = useContext(ResponsiveContext);
 
-  const [ hasDelegated, setHasDelegated ] = React.useState<boolean>(true);
+  const [ hasDelegated, setHasDelegated ] = useState<boolean>(true);
 
   const { previewPoolTx }  = usePool(); 
   const { repayDaiDebt, repayActive } = useProxy();
   const [ txActive ] = useTxActive(['repay']);
   const { account } = useSignerAccount();
 
-  const [ inputValue, setInputValue ] = React.useState<any>();
+  const [ inputValue, setInputValue ] = useState<any>();
   const debouncedInput = useDebounce(inputValue, 500);
-  const [inputRef, setInputRef] = React.useState<any>(null);
+  const [inputRef, setInputRef] = useState<any>(null);
 
-  const [ eDaiValue, setEDaiValue ] = React.useState<any>();
+  const [ eDaiValue, setEDaiValue ] = useState<any>();
 
-  const [ repayPending, setRepayPending ] = React.useState<boolean>(false);
-  const [ repayDisabled, setRepayDisabled ] = React.useState<boolean>(true);
+  const [ repayPending, setRepayPending ] = useState<boolean>(false);
+  const [ repayDisabled, setRepayDisabled ] = useState<boolean>(true);
 
-  const [ warningMsg, setWarningMsg] = React.useState<string|null>(null);
-  const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
+  const [ warningMsg, setWarningMsg] = useState<string|null>(null);
+  const [ errorMsg, setErrorMsg] = useState<string|null>(null);
 
   const repayProcedure = async (value:number) => {
     if (!repayDisabled) {

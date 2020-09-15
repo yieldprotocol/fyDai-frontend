@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 
 import { ethers } from 'ethers';
 import Moment from 'moment'; 
@@ -23,29 +23,29 @@ const TestLayer = (props:any) => {
   const { chainId, account } = useWeb3React();
 
   // const web3 = useWeb3React();
-  const { state: { position }, actions: userActions } = React.useContext( UserContext );
-  const { state: yieldState, actions: yieldActions } = React.useContext( YieldContext );
-  const { state: seriesState, actions: seriesActions } = React.useContext( SeriesContext );
-  const [ flow, setFlow ] = React.useState<string|null>('APPROVALS');
+  const { state: { position }, actions: userActions } = useContext( UserContext );
+  const { state: yieldState, actions: yieldActions } = useContext( YieldContext );
+  const { state: seriesState, actions: seriesActions } = useContext( SeriesContext );
+  const [ flow, setFlow ] = useState<string|null>('APPROVALS');
 
   const { activeSeries, seriesData } = seriesState;
   const { yieldData, deployedContracts, deployedSeries } = yieldState;
   
 
-  // const [ wethBalance, setWethBalance ] = React.useState<string|null|number>(0);
-  // const [ chaiBalance, setChaiBalance ] = React.useState<string|null|number>(0);
-  // const [ daiBalance, setDaiBalance ] = React.useState<string|null|number>(0);
+  // const [ wethBalance, setWethBalance ] = useState<string|null|number>(0);
+  // const [ chaiBalance, setChaiBalance ] = useState<string|null|number>(0);
+  // const [ daiBalance, setDaiBalance ] = useState<string|null|number>(0);
 
-  const [daiDebt, setDaiDebt] = React.useState<ethers.BigNumber>();
-  const [daiTokens, setDaiTokens] = React.useState<ethers.BigNumber>();
-  const [wethTokens, setWethTokens] = React.useState<ethers.BigNumber>();
-  const [chaiTokens, setChaiTokens] = React.useState<ethers.BigNumber>();
+  const [daiDebt, setDaiDebt] = useState<ethers.BigNumber>();
+  const [daiTokens, setDaiTokens] = useState<ethers.BigNumber>();
+  const [wethTokens, setWethTokens] = useState<ethers.BigNumber>();
+  const [chaiTokens, setChaiTokens] = useState<ethers.BigNumber>();
 
-  const [chainDate, setChainDate] = React.useState<any>(null);
+  const [chainDate, setChainDate] = useState<any>(null);
 
   const { closeLayer, changeWallet } = props;
   // const [ connectMakerVault ] = useMakerVault();
-  const { dispatch } = React.useContext<any>(NotifyContext);
+  const { dispatch } = useContext<any>(NotifyContext);
 
   const [ sendTx ]  = useSendTx();
   const [ callTx ]  = useCallTx();
@@ -75,13 +75,13 @@ const TestLayer = (props:any) => {
 
   // const { getChaiBalance, getWethBalance, getDaiBalance }  = useBalances();
 
-  // React.useEffect(()=>{
+  // useEffect(()=>{
   //   (async () => setWethBalance( await getWethBalance(deployedContracts.Weth)) )();
   //   (async () => setChaiBalance( await getChaiBalance(deployedContracts.Chai)) )();
   //   (async () => setDaiBalance( await getDaiBalance(deployedContracts.Dai)) )();
   // }, [deployedContracts, postActive, withdrawActive]);
 
-  React.useEffect(()=>{
+  useEffect(()=>{
     const daiD = utils.toWad(1);
     const chi  = utils.toRay(1.2);
 
@@ -99,14 +99,14 @@ const TestLayer = (props:any) => {
 
   }, [ yieldState ] );
 
-  React.useEffect(()=>{
+  useEffect(()=>{
 
 
 
 
   }, [chainDate]);
 
-  // React.useEffect(() => {
+  // useEffect(() => {
   //   // (async () => setBalance( await getBalance()) )();
   //   // (async () => setWeiBalance( await getWeiBalance()) )();
   //   // (async () => activate(injected, console.log))();

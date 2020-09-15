@@ -41,7 +41,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
 
   const [ inputValue, setInputValue ] = useState<any>();
   const debouncedInput = useDebounce(inputValue, 500);
-  const [inputRef, setInputRef] = React.useState<any>(null);
+  const [inputRef, setInputRef] = useState<any>(null);
 
   const [ removeLiquidityDisabled, setRemoveLiquidityDisabled ] = useState<boolean>(true);
   const [ removeLiquidityPending, setRemoveLiquidityPending] = useState<boolean>(false);

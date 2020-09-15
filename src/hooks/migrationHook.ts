@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { ethers }  from 'ethers';
 import { useWeb3React } from '@web3-react/core';
 import { useSignerAccount } from './connectionHooks';
@@ -23,9 +23,9 @@ export const useMigrations = () => {
   const { chainId } = useWeb3React('fallback');
   const { fallbackProvider } = useSignerAccount();
   const { abi: migrationAbi } = Migration;
-  const [migrationsAddress, setMigrationsAddress] = React.useState<string>( process.env.REACT_APP_MIGRATION_DEFAULT || '');
+  const [migrationsAddress, setMigrationsAddress] = useState<string>( process.env.REACT_APP_MIGRATION_DEFAULT || '');
   
-  React.useEffect(()=>{
+  useEffect(()=>{
     if (chainId) {
       const migAddr = migrationAddrs.get(chainId);
       migAddr && setMigrationsAddress(migAddr);

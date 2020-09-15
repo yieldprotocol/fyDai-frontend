@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Grid, Box, Text, ResponsiveContext } from 'grommet';
 import Loading from './Loading';
 
@@ -19,7 +19,7 @@ interface IInfoGridProps {
 
 function InfoGrid({ entries }:IInfoGridProps) {
 
-  const screenSize = React.useContext(ResponsiveContext);
+  const screenSize = useContext(ResponsiveContext);
   
   return (
     <Grid columns={screenSize !== 'small' ? '30%' : '45%'} gap="small" fill>

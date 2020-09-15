@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { ethers } from 'ethers';
 import { Box, Button, Keyboard, TextInput, Text, ResponsiveContext } from 'grommet';
 
@@ -33,13 +33,13 @@ interface ILendProps {
 }
   
 const Lend = ({ lendAmount }:ILendProps) => {
-  const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
+  const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { activeSeries } = seriesState;
 
-  const { state: userState, actions: userActions } = React.useContext(UserContext);
+  const { state: userState, actions: userActions } = useContext(UserContext);
   const { daiBalance_ } = userState.position;
 
-  const screenSize = React.useContext(ResponsiveContext);
+  const screenSize = useContext(ResponsiveContext);
 
   const { previewPoolTx } = usePool();
   const { sellDai, sellActive } = useProxy();
@@ -51,18 +51,18 @@ const Lend = ({ lendAmount }:ILendProps) => {
 
   const [ withdrawDaiOpen, setWithdrawDaiOpen ] = useState<boolean>(false);
   
-  const [ inputValue, setInputValue ] = React.useState<any>();
+  const [ inputValue, setInputValue ] = useState<any>();
   const debouncedInput = useDebounce(inputValue, 500);
-  const [inputRef, setInputRef] = React.useState<any>(null);
+  const [inputRef, setInputRef] = useState<any>(null);
   
-  const [ lendDisabled, setLendDisabled ] = React.useState<boolean>(true);
+  const [ lendDisabled, setLendDisabled ] = useState<boolean>(true);
   const [ lendPending, setLendPending ] = useState<boolean>(false);
-  const [ warningMsg, setWarningMsg] = React.useState<string|null>(null);
-  const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
+  const [ warningMsg, setWarningMsg] = useState<string|null>(null);
+  const [ errorMsg, setErrorMsg] = useState<string|null>(null);
 
-  const [ APR, setAPR ] = React.useState<number>();
-  const [ eDaiValue, setEDaiValue ] = React.useState<number>(0);
-  const [ currentValue, setCurrentValue ] = React.useState<number>(0);
+  const [ APR, setAPR ] = useState<number>();
+  const [ eDaiValue, setEDaiValue ] = useState<number>(0);
+  const [ currentValue, setCurrentValue ] = useState<number>(0);
   
   /* Lend execution flow */
   const lendProcedure = async (value:number) => {

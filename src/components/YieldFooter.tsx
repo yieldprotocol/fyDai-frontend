@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useWeb3React } from '@web3-react/core';
 
 import { Anchor, Footer, Button, Box } from 'grommet';

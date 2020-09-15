@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { ethers } from 'ethers';
 import moment from 'moment';
 
@@ -81,7 +81,7 @@ const YieldProvider = ({ children }: any) => {
   const { provider, fallbackProvider } = useSignerAccount();
   const { chainId } = useWeb3React('fallback');
 
-  const { dispatch: notifyDispatch } = React.useContext(NotifyContext);
+  const { dispatch: notifyDispatch } = useContext(NotifyContext);
 
   /* cache|localStorage declarations */
   const [cachedContracts, setCachedContracts] = useCachedState('deployedContracts', null );
@@ -241,7 +241,7 @@ const YieldProvider = ({ children }: any) => {
   };
 
   /* Init app and re-init app on change of fallback provider network  */
-  React.useEffect(() => {
+  useEffect(() => {
     // provider && (async () => initContext() )();
     fallbackProvider && (async () => initContext() )();
   }, [ fallbackProvider ]);

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Box, Text } from 'grommet';
 import { 
   FiClock as Clock,
@@ -18,14 +18,14 @@ interface IRedeemProps {
 }
 
 const Redeem  = ({ close }:IRedeemProps)  => {
-  const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
+  const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { activeSeries } = seriesState;
-  const { actions: userActions } = React.useContext(UserContext);
+  const { actions: userActions } = useContext(UserContext);
 
-  const [ redeemPending, setRedeemPending] = React.useState<boolean>(false);
-  const [ redeemDisabled, setRedeemDisabled] = React.useState<boolean>(true);
-  const [ warningMsg, setWarningMsg] = React.useState<string|null>(null);
-  const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
+  const [ redeemPending, setRedeemPending] = useState<boolean>(false);
+  const [ redeemDisabled, setRedeemDisabled] = useState<boolean>(true);
+  const [ warningMsg, setWarningMsg] = useState<string|null>(null);
+  const [ errorMsg, setErrorMsg] = useState<string|null>(null);
 
   const { redeem, redeemActive } = useEDai();
   const [ txActive ] = useTxActive(['redeem']);
@@ -43,7 +43,7 @@ const Redeem  = ({ close }:IRedeemProps)  => {
   };
 
   /* redeem button disabled logic */ 
-  React.useEffect( () => {
+  useEffect( () => {
     parseFloat(activeSeries?.eDaiBalance_) > 0 ? 
       setRedeemDisabled(false) 
       : setRedeemDisabled(true);  

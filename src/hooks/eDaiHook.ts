@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { ethers, BigNumber }  from 'ethers';
 import EDai from '../contracts/EDai.json';
 
@@ -14,11 +14,11 @@ import { useTxHelpers } from './appHooks';
  */
 export const useEDai = () => {
 
-  // const { state: { signer, account } } = React.useContext(ConnectionContext);
+  // const { state: { signer, account } } = useContext(ConnectionContext);
   const { provider, signer, account } = useSignerAccount();
   const { abi: eDaiAbi } = EDai;
-  const  { dispatch }  = React.useContext<any>(NotifyContext);
-  const [ redeemActive, setRedeemActive ] = React.useState<boolean>(false);
+  const  { dispatch }  = useContext<any>(NotifyContext);
+  const [ redeemActive, setRedeemActive ] = useState<boolean>(false);
 
   const { handleTx, handleTxError } = useTxHelpers();
 

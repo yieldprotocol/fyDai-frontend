@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 
 import { useWeb3React } from '@web3-react/core';
 
@@ -38,9 +38,9 @@ const YieldHeader = (props: any) => {
 
   const {
     state: { pendingTxs },
-  } = React.useContext(NotifyContext);
+  } = useContext(NotifyContext);
 
-  const screenSize = React.useContext(ResponsiveContext);
+  const screenSize = useContext(ResponsiveContext);
 
   // Menu state for mobile later
   const [menuOpen, setMenu] = useState(false);
@@ -74,7 +74,7 @@ const YieldHeader = (props: any) => {
 
   // const { account } = useWeb3React();
 
-  const theme = React.useContext<any>(ThemeContext);
+  const theme = useContext<any>(ThemeContext);
 
   useEffect(() => {
     // (async () => activate(injected, console.log))();

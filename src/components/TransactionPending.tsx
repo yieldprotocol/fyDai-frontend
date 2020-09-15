@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Box, Text, TextArea, ThemeContext } from 'grommet';
 
 import {FiCopy as Copy} from 'react-icons/fi';
@@ -11,7 +11,7 @@ interface TransactionPendingProps {
 
 const TransactionPending = ({ msg, tx }:TransactionPendingProps) => {
 
-  const theme:any = React.useContext(ThemeContext); 
+  const theme:any = useContext(ThemeContext); 
   const txRef = React.useRef<any>(null);
 
   const handleCopy = () => {

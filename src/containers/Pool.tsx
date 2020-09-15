@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { ethers } from 'ethers';
 import Moment from 'moment';
 import { Box, Button, Keyboard, TextInput, Text, ResponsiveContext } from 'grommet';
@@ -33,12 +33,12 @@ interface IPoolProps {
 }
   
 const Pool = (props:IPoolProps) => {
-  const { state: { deployedContracts } } = React.useContext(YieldContext);
-  const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
+  const { state: { deployedContracts } } = useContext(YieldContext);
+  const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { activeSeries } = seriesState;
-  const { state: userState, actions: userActions } = React.useContext(UserContext);
+  const { state: userState, actions: userActions } = useContext(UserContext);
   const { daiBalance_ } = userState.position;
-  const screenSize = React.useContext(ResponsiveContext);
+  const screenSize = useContext(ResponsiveContext);
 
   const { addLiquidity, addLiquidityActive } = useProxy();
   const { getBalance } = useToken();
@@ -51,16 +51,16 @@ const Pool = (props:IPoolProps) => {
 
   const [ hasDelegated, setHasDelegated ] = useState<boolean>(true);
 
-  const [ inputValue, setInputValue ] = React.useState<any>();
+  const [ inputValue, setInputValue ] = useState<any>();
   const debouncedInput = useDebounce(inputValue, 500);
-  const [inputRef, setInputRef] = React.useState<any>(null);
+  const [inputRef, setInputRef] = useState<any>(null);
 
   const [ removeLiquidityOpen, setRemoveLiquidityOpen ] = useState<boolean>(false);
 
-  const [ addLiquidityDisabled, setAddLiquidityDisabled ] = React.useState<boolean>(true);
+  const [ addLiquidityDisabled, setAddLiquidityDisabled ] = useState<boolean>(true);
   const [ addLiquidityPending, setAddLiquidityPending ] = useState<boolean>(false);
-  const [ warningMsg, setWarningMsg] = React.useState<string|null>(null);
-  const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
+  const [ warningMsg, setWarningMsg] = useState<string|null>(null);
+  const [ errorMsg, setErrorMsg] = useState<string|null>(null);
   
   /* Add Liquidity sequence */ 
   const addLiquidityProcedure = async (value:number) => { 

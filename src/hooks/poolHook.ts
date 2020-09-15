@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { ethers, BigNumber }  from 'ethers';
 
 import Pool from '../contracts/Pool.json';
@@ -14,10 +14,10 @@ import { useTxHelpers } from './appHooks';
 export const usePool = () => {
   const { fallbackProvider, provider, signer, account } = useSignerAccount();
   const { abi: poolAbi } = Pool;
-  const  { dispatch }  = React.useContext<any>(NotifyContext);
-  const [ sellActive, setSellActive ] = React.useState<boolean>(false);
-  const [ buyActive, setBuyActive ] = React.useState<boolean>(false);
-  const [ callActive, setCallActive ] = React.useState<boolean>(false);
+  const  { dispatch }  = useContext<any>(NotifyContext);
+  const [ sellActive, setSellActive ] = useState<boolean>(false);
+  const [ buyActive, setBuyActive ] = useState<boolean>(false);
+  const [ callActive, setCallActive ] = useState<boolean>(false);
 
   const { handleTx, handleTxError } = useTxHelpers();
 

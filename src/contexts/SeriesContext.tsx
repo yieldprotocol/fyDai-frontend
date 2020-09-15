@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { ethers, BigNumber } from 'ethers';
 
 import * as utils from '../utils';
@@ -50,8 +50,8 @@ const SeriesProvider = ({ children }:any) => {
   };
 
   const [ state, dispatch ] = React.useReducer(reducer, initState);
-  const { state: userState } = React.useContext( UserContext );
-  const { state: yieldState } = React.useContext(YieldContext);
+  const { state: userState } = useContext( UserContext );
+  const { state: yieldState } = useContext(YieldContext);
   const { feedData, deployedContracts } = yieldState;
 
   const { previewPoolTx, checkPoolDelegate, checkPoolState } = usePool();
@@ -192,7 +192,7 @@ const SeriesProvider = ({ children }:any) => {
   };
 
   /* Init series context and re-init on any user and/or network change */
-  React.useEffect( () => {
+  useEffect( () => {
     (provider || fallbackProvider) && !yieldState.isLoading && ( async () => {
       await updateSeriesList(yieldState.deployedSeries, false);
     })();

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Box, Button, Layer, Text, ResponsiveContext } from 'grommet';
 
 import { 
@@ -22,16 +22,16 @@ interface IAuthorizationProps {
 }
 
 const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => { 
-  const screenSize = React.useContext(ResponsiveContext);
-  const { state: { requestedSigs } } = React.useContext(NotifyContext);
-  const { state: { authorizations }, actions: userActions } = React.useContext(UserContext);
+  const screenSize = useContext(ResponsiveContext);
+  const { state: { requestedSigs } } = useContext(NotifyContext);
+  const { state: { authorizations }, actions: userActions } = useContext(UserContext);
   const { hasDelegatedProxy } = authorizations;
-  const { actions: seriesActions } = React.useContext(SeriesContext);
+  const { actions: seriesActions } = useContext(SeriesContext);
 
   // flags 
-  const [ authPending, setAuthPending ] = React.useState<boolean>(false);
-  const [ layerOpen, setLayerOpen ] = React.useState<boolean>(true);
-  const [ allSigned, setAllSigned ] = React.useState<boolean>(false);
+  const [ authPending, setAuthPending ] = useState<boolean>(false);
+  const [ layerOpen, setLayerOpen ] = useState<boolean>(true);
+  const [ allSigned, setAllSigned ] = useState<boolean>(false);
   
   const { account } = useSignerAccount();
   const { yieldAuth, poolAuth, authActive } = useAuth();
@@ -53,11 +53,11 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
   };
 
   /* manage layer open /closed by watching authActive */
-  React.useEffect(()=>{
+  useEffect(()=>{
     authActive && setLayerOpen(true);
   }, [authActive]);
 
-  React.useEffect(()=>{
+  useEffect(()=>{
     const _allSigned = requestedSigs.reduce((acc:boolean, nextItem:any)=> {
       return nextItem.signed;
     }, false);

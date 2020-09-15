@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 
 import Maker from '@makerdao/dai';
 import { McdPlugin, ETH, DAI, BAT } from '@makerdao/dai-plugin-mcd';
@@ -58,14 +58,14 @@ const defineNetwork = (_networkId:number) => {
 
 export const useMaker = () => {
 
-  // const { state : { account, chainId, provider } } = React.useContext(ConnectionContext);
+  // const { state : { account, chainId, provider } } = useContext(ConnectionContext);
 
   const { signer, provider, account, fallbackProvider, voidSigner } = useSignerAccount();
 
   // const { account, chainId, library } = useWeb3React();
-  const [openVaultActive, setOpenVaultActive] = React.useState<boolean>(false);
-  const [convertVaultActive, setConvertVaultActive] = React.useState<boolean>(false);
-  const [getVaultActive, setGetVaultActive] = React.useState<boolean>(false);
+  const [openVaultActive, setOpenVaultActive] = useState<boolean>(false);
+  const [convertVaultActive, setConvertVaultActive] = useState<boolean>(false);
+  const [getVaultActive, setGetVaultActive] = useState<boolean>(false);
 
   // const networkNumber = await chainId;
 

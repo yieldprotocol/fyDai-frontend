@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Box, Image, Text, Drop, Button, Collapsible } from 'grommet';
 import moment from 'moment';
 
@@ -31,7 +31,7 @@ const YieldSeriesMenuItem = ({
     seriesColor,
   } = series;
 
-  const [over, setOver] = React.useState<boolean>();
+  const [over, setOver] = useState<boolean>();
   const tooltipColor = { color: 'background-mid', opacity: 1 };
   const ref = React.useRef<any>();
 

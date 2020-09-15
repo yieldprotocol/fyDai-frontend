@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { ethers }  from 'ethers';
 // import { ConnectionContext } from '../contexts/ConnectionContext';
 
@@ -39,10 +39,10 @@ const contractMap = new Map<string, any>([
  * @returns { function } getEvents
  */
 export const useEvents = () => {
-  // const { state: { provider } } = React.useContext(ConnectionContext);
+  // const { state: { provider } } = useContext(ConnectionContext);
   const { provider } = useSignerAccount();
-  const [ eventListenerList, setEventListenerList ] = React.useState<boolean>();
-  const [ isLoading, setIsLoading ] = React.useState<boolean>();
+  const [ eventListenerList, setEventListenerList ] = useState<boolean>();
+  const [ isLoading, setIsLoading ] = useState<boolean>();
 
   /**
    * Setup an event listener.

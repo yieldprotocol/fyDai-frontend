@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import { ethers, BigNumber }  from 'ethers';
 
@@ -46,9 +46,9 @@ const contractMap = new Map<string, any>([
  * @returns { boolean } sendTxActive
  */
 export const useSendTx = () => {
-  // const { state: { signer, account } } = React.useContext(ConnectionContext);
+  // const { state: { signer, account } } = useContext(ConnectionContext);
   const { signer, account } = useSignerAccount();
-  const [ sendTxActive, setSendTxActive ] = React.useState<boolean>();
+  const [ sendTxActive, setSendTxActive ] = useState<boolean>();
   /**
    * Send a transaction ()
    * @param {string} contractAddress address of the contract to send to.
@@ -87,9 +87,9 @@ export const useSendTx = () => {
  */
 export const useCallTx = () => {
 
-  // const { state: { provider, altProvider } } = React.useContext(ConnectionContext);
+  // const { state: { provider, altProvider } } = useContext(ConnectionContext);
   const { signer, provider, account, fallbackProvider, voidSigner } = useSignerAccount();
-  const [ callTxActive, setCallTxActive ] = React.useState<boolean>();
+  const [ callTxActive, setCallTxActive ] = useState<boolean>();
   /**
    * Get data from the blockchain via provider (no signer reqd)
    * @param {string} contractAddress address of the contract to be called
@@ -118,7 +118,7 @@ export const useCallTx = () => {
  * @returns { boolean } getBalance
  */
 export function useBalances() {
-  // const { state: { provider, account } } = React.useContext(ConnectionContext);
+  // const { state: { provider, account } } = useContext(ConnectionContext);
   const { signer, provider, account, fallbackProvider, voidSigner } = useSignerAccount();
 
   /**
@@ -177,11 +177,11 @@ export function useBalances() {
 export const useTimeTravel = () => {
 
   const { provider } = useSignerAccount();
-  const [ snapshot, setSnapshot ] = React.useState<any>('0x1');
-  const [ block, setBlock ] = React.useState<any>(null);
-  const [ timestamp, setTimestamp ] = React.useState<number|null>(null);
+  const [ snapshot, setSnapshot ] = useState<any>('0x1');
+  const [ block, setBlock ] = useState<any>(null);
+  const [ timestamp, setTimestamp ] = useState<number|null>(null);
 
-  React.useEffect(()=>{
+  useEffect(()=>{
     provider && ( async () => {
       const { timestamp: ts } = await provider.getBlock(await provider.blockNumber);
       setTimestamp(ts);

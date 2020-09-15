@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { ethers, BigNumber  }  from 'ethers';
 import { keccak256, defaultAbiCoder, toUtf8Bytes, solidityPack } from 'ethers/lib/utils';
 import { signDaiPermit, signERC2612Permit } from 'eth-permit';
@@ -57,8 +57,8 @@ const auths = new Map([
 
 export const useAuth = () => {
   const { account, provider, signer } = useSignerAccount();
-  const { state: { deployedContracts } } = React.useContext(YieldContext);
-  const { dispatch } = React.useContext(NotifyContext);
+  const { state: { deployedContracts } } = useContext(YieldContext);
+  const { dispatch } = useContext(NotifyContext);
   
   const controllerAddr = ethers.utils.getAddress(deployedContracts.Controller);
   const controllerContract = new ethers.Contract( controllerAddr, Controller.abi, provider);
@@ -68,7 +68,7 @@ export const useAuth = () => {
   const daiAddr = ethers.utils.getAddress(deployedContracts.Dai);
   const fromAddr = account && ethers.utils.getAddress(account);
 
-  const [authActive, setAuthActive] = React.useState<boolean>(false);
+  const [authActive, setAuthActive] = useState<boolean>(false);
 
   const { handleTx, handleTxError } = useTxHelpers();
 

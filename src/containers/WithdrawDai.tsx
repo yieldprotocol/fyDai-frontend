@@ -42,9 +42,9 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
 
   const [ inputValue, setInputValue ] = useState<any>();
   const debouncedInput = useDebounce(inputValue, 500);
-  const [inputRef, setInputRef] = React.useState<any>(null);
+  const [inputRef, setInputRef] = useState<any>(null);
   
-  const [ eDaiValue, setEDaiValue ] = React.useState<number>(0);
+  const [ eDaiValue, setEDaiValue ] = useState<number>(0);
 
   const [ withdrawDisabled, setWithdrawDisabled ] = useState<boolean>(true);
   const [ withdrawDaiPending, setWithdrawDaiPending] = useState<boolean>(false);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext} from 'react';
 import { ethers } from 'ethers';
 import { Keyboard, Box, Button, TextInput, Text, ResponsiveContext } from 'grommet';
 
@@ -32,18 +32,18 @@ interface IBorrowProps {
 }
 
 const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
-  const { state: yieldState } = React.useContext(YieldContext);
+  const { state: yieldState } = useContext(YieldContext);
   const { deployedContracts } = yieldState;
-  const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
+  const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { activeSeries } = seriesState; 
-  const { state: userState, actions: userActions } = React.useContext(UserContext);
+  const { state: userState, actions: userActions } = useContext(UserContext);
   const { position, authorizations: { hasDelegatedProxy } } = userState;
   const { 
     maxDaiAvailable_,
     collateralPercent_,
   } = position;
 
-  const screenSize = React.useContext(ResponsiveContext);
+  const screenSize = useContext(ResponsiveContext);
 
   const { borrow }  = useController();
   const { previewPoolTx, callActive }  = usePool();
@@ -58,20 +58,20 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
   const { account } = useSignerAccount();
 
   /* internal component state */
-  const [ borrowPending, setBorrowPending ] = React.useState<boolean>(false);
-  const [ borrowDisabled, setBorrowDisabled ] = React.useState<boolean>(true);
-  const [ warningMsg, setWarningMsg] = React.useState<string|null>(null);
-  const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
+  const [ borrowPending, setBorrowPending ] = useState<boolean>(false);
+  const [ borrowDisabled, setBorrowDisabled ] = useState<boolean>(true);
+  const [ warningMsg, setWarningMsg] = useState<string|null>(null);
+  const [ errorMsg, setErrorMsg] = useState<string|null>(null);
 
   /* input values */
-  const [ inputValue, setInputValue ] = React.useState<any|undefined>(borrowAmount || undefined);
+  const [ inputValue, setInputValue ] = useState<any|undefined>(borrowAmount || undefined);
   const debouncedInput = useDebounce(inputValue, 500);
-  const [inputRef, setInputRef] = React.useState<any>(null);
+  const [inputRef, setInputRef] = useState<any>(null);
 
   /* token balances and calculated values */
-  const [ eDaiValue, setEDaiValue ] = React.useState<number>(0);
-  const [ APR, setAPR ] = React.useState<number>();
-  const [ estRatio, setEstRatio ] = React.useState<any>(0);
+  const [ eDaiValue, setEDaiValue ] = useState<number>(0);
+  const [ APR, setAPR ] = useState<number>();
+  const [ estRatio, setEstRatio ] = useState<any>(0);
 
   const [ txActive ] = useTxActive(['BORROW', 'BUY' ]);
 

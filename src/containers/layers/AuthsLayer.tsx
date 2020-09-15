@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 
 import { UnsupportedChainIdError } from '@web3-react/core';
 import {
@@ -37,8 +37,8 @@ import { NotifyContext } from '../../contexts/NotifyContext';
 
 
 const AuthsLayer = ({ open, closeLayer }: any) => {
-  const screenSize = React.useContext(ResponsiveContext);
-  const { state: { requestedSigs }, dispatch } = React.useContext(NotifyContext);
+  const screenSize = useContext(ResponsiveContext);
+  const { state: { requestedSigs }, dispatch } = useContext(NotifyContext);
 
   const { handleSelectConnector } = useConnection();
 
