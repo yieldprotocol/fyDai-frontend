@@ -59,8 +59,6 @@ export const useAuth = () => {
   const { account, provider, signer } = useSignerAccount();
   const { state: { deployedContracts } } = React.useContext(YieldContext);
   const { dispatch } = React.useContext(NotifyContext);
-
-  const { actions: userActions } = React.useContext(UserContext);
   
   const controllerAddr = ethers.utils.getAddress(deployedContracts.Controller);
   const controllerContract = new ethers.Contract( controllerAddr, Controller.abi, provider);
@@ -106,6 +104,10 @@ export const useAuth = () => {
     let controllerSig:any;
     let daiPermitSig:any;
 
+    const overrides = { 
+      gasLimit: BigNumber.from('1000000')
+    };
+
     setAuthActive(true);
     dispatch({ type: 'requestSigs', payload:[ auths.get(1), auths.get(2) ] });
     try {     
@@ -132,9 +134,17 @@ export const useAuth = () => {
       );
       dispatch({ type: 'signed', payload: auths.get(1) });
 
+      const daiDomain: IDomain = {
+        name: 'Dai Stablecoin',
+        version: '1',
+        chainId: 42,
+        verifyingContract: daiAddr,
+      };
+
       /* Dai permit yieldProxy */
       // @ts-ignore
-      const result = await signDaiPermit(provider.provider, daiAddr, fromAddr, proxyAddr);
+      const result = await signDaiPermit(provider.provider, daiDomain, fromAddr, proxyAddr);
+
       daiPermitSig = ethers.utils.joinSignature(result);
       dispatch({ type: 'signed', payload: auths.get(2) });
 
@@ -146,7 +156,7 @@ export const useAuth = () => {
     /* Broadcast signatures */
     let tx:any;
     try {
-      tx = await proxyContract.onboard(fromAddr, daiPermitSig, controllerSig);
+      tx = await proxyContract.onboard(fromAddr, daiPermitSig, controllerSig, overrides);
     } catch (e) {
       handleTxError('Error authorizing contracts', tx, e);
       setAuthActive(false);

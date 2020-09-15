@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Box, Layer } from 'grommet';
 import { FiCheckCircle as CheckCircle } from 'react-icons/fi';
 

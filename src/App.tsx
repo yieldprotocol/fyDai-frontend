@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 
 import { Grommet, base, Grid, Main, Box, ResponsiveContext, Nav, Layer } from 'grommet';
 import { deepMerge } from 'grommet/utils';
@@ -21,6 +21,12 @@ import TestLayer from './containers/layers/TestLayer';
 import SeriesSelector from './components/SeriesSelector';
 import YieldMark from './components/logos/YieldMark';
 import AuthsLayer from './containers/layers/AuthsLayer';
+import Splash from './components/Splash';
+
+// const LendView = React.lazy(() => import('./views/LendView'));
+// const PoolView = React.lazy(() => import('./views/PoolView'));
+// const BorrowView = React.lazy(() => import('./views/BorrowView'));
+// const Dashboard = React.lazy(() => import('./views/Dashboard'));
 
 const ThemedApp = () => {
   const [darkMode, setDarkMode] = React.useState(false);
@@ -42,6 +48,7 @@ const ThemedApp = () => {
 };
 
 const App = (props:any) => {
+
   // TODO Switch out for react router
   const [activeView, setActiveView] = React.useState<string>('BORROW');
   const [accountView, setAccountView] = React.useState<string>('ACCOUNT');
@@ -79,17 +86,16 @@ const App = (props:any) => {
       { showSeriesLayer  && <SeriesSelector activeView='borrow' close={()=>setShowSeriesLayer(false)} /> }
       
       { showAccountLayer &&
-      <AccountLayer
-        view={accountView}
-        closeLayer={() => setShowAccountLayer(false)}
-        changeWallet={() => changeConnection()}
-      /> }
+        <AccountLayer
+          view={accountView}
+          closeLayer={() => setShowAccountLayer(false)}
+          changeWallet={() => changeConnection()}
+        />}
 
       <Box direction="row" height={{ min: '100%' }}>
         <Box flex height='100%'>
 
-          <Grid fill rows={screenSize === 'small'? ['xsmall', 'auto', 'xsmall']: ['auto', 'flex', 'auto']}>
-                        
+          <Grid fill rows={screenSize === 'small'? ['xsmall', 'auto', 'xsmall']: ['auto', 'flex', 'auto']}>                 
             <Grid fill columns={columnsWidth}>
               <Box background={{ color: 'background-front' }} />
               <YieldHeader
@@ -108,7 +114,7 @@ const App = (props:any) => {
                   pad={{ vertical: 'large' }}
                   fill="horizontal"
                   align="center"
-                >
+                >          
                   {activeView === 'DASHBOARD' && <Dashboard />}
                   {activeView === 'BORROW' && <BorrowView />}
                   {activeView === 'LEND' && <LendView />}
@@ -121,19 +127,20 @@ const App = (props:any) => {
             <Grid fill columns={columnsWidth}>
               <Box background="background" />
               {screenSize !== 'small' &&
-              <YieldFooter
-                showTestLayer={showTestLayer}
-                setShowTestLayer={setShowTestLayer}
-                darkMode={props.darkMode}
-                setDarkMode={props.setDarkMode}
-                changeConnection={changeConnection}
-              />}                  
+                <YieldFooter
+                  showTestLayer={showTestLayer}
+                  setShowTestLayer={setShowTestLayer}
+                  darkMode={props.darkMode}
+                  setDarkMode={props.setDarkMode}
+                  changeConnection={changeConnection}
+                />}                  
               <Box background="background" />      
             </Grid>
 
           </Grid>
         </Box>
       </Box>
+
       {screenSize === 'small' &&    
         <Layer
           position='bottom'
@@ -143,11 +150,9 @@ const App = (props:any) => {
         >
           <Nav 
             direction="row"
-            background="background-mid"
-            
+            background="background-mid"          
             round={{ corner:'top', size:'small' }}
             elevation='small'
-
             pad="medium"
             justify='evenly'
           >
@@ -156,7 +161,7 @@ const App = (props:any) => {
             <Box>Borrow</Box>
             <Box>Repay</Box>         
           </Nav>
-        </Layer>}
+        </Layer>} 
     </div>
   );
 };

@@ -124,6 +124,8 @@ const YieldProvider = ({ children }: any) => {
           _seriesList.map(async (x: string, i: number) => {
             const name = await callTx(x, 'EDai', 'name', []);
             const maturity = await callTx(x, 'EDai', 'maturity', []);
+            // const _peripheralAddrs = await getAddresses([ `${name}-Pool` ]);
+            // const poolAddress = _peripheralAddrs.get(`${name}-Pool`);
             const _peripheralAddrs = await getAddresses([ `eDai${i}-Pool` ]);
             const poolAddress = _peripheralAddrs.get(`eDai${i}-Pool`);
             return {

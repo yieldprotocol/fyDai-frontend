@@ -273,7 +273,7 @@ export const usePool = () => {
       if ( series.isMature() === false ) {
         switch (type) {
           case 'BUYDAI':
-            value = await contract.bueDaiPreview(parsedAmount); break;
+            value = await contract.buyDaiPreview(parsedAmount); break;
           case 'SELLDAI': 
             value = await contract.sellDaiPreview(parsedAmount); break;
           case 'BUYEDAI':

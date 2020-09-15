@@ -8,6 +8,7 @@ import Migration from '../contracts/Migrations.json';
 const migrationAddrs = new Map([
   [1, process.env.REACT_APP_MIGRATION_1],
   [4, process.env.REACT_APP_MIGRATION_4 ],
+  [5, process.env.REACT_APP_MIGRATION_5 ],
   [42, process.env.REACT_APP_MIGRATION_42 ],
   [1337, process.env.REACT_APP_MIGRATION_1337 ],
   [31337, process.env.REACT_APP_MIGRATION_31337 ],
@@ -39,6 +40,7 @@ export const useMigrations = () => {
   const getAddresses = async (
     contractNameList:string[],
   ) => {
+    console.log('migration', migrationsAddress);
     const contract = new ethers.Contract(migrationsAddress, migrationAbi, fallbackProvider );
     const res = new Map<string, string>();
     await Promise.all(
