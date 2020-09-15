@@ -1,7 +1,7 @@
 import React, { Suspense, lazy } from 'react';
 import { Box } from 'grommet';
 import PageHeader from '../components/PageHeader';
-// import Pool from '../containers/Pool';
+
 const Pool = lazy(() => import('../containers/Pool'));
 
 const PoolView = () => {

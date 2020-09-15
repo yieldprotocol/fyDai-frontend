@@ -28,7 +28,7 @@ export const useMath = () => {
    */
   const collPrice = (): BigNumber => {
     // TODO: Update this to use ETH-A Oracle - not ilks.spot for market price USD
-    console.log('ETH price:', ethers.utils.formatEther(utils.mulRay(utils.toWad(1.5), (ilks.spot)).toString()));
+    console.log('ETH price:', ethers.utils.formatEther(utils.mulRay(utils.dehumanize(1.5), (ilks.spot)).toString()));
     return utils.mulRay(utils.toRay(1.5), (ilks.spot));
   };
 

@@ -166,21 +166,21 @@ const UserProvider = ({ children }: any) => {
 
     /* parse to human usable */
     const parsedValues = {  
-      ethBalance_ : utils.wadToHuman(ethBalance),
-      daiBalance_ : utils.wadToHuman(daiBalance),
-      ethPosted_ : utils.wadToHuman(ethPosted),
-      chaiPosted_ : utils.wadToHuman(chaiPosted),
-      ethLocked_ : utils.wadToHuman(ethLocked),
-      ethBorrowingPower_ : utils.wadToHuman(ethBorrowingPower),
-      ethTotalDebtDai_ : utils.wadToHuman(ethTotalDebtDai),  
-      debtValue_ : utils.wadToHuman(ethTotalDebtDai),
-      collateralPrice_ : utils.wadToHuman(collateralPrice),
-      collateralValue_ : utils.wadToHuman(collateralValue),
+      ethBalance_ : utils.humanize(ethBalance),
+      daiBalance_ : utils.humanize(daiBalance),
+      ethPosted_ : utils.humanize(ethPosted),
+      chaiPosted_ : utils.humanize(chaiPosted),
+      ethLocked_ : utils.humanize(ethLocked),
+      ethBorrowingPower_ : utils.humanize(ethBorrowingPower),
+      ethTotalDebtDai_ : utils.humanize(ethTotalDebtDai),  
+      debtValue_ : utils.humanize(ethTotalDebtDai),
+      collateralPrice_ : utils.humanize(collateralPrice),
+      collateralValue_ : utils.humanize(collateralValue),
       collateralRatio_ : parseFloat(collateralRatio.toString()),
       collateralPercent_ : parseFloat(collateralPercent.toString()),
-      // collateralAmount_ : utils.wadToHuman(collateralAmount),
-      // minSafeCollateral_ : utils.wadToHuman(minSafeCollateral),
-      maxDaiAvailable_ : utils.wadToHuman(maxDaiAvailable),
+      // collateralAmount_ : utils.humanize(collateralAmount),
+      // minSafeCollateral_ : utils.humanize(minSafeCollateral),
+      maxDaiAvailable_ : utils.humanize(maxDaiAvailable),
     };
     console.log('User updated:');
     console.log({ ...values, ...parsedValues } );

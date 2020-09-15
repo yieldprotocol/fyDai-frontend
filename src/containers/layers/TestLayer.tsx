@@ -82,7 +82,7 @@ const TestLayer = (props:any) => {
   // }, [deployedContracts, postActive, withdrawActive]);
 
   useEffect(()=>{
-    const daiD = utils.toWad(1);
+    const daiD = utils.dehumanize(1);
     const chi  = utils.toRay(1.2);
 
     setDaiDebt( daiD );

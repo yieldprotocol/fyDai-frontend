@@ -5,24 +5,18 @@ export interface IYieldSeries {
   displayName: string;
   maturity: number;
   maturity_: Date;
-  
   poolAddress: string;
   eDaiAddress: string;
   liquidityProxyAddress: string;
   hasDelegatedPool: boolean;
-
-  isMature: any; // function typeScript this out
-  
+  isMature: any; // TODO type this
   eDaiBalance_: number;
   eDaiBalance: BigNumber;
-
   totalSupply?: BigNumber;
   totalSupply_?: number;
   poolTokens?:  BigNumber;
   poolTokens_?: number;
-
   poolState?: any; // TODO type this
-
   symbol?: string;
   id?: string;
   currentValue?: any;
@@ -31,46 +25,8 @@ export interface IYieldSeries {
   wethDebtDai_?: number;
   wethDebtEDai?: BigNumber;
   wethDebtEDai_?: number;
-
   yieldAPR?: number;
   yieldAPR_?: string;
-}
-
-
-export interface IConnection {
-
-  // TODO get provider types
-  provider: any;     /* a wallet connected provider */
-  altProvider: any;  /* a provider with no connected wallet */
-  
-  // TODO get signer types
-  signer: any;       /* derived from provider if EIP1192 */
-  voidSigner: any;
-
-  chainId: number|null;   /* official chain number or development number */
-  networkName: string|null; /* network name (eg. Ropsten) */
-  account: string|null;   /* user ethereum address */
-}
-
-export interface ISeriesPosition {
-}
-
-export interface IUser {
-  appPrefs: any;
-  account?: string;
-  ethBalance?: BigNumber;
-  ethBalance_?: number;
-  ethPosted?: BigNumber;
-  ethPosted_?: number;
-  totalDebtEDai?: BigNumber;
-  totalDebtEDai_?: number;
-  ethAvailable?:BigNumber;
-  ethAvailable_?:BigNumber;
-}
-
-export interface IReducerAction {
-  type:string,
-  payload?:any,
 }
 
 export interface INotification {
@@ -89,10 +45,30 @@ export interface INotification {
   requestedSigs?: any,
 }
 
-export interface IYieldAccount {}
+export interface IUser {
+  appPrefs: any;
+  account?: string;
+  ethBalance?: BigNumber;
+  ethBalance_?: number;
+  ethPosted?: BigNumber;
+  ethPosted_?: number;
+  totalDebtEDai?: BigNumber;
+  totalDebtEDai_?: number;
+  ethAvailable?:BigNumber;
+  ethAvailable_?:BigNumber;
+}
 
-export interface IMakerVault {}
-
+export interface IConnection {
+  // TODO get provider types
+  provider: any;     /* a wallet connected provider */
+  altProvider: any;  /* a provider with no connected wallet */
+  // TODO get signer types
+  signer: any;       /* derived from provider if EIP1192 */
+  voidSigner: any;
+  chainId: number|null;   /* official chain number or development number */
+  networkName: string|null; /* network name (eg. Ropsten) */
+  account: string|null;   /* user ethereum address */
+}
 
 export interface IDelegableMessage {
   user: string;
