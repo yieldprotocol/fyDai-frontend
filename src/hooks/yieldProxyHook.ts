@@ -66,6 +66,7 @@ export const useProxy = () => {
   const [ buyActive, setBuyActive ] = useState<boolean>(false);
   const [ sellActive, setSellActive ] = useState<boolean>(false);
 
+  const { abi: yieldProxyAbi } = YieldProxy;
   /* Temporary signing messages */
   const auths = new Map([
     [1, { id: 1, desc:'Dai > treasury authenticate ' }],
@@ -89,7 +90,7 @@ export const useProxy = () => {
     deployedContracts.YieldProxy && signer &&
     setProxyContract( new ethers.Contract( 
       ethers.utils.getAddress(deployedContracts.YieldProxy), 
-      YieldProxy?.abi,
+      yieldProxyAbi,
       signer
     ));
   }, [signer, deployedContracts]);
