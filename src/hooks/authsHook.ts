@@ -134,17 +134,16 @@ export const useAuth = () => {
       );
       dispatch({ type: 'signed', payload: auths.get(1) });
 
-      const daiDomain: IDomain = {
-        name: 'Dai Stablecoin',
-        version: '1',
-        chainId: 42,
-        verifyingContract: daiAddr,
-      };
+      // const daiDomain: IDomain = {
+      //   name: 'Dai Stablecoin',
+      //   version: '1',
+      //   chainId: 42,
+      //   verifyingContract: daiAddr,
+      // };
 
       /* Dai permit yieldProxy */
       // @ts-ignore
-      const result = await signDaiPermit(provider.provider, daiDomain, fromAddr, proxyAddr);
-
+      const result = await signDaiPermit(provider.provider, daiAddr, fromAddr, proxyAddr);
       daiPermitSig = ethers.utils.joinSignature(result);
       dispatch({ type: 'signed', payload: auths.get(2) });
 
@@ -187,6 +186,10 @@ export const useAuth = () => {
     let poolSig;
     let daiSig;
     let eDaiSig;
+
+    const overrides = { 
+      gasLimit: BigNumber.from('1000000')
+    };
 
     setAuthActive(true);
     dispatch({ type: 'requestSigs', payload:[ auths.get(3), auths.get(4), auths.get(5) ] });
@@ -234,7 +237,7 @@ export const useAuth = () => {
     /* Broadcast signatures */
     let tx:any;
     try {
-      tx = await proxyContract.authorizePool(poolAddr, fromAddr, daiSig, eDaiSig, poolSig);
+      tx = await proxyContract.authorizePool(poolAddr, fromAddr, daiSig, eDaiSig, poolSig, overrides);
     } catch (e) {
       handleTxError('Error authorizing contracts', tx, e);
       setAuthActive(false);
