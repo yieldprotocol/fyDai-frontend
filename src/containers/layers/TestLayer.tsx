@@ -73,8 +73,6 @@ const TestLayer = (props:any) => {
     withdrawEthActive,
   }  = useProxy();
 
-  // const { getChaiBalance, getWethBalance, getDaiBalance }  = useBalances();
-
   // useEffect(()=>{
   //   (async () => setWethBalance( await getWethBalance(deployedContracts.Weth)) )();
   //   (async () => setChaiBalance( await getChaiBalance(deployedContracts.Chai)) )();

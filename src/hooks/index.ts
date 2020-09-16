@@ -11,7 +11,7 @@ import { useMath } from './mathHooks';  // TODO work out this cyclic reference (
 import { useAuth } from './authsHook';
 
 /* Generic blockchain transactional hooks */
-import { useCallTx, useSendTx, useBalances, useTimeTravel } from './chainHooks'; 
+import { useCallTx, useSendTx, useTimeTravel } from './chainHooks'; 
 import { useToken } from './tokenHook';
 
 /* Contract hooks */
@@ -28,7 +28,6 @@ export {
   useDebounce,
   useSendTx,
   useCallTx,
-  useBalances,
 
   useAuth,
   useProxy,

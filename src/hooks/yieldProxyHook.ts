@@ -89,7 +89,7 @@ export const useProxy = () => {
     deployedContracts.YieldProxy && signer &&
     setProxyContract( new ethers.Contract( 
       ethers.utils.getAddress(deployedContracts.YieldProxy), 
-      YieldProxy.abi,
+      YieldProxy?.abi,
       signer
     ));
   }, [signer, deployedContracts]);
