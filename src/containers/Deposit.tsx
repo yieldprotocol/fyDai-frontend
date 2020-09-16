@@ -48,7 +48,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
     debtValue_,
   } = userState.position;
 
-  const screenSize = React.useContext(ResponsiveContext);
+  const screenSize = useContext(ResponsiveContext);
 
   const { postEth, postEthActive }  = useProxy();
   const { estCollRatio: estimateRatio } = useMath();
@@ -57,7 +57,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
 
   const [ inputValue, setInputValue ] = useState<any>(depositAmount || undefined);
   const debouncedInput = useDebounce(inputValue, 500);
-  const [inputRef, setInputRef] = React.useState<any>(null);
+  const [inputRef, setInputRef] = useState<any>(null);
 
   const [ estRatio, setEstRatio ] = useState<any>(0);
 

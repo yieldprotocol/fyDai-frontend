@@ -66,6 +66,13 @@ export const rayToHuman = (x:BigNumber) => {
 
 // @dev Takes a bignumber in WEI, WAD or the like and converts it to human.
 // @return {number}
-export const wadToHuman = (x:BigNumber) => {
-  return parseFloat( ethers.utils.formatEther(x) );
+export const humanize = (x:BigNumber) => {
+  return parseFloat(ethers.utils.formatEther(x));
 };
+
+// / @dev Converts a number to WAD precision, for number up to 10 decimal places
+export const dehumanize = (value:number) => {
+  const exponent = BigNumber.from('10').pow(BigNumber.from('8'));
+  return BigNumber.from(value*10**10).mul(exponent);
+};
+

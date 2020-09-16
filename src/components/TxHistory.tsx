@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import ethers, { BigNumber } from 'ethers';
 import moment from 'moment';
 import { Box, Text, Collapsible, Button } from 'grommet';
@@ -38,10 +38,10 @@ const EtherscanButton = (props:any) => {
 
 const TxHistory = ( { filterTerms, view }:HistoryProps) => {
 
-  const { state, actions } = React.useContext(UserContext);
+  const { state, actions } = useContext(UserContext);
 
-  const [ txHistory, setTxHistory] = React.useState<any>([]);
-  const [ itemOpen, setItemOpen ] = React.useState<any>(null);
+  const [ txHistory, setTxHistory] = useState<any>([]);
+  const [ itemOpen, setItemOpen ] = useState<any>(null);
 
   // TODO NBNBNBNB improve preciseness of logic. may require a component split
 
@@ -105,12 +105,12 @@ const TxHistory = ( { filterTerms, view }:HistoryProps) => {
         { (item.event === 'Bought' && view === 'borrow') && 
         <Box>
           <Text size='xxsmall'>Amount owed @ maturity</Text>
-          <Text size='xsmall'>{Math.abs(item.yDai_).toFixed(2)} Dai</Text>
+          <Text size='xsmall'>{Math.abs(item.eDai_).toFixed(2)} Dai</Text>
         </Box> }
         { (item.event === 'Sold' && view === 'lend') && 
         <Box>
           <Text size='xxsmall'>Amount redeemable @ maturity</Text>
-          <Text size='xsmall'>{Math.abs(item.yDai_).toFixed(2)} Dai</Text>
+          <Text size='xsmall'>{Math.abs(item.eDai_).toFixed(2)} Dai</Text>
         </Box> }
         <Box alignSelf='end'>
           <EtherscanButton txHash={item.transactionHash} />
@@ -119,13 +119,13 @@ const TxHistory = ( { filterTerms, view }:HistoryProps) => {
     );
   };
 
-  React.useEffect(()=> {
+  useEffect(()=> {
     const _txHist = state.txHistory.items;
     const filteredHist = _txHist.filter((x:any) => filterTerms.includes(x.event) );  
     setTxHistory(filteredHist);
   }, [ state.txHistory ]);
 
-  React.useEffect(()=> {
+  useEffect(()=> {
   }, [ txHistory ]);
 
   return (

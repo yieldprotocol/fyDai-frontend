@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 
 import { UnsupportedChainIdError } from '@web3-react/core';
 import {
@@ -41,11 +41,11 @@ import ProfileButton from '../../components/ProfileButton';
 
 const ConnectLayer = ({ open, view, closeLayer }: any) => {
 
-  const { state: { position } } = React.useContext(UserContext);
-  const screenSize = React.useContext(ResponsiveContext);
+  const { state: { position } } = useContext(UserContext);
+  const screenSize = useContext(ResponsiveContext);
   const { account, provider } = useSignerAccount();
 
-  const [ layerView, setLayerView] = React.useState<string>(view);
+  const [ layerView, setLayerView] = useState<string>(view);
 
   const { handleSelectConnector } = useConnection();
 
@@ -57,7 +57,7 @@ const ConnectLayer = ({ open, view, closeLayer }: any) => {
     { name: 'Ledger', image: walletlinkImage, connection: ledger },
   ];
 
-  React.useEffect(()=>{
+  useEffect(()=>{
     setLayerView(view);
   }, []);
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Box, Text, ThemeContext, Layer, Drop } from 'grommet';
 
 import { NotifyContext } from '../contexts/NotifyContext';
@@ -8,8 +8,8 @@ const TransactionStatus = () => {
 
   const {
     state: { pendingTxs, lastCompletedTx },
-  } = React.useContext(NotifyContext);
-  const [over, setOver] = React.useState<boolean>(false);
+  } = useContext(NotifyContext);
+  const [over, setOver] = useState<boolean>(false);
 
   const ref = React.useRef() as React.MutableRefObject<HTMLInputElement>;
 

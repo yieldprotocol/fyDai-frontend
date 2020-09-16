@@ -1,12 +1,12 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { ethers }  from 'ethers';
 // import { ConnectionContext } from '../contexts/ConnectionContext';
 
 import { useSignerAccount } from './connectionHooks';
 
-import YDai from '../contracts/YDai.json';
+import EDai from '../contracts/EDai.json';
 import Controller from '../contracts/Controller.json';
-import TestDai from '../contracts/TestDai.json';
+import Dai from '../contracts/Dai.json';
 import WETH9 from '../contracts/WETH9.json';
 import GemJoin from '../contracts/GemJoin.json';
 import DaiJoin from '../contracts/DaiJoin.json';
@@ -18,9 +18,9 @@ import Pool from '../contracts/Pool.json';
 
 // TODO abstract this out to a higher level
 const contractMap = new Map<string, any>([
-  ['YDai', YDai.abi],
+  ['EDai', EDai.abi],
   ['Controller', Controller.abi],
-  ['Dai', TestDai.abi],
+  ['Dai', Dai.abi],
   ['Weth', WETH9.abi],
   ['Chai', Chai.abi],
   ['WethJoin', GemJoin.abi],
@@ -39,10 +39,10 @@ const contractMap = new Map<string, any>([
  * @returns { function } getEvents
  */
 export const useEvents = () => {
-  // const { state: { provider } } = React.useContext(ConnectionContext);
+  // const { state: { provider } } = useContext(ConnectionContext);
   const { provider } = useSignerAccount();
-  const [ eventListenerList, setEventListenerList ] = React.useState<boolean>();
-  const [ isLoading, setIsLoading ] = React.useState<boolean>();
+  const [ eventListenerList, setEventListenerList ] = useState<boolean>();
+  const [ isLoading, setIsLoading ] = useState<boolean>();
 
   /**
    * Setup an event listener.

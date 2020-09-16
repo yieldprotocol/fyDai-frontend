@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { ethers, BigNumber  }  from 'ethers';
 import { keccak256, defaultAbiCoder, toUtf8Bytes, solidityPack } from 'ethers/lib/utils';
 import { signDaiPermit, signERC2612Permit } from 'eth-permit';
@@ -52,15 +52,13 @@ const auths = new Map([
   [2, { id: 2, desc:'Allow the Yield Proxy contract to interact with Dai on your behalf' }],
   [3, { id: 3, desc:'Allow the Yield Proxy contract to interact with this series on your behalf' }],
   [4, { id: 4, desc:'Allow the Yield Series to trade Dai on your behalf' }],
-  [5, { id: 5, desc:'Allow the Yield Series to trade yDai on your behalf' }],
+  [5, { id: 5, desc:'Allow the Yield Series to trade eDai on your behalf' }],
 ]);
 
 export const useAuth = () => {
   const { account, provider, signer } = useSignerAccount();
-  const { state: { deployedContracts } } = React.useContext(YieldContext);
-  const { dispatch } = React.useContext(NotifyContext);
-
-  const { actions: userActions } = React.useContext(UserContext);
+  const { state: { deployedContracts } } = useContext(YieldContext);
+  const { dispatch } = useContext(NotifyContext);
   
   const controllerAddr = ethers.utils.getAddress(deployedContracts.Controller);
   const controllerContract = new ethers.Contract( controllerAddr, Controller.abi, provider);
@@ -70,7 +68,7 @@ export const useAuth = () => {
   const daiAddr = ethers.utils.getAddress(deployedContracts.Dai);
   const fromAddr = account && ethers.utils.getAddress(account);
 
-  const [authActive, setAuthActive] = React.useState<boolean>(false);
+  const [authActive, setAuthActive] = useState<boolean>(false);
 
   const { handleTx, handleTxError } = useTxHelpers();
 
@@ -106,6 +104,10 @@ export const useAuth = () => {
     let controllerSig:any;
     let daiPermitSig:any;
 
+    const overrides = { 
+      gasLimit: BigNumber.from('1000000')
+    };
+
     setAuthActive(true);
     dispatch({ type: 'requestSigs', payload:[ auths.get(1), auths.get(2) ] });
     try {     
@@ -132,6 +134,13 @@ export const useAuth = () => {
       );
       dispatch({ type: 'signed', payload: auths.get(1) });
 
+      // const daiDomain: IDomain = {
+      //   name: 'Dai Stablecoin',
+      //   version: '1',
+      //   chainId: 42,
+      //   verifyingContract: daiAddr,
+      // };
+
       /* Dai permit yieldProxy */
       // @ts-ignore
       const result = await signDaiPermit(provider.provider, daiAddr, fromAddr, proxyAddr);
@@ -146,7 +155,7 @@ export const useAuth = () => {
     /* Broadcast signatures */
     let tx:any;
     try {
-      tx = await proxyContract.onboard(fromAddr, daiPermitSig, controllerSig);
+      tx = await proxyContract.onboard(fromAddr, daiPermitSig, controllerSig, overrides);
     } catch (e) {
       handleTxError('Error authorizing contracts', tx, e);
       setAuthActive(false);
@@ -162,21 +171,25 @@ export const useAuth = () => {
   /**
    * Series/Pool authorisations that are required for each series.
    * 
-   * @param yDaiAddress series yDai address to be authorised
+   * @param eDaiAddress series eDai address to be authorised
    * @param poolAddress series pool address to be authorised
    * 
    */
   const poolAuth = async (
-    yDaiAddress:string,
+    eDaiAddress:string,
     poolAddress:string
   ) => {
     /* Sanitise input */
     const poolContract = new ethers.Contract( poolAddress, Pool.abi, provider);
-    const yDaiAddr = ethers.utils.getAddress(yDaiAddress);
+    const eDaiAddr = ethers.utils.getAddress(eDaiAddress);
     const poolAddr = ethers.utils.getAddress(poolAddress);
     let poolSig;
     let daiSig;
-    let yDaiSig;
+    let eDaiSig;
+
+    const overrides = { 
+      gasLimit: BigNumber.from('1000000')
+    };
 
     setAuthActive(true);
     dispatch({ type: 'requestSigs', payload:[ auths.get(3), auths.get(4), auths.get(5) ] });
@@ -210,10 +223,10 @@ export const useAuth = () => {
       daiSig = ethers.utils.joinSignature(dResult);
       dispatch({ type: 'signed', payload: auths.get(4) });
 
-      /* yDAi permit proxy */
+      /* eDai permit proxy */
       // @ts-ignore
-      const yResult = await signERC2612Permit(provider.provider, yDaiAddr, fromAddr, proxyAddr, MAX_INT);
-      yDaiSig = ethers.utils.joinSignature(yResult);
+      const yResult = await signERC2612Permit(provider.provider, eDaiAddr, fromAddr, proxyAddr, MAX_INT);
+      eDaiSig = ethers.utils.joinSignature(yResult);
       dispatch({ type: 'signed', payload: auths.get(5) });
 
     } catch (e) {
@@ -224,7 +237,7 @@ export const useAuth = () => {
     /* Broadcast signatures */
     let tx:any;
     try {
-      tx = await proxyContract.authorizePool(poolAddr, fromAddr, daiSig, yDaiSig, poolSig);
+      tx = await proxyContract.authorizePool(poolAddr, fromAddr, daiSig, eDaiSig, poolSig, overrides);
     } catch (e) {
       handleTxError('Error authorizing contracts', tx, e);
       setAuthActive(false);

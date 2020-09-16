@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Box, Button, Image, Heading, Text } from 'grommet';
 
 import DashBorrow from '../containers/DashBorrow';
@@ -8,7 +8,7 @@ import PageHeader from '../components/PageHeader';
 
 
 const Dashboard = () => {
-  const [activeView, setActiveView] = React.useState<string>('borrow');
+  const [activeView, setActiveView] = useState<string>('borrow');
 
   return (
     <>

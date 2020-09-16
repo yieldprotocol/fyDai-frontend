@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext} from 'react';
 import { ethers } from 'ethers';
 import { Keyboard, Box, Button, TextInput, Text, ResponsiveContext } from 'grommet';
 
 import { FiClock as Clock } from 'react-icons/fi';
 import DaiMark from '../components/logos/DaiMark';
 
-import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
 
@@ -24,7 +23,6 @@ import InputWrap from '../components/InputWrap';
 import ApprovalPending from '../components/ApprovalPending';
 import TransactionPending from '../components/TransactionPending';
 import InfoGrid from '../components/InfoGrid';
-import Authorization from '../components/Authorization';
 
 interface IBorrowProps {
   borrowAmount?:number|null;
@@ -32,54 +30,48 @@ interface IBorrowProps {
 }
 
 const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
-  const { state: yieldState } = React.useContext(YieldContext);
-  const { deployedContracts } = yieldState;
-  const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
+
+  const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { activeSeries } = seriesState; 
-  const { state: userState, actions: userActions } = React.useContext(UserContext);
+  const { state: userState, actions: userActions } = useContext(UserContext);
   const { position, authorizations: { hasDelegatedProxy } } = userState;
   const { 
     maxDaiAvailable_,
     collateralPercent_,
   } = position;
 
-  const screenSize = React.useContext(ResponsiveContext);
+  const screenSize = useContext(ResponsiveContext);
 
+  /* hooks init */
   const { borrow }  = useController();
   const { previewPoolTx, callActive }  = usePool();
-  const { 
-    borrowDai, 
-    borrowActive 
-  } = useProxy();
-  const { 
-    yieldAPR, 
-    estCollRatio: estimateRatio
-  } = useMath();
+  const { borrowDai, borrowActive } = useProxy();
+  const { yieldAPR, estCollRatio: estimateRatio } = useMath();
   const { account } = useSignerAccount();
 
+  const [ txActive ] = useTxActive(['BORROW', 'BUY' ]);
+
   /* internal component state */
-  const [ borrowPending, setBorrowPending ] = React.useState<boolean>(false);
-  const [ borrowDisabled, setBorrowDisabled ] = React.useState<boolean>(true);
-  const [ warningMsg, setWarningMsg] = React.useState<string|null>(null);
-  const [ errorMsg, setErrorMsg] = React.useState<string|null>(null);
+  const [ borrowPending, setBorrowPending ] = useState<boolean>(false);
+  const [ borrowDisabled, setBorrowDisabled ] = useState<boolean>(true);
+  const [ warningMsg, setWarningMsg] = useState<string|null>(null);
+  const [ errorMsg, setErrorMsg] = useState<string|null>(null);
 
   /* input values */
-  const [ inputValue, setInputValue ] = React.useState<any|undefined>(borrowAmount || undefined);
+  const [ inputValue, setInputValue ] = useState<any|undefined>(borrowAmount || undefined);
   const debouncedInput = useDebounce(inputValue, 500);
-  const [inputRef, setInputRef] = React.useState<any>(null);
+  const [inputRef, setInputRef] = useState<any>(null);
 
   /* token balances and calculated values */
-  const [ yDaiValue, setYDaiValue ] = React.useState<number>(0);
-  const [ APR, setAPR ] = React.useState<number>();
-  const [ estRatio, setEstRatio ] = React.useState<any>(0);
-
-  const [ txActive ] = useTxActive(['BORROW', 'BUY' ]);
+  const [ eDaiValue, setEDaiValue ] = useState<number>(0);
+  const [ APR, setAPR ] = useState<number>();
+  const [ estRatio, setEstRatio ] = useState<any>(0);
 
   /* Borrow execution flow */
   const borrowProcedure = async (value:number|undefined, autoSell:boolean=true) => {
     if (value&&value>0 && !borrowDisabled) {
       setBorrowPending(true);
-      autoSell && await borrowDai(activeSeries, 'ETH-A', yDaiValue, value);
+      autoSell && await borrowDai(activeSeries, 'ETH-A', value);
       !autoSell && await borrow('ETH-A', activeSeries.maturity, value);
       setInputValue(undefined);
       await Promise.all([
@@ -92,7 +84,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
 
   /* 
   * Handle input (debounced input) changes:
-  * 1. dai to yDai conversion and get APR (yDai needed to compare with the approved allowance)
+  * 1. dai to eDai conversion and get APR (eDai needed to compare with the approved allowance)
   * 2. calcalute yield APR
   * 3. calculate estimated collateralisation ration
   */
@@ -103,13 +95,13 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
 
       const preview = await previewPoolTx('buyDai', activeSeries, debouncedInput);
       if (!(preview instanceof Error)) {
-        setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
+        setEDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
         setAPR( yieldAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries.maturity ) );      
       } else {
         /* if the market doesnt have liquidity just estimate from rate */
         const rate = await previewPoolTx('buyDai', activeSeries, 1);
-        !(rate instanceof Error) && setYDaiValue(debouncedInput*parseFloat((ethers.utils.formatEther(rate))));
-        (rate instanceof Error) && setYDaiValue(0);
+        !(rate instanceof Error) && setEDaiValue(debouncedInput*parseFloat((ethers.utils.formatEther(rate))));
+        (rate instanceof Error) && setEDaiValue(0);
         setBorrowDisabled(true);
         setErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
       }
@@ -155,10 +147,10 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
           <InfoGrid entries={[
             {
               label: 'Current Debt',
-              visible: !txActive && !!account && activeSeries && !activeSeries?.isMature() || (activeSeries?.isMature() && activeSeries?.ethDebtYDai_ > 0 ),
+              visible: !txActive && !!account && activeSeries && !activeSeries?.isMature() || (activeSeries?.isMature() && activeSeries?.ethDebtEDai_ > 0 ),
               active: true,
               loading: borrowPending,    
-              value: activeSeries?.ethDebtYDai_? `${activeSeries.ethDebtYDai_.toFixed(2)} DAI`: '0 DAI',
+              value: activeSeries?.ethDebtEDai_? `${activeSeries.ethDebtEDai_.toFixed(2)} DAI`: '0 DAI',
               valuePrefix: null,
               valueExtra: null, 
             },
@@ -173,7 +165,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
             },
             {
               label: 'Repay Debt',
-              visible: !txActive && !!account && activeSeries?.isMature() && activeSeries?.ethDebtYDai_ > 0,
+              visible: !txActive && !!account && activeSeries?.isMature() && activeSeries?.ethDebtEDai_ > 0,
               active: true,
               loading: false,    
               value: '',
@@ -233,7 +225,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
                   visible: true,
                   active: !!inputValue&&inputValue>0,
                   loading: false,          
-                  value: `${yDaiValue.toFixed(2)} DAI`,
+                  value: `${eDaiValue.toFixed(2)} DAI`,
                   valuePrefix: null,
                   // valueExtra: () => (
                   //   <Text size='xxsmall'>

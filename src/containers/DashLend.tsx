@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { ethers } from 'ethers';
 import moment from 'moment';
 import { Box, Button, Select, Image, TextInput, Text, CheckBox, Collapsible, RangeInput } from 'grommet';
@@ -27,10 +27,10 @@ interface DashLendProps {
 
 const DashLend = () => {
 
-  const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
+  const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { activeSeries } = seriesState; 
 
-  const { state: userState, actions: userActions } = React.useContext(UserContext);
+  const { state: userState, actions: userActions } = useContext(UserContext);
   const { position } = userState;
   const { 
     debtValue_,
@@ -41,11 +41,11 @@ const DashLend = () => {
 
   const { sellDai, previewPoolTx }  = usePool();
 
-  const [ currentValue, setCurrentValue ] = React.useState<number>(0);
+  const [ currentValue, setCurrentValue ] = useState<number>(0);
 
-  React.useEffect(() => {
-    activeSeries?.yDaiBalance_>0 && ( async ()=> {
-      const preview = await previewPoolTx('SellYDai', activeSeries, activeSeries.yDaiBalance_);
+  useEffect(() => {
+    activeSeries?.eDaiBalance_>0 && ( async ()=> {
+      const preview = await previewPoolTx('SellEDai', activeSeries, activeSeries.eDaiBalance_);
       !(preview instanceof Error) && setCurrentValue( parseFloat(ethers.utils.formatEther(preview)));
     })();
   }, [ activeSeries, ]);
@@ -99,7 +99,7 @@ const DashLend = () => {
             </Box>
             <Box>
               <Text alignSelf='start' size='xsmall' color='brand'>
-                {activeSeries?.yDaiBalance_.toFixed(2)}
+                {activeSeries?.eDaiBalance_.toFixed(2)}
               </Text>
             </Box>
           </Box>}           
@@ -167,7 +167,7 @@ const DashLend = () => {
               </Box>
               <Box>
                 <Text color='text-weak' size='xsmall'>Total Value at Maturity</Text> 
-                <Text color='brand' weight='bold' size='large'>{activeSeries?.yDaiBalance_.toFixed(2)}</Text> 
+                <Text color='brand' weight='bold' size='large'>{activeSeries?.eDaiBalance_.toFixed(2)}</Text> 
               </Box>
             </Box>
           </Box>

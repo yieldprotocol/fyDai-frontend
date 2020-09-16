@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Layer, Box, DropButton, Button, TextInput, Header, Text, Heading, Footer, Collapsible, ThemeContext } from 'grommet';
 import {
   FaCheckCircle as CheckCircle,
@@ -12,7 +12,7 @@ import { NotifyContext } from '../../contexts/NotifyContext';
 
 function NotifyLayer() {
 
-  const  { state, dispatch }  = React.useContext<any>(NotifyContext);
+  const  { state, dispatch }  = useContext<any>(NotifyContext);
 
   const notificationTypeMap = (_type:string) => {
     switch(_type) {

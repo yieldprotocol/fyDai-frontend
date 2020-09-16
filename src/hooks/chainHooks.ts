@@ -1,15 +1,12 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
 import { useWeb3React } from '@web3-react/core';
-import { ethers, BigNumber }  from 'ethers';
-
-import { NotifyContext } from '../contexts/NotifyContext';
-// import { ConnectionContext } from '../contexts/ConnectionContext';
+import { ethers }  from 'ethers';
 
 import { useSignerAccount } from './connectionHooks';
 
-import YDai from '../contracts/YDai.json';
+import EDai from '../contracts/EDai.json';
 import Controller from '../contracts/Controller.json';
-import TestDai from '../contracts/TestDai.json';
+import Dai from '../contracts/Dai.json';
 import WETH9 from '../contracts/WETH9.json';
 import GemJoin from '../contracts/GemJoin.json';
 import DaiJoin from '../contracts/DaiJoin.json';
@@ -23,9 +20,9 @@ import Pool from '../contracts/Pool.json';
 // ethers.errors.setLogLevel('error');
 
 const contractMap = new Map<string, any>([
-  ['YDai', YDai.abi],
+  ['EDai', EDai.abi],
   ['Controller', Controller.abi],
-  ['Dai', TestDai.abi],
+  ['Dai', Dai.abi],
   ['Weth', WETH9.abi],
   ['Chai', Chai.abi],
   ['WethJoin', GemJoin.abi],
@@ -46,9 +43,9 @@ const contractMap = new Map<string, any>([
  * @returns { boolean } sendTxActive
  */
 export const useSendTx = () => {
-  // const { state: { signer, account } } = React.useContext(ConnectionContext);
+  // const { state: { signer, account } } = useContext(ConnectionContext);
   const { signer, account } = useSignerAccount();
-  const [ sendTxActive, setSendTxActive ] = React.useState<boolean>();
+  const [ sendTxActive, setSendTxActive ] = useState<boolean>();
   /**
    * Send a transaction ()
    * @param {string} contractAddress address of the contract to send to.
@@ -87,9 +84,9 @@ export const useSendTx = () => {
  */
 export const useCallTx = () => {
 
-  // const { state: { provider, altProvider } } = React.useContext(ConnectionContext);
+  // const { state: { provider, altProvider } } = useContext(ConnectionContext);
   const { signer, provider, account, fallbackProvider, voidSigner } = useSignerAccount();
-  const [ callTxActive, setCallTxActive ] = React.useState<boolean>();
+  const [ callTxActive, setCallTxActive ] = useState<boolean>();
   /**
    * Get data from the blockchain via provider (no signer reqd)
    * @param {string} contractAddress address of the contract to be called
@@ -112,76 +109,14 @@ export const useCallTx = () => {
   return [ callTx, callTxActive ] as const;
 };
 
-/**
- * Hook for getting native balances and token balances
- * @returns { function } getBalance
- * @returns { boolean } getBalance
- */
-export function useBalances() {
-  // const { state: { provider, account } } = React.useContext(ConnectionContext);
-  const { signer, provider, account, fallbackProvider, voidSigner } = useSignerAccount();
-
-  /**
-   * Get the user account balance of ETH  (omit args) or an ERC20token (provide args)
-   * 
-   * @param {string} tokenAddr address of the Token, *optional, omit for ETH
-   * @param {string} abi abi of the token (probably ERC20 in most cases) *optional, omit for ETH
-   * 
-   * @returns {BigNumber} ETH in Wei or token balance.
-   */
-  const getBalance = async (tokenAddr:string|null=null, contractName:string|null=null) => {
-    if (!!provider && !!account ) {
-      if (tokenAddr && contractName) {
-        const contract = new ethers.Contract(tokenAddr, contractMap.get(contractName), provider );
-        const balance = await contract.balanceOf(account);
-        return balance;
-      }
-      return provider.getBalance(account);
-    } return ethers.BigNumber.from('0');
-  };
-
-  /**
-   * Get the transaction allowance of a user for an ERC20token
-   * @param {string} tokenAddr address of the Token
-   * @param {string} operatorAddr address of the operator whose allowance you are checking
-   * @param {string} tokenName name of the token (probably ERC20 in most cases)
-   * @prarm 
-   * @returns whatever token value
-   */
-  const getTokenAllowance = async (
-    tokenAddress:string,
-    operatorAddress:string,
-    tokenName: string
-  ) => {
-    if (account) {
-      const fromAddr = account && ethers.utils.getAddress(account);
-      const tokenAddr = ethers.utils.getAddress(tokenAddress);
-      const operatorAddr = ethers.utils.getAddress(operatorAddress);
-      const contract = new ethers.Contract( tokenAddr, contractMap.get(tokenName), provider );
-      let res;
-      try {
-        res = await contract.allowance(fromAddr, operatorAddr);
-      }  catch (e) {
-        console.log(e);
-        res = ethers.BigNumber.from('0');
-      }
-      return parseFloat(ethers.utils.formatEther(res));
-    }
-    return 0;
-  };
-
-  return { getTokenAllowance, getBalance } as const;
-}
-
-
 export const useTimeTravel = () => {
-
+  
   const { provider } = useSignerAccount();
-  const [ snapshot, setSnapshot ] = React.useState<any>('0x1');
-  const [ block, setBlock ] = React.useState<any>(null);
-  const [ timestamp, setTimestamp ] = React.useState<number|null>(null);
+  const [ snapshot, setSnapshot ] = useState<any>('0x1');
+  const [ block, setBlock ] = useState<any>(null);
+  const [ timestamp, setTimestamp ] = useState<number|null>(null);
 
-  React.useEffect(()=>{
+  useEffect(()=>{
     provider && ( async () => {
       const { timestamp: ts } = await provider.getBlock(await provider.blockNumber);
       setTimestamp(ts);

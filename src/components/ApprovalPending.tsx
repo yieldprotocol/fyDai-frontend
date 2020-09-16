@@ -1,15 +1,15 @@
-import React, { forwardRef } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Box, Text, Layer, ResponsiveContext } from 'grommet';
 
 import { NotifyContext } from '../contexts/NotifyContext';
  
 const ApprovalPending = React.forwardRef( (props, ref) => {
-  const screenSize = React.useContext(ResponsiveContext);
+  const screenSize = useContext(ResponsiveContext);
 
-  const { state: { requestedSigs } }  = React.useContext(NotifyContext);
-  const [ sigsRequested, setSigsRequested ] = React.useState(false);
+  const { state: { requestedSigs } }  = useContext(NotifyContext);
+  const [ sigsRequested, setSigsRequested ] = useState(false);
 
-  React.useEffect(() =>{
+  useEffect(() =>{
     console.log(requestedSigs.length);
     requestedSigs.length ? setSigsRequested(true): setSigsRequested(false) ;
   }, [requestedSigs]);

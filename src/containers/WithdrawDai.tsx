@@ -34,7 +34,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
   const [ hasDelegated, setHasDelegated ] = useState<boolean>(true);
 
   const { previewPoolTx }  = usePool();
-  const { buyDai, buyDaiWithSignature, buyActive }  = useProxy();
+  const { buyDai, buyDaiNoSignature, buyActive }  = useProxy();
   const { account } = useSignerAccount();
 
   const [ maxWithdraw, setMaxWithdraw ] = useState<number>(0);
@@ -42,9 +42,9 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
 
   const [ inputValue, setInputValue ] = useState<any>();
   const debouncedInput = useDebounce(inputValue, 500);
-  const [inputRef, setInputRef] = React.useState<any>(null);
+  const [inputRef, setInputRef] = useState<any>(null);
   
-  const [ yDaiValue, setYDaiValue ] = React.useState<number>(0);
+  const [ eDaiValue, setEDaiValue ] = useState<number>(0);
 
   const [ withdrawDisabled, setWithdrawDisabled ] = useState<boolean>(true);
   const [ withdrawDaiPending, setWithdrawDaiPending] = useState<boolean>(false);
@@ -55,7 +55,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
   const withdrawProcedure = async (value:number) => {
     if ( !withdrawDisabled ) {
       setWithdrawDaiPending(true);
-      await buyDaiWithSignature(
+      await buyDai(
         activeSeries,
         inputValue,
       );
@@ -68,7 +68,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
 
   const getMaxWithdraw = async () => {
     setIsGettingMax(true);
-    const preview = await previewPoolTx('sellYDai', activeSeries, activeSeries.yDaiBalance_);
+    const preview = await previewPoolTx('sellEDai', activeSeries, activeSeries.eDaiBalance_);
     setIsGettingMax(false);
     if (!(preview instanceof Error)) {
       return parseFloat(ethers.utils.formatEther(preview)); 
@@ -93,7 +93,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
   useEffect(() => {
     activeSeries && debouncedInput && ( async () => {
       const preview = await previewPoolTx('buyDai', activeSeries, debouncedInput);
-      !(preview instanceof Error) && setYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
+      !(preview instanceof Error) && setEDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
     })();
   }, [debouncedInput]);
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { ethers, BigNumber }  from 'ethers';
 import * as utils from '../utils';
 
@@ -15,10 +15,10 @@ import { YieldContext } from '../contexts/YieldContext'; // TODO sort out this c
  * 
  */
 export const useMath = () => {
-  const { state: { feedData } } = React.useContext(YieldContext);
-  const [ ilks, setIlks ] = React.useState<any>();
+  const { state: { feedData } } = useContext(YieldContext);
+  const [ ilks, setIlks ] = useState<any>();
   
-  React.useEffect(()=>{
+  useEffect(()=>{
     feedData.ilks && setIlks(feedData.ilks);
   }, [feedData]);
 
@@ -28,7 +28,7 @@ export const useMath = () => {
    */
   const collPrice = (): BigNumber => {
     // TODO: Update this to use ETH-A Oracle - not ilks.spot for market price USD
-    console.log('ETH price:', ethers.utils.formatEther(utils.mulRay(utils.toWad(1.5), (ilks.spot)).toString()));
+    console.log('ETH price:', ethers.utils.formatEther(utils.mulRay(utils.dehumanize(1.5), (ilks.spot)).toString()));
     return utils.mulRay(utils.toRay(1.5), (ilks.spot));
   };
 
@@ -42,9 +42,9 @@ export const useMath = () => {
   };
 
   /**
-   * Calculates value of debt (yDaiDebt at maturity or Dai) at current Dai price
+   * Calculates value of debt (eDaiDebt at maturity or Dai) at current Dai price
    * the rate used is the rate and spot price of Dai.
-   * @param {BigNumber} _amount yDai amount (= amount of Dai at maturity)
+   * @param {BigNumber} _amount eDai amount (= amount of Dai at maturity)
    * @returns 
    */
   const debtValAdj = (_amount:BigNumber ) => {
@@ -140,6 +140,9 @@ export const useMath = () => {
     return _debtValue.mul(_liquidationRatio).div(_collateralAmount);
   };
 
+
+  
+
   /**
    * Max amount of Dai that can be borrowed
    *
@@ -178,29 +181,29 @@ export const useMath = () => {
   };
 
   /**
-   * Split a certain amount of Dai liquidity into its yDai and Dai components
+   * Split a certain amount of Dai liquidity into its eDai and Dai componetnts
    * 
    * @param {BigNumber} daiAmount // amount dai to split
    * @param { BigNumber } _daiReserves// Dai reserves
-   * @param { BigNumber } _yDaiReserves// yDai reservers
+   * @param { BigNumber } _eDaiReserves// eDai reservers
    * 
-   * @returns  [ BigNumber, BigNumber ] returns an array of [dai, yDai] 
+   * @returns  [ BigNumber, BigNumber ] returns an array of [dai, eDai] 
    */
   const splitDaiLiquidity =(
     _daiAmount: BigNumber,
     _daiReserves: BigNumber,
-    _yDaiReserves: BigNumber,
+    _eDaiReserves: BigNumber,
   )=> {
-    const daiPortion = _daiAmount.mul(_daiReserves).div(_yDaiReserves.add(_daiReserves));
-    const yDaiPortion = _daiAmount.sub(daiPortion);
-    return [daiPortion, yDaiPortion];
+    const daiPortion = _daiAmount.mul(_daiReserves).div(_eDaiReserves.add(_daiReserves));
+    const eDaiPortion = _daiAmount.sub(daiPortion);
+    return [daiPortion, eDaiPortion];
   };
 
   /**
    * Annualised Yield Rate
    *
    * @param { BigNumber } _rate // current [Dai] price per unit y[Dai]
-   * @param { BigNumber } _return // y[Dai] amount/price at maturity
+   * @param { BigNumber } _amount // y[Dai] amount at maturity
    * @param { number } _maturity  // date of maturity
    * @param { number } _fromDate // ***optional*** start date - defaults to now()
    * 
@@ -208,7 +211,7 @@ export const useMath = () => {
    */
   const yieldAPR =(
     _rate: BigNumber,
-    _return: BigNumber,
+    _amount: BigNumber,
     _maturity:number,
     _fromDate:number= (Math.round(new Date().getTime() / 1000)), // if not provided, defaults to current time.
   )=> {
@@ -218,9 +221,10 @@ export const useMath = () => {
     ) {
       const secsToMaturity = _maturity - _fromDate;
       const propOfYear = secsToMaturity/utils.SECONDS_PER_YEAR;
-      const priceRatio = parseFloat(ethers.utils.formatEther(_return)) / parseFloat(ethers.utils.formatEther(_rate));
+      const priceRatio = parseFloat(ethers.utils.formatEther(_amount)) / parseFloat(ethers.utils.formatEther(_rate));
       const powRatio = 1 / propOfYear;
       const apr = Math.pow(priceRatio, powRatio) - 1;
+      console.log(apr*100);
       return apr*100;
     }
     return 0;

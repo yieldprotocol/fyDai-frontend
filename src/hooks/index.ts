@@ -11,7 +11,7 @@ import { useMath } from './mathHooks';  // TODO work out this cyclic reference (
 import { useAuth } from './authsHook';
 
 /* Generic blockchain transactional hooks */
-import { useCallTx, useSendTx, useBalances, useTimeTravel } from './chainHooks'; 
+import { useCallTx, useSendTx, useTimeTravel } from './chainHooks'; 
 import { useToken } from './tokenHook';
 
 /* Contract hooks */
@@ -19,7 +19,7 @@ import { useMigrations } from './migrationHook';
 import { useController } from './controllerHook';
 import { useProxy } from './yieldProxyHook';
 import { usePool } from './poolHook';
-import { useYDai } from './yDaiHook';
+import { useEDai } from './eDaiHook';
 
 export {
   usePool,
@@ -28,12 +28,11 @@ export {
   useDebounce,
   useSendTx,
   useCallTx,
-  useBalances,
 
   useAuth,
   useProxy,
   useController,
-  useYDai,
+  useEDai,
   useMigrations,
 
   useEvents,

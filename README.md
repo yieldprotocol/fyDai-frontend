@@ -1,15 +1,15 @@
-# yDai-frontend
-Front end for yDai 
+# eDai-frontend
+Front end for eDai 
 
 
 ### Start a new locally served ganache instance to test the frontend UI:  
 
-1. Clone the yDai repositiory: https://github.com/yieldprotocol/yDai.git  (working commit: acc526b65769e9239ce851e7e52b7babea99912c ):  
-`git clone https://github.com/yieldprotocol/yDai.git`  
-`git reset --hard acc526b65769e9239ce851e7e52b7babea99912c`    
-( if you want to revert to the latest yDai, simply: `git pull` )
+1. Clone the eDai repositiory: https://github.com/yieldprotocol/eDai.git  (working commit: 917e43c983743ea3c685facb45c42a39dc8c4c9b ):  
+`git clone https://github.com/yieldprotocol/eDai.git`  
+`git reset --hard 917e43c983743ea3c685facb45c42a39dc8c4c9b`    
+( if you want to revert to the latest eDai, simply: `git pull` )
 
-2. Prepare necessary files ( in yDai root folder ):
+2. Prepare necessary files ( in eDai root folder ):
  - `.secret` should contain a wallet mnemonic. You will reuse this mnemonic in the next step when starting ganache.
  - `.infuraKey` should contain an infuraKey. This is used only for public network deploys but is currently expected to run the frontend. 
 
@@ -17,7 +17,7 @@ Front end for yDai
 3. Run a buidler node  
 `npx buidler node`
 
-4. In a seperate console, Run truffle migrations ( yDai root folder ): 
+4. In a seperate console, Run truffle migrations ( eDai root folder ): 
 `truffle migrate --network development --reset`  
 
 5. Setup a few proxies and a basic single market:
@@ -28,7 +28,7 @@ Output: 'Market Initiated' on success.
 ### Run the frontend on a development server: 
 
 1. Clone this repository  
-`git clone https://github.com/yieldprotocol/yDai-frontend.git`
+`git clone https://github.com/yieldprotocol/eDai-frontend.git`
 
 2. In a new console, Install and launch the development server:  
 `yarn && yarn start`  

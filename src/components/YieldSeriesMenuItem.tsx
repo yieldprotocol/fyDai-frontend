@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Box, Image, Text, Drop, Button, Collapsible } from 'grommet';
 import moment from 'moment';
 
@@ -26,12 +26,12 @@ const YieldSeriesMenuItem = ({
   const {
     name,
     maturity_,
-    yDaiBalance_,
+    eDaiBalance_,
     currentValue,
     seriesColor,
   } = series;
 
-  const [over, setOver] = React.useState<boolean>();
+  const [over, setOver] = useState<boolean>();
   const tooltipColor = { color: 'background-mid', opacity: 1 };
   const ref = React.useRef<any>();
 
@@ -89,16 +89,16 @@ const YieldSeriesMenuItem = ({
             <Text size="small" weight={selected ? 'bold': 'normal'}>{moment(maturity_).format('MMMM Y')}</Text>
             <Text 
               size="xsmall" 
-              // color={getBalanceColor(yDaiBalance_, !!selected)}
+              // color={getBalanceColor(eDaiBalance_, !!selected)}
             >
-              Balance: {yDaiBalance_} yDai
+              Balance: {eDaiBalance_} eDai
             </Text> 
           </Box>
         </Box>
 
         <Box direction='row'>
           <Box justify='end'>
-            <Text color={yDaiBalance_ === 0 ? 'border': seriesColor}> 
+            <Text color={eDaiBalance_ === 0 ? 'border': seriesColor}> 
               <Star />
             </Text>
           </Box>

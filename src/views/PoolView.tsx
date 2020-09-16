@@ -1,10 +1,8 @@
-import React from 'react';
-import { Box, Text } from 'grommet';
-
+import React, { Suspense, lazy } from 'react';
+import { Box } from 'grommet';
 import PageHeader from '../components/PageHeader';
-import SeriesDescriptor from '../components/SeriesDescriptor';
-import Pool from '../containers/Pool';
-import Authorization from '../components/Authorization';
+
+const Pool = lazy(() => import('../containers/Pool'));
 
 const PoolView = () => {
   return (
@@ -22,7 +20,9 @@ const PoolView = () => {
         background='background-front'
         round='small'
       >
-        <Pool /> 
+        <Suspense fallback={<Box> loading ... </Box>}>
+          <Pool />
+        </Suspense>
       </Box>
     </>
   );

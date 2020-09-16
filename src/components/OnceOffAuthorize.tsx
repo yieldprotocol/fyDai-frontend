@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Box, Text, ResponsiveContext, Button } from 'grommet';
 import { FiInfo as Info } from 'react-icons/fi';
 import Loading from './Loading';
@@ -14,7 +14,7 @@ interface OnceOffAuthorizeProps {
 
 const OnceOffAuthorize = ({ awaitingApproval, authProcedure, authMsg, txPending }:OnceOffAuthorizeProps) => {
 
-  const screenSize = React.useContext(ResponsiveContext);
+  const screenSize = useContext(ResponsiveContext);
   return (
     <Box 
       round 

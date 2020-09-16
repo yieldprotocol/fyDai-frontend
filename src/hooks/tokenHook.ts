@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import { ethers, BigNumber }  from 'ethers';
 
@@ -7,9 +7,9 @@ import { NotifyContext } from '../contexts/NotifyContext';
 
 import { useSignerAccount } from './connectionHooks';
 
-import YDai from '../contracts/YDai.json';
+import EDai from '../contracts/EDai.json';
 import Controller from '../contracts/Controller.json';
-import TestDai from '../contracts/TestDai.json';
+import Dai from '../contracts/Dai.json';
 import WETH9 from '../contracts/WETH9.json';
 import GemJoin from '../contracts/GemJoin.json';
 import DaiJoin from '../contracts/DaiJoin.json';
@@ -24,9 +24,9 @@ import { useTxHelpers } from './appHooks';
 // ethers.errors.setLogLevel('error');
 
 const contractMap = new Map<string, any>([
-  ['YDai', YDai.abi],
+  ['EDai', EDai.abi],
   ['Controller', Controller.abi],
-  ['Dai', TestDai.abi],
+  ['Dai', Dai.abi],
   ['Weth', WETH9.abi],
   ['Chai', Chai.abi],
   ['WethJoin', GemJoin.abi],
@@ -44,11 +44,11 @@ const contractMap = new Map<string, any>([
  * @returns { boolean } getBalance
  */
 export function useToken() {
-  // const { state: { provider, account } } = React.useContext(ConnectionContext);
+  // const { state: { provider, account } } = useContext(ConnectionContext);
   const { signer, provider, account, voidSigner } = useSignerAccount();
 
-  const  { dispatch }  = React.useContext<any>(NotifyContext);
-  const [ approveActive, setApproveActive ] = React.useState<boolean>(false);
+  const  { dispatch }  = useContext<any>(NotifyContext);
+  const [ approveActive, setApproveActive ] = useState<boolean>(false);
 
   const { handleTx, handleTxError } = useTxHelpers();
 
@@ -122,7 +122,7 @@ export function useToken() {
     setApproveActive(true);
     const contract = new ethers.Contract(
       tokenAddr,
-      YDai.abi,
+      EDai.abi,
       signer
     );
     try {

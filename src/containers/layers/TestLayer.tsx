@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 
 import { ethers } from 'ethers';
 import Moment from 'moment'; 
@@ -23,29 +23,29 @@ const TestLayer = (props:any) => {
   const { chainId, account } = useWeb3React();
 
   // const web3 = useWeb3React();
-  const { state: { position }, actions: userActions } = React.useContext( UserContext );
-  const { state: yieldState, actions: yieldActions } = React.useContext( YieldContext );
-  const { state: seriesState, actions: seriesActions } = React.useContext( SeriesContext );
-  const [ flow, setFlow ] = React.useState<string|null>('APPROVALS');
+  const { state: { position }, actions: userActions } = useContext( UserContext );
+  const { state: yieldState, actions: yieldActions } = useContext( YieldContext );
+  const { state: seriesState, actions: seriesActions } = useContext( SeriesContext );
+  const [ flow, setFlow ] = useState<string|null>('APPROVALS');
 
   const { activeSeries, seriesData } = seriesState;
   const { yieldData, deployedContracts, deployedSeries } = yieldState;
   
 
-  // const [ wethBalance, setWethBalance ] = React.useState<string|null|number>(0);
-  // const [ chaiBalance, setChaiBalance ] = React.useState<string|null|number>(0);
-  // const [ daiBalance, setDaiBalance ] = React.useState<string|null|number>(0);
+  // const [ wethBalance, setWethBalance ] = useState<string|null|number>(0);
+  // const [ chaiBalance, setChaiBalance ] = useState<string|null|number>(0);
+  // const [ daiBalance, setDaiBalance ] = useState<string|null|number>(0);
 
-  const [daiDebt, setDaiDebt] = React.useState<ethers.BigNumber>();
-  const [daiTokens, setDaiTokens] = React.useState<ethers.BigNumber>();
-  const [wethTokens, setWethTokens] = React.useState<ethers.BigNumber>();
-  const [chaiTokens, setChaiTokens] = React.useState<ethers.BigNumber>();
+  const [daiDebt, setDaiDebt] = useState<ethers.BigNumber>();
+  const [daiTokens, setDaiTokens] = useState<ethers.BigNumber>();
+  const [wethTokens, setWethTokens] = useState<ethers.BigNumber>();
+  const [chaiTokens, setChaiTokens] = useState<ethers.BigNumber>();
 
-  const [chainDate, setChainDate] = React.useState<any>(null);
+  const [chainDate, setChainDate] = useState<any>(null);
 
   const { closeLayer, changeWallet } = props;
   // const [ connectMakerVault ] = useMakerVault();
-  const { dispatch } = React.useContext<any>(NotifyContext);
+  const { dispatch } = useContext<any>(NotifyContext);
 
   const [ sendTx ]  = useSendTx();
   const [ callTx ]  = useCallTx();
@@ -73,16 +73,14 @@ const TestLayer = (props:any) => {
     withdrawEthActive,
   }  = useProxy();
 
-  // const { getChaiBalance, getWethBalance, getDaiBalance }  = useBalances();
-
-  // React.useEffect(()=>{
+  // useEffect(()=>{
   //   (async () => setWethBalance( await getWethBalance(deployedContracts.Weth)) )();
   //   (async () => setChaiBalance( await getChaiBalance(deployedContracts.Chai)) )();
   //   (async () => setDaiBalance( await getDaiBalance(deployedContracts.Dai)) )();
   // }, [deployedContracts, postActive, withdrawActive]);
 
-  React.useEffect(()=>{
-    const daiD = utils.toWad(1);
+  useEffect(()=>{
+    const daiD = utils.dehumanize(1);
     const chi  = utils.toRay(1.2);
 
     setDaiDebt( daiD );
@@ -99,14 +97,14 @@ const TestLayer = (props:any) => {
 
   }, [ yieldState ] );
 
-  React.useEffect(()=>{
+  useEffect(()=>{
 
 
 
 
   }, [chainDate]);
 
-  // React.useEffect(() => {
+  // useEffect(() => {
   //   // (async () => setBalance( await getBalance()) )();
   //   // (async () => setWeiBalance( await getWeiBalance()) )();
   //   // (async () => activate(injected, console.log))();
@@ -181,7 +179,7 @@ const TestLayer = (props:any) => {
                 <Button primary label='controller addDelegate:EthProxy' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedContracts.YieldProxy], utils.toWei('0'))} />             
                 <Button primary label='controller addDelegate:DaiProxy[0]' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedSeries[0].yieldProxyAddress], utils.toWei('0'))} />
 
-                <Button primary label='pool[0] addDelegate: yDai[0]' onClick={()=> sendTx(deployedSeries[0].poolAddress, 'Pool', 'addDelegate', [deployedSeries[0].yDaiAddress], utils.toWei('0'))} />
+                <Button primary label='pool[0] addDelegate: eDai[0]' onClick={()=> sendTx(deployedSeries[0].poolAddress, 'Pool', 'addDelegate', [deployedSeries[0].eDaiAddress], utils.toWei('0'))} />
                 <Button primary label='pool[0] addDelegate: yieldProxy[0]' onClick={()=> sendTx(deployedSeries[0].poolAddress, 'Pool', 'addDelegate', [deployedContracts.YieldProxy], utils.toWei('0'))} />
                 <Button primary label='Pool[0] addDelegate: yieldProxy[0]' onClick={()=> sendTx(deployedSeries[0].poolAddress, 'Pool', 'addDelegate', [deployedSeries[0].yieldProxyAddress], utils.toWei('0'))} />
 
@@ -204,7 +202,7 @@ const TestLayer = (props:any) => {
               <Button label='Post ETH Collateral via proxy 1.5' disabled={postActive} onClick={()=> postEth(1.5)} />
               <Button primary label='controller addDelegate:EthProxy' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedContracts.YieldProxy], utils.toWei('0'))} />             
               <Button label='Withdraw ETH via proxy 1.5)' onClick={()=> withdrawEth(1.5 )} />
-              <Button label='6.1 Repay 0.5 eth/weth debt in yDai' onClick={()=> repay('ETH-A', yieldState.deployedSeries[0].maturity, 0.5, 'YDAI' )} />
+              <Button label='6.1 Repay 0.5 eth/weth debt in eDai' onClick={()=> repay('ETH-A', yieldState.deployedSeries[0].maturity, 0.5, 'YDAI' )} />
               <Button label='( 6.2 Repay 0.5 eth/weth debt in Dai) ' onClick={()=> repay('ETH-A', yieldState.deployedSeries[0].maturity, 0.5, 'DAI' )} />
             
             </Box>}
@@ -259,13 +257,13 @@ const TestLayer = (props:any) => {
               <Button label='5.Borrow 0.5 with chai' onClick={()=> borrow('CHAI', deployedSeries[0].maturity, 0.5 )} />
 
               Chai repay; 
-              <Button label='(6.1 Repay 0.5 chaidebt in yDai)' onClick={()=> repay('CHAI', deployedSeries[0].maturity, 0.5, 'YDAI' )} />
+              <Button label='(6.1 Repay 0.5 chaidebt in eDai)' onClick={()=> repay('CHAI', deployedSeries[0].maturity, 0.5, 'YDAI' )} />
               <Button label=' 6.2 Repay 0.5 chaidebt in Dai ' onClick={()=> repay('CHAI', deployedSeries[0].maturity, 0.5, 'DAI' )} />
             </Box>}
 
             { flow === 'MATURITY' && 
             <Box gap='small'>
-              <Button label='Mature yDai' onClick={()=> account && console.log('not mature')} />
+              <Button label='Mature eDai' onClick={()=> account && console.log('not mature')} />
               <Button label='Redeem Dai' onClick={()=> account && console.log('not mature')} />
             </Box>}
           </Box>
@@ -280,7 +278,7 @@ const TestLayer = (props:any) => {
             { seriesData.size > 0 && !seriesState.isLoading ? 
               <Box pad='small' gap='medium' fill>
                 <Box direction='row'>
-                  {/* <Text weight='bold'>yDai[0]: {seriesData.get('yDai-2020-09-30').name}</Text> */}
+                  {/* <Text weight='bold'>eDai[0]: {seriesData.get('eDai-2020-09-30').name}</Text> */}
                 </Box>
                 <Box gap='small'>
                   <Text weight='bold'>Posted collateral:</Text>
@@ -308,7 +306,7 @@ const TestLayer = (props:any) => {
 
           <Button 
             label='mature Active series' 
-            onClick={()=> sendTx(activeSeries.yDaiAddress, 'YDai', 'mature', [], ethers.BigNumber.from(0) )}
+            onClick={()=> sendTx(activeSeries.eDaiAddress, 'EDai', 'mature', [], ethers.BigNumber.from(0) )}
           />
 
         </Box>
@@ -356,7 +354,7 @@ const TestLayer = (props:any) => {
             label='poolAuth' 
             primary
             onClick={async ()=> {
-              await poolAuth(deployedSeries[0].yDaiAddress, deployedSeries[0].poolAddress);
+              await poolAuth(deployedSeries[0].eDaiAddress, deployedSeries[0].poolAddress);
             }}
           />
 
@@ -368,19 +366,19 @@ const TestLayer = (props:any) => {
           <Button 
             label='init pool0' 
             primary
-            onClick={()=> sendTx(deployedSeries[0].poolAddress, 'Pool', 'init', [ethers.utils.parseEther('1'), {gasLimit:1000000}], ethers.BigNumber.from(0) )}
+            onClick={()=> sendTx(deployedSeries[0].poolAddress, 'Pool', 'init', [ethers.utils.parseEther('1')], ethers.BigNumber.from(0) )}
           />
 
           <Button 
             label='init Pool1' 
             primary
-            onClick={()=> sendTx(deployedSeries[1].poolAddress, 'Pool', 'init', [ethers.utils.parseEther('1'), {gasLimit:1000000}], ethers.BigNumber.from(0) )}
+            onClick={()=> sendTx(deployedSeries[1].poolAddress, 'Pool', 'init', [ethers.utils.parseEther('1')], ethers.BigNumber.from(0) )}
           />
 
           <Button 
             label='init pool2' 
             primary
-            onClick={()=> sendTx(deployedSeries[2].poolAddress, 'Pool', 'init', [ethers.utils.parseEther('1'), {gasLimit:1000000}], ethers.BigNumber.from(0) )}
+            onClick={()=> sendTx(deployedSeries[2].poolAddress, 'Pool', 'init', [ethers.utils.parseEther('1')], ethers.BigNumber.from(0) )}
 
           />
 

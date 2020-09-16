@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Button, Box, Sidebar, Text } from 'grommet';
 
 import PulseLoader from 'react-spinners/PulseLoader';
@@ -17,8 +17,8 @@ const YieldSidebar = ({
   setActiveSeries: any;
   setShowSeriesLayer: any;
 }) => {
-  const { state } = React.useContext(YieldContext);
-  const [seriesList, setSeriesList] = React.useState<IYieldSeries[]>([]);
+  const { state } = useContext(YieldContext);
+  const [seriesList, setSeriesList] = useState<IYieldSeries[]>([]);
 
   const { deployedSeries } = state;
   // const handleSelectSeries = (ind: number | null) => {
@@ -29,7 +29,7 @@ const YieldSidebar = ({
   //     setOpenIndex(null);
   // };
 
-  React.useEffect(() => {
+  useEffect(() => {
     !state.isLoading && setSeriesList(deployedSeries);
   }, [state.isLoading, deployedSeries]);
 

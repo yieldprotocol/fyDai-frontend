@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 
 import { Grommet, base, Grid, Main, Box, ResponsiveContext, Nav, Layer } from 'grommet';
 import { deepMerge } from 'grommet/utils';
 import { yieldTheme } from './themes';
+
+import { SeriesContext } from './contexts/SeriesContext';
 
 import Dashboard from './views/Dashboard';
 import BorrowView from './views/BorrowView';
@@ -11,20 +13,25 @@ import PoolView from './views/PoolView';
 
 import YieldHeader from './components/YieldHeader';
 import YieldFooter from './components/YieldFooter';
+import SeriesSelector from './components/SeriesSelector';
+import YieldMark from './components/logos/YieldMark';
 
 import ConnectLayer from './containers/layers/ConnectLayer';
 import AccountLayer from './containers/layers/AccountLayer';
 import NotifyLayer from './containers/layers/NotifyLayer';
+import AuthsLayer from './containers/layers/AuthsLayer';
 
 // TODO: remove testLayer for prod
 import TestLayer from './containers/layers/TestLayer';
-import SeriesSelector from './components/SeriesSelector';
-import YieldMark from './components/logos/YieldMark';
-import AuthsLayer from './containers/layers/AuthsLayer';
+
+// const LendView = React.lazy(() => import('./views/LendView'));
+// const PoolView = React.lazy(() => import('./views/PoolView'));
+// const BorrowView = React.lazy(() => import('./views/BorrowView'));
+// const Dashboard = React.lazy(() => import('./views/Dashboard'));
 
 const ThemedApp = () => {
-  const [darkMode, setDarkMode] = React.useState(false);
-  const [partyMode, setPartyMode] = React.useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+  const [partyMode, setPartyMode] = useState(false);
   return (
     <Grommet
       theme={deepMerge(base, yieldTheme)}
@@ -42,26 +49,29 @@ const ThemedApp = () => {
 };
 
 const App = (props:any) => {
+
+  const { isLoading } = useContext(SeriesContext);
+
   // TODO Switch out for react router
-  const [activeView, setActiveView] = React.useState<string>('BORROW');
-  const [accountView, setAccountView] = React.useState<string>('ACCOUNT');
+  const [activeView, setActiveView] = useState<string>('BORROW');
+  const [accountView, setAccountView] = useState<string>('ACCOUNT');
 
-  const [showConnectLayer, setShowConnectLayer] = React.useState<boolean>(false);
-  const [showAccountLayer, setShowAccountLayer] = React.useState<boolean>(false);
-  const [showAuthsLayer, setShowAuthsLayer] = React.useState<boolean>(false);
+  const [showConnectLayer, setShowConnectLayer] = useState<boolean>(false);
+  const [showAccountLayer, setShowAccountLayer] = useState<boolean>(false);
+  const [showAuthsLayer, setShowAuthsLayer] = useState<boolean>(false);
 
-  const [showSeriesLayer, setShowSeriesLayer] = React.useState<boolean>(false);
-  const [showTestLayer, setShowTestLayer] = React.useState<boolean>(false);
+  const [showSeriesLayer, setShowSeriesLayer] = useState<boolean>(false);
+  const [showTestLayer, setShowTestLayer] = useState<boolean>(false);
 
-  const screenSize = React.useContext(ResponsiveContext);
-  const [columnsWidth, setColumnsWidth] = React.useState<string[]>(['5%', 'auto', '5%']);
+  const screenSize = useContext(ResponsiveContext);
+  const [columnsWidth, setColumnsWidth] = useState<string[]>(['5%', 'auto', '5%']);
 
   const changeConnection = () => {
     setShowAccountLayer(false);
     setShowConnectLayer(true);
   };
 
-  React.useEffect(()=> {
+  useEffect(()=> {
     if (screenSize === 'small') { 
       setColumnsWidth(['0%', 'auto', '0%']);
     } else {
@@ -79,17 +89,17 @@ const App = (props:any) => {
       { showSeriesLayer  && <SeriesSelector activeView='borrow' close={()=>setShowSeriesLayer(false)} /> }
       
       { showAccountLayer &&
-      <AccountLayer
-        view={accountView}
-        closeLayer={() => setShowAccountLayer(false)}
-        changeWallet={() => changeConnection()}
-      /> }
+        <AccountLayer
+          view={accountView}
+          closeLayer={() => setShowAccountLayer(false)}
+          changeWallet={() => changeConnection()}
+        />}
+
 
       <Box direction="row" height={{ min: '100%' }}>
         <Box flex height='100%'>
 
-          <Grid fill rows={screenSize === 'small'? ['xsmall', 'auto', 'xsmall']: ['auto', 'flex', 'auto']}>
-                        
+          <Grid fill rows={screenSize === 'small'? ['xsmall', 'auto', 'xsmall']: ['auto', 'flex', 'auto']}>                 
             <Grid fill columns={columnsWidth}>
               <Box background={{ color: 'background-front' }} />
               <YieldHeader
@@ -101,6 +111,7 @@ const App = (props:any) => {
               <Box background={{ color: 'background-front' }} />
             </Grid>
 
+            {!isLoading &&
             <Main pad="none" direction="row" flex>
               <Grid fill columns={columnsWidth}>
                 <Box background="background" />
@@ -108,7 +119,7 @@ const App = (props:any) => {
                   pad={{ vertical: 'large' }}
                   fill="horizontal"
                   align="center"
-                >
+                >          
                   {activeView === 'DASHBOARD' && <Dashboard />}
                   {activeView === 'BORROW' && <BorrowView />}
                   {activeView === 'LEND' && <LendView />}
@@ -116,24 +127,25 @@ const App = (props:any) => {
                 </Box>               
                 <Box background="background" />
               </Grid>
-            </Main>
+            </Main>}
               
             <Grid fill columns={columnsWidth}>
               <Box background="background" />
               {screenSize !== 'small' &&
-              <YieldFooter
-                showTestLayer={showTestLayer}
-                setShowTestLayer={setShowTestLayer}
-                darkMode={props.darkMode}
-                setDarkMode={props.setDarkMode}
-                changeConnection={changeConnection}
-              />}                  
+                <YieldFooter
+                  showTestLayer={showTestLayer}
+                  setShowTestLayer={setShowTestLayer}
+                  darkMode={props.darkMode}
+                  setDarkMode={props.setDarkMode}
+                  changeConnection={changeConnection}
+                />}                  
               <Box background="background" />      
             </Grid>
 
           </Grid>
         </Box>
       </Box>
+
       {screenSize === 'small' &&    
         <Layer
           position='bottom'
@@ -143,11 +155,9 @@ const App = (props:any) => {
         >
           <Nav 
             direction="row"
-            background="background-mid"
-            
+            background="background-mid"          
             round={{ corner:'top', size:'small' }}
             elevation='small'
-
             pad="medium"
             justify='evenly'
           >
@@ -156,7 +166,7 @@ const App = (props:any) => {
             <Box>Borrow</Box>
             <Box>Repay</Box>         
           </Nav>
-        </Layer>}
+        </Layer>} 
     </div>
   );
 };

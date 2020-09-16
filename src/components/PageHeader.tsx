@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Box, Heading, Text, ThemeContext, ResponsiveContext, Image } from 'grommet';
 
 import TipsButton from './TipButtons';
@@ -18,13 +18,13 @@ interface PageHeaderProps {
 
 const PageHeader = (props: PageHeaderProps) => {
 
-  const { state: { authorizations } } = React.useContext(UserContext);
+  const { state: { authorizations } } = useContext(UserContext);
   const { hasDelegatedProxy } = authorizations;
 
-  const { state:{ activeSeries } } = React.useContext(SeriesContext);
+  const { state:{ activeSeries } } = useContext(SeriesContext);
   const { title, subtitle, tipPrimary, tipSecondary } = props;
-  const screenSize = React.useContext(ResponsiveContext);
-  const theme = React.useContext<any>(ThemeContext);
+  const screenSize = useContext(ResponsiveContext);
+  const theme = useContext<any>(ThemeContext);
 
   const Logo = () => (
     <Box

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Anchor, Layer, Header, Footer, Button, Box, Text } from 'grommet';
 
 import ProfileButton from '../../components/ProfileButton';
@@ -8,7 +8,7 @@ import { useWeb3React } from '../../hooks';
 
 const AccountLayer = (props:any) => {
   const { closeLayer, changeWallet } = props;
-  const { state: { position } } = React.useContext(UserContext);
+  const { state: { position } } = useContext(UserContext);
 
   const { library } = useWeb3React();
   

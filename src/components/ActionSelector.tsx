@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Box, Button, Text, ResponsiveContext } from 'grommet';
 import { useSignerAccount } from '../hooks';
 
@@ -9,7 +9,7 @@ interface IActionSelectorProps {
 
 function ActionSelector({ setActiveView, activeView }:IActionSelectorProps) {
 
-  const screenSize = React.useContext(ResponsiveContext);
+  const screenSize = useContext(ResponsiveContext);
   const { account } = useSignerAccount();
   
   return (

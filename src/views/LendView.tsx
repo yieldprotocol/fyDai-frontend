@@ -1,30 +1,19 @@
-import React, { useState, useContext } from 'react';
-import { Box, Text } from 'grommet';
-
-import { YieldContext } from '../contexts/YieldContext';
+import React, { useContext, lazy, Suspense } from 'react';
+import { Box } from 'grommet';
 import { SeriesContext } from '../contexts/SeriesContext';
-
-import Redeem from '../containers/Redeem';
-import Lend from '../containers/Lend';
-
 import PageHeader from '../components/PageHeader';
-import SeriesDescriptor from '../components/SeriesDescriptor';
-import Authorization from '../components/Authorization';
 
+const Lend = lazy(() => import('../containers/Lend'));
+const Redeem = lazy(() => import('../containers/Redeem'));
 
 interface LendProps {
   activeView?: string;
 }
 
-const LendView = ({ activeView: activeViewFromProp  }:LendProps) => {
+const LendView = ({ activeView }:LendProps) => {
 
-  const [ activeView, setActiveView ] = useState<string|undefined>( activeViewFromProp );
-
-  const { state: yieldState, yieldActions } = React.useContext(YieldContext);
-  const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
-
-  const { isLoading: positionsLoading, seriesData, activeSeries } = seriesState; 
-
+  const { state: seriesState } = useContext(SeriesContext);
+  const { activeSeries } = seriesState;
   return (
     <>
       <PageHeader
@@ -40,8 +29,17 @@ const LendView = ({ activeView: activeViewFromProp  }:LendProps) => {
         background='background-front'
         round='small'
       >
-        { activeSeries?.isMature() === false  && <Lend /> }
-        { activeSeries?.isMature() === true && <Redeem /> }
+
+        { activeSeries?.isMature() === false  && 
+        <Suspense fallback={<Box>Loading...</Box>}>
+          <Lend /> 
+        </Suspense>}
+
+        { activeSeries?.isMature() === true && 
+        <Suspense fallback={<Box>Loading...</Box>}>
+          <Redeem /> 
+        </Suspense>}
+        
       </Box>
     </>
   );

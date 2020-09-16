@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { ethers, BigNumber }  from 'ethers';
 
 import { NotifyContext } from '../contexts/NotifyContext';
@@ -25,25 +25,25 @@ import { useTxHelpers } from './appHooks';
 export const useController = () => {
   const { abi: controllerAbi } = Controller;
   const { signer, provider, account } = useSignerAccount();
-  const  { dispatch }  = React.useContext<any>(NotifyContext);
-  const { state : { deployedContracts } } = React.useContext<any>(YieldContext);
+  const  { dispatch }  = useContext<any>(NotifyContext);
+  const { state : { deployedContracts } } = useContext<any>(YieldContext);
 
   // const controllerAddr = ethers.utils.getAddress(deployedContracts.Controller);
 
-  const [ postActive, setPostActive ] = React.useState<boolean>(false);
-  const [ withdrawActive, setWithdrawActive ] = React.useState<boolean>(false);
-  const [ borrowActive, setBorrowActive ] = React.useState<boolean>(false);
-  const [ repayActive, setRepayActive ] = React.useState<boolean>(false);
-  const [ approveActive, setApproveActive ] = React.useState<boolean>(false);
+  const [ postActive, setPostActive ] = useState<boolean>(false);
+  const [ withdrawActive, setWithdrawActive ] = useState<boolean>(false);
+  const [ borrowActive, setBorrowActive ] = useState<boolean>(false);
+  const [ repayActive, setRepayActive ] = useState<boolean>(false);
+  const [ approveActive, setApproveActive ] = useState<boolean>(false);
 
   /* controller contract for txs */
-  const [controllerContract, setControllerContract] = React.useState<any>();
+  const [controllerContract, setControllerContract] = useState<any>();
   /* controller contract for reading, calls */
-  const [controllerProvider, setControllerProvider] = React.useState<any>();
+  const [controllerProvider, setControllerProvider] = useState<any>();
 
   const { handleTx, handleTxError } = useTxHelpers();
 
-  React.useEffect(()=>{
+  useEffect(()=>{
     deployedContracts.Controller && signer &&
     setControllerContract( new ethers.Contract( 
       ethers.utils.getAddress(deployedContracts.Controller), 
@@ -123,8 +123,8 @@ export const useController = () => {
   };
 
   /**
-   * Borrow yDai with available, posted collateral directly (any type of collateral).
-   * @note Direct transaction with no pool trading (doesn't automatically sell yDai for Dai)
+   * Borrow eDai with available, posted collateral directly (any type of collateral).
+   * @note Direct transaction with no pool trading (doesn't automatically sell eDai for Dai)
    * 
    * @param {string} collateral 'ETH-A' || 'CHAI' (use ETH-A for ETH collateral)
    * @param {string} maturity UNIX timestamp as a string
@@ -159,13 +159,13 @@ export const useController = () => {
   };
 
   /**
-   * Repay yDai debt directly with either Dai or YDai.
+   * Repay eDai debt directly with either Dai or EDai.
    * @note Direct transaction with no pool trading.
    * 
    * @param {string} collateral 'ETH-A' || 'CHAI' (use ETH-A for ETH collateral pool)
    * @param {string} maturity UNIX timestamp as a string
-   * @param {number} amount to repay - either yDai or Dai (in human understandable numbers)
-   * @param {string} type 'YDAI' || 'DAI' token used to pay back debt
+   * @param {number} amount to repay - either eDai or Dai (in human understandable numbers)
+   * @param {string} type 'EDAI' || 'DAI' token used to pay back debt
    */
   const repay = async (
     collateral:string,
@@ -184,8 +184,8 @@ export const useController = () => {
     let tx:any;
     setRepayActive(true);
     try {
-      if (typeCaps === 'YDAI') {
-        tx = await controllerContract.repayYDai(collateralBytes, maturity, fromAddr, toAddr, parsedAmount);
+      if (typeCaps === 'EDAI') {
+        tx = await controllerContract.repayEDai(collateralBytes, maturity, fromAddr, toAddr, parsedAmount);
       } else if (typeCaps === 'DAI') {
         tx = await controllerContract.repayDai(collateralBytes, maturity, fromAddr, toAddr, parsedAmount);
       }

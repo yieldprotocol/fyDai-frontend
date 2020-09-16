@@ -1,22 +1,18 @@
-import React from 'react';
-import { ethers, BigNumber } from 'ethers';
-import moment from 'moment';
-
-import { useWeb3React } from '@web3-react/core';
+import React, { useEffect, useContext, createContext, useReducer } from 'react';
+import { ethers } from 'ethers';
 
 import * as utils from '../utils';
 
-import { NotifyContext } from './NotifyContext';
 import { YieldContext } from './YieldContext';
 
-import { useBalances, useCallTx } from '../hooks/chainHooks';
 import { useMath } from '../hooks/mathHooks'; 
+import { useToken } from '../hooks/tokenHook';
 import { useCachedState, } from '../hooks/appHooks';
 import { useController } from '../hooks/controllerHook';
 import { useEvents } from '../hooks/eventHooks';
 import { useSignerAccount } from '../hooks/connectionHooks';
 
-const UserContext = React.createContext<any>({});
+const UserContext = createContext<any>({});
 
 // reducer
 function reducer(state: any, action: any) {
@@ -47,10 +43,10 @@ function reducer(state: any, action: any) {
         ...state,
         makerData: action.payload,
       };
-    case 'isLoading':
+    case 'userLoading':
       return {
         ...state,
-        isLoading: action.payload,
+        userLoading: action.payload,
       };
     default:
       return state;
@@ -58,7 +54,7 @@ function reducer(state: any, action: any) {
 }
 
 const initState = {
-  isLoading: true,
+  userLoading: true,
   position: {},
   txHistory: {
     lastBlock: 0, 
@@ -73,23 +69,19 @@ const initState = {
 
 const UserProvider = ({ children }: any) => {
 
-  const [ state, dispatch ] = React.useReducer(reducer, initState);
-
-  const { dispatch: notifyDispatch } = React.useContext(NotifyContext);
-  const { state: yieldState } = React.useContext(YieldContext);
+  const [ state, dispatch ] = useReducer(reducer, initState);
+  const { state: yieldState } = useContext(YieldContext);
   const { deployedContracts, deployedSeries } = yieldState;
 
   const { account, provider } = useSignerAccount();
-  const { chainId } = useWeb3React();
 
-  /* cache|localStorage declarations */
+  /* cache | localStorage declarations */
   const [txHistory, setTxHistory] = useCachedState('txHistory', null);
   const [preferences, setPreferences] = useCachedState('userPreferences', null );
   
   /* hook declarations */
-  const [ callTx ] = useCallTx();
-  const { getEventHistory, addEventListener, parseEventList } = useEvents();
-  const { getBalance } = useBalances();
+  const { getEventHistory, parseEventList } = useEvents();
+  const { getBalance } = useToken();
   const { 
     collateralPosted, 
     collateralLocked,
@@ -104,8 +96,6 @@ const UserProvider = ({ children }: any) => {
     collRatio,
     collPercent,
     yieldAPR,
-    estCollRatio: estimateRatio,
-    minSafeColl,
     daiAvailable,
   } = useMath();
 
@@ -118,13 +108,11 @@ const UserProvider = ({ children }: any) => {
     const [ 
       ethBalance, 
       daiBalance, 
-      ethPosted, 
-      chaiPosted, 
+      ethPosted,  
     ]:any[] = await Promise.all([
       getBalance(), 
       getBalance(deployedContracts.Dai, 'Dai'), 
       collateralPosted('ETH-A'),
-      collateralPosted('CHAI'),
     ]);
 
     const [
@@ -137,50 +125,46 @@ const UserProvider = ({ children }: any) => {
       totalDebtDai('ETH-A'),
     ]);
 
-    // const collateralAmount = collAmount();
     const debtValue = ethTotalDebtDai; 
-    const collateralPrice = collPrice();
     const collateralValue = collValue(ethPosted);
     const collateralRatio = collRatio(collateralValue, ethTotalDebtDai);
-    const collateralPercent = collPercent(collateralRatio);
-    // const minSafeCollateral = minSafeColl( ethTotalDebtDai, 1.5, collateralPrice);
+    const collateralPercent = collPercent(collateralRatio); 
     const maxDaiAvailable = daiAvailable( collateralValue, ethTotalDebtDai, 2);
+
+    // const collateralPrice = collPrice();
+    // const minSafeCollateral = minSafeColl( ethTotalDebtDai, 1.5, collateralPrice);
 
     const values = {
       ethBalance, 
       daiBalance, 
-      ethPosted, 
-      chaiPosted,
+      ethPosted,
       ethLocked, 
       ethBorrowingPower, 
       ethTotalDebtDai,
       debtValue,
-      collateralPrice,
       collateralValue,
       collateralRatio,
       collateralPercent,
-      // minSafeCollateral,
       maxDaiAvailable,
-      // collateralAmount
+      // collateralPrice,
+      // minSafeCollateral,
     };
 
     /* parse to human usable */
     const parsedValues = {  
-      ethBalance_ : utils.wadToHuman(ethBalance),
-      daiBalance_ : utils.wadToHuman(daiBalance),
-      ethPosted_ : utils.wadToHuman(ethPosted),
-      chaiPosted_ : utils.wadToHuman(chaiPosted),
-      ethLocked_ : utils.wadToHuman(ethLocked),
-      ethBorrowingPower_ : utils.wadToHuman(ethBorrowingPower),
-      ethTotalDebtDai_ : utils.wadToHuman(ethTotalDebtDai),  
-      debtValue_ : utils.wadToHuman(ethTotalDebtDai),
-      collateralPrice_ : utils.wadToHuman(collateralPrice),
-      collateralValue_ : utils.wadToHuman(collateralValue),
+      ethBalance_ : utils.humanize(ethBalance),
+      daiBalance_ : utils.humanize(daiBalance),
+      ethPosted_ : utils.humanize(ethPosted),
+      ethLocked_ : utils.humanize(ethLocked),
+      ethBorrowingPower_ : utils.humanize(ethBorrowingPower),
+      ethTotalDebtDai_ : utils.humanize(ethTotalDebtDai),  
+      debtValue_ : utils.humanize(ethTotalDebtDai),
+      collateralValue_ : utils.humanize(collateralValue),
       collateralRatio_ : parseFloat(collateralRatio.toString()),
       collateralPercent_ : parseFloat(collateralPercent.toString()),
-      // collateralAmount_ : utils.wadToHuman(collateralAmount),
-      // minSafeCollateral_ : utils.wadToHuman(minSafeCollateral),
-      maxDaiAvailable_ : utils.wadToHuman(maxDaiAvailable),
+      maxDaiAvailable_ : utils.humanize(maxDaiAvailable),
+      // collateralPrice_ : utils.humanize(collateralPrice),
+      // minSafeCollateral_ : utils.humanize(minSafeCollateral),
     };
     console.log('User updated:');
     console.log({ ...values, ...parsedValues } );
@@ -194,9 +178,7 @@ const UserProvider = ({ children }: any) => {
   const _getAuthorizations = async () => {
     const _auths:any={};
     _auths.hasDelegatedProxy = await checkControllerDelegate(deployedContracts.YieldProxy);
-    // _auths.hasPermittedDai = await checkControllerDelegate(deployedContracts.Controller, deployedContracts.YieldProxy);
     dispatch( { type: 'updateAuthorizations', payload: _auths });
-    console.log(_auths);
     return _auths;
   };
 
@@ -274,17 +256,17 @@ const UserProvider = ({ children }: any) => {
               maturity: parseInt(x.args_[0], 10),
               amount: Math.abs( parseFloat(ethers.utils.formatEther( x.args_[3] )) ),
               dai: x.args[3].abs(),
-              yDai: x.args[4].abs(),
+              eDai: x.args[4].abs(),
               APR: yieldAPR( x.args[3].abs(),  x.args[4].abs(), parseInt(x.args_[0], 10), x.date), 
               dai_: ethers.utils.formatEther( x.args_[3] ),
-              yDai_: ethers.utils.formatEther( x.args_[4] ),
+              eDai_: ethers.utils.formatEther( x.args_[4] ),
             };
           }); 
         });
       return [...acc, ..._seriesHist];
     }, Promise.resolve([]) );
     
-    // TODO : get blocknumber at initialisation of yDaiProtocol instead of using first block(0).
+    // TODO : get blocknumber at initialisation of eDaiProtocol instead of using first block(0).
     console.log(
       'txHistory updated from block:',
           txHistory?.lastBlock + 1 || 0,
@@ -313,8 +295,8 @@ const UserProvider = ({ children }: any) => {
    * @dev Gets user Maker data if available.
    */
   const _getMakerData = async () => {
-    const urn = await callTx(deployedContracts.Vat, 'Vat', 'urns', [ utils.ETH, account ]);
-    dispatch( { type: 'updateMakerData', payload: urn });
+    // const urn = await callTx(deployedContracts.Vat, 'Vat', 'urns', [ utils.ETH, account ]);
+    // dispatch( { type: 'updateMakerData', payload: urn });
     return {};
   };
 
@@ -322,14 +304,14 @@ const UserProvider = ({ children }: any) => {
    * @dev Gets preferences from cache.
    */
   const _getPreferences = async () => {
-    console.log('dont forget to add in the preferences' );
+    console.log('Dont forget to add in the preferences' );
     // dispatch( { type: 'updatePreferences', payload: { slippage:0.005 } });
     return {};
   };
 
-  const initUserContext = async () => {
+  const initUser = async () => {
     /* Init start */
-    dispatch({ type: 'isLoading', payload: true });
+    dispatch({ type: 'userLoading', payload: true });
     // TODO: look at splitting these up cleverly, in particular makerData.
     await Promise.all([
       _getPosition(),
@@ -338,35 +320,34 @@ const UserProvider = ({ children }: any) => {
       _getPreferences(),
       _getMakerData(),
     ]);
-    console.log('userContext initiated');
+    console.log('User initialised.');
     /* Init end */
-    dispatch({ type: 'isLoading', payload: false });
+    dispatch({ type: 'userLoading', payload: false });
   };
 
-  React.useEffect(()=>{
-    // init everytime or change
-    account && !yieldState.isLoading && initUserContext();
+  useEffect(()=>{
+    // Init everytime it starts or change of user
+    account && !yieldState.isLoading && initUser();
 
-    // if user has changed recache the history
+    // If user has changed, rebuild and re-cache the history
     const hist = JSON.parse( (localStorage.getItem('txHistory') || '{}') );
     if ( !yieldState.isLoading && account && (hist?.account !== account) ) {
       localStorage.removeItem('txHistory');
       _getTxHistory(true);
-      console.log('history updating cos of user change');
+      console.log('History updating due to user change');
     }
-
   }, [ account, yieldState.isLoading ]);
 
   const actions = {
-    updateHistory: () => _getTxHistory(),
-    rebuildHistory: () => _getTxHistory(true),
-
     updatePosition: () => _getPosition(),
     updateAuthorizations: () => _getAuthorizations(),
 
-    updateMakerData: () => console.log('makerData update'),
-    updatePreferences: () => console.log('makerData update'),
-    resetPreferences: () => console.log('preferences reset'),
+    updateHistory: () => _getTxHistory(),
+    rebuildHistory: () => _getTxHistory(true),
+
+    updateMakerData: () => console.log('makerData update fn'),
+    updatePreferences: () => console.log('preference update fn'),
+    resetPreferences: () => console.log('preferences reset fn'),
   };
 
   return (

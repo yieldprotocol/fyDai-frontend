@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { ethers } from 'ethers';
 import moment from 'moment';
 
@@ -29,12 +29,12 @@ interface DashBorrowProps {
 
 const DashBorrow = (props:DashBorrowProps) => {
 
-  const [ addCollateral, setAddCollateral ] = React.useState<boolean>(false);
+  const [ addCollateral, setAddCollateral ] = useState<boolean>(false);
 
-  const { state: seriesState, actions: seriesActions } = React.useContext(SeriesContext);
+  const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { activeSeries } = seriesState; 
 
-  const { state: userState, actions: userActions } = React.useContext(UserContext);
+  const { state: userState, actions: userActions } = useContext(UserContext);
   const { position } = userState;
   const { 
     debtValue_,

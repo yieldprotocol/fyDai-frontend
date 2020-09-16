@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { INotification, IReducerAction } from '../types';
 
 const NotifyContext = React.createContext<any>({});
@@ -72,7 +72,7 @@ function notifyReducer(state:INotification, action:IReducerAction) {
 
 const NotifyProvider = ({ children }:any) => {
   const [state, dispatch] = React.useReducer(notifyReducer, initState);
-  React.useEffect( () => {
+  useEffect( () => {
     state.open && ( () => {
       if (state.timerMs === 0) {
         dispatch({ type: '_openNotify' });

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { ethers } from 'ethers';
 
 import {
@@ -21,10 +21,12 @@ import { NotifyContext } from '../contexts/NotifyContext';
 
 import { useCachedState } from './appHooks';
 
-const defaultChainId = 4;
+const defaultChainId = 42;
 const urls = { 
   1: process.env.REACT_APP_RPC_URL_1 as string, 
   4: process.env.REACT_APP_RPC_URL_4 as string,
+  5: process.env.REACT_APP_RPC_URL_5 as string,
+  42: process.env.REACT_APP_RPC_URL_42 as string,
   1337: process.env.REACT_APP_RPC_URL_31337 as string,
   31337: process.env.REACT_APP_RPC_URL_31337 as string, 
 };
@@ -34,10 +36,10 @@ const useEagerConnect = () => {
   const { activate: activateFallback } = useWeb3React('fallback');
   const [ cachedChainId, setCachedChainId ] = useCachedState('cache_chainId', null);
 
-  const [ tried, setTried ] = React.useState(false);
+  const [ tried, setTried ] = useState(false);
   const { handleErrorMessage } = useWeb3Errors();
 
-  React.useEffect(() => {
+  useEffect(() => {
     injected.isAuthorized().then((isAuthorized: boolean) => {
       if (isAuthorized) {
         activate(injected, undefined, true).catch(() => {
@@ -47,9 +49,9 @@ const useEagerConnect = () => {
         setTried(true);
       }
     });
-  }, []); 
+  }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!tried && active) {
       setTried(true);
       ( cachedChainId !== chainId ) && localStorage.clear();
@@ -68,7 +70,7 @@ const useInactiveListener = (suppress: boolean = false) => {
   const [ cachedChainId, setCachedChainId ] = useCachedState('cache_chainId', null);
 
   // eslint-disable-next-line consistent-return
-  React.useEffect((): any => {
+  useEffect((): any => {
     const { ethereum } = window as any;
     if (ethereum && ethereum.on && !active && !error && !suppress) {
       const handleConnect = () => {
@@ -141,7 +143,7 @@ const useFallbackConnect = (triedEager: boolean = false) => {
   const { activate: activateFallback, active: fallbackActive } = useWeb3React('fallback');
   const { handleErrorMessage } = useWeb3Errors();
 
-  React.useEffect(()=>{
+  useEffect(()=>{
     if ( triedEager && !active && !fallbackActive ) {        
       ( cachedChainId !== defaultChainId ) && localStorage.clear();
       activateFallback( new NetworkConnector({ urls, defaultChainId }), (e) => handleErrorMessage(e));
@@ -152,7 +154,7 @@ const useFallbackConnect = (triedEager: boolean = false) => {
 
 /* useConnection ig the GAteway into the web3 connections */
 export function useConnection() {
-  const { dispatch: notifyDispatch } = React.useContext(NotifyContext);
+  const { dispatch: notifyDispatch } = useContext(NotifyContext);
   const [ cachedChainId, setCachedChainId ] = useCachedState('cache_chainId', null);
   const { 
     connector,
@@ -162,8 +164,8 @@ export function useConnection() {
   const { handleErrorMessage } = useWeb3Errors();
 
   /* Try web3 initiate automatically irrespective of state */
-  const [activatingConnector, setActivatingConnector] = React.useState<any>();
-  React.useEffect(() => {
+  const [activatingConnector, setActivatingConnector] = useState<any>();
+  useEffect(() => {
     if (activatingConnector && activatingConnector === connector) {
       setActivatingConnector(undefined);
     }
@@ -178,7 +180,7 @@ export function useConnection() {
 
   /* Watch the chain id. If it changes, and if it is different from the previously loaded chainId (stored in the cache), 
   clear EVERYTHING from cache and reset the app - it will be different info */
-  React.useEffect(()=>{
+  useEffect(()=>{
     if (chainId && cachedChainId && (cachedChainId !== chainId) ) { 
       localStorage.clear();
       // eslint-disable-next-line no-restricted-globals
@@ -198,7 +200,7 @@ export function useConnection() {
 }
 
 const useWeb3Errors = ()=> {
-  const { dispatch: notifyDispatch } = React.useContext(NotifyContext);
+  const { dispatch: notifyDispatch } = useContext(NotifyContext);
   const NO_BROWSER_EXT = 'No Ethereum browser extension detected, install MetaMask on desktop or visit from a dApp browser on mobile.';
   const UNSUPPORTED_NETWORK = 'Your Wallet or Browser is connected to an unsupported network.';
   const UNAUTHORISED_SITE = 'Please authorize this website to access your Ethereum account.';
@@ -231,17 +233,17 @@ const useWeb3Errors = ()=> {
 export function useSignerAccount() {
   const { library: provider, account } = useWeb3React();
   const { library: altProvider } = useWeb3React('fallback');
-  const [ signer, setSigner ] = React.useState<any>();
-  const [ voidSigner, setVoidSigner ] = React.useState<any>();
-  const [ fallbackProvider, setFallbackProvider ] = React.useState<any>();
-  React.useEffect(()=>{
+  const [ signer, setSigner ] = useState<any>();
+  const [ voidSigner, setVoidSigner ] = useState<any>();
+  const [ fallbackProvider, setFallbackProvider ] = useState<any>();
+  useEffect(()=>{
     provider && (async () => {
       setSigner( await provider.getSigner() );
       account && setVoidSigner( new ethers.VoidSigner( account ));
     })();
   }, [account, provider]);
 
-  React.useEffect(()=>{
+  useEffect(()=>{
     altProvider && (async () => {
       setFallbackProvider( altProvider );
     })();
@@ -252,8 +254,8 @@ export function useSignerAccount() {
 // TODO: get rid of this
 export function useConnectorImage() {
   const { connector } = useWeb3React();
-  const [ image, setImage ] = React.useState<any>();
-  React.useEffect(() => {
+  const [ image, setImage ] = useState<any>();
+  useEffect(() => {
     switch (connector) {
       case injected:
         setImage(injectedImage);

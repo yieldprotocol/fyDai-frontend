@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Box, CheckBox, ThemeContext } from 'grommet';
 
 import { useToken } from '../hooks';
 
 function Approval({ inputValue, approved, approveProcedure }:any) {
 
-  const theme:any = React.useContext(ThemeContext);
+  const theme:any = useContext(ThemeContext);
   const { approveActive } = useToken();
 
   return (

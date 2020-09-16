@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { ethers }  from 'ethers';
 import { useWeb3React } from '@web3-react/core';
 import { useSignerAccount } from './connectionHooks';
@@ -8,6 +8,8 @@ import Migration from '../contracts/Migrations.json';
 const migrationAddrs = new Map([
   [1, process.env.REACT_APP_MIGRATION_1],
   [4, process.env.REACT_APP_MIGRATION_4 ],
+  [5, process.env.REACT_APP_MIGRATION_5 ],
+  [42, process.env.REACT_APP_MIGRATION_42 ],
   [1337, process.env.REACT_APP_MIGRATION_1337 ],
   [31337, process.env.REACT_APP_MIGRATION_31337 ],
 ]);
@@ -21,9 +23,9 @@ export const useMigrations = () => {
   const { chainId } = useWeb3React('fallback');
   const { fallbackProvider } = useSignerAccount();
   const { abi: migrationAbi } = Migration;
-  const [migrationsAddress, setMigrationsAddress] = React.useState<string>( process.env.REACT_APP_MIGRATION_DEFAULT || '');
+  const [migrationsAddress, setMigrationsAddress] = useState<string>( process.env.REACT_APP_MIGRATION_DEFAULT || '');
   
-  React.useEffect(()=>{
+  useEffect(()=>{
     if (chainId) {
       const migAddr = migrationAddrs.get(chainId);
       migAddr && setMigrationsAddress(migAddr);
@@ -33,11 +35,12 @@ export const useMigrations = () => {
   /**
    * Concurrently fetches Yield Addresses registered with the migrations contract.
    * @param {string[]} contractNameList list of contract names registered in the migrations contract.
-   * @returns {Map} keyed with contract names
+   * @returns {Promise<Map>} keyed with contract names
    */
   const getAddresses = async (
     contractNameList:string[],
   ) => {
+    console.log('Migration contract called:', migrationsAddress);
     const contract = new ethers.Contract(migrationsAddress, migrationAbi, fallbackProvider );
     const res = new Map<string, string>();
     await Promise.all(
@@ -48,7 +51,17 @@ export const useMigrations = () => {
     return res;
   };
 
+  /**
+   * Fetches Yield protocol contract version from 
+   * @returns {string} yield protocol version
+   */
+  const getYieldVersion = async (
+  ) => {
+    const contract = new ethers.Contract(migrationsAddress, migrationAbi, fallbackProvider );
+    await contract.version();
+  };
+
   return {
-    getAddresses,
+    getAddresses, getYieldVersion
   } as const;
 };
