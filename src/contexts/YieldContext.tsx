@@ -113,15 +113,20 @@ const YieldProvider = ({ children }: any) => {
       /* Load series specific contract addrs */
       if (!cachedSeries || (cachedSeries.length !== eDaiList.length) || forceUpdate) {
 
-        const _list = await getAddresses(eDaiList.map((x:any)=> `eDai${x}`));   
+        const _list = await getAddresses(eDaiList.map((x:any)=> `eDai${x}`));
         const _poolList = await getAddresses(eDaiList.map((x:any)=> `eDaiLP${x}`));
+
+        console.log(_poolList);
+
         const _seriesList = Array.from(_list.values());
 
         await Promise.all(
           _seriesList.map(async (x: string, i: number) => {
+
             const symbol = await callTx(x, 'EDai', 'symbol', []);
             const maturity = await callTx(x, 'EDai', 'maturity', []);
-            const poolAddress = _poolList.get(symbol.splice(4, 0, 'LP')); 
+            const poolAddress = _poolList.get(`${symbol.slice(0, 4)}LP${symbol.slice(4)}`); 
+
             return {
               eDaiAddress: x,
               symbol,

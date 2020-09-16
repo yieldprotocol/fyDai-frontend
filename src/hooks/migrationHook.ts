@@ -35,7 +35,7 @@ export const useMigrations = () => {
   /**
    * Concurrently fetches Yield Addresses registered with the migrations contract.
    * @param {string[]} contractNameList list of contract names registered in the migrations contract.
-   * @returns {Map} keyed with contract names
+   * @returns {Promise<Map>} keyed with contract names
    */
   const getAddresses = async (
     contractNameList:string[],
@@ -51,7 +51,17 @@ export const useMigrations = () => {
     return res;
   };
 
+  /**
+   * Fetches Yield protocol contract version from 
+   * @returns {string} yield protocol version
+   */
+  const getYieldVersion = async (
+  ) => {
+    const contract = new ethers.Contract(migrationsAddress, migrationAbi, fallbackProvider );
+    await contract.version();
+  };
+
   return {
-    getAddresses,
+    getAddresses, getYieldVersion
   } as const;
 };
