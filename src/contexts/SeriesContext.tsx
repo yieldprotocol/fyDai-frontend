@@ -143,6 +143,7 @@ const SeriesProvider = ({ children }:any) => {
   /* Actions for updating the series Context */
   const actions = {
     updateSeries: (series:IYieldSeries[]) => updateSeries(series), /* updates one, or any number of series */
+    updateActiveSeries: () => updateSeries([state.activeSeries]), /* updates only the active series */
     setActiveSeries: (seriesMaturity:string) => dispatch({ type:'setActiveSeries', payload: state.seriesData.get(seriesMaturity) }),
   };
 
