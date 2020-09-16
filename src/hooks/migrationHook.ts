@@ -40,7 +40,6 @@ export const useMigrations = () => {
   const getAddresses = async (
     contractNameList:string[],
   ) => {
-    console.log('migration', migrationsAddress);
     const contract = new ethers.Contract(migrationsAddress, migrationAbi, fallbackProvider );
     const res = new Map<string, string>();
     await Promise.all(

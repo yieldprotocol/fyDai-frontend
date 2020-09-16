@@ -110,27 +110,27 @@ const YieldProvider = ({ children }: any) => {
         window.localStorage.removeItem('deployedContracts');
         setCachedContracts(_deployedContracts);
         console.log('Contract addresses updated:', _deployedContracts);
-
       } else {
         _deployedContracts = cachedContracts;
       }
 
       if (!cachedSeries || (cachedSeries.length !== eDaiList.length) || forceUpdate) {
-        // TODO: better implementation of iterating through series (possibly a list length from contracts function?)
+        
         const _list = await getAddresses(eDaiList);
+        const _poollist = await getAddresses(eDaiList.map((x:any)=>`${x}-Pool`));
         const _seriesList = Array.from(_list.values());
-
+ 
         await Promise.all(
           _seriesList.map(async (x: string, i: number) => {
-            const name = await callTx(x, 'EDai', 'name', []);
+            // const name = await callTx(x, 'EDai', 'name', []);
+            const symbol = await callTx(x, 'EDai', 'symbol', []);
             const maturity = await callTx(x, 'EDai', 'maturity', []);
-            // const _peripheralAddrs = await getAddresses([ `${name}-Pool` ]);
-            // const poolAddress = _peripheralAddrs.get(`${name}-Pool`);
-            const _peripheralAddrs = await getAddresses([ `eDai${i}-Pool` ]);
-            const poolAddress = _peripheralAddrs.get(`eDai${i}-Pool`);
+            console.log(_poollist.get(`eDai${i}-Pool`));
+            const poolAddress = _poollist.get(`eDai${i}-Pool`);
             return {
               eDaiAddress: x,
-              name,
+              // name,
+              symbol,
               maturity: maturity.toNumber(),
               poolAddress,
               maturity_: new Date(maturity * 1000),

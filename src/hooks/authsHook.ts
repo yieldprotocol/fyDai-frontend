@@ -143,7 +143,7 @@ export const useAuth = () => {
 
       /* Dai permit yieldProxy */
       // @ts-ignore
-      const result = await signDaiPermit(provider.provider, daiDomain, fromAddr, proxyAddr);
+      const result = await signDaiPermit(provider.provider, daiAddr, fromAddr, proxyAddr);
 
       daiPermitSig = ethers.utils.joinSignature(result);
       dispatch({ type: 'signed', payload: auths.get(2) });
