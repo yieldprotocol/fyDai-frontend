@@ -115,22 +115,24 @@ const SeriesProvider = ({ children }:any) => {
 
   /* Update a list of series */
   const updateSeries = async (seriesArr:IYieldSeries[] ) => {
-    dispatch({ type:'isLoading', payload: true });
-    /* Build/re-build series map with data */ 
-    const seriesMap:any = await _getSeriesData(seriesArr); 
-    /* Set the active series */
-    if (seriesArr.length===1 ){ 
+    if(!yieldState.isLoading) {
+      dispatch({ type:'isLoading', payload: true });
+      /* Build/re-build series map with data */ 
+      const seriesMap:any = await _getSeriesData(seriesArr); 
+      /* Set the active series */
+      if (seriesArr.length===1 ){ 
       /* if there was only one series updated set that one as the active series */   
-      dispatch({ type:'setActiveSeries', payload: seriesMap.get(seriesArr[0].maturity) }); 
-    } else {
+        dispatch({ type:'setActiveSeries', payload: seriesMap.get(seriesArr[0].maturity) }); 
+      } else {
       /* if no active series or multiple updated, set it to non-mature series that is maturing soonest. */
-      const unmatureSeries: IYieldSeries[] = Array.from(seriesMap.values());
-      const toSelect = unmatureSeries
-        .filter((x:IYieldSeries)=>!x.isMature())
-        .sort((a:IYieldSeries, b:IYieldSeries)=> a.maturity-b.maturity );
-      dispatch({ type:'setActiveSeries', payload: seriesMap.get(toSelect[0].maturity) }); 
-    } 
-    dispatch({ type:'isLoading', payload: false });
+        const unmatureSeries: IYieldSeries[] = Array.from(seriesMap.values());
+        const toSelect = unmatureSeries
+          .filter((x:IYieldSeries)=>!x.isMature())
+          .sort((a:IYieldSeries, b:IYieldSeries)=> a.maturity-b.maturity );
+        dispatch({ type:'setActiveSeries', payload: seriesMap.get(toSelect[0].maturity) }); 
+      } 
+      dispatch({ type:'isLoading', payload: false });
+    }
   };
 
   /* Init all the series once yieldState is not loading and re-init on any user and/or network change */
