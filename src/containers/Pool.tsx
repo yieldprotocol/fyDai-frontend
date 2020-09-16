@@ -43,7 +43,7 @@ const Pool = (props:IPoolProps) => {
   const { addLiquidity, addLiquidityActive } = useProxy();
   const { getBalance } = useToken();
 
-  const [newShare, setNewShare] = useState<number>(activeSeries?.poolPercent_);
+  const [newShare, setNewShare] = useState<number>(activeSeries?.poolPercent);
   const [calculating, setCalculating] = useState<boolean>(false);
 
   const { account } = useSignerAccount();
@@ -138,7 +138,7 @@ const Pool = (props:IPoolProps) => {
             visible: !!account && txActive?.type !== 'ADD_LIQUIDITY',
             active: true,
             loading: addLiquidityPending,           
-            value: activeSeries?` ${activeSeries?.poolPercent_.toFixed(4)}%`: '',
+            value: activeSeries?` ${activeSeries?.poolPercent.toFixed(4)}%`: '',
             valuePrefix: null,
             valueExtra: null,
           },

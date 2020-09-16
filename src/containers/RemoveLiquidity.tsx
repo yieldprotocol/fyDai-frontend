@@ -36,7 +36,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
   
   const [ maxRemove, setMaxRemove ] = useState<number>(0);
 
-  const [newShare, setNewShare] = useState<number>(activeSeries?.poolPercent_);
+  const [newShare, setNewShare] = useState<number>(activeSeries?.poolPercent);
   const [calculating, setCalculating] = useState<boolean>(false);
 
   const [ inputValue, setInputValue ] = useState<any>();
