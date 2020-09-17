@@ -70,4 +70,4 @@ const TxStatus= () => {
   );
 };
 
-export default TransactionStatus;
+export default TxStatus;

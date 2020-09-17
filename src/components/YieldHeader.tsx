@@ -18,7 +18,7 @@ import logoLight from '../assets/images/logo_light.svg';
 import ProfileButton from './ProfileButton';
 
 import { NotifyContext } from '../contexts/NotifyContext';
-import TxStatusfrom './TransactionStatus';
+import TxStatus from  './TxStatus';
 
 interface LinkProps {
   link: string;
