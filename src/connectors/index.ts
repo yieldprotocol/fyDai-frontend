@@ -17,7 +17,7 @@ const RPC_URLS: { [chainId: number]: string } = {
   31337: process.env.REACT_APP_RPC_URL_31337 as string,
 };
 
-export const injected = new InjectedConnector({ supportedChainIds: [4, 42, 31337] });
+export const injected = new InjectedConnector({ supportedChainIds: [5, 42, 31337] });
 
 export const walletlink = new WalletLinkConnector({
   url: RPC_URLS[1],
