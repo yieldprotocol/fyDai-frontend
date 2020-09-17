@@ -48,7 +48,7 @@ const TxHistory = ( { filterTerms, view }:HistoryProps) => {
   /* Cpmponent renaming pool events depending on the different views */
   const HistoryItemName = (props:any) => {
     const { item } = props;
-
+    
     if (item.event === 'Bought') {
       return (
         <Box direction='row' gap='xsmall' align='center'>
@@ -62,7 +62,7 @@ const TxHistory = ( { filterTerms, view }:HistoryProps) => {
         </Box>
       );
     } 
-
+    
     if (item.event === 'Sold') {
       return (
         <>
@@ -122,7 +122,8 @@ const TxHistory = ( { filterTerms, view }:HistoryProps) => {
   useEffect(()=> {
     const _txHist = state.txHistory.items;
     const filteredHist = _txHist.filter((x:any) => filterTerms.includes(x.event) );  
-    setTxHistory(filteredHist);
+    const sortedList = filteredHist.sort( (a:any, b:any) => a.date - b.date ); 
+    setTxHistory(sortedList);
   }, [ state.txHistory ]);
 
   useEffect(()=> {

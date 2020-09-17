@@ -195,7 +195,7 @@ const UserProvider = ({ children }: any) => {
       deployedContracts.Controller,
       'Controller',
       'Posted',
-      [null, account, null],
+      [ethers.utils.formatBytes32String('ETH-A'), account, null],
       !txHistory ? 0 : txHistory.lastBlock + 1
     )
       .then((res: any) => parseEventList(res))       /* then parse returned values */
@@ -217,7 +217,7 @@ const UserProvider = ({ children }: any) => {
       deployedContracts.Controller,
       'Controller',
       'Borrowed',
-      [],
+      [null, null, account, null],
       !txHistory ? 0 : txHistory.lastBlock + 1
     )
       .then((res: any) => parseEventList(res))        /* then parse returned values */
