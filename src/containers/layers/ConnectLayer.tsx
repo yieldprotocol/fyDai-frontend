@@ -14,6 +14,10 @@ import {
   Paragraph,
 } from 'grommet';
 
+import { 
+  FiArrowLeft as ArrowLeft,
+} from 'react-icons/fi';
+
 import {
   useConnection,
   useSignerAccount,
@@ -23,11 +27,11 @@ import { injected, torus } from '../../connectors';
 import metamaskImage from '../../assets/images/providers/metamask.png';
 import torusImage from '../../assets/images/providers/torus.png';
 
-import { UserContext } from '../../contexts/UserContext'
+import { UserContext } from '../../contexts/UserContext';
 
 import ProfileButton from '../../components/ProfileButton';
 
-const ConnectLayer = ({ view, closeLayer }: any) => {
+const ConnectLayer = ({ view, target, closeLayer }: any) => {
 
   const { state: { position } } = useContext(UserContext);
   const screenSize = useContext(ResponsiveContext);
@@ -49,8 +53,9 @@ const ConnectLayer = ({ view, closeLayer }: any) => {
       {layerView && (
         <Layer
           onClickOutside={() => closeLayer(true)}
-          animation="slide"
+          animation='slide'
           onEsc={() => closeLayer(true)}
+          target={target || undefined}
         >
           <Box
             width={screenSize!=='small'?{ min:'600px', max:'750px' }: undefined}
@@ -63,69 +68,89 @@ const ConnectLayer = ({ view, closeLayer }: any) => {
             }}
           >
             { account && layerView !== 'CONNECT' &&
+
               <>
-                <Header 
-                  fill='horizontal'
-                  background='background-mid'
-                  pad={{ horizontal: 'medium', vertical:'large' }}
-                >
-                  <ProfileButton />
-                  <Anchor color='brand' onClick={()=>closeLayer()} size='xsmall' label='Close' />
-                </Header>
+                <Box pad="medium" gap="small">
+                  <Box direction='row' justify='between'>
 
-                <Box
-                  pad="medium"
-                  align="center"
-                  justify="center"
-                  gap='small'
-                >
-                  <Text size='xsmall'>Connected to:</Text> 
-                  <Text weight="bold"> { provider.network.name } </Text>
-                  <Box direction='row' gap='small'>
-                    <Text size='xsmall'>ETH balance:</Text>
-                    <Text>{ position.ethBalance_ && position.ethBalance_ || '' }</Text>
+                    <Text alignSelf='start' size='xxlarge' color='brand' weight='bold'>Connected Wallet</Text>   
+                    <Box round>
+                      <Button 
+                        fill='horizontal'
+                        size='small' 
+                        onClick={()=>setLayerView('CONNECT')}
+                        color='background-front'
+                        label='Change wallet'
+                        hoverIndicator='background'
+                      /> 
+                    </Box>
+
                   </Box>
-                  {/* <Button fill='horizontal' label='Connect to another wallet' onClick={()=>setShowConnectLayer(true)} /> */}
+                   
+                  <Box
+                    pad={{ vertical:'medium' }}
+                    justify="center"
+                    gap='small'
+                  >
+                    {/* <ProfileButton /> */}
+                    {account}
+                    <Box direction='row' gap='small'>
+                      <Text size='xsmall'>Connected Network:</Text> 
+                      <Text weight="bold"> { provider.network.name } </Text>                   
+                    </Box> 
+
+                    <Box direction='row' gap='small'>
+                      <Text size='xsmall'>ETH balance:</Text>
+                      <Text>{ position.ethBalance_ && position.ethBalance_ || '' }</Text>
+                    </Box>
+
+                    <Box direction='row' gap='small'>
+                      <Text size='xsmall'>DAI balance:</Text>
+                      <Text>{ position.daiBalance_ && position.daiBalance_ || '' }</Text>
+                    </Box>
+                    {/* <Button fill='horizontal' label='Connect to another wallet' onClick={()=>setShowConnectLayer(true)} /> */}
+                  </Box>
                 </Box>
 
-                <Box 
-                  align='center'
-                  overflow='auto'
-                >
-                  <Text>Previous TX Info</Text>
-                  <Text>Previous TX Info</Text>
-                  <Text>Previous TX Info</Text>
-                  <Text>Previous TX Info</Text>
-
+                <Box pad="medium" gap="small">
+                  <Text alignSelf='start' size='xxlarge' color='brand' weight='bold'>Account Settings</Text>    
+                  <Box
+                    pad={{ vertical:'medium' }}
+                    justify="center"
+                    gap='small'
+                  >
+                    <Text size='xsmall'>Slippage value: 0.05% </Text> 
+                  </Box>
                 </Box>
-                <Footer pad='medium' gap='xsmall' direction='row' justify='center' align='center'>
-                  <Box round>
-                    <Button 
-                      fill='horizontal'
-                      size='small' 
-                      onClick={()=>setLayerView('CONNECT')}
-                      color='background-front'
-                      label='Change wallet'
-                      hoverIndicator='background'
-                    />
+
+
+
+
+
+                <Footer pad='medium' gap='xsmall' direction='row' justify='start' align='center'>
+                  <Box alignSelf='start'>
+                    <Box
+                      round
+                      onClick={()=>closeLayer()}
+                      hoverIndicator='brand-transparent'
+                      pad={{ horizontal:'small', vertical:'small' }}
+                      justify='center'
+                    >
+                      <Box direction='row' gap='small' align='center'>
+                        <ArrowLeft color='text-weak' />
+                        <Text size='xsmall' color='text-weak'> go back  </Text>
+                      </Box>
+                    </Box>
                   </Box>
                 </Footer>
               </> }
 
             { layerView === 'CONNECT' &&      
-              <>
-                <Header fill="horizontal" gap="medium">
-                  <Heading
-                    level="2"
-                    style={{
-                      textAlign: 'center',
-                      margin: 'auto',
-                    }}
-                  >
-                    Connect to a Wallet
-                  </Heading>
-                </Header>
+              <Box pad="medium" gap="small">
+
                 <Box align="center" pad="medium" gap="small">
+                  <Text size='xxlarge' color='brand' weight='bold'>Connect a wallet</Text>
+
                   <Paragraph>Try connecting with:</Paragraph>
                   {connectorList.map((x) => (
                     <Button
@@ -155,12 +180,36 @@ const ConnectLayer = ({ view, closeLayer }: any) => {
                       key={x.name}
                     />
                   ))}
-                </Box>
-                <Footer direction="column" pad="medium">
+
                   <Box gap="xsmall" direction="row">
                     <Anchor href="#" label="Help!" size="xsmall" color="brand" />
                     <Text size="xsmall"> I'm not sure what this means.</Text>
                   </Box>
+
+                </Box>
+                <Footer direction="row-responsive" justify='between' pad="medium">
+
+                  <Box alignSelf='start'>
+                    <Box
+                      round
+                      hoverIndicator='brand-transparent'
+                      pad={{ horizontal:'small', vertical:'small' }}
+                      justify='center'
+                      onClick={() => {
+                        if (view === 'ACCOUNT') { 
+                          setLayerView('ACCOUNT');
+                        } else {
+                          closeLayer();
+                        }
+                      }}
+                    >
+                      <Box direction='row' gap='small' align='center'>
+                        <ArrowLeft color='text-weak' />
+                        <Text size='xsmall' color='text-weak'> go back  </Text>
+                      </Box>
+                    </Box>
+                  </Box>
+
                   <Box direction="row">
                     <Button
                       label="Close"
@@ -170,11 +219,11 @@ const ConnectLayer = ({ view, closeLayer }: any) => {
                         fontWeight: 600,
                         height: screenSize === 'small' ? '2.25rem' : 'auto',
                       }}
-                      onClick={() => closeLayer()}
+                      onClick={()=>closeLayer()}
                     />
                   </Box>
                 </Footer>
-              </>}
+              </Box>}
           </Box>
         </Layer>
       )}
