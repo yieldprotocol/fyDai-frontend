@@ -14,30 +14,29 @@ function ActionSelector({ setActiveView, activeView }:IActionSelectorProps) {
   
   return (
     <Box
-      direction="row"
       pad={{ horizontal:'medium', vertical :'medium' }}
       alignSelf="center"
       width={{ max: '750px' }}
       fill="horizontal"
     >
       <Box
-        round='small'
         direction="row"
         gap="small"
         fill="horizontal"
         justify='between'
       >
         <Box
-          round='small'
+          round='large'
           pad={{ horizontal: 'large', vertical: 'xsmall' }}
           background={
             activeView === 0 ? 'background-front' : undefined
           }
-          elevation={activeView === 0 ? 'small' : undefined}
           onClick={() => setActiveView(0)}
           direction="row"
           justify="between"
           gap="small"
+          // border={activeView === 0 ? undefined : 'all'} 
+          hoverIndicator={activeView === 0 ? undefined : 'brand-transparent'}
         >
           <Text size="small" weight="bold">
             1. Add Collateral
@@ -46,13 +45,14 @@ function ActionSelector({ setActiveView, activeView }:IActionSelectorProps) {
         </Box>
 
         <Box
-          round='small'
+          round='large'
           pad={{ horizontal: 'large', vertical: 'xsmall' }}
           background={
             activeView === 1 ? 'background-front' : undefined
           }
-          elevation={activeView === 1 ? 'small' : undefined}
           onClick={() => setActiveView(1)}
+          // border={activeView === 1 ? undefined : 'all'} 
+          hoverIndicator={activeView === 1 ? undefined : 'brand-transparent'}
         >
           <Text size="small" weight="bold">
             2. Borrow Dai
@@ -60,11 +60,13 @@ function ActionSelector({ setActiveView, activeView }:IActionSelectorProps) {
         </Box>
 
         <Box
-          round='small'
+          round='large'
           pad={{ horizontal: 'large', vertical: 'xsmall' }}
           background={activeView === 2 ? 'background-front' : undefined}
-          elevation={activeView === 2 ? 'small' : undefined}
+          // elevation={activeView === 2 ? 'small' : undefined}
           onClick={account?() => setActiveView(2):()=>{console.log('connect a wallet')}}
+          // border={activeView === 2 ? undefined : 'all'} 
+          hoverIndicator={activeView === 2 ? undefined : 'brand-transparent'}  
         >
           <Text size="small" weight="bold" color={account?undefined:'text-weak'}>
             3. Repay Dai Debt
