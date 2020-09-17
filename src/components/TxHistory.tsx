@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useContext } from 'react';
-import ethers, { BigNumber } from 'ethers';
 import moment from 'moment';
 import { Box, Text, Collapsible, Button } from 'grommet';
 
@@ -8,8 +7,6 @@ import {
   FiChevronUp as ChevronUp,
 } from 'react-icons/fi';
 
-import { YieldContext } from '../contexts/YieldContext';
-import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
 
 interface HistoryProps {
@@ -196,7 +193,7 @@ const TxHistory = ( { filterTerms, view }:HistoryProps) => {
             );
           }):
           <Box align='center'>
-            { state.isLoading ? 
+            { state.userLoading ? 
               <Box pad='xsmall'> 
                 <Text size='xxsmall'>Loading...</Text> 
               </Box>

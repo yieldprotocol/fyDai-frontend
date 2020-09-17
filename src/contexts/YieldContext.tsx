@@ -53,7 +53,7 @@ function reducer(state: any, action: any) {
     case 'isLoading':
       return {
         ...state,
-        isLoading: action.payload,
+        yieldLoading: action.payload,
       };
     default:
       return state;
@@ -61,7 +61,6 @@ function reducer(state: any, action: any) {
 }
 
 const initState = {
-  isLoading: true,
   deployedSeries: [],
   deployedContracts: {},
   feedData: {
@@ -71,6 +70,7 @@ const initState = {
     },
   },
   yieldData: {},
+  yieldLoading: true,
 };
 
 const YieldProvider = ({ children }: any) => {

@@ -13,6 +13,7 @@ const SeriesContext = React.createContext<any>({});
 const initState = { 
   seriesData : new Map(),
   activeSeries: null,
+  seriesLoading : true,
 };
 
 function reducer(state:any, action:any) {
@@ -30,7 +31,7 @@ function reducer(state:any, action:any) {
     case 'isLoading':
       return { 
         ...state,
-        isLoading: action.payload
+        seriesLoading: action.payload
       };
     default:
       return state;
@@ -43,7 +44,7 @@ const SeriesProvider = ({ children }:any) => {
   const { chainId } = useWeb3React();
   const [ state, dispatch ] = React.useReducer(reducer, initState);
   const { state: yieldState } = useContext(YieldContext);
-  const { deployedContracts } = yieldState;
+  const { yieldLoading, deployedContracts } = yieldState;
 
   const { previewPoolTx, checkPoolDelegate, checkPoolState } = usePool();
   const { debtDai } = useController();
@@ -115,7 +116,7 @@ const SeriesProvider = ({ children }:any) => {
 
   /* Update a list of series */
   const updateSeries = async (seriesArr:IYieldSeries[] ) => {
-    if(!yieldState.isLoading) {
+    if(!yieldLoading) {
       dispatch({ type:'isLoading', payload: true });
       /* Build/re-build series map with data */ 
       const seriesMap:any = await _getSeriesData(seriesArr); 
@@ -137,10 +138,10 @@ const SeriesProvider = ({ children }:any) => {
 
   /* Init all the series once yieldState is not loading and re-init on any user and/or network change */
   useEffect( () => {
-    (provider || fallbackProvider) && !yieldState.isLoading && ( async () => {
+    (provider || fallbackProvider) && !yieldLoading && ( async () => {
       await updateSeries(yieldState.deployedSeries);
     })();
-  }, [ provider, fallbackProvider, chainId, account, yieldState.isLoading ]);
+  }, [ provider, fallbackProvider, chainId, account, yieldLoading ]);
 
   /* Actions for updating the series Context */
   const actions = {

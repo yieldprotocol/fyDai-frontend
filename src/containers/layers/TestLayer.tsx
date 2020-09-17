@@ -275,7 +275,7 @@ const TestLayer = (props:any) => {
             gap='small'
             overflow='auto'
           > 
-            { seriesData.size > 0 && !seriesState.isLoading ? 
+            { seriesData.size > 0 && !seriesState.seriesLoading ? 
               <Box pad='small' gap='medium' fill>
                 <Box direction='row'>
                   {/* <Text weight='bold'>eDai[0]: {seriesData.get('eDai-2020-09-30').name}</Text> */}

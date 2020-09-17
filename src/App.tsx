@@ -5,6 +5,7 @@ import { deepMerge } from 'grommet/utils';
 import { yieldTheme } from './themes';
 
 import { SeriesContext } from './contexts/SeriesContext';
+import { YieldContext } from './contexts/YieldContext';
 
 import Dashboard from './views/Dashboard';
 import BorrowView from './views/BorrowView';
@@ -21,6 +22,7 @@ import NotifyLayer from './containers/layers/NotifyLayer';
 
 // TODO: remove testLayer for prod
 import TestLayer from './containers/layers/TestLayer';
+import Splash from './components/Splash';
 
 // const LendView = React.lazy(() => import('./views/LendView'));
 // const PoolView = React.lazy(() => import('./views/PoolView'));
@@ -48,7 +50,8 @@ const ThemedApp = () => {
 
 const App = (props:any) => {
 
-  const { isLoading } = useContext(SeriesContext);
+  const { seriesLoading } = useContext(SeriesContext);
+  const { yieldLoading } = useContext(YieldContext);
 
   // TODO Switch out for react router
   const [activeView, setActiveView] = useState<string>('BORROW');
@@ -58,6 +61,8 @@ const App = (props:any) => {
 
   // TODO remove for prod
   const [showTestLayer, setShowTestLayer] = useState<boolean>(false);
+
+  const [appReady, setAppReady] = useState<boolean>(false);
 
   const screenSize = useContext(ResponsiveContext);
   const [columnsWidth, setColumnsWidth] = useState<string[]>(['5%', 'auto', '5%']);
@@ -70,6 +75,11 @@ const App = (props:any) => {
     }
   }, [screenSize]);
 
+  useEffect(()=> {
+    !yieldLoading && !seriesLoading && setAppReady(true);
+    console.log(yieldLoading, seriesLoading);
+  }, [yieldLoading, seriesLoading]);
+
   return (
     <div className="App">
       <NotifyLayer />
@@ -78,41 +88,41 @@ const App = (props:any) => {
       { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
       { showSeriesLayer  && <SeriesSelector activeView='borrow' close={()=>setShowSeriesLayer(false)} /> }
 
-      <Box direction="row" height={{ min: '100%' }}>
-        <Box flex height='100%'>
+      { appReady ? 
+        <Box direction="row" height={{ min: '100%' }}>
+          <Box flex height='100%'>
 
-          <Grid fill rows={screenSize === 'small'? ['xsmall', 'auto', 'xsmall']: ['auto', 'flex', 'auto']}>                 
-            <Grid fill columns={columnsWidth}>
-              <Box background={{ color: 'background-front' }} />
-              <YieldHeader
-                openConnectLayer={(v:string) => setShowConnectLayer(v)}
-                activeView={activeView}
-                setActiveView={setActiveView}
-              />
-              <Box background={{ color: 'background-front' }} />
-            </Grid>
+            <Grid fill rows={screenSize === 'small'? ['xsmall', 'auto', 'xsmall']: ['auto', 'flex', 'auto']}>                 
+              <Grid fill columns={columnsWidth}>
+                <Box background={{ color: 'background-front' }} />
+                <YieldHeader
+                  openConnectLayer={(v:string) => setShowConnectLayer(v)}
+                  activeView={activeView}
+                  setActiveView={setActiveView}
+                />
+                <Box background={{ color: 'background-front' }} />
+              </Grid>
 
-            {!isLoading &&
-            <Main pad="none" direction="row" flex>
+              <Main pad="none" direction="row" flex>
+                <Grid fill columns={columnsWidth}>
+                  <Box background="background" />
+                  <Box
+                    pad={{ vertical: 'large' }}
+                    fill="horizontal"
+                    align="center"
+                  >          
+                    {activeView === 'DASHBOARD' && <Dashboard />}
+                    {activeView === 'BORROW' && <BorrowView />}
+                    {activeView === 'LEND' && <LendView />}
+                    {activeView === 'POOL' && <PoolView />}
+                  </Box>               
+                  <Box background="background" />
+                </Grid>
+              </Main>
+              
               <Grid fill columns={columnsWidth}>
                 <Box background="background" />
-                <Box
-                  pad={{ vertical: 'large' }}
-                  fill="horizontal"
-                  align="center"
-                >          
-                  {activeView === 'DASHBOARD' && <Dashboard />}
-                  {activeView === 'BORROW' && <BorrowView />}
-                  {activeView === 'LEND' && <LendView />}
-                  {activeView === 'POOL' && <PoolView />}
-                </Box>               
-                <Box background="background" />
-              </Grid>
-            </Main>}
-              
-            <Grid fill columns={columnsWidth}>
-              <Box background="background" />
-              {screenSize !== 'small' &&
+                {screenSize !== 'small' &&
                 <YieldFooter
                   showTestLayer={showTestLayer}
                   setShowTestLayer={setShowTestLayer}
@@ -120,11 +130,12 @@ const App = (props:any) => {
                   setDarkMode={props.setDarkMode}
                   openConnectLayer={() => setShowConnectLayer('CONNECT')}
                 />}                  
-              <Box background="background" />      
+                <Box background="background" />      
+              </Grid>
             </Grid>
-          </Grid>
-        </Box>
-      </Box>
+          </Box>
+        </Box>:
+        <Splash />}
 
       {screenSize === 'small' &&    
         <Layer
@@ -146,7 +157,7 @@ const App = (props:any) => {
             <Box>Borrow</Box>
             <Box>Repay</Box>         
           </Nav>
-        </Layer>} 
+        </Layer>}
     </div>
   );
 };

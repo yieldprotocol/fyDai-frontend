@@ -20,7 +20,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
 
   const screenSize = useContext(ResponsiveContext);
   const { state: seriesState, actions: seriesActions } = useContext( SeriesContext );
-  const { isLoading, activeSeries, seriesData } = seriesState; 
+  const { seriesLoading, activeSeries, seriesData } = seriesState; 
   const { setActiveSeries } = seriesActions;
 
   const [sortedList, setSortedList] = useState<any>(seriesData);
@@ -109,8 +109,8 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
               </Box>}
           </Box>
 
-          <Loading condition={isLoading} size='large'>
-            { !isLoading && [...sortedList.values() ].map((x:any, i:any) => {       
+          <Loading condition={seriesLoading} size='large'>
+            { !seriesLoading && [...sortedList.values() ].map((x:any, i:any) => {       
               const _key = i;
               const field = viewMap.get(activeView.toUpperCase())?.field || '';
 

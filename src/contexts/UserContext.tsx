@@ -43,7 +43,7 @@ function reducer(state: any, action: any) {
         ...state,
         makerData: action.payload,
       };
-    case 'userLoading':
+    case 'isLoading':
       return {
         ...state,
         userLoading: action.payload,
@@ -311,7 +311,7 @@ const UserProvider = ({ children }: any) => {
 
   const initUser = async () => {
     /* Init start */
-    dispatch({ type: 'userLoading', payload: true });
+    dispatch({ type: 'isLoading', payload: true });
     // TODO: look at splitting these up cleverly, in particular makerData.
     await Promise.all([
       _getPosition(),
@@ -322,21 +322,21 @@ const UserProvider = ({ children }: any) => {
     ]);
     console.log('User initialised.');
     /* Init end */
-    dispatch({ type: 'userLoading', payload: false });
+    dispatch({ type: 'isLoading', payload: false });
   };
 
   useEffect(()=>{
     // Init everytime it starts or change of user
-    account && !yieldState.isLoading && initUser();
+    account && !yieldState.yieldLoading && initUser();
 
     // If user has changed, rebuild and re-cache the history
     const hist = JSON.parse( (localStorage.getItem('txHistory') || '{}') );
-    if ( !yieldState.isLoading && account && (hist?.account !== account) ) {
+    if ( !yieldState.yieldLoading && account && (hist?.account !== account) ) {
       localStorage.removeItem('txHistory');
       _getTxHistory(true);
       console.log('History updating due to user change');
     }
-  }, [ account, yieldState.isLoading ]);
+  }, [ account, yieldState.yieldLoading ]);
 
   const actions = {
     updatePosition: () => _getPosition(),
