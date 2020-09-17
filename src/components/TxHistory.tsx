@@ -181,7 +181,7 @@ const TxHistory = ( { filterTerms, view }:HistoryProps) => {
                       <HistoryItemName item={x} />                           
                     </Text>
                   </Box>
-                  <Box basis='25%' align='center'><Text size='xsmall'> {x.amount} </Text></Box>
+                  <Box basis='25%' align='center'><Text size='xsmall'> {x.amount.toFixed(2)} </Text></Box>
                   <Box basis='25%' align='center'><Text size='xsmall'> {moment(x.date_).format('DD MMMM YYYY')} </Text></Box>
                   <Box>
                     <Text size='xsmall'> 
