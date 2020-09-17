@@ -31,7 +31,6 @@ const YieldHeader = (props: any) => {
 
   const {
     openConnectLayer,
-    openAccountLayer,
     activeView,
     setActiveView,
   } = props;
@@ -234,7 +233,7 @@ const YieldHeader = (props: any) => {
       return (
         <Box>
           <ProfileButton
-            action={() => openAccountLayer()}
+            action={()=>openConnectLayer('ACCOUNT')}
             account={account || ''}
           />
         </Box>
@@ -245,7 +244,7 @@ const YieldHeader = (props: any) => {
         <Button
           onClick={() => {
             closeMenu();
-            openConnectLayer();
+            openConnectLayer('CONNECT');
           }}
           label="Connect to a wallet"
           color="border"
@@ -300,7 +299,7 @@ const YieldHeader = (props: any) => {
             <MenuButton />
           ) : (
             <Box direction="row" align="center" gap="small">
-              <TxStatus/>
+              <TxStatus />
               <Account />
               <Settings />
             </Box>

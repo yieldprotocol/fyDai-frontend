@@ -17,7 +17,7 @@ import SeriesSelector from './components/SeriesSelector';
 import YieldMark from './components/logos/YieldMark';
 
 import ConnectLayer from './containers/layers/ConnectLayer';
-import AccountLayer from './containers/layers/AccountLayer';
+
 import NotifyLayer from './containers/layers/NotifyLayer';
 import AuthsLayer from './containers/layers/AuthsLayer';
 
@@ -54,22 +54,16 @@ const App = (props:any) => {
 
   // TODO Switch out for react router
   const [activeView, setActiveView] = useState<string>('BORROW');
-  const [accountView, setAccountView] = useState<string>('ACCOUNT');
 
-  const [showConnectLayer, setShowConnectLayer] = useState<boolean>(false);
-  const [showAccountLayer, setShowAccountLayer] = useState<boolean>(false);
+  const [showConnectLayer, setShowConnectLayer] = useState<string|null>(null);
+
   const [showAuthsLayer, setShowAuthsLayer] = useState<boolean>(false);
-
   const [showSeriesLayer, setShowSeriesLayer] = useState<boolean>(false);
+  // TODO remove for prod
   const [showTestLayer, setShowTestLayer] = useState<boolean>(false);
 
   const screenSize = useContext(ResponsiveContext);
   const [columnsWidth, setColumnsWidth] = useState<string[]>(['5%', 'auto', '5%']);
-
-  const changeConnection = () => {
-    setShowAccountLayer(false);
-    setShowConnectLayer(true);
-  };
 
   useEffect(()=> {
     if (screenSize === 'small') { 
@@ -83,17 +77,10 @@ const App = (props:any) => {
     <div className="App">
       <NotifyLayer />
       <AuthsLayer open={showAuthsLayer} closeLayer={() => setShowAuthsLayer(false)} />
-      <ConnectLayer view={accountView} open={showConnectLayer} closeLayer={() => setShowConnectLayer(false)} />
+      <ConnectLayer view={showConnectLayer} closeLayer={() => setShowConnectLayer(null)} />
       
       { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
       { showSeriesLayer  && <SeriesSelector activeView='borrow' close={()=>setShowSeriesLayer(false)} /> }
-
-      { showAccountLayer &&
-        <AccountLayer
-          view={accountView}
-          closeLayer={() => setShowAccountLayer(false)}
-          changeWallet={() => changeConnection()}
-        />}
 
       <Box direction="row" height={{ min: '100%' }}>
         <Box flex height='100%'>
@@ -102,8 +89,7 @@ const App = (props:any) => {
             <Grid fill columns={columnsWidth}>
               <Box background={{ color: 'background-front' }} />
               <YieldHeader
-                openConnectLayer={() => setShowConnectLayer(true)}
-                openAccountLayer={() => setShowAccountLayer(true)}
+                openConnectLayer={(v:string) => setShowConnectLayer(v)}
                 activeView={activeView}
                 setActiveView={setActiveView}
               />
@@ -136,11 +122,10 @@ const App = (props:any) => {
                   setShowTestLayer={setShowTestLayer}
                   darkMode={props.darkMode}
                   setDarkMode={props.setDarkMode}
-                  changeConnection={changeConnection}
+                  openConnectLayer={() => setShowConnectLayer('CONNECT')}
                 />}                  
               <Box background="background" />      
             </Grid>
-
           </Grid>
         </Box>
       </Box>

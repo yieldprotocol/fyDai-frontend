@@ -39,33 +39,29 @@ import { NotifyContext } from '../../contexts/NotifyContext';
 import { UserContext } from '../../contexts/UserContext';
 import ProfileButton from '../../components/ProfileButton';
 
-const ConnectLayer = ({ open, view, closeLayer }: any) => {
+
+
+const ConnectLayer = ({ view, closeLayer }: any) => {
 
   const { state: { position } } = useContext(UserContext);
   const screenSize = useContext(ResponsiveContext);
   const { account, provider } = useSignerAccount();
-
   const [ layerView, setLayerView] = useState<string>(view);
-
   const { handleSelectConnector } = useConnection();
 
   const connectorList = [
     { name: 'Metamask', image: metamaskImage, connection: injected },
-    { name: 'Tezor', image: trezorImage, connection: trezor },
+    // { name: 'Tezor', image: trezorImage, connection: trezor },
     { name: 'Torus', image: torusImage, connection: torus },
-    { name: 'Walletlink', image: walletlinkImage, connection: walletlink },
-    { name: 'Ledger', image: walletlinkImage, connection: ledger },
   ];
 
   useEffect(()=>{
     setLayerView(view);
-  }, []);
+  }, [view]);
 
   return (
     <>
-
-    
-      {open && (
+      {layerView && (
         <Layer
           onClickOutside={() => closeLayer(true)}
           animation="slide"
@@ -81,7 +77,7 @@ const ConnectLayer = ({ open, view, closeLayer }: any) => {
               padding: '2rem',
             }}
           >
-            { false ?
+            { account && layerView !== 'CONNECT' &&
               <>
                 <Header 
                   fill='horizontal'
@@ -129,10 +125,9 @@ const ConnectLayer = ({ open, view, closeLayer }: any) => {
                     />
                   </Box>
                 </Footer>
-              </> 
+              </> }
 
-              :
-
+            { layerView === 'CONNECT' &&      
               <>
                 <Header fill="horizontal" gap="medium">
                   <Heading
@@ -195,7 +190,6 @@ const ConnectLayer = ({ open, view, closeLayer }: any) => {
                   </Box>
                 </Footer>
               </>}
-
           </Box>
         </Layer>
       )}
