@@ -22,7 +22,7 @@ const YieldFooter = (props: any) => {
     showTestLayer,
     setDarkMode,
     darkMode,
-    changeConnection,
+    openConnectLayer,
   } = props;
   const { account } = useSignerAccount();
 
@@ -57,7 +57,7 @@ const YieldFooter = (props: any) => {
         {!account && (
           <Button
             label="Connect wallet"
-            onClick={() => changeConnection()}
+            onClick={() => openConnectLayer()}
             style={{
               fontWeight: 600,
             }}

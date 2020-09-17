@@ -5,6 +5,7 @@ import PageHeader from '../components/PageHeader';
 
 import Lend from '../containers/Lend';
 import Redeem from '../containers/Redeem';
+import RaisedBox from '../components/RaisedBox';
 
 // const Lend = lazy(() => import('../containers/Lend'));
 // const Redeem = lazy(() => import('../containers/Redeem'));
@@ -25,7 +26,7 @@ const LendView = ({ activeView }:LendProps) => {
         tipPrimary="Tip: Convert your Maker vault"
         tipSecondary="View more tips"
       />
-      <Box
+      <RaisedBox
         width={{ max:'750px' }}
         alignSelf='center'
         fill='horizontal'
@@ -36,7 +37,7 @@ const LendView = ({ activeView }:LendProps) => {
           <Lend />}
         { activeSeries?.isMature() === true && 
           <Redeem />}      
-      </Box>
+      </RaisedBox>
     </>
   );
 };

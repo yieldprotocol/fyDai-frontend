@@ -2,6 +2,7 @@ import React from 'react';
 import { Box } from 'grommet';
 import PageHeader from '../components/PageHeader';
 import Pool from '../containers/Pool';
+import RaisedBox from '../components/RaisedBox';
 
 const PoolView = () => {
   return (
@@ -12,7 +13,7 @@ const PoolView = () => {
         tipPrimary="Tip: Convert your Maker vault"
         tipSecondary="View more tips"
       />
-      <Box
+      <RaisedBox
         width={{ max:'750px' }}
         alignSelf='center'
         fill='horizontal'
@@ -20,7 +21,7 @@ const PoolView = () => {
         round='small'
       >
         <Pool />
-      </Box>
+      </RaisedBox>
     </>
   );
 };

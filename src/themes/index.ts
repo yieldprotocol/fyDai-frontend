@@ -41,24 +41,27 @@ export const yieldTheme = {
         // light: 'rgb(98, 126, 234, 0.1)',
       },
       background: {
-        // 'dark': '#111111',
-        // 'light': '#FFFFFF',
         dark: '#111111',
-        light: '#F1F5F9',
+        light: '#f8f8f8',
       },
 
       'background-back': {
         dark: '#111111',
-        light: '#EEEEEE',
+        // light: '#EEEEEE',
+        // light: '#d1dbe0',
+        light:'#f1f1f1'
       },
       'background-mid': {
         dark: 'dark-1',
-        light: '#F5FAFF',
+        light:'#f1f1f1'
+
+        // light: '#F5FAFF',
         // light: 'light-3',
       },
       'background-front': {
         dark: '#222222',
-        light: '#ffffff',
+        light:'#f8f8f8'
+        // light: '#ffffff',
         // 'dark': 'dark-1',
         // light: 'light-1',
       },
@@ -258,6 +261,7 @@ export const yieldTheme = {
   TextInput: {
 
   },
+
   collapsible: {
     minSpeed: '100',
   },

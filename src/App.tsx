@@ -23,6 +23,7 @@ import NotifyLayer from './containers/layers/NotifyLayer';
 // TODO: remove testLayer for prod
 import TestLayer from './containers/layers/TestLayer';
 import Splash from './components/Splash';
+import RaisedBox from './components/RaisedBox';
 
 // const LendView = React.lazy(() => import('./views/LendView'));
 // const PoolView = React.lazy(() => import('./views/PoolView'));

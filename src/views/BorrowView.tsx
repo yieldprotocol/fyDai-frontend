@@ -1,5 +1,7 @@
 import React, { useState  } from 'react';
 import { Box } from 'grommet';
+
+import RaisedBox from '../components/RaisedBox';
 import PageHeader from '../components/PageHeader';
 import ActionSelector from '../components/ActionSelector';
 
@@ -31,12 +33,13 @@ const BorrowView = ({
         tipPrimary="Tip: Convert your Maker vault"
         tipSecondary="View more tips"
       />
-      <Box 
-        background="brand-transparent"
+      <RaisedBox
+        background="background"
         round='small'
         alignSelf="center"
         width={{ max: '750px' }}
         fill
+        elevation='small'
       >
         <ActionSelector activeView={activeView} setActiveView={setActiveView} />    
         <Box
@@ -50,7 +53,7 @@ const BorrowView = ({
           {activeView === 1 && <Borrow setActiveView={setActiveView} /> }
           {activeView === 2 && <Repay setActiveView={setActiveView} />}
         </Box>
-      </Box>    
+      </RaisedBox>    
     </>
   );
 };
