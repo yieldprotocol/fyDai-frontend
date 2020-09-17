@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { ethers } from 'ethers';
 
 import {
@@ -35,7 +35,6 @@ const useEagerConnect = () => {
   const { activate, active, chainId } = useWeb3React();
   const { activate: activateFallback } = useWeb3React('fallback');
   const [ cachedChainId, setCachedChainId ] = useCachedState('cache_chainId', null);
-
   const [ tried, setTried ] = useState(false);
   const { handleErrorMessage } = useWeb3Errors();
 
@@ -55,6 +54,7 @@ const useEagerConnect = () => {
     if (!tried && active) {
       setTried(true);
       ( cachedChainId !== chainId ) && localStorage.clear();
+      // eslint-disable-next-line no-console
       console.log('Web3 connected (eagerly ). Now, connecting fallback provider with same chainId');
       activateFallback( new NetworkConnector({ urls, defaultChainId: chainId }), (e) => handleErrorMessage(e));
       setCachedChainId(chainId);

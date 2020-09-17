@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import { useEffect, useState } from 'react';
 import { ethers }  from 'ethers';
 import { useWeb3React } from '@web3-react/core';
 import { useSignerAccount } from './connectionHooks';
@@ -40,6 +40,7 @@ export const useMigrations = () => {
   const getAddresses = async (
     contractNameList:string[],
   ) => {
+    // eslint-disable-next-line no-console
     console.log('Migration contract called:', migrationsAddress);
     const contract = new ethers.Contract(migrationsAddress, migrationAbi, fallbackProvider );
     const res = new Map<string, string>();

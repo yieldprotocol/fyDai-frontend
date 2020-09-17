@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useWeb3React } from '@web3-react/core';
 import { ethers }  from 'ethers';
 
 import { useSignerAccount } from './connectionHooks';
@@ -7,15 +6,10 @@ import { useSignerAccount } from './connectionHooks';
 import EDai from '../contracts/EDai.json';
 import Controller from '../contracts/Controller.json';
 import Dai from '../contracts/Dai.json';
-import WETH9 from '../contracts/WETH9.json';
-import GemJoin from '../contracts/GemJoin.json';
-import DaiJoin from '../contracts/DaiJoin.json';
-import Chai from '../contracts/Chai.json';
-import Vat from '../contracts/Vat.json';
-import Pot from '../contracts/Pot.json';
 import YieldProxy from '../contracts/YieldProxy.json';
 import Migrations from '../contracts/Migrations.json';
 import Pool from '../contracts/Pool.json';
+import Vat from '../contracts/Vat.json';
 
 // ethers.errors.setLogLevel('error');
 
@@ -23,18 +17,17 @@ const contractMap = new Map<string, any>([
   ['EDai', EDai.abi],
   ['Controller', Controller.abi],
   ['Dai', Dai.abi],
-  ['Weth', WETH9.abi],
-  ['Chai', Chai.abi],
-  ['WethJoin', GemJoin.abi],
-  ['DaiJoin', DaiJoin.abi],
-  ['Vat', Vat.abi],
-  ['Pot', Pot.abi],
   ['YieldProxy', YieldProxy.abi],
   ['Migrations', Migrations.abi],
   ['Pool', Pool.abi],
+  ['Vat', Vat.abi], 
 ]);
 
-// TODO: Sanitize all inputs!!
+export const useContractAbi = (contractName:string) =>{ 
+  const { abi }  = contractMap.get(contractName);
+  return { abi } as const;
+};
+
 /**
  * SendTx is a generic function to interact with any contract.
  * Primarily used for development/testing, or for once off interactions with a contract.
@@ -83,14 +76,12 @@ export const useSendTx = () => {
  * @returns { boolean } callTxActive
  */
 export const useCallTx = () => {
-
-  // const { state: { provider, altProvider } } = useContext(ConnectionContext);
-  const { signer, provider, account, fallbackProvider, voidSigner } = useSignerAccount();
+  const { fallbackProvider } = useSignerAccount();
   const [ callTxActive, setCallTxActive ] = useState<boolean>();
   /**
    * Get data from the blockchain via provider (no signer reqd)
    * @param {string} contractAddress address of the contract to be called
-   * @param {string} contractName name of the contract to call (uses this to get the abi from a contract map)
+   * @param {string} contractName name of the contract to call (this is used to get the abi from a contract map)
    * @param {string} fn name of the function to call 
    * @param {any[]} data array of any arguments required by the contract function 
    */
@@ -110,9 +101,8 @@ export const useCallTx = () => {
 };
 
 export const useTimeTravel = () => {
-  
   const { provider } = useSignerAccount();
-  const [ snapshot, setSnapshot ] = useState<any>('0x1');
+  const [ snapshotNumber, setSnapshotNumber ] = useState<any>('0x1');
   const [ block, setBlock ] = useState<any>(null);
   const [ timestamp, setTimestamp ] = useState<number|null>(null);
 
@@ -132,9 +122,9 @@ export const useTimeTravel = () => {
       body: '{"id":1337,"jsonrpc":"2.0","method":"evm_snapshot","params":[]}'
     });
     const num = await res.json();
+    // eslint-disable-next-line no-console
     console.log( 'Snapshot taken', num.result );
-    setSnapshot( num.result );
-
+    setSnapshotNumber( num.result );
     window.localStorage.setItem('snapshot', num.result);
     setBlock(provider.blockNumber);
   };
@@ -147,6 +137,7 @@ export const useTimeTravel = () => {
       },
       body: `{"id":1337,"jsonrpc":"2.0","method":"evm_revert","params":["${window.localStorage.getItem('snapshot')}"]}`
     });
+    // eslint-disable-next-line no-console
     console.log('Reverted to Snapshot', (await res.json()).result );
     takeSnapshot();
     setBlock(provider.blockNumber);
@@ -162,6 +153,7 @@ export const useTimeTravel = () => {
       },
       body: '{"id":1337,"jsonrpc":"2.0","method":"evm_revert","params":["0x1"]}'
     });
+    // eslint-disable-next-line no-console
     console.log('Reverted to first snapshot', (await res.json()).result );
     takeSnapshot();
     setBlock(provider.blockNumber);
@@ -177,6 +169,7 @@ export const useTimeTravel = () => {
       },
       body: `{"id":1337,"jsonrpc":"2.0","method":"evm_increaseTime","params":[${time}]}`
     });
+    // eslint-disable-next-line no-console
     console.log(await res.json()); 
     setBlock(provider.blockNumber);
     window.location.reload();
@@ -190,6 +183,7 @@ export const useTimeTravel = () => {
       },
       body: '{"id":1337,"jsonrpc":"2.0","method":"evm_mine","params":[]}'
     });
+    // eslint-disable-next-line no-console
     console.log(await res.json());
     setBlock(provider.blockNumber);
     console.log('new block:', provider.blockNumber);
@@ -200,5 +194,5 @@ export const useTimeTravel = () => {
     await advanceBlock();
   };
 
-  return { advanceTimeAndBlock, revertToSnapshot, takeSnapshot, revertToT0, block, timestamp } as const;
+  return { advanceTimeAndBlock, revertToSnapshot, takeSnapshot, snapshotNumber, revertToT0, block, timestamp } as const;
 };

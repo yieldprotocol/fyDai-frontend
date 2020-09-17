@@ -1,6 +1,5 @@
-import React, { useEffect, useState, useContext } from 'react';
+import { useState, useContext } from 'react';
 import { ethers, BigNumber  }  from 'ethers';
-import { keccak256, defaultAbiCoder, toUtf8Bytes, solidityPack } from 'ethers/lib/utils';
 import { signDaiPermit, signERC2612Permit } from 'eth-permit';
 
 import Controller from '../contracts/Controller.json';
@@ -9,14 +8,11 @@ import YieldProxy from '../contracts/YieldProxy.json';
 
 import {
   IDelegableMessage,
-  IDomain,
-  DaiPermitMessage,
-  ERC2612PermitMessage,
+  IDomain
 } from '../types';
 
 import { NotifyContext } from '../contexts/NotifyContext';
 import { YieldContext } from '../contexts/YieldContext';
-import { UserContext } from '../contexts/UserContext';
 
 import { useSignerAccount } from './connectionHooks';
 import { useTxHelpers } from './appHooks';
@@ -114,7 +110,7 @@ export const useAuth = () => {
       /* yieldProxy | Controller delegation */ 
       const controllerNonce = await controllerContract.signatureCount(fromAddr);
       const msg: IDelegableMessage = {
-      // @ts-ignore
+        // @ts-ignore
         user: fromAddr,
         delegate: proxyAddr,
         nonce: controllerNonce.toHexString(),
@@ -133,13 +129,6 @@ export const useAuth = () => {
         [fromAddr, createTypedDelegableData(msg, domain)],
       );
       dispatch({ type: 'signed', payload: auths.get(1) });
-
-      // const daiDomain: IDomain = {
-      //   name: 'Dai Stablecoin',
-      //   version: '1',
-      //   chainId: 42,
-      //   verifyingContract: daiAddr,
-      // };
 
       /* Dai permit yieldProxy */
       // @ts-ignore

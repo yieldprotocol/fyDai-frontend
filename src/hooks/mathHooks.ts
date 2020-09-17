@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useContext } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { ethers, BigNumber }  from 'ethers';
 import * as utils from '../utils';
 
-import { YieldContext } from '../contexts/YieldContext'; // TODO sort out this cyclic ref (not critical)
+import { YieldContext } from '../contexts/YieldContext';
 
 /**
  * Hook for Yield maths functions
@@ -65,7 +65,6 @@ export const useMath = () => {
       // handle this case better
       return BigNumber.from(0);
     }
-    console.log('colRatio in RAY :', utils.divRay(_collateralValue, _debtValue).toString());
     return utils.divRay(_collateralValue, _debtValue);
   };
 
@@ -76,7 +75,6 @@ export const useMath = () => {
    * @returns {BigNumber} percentage as a big number
    */
   const collPercent = ( _collateralizationRate:BigNumber ) => {
-    console.log('collat %:', utils.mulRay(BigNumber.from('100'), _collateralizationRate).toString());
     return utils.mulRay(BigNumber.from('100'), _collateralizationRate);
   };
 
@@ -92,14 +90,12 @@ export const useMath = () => {
   // TODO merge this in to the 'collateralization ratio function' above.
   const estCollRatio = (_collateralAmount:Number, _debtValue:Number) => {
     if (!_collateralAmount || _debtValue === 0 ) {
-      // TODO handle this better
       return undefined;
     }
     const _colAmnt = ethers.utils.parseEther(_collateralAmount.toString());
     const _debtVal = ethers.utils.parseEther(_debtValue.toString());
     const _colVal = utils.mulRay(_colAmnt, collPrice());
     const _ratio = utils.divRay(_colVal, _debtVal);
-    console.log( parseFloat(utils.mulRay(BigNumber.from('100'), _ratio).toString()) );
     return parseFloat(utils.mulRay(BigNumber.from('100'), _ratio).toString());
   };
 
@@ -114,7 +110,6 @@ export const useMath = () => {
   const minSafeColl=(_debtValue:BigNumber, _liquidationRatio:number, _collateralPrice:BigNumber)=> {
     const _s = utils.divRay( utils.toRay(_liquidationRatio), _collateralPrice);
     const _msc = utils.mulRay(_debtValue, _s);
-    console.log('minSafeColl:', ethers.utils.formatEther(_msc).toString());
     return _msc;
   };
 
@@ -140,9 +135,6 @@ export const useMath = () => {
     return _debtValue.mul(_liquidationRatio).div(_collateralAmount);
   };
 
-
-  
-
   /**
    * Max amount of Dai that can be borrowed
    *
@@ -158,7 +150,6 @@ export const useMath = () => {
   ) =>{
     const maxSafeDebtValue = utils.divRay(_collateralValue, utils.toRay(_liquidationRatio));
     const _max = _debtValue.lt(maxSafeDebtValue) ? maxSafeDebtValue.sub(_debtValue) : BigNumber.from('0');
-    console.log('max debt:', ethers.utils.formatEther(_max).toString());
     return _max;
   };
 
@@ -224,7 +215,6 @@ export const useMath = () => {
       const priceRatio = parseFloat(ethers.utils.formatEther(_amount)) / parseFloat(ethers.utils.formatEther(_rate));
       const powRatio = 1 / propOfYear;
       const apr = Math.pow(priceRatio, powRatio) - 1;
-      console.log(apr*100);
       return apr*100;
     }
     return 0;

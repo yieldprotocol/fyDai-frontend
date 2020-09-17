@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useContext } from 'react';
+import { useState, useContext } from 'react';
 import { ethers, BigNumber }  from 'ethers';
+
 import EDai from '../contracts/EDai.json';
 
 import { NotifyContext } from '../contexts/NotifyContext';
 import { useSignerAccount } from './connectionHooks';
 import { useTxHelpers } from './appHooks';
-
 
 /**
  * Hook for interacting with the yield 'eDAI' Contract
@@ -14,12 +14,11 @@ import { useTxHelpers } from './appHooks';
  */
 export const useEDai = () => {
 
-  // const { state: { signer, account } } = useContext(ConnectionContext);
   const { provider, signer, account } = useSignerAccount();
   const { abi: eDaiAbi } = EDai;
   const  { dispatch }  = useContext<any>(NotifyContext);
   const [ redeemActive, setRedeemActive ] = useState<boolean>(false);
-
+  
   const { handleTx, handleTxError } = useTxHelpers();
 
   /**
@@ -32,7 +31,6 @@ export const useEDai = () => {
     amount: number
   ) => {
     let tx:any;
-    // const parsedAmount = ethers.utils.parseEther(amount.toString());
     const parsedAmount = amount;
     const fromAddr = account && ethers.utils.getAddress(account);
     const toAddr = fromAddr;
@@ -53,34 +51,6 @@ export const useEDai = () => {
   };
 
   /**
-   * @dev User eDai token allowance
-   * @param {string} eDaiAddress address of the eDai series .
-   * @param {string} poolAddress address of the pool.
-   * @returns {number} allowance amount
-   */
-  const userAllowance = async (
-    eDaiAddress:string,
-    poolAddress: string
-  ) => {
-    if (account) {
-      const fromAddr = account && ethers.utils.getAddress(account);
-      const eDaiAddr = ethers.utils.getAddress(eDaiAddress);
-      const poolAddr = ethers.utils.getAddress(poolAddress);
-      const contract = new ethers.Contract( eDaiAddr, eDaiAbi, provider );
-      let res;
-      try {
-        res = await contract.allowance(fromAddr, poolAddr);
-      }  catch (e) {
-        console.log(e);
-        res = BigNumber.from('0');
-      }
-      console.log(ethers.utils.formatEther(res.toString()));
-      return parseFloat(ethers.utils.formatEther(res.toString()));
-    } 
-    return 0;
-  };
-
-  /**
    * @dev eDai Series is Mature or not?
    * @param {string} eDaiAddress address of the eDai series to check.
    * @returns {boolean}
@@ -94,14 +64,14 @@ export const useEDai = () => {
     try {
       res = await contract.isMature();
     }  catch (e) {
+      // eslint-disable-next-line no-console
       console.log(e);
       res = BigNumber.from('0');
     }
-    console.log('Series is mature?', res);
     return res;
   };
 
   return {
-    isMature, redeem, redeemActive, userAllowance
+    isMature, redeem, redeemActive
   } as const;
 };

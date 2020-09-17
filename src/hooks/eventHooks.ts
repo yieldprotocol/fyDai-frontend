@@ -1,34 +1,23 @@
-import React, { useEffect, useState, useContext } from 'react';
+import { useState } from 'react';
 import { ethers }  from 'ethers';
-// import { ConnectionContext } from '../contexts/ConnectionContext';
 
 import { useSignerAccount } from './connectionHooks';
 
 import EDai from '../contracts/EDai.json';
 import Controller from '../contracts/Controller.json';
 import Dai from '../contracts/Dai.json';
-import WETH9 from '../contracts/WETH9.json';
-import GemJoin from '../contracts/GemJoin.json';
-import DaiJoin from '../contracts/DaiJoin.json';
-import Chai from '../contracts/Chai.json';
-import Vat from '../contracts/Vat.json';
-import Pot from '../contracts/Pot.json';
 import YieldProxy from '../contracts/YieldProxy.json';
 import Pool from '../contracts/Pool.json';
+import Vat from '../contracts/Vat.json';
 
 // TODO abstract this out to a higher level
 const contractMap = new Map<string, any>([
   ['EDai', EDai.abi],
   ['Controller', Controller.abi],
   ['Dai', Dai.abi],
-  ['Weth', WETH9.abi],
-  ['Chai', Chai.abi],
-  ['WethJoin', GemJoin.abi],
-  ['DaiJoin', DaiJoin.abi],
-  ['Vat', Vat.abi],
-  ['Pot', Pot.abi],
   ['YieldProxy', YieldProxy.abi],
   ['Pool', Pool.abi],
+  ['Vat', Vat.abi], 
 ]);
 
 /**

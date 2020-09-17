@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import { useState, useContext } from 'react';
 import { ethers, BigNumber }  from 'ethers';
 
 import Pool from '../contracts/Pool.json';
@@ -38,9 +38,7 @@ export const usePool = () => {
     const fromAddr = account && ethers.utils.getAddress(account);
     const toAddr = fromAddr;
     const marketAddr = ethers.utils.getAddress(poolAddress);
-
     const overrides = { 
-      // nonce: signer.getTransactionCount().then( (nonce:any) => nonce + queue) 
       gasLimit: BigNumber.from('300000')
     };
     
@@ -78,7 +76,6 @@ export const usePool = () => {
     const toAddr = account && ethers.utils.getAddress(account);
     const marketAddr = ethers.utils.getAddress(poolAddress);
     const overrides = { 
-      // nonce: signer.getTransactionCount().then( (nonce:any) => nonce + queue) 
       gasLimit: BigNumber.from('250000')
     };
 
@@ -103,14 +100,12 @@ export const usePool = () => {
    * 
    * @param {string} poolAddress address of the eDai series market.
    * @param {number} daiIn Amount of eDai being bought that will be deposited in `to` wallet
-   * @param {number} queue The number that this transaction is in the queue. // TODO extend the queue system globally
    * @return Amount of eDai that will be deposited on `to` wallet
    * 
    */
   const sellDai = async (
     poolAddress:string,
     daiIn: number,
-    queue: number,
   ) => {
     const parsedAmount = ethers.utils.parseEther(daiIn.toString());
     const fromAddr = account && ethers.utils.getAddress(account);
@@ -118,7 +113,6 @@ export const usePool = () => {
     const marketAddr = ethers.utils.getAddress(poolAddress);
 
     const overrides = { 
-      // nonce: signer.getTransactionCount().then( (nonce:any) => nonce + queue) 
       gasLimit: BigNumber.from('300000')
     };
 
@@ -145,7 +139,6 @@ export const usePool = () => {
    * @param {string} eDaiAddress address of the eDai contract.
    * @param {string} poolAddress address of the eDai series market.
    * @param {number} daiOut Amount of dai/chai being bought that will be deposited in `to` wallet
-   * @param {number} queue The number that this transaction is in the queue. // TODO extend the queue system globally
    * 
    * @return Amount of eDai that will be taken from `from` wallet
    *
@@ -153,16 +146,13 @@ export const usePool = () => {
   const buyDai = async (
     poolAddress:string,
     daiOut: number,
-    queue: number,
   ) => {
     const parsedAmount = ethers.utils.parseEther(daiOut.toString());
-    // const parsedAmount = daiOut;
     const fromAddr = account && ethers.utils.getAddress(account);
     const toAddr = account && ethers.utils.getAddress(account);
     const marketAddr = ethers.utils.getAddress(poolAddress);
     
     const overrides = { 
-      // nonce: signer.getTransactionCount().then( (nonce:any) => nonce + queue) 
       gasLimit: BigNumber.from('300000')
     };
 
@@ -234,6 +224,7 @@ export const usePool = () => {
     try {
       res = await contract.delegated(fromAddr, delegateAddr);
     }  catch (e) {
+      // eslint-disable-next-line no-console
       console.log(e);
       res = false;
     }

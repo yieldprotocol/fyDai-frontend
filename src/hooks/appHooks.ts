@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { NotifyContext } from '../contexts/NotifyContext';
 
 /* Simple Hook for checking if a transaction family/families are in process */
@@ -6,11 +6,9 @@ export const useTxActive = (typeList:string[]) => {
   const { state: { pendingTxs } } = useContext(NotifyContext);
   const [txActive, setTxActive] = useState<any>(null);
   const upperTypeList = typeList.map( (x:any) => x.toUpperCase() );
-
   useEffect(()=>{
     setTxActive(pendingTxs.find( (x:any)=> upperTypeList.includes(x.type) ));
   }, [ pendingTxs ]);
-
   return [txActive] as const; 
 };
 
@@ -46,13 +44,10 @@ export const useTxHelpers = () => {
         // });
       });
   };
-  
   return { handleTx, txComplete, handleTxError };
-
 };
 
-
-/* Simple Hook for caching retrieved data */
+/* Simple Hook for caching & retrieved data */
 export const useCachedState = (key:string, initialValue:any) => {
   // const genKey = `${chainId}_${key}` || key;
   const genKey = key;
@@ -85,22 +80,20 @@ export const useCachedState = (key:string, initialValue:any) => {
 
 export const useDebounce = (value:any, delay:number) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
-
   useEffect(
     () => {
-      // Update debounced value after delay
+      /* Update debounced value after delay */
       const handler = setTimeout(() => {
         setDebouncedValue(value);
       }, delay);
-      // Cancel the timeout if value changes (also on delay change or unmount)
-      // This is how we prevent debounced value from updating if value is changed ...
-      // .. within the delay period. Timeout gets cleared and restarted.
+      /* Cancel the timeout if value changes (also on delay change or unmount)
+      This is how we prevent debounced value from updating if value is changed ...
+      .. within the delay period. Timeout gets cleared and restarted. */
       return () => {
         clearTimeout(handler);
       };
     },
-    [value, delay] // Only re-call effect if value or delay changes
+    [value, delay] /* Only re-call effect if value or delay changes */ 
   );
-  
   return debouncedValue;
 };

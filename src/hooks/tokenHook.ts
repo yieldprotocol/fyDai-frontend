@@ -1,40 +1,18 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { useWeb3React } from '@web3-react/core';
-import { ethers, BigNumber }  from 'ethers';
+import { useState, useContext } from 'react';
+import { ethers }  from 'ethers';
 
 import { NotifyContext } from '../contexts/NotifyContext';
-// import { ConnectionContext } from '../contexts/ConnectionContext';
 
 import { useSignerAccount } from './connectionHooks';
 
 import EDai from '../contracts/EDai.json';
-import Controller from '../contracts/Controller.json';
 import Dai from '../contracts/Dai.json';
-import WETH9 from '../contracts/WETH9.json';
-import GemJoin from '../contracts/GemJoin.json';
-import DaiJoin from '../contracts/DaiJoin.json';
-import Chai from '../contracts/Chai.json';
-import Vat from '../contracts/Vat.json';
-import Pot from '../contracts/Pot.json';
-import YieldProxy from '../contracts/YieldProxy.json';
-import Migrations from '../contracts/Migrations.json';
 import Pool from '../contracts/Pool.json';
 import { useTxHelpers } from './appHooks';
 
-// ethers.errors.setLogLevel('error');
-
 const contractMap = new Map<string, any>([
   ['EDai', EDai.abi],
-  ['Controller', Controller.abi],
   ['Dai', Dai.abi],
-  ['Weth', WETH9.abi],
-  ['Chai', Chai.abi],
-  ['WethJoin', GemJoin.abi],
-  ['DaiJoin', DaiJoin.abi],
-  ['Vat', Vat.abi],
-  ['Pot', Pot.abi],
-  ['YieldProxy', YieldProxy.abi],
-  ['Migrations', Migrations.abi],
   ['Pool', Pool.abi],
 ]);
 
@@ -46,10 +24,8 @@ const contractMap = new Map<string, any>([
 export function useToken() {
   // const { state: { provider, account } } = useContext(ConnectionContext);
   const { signer, provider, account, voidSigner } = useSignerAccount();
-
   const  { dispatch }  = useContext<any>(NotifyContext);
   const [ approveActive, setApproveActive ] = useState<boolean>(false);
-
   const { handleTx, handleTxError } = useTxHelpers();
 
   /**

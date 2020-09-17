@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { ethers, BigNumber }  from 'ethers';
 
 import { NotifyContext } from '../contexts/NotifyContext';
@@ -28,13 +28,10 @@ export const useController = () => {
   const  { dispatch }  = useContext<any>(NotifyContext);
   const { state : { deployedContracts } } = useContext<any>(YieldContext);
 
-  // const controllerAddr = ethers.utils.getAddress(deployedContracts.Controller);
-
   const [ postActive, setPostActive ] = useState<boolean>(false);
   const [ withdrawActive, setWithdrawActive ] = useState<boolean>(false);
   const [ borrowActive, setBorrowActive ] = useState<boolean>(false);
   const [ repayActive, setRepayActive ] = useState<boolean>(false);
-  const [ approveActive, setApproveActive ] = useState<boolean>(false);
 
   /* controller contract for txs */
   const [controllerContract, setControllerContract] = useState<any>();
@@ -200,30 +197,6 @@ export const useController = () => {
   };
 
   /**
-   * LEGACY: Delegate a 3rd party to act on behalf of the user in the Controller
-   * @param {string} delegatedAddress address of the contract/entity getting delegated (in this case: ethproxy)
-   */
-  const addControllerDelegate = async (
-    delegatedAddress:string,
-  ) => {
-    /* Processing and sanitizing input */
-    const delegatedAddr = ethers.utils.getAddress(delegatedAddress);
-    
-    /* Contract interaction */
-    let tx:any;
-    try {
-      tx = await controllerContract.addDelegate(delegatedAddr);
-    } catch (e) {
-      handleTxError('Transaction was aborted or it failed.', tx, e );
-      return;
-    }
-    /* Transaction reporting & tracking */
-    dispatch({ type: 'txPending', payload:{ tx, message: 'Pending once-off delegation...', type:'DELEGATION' } } );
-    await handleTx(tx);
-  };
-
-
-  /**
    * @dev Checks to see if an account (user) has delegated a contract/3rd Party for the controller.
    * @param {string} delegateAddress address of the delegate to be checked (yieldProxy contract getting approved). 
    * @returns {Promise<boolean>} promise > approved or not
@@ -365,10 +338,7 @@ export const useController = () => {
     borrow, borrowActive,
     repay, repayActive,
 
-    // approveController, approveActive, // TODO remove this if not used
-    addControllerDelegate,
     checkControllerDelegate,
-   
     collateralPosted,
     collateralLocked,
     borrowingPower,
