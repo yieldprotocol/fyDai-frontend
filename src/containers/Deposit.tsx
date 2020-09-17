@@ -30,7 +30,7 @@ import WithdrawEth from './WithdrawEth';
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
 import ApprovalPending from '../components/ApprovalPending';
-import TransactionPending from '../components/TransactionPending';
+import TxPending from '../components/TxPending';
 
 interface DepositProps {
   /* deposit amount prop is for quick linking into component */
@@ -239,7 +239,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
        
         </Box>}
       { postEthActive && !txActive && <ApprovalPending /> } 
-      { txActive && txActive.type !== 'WITHDRAW' && <TransactionPending msg={`You are depositing ${inputValue} ETH`} tx={txActive} /> }
+      { txActive && txActive.type !== 'WITHDRAW' && <TxPending msg={`You are depositing ${inputValue} ETH`} tx={txActive} /> }
     </Keyboard>
   );
 };

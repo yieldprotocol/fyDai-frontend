@@ -1,10 +1,10 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { Box, Text, ThemeContext, Layer, Drop } from 'grommet';
+import React, { useState, useContext } from 'react';
+import { Box, Drop } from 'grommet';
 
 import { NotifyContext } from '../contexts/NotifyContext';
 
 
-const TransactionStatus = () => {
+const TxStatus= () => {
 
   const {
     state: { pendingTxs, lastCompletedTx },

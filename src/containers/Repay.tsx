@@ -19,7 +19,7 @@ import {
 
 import SeriesDescriptor from '../components/SeriesDescriptor';
 import ApprovalPending from '../components/ApprovalPending';
-import TransactionPending from '../components/TransactionPending';
+import TxPending from '../components/TxPending';
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
 
@@ -221,7 +221,7 @@ function Repay({ setActiveView, repayAmount }:IRepayProps) {
         </Box>
       </Box>}
       { repayActive && !txActive && <ApprovalPending /> } 
-      { txActive && <TransactionPending msg={`You are repaying ${inputValue} DAI`} tx={txActive} /> }
+      { txActive && <TxPending msg={`You are repaying ${inputValue} DAI`} tx={txActive} /> }
     </Keyboard>
   );
 }

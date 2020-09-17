@@ -15,7 +15,7 @@ import { useSignerAccount, useProxy, useTxActive, useDebounce } from '../hooks';
 import InputWrap from '../components/InputWrap';
 import InfoGrid from '../components/InfoGrid';
 import ApprovalPending from '../components/ApprovalPending';
-import TransactionPending from '../components/TransactionPending';
+import TxPending from '../components/TxPending';
 
 interface IRemoveLiquidityProps {
   close?: any;
@@ -228,7 +228,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
             gap='medium'
             justify='between'
           > 
-            <TransactionPending msg={`You are removing ${inputValue} liquidity tokens`} tx={txActive} />
+            <TxPending msg={`You are removing ${inputValue} liquidity tokens`} tx={txActive} />
                 
             <Box alignSelf='start'>
               <Box

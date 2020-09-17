@@ -18,7 +18,7 @@ import logoLight from '../assets/images/logo_light.svg';
 import ProfileButton from './ProfileButton';
 
 import { NotifyContext } from '../contexts/NotifyContext';
-import TransactionStatus from './TransactionStatus';
+import TxStatusfrom './TransactionStatus';
 
 interface LinkProps {
   link: string;
@@ -300,7 +300,7 @@ const YieldHeader = (props: any) => {
             <MenuButton />
           ) : (
             <Box direction="row" align="center" gap="small">
-              <TransactionStatus />
+              <TxStatus/>
               <Account />
               <Settings />
             </Box>

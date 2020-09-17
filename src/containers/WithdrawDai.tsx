@@ -14,7 +14,7 @@ import { usePool, useProxy, useSignerAccount, useTxActive, useDebounce } from '.
 
 import InputWrap from '../components/InputWrap';
 import Loading from '../components/Loading';
-import TransactionPending from '../components/TransactionPending';
+import TxPending from '../components/TxPending';
 import ApprovalPending from '../components/ApprovalPending';
 
 interface IWithDrawDaiProps {
@@ -183,7 +183,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
             gap='medium'
             justify='between'
           > 
-            <TransactionPending msg={`You are withdrawing ${inputValue} ETH`} tx={txActive} />
+            <TxPending msg={`You are withdrawing ${inputValue} ETH`} tx={txActive} />
                 
             <Box alignSelf='start'>
               <Box

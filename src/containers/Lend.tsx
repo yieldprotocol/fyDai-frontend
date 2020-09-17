@@ -25,7 +25,7 @@ import Redeem from './Redeem';
 import InputWrap from '../components/InputWrap';
 import InfoGrid from '../components/InfoGrid';
 import ApprovalPending from '../components/ApprovalPending';
-import TransactionPending from '../components/TransactionPending';
+import TxPending from '../components/TxPending';
 import SeriesDescriptor from '../components/SeriesDescriptor';
 
 interface ILendProps {
@@ -288,7 +288,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
 
       {/* If there is a transaction active, show the applicable view */}
       { sellActive && !txActive && <ApprovalPending /> } 
-      { txActive && <TransactionPending msg={`You are lending ${inputValue} DAI`} tx={txActive} /> }
+      { txActive && <TxPending msg={`You are lending ${inputValue} DAI`} tx={txActive} /> }
     </Keyboard>
   );
 };

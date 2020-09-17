@@ -21,7 +21,7 @@ import {
 import SeriesDescriptor from '../components/SeriesDescriptor';
 import InputWrap from '../components/InputWrap';
 import ApprovalPending from '../components/ApprovalPending';
-import TransactionPending from '../components/TransactionPending';
+import TxPending from '../components/TxPending';
 import InfoGrid from '../components/InfoGrid';
 
 interface IBorrowProps {
@@ -330,7 +330,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
 
       {/* If there is a transaction active, show the applicable view */}
       { borrowActive && !txActive && <ApprovalPending /> } 
-      { txActive && <TransactionPending msg={`You are borrowing ${inputValue} DAI`} tx={txActive} /> }
+      { txActive && <TxPending msg={`You are borrowing ${inputValue} DAI`} tx={txActive} /> }
     </Keyboard>
   );
 };
