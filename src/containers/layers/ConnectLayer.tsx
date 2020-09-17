@@ -1,11 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
 
-import { UnsupportedChainIdError } from '@web3-react/core';
-import {
-  NoEthereumProviderError,
-  UserRejectedRequestError as UserRejectedRequestErrorInjected,
-} from '@web3-react/injected-connector';
-
 import {
   Anchor,
   Layer,
@@ -19,27 +13,19 @@ import {
   ResponsiveContext,
   Paragraph,
 } from 'grommet';
-import {
 
-  useWeb3React,
+import {
   useConnection,
-  useCachedState, 
   useSignerAccount,
 } from '../../hooks';
 
-import { injected, trezor, walletlink, torus, ledger } from '../../connectors';
-
+import { injected, torus } from '../../connectors';
 import metamaskImage from '../../assets/images/providers/metamask.png';
-import trezorImage from '../../assets/images/providers/trezor.png';
-import walletlinkImage from '../../assets/images/providers/walletlink.png';
 import torusImage from '../../assets/images/providers/torus.png';
-// import noConnectionImage from '../assets/images/noconnection.png';
 
-import { NotifyContext } from '../../contexts/NotifyContext';
-import { UserContext } from '../../contexts/UserContext';
+import { UserContext } from '../../contexts/UserContext'
+
 import ProfileButton from '../../components/ProfileButton';
-
-
 
 const ConnectLayer = ({ view, closeLayer }: any) => {
 
@@ -51,7 +37,6 @@ const ConnectLayer = ({ view, closeLayer }: any) => {
 
   const connectorList = [
     { name: 'Metamask', image: metamaskImage, connection: injected },
-    // { name: 'Tezor', image: trezorImage, connection: trezor },
     { name: 'Torus', image: torusImage, connection: torus },
   ];
 

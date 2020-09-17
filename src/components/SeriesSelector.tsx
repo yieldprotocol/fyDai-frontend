@@ -24,9 +24,6 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
   const { setActiveSeries } = seriesActions;
 
   const [sortedList, setSortedList] = useState<any>(seriesData);
-  const [firstSort, setFirstSort] = useState<any>('');
-  const [secondSort, setSecondSort] = useState<any>('');
-
 
   const viewMap = new Map([
     ['BORROW', { head: 'DEBT', field: 'ethDebtEDai_' }],
@@ -56,8 +53,6 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
     );
     const mergedMap = new Map([...sortedActive, ...sortedMature]);
     setSortedList(mergedMap);
-
-    // setSortedList(seriesData);
 
   }, [seriesData]);
 

@@ -16,8 +16,6 @@ import {
 import { yieldTheme } from '../themes';
 import { useSignerAccount } from '../hooks';
 
-// import { ConnectionContext } from '../contexts/ConnectionContext';
-
 const YieldFooter = (props: any) => {
   const {
     setShowTestLayer,

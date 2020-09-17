@@ -17,9 +17,7 @@ import SeriesSelector from './components/SeriesSelector';
 import YieldMark from './components/logos/YieldMark';
 
 import ConnectLayer from './containers/layers/ConnectLayer';
-
 import NotifyLayer from './containers/layers/NotifyLayer';
-import AuthsLayer from './containers/layers/AuthsLayer';
 
 // TODO: remove testLayer for prod
 import TestLayer from './containers/layers/TestLayer';
@@ -56,9 +54,8 @@ const App = (props:any) => {
   const [activeView, setActiveView] = useState<string>('BORROW');
 
   const [showConnectLayer, setShowConnectLayer] = useState<string|null>(null);
-
-  const [showAuthsLayer, setShowAuthsLayer] = useState<boolean>(false);
   const [showSeriesLayer, setShowSeriesLayer] = useState<boolean>(false);
+
   // TODO remove for prod
   const [showTestLayer, setShowTestLayer] = useState<boolean>(false);
 
@@ -76,7 +73,6 @@ const App = (props:any) => {
   return (
     <div className="App">
       <NotifyLayer />
-      <AuthsLayer open={showAuthsLayer} closeLayer={() => setShowAuthsLayer(false)} />
       <ConnectLayer view={showConnectLayer} closeLayer={() => setShowConnectLayer(null)} />
       
       { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }

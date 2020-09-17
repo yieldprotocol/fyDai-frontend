@@ -1,11 +1,15 @@
-import React, { useState, Suspense, lazy } from 'react';
+import React, { useState  } from 'react';
 import { Box } from 'grommet';
 import PageHeader from '../components/PageHeader';
 import ActionSelector from '../components/ActionSelector';
 
-const Deposit = lazy(() => import('../containers/Deposit'));
-const Borrow = lazy(() => import('../containers/Borrow'));
-const Repay = lazy(() => import('../containers/Repay'));
+import Deposit from '../containers/Deposit';
+import Borrow from '../containers/Borrow';
+import Repay from '../containers/Repay';
+
+// const Deposit = lazy(() => import('../containers/Deposit'));
+// const Borrow = lazy(() => import('../containers/Borrow'));
+// const Repay = lazy(() => import('../containers/Repay'));
 
 interface BorrowProps {
   activeView?: number;
@@ -42,22 +46,9 @@ const BorrowView = ({
           background="background-front"
           round='small'
         > 
-          {activeView === 0 && 
-          <Suspense fallback={<Box>Loading...</Box>}>
-            <Deposit setActiveView={setActiveView} />
-          </Suspense>}
-          
-          {activeView === 1 && (
-            <Suspense fallback={<Box>Loading...</Box>}>
-              <Borrow setActiveView={setActiveView} />
-            </Suspense>
-
-          )}
-          {activeView === 2 && (
-            <Suspense fallback={<Box>Loading...</Box>}>
-              <Repay setActiveView={setActiveView} />
-            </Suspense>
-          )}
+          {activeView === 0 && <Deposit setActiveView={setActiveView} /> }  
+          {activeView === 1 && <Borrow setActiveView={setActiveView} /> }
+          {activeView === 2 && <Repay setActiveView={setActiveView} />}
         </Box>
       </Box>    
     </>
