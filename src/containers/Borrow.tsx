@@ -106,7 +106,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
         setErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
       }
     })();
-  }, [debouncedInput, activeSeries]);
+  }, [debouncedInput, activeSeries, position, previewPoolTx, yieldAPR, estimateRatio ]);
     
   /* Handle borrow disabling deposits */
   useEffect(()=>{
@@ -115,10 +115,10 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
       !hasDelegatedProxy ||
       position.ethPosted_ <= 0 ||
       estRatio <= 2 ||
-      inputValue >= maxDaiAvailable_||
+      inputValue >= maxDaiAvailable_ ||
       inputValue<=0
     )? setBorrowDisabled(true): setBorrowDisabled(false);
-  }, [ callActive, inputValue, hasDelegatedProxy, estRatio ]);
+  }, [ account, position.ethPosted_, callActive, inputValue, hasDelegatedProxy, estRatio, maxDaiAvailable_]);
 
   /* Handle input exception logic */
   useEffect(() => {
@@ -132,7 +132,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
       setWarningMsg(null);
       setErrorMsg(null);
     }
-  }, [ debouncedInput ]);
+  }, [ debouncedInput, maxDaiAvailable_ ]);
 
   return (
     <Keyboard 
@@ -147,7 +147,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
           <InfoGrid entries={[
             {
               label: 'Current Debt',
-              visible: !txActive && !!account && activeSeries && !activeSeries?.isMature() || (activeSeries?.isMature() && activeSeries?.ethDebtEDai_ > 0 ),
+              visible: (!activeSeries?.isMature() && !txActive)  || (activeSeries?.isMature() && activeSeries?.ethDebtEDai_ > 0 ),
               active: true,
               loading: borrowPending,    
               value: activeSeries?.ethDebtEDai_? `${activeSeries.ethDebtEDai_.toFixed(2)} DAI`: '0 DAI',

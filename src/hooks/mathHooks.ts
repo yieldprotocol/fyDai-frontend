@@ -224,7 +224,7 @@ export const useMath = () => {
     yieldAPR,
     poolPercent,
     splitDaiLiquidity,
-
+    liquidationPrice,
     collValue,
     collPrice,
     debtValAdj,

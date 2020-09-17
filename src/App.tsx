@@ -87,14 +87,13 @@ const App = (props:any) => {
       
       { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
       { showSeriesLayer  && <SeriesSelector activeView='borrow' close={()=>setShowSeriesLayer(false)} /> }
-      
+
       { showAccountLayer &&
         <AccountLayer
           view={accountView}
           closeLayer={() => setShowAccountLayer(false)}
           changeWallet={() => changeConnection()}
         />}
-
 
       <Box direction="row" height={{ min: '100%' }}>
         <Box flex height='100%'>

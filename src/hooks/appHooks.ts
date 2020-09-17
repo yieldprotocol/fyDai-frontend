@@ -8,7 +8,7 @@ export const useTxActive = (typeList:string[]) => {
   const upperTypeList = typeList.map( (x:any) => x.toUpperCase() );
   useEffect(()=>{
     setTxActive(pendingTxs.find( (x:any)=> upperTypeList.includes(x.type) ));
-  }, [ pendingTxs ]);
+  }, [ pendingTxs, upperTypeList ]);
   return [txActive] as const; 
 };
 
