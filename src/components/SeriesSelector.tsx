@@ -9,7 +9,6 @@ import { SeriesContext } from '../contexts/SeriesContext';
 
 import AprBadge from './AprBadge';
 import Loading from './Loading';
-import { IYieldSeries } from '../types';
 
 interface ISeriesSelectorProps {
   activeView:string;

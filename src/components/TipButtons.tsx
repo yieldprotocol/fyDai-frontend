@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import { Box, Button, ResponsiveContext } from 'grommet';
 
 interface TipProps {

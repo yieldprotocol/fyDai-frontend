@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import { Box, Heading, Text, ThemeContext, ResponsiveContext, Image } from 'grommet';
 
 import TipsButton from './TipButtons';

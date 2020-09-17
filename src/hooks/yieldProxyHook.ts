@@ -93,7 +93,7 @@ export const useProxy = () => {
       yieldProxyAbi,
       signer
     ));
-  }, [signer, deployedContracts]);
+  }, [signer, deployedContracts, yieldProxyAbi ]);
 
   /**
    * @dev Post ETH collateral via yieldProxy

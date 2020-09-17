@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
 import { ethers } from 'ethers';
 import { Web3ReactProvider, createWeb3ReactRoot } from '@web3-react/core';

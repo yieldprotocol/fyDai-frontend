@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import { Grid, Box, Text, ResponsiveContext } from 'grommet';
 import Loading from './Loading';
 

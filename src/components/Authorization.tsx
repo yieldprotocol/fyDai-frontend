@@ -3,7 +3,6 @@ import { Box, Button, Layer, Text, ResponsiveContext } from 'grommet';
 
 import { 
   FiCheckCircle as Check,
-  FiCircle as Circle,
   FiClock as Clock,
   FiUnlock as Unlock,
   FiArrowLeft as ArrowLeft, 
