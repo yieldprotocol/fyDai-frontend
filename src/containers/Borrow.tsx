@@ -106,7 +106,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
         setErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
       }
     })();
-  }, [debouncedInput, activeSeries, position, previewPoolTx, yieldAPR, estimateRatio ]);
+  }, [debouncedInput, activeSeries ]);
     
   /* Handle borrow disabling deposits */
   useEffect(()=>{
@@ -118,7 +118,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
       inputValue >= maxDaiAvailable_ ||
       inputValue<=0
     )? setBorrowDisabled(true): setBorrowDisabled(false);
-  }, [ account, position.ethPosted_, callActive, inputValue, hasDelegatedProxy, estRatio, maxDaiAvailable_]);
+  }, [ account, inputValue, hasDelegatedProxy ]);
 
   /* Handle input exception logic */
   useEffect(() => {
@@ -132,7 +132,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
       setWarningMsg(null);
       setErrorMsg(null);
     }
-  }, [ debouncedInput, maxDaiAvailable_ ]);
+  }, [ debouncedInput]);
 
   return (
     <Keyboard 
