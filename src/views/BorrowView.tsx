@@ -27,20 +27,13 @@ const BorrowView = ({
 
   return (
     <>
-      <PageHeader
+      {/* <PageHeader
         title="Borrow"
         subtitle="Description of borrowing"
         tipPrimary="Tip: Convert your Maker vault"
         tipSecondary="View more tips"
-      />
-      <RaisedBox
-        background="background"
-        round='small'
-        alignSelf="center"
-        width={{ max: '750px' }}
-        fill
-        elevation='small'
-      >
+      /> */}
+      <RaisedBox>
         <ActionSelector activeView={activeView} setActiveView={setActiveView} />    
         <Box
           width={{ max: '750px' }}

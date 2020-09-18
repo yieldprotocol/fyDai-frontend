@@ -7,19 +7,13 @@ import RaisedBox from '../components/RaisedBox';
 const PoolView = () => {
   return (
     <>
-      <PageHeader
+      {/* <PageHeader
         title="Pool"
         subtitle="Description of pool"
         tipPrimary="Tip: Convert your Maker vault"
         tipSecondary="View more tips"
-      />
-      <RaisedBox
-        width={{ max:'750px' }}
-        alignSelf='center'
-        fill='horizontal'
-        background='background-front'
-        round='small'
-      >
+      /> */}
+      <RaisedBox>
         <Pool />
       </RaisedBox>
     </>

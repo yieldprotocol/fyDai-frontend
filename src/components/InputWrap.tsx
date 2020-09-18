@@ -1,12 +1,10 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { BigNumber } from 'ethers';
 
+import styled, { css } from 'styled-components';
+
 import { 
   Box, 
-  TextInput, 
-  Text, 
-  ThemeContext,
-  ResponsiveContext,
   Collapsible,
 } from 'grommet';
 
@@ -24,6 +22,17 @@ interface IInputProps {
   disabled?: boolean,
   children:any;
 }
+
+const InsetBox = styled(Box)`
+border-radius: 8px;
+background: #f8f8f8;
+box-shadow: inset 6px 6px 11px #e9e9e9, 
+            inset -6px -6px 11px #ffffff;
+  ${(props:any) => props.background && css`
+    background: ${props.background};
+    color: black;
+  `}
+`;
 
 function InputWrap( { warningMsg, errorMsg, disabled, children }: IInputProps) {
 
@@ -46,7 +55,7 @@ function InputWrap( { warningMsg, errorMsg, disabled, children }: IInputProps) {
 
 
   return (
-    <Box
+    <InsetBox
      // direction='row-responsive'
       fill='horizontal'
       gap='none'
@@ -56,7 +65,7 @@ function InputWrap( { warningMsg, errorMsg, disabled, children }: IInputProps) {
       <Box 
         round={corners}
         // background='brand-transparent'
-        border={border}   
+        // border={border}   
         direction='row'
         fill='horizontal'
         pad='small'
@@ -70,7 +79,7 @@ function InputWrap( { warningMsg, errorMsg, disabled, children }: IInputProps) {
           <InlineAlert warnMsg={warningMsg || null} errorMsg={errorMsg || null} />
         </Collapsible>
       </Box>
-    </Box>
+    </InsetBox>
   );
 }
 

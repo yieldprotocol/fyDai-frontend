@@ -29,7 +29,7 @@ function ActionSelector({ setActiveView, activeView }:IActionSelectorProps) {
           round='large'
           pad={{ horizontal: 'large', vertical: 'xsmall' }}
           background={
-            activeView === 0 ? 'background-front' : undefined
+            activeView === 0 ? 'brand-transparent' : undefined
           }
           onClick={() => setActiveView(0)}
           direction="row"
@@ -39,7 +39,7 @@ function ActionSelector({ setActiveView, activeView }:IActionSelectorProps) {
           hoverIndicator={activeView === 0 ? undefined : 'brand-transparent'}
         >
           <Text size="small" weight="bold">
-            1. Add Collateral
+            1. Manage Collateral
           </Text>
           {/* {position.ethPosted>0 && <CheckCircle color="green" />} */}
         </Box>
@@ -48,7 +48,7 @@ function ActionSelector({ setActiveView, activeView }:IActionSelectorProps) {
           round='large'
           pad={{ horizontal: 'large', vertical: 'xsmall' }}
           background={
-            activeView === 1 ? 'background-front' : undefined
+            activeView === 1 ? 'brand-transparent' : undefined
           }
           onClick={() => setActiveView(1)}
           // border={activeView === 1 ? undefined : 'all'} 
@@ -62,8 +62,7 @@ function ActionSelector({ setActiveView, activeView }:IActionSelectorProps) {
         <Box
           round='large'
           pad={{ horizontal: 'large', vertical: 'xsmall' }}
-          background={activeView === 2 ? 'background-front' : undefined}
-          // elevation={activeView === 2 ? 'small' : undefined}
+          background={activeView === 2 ? 'brand-transparent' : undefined}
           onClick={account?() => setActiveView(2):()=>{console.log('connect a wallet')}}
           // border={activeView === 2 ? undefined : 'all'} 
           hoverIndicator={activeView === 2 ? undefined : 'brand-transparent'}  

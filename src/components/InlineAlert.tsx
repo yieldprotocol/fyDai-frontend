@@ -19,7 +19,8 @@ const InlineAlert = ({ warnMsg, errorMsg, warnHead, errorHead }:ErrorDisplayProp
     <>
       { warnMsg &&
       <Box 
-        border={[{ color: 'orange', side:'bottom' }, { color: 'orange', side:'vertical' }]} 
+        // border={[{ color: 'orange', side:'bottom' }, { color: 'orange', side:'vertical' }]} 
+        // border={{color:'orange'}}
         fill
         round={{ corner:'bottom', size:'small' }}
         pad='small'
@@ -30,7 +31,9 @@ const InlineAlert = ({ warnMsg, errorMsg, warnHead, errorHead }:ErrorDisplayProp
 
       { errorMsg &&
       <Box
-        border={[{ color: 'red', side:'bottom' }, { color: 'red', side:'vertical' }]}
+        // border={[{ color: 'red', side:'bottom' }, { color: 'red', side:'vertical' }]}
+        // border={{color:'red'}}
+        background='#ff000025'
         fill
         round={{ corner:'bottom', size:'small' }}
         pad='small'

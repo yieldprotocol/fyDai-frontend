@@ -20,19 +20,13 @@ const LendView = ({ activeView }:LendProps) => {
   const { activeSeries } = seriesState;
   return (
     <>
-      <PageHeader
+      {/* <PageHeader
         title="Lend"
         subtitle="Description of lending"
         tipPrimary="Tip: Convert your Maker vault"
         tipSecondary="View more tips"
-      />
-      <RaisedBox
-        width={{ max:'750px' }}
-        alignSelf='center'
-        fill='horizontal'
-        background='background-front'
-        round='small'
-      >
+      /> */}
+      <RaisedBox>
         { activeSeries?.isMature() === false  && 
           <Lend />}
         { activeSeries?.isMature() === true && 
