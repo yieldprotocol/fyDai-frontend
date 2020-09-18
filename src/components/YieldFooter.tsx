@@ -34,6 +34,7 @@ const YieldFooter = (props: any) => {
       align="center"
       fill="horizontal"
       pad={{ horizontal: 'none', vertical: 'medium' }}
+      background='#ffffff00'
     >
       <Box
         direction="row"

@@ -104,9 +104,13 @@ const App = (props:any) => {
                 <Box background={{ color: 'background-front' }} />
               </Grid>
 
-              <Main pad="none" direction="row" flex>
+              <Main 
+                pad={{ bottom:'small' }} 
+                direction="row" 
+                flex
+              >
                 <Grid fill columns={columnsWidth}>
-                  <Box background="background" />
+                  <Box />
                   <Box
                     pad={{ vertical: 'large' }}
                     fill="horizontal"
@@ -117,12 +121,12 @@ const App = (props:any) => {
                     {activeView === 'LEND' && <LendView />}
                     {activeView === 'POOL' && <PoolView />}
                   </Box>               
-                  <Box background="background" />
+                  <Box />
                 </Grid>
               </Main>
               
               <Grid fill columns={columnsWidth}>
-                <Box background="background" />
+                <Box />
                 {screenSize !== 'small' &&
                 <YieldFooter
                   showTestLayer={showTestLayer}
@@ -131,7 +135,7 @@ const App = (props:any) => {
                   setDarkMode={props.setDarkMode}
                   openConnectLayer={() => setShowConnectLayer('CONNECT')}
                 />}                  
-                <Box background="background" />      
+                <Box />      
               </Grid>
             </Grid>
           </Box>
