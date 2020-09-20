@@ -89,58 +89,53 @@ const App = (props:any) => {
       { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
       { showSeriesLayer  && <SeriesSelector activeView='borrow' close={()=>setShowSeriesLayer(false)} /> }
 
-      { appReady ? 
-        <Box direction="row" height={{ min: '100%' }}>
-          <Box flex height='100%'>
+      {/* <Grid fill rows={screenSize === 'small'? ['xsmall', 'auto', 'xsmall']: ['auto', 'flex', 'auto']}>  */}
+        
+      <Grid fill columns={columnsWidth}>
+        <Box background={{ color: 'background-front' }} />
+        <YieldHeader
+          openConnectLayer={(v:string) => setShowConnectLayer(v)}
+          activeView={activeView}
+          setActiveView={setActiveView}
+        />
+        <Box background={{ color: 'background-front' }} />
+      </Grid>
 
-            <Grid fill rows={screenSize === 'small'? ['xsmall', 'auto', 'xsmall']: ['auto', 'flex', 'auto']}>                 
-              <Grid fill columns={columnsWidth}>
-                <Box background={{ color: 'background-front' }} />
-                <YieldHeader
-                  openConnectLayer={(v:string) => setShowConnectLayer(v)}
-                  activeView={activeView}
-                  setActiveView={setActiveView}
-                />
-                <Box background={{ color: 'background-front' }} />
-              </Grid>
+      <Main 
+        pad={{ bottom:'small' }} 
+        direction="row" 
+        flex
+      >
+        <Grid fill columns={columnsWidth}>
+          <Box />
+          <Box
+            pad={{ vertical: 'large' }}
+            fill="horizontal"
+            align="center"
+          >          
+            {activeView === 'DASHBOARD' && <Dashboard />}
+            {activeView === 'BORROW' && <BorrowView />}
+            {activeView === 'LEND' && <LendView />}
+            {activeView === 'POOL' && <PoolView />}
+          </Box>               
+          <Box />
+        </Grid>
+      </Main>
 
-              <Main 
-                pad={{ bottom:'small' }} 
-                direction="row" 
-                flex
-              >
-                <Grid fill columns={columnsWidth}>
-                  <Box />
-                  <Box
-                    pad={{ vertical: 'large' }}
-                    fill="horizontal"
-                    align="center"
-                  >          
-                    {activeView === 'DASHBOARD' && <Dashboard />}
-                    {activeView === 'BORROW' && <BorrowView />}
-                    {activeView === 'LEND' && <LendView />}
-                    {activeView === 'POOL' && <PoolView />}
-                  </Box>               
-                  <Box />
-                </Grid>
-              </Main>
-              
-              <Grid fill columns={columnsWidth}>
-                <Box />
-                {screenSize !== 'small' &&
-                <YieldFooter
-                  showTestLayer={showTestLayer}
-                  setShowTestLayer={setShowTestLayer}
-                  darkMode={props.darkMode}
-                  setDarkMode={props.setDarkMode}
-                  openConnectLayer={() => setShowConnectLayer('CONNECT')}
-                />}                  
-                <Box />      
-              </Grid>
-            </Grid>
-          </Box>
-        </Box>:
-        <Splash />}
+      <Grid fill columns={columnsWidth}>
+        <Box />
+        {screenSize !== 'small' &&
+        <YieldFooter
+          showTestLayer={showTestLayer}
+          setShowTestLayer={setShowTestLayer}
+          darkMode={props.darkMode}
+          setDarkMode={props.setDarkMode}
+          openConnectLayer={() => setShowConnectLayer('CONNECT')}
+        />}                  
+        <Box />      
+      </Grid>
+
+      {/* </Grid> */}
 
       {screenSize === 'small' &&    
         <Layer
