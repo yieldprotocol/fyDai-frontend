@@ -13,6 +13,9 @@ import ApprovalPending from '../components/ApprovalPending';
 import TxPending from '../components/TxPending';
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
+import RaisedButton from '../components/RaisedButton';
+import ActionButton from '../components/ActionButton';
+import FlatButton from '../components/FlatButton';
 
 interface IWithDrawProps {
   close?: any;
@@ -105,7 +108,6 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
   return (
     <Layer 
       onClickOutside={()=>close()}
-  
     >
       <Keyboard 
         onEsc={() => { inputValue? setInputValue(undefined): close();}}
@@ -137,12 +139,10 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
                 onChange={(event:any) => setInputValue(event.target.value)}
                 icon={<EthMark />}
               />
-              <Button 
-                label='Max'
+              <RaisedButton 
+                label='Maximum'
                 disabled={!hasDelegated}
-                color='brand-transparent'
-                onClick={()=>setInputValue(maxWithdraw)}
-                hoverIndicator='brand-transparent'
+                onClick={()=>setInputValue(maxWithdraw.toFixed(6))}
               />
             </InputWrap>
         
@@ -173,36 +173,22 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
             ]}
             />
 
-            <Box
-              fill='horizontal'
-              round='small'
-              background={withdrawDisabled ? 'brand-transparent' : 'brand'}
+            <ActionButton
               onClick={()=> withdrawProcedure(inputValue)}
-              align='center'
-              pad='small'
-            >
-              <Text
-                weight='bold'
-                size='large'
-                color={withdrawDisabled ? 'text-xweak' : 'text'}
-              >
-                {`Withdraw ${inputValue || ''} Eth`}
-              </Text>
-            </Box>
+              label={`Withdraw ${inputValue || ''} Eth`}
+              disabled={withdrawDisabled}
+            />  
           
             <Box alignSelf='start'>
-              <Box
-                round
+              <FlatButton 
                 onClick={()=>close()}
-                hoverIndicator='brand-transparent'
-                pad={{ horizontal:'small', vertical:'small' }}
-                justify='center'
-              >
-                <Box direction='row' gap='small' align='center'>
-                  <ArrowLeft color='text-weak' />
-                  <Text size='xsmall' color='text-weak'> { !withdrawPending? 'cancel, and go back.': 'go back'}  </Text>
-                </Box>
-              </Box>
+                label={
+                  <Box direction='row' gap='medium' align='center'>
+                    <ArrowLeft color='text-weak' />
+                    <Text size='small' color='text-weak'> { !withdrawPending? 'cancel, and go back.': 'go back'}</Text>
+                  </Box>
+                }
+              />
             </Box>
             
           </Box>}
@@ -221,7 +207,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
           justify='between'
         > 
           <TxPending msg={`You are withdrawing ${inputValue} ETH`} tx={txActive} />
-              
+
           <Box alignSelf='start'>
             <Box
               round

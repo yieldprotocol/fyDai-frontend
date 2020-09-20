@@ -12,6 +12,7 @@ import { useEDai, useTxActive } from '../hooks';
 import InlineAlert from '../components/InlineAlert';
 import ApprovalPending from '../components/ApprovalPending';
 import TxPending from '../components/TxPending';
+import ActionButton from '../components/ActionButton';
 
 interface IRedeemProps {
   close?:any,
@@ -51,14 +52,14 @@ const Redeem  = ({ close }:IRedeemProps)  => {
 
   return (
     <Box
-    width={{ max:'750px' }}
-    alignSelf='center'
-    fill='horizontal'
-    background='background-front'
-    round='small'
-    pad='large'
-    gap='medium'
-  >
+      width={{ max:'750px' }}
+      alignSelf='center'
+      fill='horizontal'
+      background='background-front'
+      round='small'
+      pad='large'
+      gap='medium'
+    >
       <Box flex='grow' align='center' fill='horizontal'>
         <InlineAlert warnMsg={warningMsg} errorMsg={errorMsg} />
         { txActive?.type !== 'REDEEM' &&
@@ -78,21 +79,13 @@ const Redeem  = ({ close }:IRedeemProps)  => {
               <Text size='small' color='brand'> This series has matured.</Text>         
             </Box>
           </Box>
-          <Box
-            round='xsmall'
-            background={redeemDisabled ? 'brand-transparent' : 'brand'}
-            onClick={()=>redeemProcedure()}  
-            pad='small'
-            align='center'
-          >
-            <Text 
-              weight='bold'
-              size='large'
-              color={redeemDisabled ? 'text-xweak' : 'text'}
-            >
-              {`Redeem ${activeSeries?.eDaiBalance_.toFixed(4) || ''} Dai`}
-            </Text>
-          </Box>               
+
+          <ActionButton
+            onClick={()=>redeemProcedure()} 
+            label={`Redeem ${activeSeries?.eDaiBalance_.toFixed(4) || ''} Dai`}
+            disabled={redeemDisabled}
+          />
+                        
         </Box>}
         { redeemActive && !txActive && <ApprovalPending /> } 
         { txActive && <TxPending msg={`You are redeeming ${activeSeries?.eDaiBalance_.toFixed(4)} DAI`} tx={txActive} /> }

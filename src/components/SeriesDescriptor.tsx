@@ -1,7 +1,9 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Box, Text, ThemeContext, ResponsiveContext, Button } from 'grommet';
 
 import { FiLayers as ChangeSeries } from 'react-icons/fi';
+import { modColor, invertColor, contrastColor } from '../utils';
+
 
 import { SeriesContext } from '../contexts/SeriesContext';
 
@@ -9,6 +11,7 @@ import SeriesSelector from './SeriesSelector';
 import AprBadge from './AprBadge';
 import Authorization from './Authorization';
 import Loading from './Loading';
+import RaisedButton from './RaisedButton';
 
 interface ISeriesDescriptorProps {
   activeView: string;
@@ -20,7 +23,6 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
 
   const { activeView, minified, children } = props;
 
-  const theme:any = useContext(ThemeContext);
   const screenSize = useContext(ResponsiveContext);
 
   const { state: seriesState } = useContext(SeriesContext);
@@ -29,85 +31,103 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
   const [ selectorOpen, setSelectorOpen ] = useState<boolean>(false);
 
   return (
-
     <>
       {selectorOpen && <SeriesSelector activeView={activeView} close={()=>setSelectorOpen(false)} /> }
-      <Box
-        alignSelf="center"
-        fill
-        round='small'
-        pad={{ horizontal:'large', top:'large' }}
-        gap='medium'
-      >
-        <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Selected series</Text>
+      {/* { activeSeries && */}
+
+      <Loading condition={!activeSeries} size='small'>
+      
+        {activeSeries &&
         <Box
-          direction='row-responsive'
-          fill='horizontal'
+          alignSelf="center"
+          fill
+        // round={{ corner:'top', size:'small' }}
+        // pad={{ horizontal:'small' }}
+          round='small'
+          pad='small'
           gap='small'
-          align='center'
+        // background=${modColor( activeSeries?.seriesColor, 30)}
+          background={`linear-gradient(to right, 
+          ${modColor( activeSeries?.seriesColor, -40)}, 
+          ${modColor( activeSeries?.seriesColor, -10)}, 
+          ${modColor( activeSeries?.seriesColor, 10)}, 
+          ${modColor( activeSeries?.seriesColor, 40)}, 
+          ${modColor( activeSeries?.seriesColor, 40)})`}
+          margin={{ bottom:'-16px' }}
         >
-          <Box 
-            round='xsmall'
-            background='background-mid'
-            border='all'
-            onClick={()=>setSelectorOpen(true)}
-            direction='row'
-            fill
-            pad='small'
-            flex
-            justify='between'
+
+          {/* <Text alignSelf='start' size='xlarge' color='text' weight='bold'>Selected series</Text> */}
+          <Box
+            direction='row-responsive'
+            fill='horizontal'
+            gap='small'
+            align='center'
           >
-            <Loading condition={!activeSeries} size='small'>
+            <Box 
+              round='xsmall'
+            // background='background-mid'
+            // border='all'
+              onClick={()=>setSelectorOpen(true)}
+              direction='row'
+              fill
+              pad='small'
+              flex
+              justify='between'
+            >
+            
               {activeSeries &&
               <Box 
                 direction='row' 
                 gap='small'
               >             
                 <AprBadge activeView={activeView} series={activeSeries} />
-                <Text color='brand' size='large'>            
+                <Text size='xlarge' weight='bold'>            
                   { activeSeries?.displayName }
                 </Text>
               </Box>}
-            </Loading>
 
-            <Button
-              color='brand-transparent'
-              label={(screenSize !== 'small' ) ?
-            
-                <Box align='center' direction='row' gap='small'>
-                  <ChangeSeries />
-                  <Text size='xsmall' color='brand'>
-                    Change Series              
-                  </Text>
-                </Box>
-                : 
-                <Box align='center'>
-                  <ChangeSeries />
-                </Box>}
-              onClick={()=>setSelectorOpen(true)}
-              hoverIndicator='brand-transparent'
-            />
+              <RaisedButton
+                background={modColor( activeSeries?.seriesColor, 40)}
+                label={(screenSize !== 'small' ) ?        
+                  <Box align='center' direction='row' gap='small'>
+                    <ChangeSeries />
+                    <Text size='xsmall'>
+                      Change Series              
+                    </Text>
+                  </Box>
+                  : 
+                  <Box align='center'>
+                    <ChangeSeries />
+                  </Box>}
+                onClick={()=>setSelectorOpen(true)}
+              />
+            </Box>
           </Box>
 
-        </Box>
-
-        { !(activeSeries?.isMature()) &&  activeSeries?.hasDelegatedPool === false && 
-        <Box 
-          fill='horizontal'
-          margin={{ vertical:'small' }}
-        >
-          <Box 
-            round='xsmall'
-            border='all'
-            pad='small' 
-            fill
+          <Box
+            pad={{ horizontal:'medium', bottom:'large' }}
           >
-            <Authorization series={activeSeries} />
-          </Box>
-        </Box>} 
-         
-        { children }
-      </Box>
+          
+            { children }
+
+            { !(activeSeries?.isMature()) &&  activeSeries?.hasDelegatedPool === false && 
+            <Box 
+              fill='horizontal'
+              margin={{ vertical:'small' }}
+            >
+              <Box 
+                round='xsmall'
+                border='all'
+                pad='small' 
+                fill
+              >
+                <Authorization series={activeSeries} />
+              </Box>
+            </Box>} 
+
+          </Box>       
+        </Box>}
+      </Loading>
     </>
   );
 }

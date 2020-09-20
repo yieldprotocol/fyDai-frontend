@@ -22,6 +22,8 @@ import ApprovalPending from '../components/ApprovalPending';
 import TxPending from '../components/TxPending';
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
+import RaisedButton from '../components/RaisedButton';
+import ActionButton from '../components/ActionButton';
 
 interface IRepayProps {
   repayAmount?:any
@@ -119,26 +121,28 @@ function Repay({ setActiveView, repayAmount }:IRepayProps) {
       target='document'
     >
       <SeriesDescriptor activeView='borrow'> 
-        <InfoGrid entries={[
-          {
-            label: 'Current Debt',
-            visible: !!account && !txActive,
-            active: true,
-            loading: repayPending,     
-            value: activeSeries?.ethDebtEDai_? `${activeSeries.ethDebtEDai_.toFixed(2)} DAI`: '0 DAI',
-            valuePrefix: null,
-            valueExtra: null, 
-          },
-          {
-            label: 'Dai balance',
-            visible: !!account && !txActive,
-            active: true,
-            loading: repayPending,            
-            value: daiBalance_?`${daiBalance_.toFixed(2)} DAI`: '-',
-            valuePrefix: null,
-            valueExtra: null,
-          },
-        ]}
+        <InfoGrid 
+          alt
+          entries={[
+            {
+              label: 'Current Debt',
+              visible: !!account && !txActive,
+              active: true,
+              loading: repayPending,     
+              value: activeSeries?.ethDebtEDai_? `${activeSeries.ethDebtEDai_.toFixed(2)} DAI`: '0 DAI',
+              valuePrefix: null,
+              valueExtra: null, 
+            },
+            {
+              label: 'Dai balance',
+              visible: !!account && !txActive,
+              active: true,
+              loading: repayPending,            
+              value: daiBalance_?`${daiBalance_.toFixed(2)} DAI`: '-',
+              valuePrefix: null,
+              valueExtra: null,
+            },
+          ]}
         />
       </SeriesDescriptor>
 
@@ -170,31 +174,17 @@ function Repay({ setActiveView, repayAmount }:IRepayProps) {
                     onChange={(event:any) => setInputValue(event.target.value)}
                     icon={<DaiMark />}
                   />
-                  <Button 
-                    label={<Text size='xsmall' color='brand'> {screenSize !== 'small' ? 'Repay Maximum': 'Max'}</Text>}
-                    color='brand-transparent'
-                    onClick={()=>setInputValue(activeSeries?.ethDebtEDai_)}
-                    hoverIndicator='brand-transparent'
+                  <RaisedButton 
+                    label={screenSize !== 'small' ? 'Repay Maximum': 'Maximum'}
+                    onClick={()=>setInputValue(daiBalance_)}
                   />
                 </InputWrap>    
-                <> 
-                  <Box
-                    fill='horizontal'
-                    round='small'
-                    background={repayDisabled ? 'brand-transparent' : 'brand'}
-                    onClick={()=>repayProcedure(inputValue)}
-                    align='center'
-                    pad='small'
-                  >
-                    <Text 
-                      weight='bold'
-                      size='large'
-                      color={repayDisabled ? 'text-xweak' : 'text'}
-                    >
-                      {`Repay ${inputValue || ''} DAI`}
-                    </Text>
-                  </Box>
-                </>
+
+                <ActionButton
+                  onClick={()=>repayProcedure(inputValue)}
+                  label={`Repay ${inputValue || ''} DAI`}
+                  disabled={repayDisabled}
+                />
               </Box> :
 
               <Box 

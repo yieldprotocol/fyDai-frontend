@@ -31,6 +31,9 @@ import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
 import ApprovalPending from '../components/ApprovalPending';
 import TxPending from '../components/TxPending';
+import RaisedButton from '../components/RaisedButton';
+import ActionButton from '../components/ActionButton';
+import FlatButton from '../components/FlatButton';
 
 interface DepositProps {
   /* deposit amount prop is for quick linking into component */
@@ -64,6 +67,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
   const [ withdrawOpen, setWithdrawOpen ] = useState<boolean>(false);
   const [ depositPending, setDepositPending ] = useState<boolean>(false);
   const [ depositDisabled, setDepositDisabled ] = useState<boolean>(true);
+
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
 
@@ -143,13 +147,16 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
               onChange={(event:any) => setInputValue(event.target.value)}
               icon={<EthMark />}
             />
-            <Button
-              color='brand-transparent'
+
+            <RaisedButton
+              // color='brand-transparent'
               disabled={!account || ethBalance_=== 0}
-              label={<Text size='xsmall' color='brand'> { (screenSize !== 'small' && !modalView) ? 'Deposit Maximum': 'Max'}</Text>}
+              label={(screenSize !== 'small' && !modalView) ? 'Deposit Maximum': 'Max'}
               onClick={()=>setInputValue(ethBalance_)}
-              hoverIndicator='brand-transparent'
+              // hoverIndicator='brand-transparent'
             />
+            
+
           </InputWrap>
 
           <InfoGrid entries={[
@@ -192,18 +199,16 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
               value: '',
               valuePrefix: null,
               valueExtra: () => (
-                <Button
-                  color={inputValue? 'brand': 'brand-transparent'}
-                  label={<Text size='xsmall' color='brand'>Connect a wallet</Text>}
+                <RaisedButton
+                  label={<Text size='small'>Connect a wallet</Text>}
                   onClick={()=>console.log('still to implement')}
-                  hoverIndicator='brand-transparent'
                 /> 
               )
             },
           ]}
           />
 
-          { account &&
+          {/* { account &&
             <Box
               fill='horizontal'
               round='small'
@@ -219,22 +224,27 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
               >
                 {`Deposit ${inputValue || ''} Eth`}
               </Text>
-            </Box>}
+            </Box>} */}
+
+          {account &&  
+            <ActionButton
+              onClick={()=>depositProcedure(inputValue)}
+              label={`Deposit ${inputValue || ''} Eth`}
+              disabled={depositDisabled}
+            /> }
 
           { ethPosted_ > 0 &&
+
           <Box alignSelf='end'>
-            <Box
-              round
+
+            <FlatButton 
               onClick={()=>setWithdrawOpen(true)}
-              hoverIndicator='brand-transparent'
-              pad={{ horizontal:'small', vertical:'small' }}
-              justify='center'
-            >
-              <Box direction='row' gap='small'>
-                <Text size='xsmall' color='text-weak'> alternatively, withdraw collateral</Text>
-                <ArrowRight color='text-weak' />
-              </Box>
-            </Box>
+              label={
+                <Box direction='row' gap='small' align='center'>
+                  <Box><Text size='xsmall' color='text-weak'>alternatively, withdraw collateral</Text></Box>
+                  <ArrowRight color='text-weak' />
+                </Box>}
+            />
           </Box>}
        
         </Box>}

@@ -9,6 +9,8 @@ import { SeriesContext } from '../contexts/SeriesContext';
 
 import AprBadge from './AprBadge';
 import Loading from './Loading';
+import FlatButton from './FlatButton';
+import RaisedButton from './RaisedButton';
 
 interface ISeriesSelectorProps {
   activeView:string;
@@ -150,35 +152,32 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
                     { activeSeries && activeSeries.maturity === x.maturity ? 
                       <Button 
                         primary
-                        label='Selected'
+                        label={
+                          <Text size='small'>Selected</Text>           
+                        }
                         icon={<Check />}
                       /> : 
-                      <Button 
+                      <RaisedButton 
                         secondary
-                        label='Select'
+                        label={<Text size='small'>Select</Text>}
                       />}
                   </Box>}
                 </Box>
               );     
             })}
-
           </Loading>        
         </Box>
 
         <Box alignSelf='start'>
-          <Box
-            round
+          <FlatButton 
             onClick={()=>close()}
-            hoverIndicator='brand-transparent'
-          // border='all'
-            pad={{ horizontal:'small', vertical:'small' }}
-            justify='center'
-          >
-            <Box direction='row' gap='small' align='center'>
-              <ArrowLeft color='text-weak' />
-              <Text size='xsmall' color='text-weak'> go back </Text>
-            </Box>
-          </Box>
+            label={
+              <Box direction='row' gap='medium' align='center'>
+                <ArrowLeft color='text-weak' />
+                <Text size='small' color='text-weak'> go back </Text>
+              </Box>
+            }
+          />
         </Box>
       </Box>
     </Layer>

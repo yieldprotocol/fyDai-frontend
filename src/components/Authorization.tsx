@@ -14,6 +14,8 @@ import { NotifyContext } from '../contexts/NotifyContext';
 import { UserContext } from '../contexts/UserContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { useAuth, useSignerAccount, useTxActive } from '../hooks';
+import RaisedButton from './RaisedButton';
+import { modColor } from '../utils';
 
 interface IAuthorizationProps {
   series?: IYieldSeries|null;
@@ -68,8 +70,8 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
       { !series && !hasDelegatedProxy && account && 
         <Box direction='row' fill='horizontal' gap='small' justify='between'>
           {!buttonOnly && <Text>Before we start, Yield requires some permissions. </Text> }
-          <Button 
-            primary={buttonOnly}
+          <RaisedButton 
+            // primary={buttonOnly}
             label={buttonOnly?'Authorization is required to get started':'Authorise Yield'}
             onClick={()=>{authProcedure();}}
             icon={<Unlock />}
@@ -77,13 +79,13 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
         </Box>}
 
       { account && series?.hasDelegatedPool === false &&
-        <Box direction='row' fill='horizontal' gap='small' justify='between' align='center'>
+        <Box direction='row' fill='horizontal' gap='small' justify='between'>
           {!buttonOnly && <Warning />}
           {!buttonOnly && <Text>A once-off authorisation is required to use this series</Text>}
-          <Button 
-            label='Unlock Series'
-            onClick={()=>{authProcedure();}}
-            icon={<Unlock />}
+          <RaisedButton 
+            background={modColor( series.seriesColor, 40)}
+            label={ <Text size='small'><Unlock /> Unlock Series </Text>}
+            onClick={()=>{authProcedure();}}           
           />        
         </Box>}
 

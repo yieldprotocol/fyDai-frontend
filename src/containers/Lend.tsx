@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { ethers } from 'ethers';
-import { Box, Button, Keyboard, TextInput, Text, ResponsiveContext } from 'grommet';
+import { Box, Button, Keyboard, TextInput, Text, ResponsiveContext, Collapsible } from 'grommet';
 
 import { 
   FiArrowRight as ArrowRight,
@@ -27,6 +27,9 @@ import InfoGrid from '../components/InfoGrid';
 import ApprovalPending from '../components/ApprovalPending';
 import TxPending from '../components/TxPending';
 import SeriesDescriptor from '../components/SeriesDescriptor';
+import RaisedButton from '../components/RaisedButton';
+import ActionButton from '../components/ActionButton';
+import FlatButton from '../components/FlatButton';
 
 interface ILendProps {
   lendAmount?:any
@@ -129,38 +132,43 @@ const Lend = ({ lendAmount }:ILendProps) => {
       target='document'
     >
       { withdrawDaiOpen && <WithdrawDai close={()=>setWithdrawDaiOpen(false)} /> }
-      <SeriesDescriptor activeView='lend'>
-        <InfoGrid entries={[
-          {
-            label: 'Portfolio Value at Maturity',
-            visible: !!account && !txActive,
-            active: true,
-            loading: lendPending,     
-            value: activeSeries && `${activeSeries?.eDaiBalance_.toFixed(2)} DAI` || '-',
-            valuePrefix: null,
-            valueExtra: null, 
-          },
-          {
-            label: 'Current Value',
-            visible: !!account && !txActive,
-            active: true,
-            loading: lendPending,           
-            value: currentValue!==0?`${currentValue.toFixed(2)} DAI`: '-',
-            valuePrefix: null,
-            valueExtra: null,
-          },
-          {
-            label: 'Dai balance',
-            visible: !!account && !txActive,
-            active: true,
-            loading: lendPending,            
-            value: daiBalance_?`${daiBalance_.toFixed(2)} DAI`: '0 DAI',
-            valuePrefix: null,
-            valueExtra: null,
-          },
-        ]}
-        />
-      </SeriesDescriptor>
+
+      <Collapsible open={!!activeSeries}> 
+        <SeriesDescriptor activeView='lend'>
+          <InfoGrid 
+            alt 
+            entries={[
+              {
+                label: 'Portfolio Value at Maturity',
+                visible: !!account && !txActive,
+                active: true,
+                loading: lendPending,     
+                value: activeSeries && `${activeSeries?.eDaiBalance_.toFixed(2)} DAI` || '-',
+                valuePrefix: null,
+                valueExtra: null, 
+              },
+              {
+                label: 'Current Value',
+                visible: false && !!account && !txActive,
+                active: true,
+                loading: lendPending,           
+                value: currentValue!==0?`${currentValue.toFixed(2)} DAI`: '-',
+                valuePrefix: null,
+                valueExtra: null,
+              },
+              {
+                label: 'Dai balance',
+                visible: !!account && !txActive,
+                active: true,
+                loading: lendPending,            
+                value: daiBalance_?`${daiBalance_.toFixed(2)} DAI`: '0 DAI',
+                valuePrefix: null,
+                valueExtra: null,
+              },
+            ]}
+          />
+        </SeriesDescriptor>
+      </Collapsible>
       
       {/* If there is no applicable transaction active, show the lending page */}
       { !txActive &&
@@ -175,6 +183,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
       >
         <Box flex='grow' gap='small' align='center' fill='horizontal'>
           {/* If the series has NOT matured, show the lending input */}
+
           { !activeSeries?.isMature() && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
           <>
             <Box fill gap='medium'>
@@ -190,11 +199,9 @@ const Lend = ({ lendAmount }:ILendProps) => {
                   icon={<DaiMark />}
                 />
                 {account &&
-                <Button 
-                  label={<Text size='xsmall' color='brand'> {screenSize !== 'small' ? 'Lend Maximum': 'Max'}</Text>}
-                  color='brand-transparent'
-                  onClick={()=>setInputValue(daiBalance_)}
-                  hoverIndicator='brand-transparent'
+                <RaisedButton 
+                  label={screenSize !== 'small' ? 'Lend Maximum': 'Maximum'}
+                  onClick={()=>setInputValue(daiBalance_)}                  
                 />}
               </InputWrap>
 
@@ -230,11 +237,9 @@ const Lend = ({ lendAmount }:ILendProps) => {
                   value: '',
                   valuePrefix: null,
                   valueExtra: () => (
-                    <Button
-                      color='brand-transparent'
-                      label={<Text size='xsmall' color='brand'>Connect a wallet</Text>}
+                    <RaisedButton
+                      label={<Text size='small'>Connect a wallet</Text>}
                       onClick={()=>console.log('still to implement')}
-                      hoverIndicator='brand-transparent'
                     /> 
                   )
                 },
@@ -242,40 +247,29 @@ const Lend = ({ lendAmount }:ILendProps) => {
               />
             </Box>
 
-            <Box gap='small' fill='horizontal' align='center'>
-
-              <Box
-                fill='horizontal'
-                round='small'
-                background={lendDisabled ? 'brand-transparent' : 'brand'}
+            <Box gap='small' fill='horizontal' align='center' pad={{ vertical:'small' }}>
+              <ActionButton
                 onClick={()=>lendProcedure(inputValue)}
-                align='center'
-                pad='small'
-              >
-                <Text 
-                  weight='bold'
-                  size='large'
-                  color={lendDisabled ? 'text-xweak' : 'text'}
-                >
-                  {`Lend ${inputValue || ''} DAI`}
-                </Text>
-              </Box>         
+                label={`Lend ${inputValue || ''} DAI`}
+                disabled={lendDisabled}
+              />       
             </Box>
+
             { activeSeries?.eDaiBalance_ > 0 &&
+
             <Box alignSelf='end'>
-              <Box
-                round
+
+              <FlatButton 
                 onClick={()=>setWithdrawDaiOpen(true)}
-                hoverIndicator='brand-transparent'
-                pad={{ horizontal:'small', vertical:'small' }}
-                justify='center'
-              >
-                <Box direction='row' gap='small'>
-                  <Text size='xsmall' color='text-weak'>alternatively, close your position in this series</Text>
-                  <ArrowRight color='text-weak' />
-                </Box>
-              </Box>
-            </Box> }
+                label={
+                  <Box direction='row' gap='small' align='center'>
+                    <Box><Text size='xsmall' color='text-weak'>alternatively, close your position in this series</Text></Box>
+                    <ArrowRight color='text-weak' />
+                  </Box>
+                }
+              />
+            </Box>}
+
           </>}
 
           {/* If the series is mature show the redeem view */}

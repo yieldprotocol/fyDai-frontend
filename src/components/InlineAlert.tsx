@@ -13,6 +13,9 @@ const defaultHeadings = {
   errorHead: 'Oops!',
 };
 
+// linear-gradient(to top, #efa1a1, #f1b6c6, #eecde1, #eee4f1, #f8f8f8);
+
+
 const InlineAlert = ({ warnMsg, errorMsg, warnHead, errorHead }:ErrorDisplayProps) => {
 
   return (
@@ -21,6 +24,7 @@ const InlineAlert = ({ warnMsg, errorMsg, warnHead, errorHead }:ErrorDisplayProp
       <Box 
         // border={[{ color: 'orange', side:'bottom' }, { color: 'orange', side:'vertical' }]} 
         // border={{color:'orange'}}
+        // background='linear-gradient(to top, #efa1a1, #f1b6c6, #eecde1, #eee4f1, #f8f8f8)'
         fill
         round={{ corner:'bottom', size:'small' }}
         pad='small'
@@ -33,7 +37,7 @@ const InlineAlert = ({ warnMsg, errorMsg, warnHead, errorHead }:ErrorDisplayProp
       <Box
         // border={[{ color: 'red', side:'bottom' }, { color: 'red', side:'vertical' }]}
         // border={{color:'red'}}
-        background='#ff000025'
+        // background='linear-gradient(to top, #efa1a1, #f1b6c6,#eee4f1, #f8f8f8, #f8f8f8)'
         fill
         round={{ corner:'bottom', size:'small' }}
         pad='small'

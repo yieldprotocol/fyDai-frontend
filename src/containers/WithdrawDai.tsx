@@ -16,6 +16,9 @@ import InputWrap from '../components/InputWrap';
 import Loading from '../components/Loading';
 import TxPending from '../components/TxPending';
 import ApprovalPending from '../components/ApprovalPending';
+import RaisedButton from '../components/RaisedButton';
+import ActionButton from '../components/ActionButton';
+import FlatButton from '../components/FlatButton';
 
 interface IWithDrawDaiProps {
   close?: any;
@@ -126,47 +129,31 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
               onChange={(event:any) => setInputValue(event.target.value)}
               icon={<DaiMark />}
             />
-            <Button 
-              label='Max'
-              color='brand-transparent'
+            <RaisedButton 
+              label='Maximum'
               onClick={async ()=>{
                 const max = await getMaxWithdraw();
                 max && setInputValue( max );
               }}
-              hoverIndicator='brand-transparent'
             />
           </InputWrap>
 
-          <Box
-            fill='horizontal'
-            round='small'
-            background={withdrawDisabled ? 'brand-transparent' : 'brand'}
+          <ActionButton
             onClick={()=> withdrawProcedure(inputValue)}
-            align='center'
-            pad='small'
-          >
-            <Text
-              weight='bold'
-              size='large'
-              color={withdrawDisabled ? 'text-xweak' : 'text'}
-            >
-              {`Reclaim ${inputValue || ''} Dai`}
-            </Text>
-          </Box>
-
+            label={`Reclaim ${inputValue || ''} Dai`}
+            disabled={withdrawDisabled}
+          />
+          
           <Box alignSelf='start'>
-            <Box
-              round
+            <FlatButton 
               onClick={()=>close()}
-              hoverIndicator='brand-transparent'
-              pad={{ horizontal:'small', vertical:'small' }}
-              justify='center'
-            >
-              <Box direction='row' gap='small' align='center'>
-                <ArrowLeft color='text-weak' />
-                <Text size='xsmall' color='text-weak'> go back </Text>
-              </Box>
-            </Box>
+              label={
+                <Box direction='row' gap='medium' align='center'>
+                  <ArrowLeft color='text-weak' />
+                  <Text size='xsmall' color='text-weak'> go back </Text>
+                </Box>
+                }
+            />
           </Box>
         </Box>}
 

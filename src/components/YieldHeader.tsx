@@ -11,6 +11,7 @@ import {
   ThemeContext,
   ResponsiveContext,
   Layer,
+  Menu,
 } from 'grommet';
 
 import { FiSettings as Gear } from 'react-icons/fi';
@@ -19,10 +20,9 @@ import logoDark from '../assets/images/logo.svg';
 import logoLight from '../assets/images/logo_light.svg';
 import YieldLogo from './logos/YieldLogo';
 
-import ProfileButton from './ProfileButton';
-
 import { NotifyContext } from '../contexts/NotifyContext';
 import TxStatus from  './TxStatus';
+import FlatButton from './FlatButton';
 
 interface LinkProps {
   link: string;
@@ -140,6 +140,7 @@ const YieldHeader = (props: any) => {
     <Box
       direction={screenSize === 'small' ? 'column' : 'row'}
       fill={screenSize === 'small' ? 'horizontal' : false}
+      gap='medium'
     >
       {navLinks.map((item) => (
         <NavLink
@@ -162,15 +163,20 @@ const YieldHeader = (props: any) => {
   const Account = () => {
     return (
       <> 
-        { !!account && 
-        <Box direction='row'>
-          <ProfileButton
-            action={()=>openConnectLayer('ACCOUNT')}
-            account={account || ''}
-          />
-        </Box>}
+        { account?
+          <FlatButton
+            onClick={()=>openConnectLayer('ACCOUNT')}
+            label={<Text size='small'>{`${account?.substring(0, 4)}...${account?.substring(account.length - 4)}`} </Text>}
+          /> : 
+          <FlatButton 
+            onClick={() => {
+              setMenuOpen(false);
+              openConnectLayer('CONNECT');
+            }}
+            label={<Text size='small'>Connect a wallet</Text>}
+          />}
 
-        { !account && 
+        {/* { !account && 
         <Box direction="row" fill="horizontal">
           <Button
             onClick={() => {
@@ -185,7 +191,7 @@ const YieldHeader = (props: any) => {
               height: screenSize === 'small' ? '2.25rem' : 'auto',
             }}
           />
-        </Box>}
+        </Box>} */}
       </>
     );
   };
@@ -206,7 +212,14 @@ const YieldHeader = (props: any) => {
         <MobileNav /> 
         : 
         <Box direction='row' align='center' basis='1/3'> 
-          <Nav />       
+          <Nav />
+          {/* <Menu
+            label={<Text size='xxlarge' weight='bold'>Borrow</Text>}
+            items={[
+              { label: <Text size='xxlarge' weight='bold'>Lend</Text>, onClick: () => {} },
+              { label: <Text size='xxlarge' weight='bold'>Pool</Text>, onClick: () => {} },
+            ]}
+          />    */}
         </Box>}
 
       <Box basis='auto'>

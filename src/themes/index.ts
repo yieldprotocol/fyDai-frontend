@@ -30,6 +30,10 @@ export const yieldTheme = {
         dark: '#0057921A',
         light: '#0057921A',
       },
+      'brand-light': {
+        dark: '#FFFFFF',
+        light: '#FFFFFF',
+      },
       secondary: {
         dark: '#627EEA',
         light: '#627EEA',

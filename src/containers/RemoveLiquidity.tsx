@@ -16,6 +16,8 @@ import InputWrap from '../components/InputWrap';
 import InfoGrid from '../components/InfoGrid';
 import ApprovalPending from '../components/ApprovalPending';
 import TxPending from '../components/TxPending';
+import RaisedButton from '../components/RaisedButton';
+import ActionButton from '../components/ActionButton';
 
 interface IRemoveLiquidityProps {
   close?: any;
@@ -130,11 +132,9 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
                 onChange={(event:any) => setInputValue(event.target.value)}
                 icon={<YieldMark />}
               />
-              <Button 
-                label='Max'
-                color='brand-transparent'
+              <RaisedButton 
+                label='Maximum'
                 onClick={()=>setInputValue( activeSeries?.poolTokens_ )}
-                hoverIndicator='brand-transparent'
               />
             </InputWrap>
 
@@ -184,22 +184,12 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
               },
             ]}
             />
-            <Box
-              fill='horizontal'
-              round='small'
-              background={removeLiquidityDisabled ? 'brand-transparent' : 'brand'}
+
+            <ActionButton
               onClick={()=> removeLiquidityProcedure(inputValue)}
-              align='center'
-              pad='small'
-            >
-              <Text
-                weight='bold'
-                size='large'
-                color={removeLiquidityDisabled ? 'text-xweak' : 'text'}
-              >
-                {`Remove ${inputValue || ''} tokens`}
-              </Text>
-            </Box>
+              label={`Remove ${inputValue || ''} tokens`}
+              disabled={removeLiquidityDisabled}
+            />
 
             <Box alignSelf='start'>
               <Box

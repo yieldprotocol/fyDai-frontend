@@ -30,6 +30,8 @@ import torusImage from '../../assets/images/providers/torus.png';
 import { UserContext } from '../../contexts/UserContext';
 
 import ProfileButton from '../../components/ProfileButton';
+import RaisedButton from '../../components/RaisedButton';
+import FlatButton from '../../components/FlatButton';
 
 const ConnectLayer = ({ view, target, closeLayer }: any) => {
 
@@ -75,13 +77,9 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
 
                     <Text alignSelf='start' size='xxlarge' color='brand' weight='bold'>Connected Wallet</Text>   
                     <Box round>
-                      <Button 
-                        fill='horizontal'
-                        size='small' 
+                      <RaisedButton
                         onClick={()=>setLayerView('CONNECT')}
-                        color='background-front'
-                        label='Change wallet'
-                        hoverIndicator='background'
+                        label={<Text size='small'>Change wallet</Text>}
                       /> 
                     </Box>
 
@@ -123,25 +121,17 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                   </Box>
                 </Box>
 
-
-
-
-
                 <Footer pad='medium' gap='xsmall' direction='row' justify='start' align='center'>
-                  <Box alignSelf='start'>
-                    <Box
-                      round
-                      onClick={()=>closeLayer()}
-                      hoverIndicator='brand-transparent'
-                      pad={{ horizontal:'small', vertical:'small' }}
-                      justify='center'
-                    >
-                      <Box direction='row' gap='small' align='center'>
-                        <ArrowLeft color='text-weak' />
-                        <Text size='xsmall' color='text-weak'> go back  </Text>
+
+                  <FlatButton 
+                    onClick={() => closeLayer()}
+                    label={
+                      <Box direction='row' gap='medium' align='center'>
+                        <ArrowLeft color='text-weak' />                    
+                        <Text size='small' color='text-weak'> go back  </Text>
                       </Box>
-                    </Box>
-                  </Box>
+                  }
+                  />
                 </Footer>
               </> }
 
@@ -153,11 +143,9 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
 
                   <Paragraph>Try connecting with:</Paragraph>
                   {connectorList.map((x) => (
-                    <Button
-                      hoverIndicator="border"
+                    <RaisedButton
                       onClick={() => { handleSelectConnector(x.connection); closeLayer();}}
                       label={x.name}
-                      color="border"
                       fill="horizontal"
                       icon={
                         <Box
@@ -188,40 +176,25 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
 
                 </Box>
                 <Footer direction="row-responsive" justify='between' pad="medium">
-
-                  <Box alignSelf='start'>
-                    <Box
-                      round
-                      hoverIndicator='brand-transparent'
-                      pad={{ horizontal:'small', vertical:'small' }}
-                      justify='center'
-                      onClick={() => {
-                        if (view === 'ACCOUNT') { 
-                          setLayerView('ACCOUNT');
-                        } else {
-                          closeLayer();
-                        }
-                      }}
-                    >
-                      <Box direction='row' gap='small' align='center'>
-                        <ArrowLeft color='text-weak' />
-                        <Text size='xsmall' color='text-weak'> go back  </Text>
+                  <FlatButton 
+                    onClick={() => {
+                      if (view === 'ACCOUNT') { 
+                        setLayerView('ACCOUNT');
+                      } else {
+                        closeLayer();
+                      }
+                    }}
+                    label={
+                      <Box direction='row' gap='medium' align='center'>
+                        <ArrowLeft color='text-weak' />                    
+                        <Text size='small' color='text-weak'> go back  </Text>
                       </Box>
-                    </Box>
-                  </Box>
-
-                  <Box direction="row">
-                    <Button
-                      label="Close"
-                      fill="horizontal"
-                      color="border"
-                      style={{
-                        fontWeight: 600,
-                        height: screenSize === 'small' ? '2.25rem' : 'auto',
-                      }}
-                      onClick={()=>closeLayer()}
-                    />
-                  </Box>
+                  }            
+                  />
+                  <FlatButton
+                    label={<Text size='small' color='text-weak'>Close</Text>}
+                    onClick={()=>closeLayer()}
+                  />
                 </Footer>
               </Box>}
           </Box>
