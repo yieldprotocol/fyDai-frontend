@@ -106,7 +106,7 @@ const App = (props:any) => {
       </Grid>
 
       <Main 
-        pad={{ bottom:'small' }} 
+        pad={{ bottom:'large' }} 
         direction="row" 
         flex
       >
