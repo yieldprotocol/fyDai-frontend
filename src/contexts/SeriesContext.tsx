@@ -53,6 +53,15 @@ const SeriesProvider = ({ children }:any) => {
   const [ callTx ] = useCallTx();
   const { yieldAPR: calcAPR, poolPercent: calcPercent }  = useMath();
 
+  const _prePopulateSeriesData = (seriesArr:IYieldSeries[]) => {
+    /* preMap is for faster loading - creates an initial map from the cached data */
+    const preMap= seriesArr.reduce((acc: Map<string, any>, x:any) => {
+      const _x = { ...x, isMature: ()=>( x.maturity < Math.round(new Date().getTime() / 1000)) };
+      return acc.set( x.maturity, { ..._x });
+    }, state.seriesData);
+    dispatch( { type:'updateSeries', payload: preMap });
+    return preMap;
+  };
 
   /* Get the data for a particular series, or set of series */
   const _getSeriesData = async (seriesArr:IYieldSeries[]) => {
@@ -66,23 +75,25 @@ const SeriesProvider = ({ children }:any) => {
           await previewPoolTx('sellEDai', _x, 1),
           await callTx(_x.poolAddress, 'Pool', 'totalSupply', []),
         ]);
+
         /* with user */
-        const [ poolTokens, hasDelegatedPool, ethDebtDai, ethDebtEDai, eDaiBalance] = await Promise.all([
-          account? await getBalance(_x.poolAddress, 'Pool', account): BigNumber.from('0'),
-          account? await checkPoolDelegate(_x.poolAddress, deployedContracts.YieldProxy): BigNumber.from('0'),
-          account? await debtDai('ETH-A', _x.maturity ): BigNumber.from('0'),
-          account? await callTx(deployedContracts.Controller, 'Controller', 'debtEDai', [utils.ETH, _x.maturity, account]): BigNumber.from('0'),
-          account? await getBalance(_x.eDaiAddress, 'EDai', account): BigNumber.from('0'),
-        ]);
+        const [ poolTokens, hasDelegatedPool, ethDebtDai, ethDebtEDai, eDaiBalance] =  account && await Promise.all([
+          getBalance(_x.poolAddress, 'Pool', account),
+          checkPoolDelegate(_x.poolAddress, deployedContracts.YieldProxy),
+          debtDai('ETH-A', _x.maturity ),
+          callTx(deployedContracts.Controller, 'Controller', 'debtEDai', [utils.ETH, _x.maturity, account]),
+          getBalance(_x.eDaiAddress, 'EDai', account),
+        ]) || [];
+
         return {
           ..._x,
           sellEDaiRate: !(sellEDaiRate instanceof Error)? sellEDaiRate : BigNumber.from('0'),
           totalSupply,
-          poolTokens,
-          hasDelegatedPool,
-          ethDebtDai,
-          ethDebtEDai,
-          eDaiBalance,
+          poolTokens: poolTokens || BigNumber.from('0'),
+          hasDelegatedPool: hasDelegatedPool || BigNumber.from('0'), // TODO check this
+          ethDebtDai: ethDebtDai || BigNumber.from('0'),
+          ethDebtEDai : ethDebtEDai || BigNumber.from('0'),
+          eDaiBalance : eDaiBalance || BigNumber.from('0'),
         };
       })
     );
@@ -118,6 +129,15 @@ const SeriesProvider = ({ children }:any) => {
   const updateSeries = async (seriesArr:IYieldSeries[] ) => {
     if(!yieldLoading) {
       dispatch({ type:'isLoading', payload: true });
+
+      /* pre-populate info with cached data if available */
+      const preMap:any = _prePopulateSeriesData(seriesArr);
+      const preSeries: IYieldSeries[] = Array.from(preMap.values());
+      const preSelect = preSeries
+        .filter((x:IYieldSeries)=>!x.isMature())
+        .sort((a:IYieldSeries, b:IYieldSeries)=> a.maturity-b.maturity );
+      dispatch({ type:'setActiveSeries', payload: preMap.get(preSelect[0].maturity) }); 
+
       /* Build/re-build series map with data */ 
       const seriesMap:any = await _getSeriesData(seriesArr); 
       /* Set the active series */
