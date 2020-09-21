@@ -2,8 +2,6 @@ import React, { useEffect, useState, useContext } from 'react';
 import { ethers } from 'ethers';
 import { Box, Button, Keyboard, TextInput, Text, ResponsiveContext, Collapsible } from 'grommet';
 
-import * as utils from '../utils';
-
 import { 
   FiArrowRight as ArrowRight,
 } from 'react-icons/fi';
@@ -83,11 +81,18 @@ const Pool = (props:IPoolProps) => {
   };
 
   const calculateNewShare = async () => {
+
     setCalculating(true);
+
     const daiReserves = await getBalance(deployedContracts.Dai, 'Dai', activeSeries.poolAddress);
+    console.log(daiReserves);
     const eDaiReserves = await getBalance(activeSeries.eDaiAddress, 'EDai', activeSeries.poolAddress);
+    console.log(eDaiReserves);
+
     const tokens_ = ethers.utils.parseEther(debouncedInput).mul(daiReserves).div(eDaiReserves.add(daiReserves));
+
     const newBalance = tokens_.add(activeSeries.poolTokens);
+    
     const percent= ( parseFloat(ethers.utils.formatEther(newBalance)) / parseFloat(ethers.utils.formatEther(activeSeries.totalSupply)) )*100;
     setNewShare(percent.toFixed(5)) ;
     setCalculating(false);
@@ -178,7 +183,8 @@ const Pool = (props:IPoolProps) => {
         gap='medium'
       >
         <Box flex='grow' gap='small' align='center' fill='horizontal'>
-          { account && !(activeSeries?.isMature()) && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
+          
+          { !(activeSeries?.isMature()) && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
           <>
             <Box fill gap='medium'>
               <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Add liquidity</Text>
