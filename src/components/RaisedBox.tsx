@@ -19,7 +19,7 @@ function RaisedBox({ inset=false, children }:any ) {
     <>
       { screenSize !=='small' ?
         <StyledBox 
-          width={{ max:'750px' }}
+          width={{ max:'600px' }}
           alignSelf='center'
           fill='horizontal'
           round='small'
@@ -28,7 +28,7 @@ function RaisedBox({ inset=false, children }:any ) {
         </StyledBox>
         : 
         <Box
-          width={{ max:'750px' }}
+          width={{ max:'600px' }}
           alignSelf='center'
           fill='horizontal'
           round='small' 

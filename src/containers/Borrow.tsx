@@ -135,6 +135,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
 
   /* Handle input exception logic */
   useEffect(() => {
+
     if ( debouncedInput && maxDaiAvailable && ethers.utils.parseEther(debouncedInput).gte(maxDaiAvailable) ) {
       setWarningMsg(null);
       setErrorMsg('That amount exceeds the amount of Dai you can borrow based on your collateral'); 

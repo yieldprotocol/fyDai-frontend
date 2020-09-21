@@ -174,7 +174,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
       {/* If there is no applicable transaction active, show the lending page */}
       { !txActive &&
       <Box
-        width={{ max:'750px' }}
+        width={{ max:'600px' }}
         alignSelf='center'
         fill='horizontal'
         background='background-front'

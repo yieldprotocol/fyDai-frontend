@@ -29,7 +29,7 @@ const BorrowView = ({
   return (
     <Box 
       gap='small'
-      width={{ max:'640px' }}
+      width={{ max:'600px' }}
       alignSelf='center'
       fill='horizontal'
       round='small'
@@ -46,7 +46,7 @@ const BorrowView = ({
 
       <RaisedBox>      
         <Box
-          width={{ max: '640px' }}
+          width={{ max: '600px' }}
           alignSelf="center"
           fill
           background="background-front"

@@ -174,7 +174,7 @@ const Pool = (props:IPoolProps) => {
 
       { !txActive &&
       <Box
-        width={{ max:'750px' }}
+        width={{ max:'600px' }}
         alignSelf='center'
         fill='horizontal'
         background='background-front'

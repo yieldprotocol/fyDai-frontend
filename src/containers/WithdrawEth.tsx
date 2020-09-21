@@ -101,7 +101,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
 
   /* show warnings and errors with collateralisation ratio levels and inputs */
   useEffect(()=>{
-    if (estRatio < 150 || (maxWithdraw && (debouncedInput > maxWithdraw) )) {
+    if ( debouncedInput && maxWithdraw && (debouncedInput > maxWithdraw) ) {
       setWarningMsg(null);
       setErrorMsg('You are not allowed to withdraw below the collateralization ratio'); 
     } else if (estRatio >= 150 && estRatio < 200 ) {
@@ -125,7 +125,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
       >
         { !txActive && !withdrawPending && 
           <Box 
-            width={screenSize!=='small'?{ min:'600px', max:'750px' }: undefined}
+            width={screenSize!=='small'?{ min:'600px', max:'600px' }: undefined}
             alignSelf='center'
             fill
             background='background-front'
@@ -205,7 +205,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
           
         { txActive && 
         <Box 
-          width={{ max:'750px' }}
+          width={{ max:'600px' }}
           alignSelf='center'
           fill
           background='background-front'

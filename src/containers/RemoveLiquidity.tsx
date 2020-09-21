@@ -114,7 +114,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
       >
         {!txActive && !removeLiquidityPending && 
           <Box 
-            width={screenSize!=='small'?{ min:'600px', max:'750px' }: undefined}
+            width={screenSize!=='small'?{ min:'600px', max:'600px' }: undefined}
             alignSelf='center'
             fill
             background='background-front'
@@ -201,7 +201,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
         { removeLiquidityPending && !txActive && <ApprovalPending /> }   
         { txActive && 
           <Box 
-            width={{ max:'750px' }}
+            width={{ max:'600px' }}
             alignSelf='center'
             fill
             background='background-front'

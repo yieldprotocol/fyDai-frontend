@@ -96,7 +96,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
       >
         { !txActive && !withdrawDaiPending && 
         <Box 
-          width={screenSize!=='small'?{ min:'600px', max:'750px' }: undefined}
+          width={screenSize!=='small'?{ min:'600px', max:'600px' }: undefined}
           alignSelf='center'
           fill
           background='background-front'
@@ -147,7 +147,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
 
         { txActive && 
           <Box 
-            width={{ max:'750px' }}
+            width={{ max:'600px' }}
             alignSelf='center'
             fill
             background='background-front'

@@ -78,8 +78,9 @@ export const dehumanizeNumber = (value:number) => {
 };
 
 export const cleanValue = (input:string, decimals:number=18) => {
+
   const re = new RegExp(`(\\d+\\.\\d{${decimals}})(\\d)`);
-  const inpu = input.match(re);
+  const inpu = input.match(re); // inpu = truncated 'input'... get it?
   if (inpu) {
     console.log('Value truncated: ', inpu[1]);
     return inpu[1];

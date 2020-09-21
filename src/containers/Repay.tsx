@@ -134,7 +134,7 @@ function Repay({ setActiveView, repayAmount }:IRepayProps) {
       { !txActive &&
 
       <Box
-        width={{ max: '750px' }}
+        width={{ max: '600px' }}
         alignSelf="center"
         fill
         background="background-front"

@@ -54,8 +54,8 @@ const Redeem  = ({ close }:IRedeemProps)  => {
 
   return (
     <>
-    <SeriesDescriptor activeView='lend'> 
-    {/* <InfoGrid 
+      <SeriesDescriptor activeView='lend'> 
+        {/* <InfoGrid 
       alt
       entries={[
         {
@@ -78,48 +78,48 @@ const Redeem  = ({ close }:IRedeemProps)  => {
         },
       ]}
     /> */}
-  </SeriesDescriptor>
+      </SeriesDescriptor>
 
-    <Box
-      width={{ max:'750px' }}
-      alignSelf='center'
-      fill='horizontal'
-      background='background-front'
-      round='small'
-      pad='large'
-      gap='medium'
-    >
-      <Box flex='grow' align='center' fill='horizontal'>
-        <InlineAlert warnMsg={warningMsg} errorMsg={errorMsg} />
-        { txActive?.type !== 'REDEEM' &&
-        <Box 
-          gap='medium' 
-          margin={{ vertical:'large' }}  
-          pad='medium'     
-          round='small'
-          fill='horizontal'
-          border='all'
-        >    
-          <Box direction='row' gap='small' align='center' fill>          
-            <Box>
-              <Clock />
+      <Box
+        width={{ max:'600px' }}
+        alignSelf='center'
+        fill='horizontal'
+        background='background-front'
+        round='small'
+        pad='large'
+        gap='medium'
+      >
+        <Box flex='grow' align='center' fill='horizontal'>
+          <InlineAlert warnMsg={warningMsg} errorMsg={errorMsg} />
+          { txActive?.type !== 'REDEEM' &&
+          <Box 
+            gap='medium' 
+            margin={{ vertical:'large' }}  
+            pad='medium'     
+            round='small'
+            fill='horizontal'
+            border='all'
+          >    
+            <Box direction='row' gap='small' align='center' fill>          
+              <Box>
+                <Clock />
+              </Box>
+              <Box> 
+                <Text size='small' color='brand'> This series has matured.</Text>         
+              </Box>
             </Box>
-            <Box> 
-              <Text size='small' color='brand'> This series has matured.</Text>         
-            </Box>
-          </Box>
 
-          <ActionButton
-            onClick={()=>redeemProcedure()} 
-            label={`Redeem ${activeSeries?.eDaiBalance_ || ''} Dai`}
-            disabled={redeemDisabled}
-          />
+            <ActionButton
+              onClick={()=>redeemProcedure()} 
+              label={`Redeem ${activeSeries?.eDaiBalance_ || ''} Dai`}
+              disabled={redeemDisabled}
+            />
                         
-        </Box>}
-        { redeemActive && !txActive && <ApprovalPending /> } 
-        { txActive && <TxPending msg={`You are redeeming ${activeSeries?.eDaiBalance_.toFixed(4)} DAI`} tx={txActive} /> }
+          </Box>}
+          { redeemActive && !txActive && <ApprovalPending /> } 
+          { txActive && <TxPending msg={`You are redeeming ${activeSeries?.eDaiBalance_.toFixed(4)} DAI`} tx={txActive} /> }
+        </Box>
       </Box>
-    </Box>
     </>
   );
 };
