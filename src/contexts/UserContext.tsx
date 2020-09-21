@@ -72,7 +72,6 @@ const UserProvider = ({ children }: any) => {
   const [ state, dispatch ] = useReducer(reducer, initState);
   const { state: yieldState } = useContext(YieldContext);
   const { deployedContracts, deployedSeries } = yieldState;
-
   const { account, provider } = useSignerAccount();
 
   /* cache | localStorage declarations */
@@ -313,6 +312,7 @@ const UserProvider = ({ children }: any) => {
     /* Init start */
     dispatch({ type: 'isLoading', payload: true });
     // TODO: look at splitting these up cleverly, in particular makerData.
+
     await Promise.all([
       _getPosition(),
       _getAuthorizations(),
@@ -326,8 +326,9 @@ const UserProvider = ({ children }: any) => {
   };
 
   useEffect(()=>{
+
     // Init everytime it starts or change of user
-    account && !yieldState.yieldLoading && initUser();
+    !yieldState.yieldLoading && account && initUser();
 
     // If user has changed, rebuild and re-cache the history
     const hist = JSON.parse( (localStorage.getItem('txHistory') || '{}') );

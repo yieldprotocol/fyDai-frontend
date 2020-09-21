@@ -75,7 +75,7 @@ const initState = {
 
 const YieldProvider = ({ children }: any) => {
   const [state, dispatch] = useReducer(reducer, initState);
-  const { provider, fallbackProvider } = useSignerAccount();
+  const { account, provider, fallbackProvider } = useSignerAccount();
   const { dispatch: notifyDispatch } = useContext(NotifyContext);
 
   /* cache|localStorage declarations */

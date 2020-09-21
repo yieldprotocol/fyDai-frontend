@@ -24,7 +24,7 @@ import { useTxHelpers } from './appHooks';
  */
 export const useController = () => {
   const { abi: controllerAbi } = Controller;
-  const { signer, provider, account } = useSignerAccount();
+  const { signer, fallbackProvider, account } = useSignerAccount();
   const  { dispatch }  = useContext<any>(NotifyContext);
   const { state : { deployedContracts } } = useContext<any>(YieldContext);
 
@@ -41,6 +41,7 @@ export const useController = () => {
   const { handleTx, handleTxError } = useTxHelpers();
 
   useEffect(()=>{
+
     deployedContracts.Controller && signer &&
     setControllerContract( new ethers.Contract( 
       ethers.utils.getAddress(deployedContracts.Controller), 
@@ -48,14 +49,14 @@ export const useController = () => {
       signer
     ));
 
-    deployedContracts.Controller && provider &&
+    deployedContracts.Controller && fallbackProvider &&
     setControllerProvider( new ethers.Contract( 
       ethers.utils.getAddress(deployedContracts.Controller), 
       controllerAbi,
-      provider
+      fallbackProvider
     ));
 
-  }, [signer, provider, deployedContracts]);
+  }, [signer, fallbackProvider, deployedContracts]);
 
 
   /**
