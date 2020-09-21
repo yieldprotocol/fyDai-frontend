@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Box, Text, ThemeContext, ResponsiveContext, Button } from 'grommet';
+import { Box, Text, ThemeContext, ResponsiveContext, Button, Collapsible } from 'grommet';
 
 import { FiLayers as ChangeSeries } from 'react-icons/fi';
 import { modColor, invertColor, contrastColor } from '../utils';
@@ -80,7 +80,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
                 direction='row' 
                 gap='small'
               >             
-                <AprBadge activeView={activeView} series={activeSeries} />
+                <AprBadge activeView={activeView} series={activeSeries} animate />
                 <Text size='xlarge' weight='bold'>            
                   { activeSeries?.displayName }
                 </Text>
@@ -107,8 +107,9 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
           <Box
             pad={{ horizontal:'medium', bottom:'large' }}
           >
-          
-            { children }
+            <Collapsible open={!seriesState.seriesLoading}>
+              { children }
+            </Collapsible>
 
             { !(activeSeries?.isMature()) &&  activeSeries?.hasDelegatedPool === false && 
             <Box 

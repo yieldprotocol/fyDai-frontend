@@ -8,13 +8,15 @@ import {
 } from 'react-icons/fi';
 
 import { IYieldSeries } from '../types';
+import Loading from './Loading';
 
 interface IAprBadgeProps {
   activeView: string;
   series: IYieldSeries;
+  animate?: boolean;
 }
 
-function AprBadge({ activeView, series }:IAprBadgeProps) {
+function AprBadge({ activeView, series, animate }:IAprBadgeProps) {
   const [ seriesApr, setSeriesApr ] = useState<string>(`${series.yieldAPR_} %`);
   const [ seriesMature, setSeriesMature ] = useState<boolean>(series.isMature());
 
@@ -50,8 +52,11 @@ function AprBadge({ activeView, series }:IAprBadgeProps) {
           pad={{ horizontal:'small', vertical:'none' }} 
           align='center'
           justify='center'
+          animation={animate ? { type:'zoomIn', duration:1000, size:'large' } : undefined} 
         >
-          <Text size='xxsmall'> { seriesApr } </Text>  
+          <Loading condition={!seriesApr} size='xxsmall'>
+            <Text size='xxsmall'> { seriesApr } </Text>  
+          </Loading>
         </Box>}
 
       { seriesMature === false &&
@@ -73,5 +78,7 @@ function AprBadge({ activeView, series }:IAprBadgeProps) {
     </>
   );
 }
+
+AprBadge.defaultProps={ animate:false };
 
 export default AprBadge;
