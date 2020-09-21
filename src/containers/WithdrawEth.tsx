@@ -1,10 +1,13 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Box, Layer, Button, Keyboard, TextInput, Text, ResponsiveContext } from 'grommet';
+import { Box, Layer, Keyboard, TextInput, Text, ResponsiveContext } from 'grommet';
+import ethers from 'ethers';
 
 import { 
   FiArrowLeft as ArrowLeft,
 } from 'react-icons/fi';
 import EthMark from '../components/logos/EthMark';
+
+import { cleanValue } from '../utils';
 
 import { UserContext } from '../contexts/UserContext';
 import { useProxy, useMath, useTxActive, useDebounce } from '../hooks';
@@ -27,9 +30,12 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
 
   const { state: { position }, actions: userActions } = useContext(UserContext);
   const {
+    ethPosted,
     ethPosted_,
+    ethLocked,
     ethLocked_,
     collateralPercent_,
+    debtValue,
     debtValue_,
   } = position;
 
@@ -37,13 +43,13 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
   const { estCollRatio: estimateRatio } = useMath();
   const [ txActive ] = useTxActive(['WITHDRAW']);
 
-  const [ inputValue, setInputValue ] = useState<any>();
+  const [ inputValue, setInputValue ] = useState<string>();
   const debouncedInput = useDebounce(inputValue, 500);
   const [inputRef, setInputRef] = useState<any>(null);
 
   const [ estRatio, setEstRatio ] = useState<any>();
   const [ estDecrease, setEstDecrease ] = useState<any>();
-  const [ maxWithdraw, setMaxWithdraw ] = useState<number>(0);
+  const [ maxWithdraw, setMaxWithdraw ] = useState<string>();
 
   const [ hasDelegated, setHasDelegated ] = useState<boolean>( true );
 
@@ -53,10 +59,10 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
 
   /* Withdraw execution flow */
-  const withdrawProcedure = async (value:number) => {
-    if ( !withdrawDisabled ) {
+  const withdrawProcedure = async () => {
+    if (inputValue && !withdrawDisabled ) {
       setWithdrawPending(true);
-      await withdrawEth(value);
+      await withdrawEth(inputValue);
       userActions.updatePosition();
       setWithdrawPending(false);
       close();
@@ -65,26 +71,28 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
 
   /* Calculate maximum available to withdraw */
   useEffect(()=>{
-    setMaxWithdraw(ethPosted_ - ethLocked_);
+    setMaxWithdraw( ethers.utils.formatEther(ethPosted.sub(ethLocked) )) ;
   }, [ethPosted_, ethLocked_]);
 
   /* Calculate collateralization Ratio based on input */ 
   useEffect(()=>{
-    if ( (ethPosted_ > inputValue) && inputValue && debtValue_) {
-      const newRatio = estimateRatio((ethPosted_- parseFloat(inputValue)), debtValue_); 
+    const parsedInput = ethers.utils.parseEther(debouncedInput || '0');
+    if ( debouncedInput && ethPosted.gt(parsedInput) && debtValue_) {
+      const newRatio = estimateRatio((ethPosted.sub( parsedInput )), debtValue); 
+      // const newRatio = estimateRatio((ethPosted_ - parseFloat(inputValue)).toString(), debtValue_);
       if (newRatio) {
-        setEstRatio(newRatio.toFixed(2));
-        const newDecrease = collateralPercent_ - newRatio ;
+        console.log('new ratio', newRatio)
+        setEstRatio(parseFloat(newRatio.toString()).toFixed(2));
+        const newDecrease = collateralPercent_ - parseFloat(newRatio.toString());
         setEstDecrease(newDecrease.toFixed(2));
       }
     }
-  }, [ inputValue ]);
+  }, [ debouncedInput ]);
 
   /* Withdraw disabled logic */
   useEffect(()=>{
     ( 
       estRatio < 150 ||
-      inputValue > maxWithdraw || 
       txActive ||
       !inputValue ||
       parseFloat(inputValue) === 0
@@ -93,7 +101,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
 
   /* show warnings and errors with collateralisation ratio levels and inputs */
   useEffect(()=>{
-    if (estRatio < 150 || debouncedInput > maxWithdraw ) {
+    if (estRatio < 150 || (maxWithdraw && (debouncedInput > maxWithdraw) )) {
       setWarningMsg(null);
       setErrorMsg('You are not allowed to withdraw below the collateralization ratio'); 
     } else if (estRatio >= 150 && estRatio < 200 ) {
@@ -111,7 +119,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
     >
       <Keyboard 
         onEsc={() => { inputValue? setInputValue(undefined): close();}}
-        onEnter={()=> withdrawProcedure(inputValue)}
+        onEnter={()=> withdrawProcedure()}
         onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
         target='document'
       >
@@ -136,13 +144,13 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
                 disabled={!hasDelegated}
                 value={inputValue || ''}
                 plain
-                onChange={(event:any) => setInputValue(event.target.value)}
+                onChange={(event:any) => setInputValue(( cleanValue(event.target.value) ))}
                 icon={<EthMark />}
               />
               <RaisedButton 
                 label='Maximum'
                 disabled={!hasDelegated}
-                onClick={()=>setInputValue(maxWithdraw.toFixed(6))}
+                onClick={()=>setInputValue(maxWithdraw)}
               />
             </InputWrap>
         
@@ -152,14 +160,14 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
                 visible: true,
                 active: hasDelegated,
                 loading: false, 
-                value: ethPosted_ ? `${maxWithdraw.toFixed(2)} Eth` : '-',
+                value: maxWithdraw? `${parseFloat(maxWithdraw).toFixed(4)} Eth` : '-',
                 valuePrefix: null,
                 valueExtra: null, 
               },
               {
                 label: 'Ratio after Withdraw',
                 visible: collateralPercent_ > 0,
-                active: inputValue,
+                active: !!inputValue,
                 loading: false,           
                 value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
                 valuePrefix: 'Approx.',
@@ -174,7 +182,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
             />
 
             <ActionButton
-              onClick={()=> withdrawProcedure(inputValue)}
+              onClick={()=> withdrawProcedure()}
               label={`Withdraw ${inputValue || ''} Eth`}
               disabled={withdrawDisabled}
             />  

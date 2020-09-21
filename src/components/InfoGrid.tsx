@@ -43,7 +43,7 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
                     wordBreak='keep-all' 
                     color={alt? 'brand': 'text-weak'} 
                     size='xxsmall' 
-                    weight={alt? 'bold': undefined}
+                    // weight={alt? 'bold': undefined}
                   >
                     {x.label}
                   </Text> 

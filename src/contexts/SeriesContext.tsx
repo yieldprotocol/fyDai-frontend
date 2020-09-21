@@ -90,17 +90,17 @@ const SeriesProvider = ({ children }:any) => {
     /* Parse the data */
     const _parsedSeriesData = _seriesData.reduce((acc: Map<string, any>, x:any) => {
       const yieldAPR = calcAPR(x.sellEDaiRate, ethers.utils.parseEther('1'), x.maturity);
-      const poolPercent = calcPercent(x.totalSupply, x.poolTokens);
+      const poolPercent = calcPercent(x.totalSupply, x.poolTokens).toFixed(4);
       const poolState = checkPoolState(x);
       return acc.set(
         x.maturity,
         { ...x,
-          sellEDaiRate_: parseFloat(ethers.utils.formatEther(x.sellEDaiRate.toString())),
-          totalSupply_: parseFloat(ethers.utils.formatEther(x.totalSupply.toString())),
-          eDaiBalance_: parseFloat(ethers.utils.formatEther(x.eDaiBalance.toString())),
-          ethDebtEDai_: parseFloat(ethers.utils.formatEther(x.ethDebtEDai.toString())),
-          ethDebtDai_: parseFloat(ethers.utils.formatEther(x.ethDebtDai.toString())),
-          poolTokens_: parseFloat(ethers.utils.formatEther(x.poolTokens.toString())),
+          sellEDaiRate_: utils.cleanValue(ethers.utils.formatEther(x.sellEDaiRate), 2),
+          totalSupply_: utils.cleanValue(ethers.utils.formatEther(x.totalSupply), 2),
+          eDaiBalance_: utils.cleanValue(ethers.utils.formatEther(x.eDaiBalance), 2),
+          ethDebtEDai_: utils.cleanValue(ethers.utils.formatEther(x.ethDebtEDai), 2),
+          ethDebtDai_: utils.cleanValue(ethers.utils.formatEther(x.ethDebtDai), 2),
+          poolTokens_: utils.cleanValue(ethers.utils.formatEther(x.poolTokens), 6),
           yieldAPR_: yieldAPR.toFixed(2),
           yieldAPR,
           poolState,

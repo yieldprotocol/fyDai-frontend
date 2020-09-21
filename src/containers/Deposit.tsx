@@ -1,19 +1,20 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { BigNumber } from 'ethers';
+import ethers, { BigNumber } from 'ethers';
 
 import { 
-  Box, 
-  Button,
+  Box,
   Keyboard,
   TextInput, 
   Text,
   ResponsiveContext,
 } from 'grommet';
 
-import { 
+import {
   FiArrowRight as ArrowRight,
 } from 'react-icons/fi';
 import EthMark from '../components/logos/EthMark';
+
+import { cleanValue } from '../utils';
 
 import { UserContext } from '../contexts/UserContext';
 
@@ -39,16 +40,17 @@ interface DepositProps {
   /* deposit amount prop is for quick linking into component */
   setActiveView: any;
   modalView?:boolean;
-  depositAmount?:number|BigNumber|null;
+  depositAmount?:string|BigNumber;
 }
 
 const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
   const { state: userState, actions: userActions } = useContext(UserContext);
   const {
-    ethBalance_,
+    ethBalance,
+    ethPosted,
     ethPosted_,
     collateralPercent_,
-    debtValue_,
+    debtValue,
   } = userState.position;
 
   const screenSize = useContext(ResponsiveContext);
@@ -60,6 +62,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
 
   const [ inputValue, setInputValue ] = useState<any>(depositAmount || undefined);
   const debouncedInput = useDebounce(inputValue, 500);
+
   const [inputRef, setInputRef] = useState<any>(null);
 
   const [ estRatio, setEstRatio ] = useState<any>(0);
@@ -72,29 +75,29 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
 
   /* Steps required to deposit and update values */
-  const depositProcedure = async (value:number) => {
-    if ( !depositDisabled ) {
+  const depositProcedure = async () => {
+    if (inputValue && !depositDisabled ) {
       setDepositPending(true);
-      await postEth(value);
+      await postEth(inputValue);
       await userActions.updatePosition();
       setDepositPending(false);
     }
   };
 
-  /* Handle input value changes */
+  /* Handle debounced input value changes */
   useEffect(()=>{
     /* 1. Adjust estimated ratio based on input changes */
-    if (debouncedInput && ethPosted_ && debtValue_) {
-      const newRatio = estimateRatio((ethPosted_+ parseFloat(debouncedInput)), debtValue_); 
-      newRatio && setEstRatio(newRatio.toFixed(0));
+    if (debouncedInput && ethPosted && debtValue) {
+      const newRatio = estimateRatio((ethPosted.add(ethers.utils.parseEther(debouncedInput) )), debtValue); 
+      newRatio && setEstRatio(parseFloat(newRatio.toString()).toFixed(0));
     }
   }, [debouncedInput]);
 
   /* Handle deposit disabling deposits */
-  useEffect(()=>{   
+  useEffect(()=>{
     (
-      ethBalance_<= 0 ||
-      inputValue > ethBalance_ ||
+      (ethBalance && ethBalance.eq(ethers.constants.Zero)) ||
+      (inputValue && ethers.utils.parseEther(inputValue).gt(ethBalance)) ||
       txActive ||
       !account ||
       !inputValue ||
@@ -104,10 +107,10 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
 
   /* Handle input exceptions and warnings */
   useEffect(()=>{   
-    if ( debouncedInput && ( debouncedInput > ethBalance_) ) {
+    if ( debouncedInput && ( ethers.utils.parseEther(debouncedInput).gt(ethBalance) ) ) {
       setWarningMsg(null);
       setErrorMsg('That amount exceeds your available ETH balance'); 
-    } else if (debouncedInput && (debouncedInput === ethBalance_) ) {
+    } else if (debouncedInput && (ethers.utils.parseEther(debouncedInput).eq(ethBalance)) ) {
       setErrorMsg(null);
       setWarningMsg('If you deposit all your ETH you may not be able to make any further transactions!');
     } else {
@@ -119,8 +122,8 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
   return (
     <Keyboard 
       onEsc={() => setInputValue(undefined)}
-      onEnter={()=> depositProcedure(inputValue)}
-      onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
+      onEnter={()=> depositProcedure()}
+      onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.slice(0, -1))}
       target='document'
     >
       { withdrawOpen && <WithdrawEth close={()=>setWithdrawOpen(false)} /> }    
@@ -144,19 +147,13 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
               value={inputValue || ''}
               disabled={postEthActive}
               plain
-              onChange={(event:any) => setInputValue(event.target.value)}
+              onChange={(event:any) => setInputValue( cleanValue(event.target.value) )}
               icon={<EthMark />}
             />
-
             <RaisedButton
-              // color='brand-transparent'
-              disabled={!account || ethBalance_=== 0}
               label={(screenSize !== 'small' && !modalView) ? 'Deposit Maximum': 'Max'}
-              onClick={()=>setInputValue(ethBalance_)}
-              // hoverIndicator='brand-transparent'
+              onClick={()=>setInputValue(ethers.utils.formatEther(ethBalance))}
             />
-            
-
           </InputWrap>
 
           <InfoGrid entries={[
@@ -165,7 +162,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
               visible: !!account,
               active: true,
               loading: depositPending || txActive?.type ==='WITHDRAW',     
-              value: ethPosted_ ? `${ethPosted_.toFixed(4)} Eth` : '0 Eth',
+              value: ethPosted_ ? `${ethPosted_} Eth` : '0 Eth',
               valuePrefix: null,
               valueExtra: null,
             },
@@ -208,27 +205,9 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
           ]}
           />
 
-          {/* { account &&
-            <Box
-              fill='horizontal'
-              round='small'
-              background={depositDisabled ? 'brand-transparent' : 'brand'}
-              onClick={()=>depositProcedure(inputValue)}
-              align='center'
-              pad='small'
-            >
-              <Text
-                weight='bold'
-                size='large'
-                color={depositDisabled ? 'text-xweak' : 'text'}
-              >
-                {`Deposit ${inputValue || ''} Eth`}
-              </Text>
-            </Box>} */}
-
           {account &&  
             <ActionButton
-              onClick={()=>depositProcedure(inputValue)}
+              onClick={()=>depositProcedure()}
               label={`Deposit ${inputValue || ''} Eth`}
               disabled={depositDisabled}
             /> }
@@ -243,7 +222,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
                 <Box direction='row' gap='small' align='center'>
                   <Box><Text size='xsmall' color='text-weak'>alternatively, withdraw collateral</Text></Box>
                   <ArrowRight color='text-weak' />
-                </Box>}
+                </Box> }
             />
           </Box>}
        

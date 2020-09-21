@@ -97,15 +97,15 @@ export const useProxy = () => {
 
   /**
    * @dev Post ETH collateral via yieldProxy
-   * @param {number | BigNumber} amount amount of ETH to post (in normal human numbers or in Wei as a BigNumber)
+   * @param {string | BigNumber} amount amount of ETH to post (asa string in normal human numbers or in Wei as a BigNumber)
    * @note if BigNumber is used make sure it is in WEI
    */
   const postEth = async (
-    amount:number | BigNumber,
+    amount:string | BigNumber,
   ) => {
 
     /* Processing and/or sanitizing input */
-    const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(amount.toString());
+    const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(utils.cleanValue(amount));
     const toAddr = account && ethers.utils.getAddress(account); /* 'to' in this case represents the vault to be depositied into within controller */  
     
     /* Contract interaction */
@@ -125,15 +125,14 @@ export const useProxy = () => {
 
   /**
    * @dev Withdraw ETH collateral via YieldProxy
-   * @param {number|BigNumber} amount amount of ETH to withdraw (in normal human numbers or in Wei as a BigNumber)
+   * @param {string|BigNumber} amount amount of ETH to withdraw (in normal human numbers or in Wei as a BigNumber)
    * @note if BigNumber is used make sure it is in WEI
    */
   const withdrawEth = async (
-    amount:number|BigNumber
+    amount:string|BigNumber
   ) => {
-
     /* Processing and sanitizing input */
-    const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(amount.toString());
+    const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(utils.cleanValue(amount));
     const toAddr = account && ethers.utils.getAddress(account);
 
     /* Contract interaction */

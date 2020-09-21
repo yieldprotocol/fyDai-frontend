@@ -7,13 +7,14 @@ import {
 } from 'react-icons/fi';
 import DaiMark from '../components/logos/DaiMark';
 
+import { cleanValue } from '../utils';
+
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
 
 import { usePool, useProxy, useSignerAccount, useTxActive, useDebounce } from '../hooks';
 
 import InputWrap from '../components/InputWrap';
-import Loading from '../components/Loading';
 import TxPending from '../components/TxPending';
 import ApprovalPending from '../components/ApprovalPending';
 import RaisedButton from '../components/RaisedButton';
@@ -40,22 +41,19 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
   const { buyDai, buyDaiNoSignature, buyActive }  = useProxy();
   const { account } = useSignerAccount();
 
-  const [ maxWithdraw, setMaxWithdraw ] = useState<number>(0);
-  const [ isGettingMax, setIsGettingMax ] = useState<boolean>(false);
-
   const [ inputValue, setInputValue ] = useState<any>();
   const debouncedInput = useDebounce(inputValue, 500);
   const [inputRef, setInputRef] = useState<any>(null);
-  
-  const [ eDaiValue, setEDaiValue ] = useState<number>(0);
 
+  const [ isGettingMax, setIsGettingMax ] = useState<boolean>(false);
+  
   const [ withdrawDisabled, setWithdrawDisabled ] = useState<boolean>(true);
   const [ withdrawDaiPending, setWithdrawDaiPending] = useState<boolean>(false);
 
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
 
-  const withdrawProcedure = async (value:number) => {
+  const withdrawProcedure = async () => {
     if ( !withdrawDisabled ) {
       setWithdrawDaiPending(true);
       await buyDai(
@@ -71,17 +69,12 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
 
   const getMaxWithdraw = async () => {
     setIsGettingMax(true);
-    const preview = await previewPoolTx('sellEDai', activeSeries, activeSeries.eDaiBalance_);
+    const preview = await previewPoolTx('sellEDai', activeSeries, activeSeries.eDaiBalance);
     setIsGettingMax(false);
     if (!(preview instanceof Error)) {
       return parseFloat(ethers.utils.formatEther(preview)); 
     }
   };
-  
-  // useEffect(() => {
-  //   activeSeries &&
-  //   (async () => setMaxWithdraw( await getMaxWithdraw() ))();
-  // }, [ activeSeries, inputValue ]);
 
   /* Withdraw DAi button disabling logic */
   useEffect(()=>{
@@ -91,20 +84,13 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
       !inputValue || 
       parseFloat(inputValue) === 0
     ) ? setWithdrawDisabled(true): setWithdrawDisabled(false);
-  }, [ inputValue, hasDelegated, maxWithdraw, isGettingMax]);
-
-  useEffect(() => {
-    activeSeries && debouncedInput && ( async () => {
-      const preview = await previewPoolTx('buyDai', activeSeries, debouncedInput);
-      !(preview instanceof Error) && setEDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
-    })();
-  }, [debouncedInput]);
+  }, [ inputValue, hasDelegated ]);
 
   return (
     <Layer onClickOutside={()=>close()}>
       <Keyboard 
         onEsc={() => { inputValue? setInputValue(undefined): close();}}
-        onEnter={()=> withdrawProcedure(inputValue)}
+        onEnter={()=> withdrawProcedure()}
         onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
         target='document'
       >
@@ -126,7 +112,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
               placeholder='DAI'
               value={inputValue || ''}
               plain
-              onChange={(event:any) => setInputValue(event.target.value)}
+              onChange={(event:any) => setInputValue(( cleanValue(event.target.value) ))}
               icon={<DaiMark />}
             />
             <RaisedButton 
@@ -139,7 +125,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
           </InputWrap>
 
           <ActionButton
-            onClick={()=> withdrawProcedure(inputValue)}
+            onClick={()=> withdrawProcedure()}
             label={`Reclaim ${inputValue || ''} Dai`}
             disabled={withdrawDisabled}
           />

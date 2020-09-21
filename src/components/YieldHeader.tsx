@@ -128,7 +128,7 @@ const YieldHeader = (props: any) => {
         weight='bold'
         // eslint-disable-next-line no-nested-ternary
         color={disabled ? 'lightgrey' : activeView === link ? 'brand' : 'text-weak'}
-        size={screenSize === 'small' ? 'medium' : 'xxlarge'}
+        size={screenSize === 'small' ? 'medium' : 'xlarge'}
         style={{ textDecoration: activeView === link ? 'underline' : 'none', width: screenSize === 'small' ? '100%' : 'auto' }}
       >
         {text}

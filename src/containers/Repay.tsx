@@ -5,6 +5,8 @@ import { Box, Button, TextInput, Text, ResponsiveContext, Keyboard } from 'gromm
 import { FiCheckCircle as Check } from 'react-icons/fi';
 import DaiMark from '../components/logos/DaiMark';
 
+import { cleanValue } from '../utils';
+
 import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
@@ -35,7 +37,7 @@ function Repay({ setActiveView, repayAmount }:IRepayProps) {
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { activeSeries } = seriesState;
   const { state: userState, actions: userActions } = useContext(UserContext);
-  const { daiBalance_ } = userState.position;
+  const { daiBalance_, daiBalance } = userState.position;
   const screenSize = useContext(ResponsiveContext);
 
   const [ hasDelegated, setHasDelegated ] = useState<boolean>(true);
@@ -48,8 +50,6 @@ function Repay({ setActiveView, repayAmount }:IRepayProps) {
   const [ inputValue, setInputValue ] = useState<any>();
   const debouncedInput = useDebounce(inputValue, 500);
   const [inputRef, setInputRef] = useState<any>(null);
-
-  const [ eDaiValue, setEDaiValue ] = useState<any>();
 
   const [ repayPending, setRepayPending ] = useState<boolean>(false);
   const [ repayDisabled, setRepayDisabled ] = useState<boolean>(true);
@@ -71,25 +71,10 @@ function Repay({ setActiveView, repayAmount }:IRepayProps) {
     }
   };
 
-  /* Handle dai to eDai conversion  (needed to set a min eDai value for repayment) */
-  useEffect(() => {
-    !(activeSeries?.isMature()) && debouncedInput > 0 && ( async () => {
-      const preview = await previewPoolTx('sellDai', activeSeries, debouncedInput);
-      if (!(preview instanceof Error)) {
-        setEDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
-      } else {
-        /* if the market doesnt have liquidity just estimate from rate */
-        const rate = await previewPoolTx('sellDai', activeSeries, 1);
-        !(rate instanceof Error) && setEDaiValue(debouncedInput* parseFloat((ethers.utils.formatEther(rate))) );
-      }
-    })();
-
-  }, [debouncedInput]);
-
   /* Repay disabling logic */
   useEffect(()=>{
     (
-      !daiBalance_ ||
+      (daiBalance && daiBalance.eq(ethers.constants.Zero)) ||
       !account ||
       !hasDelegated ||
       !inputValue ||
@@ -99,7 +84,7 @@ function Repay({ setActiveView, repayAmount }:IRepayProps) {
 
   /* Handle input warnings and errors */ 
   useEffect(() => {
-    if ( debouncedInput  && daiBalance_ && ( debouncedInput > daiBalance_ ) ) {
+    if ( debouncedInput  && daiBalance && ( ethers.utils.parseEther(debouncedInput).gt(daiBalance) ) ) {
       setWarningMsg(null);
       setErrorMsg('That amount exceeds the amount of Dai in your wallet'); 
     } else {
@@ -129,7 +114,7 @@ function Repay({ setActiveView, repayAmount }:IRepayProps) {
               visible: !!account && !txActive,
               active: true,
               loading: repayPending,     
-              value: activeSeries?.ethDebtEDai_? `${activeSeries.ethDebtEDai_.toFixed(2)} DAI`: '0 DAI',
+              value: activeSeries?.ethDebtEDai_? `${activeSeries.ethDebtEDai_} DAI`: '0 DAI',
               valuePrefix: null,
               valueExtra: null, 
             },
@@ -138,7 +123,7 @@ function Repay({ setActiveView, repayAmount }:IRepayProps) {
               visible: !!account && !txActive,
               active: true,
               loading: repayPending,            
-              value: daiBalance_?`${daiBalance_.toFixed(2)} DAI`: '-',
+              value: daiBalance_?`${daiBalance_} DAI`: '-',
               valuePrefix: null,
               valueExtra: null,
             },
@@ -159,7 +144,7 @@ function Repay({ setActiveView, repayAmount }:IRepayProps) {
         <Box flex='grow' justify='between'>
           <Box gap='medium' align='center' fill='horizontal'>
 
-            { (activeSeries?.ethDebtEDai_.toFixed(2) > 0) ?
+            { (activeSeries?.ethDebtEDai.gt(ethers.constants.Zero)) ?
              
               <Box gap='medium' align='center' fill='horizontal'>
                 <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to Repay</Text>
@@ -171,14 +156,14 @@ function Repay({ setActiveView, repayAmount }:IRepayProps) {
                     placeholder={screenSize !== 'small' ? 'Enter the amount of Dai to Repay': 'DAI'}
                     value={inputValue || ''}
                     plain
-                    onChange={(event:any) => setInputValue(event.target.value)}
+                    onChange={(event:any) => setInputValue(( cleanValue(event.target.value) ))}
                     icon={<DaiMark />}
                   />
                   <RaisedButton 
                     label={screenSize !== 'small' ? 'Repay Maximum': 'Maximum'}
-                    onClick={()=>setInputValue(daiBalance_)}
+                    onClick={()=>setInputValue(ethers.utils.formatEther(daiBalance))}
                   />
-                </InputWrap>    
+                </InputWrap>
 
                 <ActionButton
                   onClick={()=>repayProcedure(inputValue)}
@@ -186,7 +171,6 @@ function Repay({ setActiveView, repayAmount }:IRepayProps) {
                   disabled={repayDisabled}
                 />
               </Box> :
-
               <Box 
                 gap='medium' 
                 margin={{ vertical:'large' }}  

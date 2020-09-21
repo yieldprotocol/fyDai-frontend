@@ -13,6 +13,8 @@ import InlineAlert from '../components/InlineAlert';
 import ApprovalPending from '../components/ApprovalPending';
 import TxPending from '../components/TxPending';
 import ActionButton from '../components/ActionButton';
+import SeriesDescriptor from '../components/SeriesDescriptor';
+import InfoGrid from '../components/InfoGrid';
 
 interface IRedeemProps {
   close?:any,
@@ -51,6 +53,33 @@ const Redeem  = ({ close }:IRedeemProps)  => {
   }, [activeSeries]);
 
   return (
+    <>
+    <SeriesDescriptor activeView='lend'> 
+    {/* <InfoGrid 
+      alt
+      entries={[
+        {
+          label: 'Current Debt',
+          visible: !!account && !txActive,
+          active: true,
+          loading: false,     
+          value: activeSeries?.ethDebtEDai_? `${activeSeries.ethDebtEDai_} DAI`: '0 DAI',
+          valuePrefix: null,
+          valueExtra: null, 
+        },
+        {
+          label: 'Dai balance',
+          visible: !!account && !txActive,
+          active: true,
+          loading: repayPending,            
+          value: daiBalance_?`${daiBalance_} DAI`: '-',
+          valuePrefix: null,
+          valueExtra: null,
+        },
+      ]}
+    /> */}
+  </SeriesDescriptor>
+
     <Box
       width={{ max:'750px' }}
       alignSelf='center'
@@ -82,7 +111,7 @@ const Redeem  = ({ close }:IRedeemProps)  => {
 
           <ActionButton
             onClick={()=>redeemProcedure()} 
-            label={`Redeem ${activeSeries?.eDaiBalance_.toFixed(4) || ''} Dai`}
+            label={`Redeem ${activeSeries?.eDaiBalance_ || ''} Dai`}
             disabled={redeemDisabled}
           />
                         
@@ -91,6 +120,7 @@ const Redeem  = ({ close }:IRedeemProps)  => {
         { txActive && <TxPending msg={`You are redeeming ${activeSeries?.eDaiBalance_.toFixed(4)} DAI`} tx={txActive} /> }
       </Box>
     </Box>
+    </>
   );
 };
 

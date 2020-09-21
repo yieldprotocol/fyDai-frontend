@@ -142,7 +142,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
                     </Box>
                     <Box fill align={screenSize==='small'?'end':undefined}>
                       <Text size={screenSize} color='brand'>
-                        {x[field].toFixed(2)}
+                        {x[field]}
                       </Text>
                     </Box>                 
                   </Box>

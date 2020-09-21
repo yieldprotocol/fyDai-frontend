@@ -1,7 +1,7 @@
 import React, { useEffect, useContext, createContext, useReducer } from 'react';
 import { ethers } from 'ethers';
 
-import * as utils from '../utils';
+import { cleanValue } from '../utils';
 
 import { YieldContext } from './YieldContext';
 
@@ -152,17 +152,17 @@ const UserProvider = ({ children }: any) => {
 
     /* parse to human usable */
     const parsedValues = {  
-      ethBalance_ : utils.humanize(ethBalance),
-      daiBalance_ : utils.humanize(daiBalance),
-      ethPosted_ : utils.humanize(ethPosted),
-      ethLocked_ : utils.humanize(ethLocked),
-      ethBorrowingPower_ : utils.humanize(ethBorrowingPower),
-      ethTotalDebtDai_ : utils.humanize(ethTotalDebtDai),  
-      debtValue_ : utils.humanize(ethTotalDebtDai),
-      collateralValue_ : utils.humanize(collateralValue),
+      ethBalance_ : cleanValue(ethers.utils.formatEther(ethBalance), 6),
+      daiBalance_ : cleanValue(ethers.utils.formatEther(daiBalance), 2),
+      ethPosted_ : cleanValue(ethers.utils.formatEther(ethPosted), 6),
+      ethLocked_ : cleanValue(ethers.utils.formatEther(ethLocked), 6),
+      ethBorrowingPower_ : cleanValue(ethers.utils.formatEther(ethBorrowingPower), 2),
+      ethTotalDebtDai_ : cleanValue(ethers.utils.formatEther(ethTotalDebtDai), 2),  
+      debtValue_ : cleanValue(ethers.utils.formatEther(ethTotalDebtDai), 2),
+      collateralValue_ : cleanValue(ethers.utils.formatEther(collateralValue), 2),
       collateralRatio_ : parseFloat(collateralRatio.toString()),
       collateralPercent_ : parseFloat(collateralPercent.toString()),
-      maxDaiAvailable_ : utils.humanize(maxDaiAvailable),
+      maxDaiAvailable_ : cleanValue(ethers.utils.formatEther(maxDaiAvailable), 2),
       // collateralPrice_ : utils.humanize(collateralPrice),
       // minSafeCollateral_ : utils.humanize(minSafeCollateral),
     };

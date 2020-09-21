@@ -5,6 +5,8 @@ import { Keyboard, Box, Button, TextInput, Text, ResponsiveContext, Collapsible 
 import { FiClock as Clock } from 'react-icons/fi';
 import DaiMark from '../components/logos/DaiMark';
 
+import { cleanValue } from '../utils';
+
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
 
@@ -38,6 +40,8 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
   const { state: userState, actions: userActions } = useContext(UserContext);
   const { position, authorizations: { hasDelegatedProxy } } = userState;
   const { 
+    ethPosted,
+    maxDaiAvailable,
     maxDaiAvailable_,
     collateralPercent_,
   } = position;
@@ -71,11 +75,11 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
   const [ estRatio, setEstRatio ] = useState<number>(0);
 
   /* Borrow execution flow */
-  const borrowProcedure = async (value:number|undefined, autoSell:boolean=true) => {
-    if (value&&value>0 && !borrowDisabled) {
+  const borrowProcedure = async (autoSell:boolean=true) => {
+    if (inputValue && !borrowDisabled) {
       setBorrowPending(true);
-      autoSell && await borrowDai(activeSeries, 'ETH-A', value);
-      !autoSell && await borrow('ETH-A', activeSeries.maturity, value);
+      autoSell && await borrowDai(activeSeries, 'ETH-A', inputValue);
+      !autoSell && await borrow('ETH-A', activeSeries.maturity, inputValue);
       setInputValue(undefined);
       await Promise.all([
         userActions.updatePosition(),
@@ -93,9 +97,11 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
   */
   useEffect(() => {
     activeSeries && debouncedInput>0 && ( async () => {
-      const newRatio = estimateRatio(position.ethPosted_, ( position.debtValue_+ parseFloat(debouncedInput)) ); 
-      newRatio && setEstRatio(newRatio);
-
+      const newRatio = estimateRatio(
+        position.ethPosted, 
+        ( position.debtValue.add(ethers.utils.parseEther(debouncedInput)) )
+      ); 
+      newRatio && setEstRatio(parseFloat(newRatio.toString()));
       const preview = await previewPoolTx('buyDai', activeSeries, debouncedInput);
       if (!(preview instanceof Error)) {
         setEDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
@@ -114,10 +120,10 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
   /* Handle borrow disabling deposits */
   useEffect(()=>{
     (
+      (ethPosted && ethPosted.eq(ethers.constants.Zero) ) ||
+      (inputValue && maxDaiAvailable && ethers.utils.parseEther(inputValue).gte(maxDaiAvailable)) ||
       !account ||
-      !hasDelegatedProxy ||
-      position.ethPosted_ <= 0 ||
-      inputValue >= maxDaiAvailable_ ||
+      !hasDelegatedProxy ||   
       !inputValue ||
       parseFloat(inputValue) === 0
     )? setBorrowDisabled(true): setBorrowDisabled(false);
@@ -125,7 +131,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
 
   /* Handle input exception logic */
   useEffect(() => {
-    if ( debouncedInput && debouncedInput >= maxDaiAvailable_ ) {
+    if ( debouncedInput && ethers.utils.parseEther(debouncedInput).gte(maxDaiAvailable) ) {
       setWarningMsg(null);
       setErrorMsg('That amount exceeds the amount of Dai you can borrow based on your collateral'); 
     } else if (debouncedInput && ( debouncedInput > Math.round(maxDaiAvailable_- maxDaiAvailable_*0.05 ) ) ) {
@@ -155,7 +161,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
                 visible: (!activeSeries?.isMature() && !txActive)  || (activeSeries?.isMature() && activeSeries?.ethDebtEDai_ > 0 ),
                 active: true,
                 loading: borrowPending,    
-                value: activeSeries?.ethDebtEDai_? `${activeSeries.ethDebtEDai_.toFixed(2)} DAI`: '0 DAI',
+                value: activeSeries?.ethDebtEDai_? `${activeSeries.ethDebtEDai_} DAI`: '0 DAI',
                 valuePrefix: null,
                 valueExtra: null, 
               },
@@ -164,7 +170,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
                 visible: !txActive && activeSeries && !activeSeries.isMature()  && !!account,
                 active: maxDaiAvailable_,
                 loading: borrowPending,
-                value: maxDaiAvailable_ ? `${maxDaiAvailable_.toFixed(2)} DAI`: '',           
+                value: maxDaiAvailable_ ? `${maxDaiAvailable_} DAI`: '',           
                 valuePrefix: 'Approx.',
                 valueExtra: null,
               },
@@ -209,7 +215,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
                   placeholder={screenSize !== 'small' ? 'Enter the amount of Dai to borrow': 'DAI'} 
                   value={inputValue || ''}
                   plain
-                  onChange={(event:any) => setInputValue(event.target.value)}
+                  onChange={(event:any) => setInputValue( cleanValue(event.target.value) )}
                   icon={<DaiMark />}
                 />
               </InputWrap>
@@ -249,7 +255,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
                     <Text color='red' size='small'> 
                       { inputValue &&
                         estRatio &&
-                        ( (collateralPercent_- estRatio) > 0) &&
+                        ( (collateralPercent_-estRatio) > 0) &&
                         `(-${(collateralPercent_-estRatio).toFixed(0)}%)` }
                     </Text>
                   )
@@ -290,7 +296,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
 
               { account &&  
               <ActionButton
-                onClick={()=>borrowProcedure(inputValue)}
+                onClick={()=>borrowProcedure()}
                 label={`Borrow ${inputValue || ''} DAI`}
                 disabled={borrowDisabled}
               />}

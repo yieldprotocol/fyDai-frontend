@@ -1,4 +1,5 @@
 import { ethers, BigNumber } from 'ethers';
+import { constants } from 'buffer';
 
 /* constants */
 export const BN_RAY = BigNumber.from('1000000000000000000000000000');
@@ -66,14 +67,24 @@ export const rayToHuman = (x:BigNumber) => {
 
 // @dev Takes a bignumber in WEI, WAD or the like and converts it to human.
 // @return {number}
-export const humanize = (x:BigNumber) => {
+export const humanizeNumber = (x:BigNumber) => {
   return parseFloat(ethers.utils.formatEther(x));
 };
 
 // / @dev Converts a number to WAD precision, for number up to 10 decimal places
-export const dehumanize = (value:number) => {
+export const dehumanizeNumber = (value:number) => {
   const exponent = BigNumber.from('10').pow(BigNumber.from('8'));
   return BigNumber.from(value*10**10).mul(exponent);
+};
+
+export const cleanValue = (input:string, decimals:number=18) => {
+  const re = new RegExp(`(\\d+\\.\\d{${decimals}})(\\d)`);
+  const inpu = input.match(re);
+  if (inpu) {
+    console.log('Value truncated: ', inpu[1]);
+    return inpu[1];
+  }
+  return input.valueOf();
 };
 
 export const modColor = (color:any, amount:any) => {

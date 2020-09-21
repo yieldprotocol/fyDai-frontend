@@ -7,6 +7,8 @@ import {
 } from 'react-icons/fi';
 import DaiMark from '../components/logos/DaiMark';
 
+import { cleanValue } from '../utils';
+
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
   
@@ -40,7 +42,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
   const { activeSeries } = seriesState;
 
   const { state: userState, actions: userActions } = useContext(UserContext);
-  const { daiBalance_ } = userState.position;
+  const { daiBalance, daiBalance_ } = userState.position;
 
   const screenSize = useContext(ResponsiveContext);
 
@@ -68,12 +70,12 @@ const Lend = ({ lendAmount }:ILendProps) => {
   const [ currentValue, setCurrentValue ] = useState<number>(0);
   
   /* Lend execution flow */
-  const lendProcedure = async (value:number) => {
-    if (!lendDisabled ) {
+  const lendProcedure = async () => {
+    if (inputValue && !lendDisabled ) {
       setLendPending(true);
       await sellDai(
         activeSeries,
-        value
+        inputValue
       );
       setInputValue('');
       await Promise.all([
@@ -89,7 +91,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
     activeSeries && !(activeSeries.isMature()) && !!debouncedInput && ( async () => {
       const preview = await previewPoolTx('sellDai', activeSeries, debouncedInput);
       !(preview instanceof Error) && setEDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
-      !(preview instanceof Error) && setAPR( yieldAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries.maturity ) );
+      !(preview instanceof Error) && setAPR( yieldAPR( ethers.utils.parseEther(debouncedInput), preview, activeSeries.maturity ) );
     })();
   }, [activeSeries, debouncedInput]);
 
@@ -104,7 +106,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
   /* Lend button disabling logic */
   useEffect(()=>{
     (
-      inputValue > daiBalance_ ||
+      ( inputValue && daiBalance && ethers.utils.parseEther(inputValue).gt(daiBalance) ) ||
       !account ||
       !hasDelegated ||
       !inputValue || 
@@ -112,22 +114,21 @@ const Lend = ({ lendAmount }:ILendProps) => {
     )? setLendDisabled(true): setLendDisabled(false);
   }, [ inputValue, hasDelegated ]);
 
-
   /* handle exceptions, errors and warnings */
   useEffect(() => {
-    if ( !!account && debouncedInput && debouncedInput> daiBalance_  ) {
+    if ( daiBalance && debouncedInput && ethers.utils.parseEther(debouncedInput).gt(daiBalance)  ) {
       setWarningMsg(null);
       setErrorMsg('That amount exceeds the amount of Dai you have'); 
     } else {
       setWarningMsg(null);
       setErrorMsg(null);
     }
-  }, [ debouncedInput ]);
+  }, [ debouncedInput, daiBalance ]);
 
   return (
     <Keyboard 
       onEsc={() => setInputValue(undefined)}
-      onEnter={()=> lendProcedure(inputValue)}
+      onEnter={()=> lendProcedure()}
       onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
       target='document'
     >
@@ -143,7 +144,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
                 visible: !!account && !txActive,
                 active: true,
                 loading: lendPending,     
-                value: activeSeries && `${activeSeries?.eDaiBalance_.toFixed(2)} DAI` || '-',
+                value: activeSeries && `${activeSeries?.eDaiBalance_} DAI` || '-',
                 valuePrefix: null,
                 valueExtra: null, 
               },
@@ -152,7 +153,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
                 visible: false && !!account && !txActive,
                 active: true,
                 loading: lendPending,           
-                value: currentValue!==0?`${currentValue.toFixed(2)} DAI`: '-',
+                value: currentValue!==0?`${currentValue} DAI`: '-',
                 valuePrefix: null,
                 valueExtra: null,
               },
@@ -161,7 +162,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
                 visible: !!account && !txActive,
                 active: true,
                 loading: lendPending,            
-                value: daiBalance_?`${daiBalance_.toFixed(2)} DAI`: '0 DAI',
+                value: daiBalance_?`${daiBalance_} DAI`: '0 DAI',
                 valuePrefix: null,
                 valueExtra: null,
               },
@@ -195,13 +196,13 @@ const Lend = ({ lendAmount }:ILendProps) => {
                   placeholder={screenSize !== 'small' ? 'Enter the amount of Dai to lend': 'DAI'}
                   value={inputValue || ''}
                   plain
-                  onChange={(event:any) => setInputValue(event.target.value)}
+                  onChange={(event:any) => setInputValue( cleanValue(event.target.value) )}
                   icon={<DaiMark />}
                 />
                 {account &&
                 <RaisedButton 
                   label={screenSize !== 'small' ? 'Lend Maximum': 'Maximum'}
-                  onClick={()=>setInputValue(daiBalance_)}                  
+                  onClick={()=>setInputValue( ethers.utils.formatEther(daiBalance) )}            
                 />}
               </InputWrap>
 
@@ -249,7 +250,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
 
             <Box gap='small' fill='horizontal' align='center' pad={{ vertical:'small' }}>
               <ActionButton
-                onClick={()=>lendProcedure(inputValue)}
+                onClick={()=>lendProcedure()}
                 label={`Lend ${inputValue || ''} DAI`}
                 disabled={lendDisabled}
               />       

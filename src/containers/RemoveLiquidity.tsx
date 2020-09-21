@@ -6,6 +6,8 @@ import {
 } from 'react-icons/fi';
 import YieldMark from '../components/logos/YieldMark';
 
+import { cleanValue } from '../utils';
+
 import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
 import { UserContext } from '../contexts/UserContext';
@@ -35,10 +37,8 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
   const { account } = useSignerAccount();
   const { removeLiquidity } = useProxy();
   const [ txActive ] = useTxActive(['REMOVE_LIQUIDITY']);
-  
-  const [ maxRemove, setMaxRemove ] = useState<number>(0);
 
-  const [newShare, setNewShare] = useState<number>(activeSeries?.poolPercent);
+  const [newShare, setNewShare] = useState<string>(activeSeries?.poolPercent);
   const [calculating, setCalculating] = useState<boolean>(false);
 
   const [ inputValue, setInputValue ] = useState<any>();
@@ -66,8 +66,9 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
 
   const calculateNewShare = async () => {
     setCalculating(true);
-    const percent = ((activeSeries?.poolTokens_- debouncedInput) / activeSeries.totalSupply_ )*100;
-    setNewShare(percent);
+    const newBalance = activeSeries.poolTokens.sub(ethers.utils.parseEther(debouncedInput));
+    const percent= ( parseFloat(ethers.utils.formatEther(newBalance)) / parseFloat(ethers.utils.formatEther(activeSeries.totalSupply)) )*100;
+    setNewShare(percent.toFixed(4));
     setCalculating(false);
   };
 
@@ -78,7 +79,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
 
   /* handle warnings input errors */
   useEffect(() => {
-    if ( debouncedInput && (activeSeries?.poolTokens_- debouncedInput < 0) ) {
+    if ( debouncedInput && (activeSeries.poolTokens.sub(ethers.utils.parseEther(debouncedInput)).lt(ethers.constants.Zero)) ) {
       setWarningMsg(null);
       setErrorMsg('That amount exceeds the amount of tokens you have'); 
     } else {
@@ -129,7 +130,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
                 placeholder='Tokens to remove'
                 value={inputValue || ''}
                 plain
-                onChange={(event:any) => setInputValue(event.target.value)}
+                onChange={(event:any) => setInputValue(( cleanValue(event.target.value) ))}
                 icon={<YieldMark />}
               />
               <RaisedButton 
@@ -140,11 +141,11 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
 
             <InfoGrid entries={[
               {
-                label: 'Token Balance',
-                visible: false,
+                label: 'Current Token Balance',
+                visible: true,
                 active: true,
                 loading: false,     
-                value: activeSeries?.poolTokens_.toFixed(2),
+                value: activeSeries?.poolTokens_,
                 valuePrefix: null,
                 valueExtra: null, 
               },
@@ -153,18 +154,9 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
                 visible: true,
                 active: inputValue,
                 loading: calculating,           
-                value: newShare>=0 ? `${newShare.toFixed(4)}%`: '',
+                value: parseFloat(newShare)>=0 ? `${newShare}%`: '',
                 valuePrefix: null,
                 valueExtra: null, 
-              },
-              {
-                label: 'Expected Dai to Receive',
-                visible: false,
-                active: inputValue,
-                loading: false,           
-                value: '34 DAI',
-                valuePrefix: null,
-                valueExtra: null,
               },
               {
                 label: 'Like what you see?',
