@@ -38,6 +38,7 @@ interface ILendProps {
 }
   
 const Lend = ({ lendAmount }:ILendProps) => {
+
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { activeSeries } = seriesState;
 
@@ -49,7 +50,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
   const { previewPoolTx } = usePool();
   const { sellDai, sellActive } = useProxy();
   const { yieldAPR } = useMath();
-  const { account } = useSignerAccount();
+  const { account, fallbackProvider } = useSignerAccount();
   const [ txActive ] = useTxActive(['SELL_DAI']);
 
   const [ hasDelegated, setHasDelegated ] = useState<boolean>(true);
@@ -97,11 +98,11 @@ const Lend = ({ lendAmount }:ILendProps) => {
 
   /* handle active series loads and changes */
   useEffect(() => {
-    account && activeSeries?.eDaiBalance_ && !(activeSeries.isMature()) && ( async () => {
+    fallbackProvider && account && activeSeries?.eDaiBalance_ && !(activeSeries.isMature()) && ( async () => {
       const preview = await previewPoolTx('SellEDai', activeSeries, activeSeries.eDaiBalance_);
       !(preview instanceof Error) && setCurrentValue( parseFloat(ethers.utils.formatEther(preview)));
     })();
-  }, [ activeSeries, account ]);
+  }, [ activeSeries, account, fallbackProvider ]);
   
   /* Lend button disabling logic */
   useEffect(()=>{

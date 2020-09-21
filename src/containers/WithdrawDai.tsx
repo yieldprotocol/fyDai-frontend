@@ -39,13 +39,14 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
 
   const { previewPoolTx }  = usePool();
   const { buyDai, buyDaiNoSignature, buyActive }  = useProxy();
-  const { account } = useSignerAccount();
+  const { account, fallbackProvider } = useSignerAccount();
 
   const [ inputValue, setInputValue ] = useState<any>();
   const debouncedInput = useDebounce(inputValue, 500);
   const [inputRef, setInputRef] = useState<any>(null);
 
   const [ isGettingMax, setIsGettingMax ] = useState<boolean>(false);
+  const [ maxWithdraw, setMaxWithdraw ] = useState<string>();
   
   const [ withdrawDisabled, setWithdrawDisabled ] = useState<boolean>(true);
   const [ withdrawDaiPending, setWithdrawDaiPending] = useState<boolean>(false);
@@ -67,14 +68,14 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
     }
   };
 
-  const getMaxWithdraw = async () => {
-    setIsGettingMax(true);
-    const preview = await previewPoolTx('sellEDai', activeSeries, activeSeries.eDaiBalance);
-    setIsGettingMax(false);
-    if (!(preview instanceof Error)) {
-      return parseFloat(ethers.utils.formatEther(preview)); 
-    }
-  };
+  useEffect(()=> {
+    fallbackProvider && account && activeSeries.eDaiBalance && (async () => {
+      const preview = await previewPoolTx('sellEDai', activeSeries, activeSeries.eDaiBalance);
+      if (!(preview instanceof Error)) {
+        setMaxWithdraw(ethers.utils.formatEther(preview));
+      }
+    })();
+  }, [account, activeSeries.eDaiBalance, fallbackProvider]);
 
   /* Withdraw DAi button disabling logic */
   useEffect(()=>{
@@ -85,6 +86,18 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
       parseFloat(inputValue) === 0
     ) ? setWithdrawDisabled(true): setWithdrawDisabled(false);
   }, [ inputValue, hasDelegated ]);
+
+
+  /* show warnings and errors with collateralisation ratio levels and inputs */
+  useEffect(()=>{
+    if ( debouncedInput && maxWithdraw && (debouncedInput > maxWithdraw) ) {
+      setWarningMsg(null);
+      setErrorMsg('You are not allowed to reclaim more than you have lent'); 
+    } else {   
+      setWarningMsg(null);
+      setErrorMsg(null);
+    }
+  }, [ debouncedInput ]);
 
   return (
     <Layer onClickOutside={()=>close()}>
@@ -117,10 +130,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
             />
             <RaisedButton 
               label='Maximum'
-              onClick={async ()=>{
-                const max = await getMaxWithdraw();
-                max && setInputValue( max );
-              }}
+              onClick={()=> setInputValue(maxWithdraw)}
             />
           </InputWrap>
 
