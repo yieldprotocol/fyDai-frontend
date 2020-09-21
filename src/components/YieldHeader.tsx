@@ -201,27 +201,28 @@ const YieldHeader = (props: any) => {
       background='background-front'
       direction='row'
       pad={{ horizontal:'small', vertical:'large' }}
-      align='center'
       justify='between'
+      fill='horizontal'
     >
-      <Box basis='auto'>
-        <Image src={theme.dark ? logoLight : logoDark} fit="contain" />
-      </Box>
+      <Box direction='row' fill='horizontal' gap='medium'>
+        <Box basis='auto'>
+          <Image src={theme.dark ? logoLight : logoDark} fit="contain" />
+        </Box>
         
-      { screenSize === 'small' ? 
-        <MobileNav /> 
-        : 
-        <Box direction='row' align='center' basis='1/3'> 
-          <Nav />
-          {/* <Menu
+        { screenSize === 'small' ? 
+          <MobileNav /> 
+          : 
+          <Box direction='row' align='center' basis='1/3'> 
+            <Nav />
+            {/* <Menu
             label={<Text size='xxlarge' weight='bold'>Borrow</Text>}
             items={[
               { label: <Text size='xxlarge' weight='bold'>Lend</Text>, onClick: () => {} },
               { label: <Text size='xxlarge' weight='bold'>Pool</Text>, onClick: () => {} },
             ]}
           />    */}
-        </Box>}
-
+          </Box>}
+      </Box> 
       <Box basis='auto'>
         {screenSize === 'small' ? (
           <MenuButton />
@@ -235,7 +236,6 @@ const YieldHeader = (props: any) => {
           </Box>
         )}
       </Box>
-
     </Box>
   );
 };
