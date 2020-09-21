@@ -72,9 +72,8 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
           {!buttonOnly && <Text>Before we start, Yield requires some permissions. </Text> }
           <RaisedButton 
             // primary={buttonOnly}
-            label={buttonOnly?'Authorization is required to get started':'Authorise Yield'}
+            label={buttonOnly?<Text size='small'><Unlock /> Authorization is required to get started</Text>:<Text size='small'><Unlock /> Authorise Yield</Text>}
             onClick={()=>{authProcedure();}}
-            icon={<Unlock />}
           />        
         </Box>}
 

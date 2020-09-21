@@ -5,6 +5,7 @@ import { deepMerge } from 'grommet/utils';
 import { yieldTheme } from './themes';
 
 import { SeriesContext } from './contexts/SeriesContext';
+import { UserContext } from './contexts/UserContext';
 import { YieldContext } from './contexts/YieldContext';
 
 import Dashboard from './views/Dashboard';
@@ -24,6 +25,7 @@ import NotifyLayer from './containers/layers/NotifyLayer';
 import TestLayer from './containers/layers/TestLayer';
 import Splash from './components/Splash';
 import RaisedBox from './components/RaisedBox';
+import Authorization from './components/Authorization';
 
 // const LendView = React.lazy(() => import('./views/LendView'));
 // const PoolView = React.lazy(() => import('./views/PoolView'));
@@ -51,8 +53,10 @@ const ThemedApp = () => {
 
 const App = (props:any) => {
 
-  const { seriesLoading } = useContext(SeriesContext);
-  const { yieldLoading } = useContext(YieldContext);
+  const { state: { seriesLoading, activeSeries } } = useContext(SeriesContext);
+  const { state : { authorizations : { hasDelegatedProxy } } } = useContext(UserContext);
+
+  const { state: { yieldLoading } } = useContext(YieldContext);
 
   // TODO Switch out for react router
   const [activeView, setActiveView] = useState<string>('BORROW');
@@ -78,7 +82,7 @@ const App = (props:any) => {
 
   useEffect(()=> {
     !yieldLoading && !seriesLoading && setAppReady(true);
-    console.log(yieldLoading, seriesLoading);
+     console.log(yieldLoading, seriesLoading);
   }, [yieldLoading, seriesLoading]);
 
   return (
@@ -112,7 +116,10 @@ const App = (props:any) => {
             pad={{ vertical: 'large' }}
             fill="horizontal"
             align="center"
-          >          
+          > 
+            <Box align='end' fill='horizontal'>
+              {!hasDelegatedProxy && activeSeries && <Authorization buttonOnly />}
+            </Box>    
             {activeView === 'DASHBOARD' && <Dashboard />}
             {activeView === 'BORROW' && <BorrowView />}
             {activeView === 'LEND' && <LendView />}
