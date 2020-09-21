@@ -96,8 +96,8 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
   /* Handle deposit disabling deposits */
   useEffect(()=>{
     (
-      (ethBalance && ethBalance.eq(ethers.constants.Zero)) ||
-      (inputValue && ethers.utils.parseEther(inputValue).gt(ethBalance)) ||
+      (account && ethBalance.eq(ethers.constants.Zero)) ||
+      (account && inputValue && ethers.utils.parseEther(inputValue).gt(ethBalance)) ||
       txActive ||
       !account ||
       !inputValue ||
@@ -107,10 +107,10 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
 
   /* Handle input exceptions and warnings */
   useEffect(()=>{   
-    if ( debouncedInput && ( ethers.utils.parseEther(debouncedInput).gt(ethBalance) ) ) {
+    if ( ethBalance && debouncedInput && ( ethers.utils.parseEther(debouncedInput).gt(ethBalance) ) ) {
       setWarningMsg(null);
       setErrorMsg('That amount exceeds your available ETH balance'); 
-    } else if (debouncedInput && (ethers.utils.parseEther(debouncedInput).eq(ethBalance)) ) {
+    } else if (ethBalance && debouncedInput && (ethers.utils.parseEther(debouncedInput).eq(ethBalance)) ) {
       setErrorMsg(null);
       setWarningMsg('If you deposit all your ETH you may not be able to make any further transactions!');
     } else {
@@ -152,7 +152,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
             />
             <RaisedButton
               label={(screenSize !== 'small' && !modalView) ? 'Deposit Maximum': 'Max'}
-              onClick={()=>setInputValue(ethers.utils.formatEther(ethBalance))}
+              onClick={()=>account && setInputValue(ethers.utils.formatEther(ethBalance))}
             />
           </InputWrap>
 

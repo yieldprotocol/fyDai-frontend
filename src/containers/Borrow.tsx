@@ -96,12 +96,16 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
   * 3. calculate estimated collateralisation ration
   */
   useEffect(() => {
-    activeSeries && debouncedInput>0 && ( async () => {
+
+    account && position && debouncedInput>0 && ( async () => {
       const newRatio = estimateRatio(
         position.ethPosted, 
         ( position.debtValue.add(ethers.utils.parseEther(debouncedInput)) )
       ); 
       newRatio && setEstRatio(parseFloat(newRatio.toString()));
+    })();
+
+    activeSeries && debouncedInput>0 && ( async () => {
       const preview = await previewPoolTx('buyDai', activeSeries, debouncedInput);
       if (!(preview instanceof Error)) {
         setEDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
@@ -131,7 +135,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
 
   /* Handle input exception logic */
   useEffect(() => {
-    if ( debouncedInput && ethers.utils.parseEther(debouncedInput).gte(maxDaiAvailable) ) {
+    if ( debouncedInput && maxDaiAvailable && ethers.utils.parseEther(debouncedInput).gte(maxDaiAvailable) ) {
       setWarningMsg(null);
       setErrorMsg('That amount exceeds the amount of Dai you can borrow based on your collateral'); 
     } else if (debouncedInput && ( debouncedInput > Math.round(maxDaiAvailable_- maxDaiAvailable_*0.05 ) ) ) {

@@ -67,7 +67,7 @@ function BorrowSelector({ setActiveView, activeView }:IActionSelectorProps) {
         direction="row"
         gap="small"
         fill="horizontal"
-        justify='between'
+        justify={account? 'between':'start'}
       >
         <Box gap='small' align='center'>
           {/* <Text size='xxsmall' color='brand'>Step 1</Text> */}
@@ -97,6 +97,7 @@ function BorrowSelector({ setActiveView, activeView }:IActionSelectorProps) {
           </StyledBox>
         </Box>
 
+        {account && 
         <Box gap='small' align='center'>
           {/* <Text size='xxsmall' color='brand'>Step 3</Text> */}
           <StyledBox
@@ -108,7 +109,7 @@ function BorrowSelector({ setActiveView, activeView }:IActionSelectorProps) {
               Repay Dai Debt
             </Text>
           </StyledBox>
-        </Box>
+        </Box>}
 
         {false && !account && 
         <RaisedButton
