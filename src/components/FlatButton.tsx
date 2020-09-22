@@ -9,7 +9,8 @@ const StyledButton = styled(Button)`
   transition: all .3s ease-in-out;
   background: #f8f8f8;
 
-  border: 1px solid #dfdfdf;
+  /* border: 1px solid #dfdfdf; */
+  border: 1px solid #f8f8f8;
   box-shadow:  0px 0px 0px #dfdfdf, -0px -0px 0px #ffffff;
 
   :active:hover {

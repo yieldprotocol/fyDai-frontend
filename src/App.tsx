@@ -8,7 +8,6 @@ import { SeriesContext } from './contexts/SeriesContext';
 import { UserContext } from './contexts/UserContext';
 import { YieldContext } from './contexts/YieldContext';
 
-import Dashboard from './views/Dashboard';
 import BorrowView from './views/BorrowView';
 import LendView from './views/LendView';
 import PoolView from './views/PoolView';
@@ -120,7 +119,6 @@ const App = (props:any) => {
             <Box align='end' fill='horizontal'>
               {!hasDelegatedProxy && activeSeries && <Authorization buttonOnly />}
             </Box>    
-            {activeView === 'DASHBOARD' && <Dashboard />}
             {activeView === 'BORROW' && <BorrowView />}
             {activeView === 'LEND' && <LendView />}
             {activeView === 'POOL' && <PoolView />}
