@@ -81,18 +81,17 @@ const App = (props:any) => {
 
   useEffect(()=> {
     !yieldLoading && !seriesLoading && setAppReady(true);
-     console.log(yieldLoading, seriesLoading);
-  }, [yieldLoading, seriesLoading]);
+    console.log(yieldLoading, seriesLoading);
+    console.log(hasDelegatedProxy);
+  }, [yieldLoading, seriesLoading, hasDelegatedProxy]);
 
   return (
     <div className="App">
       <NotifyLayer />
       <ConnectLayer view={showConnectLayer} closeLayer={() => setShowConnectLayer(null)} />
-      
+
       { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
       { showSeriesLayer  && <SeriesSelector activeView='borrow' close={()=>setShowSeriesLayer(false)} /> }
-
-      {/* <Grid fill rows={screenSize === 'small'? ['xsmall', 'auto', 'xsmall']: ['auto', 'flex', 'auto']}>  */}
         
       <Grid fill columns={columnsWidth}>
         <Box background={{ color: 'background-front' }} />
@@ -116,9 +115,7 @@ const App = (props:any) => {
             fill="horizontal"
             align="center"
           > 
-            <Box align='end' fill='horizontal'>
-              {!hasDelegatedProxy && activeSeries && <Authorization buttonOnly />}
-            </Box>    
+            <Box width={{min:'600px'}}>{!yieldLoading && <Authorization buttonOnly />}</Box>
             {activeView === 'BORROW' && <BorrowView />}
             {activeView === 'LEND' && <LendView />}
             {activeView === 'POOL' && <PoolView />}
@@ -139,8 +136,6 @@ const App = (props:any) => {
         />}                  
         <Box />      
       </Grid>
-
-      {/* </Grid> */}
 
       {screenSize === 'small' &&    
         <Layer

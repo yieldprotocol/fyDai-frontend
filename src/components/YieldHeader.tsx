@@ -21,8 +21,10 @@ import logoLight from '../assets/images/logo_light.svg';
 import YieldLogo from './logos/YieldLogo';
 
 import { NotifyContext } from '../contexts/NotifyContext';
+import { YieldContext } from '../contexts/YieldContext';
 import TxStatus from  './TxStatus';
 import FlatButton from './FlatButton';
+import Authorization from './Authorization';
 
 interface LinkProps {
   link: string;
@@ -39,6 +41,7 @@ const YieldHeader = (props: any) => {
   } = props;
 
   const { state: { pendingTxs } } = useContext(NotifyContext);
+  const { state: { yieldLoading } } = useContext(YieldContext);
   const screenSize = useContext(ResponsiveContext);
 
   // Menu state for mobile later
@@ -204,8 +207,8 @@ const YieldHeader = (props: any) => {
       justify='between'
       fill='horizontal'
     >
-      <Box direction='row' fill='horizontal' gap='medium' justify='between'>
-        <Box>
+      <Box direction='row' fill='horizontal' gap='medium'>
+        <Box basis='1/4'>
           <Image src={theme.dark ? logoLight : logoDark} fit="contain" />
         </Box>
         
@@ -222,8 +225,8 @@ const YieldHeader = (props: any) => {
             ]}
           />    */}
           </Box>}
-      </Box> 
-
+      </Box>
+      
       <Box basis='auto'>
         {screenSize === 'small' ? (
           <MenuButton />

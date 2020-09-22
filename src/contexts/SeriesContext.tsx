@@ -90,7 +90,7 @@ const SeriesProvider = ({ children }:any) => {
           sellEDaiRate: !(sellEDaiRate instanceof Error)? sellEDaiRate : BigNumber.from('0'),
           totalSupply,
           poolTokens: poolTokens || BigNumber.from('0'),
-          hasDelegatedPool: hasDelegatedPool || BigNumber.from('0'), // TODO check this
+          hasDelegatedPool: hasDelegatedPool || false, // TODO check this
           ethDebtDai: ethDebtDai || BigNumber.from('0'),
           ethDebtEDai : ethDebtEDai || BigNumber.from('0'),
           eDaiBalance : eDaiBalance || BigNumber.from('0'),

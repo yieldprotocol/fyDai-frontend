@@ -46,7 +46,6 @@ const BorrowView = ({
       /> */}
 
       <BorrowSelector activeView={activeView} setActiveView={setActiveView} />
-
       <RaisedBox>
         <Box
           width={{ max: '600px' }}

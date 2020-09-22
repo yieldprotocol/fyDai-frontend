@@ -145,10 +145,19 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
   /* Handle input exception logic */
   useEffect(() => {
 
-    if ( debouncedInput && maxDaiAvailable && ethers.utils.parseEther(debouncedInput).gte(maxDaiAvailable) ) {
+    if ( 
+      debouncedInput && 
+      maxDaiAvailable && 
+      ethers.utils.parseEther(debouncedInput).gte(maxDaiAvailable) &&
+      !(ethPosted.isZero())
+    ) {
       setWarningMsg(null);
       setErrorMsg('That amount exceeds the amount of Dai you can borrow based on your collateral'); 
-    } else if (debouncedInput && ( debouncedInput > Math.round(maxDaiAvailable_- maxDaiAvailable_*0.05 ) ) ) {
+    } else if (
+      debouncedInput && 
+        ( debouncedInput > Math.round(maxDaiAvailable_- maxDaiAvailable_*0.05 ) &&
+        !(ethPosted.isZero())
+        ) ) {
       setErrorMsg(null);
       setWarningMsg('If you borrow right up to your maximum allowance, there is high probability you will be liquidated!');
     } else {
@@ -169,7 +178,6 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
 
       <Collapsible open={!!activeSeries}>
         <SeriesDescriptor activeView='borrow'>
-          { hasDelegatedProxy &&
           <InfoGrid
             alt
             entries={[
@@ -206,10 +214,9 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
                 ),
               },
             ]} 
-          /> }
+          />
         </SeriesDescriptor>
       </Collapsible>
-      
       
 
       { txActive?.type !== 'BORROW' && txActive?.type !== 'BUY' &&  

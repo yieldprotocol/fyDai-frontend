@@ -166,7 +166,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
             gap='medium'
             justify='between'
           > 
-            <TxPending msg={`You are withdrawing ${inputValue} ETH`} tx={txActive} />
+            <TxPending msg={`You are closing ${inputValue} DAI`} tx={txActive} />
                 
             <Box alignSelf='start'>
               <Box

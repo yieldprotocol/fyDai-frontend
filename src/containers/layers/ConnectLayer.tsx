@@ -12,12 +12,14 @@ import {
   Text,
   ResponsiveContext,
   Paragraph,
+  Collapsible,
 } from 'grommet';
 
 import { 
   FiArrowLeft as ArrowLeft,
 } from 'react-icons/fi';
 
+import { FaCaretDown } from 'react-icons/fa';
 import {
   useConnection,
   useSignerAccount,
@@ -41,6 +43,8 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
   const { account, provider } = useSignerAccount();
   const [ layerView, setLayerView] = useState<string>(view);
   const { handleSelectConnector } = useConnection();
+
+  const [ histOpen, setHistOpen] = useState<string>('BORROW');
 
   const connectorList = [
     { name: 'Metamask', image: metamaskImage, connection: injected },
@@ -75,11 +79,11 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
               <>
                 <Box pad="small" gap="small">
                   <Box direction='row' justify='between'>
-                    <Text alignSelf='start' size='xxlarge' color='brand' weight='bold'>Wallet</Text>   
+                    <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Connected Wallet</Text>   
                     <Box round>
                       <FlatButton
                         onClick={()=>setLayerView('CONNECT')}
-                        label={<Text size='xsmall'>Change wallet</Text>}
+                        label={<Text size='xsmall'>Change Wallet Provider</Text>}
                       /> 
                     </Box>
                   </Box>
@@ -92,7 +96,7 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                     {/* <ProfileButton /> */}
                     {account}
                     <Box direction='row' gap='small'>
-                      <Text size='xsmall'>Connected Network:</Text> 
+                      <Text size='xsmall'>Network:</Text> 
                       <Text weight="bold"> { provider.network.name } </Text>                   
                     </Box> 
 
@@ -111,7 +115,7 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
 
                 <Box pad="small" gap="small">
                   <Box direction='row' justify='between'>
-                    <Text alignSelf='start' size='xxlarge' color='brand' weight='bold'>Transactions</Text>   
+                    <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Transactions</Text>   
                     <Box round>
                       <FlatButton
                         onClick={()=>setLayerView('HISTORY')}
@@ -131,7 +135,7 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
 
                 <Box pad="small" gap="small">
                   <Box direction='row' justify='between'>
-                    <Text alignSelf='start' size='xxlarge' color='brand' weight='bold'>Account Settings</Text> 
+                    <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Account Settings</Text> 
                     <Box round>
                       <FlatButton
                         onClick={()=>console.log('STILL TO DO!')}
@@ -192,14 +196,33 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
 
               </Box>}
 
-
             { account && layerView === 'HISTORY' &&      
               <Box pad="medium" gap="small"> 
-              something
-                {/* <TxHistory /> */}
+                <Box direction='row' justify='evenly'>
+                  <FlatButton 
+                    onClick={()=> setHistOpen('BORROW')}
+                    label='Borrowing History'
+                    selected={histOpen==='BORROW'}
+                  />
+                  <FlatButton 
+                    onClick={()=> setHistOpen('LEND')}
+                    label='Lending History'
+                    selected={histOpen==='LEND'}
+                  />
+                  <FlatButton 
+                    onClick={()=> setHistOpen('POOL')}
+                    label='Pool History'
+                    selected={histOpen==='POOL'}
+                  />
+                </Box>
+                <Box>
+                  {histOpen === 'BORROW' && <TxHistory filterTerms={['Bought', 'Repaid', 'Deposited', 'Withdrew']} view='borrow' />}
+                  {histOpen === 'LEND' && <TxHistory filterTerms={['Bought', 'Sold' ]} view='lend' />}
+                  {histOpen === 'POOL' && <TxHistory filterTerms={['Bought', 'Sold' ]} view='pool' />}
+                </Box>
               </Box> }
 
-            <Footer direction="row-responsive" justify='between' pad="medium">
+            <Footer direction="row-responsive" justify='between' pad="medium" margin={{top:'medium'}}>
               <FlatButton 
                 onClick={() => {
                   if (view === 'ACCOUNT' && layerView !== 'ACCOUNT') { 

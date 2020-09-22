@@ -22,22 +22,22 @@ interface ISeriesDescriptorProps {
 function SeriesDescriptor( props: ISeriesDescriptorProps ) {
 
   const { activeView, minified, children } = props;
-
   const screenSize = useContext(ResponsiveContext);
-
   const { state: seriesState } = useContext(SeriesContext);
   const { activeSeries } = seriesState; 
-
   const [ selectorOpen, setSelectorOpen ] = useState<boolean>(false);
+  const [ delegated, setDelegated ] = useState<boolean>(true);
+
+
+  useEffect(()=>{
+    activeSeries && setDelegated(activeSeries.hasDelegatedPool);
+  }, [ activeSeries ]);
 
   return (
     <>
       {selectorOpen && <SeriesSelector activeView={activeView} close={()=>setSelectorOpen(false)} /> }
-      {/* { activeSeries && */}
 
-      <Loading condition={!activeSeries} size='small'>
-      
-        {activeSeries &&
+      {activeSeries &&
         <Box
           alignSelf="center"
           fill
@@ -105,30 +105,32 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
           </Box>
 
           <Box
-            pad={{ horizontal:'medium', bottom:'large' }}
+            pad={!delegated? { horizontal:'medium' }: {horizontal:'medium', bottom:'medium' }}
+            // margin={ !delegated? undefined: { bottom:'medium'} }
           >
             <Collapsible open={!seriesState.seriesLoading}>
               { children }
             </Collapsible>
-
-            { !(activeSeries?.isMature()) &&  activeSeries?.hasDelegatedPool === false && 
+          </Box>
+          
+          { !delegated && !activeSeries.isMature() && 
+          <Box 
+            fill='horizontal'
+            // background={activeSeries.seriesColor}
+            round='small'
+            pad={{ bottom:'medium' }}
+            // margin={{ bottom:'-15px' }}          
+          >
             <Box 
-              fill='horizontal'
-              margin={{ vertical:'small' }}
+              round='small'
+              pad='small' 
+              fill
             >
-              <Box 
-                round='xsmall'
-                border='all'
-                pad='small' 
-                fill
-              >
-                <Authorization series={activeSeries} />
-              </Box>
-            </Box>} 
+              <Authorization series={activeSeries} />
+            </Box>
+          </Box>} 
 
-          </Box>       
         </Box>}
-      </Loading>
     </>
   );
 }

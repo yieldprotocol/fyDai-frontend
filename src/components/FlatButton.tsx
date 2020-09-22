@@ -24,6 +24,18 @@ const StyledButton = styled(Button)`
     box-shadow:  6px 6px 11px #dfdfdf, -6px -6px 11px #ffffff;
   }
 
+  ${(props:any) => (props.selected) && css`
+  box-shadow:  inset 6px 6px 11px #dfdfdf,  
+    inset -6px -6px 11px #ffffff;
+  :active:hover {
+    box-shadow:  0px 0px 0px #dfdfdf, 
+        -0px -0px 0px #ffffff;
+    }
+  :hover {
+    /* transform: scale(1.01); */
+    }
+  `}
+
 ${(props:any) => props.background && css`
     background: ${ props.background };
 
@@ -42,7 +54,7 @@ ${(props:any) => props.background && css`
 `}
 `;
 
-function FlatButton({ selected=true, ...props }:any ) {
+function FlatButton({ ...props }:any ) {
   return (
     <>
       <StyledButton 

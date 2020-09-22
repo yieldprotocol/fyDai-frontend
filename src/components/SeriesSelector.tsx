@@ -168,7 +168,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
           </Loading>        
         </Box>
 
-        <Box alignSelf='start'>
+        <Box alignSelf='start' margin={{ top:'medium' }}>
           <FlatButton 
             onClick={()=>close()}
             label={
