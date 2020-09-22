@@ -2,7 +2,11 @@ import React, { useEffect, useState, useContext } from 'react';
 import { ethers } from 'ethers';
 import { Keyboard, Box, Button, TextInput, Text, ResponsiveContext, Collapsible } from 'grommet';
 
-import { FiClock as Clock } from 'react-icons/fi';
+import { 
+  FiClock as Clock,
+  FiArrowRight as ArrowRight,
+} from 'react-icons/fi';
+
 import DaiMark from '../components/logos/DaiMark';
 
 import { cleanValue } from '../utils';
@@ -27,6 +31,7 @@ import TxPending from '../components/TxPending';
 import InfoGrid from '../components/InfoGrid';
 import ActionButton from '../components/ActionButton';
 import RaisedButton from '../components/RaisedButton';
+import FlatButton from '../components/FlatButton';
 
 interface IBorrowProps {
   borrowAmount?:number|null;
@@ -305,6 +310,20 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
                 label={`Borrow ${inputValue || ''} DAI`}
                 disabled={borrowDisabled}
               />}
+            </Box>}
+
+          
+          { activeSeries?.eDaiBalance_ > 0 &&
+            <Box alignSelf='end'>
+              <FlatButton 
+                // onClick={()=>setRepayOpen(true)}
+                label={
+                  <Box direction='row' gap='small' align='center'>
+                    <Box><Text size='xsmall' color='text-weak'>alternatively, <Text weight='bold'>repay</Text> series debt</Text></Box>
+                    <ArrowRight color='text-weak' />
+                  </Box>
+                }
+              />
             </Box>}
 
           { activeSeries && activeSeries.isMature() &&

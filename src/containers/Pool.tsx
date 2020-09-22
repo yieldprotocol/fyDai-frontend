@@ -253,10 +253,10 @@ const Pool = (props:IPoolProps) => {
                 onClick={()=>setRemoveLiquidityOpen(true)}
                 label={
                   <Box direction='row' gap='small' align='center'>
-                    { !(activeSeries?.isMature()) ? 
-                      <Box><Text size='xsmall' color='text-weak'>Remove exisiting Liquidity from this series</Text></Box>
+                    { activeSeries?.isMature() ? 
+                      <Box><Text size='xsmall' color='text-weak'><Text weight='bold'>Remove</Text> exisiting Liquidity from this series</Text></Box>
                       :
-                      <Text size='xsmall' color='text-weak'>alternatively, Remove Liquidity from this series</Text>}
+                      <Text size='xsmall' color='text-weak'>alternatively, <Text weight='bold'>Remove Liquidity</Text> from this series</Text>}
                     <ArrowRight color='text-weak' />
                   </Box>
                 }  

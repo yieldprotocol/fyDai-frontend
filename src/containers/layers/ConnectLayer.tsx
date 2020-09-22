@@ -32,6 +32,7 @@ import { UserContext } from '../../contexts/UserContext';
 import ProfileButton from '../../components/ProfileButton';
 import RaisedButton from '../../components/RaisedButton';
 import FlatButton from '../../components/FlatButton';
+import TxHistory from '../../components/TxHistory';
 
 const ConnectLayer = ({ view, target, closeLayer }: any) => {
 
@@ -69,22 +70,22 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
               padding: '2rem',
             }}
           >
-            { account && layerView !== 'CONNECT' &&
 
+            { account && layerView === 'ACCOUNT' &&
               <>
-                <Box pad="medium" gap="small">
+                <Box pad="small" gap="small">
                   <Box direction='row' justify='between'>
-                    <Text alignSelf='start' size='xxlarge' color='brand' weight='bold'>Connected Wallet</Text>   
+                    <Text alignSelf='start' size='xxlarge' color='brand' weight='bold'>Wallet</Text>   
                     <Box round>
                       <FlatButton
                         onClick={()=>setLayerView('CONNECT')}
-                        label={<Text size='small'>Change wallet</Text>}
+                        label={<Text size='xsmall'>Change wallet</Text>}
                       /> 
                     </Box>
                   </Box>
                    
                   <Box
-                    pad={{ vertical:'medium' }}
+                    pad={{ vertical:'small' }}
                     justify="center"
                     gap='small'
                   >
@@ -108,10 +109,38 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                   </Box>
                 </Box>
 
-                <Box pad="medium" gap="small">
-                  <Text alignSelf='start' size='xxlarge' color='brand' weight='bold'>Account Settings</Text>    
+                <Box pad="small" gap="small">
+                  <Box direction='row' justify='between'>
+                    <Text alignSelf='start' size='xxlarge' color='brand' weight='bold'>Transactions</Text>   
+                    <Box round>
+                      <FlatButton
+                        onClick={()=>setLayerView('HISTORY')}
+                        label={<Text size='xsmall'>View history</Text>}
+                      /> 
+                    </Box>
+                  </Box>  
                   <Box
-                    pad={{ vertical:'medium' }}
+                    pad={{ vertical:'small' }}
+                    justify="center"
+                    gap='small'
+                  >
+                    <Text size='xsmall'>Last complete transaction: txhashofsomething </Text>
+                    <Text size='xsmall'>Pending transactions: txhashofsomething </Text>    
+                  </Box>
+                </Box>
+
+                <Box pad="small" gap="small">
+                  <Box direction='row' justify='between'>
+                    <Text alignSelf='start' size='xxlarge' color='brand' weight='bold'>Account Settings</Text> 
+                    <Box round>
+                      <FlatButton
+                        onClick={()=>console.log('STILL TO DO!')}
+                        label={<Text size='xsmall'>More settings</Text>}
+                      /> 
+                    </Box>
+                  </Box>  
+                  <Box
+                    pad={{ vertical:'small' }}
                     justify="center"
                     gap='small'
                   >
@@ -119,18 +148,6 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                   </Box>
                 </Box>
 
-                <Footer pad='medium' gap='xsmall' direction='row' justify='start' align='center'>
-
-                  <FlatButton 
-                    onClick={() => closeLayer()}
-                    label={
-                      <Box direction='row' gap='medium' align='center'>
-                        <ArrowLeft color='text-weak' />                    
-                        <Text size='small' color='text-weak'> go back  </Text>
-                      </Box>
-                  }
-                  />
-                </Footer>
               </> }
 
             { layerView === 'CONNECT' &&      
@@ -171,33 +188,44 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                     <Anchor href="#" label="Help!" size="xsmall" color="brand" />
                     <Text size="xsmall"> I'm not sure what this means.</Text>
                   </Box>
-
                 </Box>
-                <Footer direction="row-responsive" justify='between' pad="medium">
-                  <FlatButton 
-                    onClick={() => {
-                      if (view === 'ACCOUNT') { 
-                        setLayerView('ACCOUNT');
-                      } else {
-                        closeLayer();
-                      }
-                    }}
-                    label={
-                      <Box direction='row' gap='medium' align='center'>
-                        <ArrowLeft color='text-weak' />                    
-                        <Text size='small' color='text-weak'> go back  </Text>
-                      </Box>
-                  }            
-                  />
-                  <FlatButton
-                    label={<Text size='small' color='text-weak'>Close</Text>}
-                    onClick={()=>closeLayer()}
-                  />
-                </Footer>
+
               </Box>}
+
+
+            { account && layerView === 'HISTORY' &&      
+              <Box pad="medium" gap="small"> 
+              something
+                {/* <TxHistory /> */}
+              </Box> }
+
+            <Footer direction="row-responsive" justify='between' pad="medium">
+              <FlatButton 
+                onClick={() => {
+                  if (view === 'ACCOUNT' && layerView !== 'ACCOUNT') { 
+                    setLayerView('ACCOUNT');
+                  } else {
+                    closeLayer();
+                  }
+                }}
+                label={
+                  <Box direction='row' gap='medium' align='center'>
+                    <ArrowLeft color='text-weak' />                    
+                    <Text size='xsmall' color='text-weak'> go back  </Text>
+                  </Box>
+                  }
+              />
+              {layerView !== 'ACCOUNT' &&  <FlatButton
+                label={<Text size='xsmall' color='text-weak'>Close</Text>}
+                onClick={()=>closeLayer()}
+              />}
+            </Footer>
           </Box>
         </Layer>
       )}
+
+
+
     </>
   );
 };
