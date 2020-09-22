@@ -27,7 +27,7 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
   const { state: { requestedSigs } } = useContext(NotifyContext);
   const { state: { authorizations }, actions: userActions } = useContext(UserContext);
   const { hasDelegatedProxy } = authorizations;
-  const { actions: seriesActions } = useContext(SeriesContext);
+  const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
 
   // flags 
   const [ authPending, setAuthPending ] = useState<boolean>(false);
@@ -67,12 +67,12 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
 
   return (
     <>
-      { !series && !hasDelegatedProxy && account && 
+      { !!seriesState.stateLaoding && !series && !hasDelegatedProxy && account && 
         <Box direction='row' fill='horizontal' gap='small' justify='between'>
           {!buttonOnly && <Text>Before we start, Yield requires some permissions. </Text> }
           <RaisedButton 
             // primary={buttonOnly}
-            label={buttonOnly?<Text size='small'><Unlock /> Authorization is required to get started</Text>:<Text size='small'><Unlock /> Authorise Yield</Text>}
+            label={buttonOnly?<Text size='small'><Unlock /> Authorization is required to use Yield.</Text>:<Text size='small'><Unlock /> Authorise Yield</Text>}
             onClick={()=>{authProcedure();}}
           />        
         </Box>}
