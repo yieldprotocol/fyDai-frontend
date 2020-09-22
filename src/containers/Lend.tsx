@@ -68,7 +68,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
 
   const [ APR, setAPR ] = useState<number>();
   const [ eDaiValue, setEDaiValue ] = useState<number>(0);
-  const [ currentValue, setCurrentValue ] = useState<number>(0);
+  const [ currentValue, setCurrentValue ] = useState<string>();
   
   /* Lend execution flow */
   const lendProcedure = async () => {
@@ -100,7 +100,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
   useEffect(() => {
     fallbackProvider && account && activeSeries?.eDaiBalance_ && !(activeSeries.isMature()) && ( async () => {
       const preview = await previewPoolTx('SellEDai', activeSeries, activeSeries.eDaiBalance_);
-      !(preview instanceof Error) && setCurrentValue( parseFloat(ethers.utils.formatEther(preview)));
+      !(preview instanceof Error) && setCurrentValue( ethers.utils.formatEther(preview));
     })();
   }, [ activeSeries, account, fallbackProvider ]);
   
@@ -151,10 +151,10 @@ const Lend = ({ lendAmount }:ILendProps) => {
               },
               {
                 label: 'Current Value',
-                visible: false && !!account && !txActive,
+                visible: !!account && !txActive,
                 active: true,
-                loading: lendPending,           
-                value: currentValue!==0?`${currentValue} DAI`: '-',
+                loading: lendPending || !currentValue,           
+                value: currentValue?`${cleanValue(currentValue, 2)} DAI`: '- Dai',
                 valuePrefix: null,
                 valueExtra: null,
               },
@@ -269,7 +269,6 @@ const Lend = ({ lendAmount }:ILendProps) => {
                 }
               />
             </Box>}
-
           </>}
 
           {/* If the series is mature show the redeem view */}
@@ -281,7 +280,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
       </Box>}
 
       {/* If there is a transaction active, show the applicable view */}
-      { sellActive && !txActive && <ApprovalPending /> } 
+      { sellActive && !txActive && <ApprovalPending /> }
       { txActive && <TxPending msg={`You are lending ${inputValue} DAI`} tx={txActive} /> }
     </Keyboard>
   );

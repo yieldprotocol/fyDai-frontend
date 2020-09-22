@@ -1,8 +1,11 @@
 import React, { useEffect, useContext, useState } from 'react';
 import { ethers } from 'ethers';
-import { Box, Button, TextInput, Text, ResponsiveContext, Keyboard } from 'grommet';
+import { Box, Button, TextInput, Text, ResponsiveContext, Keyboard, Layer } from 'grommet';
 
-import { FiCheckCircle as Check } from 'react-icons/fi';
+import { 
+  FiCheckCircle as Check,
+  FiArrowLeft as ArrowLeft,
+} from 'react-icons/fi';
 import DaiMark from '../components/logos/DaiMark';
 
 import { cleanValue } from '../utils';
@@ -26,13 +29,15 @@ import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
 import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
+import FlatButton from '../components/FlatButton';
 
 interface IRepayProps {
   repayAmount?:any
   setActiveView?: any;
+  close?:any;
 }
 
-function Repay({ setActiveView, repayAmount }:IRepayProps) {
+function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
   const { state: { deployedContracts } } = useContext(YieldContext);
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { activeSeries } = seriesState;
@@ -99,107 +104,95 @@ function Repay({ setActiveView, repayAmount }:IRepayProps) {
   }, [ activeSeries ]);
 
   return (
-    <Keyboard 
-      onEsc={() => setInputValue(undefined)}
-      onEnter={()=> repayProcedure(inputValue)}
-      onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
-      target='document'
-    >
-      <SeriesDescriptor activeView='borrow'> 
-        <InfoGrid 
-          alt
-          entries={[
-            {
-              label: 'Current Debt',
-              visible: !!account && !txActive,
-              active: true,
-              loading: repayPending,     
-              value: activeSeries?.ethDebtEDai_? `${activeSeries.ethDebtEDai_} DAI`: '0 DAI',
-              valuePrefix: null,
-              valueExtra: null, 
-            },
-            {
-              label: 'Dai balance',
-              visible: !!account && !txActive,
-              active: true,
-              loading: repayPending,            
-              value: daiBalance_?`${daiBalance_} DAI`: '-',
-              valuePrefix: null,
-              valueExtra: null,
-            },
-          ]}
-        />
-      </SeriesDescriptor>
-
-      { !txActive &&
-
-      <Box
-        width={{ max: '600px' }}
-        alignSelf="center"
-        fill
-        background="background-front"
-        round='small'
-        pad="large"
+    <Layer onClickOutside={()=>close()}>
+      <Keyboard 
+        onEsc={() => setInputValue(undefined)}
+        onEnter={()=> repayProcedure(inputValue)}
+        onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
+        target='document'
       >
-        <Box flex='grow' justify='between'>
-          <Box gap='medium' align='center' fill='horizontal'>
+        { !txActive &&
+        <Box
+          width={{ min: '600px', max: '600px' }}
+          alignSelf="center"
+          fill
+          background="background-front"
+          round='small'
+          pad="large"
+        >
+          <Box flex='grow' justify='between'>
+            <Box gap='medium' align='center' fill='horizontal'>
 
-            { (activeSeries?.ethDebtEDai.gt(ethers.constants.Zero)) ?
+              { (activeSeries?.ethDebtEDai.gt(ethers.constants.Zero)) ?
              
-              <Box gap='medium' align='center' fill='horizontal'>
-                <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to Repay</Text>
+                <Box gap='medium' align='center' fill='horizontal'>
+                  <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to Repay</Text>
 
-                <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={repayDisabled}>
-                  <TextInput
-                    ref={(el:any) => {el && el.focus(); setInputRef(el);}} 
-                    type="number"
-                    placeholder={screenSize !== 'small' ? 'Enter the amount of Dai to Repay': 'DAI'}
-                    value={inputValue || ''}
-                    plain
-                    onChange={(event:any) => setInputValue(( cleanValue(event.target.value) ))}
-                    icon={<DaiMark />}
-                  />
-                  <RaisedButton 
-                    label={screenSize !== 'small' ? 'Repay Maximum': 'Maximum'}
-                    onClick={()=>setInputValue(ethers.utils.formatEther(daiBalance))}
-                  />
-                </InputWrap>
+                  <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={repayDisabled}>
+                    <TextInput
+                      ref={(el:any) => {el && el.focus(); setInputRef(el);}} 
+                      type="number"
+                      placeholder={screenSize !== 'small' ? 'Enter the amount of Dai to Repay': 'DAI'}
+                      value={inputValue || ''}
+                      plain
+                      onChange={(event:any) => setInputValue(( cleanValue(event.target.value) ))}
+                      icon={<DaiMark />}
+                    />
+                    <RaisedButton 
+                      label={screenSize !== 'small' ? 'Repay Maximum': 'Maximum'}
+                      onClick={()=>setInputValue(ethers.utils.formatEther(daiBalance))}
+                    />
+                  </InputWrap>
 
-                <ActionButton
-                  onClick={()=>repayProcedure(inputValue)}
-                  label={`Repay ${inputValue || ''} DAI`}
-                  disabled={repayDisabled}
-                />
-              </Box> :
-              <Box 
-                gap='medium' 
-                margin={{ vertical:'large' }}  
-                pad='medium'     
-                round='small'
-                fill='horizontal'
-                border='all'
-              >    
-                <Box direction='row' justify='center' fill>          
-                  <Box direction='row' gap='small' align='center'>
-                    <Box>
-                      <Check />
-                    </Box>
-                    <Box> 
-                      <Text size='small' color='brand'>You do not have any debt in this series.</Text>         
-                    </Box>
+                  <ActionButton
+                    onClick={()=>repayProcedure(inputValue)}
+                    label={`Repay ${inputValue || ''} DAI`}
+                    disabled={repayDisabled}
+                  />
+
+                  <Box alignSelf='start'>
+                    <FlatButton 
+                      onClick={()=>close()}
+                      label={
+                        <Box direction='row' gap='medium' align='center'>
+                          <ArrowLeft color='text-weak' />
+                          <Text size='xsmall' color='text-weak'> go back </Text>
+                        </Box>}
+                    />
                   </Box>
-                  {/* <Button label='borrow Dai from this series' /> */}
-                </Box>             
-              </Box>}            
+          
+                </Box> :
+                <Box 
+                  gap='medium' 
+                  margin={{ vertical:'large' }}  
+                  pad='medium'     
+                  round='small'
+                  fill='horizontal'
+                  border='all'
+                >    
+                  <Box direction='row' justify='center' fill>          
+                    <Box direction='row' gap='small' align='center'>
+                      <Box>
+                        <Check />
+                      </Box>
+                      <Box> 
+                        <Text size='small' color='brand'>You do not have any debt in this series.</Text>         
+                      </Box>
+                    </Box>
+                    {/* <Button label='borrow Dai from this series' /> */}
+                  </Box>             
+                </Box>}            
+            </Box>
           </Box>
-        </Box>
-      </Box>}
-      { repayActive && !txActive && <ApprovalPending /> } 
-      { txActive && <TxPending msg={`You are repaying ${inputValue} DAI`} tx={txActive} /> }
-    </Keyboard>
+        </Box>}
+        { repayActive && !txActive && <ApprovalPending /> }
+
+        { txActive && <TxPending msg={`You are repaying ${inputValue} DAI`} tx={txActive} /> }
+      </Keyboard>
+    </Layer>
   );
 }
 
-Repay.defaultProps = { repayAmount:null, setActiveView: 2 };
+Repay.defaultProps = { repayAmount:null, setActiveView: 2, close:()=>console.log('Send in a close function') };
 
 export default Repay;

@@ -1,5 +1,8 @@
 import React, { useState  } from 'react';
-import { Box, Collapsible } from 'grommet';
+import { Box, Collapsible, Stack } from 'grommet';
+
+
+
 
 import RaisedBox from '../components/RaisedBox';
 import PageHeader from '../components/PageHeader';
@@ -8,7 +11,8 @@ import BorrowSelector from '../components/BorrowSelector';
 import Deposit from '../containers/Deposit';
 import Borrow from '../containers/Borrow';
 import Repay from '../containers/Repay';
-import SeriesDescriptor from '../components/SeriesDescriptor';
+
+import CollateralSummary from '../components/CollateralSummary';
 
 // const Deposit = lazy(() => import('../containers/Deposit'));
 // const Borrow = lazy(() => import('../containers/Borrow'));
@@ -40,11 +44,10 @@ const BorrowView = ({
         tipPrimary="Tip: Convert your Maker vault"
         tipSecondary="View more tips"
       /> */}
-      <Box>
-        <BorrowSelector activeView={activeView} setActiveView={setActiveView} />
-      </Box>
 
-      <RaisedBox>      
+      <BorrowSelector activeView={activeView} setActiveView={setActiveView} />
+
+      <RaisedBox>
         <Box
           width={{ max: '600px' }}
           alignSelf="center"
@@ -56,7 +59,7 @@ const BorrowView = ({
           {activeView === 1 && <Borrow setActiveView={setActiveView} /> }
           {activeView === 2 && <Repay setActiveView={setActiveView} />}
         </Box>
-      </RaisedBox>    
+      </RaisedBox>
     </Box>
   );
 };

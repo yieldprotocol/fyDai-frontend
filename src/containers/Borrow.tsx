@@ -32,6 +32,7 @@ import InfoGrid from '../components/InfoGrid';
 import ActionButton from '../components/ActionButton';
 import RaisedButton from '../components/RaisedButton';
 import FlatButton from '../components/FlatButton';
+import Repay from './Repay';
 
 interface IBorrowProps {
   borrowAmount?:number|null;
@@ -61,6 +62,8 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
   const { account } = useSignerAccount();
 
   const [ txActive ] = useTxActive(['BORROW', 'BUY' ]);
+
+  const [ repayOpen, setRepayOpen ] = useState<boolean>(false);
 
   /* internal component state */
   const [ borrowPending, setBorrowPending ] = useState<boolean>(false);
@@ -160,6 +163,9 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
       onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
       target='document'   
     >
+
+      { repayOpen && <Repay close={()=>setRepayOpen(false)} /> }
+
       <Collapsible open={!!activeSeries}>
         <SeriesDescriptor activeView='borrow'>
           { hasDelegatedProxy &&
@@ -180,7 +186,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
                 visible: !txActive && activeSeries && !activeSeries.isMature()  && !!account,
                 active: maxDaiAvailable_,
                 loading: borrowPending,
-                value: maxDaiAvailable_ ? `${maxDaiAvailable_} DAI`: '',           
+                value: maxDaiAvailable_? `${maxDaiAvailable_} DAI`: '0 DAI',           
                 valuePrefix: 'Approx.',
                 valueExtra: null,
               },
@@ -220,7 +226,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
 
               <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={borrowDisabled}>
                 <TextInput
-                  ref={(el:any) => {el && el.focus(); setInputRef(el);}} 
+                  ref={(el:any) => {el && !repayOpen && el.focus(); setInputRef(el);}} 
                   type="number"
                   placeholder={screenSize !== 'small' ? 'Enter the amount of Dai to borrow': 'DAI'} 
                   value={inputValue || ''}
@@ -303,7 +309,6 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
                 },
               ]}
               />
-
               { account &&  
               <ActionButton
                 onClick={()=>borrowProcedure()}
@@ -311,12 +316,11 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
                 disabled={borrowDisabled}
               />}
             </Box>}
-
-          
-          { activeSeries?.eDaiBalance_ > 0 &&
+       
+          { activeSeries?.ethDebtEDai_ > 0 &&
             <Box alignSelf='end'>
               <FlatButton 
-                // onClick={()=>setRepayOpen(true)}
+                onClick={()=>setRepayOpen(true)}
                 label={
                   <Box direction='row' gap='small' align='center'>
                     <Box><Text size='xsmall' color='text-weak'>alternatively, <Text weight='bold'>repay</Text> series debt</Text></Box>

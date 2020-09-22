@@ -11,6 +11,7 @@ import {
 
 import {
   FiArrowRight as ArrowRight,
+  FiArrowLeft as ArrowLeft,
 } from 'react-icons/fi';
 import EthMark from '../components/logos/EthMark';
 
@@ -214,13 +215,26 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
 
           { ethPosted_ > 0 &&
 
-          <Box alignSelf='end'>
+          <Box 
+            direction='row'
+            fill='horizontal'
+            justify='between' 
+          >
+
+            <FlatButton 
+              onClick={()=>setActiveView(1)}
+              label={
+                <Box direction='row' gap='small' align='center'>
+                  <ArrowLeft color='text-weak' />
+                  <Box><Text size='xsmall' color='text-weak'>back to borrow</Text></Box>   
+                </Box>}
+            />
 
             <FlatButton 
               onClick={()=>setWithdrawOpen(true)}
               label={
                 <Box direction='row' gap='small' align='center'>
-                  <Box><Text size='xsmall' color='text-weak'>alternatively, <Text weight='bold'>withdraw</Text> collateral</Text></Box>
+                  <Box><Text size='xsmall' color='text-weak'>or,  <Text weight='bold'>withdraw</Text> collateral</Text></Box>
                   <ArrowRight color='text-weak' />
                 </Box> }
             />
