@@ -74,15 +74,13 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
               <>
                 <Box pad="medium" gap="small">
                   <Box direction='row' justify='between'>
-
                     <Text alignSelf='start' size='xxlarge' color='brand' weight='bold'>Connected Wallet</Text>   
                     <Box round>
-                      <RaisedButton
+                      <FlatButton
                         onClick={()=>setLayerView('CONNECT')}
                         label={<Text size='small'>Change wallet</Text>}
                       /> 
                     </Box>
-
                   </Box>
                    
                   <Box

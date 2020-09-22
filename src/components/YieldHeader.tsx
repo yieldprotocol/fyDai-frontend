@@ -200,7 +200,7 @@ const YieldHeader = (props: any) => {
     <Box
       background='background-front'
       direction='row'
-      pad={{ horizontal:'small', vertical:'large' }}
+      pad={{ horizontal:'medium', vertical:'large' }}
       justify='between'
       fill='horizontal'
     >

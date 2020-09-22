@@ -20,6 +20,7 @@ import ApprovalPending from '../components/ApprovalPending';
 import TxPending from '../components/TxPending';
 import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
+import FlatButton from '../components/FlatButton';
 
 interface IRemoveLiquidityProps {
   close?: any;
@@ -184,18 +185,15 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
             />
 
             <Box alignSelf='start'>
-              <Box
-                round
+              <FlatButton 
                 onClick={()=>close()}
-                hoverIndicator='brand-transparent'
-                pad={{ horizontal:'small', vertical:'small' }}
-                justify='center'
-              >
-                <Box direction='row' gap='small' align='center'>
-                  <ArrowLeft color='text-weak' />
-                  <Text size='xsmall' color='text-weak'> go back </Text>
-                </Box>
-              </Box>
+                label={
+                  <Box direction='row' gap='medium' align='center'>
+                    <ArrowLeft color='text-weak' />
+                    <Text size='small' color='text-weak'> go back </Text>
+                  </Box>
+                }
+              />
             </Box>
           </Box>}
         { removeLiquidityPending && !txActive && <ApprovalPending /> }   
