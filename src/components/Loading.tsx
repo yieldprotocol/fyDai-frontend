@@ -22,7 +22,7 @@ function Loading({ condition, size, children }:ILoadingProps) {
   
   return (
     <>
-      { condition ?    
+      { condition ? 
         <ScaleLoader 
           color={theme?.global?.colors['brand-transparent'].dark}
           height={`${(theme?.text[size].size).slice(0, -2)}px`}

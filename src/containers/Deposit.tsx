@@ -130,7 +130,6 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
       { withdrawOpen && <WithdrawEth close={()=>setWithdrawOpen(false)} /> }    
       { (!txActive || txActive?.type === 'WITHDRAW') &&
         <Box
-          // width={{ max: '750px' }}
           alignSelf="center"
           fill
           background="background-front"

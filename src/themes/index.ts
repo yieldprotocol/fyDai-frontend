@@ -263,7 +263,24 @@ export const yieldTheme = {
     `,
   },
   TextInput: {
-
+    color: 'red',
+    // @ts-ignore
+    extend: () => css`
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+        input[type='number'] {
+          -moz-appearance: textfield;
+        }
+        overflow: auto;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+        ::-webkit-scrollbar {
+          display: none;
+        }
+      `,
   },
 
   collapsible: {

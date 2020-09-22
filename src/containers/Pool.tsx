@@ -32,6 +32,7 @@ import SeriesDescriptor from '../components/SeriesDescriptor';
 import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
+import Loading from '../components/Loading';
 
 interface IPoolProps {
   // lendAmount?:any
@@ -184,70 +185,71 @@ const Pool = (props:IPoolProps) => {
         gap='medium'
       >
         <Box flex='grow' gap='small' align='center' fill='horizontal'>
+          <Loading condition={seriesState.seriesLoading} size='large'>
           
-          { !(activeSeries?.isMature()) && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
-          <>
-            <Box fill gap='medium'>
-              <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Add liquidity</Text>
-              <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={addLiquidityDisabled}>
-                <TextInput
-                  ref={(el:any) => {el && !removeLiquidityOpen && el.focus(); setInputRef(el);}} 
-                  type="number"
-                  placeholder={screenSize !== 'small' ? 'Enter the amount of Dai Liquidity to add': 'DAI'}
-                  value={inputValue || ''}
-                  plain
-                  onChange={(event:any) => setInputValue( cleanValue(event.target.value) )}
-                  icon={<DaiMark />}
-                />
-                {account &&
-                <RaisedButton 
-                  label={screenSize !== 'small' ? 'Add Maximum': 'Maximum'}
-                  onClick={()=>setInputValue(daiBalance_)}
-                />}
-              </InputWrap>
+            { !(activeSeries?.isMature()) && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
+            <>
+              <Box fill gap='medium'>
+                <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Add liquidity</Text>
+                <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={addLiquidityDisabled}>
+                  <TextInput
+                    ref={(el:any) => {el && !removeLiquidityOpen && el.focus(); setInputRef(el);}} 
+                    type="number"
+                    placeholder={screenSize !== 'small' ? 'Enter the amount of Dai Liquidity to add': 'DAI'}
+                    value={inputValue || ''}
+                    plain
+                    onChange={(event:any) => setInputValue( cleanValue(event.target.value) )}
+                    icon={<DaiMark />}
+                  />
+                  {account &&
+                  <RaisedButton 
+                    label={screenSize !== 'small' ? 'Add Maximum': 'Maximum'}
+                    onClick={()=>setInputValue(daiBalance_)}
+                  />}
+                </InputWrap>
 
-              <InfoGrid entries={[
-                {
-                  label: 'Share of the Pool after adding liquidity',
-                  visible: true,
-                  active: inputValue,
-                  loading: calculating,           
-                  value: newShare? `${newShare}%`: '',
-                  valuePrefix: null,
-                  valueExtra: null,
-                },
-                {
-                  label: 'Like what you see?',
-                  visible: !account && inputValue>0,
-                  active: inputValue,
-                  loading: false,            
-                  value: '',
-                  valuePrefix: null,
-                  valueExtra: () => (
-                    <Button
-                      color='brand-transparent'
-                      label={<Text size='xsmall' color='brand'>Connect a wallet</Text>}
-                      onClick={()=>console.log('still to implement')}
-                      hoverIndicator='brand-transparent'
-                    /> 
-                  )
-                },
-              ]}
-              />
-            </Box> 
-            {/* }
+                <InfoGrid entries={[
+                  {
+                    label: 'Share of the Pool after adding liquidity',
+                    visible: true,
+                    active: inputValue,
+                    loading: calculating,           
+                    value: newShare? `${newShare}%`: '',
+                    valuePrefix: null,
+                    valueExtra: null,
+                  },
+                  {
+                    label: 'Like what you see?',
+                    visible: !account && inputValue>0,
+                    active: inputValue,
+                    loading: false,            
+                    value: '',
+                    valuePrefix: null,
+                    valueExtra: () => (
+                      <Button
+                        color='brand-transparent'
+                        label={<Text size='xsmall' color='brand'>Connect a wallet</Text>}
+                        onClick={()=>console.log('still to implement')}
+                        hoverIndicator='brand-transparent'
+                      /> 
+                    )
+                  },
+                ]}
+                />
+              </Box> 
+              {/* }
   
           { account && !(activeSeries?.isMature()) && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) && */}
-            <Box gap='small' fill='horizontal' align='center'>
-              <ActionButton
-                onClick={()=>addLiquidityProcedure()} 
-                label={`Supply ${inputValue || ''} DAI`}
-                disabled={addLiquidityDisabled}
-              />
+              <Box gap='small' fill='horizontal' align='center'>
+                <ActionButton
+                  onClick={()=>addLiquidityProcedure()} 
+                  label={`Supply ${inputValue || ''} DAI`}
+                  disabled={addLiquidityDisabled}
+                />
 
-            </Box>
-          </>}
-          { activeSeries?.poolTokens_>0 &&
+              </Box>
+            </>}
+            { activeSeries?.poolTokens_>0 &&
             <Box alignSelf='end'>
 
               <FlatButton 
@@ -264,7 +266,7 @@ const Pool = (props:IPoolProps) => {
               />
             </Box>}
 
-          { activeSeries && activeSeries.isMature() &&
+            { activeSeries && activeSeries.isMature() &&
             <Box 
               gap='medium' 
               margin={{ vertical:'large' }}  
@@ -282,7 +284,7 @@ const Pool = (props:IPoolProps) => {
                 </Box>
               </Box>             
             </Box>}
-
+          </Loading>
         </Box>
       </Box>}
 

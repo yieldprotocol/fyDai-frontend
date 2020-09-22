@@ -32,6 +32,7 @@ import SeriesDescriptor from '../components/SeriesDescriptor';
 import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
+import Loading from '../components/Loading';
 
 interface ILendProps {
   lendAmount?:any
@@ -185,97 +186,98 @@ const Lend = ({ lendAmount }:ILendProps) => {
       >
         <Box flex='grow' gap='small' align='center' fill='horizontal'>
           {/* If the series has NOT matured, show the lending input */}
+          <Loading condition={seriesState.seriesLoading} size='large'>
+            { !activeSeries?.isMature() && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
+            <>
+              <Box fill gap='medium'>
+                <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to lend</Text>
+                <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={lendDisabled}>
+                  <TextInput
+                    ref={(el:any) => {el && !withdrawDaiOpen && el.focus(); setInputRef(el);}}
+                    type="number"
+                    placeholder={screenSize !== 'small' ? 'Enter the amount of Dai to lend': 'DAI'}
+                    value={inputValue || ''}
+                    plain
+                    onChange={(event:any) => setInputValue( cleanValue(event.target.value) )}
+                    icon={<DaiMark />}
+                  />
+                  {account &&
+                  <RaisedButton 
+                    label={screenSize !== 'small' ? 'Lend Maximum': 'Maximum'}
+                    onClick={()=>setInputValue( ethers.utils.formatEther(daiBalance) )}
+                  />}
+                </InputWrap>
 
-          { !activeSeries?.isMature() && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
-          <>
-            <Box fill gap='medium'>
-              <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to lend</Text>
-              <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={lendDisabled}>
-                <TextInput
-                  ref={(el:any) => {el && !withdrawDaiOpen && el.focus(); setInputRef(el);}}
-                  type="number"
-                  placeholder={screenSize !== 'small' ? 'Enter the amount of Dai to lend': 'DAI'}
-                  value={inputValue || ''}
-                  plain
-                  onChange={(event:any) => setInputValue( cleanValue(event.target.value) )}
-                  icon={<DaiMark />}
+                <InfoGrid entries={[
+                  {
+                    label: 'Estimated APR',
+                    visible: true,
+                    active: inputValue,
+                    loading: false,     
+                    value: APR?`${APR.toFixed(2)}%`: `${activeSeries? activeSeries.yieldAPR_: ''}%`,
+                    valuePrefix: null,
+                    valueExtra: null, 
+                  },
+                  {
+                    label: 'Approx. Dai received at maturity',
+                    visible: true,
+                    active: inputValue,
+                    loading: false,           
+                    value: `${eDaiValue.toFixed(2)} DAI`,
+                    valuePrefix: null,
+                    valueExtra: null,
+                    //   valueExtra: () => (
+                    //   <Text size='xxsmall'>
+                    //     {activeSeries && Moment(activeSeries.maturity_).format('DD MMMM YYYY')}
+                    //   </Text>
+                    // ),
+                  },
+                  {
+                    label: 'Like what you see?',
+                    visible: !account && inputValue>0,
+                    active: inputValue,
+                    loading: false,            
+                    value: '',
+                    valuePrefix: null,
+                    valueExtra: () => (
+                      <RaisedButton
+                        label={<Text size='small'>Connect a wallet</Text>}
+                        onClick={()=>console.log('still to implement')}
+                      /> 
+                    )
+                  },
+                ]}
                 />
-                {account &&
-                <RaisedButton 
-                  label={screenSize !== 'small' ? 'Lend Maximum': 'Maximum'}
-                  onClick={()=>setInputValue( ethers.utils.formatEther(daiBalance) )}            
-                />}
-              </InputWrap>
+              </Box>
 
-              <InfoGrid entries={[
-                {
-                  label: 'Estimated APR',
-                  visible: true,
-                  active: inputValue,
-                  loading: false,     
-                  value: APR?`${APR.toFixed(2)}%`: `${activeSeries? activeSeries.yieldAPR_: ''}%`,
-                  valuePrefix: null,
-                  valueExtra: null, 
-                },
-                {
-                  label: 'Approx. Dai received at maturity',
-                  visible: true,
-                  active: inputValue,
-                  loading: false,           
-                  value: `${eDaiValue.toFixed(2)} DAI`,
-                  valuePrefix: null,
-                  valueExtra: null,
-                //   valueExtra: () => (
-                //   <Text size='xxsmall'>
-                //     {activeSeries && Moment(activeSeries.maturity_).format('DD MMMM YYYY')}
-                //   </Text>
-                // ),
-                },
-                {
-                  label: 'Like what you see?',
-                  visible: !account && inputValue>0,
-                  active: inputValue,
-                  loading: false,            
-                  value: '',
-                  valuePrefix: null,
-                  valueExtra: () => (
-                    <RaisedButton
-                      label={<Text size='small'>Connect a wallet</Text>}
-                      onClick={()=>console.log('still to implement')}
-                    /> 
-                  )
-                },
-              ]}
-              />
-            </Box>
+              <Box gap='small' fill='horizontal' align='center' pad={{ vertical:'small' }}>
+                <ActionButton
+                  onClick={()=>lendProcedure()}
+                  label={`Lend ${inputValue || ''} DAI`}
+                  disabled={lendDisabled}
+                />       
+              </Box>
 
-            <Box gap='small' fill='horizontal' align='center' pad={{ vertical:'small' }}>
-              <ActionButton
-                onClick={()=>lendProcedure()}
-                label={`Lend ${inputValue || ''} DAI`}
-                disabled={lendDisabled}
-              />       
-            </Box>
-
-            { activeSeries?.eDaiBalance_ > 0 &&
-            <Box alignSelf='end'>
-              <FlatButton 
-                onClick={()=>setWithdrawDaiOpen(true)}
-                label={
-                  <Box direction='row' gap='small' align='center'>
-                    <Box><Text size='xsmall' color='text-weak'>alternatively, <Text weight='bold'>close</Text> your position in this series</Text></Box>
-                    <ArrowRight color='text-weak' />
-                  </Box>
+              { activeSeries?.eDaiBalance_ > 0 &&
+              <Box alignSelf='end'>
+                <FlatButton 
+                  onClick={()=>setWithdrawDaiOpen(true)}
+                  label={
+                    <Box direction='row' gap='small' align='center'>
+                      <Box><Text size='xsmall' color='text-weak'>alternatively, <Text weight='bold'>close</Text> your position in this series</Text></Box>
+                      <ArrowRight color='text-weak' />
+                    </Box>
                 }
-              />
-            </Box>}
-          </>}
+                />
+              </Box>}
+            </>}
 
-          {/* If the series is mature show the redeem view */}
-          { (activeSeries?.isMature()) &&
-          <Box fill gap='medium' margin={{ vertical:'large' }}>
-            <Redeem />
-          </Box>}
+            {/* If the series is mature show the redeem view */}
+            { (activeSeries?.isMature()) &&
+            <Box fill gap='medium' margin={{ vertical:'large' }}>
+              <Redeem />
+            </Box>}
+          </Loading>
         </Box>
       </Box>}
 

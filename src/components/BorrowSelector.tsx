@@ -67,7 +67,7 @@ function BorrowSelector({ setActiveView, activeView }:IActionSelectorProps) {
       <Box
         pad={{ horizontal:'medium', vertical :'medium' }}
         alignSelf="center"
-        width={{ max: '750px' }}
+        width={{ max: '600px' }}
         fill="horizontal"
       >
         <Box
