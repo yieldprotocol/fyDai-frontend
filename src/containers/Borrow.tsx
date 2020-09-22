@@ -220,140 +220,142 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
         background="background-front"
         round='small'
         pad="large"
+        gap='small'
       >
 
-        <Box gap='medium' align='center' fill='horizontal'>
-          <Loading condition={seriesState.seriesLoading} size='large'>
+        <Box gap='small' align='center' fill='horizontal'>
+          {/* <Loading condition={seriesState.seriesLoading} size='large'> */}
 
-            { !activeSeries?.isMature() && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
-              <Box gap='medium' align='center' fill='horizontal'>
-                <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to borrow</Text>
+          { !activeSeries?.isMature() && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
+          <Box gap='medium' align='center' fill='horizontal'>
+            <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to borrow</Text>
 
-                <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={borrowDisabled}>
-                  <TextInput
-                    ref={(el:any) => {el && !repayOpen && el.focus(); setInputRef(el);}} 
-                    type="number"
-                    placeholder={screenSize !== 'small' ? 'Enter the amount of Dai to borrow': 'DAI'} 
-                    value={inputValue || ''}
-                    plain
-                    onChange={(event:any) => setInputValue( cleanValue(event.target.value) )}
-                    icon={<DaiMark />}
-                  />
-                </InputWrap>
+            <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={borrowDisabled}>
+              <TextInput
+                ref={(el:any) => {el && !repayOpen && el.focus(); setInputRef(el);}} 
+                type="number"
+                placeholder={screenSize !== 'small' ? 'Enter the amount of Dai to borrow': 'DAI'} 
+                value={inputValue || ''}
+                plain
+                onChange={(event:any) => setInputValue( cleanValue(event.target.value) )}
+                icon={<DaiMark />}
+              />
+            </InputWrap>
 
-                <InfoGrid entries={[
-                  {
-                    label: 'Estimated APR',
-                    visible: true,
-                    active: !!inputValue&&inputValue>0,
-                    loading: false,    
-                    value: APR?`${APR.toFixed(2)}%`: `${activeSeries? activeSeries.yieldAPR_: ''}%`,
-                    valuePrefix: null,
-                    valueExtra: null, 
-                  },
-                  {
-                    label: 'Approx. Dai owed at maturity',
-                    visible: true,
-                    active: !!inputValue&&inputValue>0,
-                    loading: false,          
-                    value: `${eDaiValue.toFixed(2)} DAI`,
-                    valuePrefix: null,
-                  // valueExtra: () => (
-                  //   <Text size='xxsmall'>
-                  //     {activeSeries && Moment(activeSeries.maturity_).format('DD MMMM YYYY')}
-                  //   </Text>
-                  // ),
-                  },
+            <InfoGrid entries={[
+              {
+                label: 'Estimated APR',
+                visible: true,
+                active: !!inputValue&&inputValue>0,
+                loading: false,    
+                value: APR?`${APR.toFixed(2)}%`: `${activeSeries? activeSeries.yieldAPR_: ''}%`,
+                valuePrefix: null,
+                valueExtra: null, 
+              },
+              {
+                label: 'Approx. Dai owed at maturity',
+                visible: true,
+                active: !!inputValue&&inputValue>0,
+                loading: false,          
+                value: `${eDaiValue.toFixed(2)} DAI`,
+                valuePrefix: null,
+                // valueExtra: () => (
+                //   <Text size='xxsmall'>
+                //     {activeSeries && Moment(activeSeries.maturity_).format('DD MMMM YYYY')}
+                //   </Text>
+                // ),
+              },
 
-                  {
-                    label: 'Ratio after Borrow',
-                    visible: !!account && position.ethPosted_>0,
-                    active: !!inputValue&&inputValue>0,
-                    loading: false,        
-                    value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
-                    valuePrefix: 'Approx.',
-                    valueExtra: () => (
-                      <Text color='red' size='small'> 
-                        { inputValue &&
+              {
+                label: 'Ratio after Borrow',
+                visible: !!account && position.ethPosted_>0,
+                active: !!inputValue&&inputValue>0,
+                loading: false,        
+                value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
+                valuePrefix: 'Approx.',
+                valueExtra: () => (
+                  <Text color='red' size='small'> 
+                    { inputValue &&
                         estRatio &&
                         ( (collateralPercent_-estRatio) > 0) &&
                         `(-${(collateralPercent_-estRatio).toFixed(0)}%)` }
-                      </Text>
-                    )
-                  },
-                  {
-                    label: 'Like what you see?',
-                    visible: !account && !!inputValue&&inputValue>0,
-                    active: !!inputValue&&inputValue>0,
-                    loading: false,            
-                    value: '',
-                    valuePrefix: null,
-                    valueExtra: () => (
-                      <Box>
-                        <RaisedButton
-                          label={<Text size='xsmall' color='brand'>Connect a wallet</Text>}
-                          onClick={()=>console.log('still to implement')}
-                        /> 
-                      </Box>
-                    )
-                  },
-                  {
-                    label: 'Want to borrow Dai?',
-                    visible: !!inputValue&&inputValue>0 && !!account && position.ethPosted <= 0,
-                    active: !!inputValue,
-                    loading: false,            
-                    value: '',
-                    valuePrefix: null,
-                    valueExtra: () => (
-                      <RaisedButton
-                        color={inputValue? 'brand': 'brand-transparent'}
-                        label={<Text size='xsmall' color='brand'>Deposit collateral</Text>}
-                        onClick={() => setActiveView(0)}
-                      /> 
-                    )
-                  },
-                ]}
-                />
-                { account &&  
-                <ActionButton
-                  onClick={()=>borrowProcedure()}
-                  label={`Borrow ${inputValue || ''} DAI`}
-                  disabled={borrowDisabled}
-                />}
-              </Box>}
-       
-            { activeSeries?.ethDebtEDai_ > 0 &&
-              <Box alignSelf='end'>
-                <FlatButton 
-                  onClick={()=>setRepayOpen(true)}
-                  label={
-                    <Box direction='row' gap='small' align='center'>
-                      <Box><Text size='xsmall' color='text-weak'>alternatively, <Text weight='bold'>repay</Text> series debt</Text></Box>
-                      <ArrowRight color='text-weak' />
-                    </Box>
-                }
-                />
-              </Box>}
-
-            { activeSeries && activeSeries.isMature() &&
-              <Box 
-                gap='medium' 
-                margin={{ vertical:'large' }}  
-                pad='medium'     
-                round='small'
-                fill='horizontal'
-                border='all'
-              >    
-                <Box direction='row' gap='small' align='center' fill>          
+                  </Text>
+                )
+              },
+              {
+                label: 'Like what you see?',
+                visible: !account && !!inputValue&&inputValue>0,
+                active: !!inputValue&&inputValue>0,
+                loading: false,            
+                value: '',
+                valuePrefix: null,
+                valueExtra: () => (
                   <Box>
-                    <Clock />
+                    <RaisedButton
+                      label={<Text size='xsmall' color='brand'>Connect a wallet</Text>}
+                      onClick={()=>console.log('still to implement')}
+                    /> 
                   </Box>
-                  <Box> 
-                    <Text size='small' color='brand'> This series has matured.</Text>         
-                  </Box>
-                </Box>             
-              </Box>}
-          </Loading>
+                )
+              },
+              {
+                label: 'Want to borrow Dai?',
+                visible: !!inputValue&&inputValue>0 && !!account && position.ethPosted <= 0,
+                active: !!inputValue,
+                loading: false,            
+                value: '',
+                valuePrefix: null,
+                valueExtra: () => (
+                  <RaisedButton
+                    color={inputValue? 'brand': 'brand-transparent'}
+                    label={<Text size='xsmall' color='brand'>Deposit collateral</Text>}
+                    onClick={() => setActiveView(0)}
+                  /> 
+                )
+              },
+            ]}
+            />
+            { account &&  
+            <ActionButton
+              onClick={()=>borrowProcedure()}
+              label={`Borrow ${inputValue || ''} DAI`}
+              disabled={borrowDisabled}
+            />}
+          </Box>}
+       
+
+          { activeSeries?.ethDebtEDai_ > 0 &&
+          <Box alignSelf='end' margin={{ top:'medium' }}>
+            <FlatButton 
+              onClick={()=>setRepayOpen(true)}
+              label={
+                <Box direction='row' gap='small' align='center'>
+                  <Box><Text size='xsmall' color='text-weak'>alternatively, <Text weight='bold'>repay</Text> series debt</Text></Box>
+                  <ArrowRight color='text-weak' />
+                </Box>
+                }
+            />
+          </Box>}
+
+          { activeSeries && activeSeries.isMature() &&
+          <Box 
+            gap='medium' 
+            margin={{ vertical:'large' }}  
+            pad='medium'     
+            round='small'
+            fill='horizontal'
+            border='all'
+          >    
+            <Box direction='row' gap='small' align='center' fill>          
+              <Box>
+                <Clock />
+              </Box>
+              <Box> 
+                <Text size='small' color='brand'> This series has matured.</Text>         
+              </Box>
+            </Box>             
+          </Box>}
+          {/* </Loading> */}
         </Box>
       </Box>}
 

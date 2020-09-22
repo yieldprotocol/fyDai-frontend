@@ -204,15 +204,15 @@ const YieldHeader = (props: any) => {
       justify='between'
       fill='horizontal'
     >
-      <Box direction='row' fill='horizontal' gap='medium'>
-        <Box basis='auto'>
+      <Box direction='row' fill='horizontal' gap='medium' justify='between'>
+        <Box>
           <Image src={theme.dark ? logoLight : logoDark} fit="contain" />
         </Box>
         
         { screenSize === 'small' ? 
           <MobileNav /> 
           : 
-          <Box direction='row' align='center' basis='1/3'> 
+          <Box direction='row' align='center' width={{ min:'600px', max:'600px'}}> 
             <Nav />
             {/* <Menu
             label={<Text size='xxlarge' weight='bold'>Borrow</Text>}
@@ -223,6 +223,7 @@ const YieldHeader = (props: any) => {
           />    */}
           </Box>}
       </Box> 
+
       <Box basis='auto'>
         {screenSize === 'small' ? (
           <MenuButton />

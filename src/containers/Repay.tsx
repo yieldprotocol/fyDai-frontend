@@ -150,7 +150,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
                     disabled={repayDisabled}
                   />
 
-                  <Box alignSelf='start'>
+                  <Box alignSelf='start' margin={{ top:'medium' }}> 
                     <FlatButton 
                       onClick={()=>close()}
                       label={

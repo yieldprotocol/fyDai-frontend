@@ -140,7 +140,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
             disabled={withdrawDisabled}
           />
           
-          <Box alignSelf='start'>
+          <Box alignSelf='start' margin={{ top:'medium' }}>
             <FlatButton 
               onClick={()=>close()}
               label={

@@ -187,7 +187,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
               disabled={withdrawDisabled}
             />  
           
-            <Box alignSelf='start'>
+            <Box alignSelf='start' margin={{ top:'medium' }}>
               <FlatButton 
                 onClick={()=>close()}
                 label={

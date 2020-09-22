@@ -186,8 +186,8 @@ const Lend = ({ lendAmount }:ILendProps) => {
       >
         <Box flex='grow' gap='small' align='center' fill='horizontal'>
           {/* If the series has NOT matured, show the lending input */}
-          <Loading condition={seriesState.seriesLoading} size='large'>
-            { !activeSeries?.isMature() && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
+          {/* <Loading condition={seriesState.seriesLoading} size='large'> */}
+          { !activeSeries?.isMature() && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
             <>
               <Box fill gap='medium'>
                 <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to lend</Text>
@@ -259,7 +259,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
               </Box>
 
               { activeSeries?.eDaiBalance_ > 0 &&
-              <Box alignSelf='end'>
+              <Box alignSelf='end' margin={{ top:'medium' }}>
                 <FlatButton 
                   onClick={()=>setWithdrawDaiOpen(true)}
                   label={
@@ -272,12 +272,12 @@ const Lend = ({ lendAmount }:ILendProps) => {
               </Box>}
             </>}
 
-            {/* If the series is mature show the redeem view */}
-            { (activeSeries?.isMature()) &&
+          {/* If the series is mature show the redeem view */}
+          { (activeSeries?.isMature()) &&
             <Box fill gap='medium' margin={{ vertical:'large' }}>
               <Redeem />
             </Box>}
-          </Loading>
+          {/* </Loading> */}
         </Box>
       </Box>}
 
