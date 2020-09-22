@@ -4,6 +4,7 @@ import { Box, Button, Keyboard, TextInput, Text, ResponsiveContext, Collapsible 
 
 import { 
   FiArrowRight as ArrowRight,
+  FiClock as Clock
 } from 'react-icons/fi';
 import DaiMark from '../components/logos/DaiMark';
 
@@ -254,13 +255,32 @@ const Pool = (props:IPoolProps) => {
                 label={
                   <Box direction='row' gap='small' align='center'>
                     { activeSeries?.isMature() ? 
-                      <Box><Text size='xsmall' color='text-weak'><Text weight='bold'>Remove</Text> exisiting Liquidity from this series</Text></Box>
+                      <Box><Text size='xsmall' color='text-weak'><Text weight='bold'>Remove</Text> existing Liquidity from this series</Text></Box>
                       :
                       <Text size='xsmall' color='text-weak'>alternatively, <Text weight='bold'>Remove Liquidity</Text> from this series</Text>}
                     <ArrowRight color='text-weak' />
                   </Box>
                 }  
               />
+            </Box>}
+
+          { activeSeries && activeSeries.isMature() &&
+            <Box 
+              gap='medium' 
+              margin={{ vertical:'large' }}  
+              pad='medium'     
+              round='small'
+              fill='horizontal'
+              border='all'
+            >    
+              <Box direction='row' gap='small' align='center' fill>          
+                <Box>
+                  <Clock />
+                </Box>
+                <Box> 
+                  <Text size='small' color='brand'> This series has matured.</Text>         
+                </Box>
+              </Box>             
             </Box>}
 
         </Box>

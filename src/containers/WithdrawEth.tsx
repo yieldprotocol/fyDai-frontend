@@ -148,7 +148,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
                 icon={<EthMark />}
               />
               <RaisedButton 
-                label='Maximum'
+                label='Withdraw maximum'
                 disabled={!hasDelegated}
                 onClick={()=>setInputValue(maxWithdraw)}
               />

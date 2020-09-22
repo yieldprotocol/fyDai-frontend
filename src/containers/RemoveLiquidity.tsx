@@ -123,7 +123,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
             pad='large'
             gap='medium'
           >
-            <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Remove Liquidity</Text>
+            <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Remove Liquidity Tokens</Text>
             <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={removeLiquidityDisabled}>
               <TextInput
                 ref={(el:any) => {el && el.focus(); setInputRef(el);}} 
