@@ -249,7 +249,6 @@ export const useProxy = () => {
     let minEDai:BigNumber;
     try {
       console.log( await series.isMature() );
-
       if ( await isMature(series.eDaiAddress) ) {  
         try {
           console.log('repay with sig- after maturity');

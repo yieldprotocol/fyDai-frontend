@@ -62,7 +62,7 @@ const initState = {
   },
   authorizations:{},
   preferences:{
-    slippage: 0.005 // default === 0.5%
+    slippage: 0.05 // default === 5%
   },
   makerData:{},
 };

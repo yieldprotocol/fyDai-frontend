@@ -106,7 +106,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
   */
   useEffect(() => {
 
-    account && position && debouncedInput>0 && ( async () => {
+    account && position && position.debtValue && debouncedInput>0 && ( async () => {
       const newRatio = estimateRatio(
         position.ethPosted, 
         ( position.debtValue.add(ethers.utils.parseEther(debouncedInput)) )
