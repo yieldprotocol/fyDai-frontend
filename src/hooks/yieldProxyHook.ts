@@ -72,7 +72,6 @@ export const useProxy = () => {
     [1, { id: 1, desc:'Dai > treasury authenticate ' }],
     [2, { id: 2, desc:'eDai > pool authenticate ' }],
   ]);
-  
 
   // TODO: deal with big number rather also, put this out in a hook
   const valueWithSlippage = (value:BigNumber, minimise:boolean=false ) => {

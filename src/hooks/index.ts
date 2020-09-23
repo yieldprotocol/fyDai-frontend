@@ -3,7 +3,7 @@ import { useWeb3React } from '@web3-react/core';
 import { useConnectorImage, useSignerAccount, useConnection } from './connectionHooks';
 
 /* General app hooks */
-import { useCachedState, useDebounce, useTxActive } from './appHooks';
+import { useCachedState, useDebounce, useTxActive, useIsLol } from './appHooks';
 import { useEvents } from './eventHooks';
 
 /* Utility hooks */
@@ -28,6 +28,7 @@ export {
   useDebounce,
   useSendTx,
   useCallTx,
+  useIsLol,
 
   useAuth,
   useProxy,

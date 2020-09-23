@@ -20,6 +20,7 @@ import {
   useTxActive,
   useSignerAccount,
   useDebounce,
+  useIsLol,
 } from '../hooks';
 
 import SeriesDescriptor from '../components/SeriesDescriptor';
@@ -61,6 +62,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
 
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
+  const isLol = useIsLol(inputValue);
 
   const repayProcedure = async (value:number) => {
     if (!repayDisabled) {
@@ -83,7 +85,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
       !account ||
       !hasDelegated ||
       !inputValue ||
-      parseFloat(inputValue) === 0
+      parseFloat(inputValue) <= 0
     )? setRepayDisabled(true): setRepayDisabled(false);
   }, [ inputValue, hasDelegated ]);
 
@@ -136,7 +138,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
                       value={inputValue || ''}
                       plain
                       onChange={(event:any) => setInputValue(( cleanValue(event.target.value) ))}
-                      icon={<DaiMark />}
+                      icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <DaiMark />}
                     />
                     <RaisedButton 
                       label={screenSize !== 'small' ? 'Repay Maximum': 'Maximum'}

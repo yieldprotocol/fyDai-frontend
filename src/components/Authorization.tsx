@@ -76,7 +76,7 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
           background='#555555'
           justify='between'
         >
-          {!buttonOnly && <Text>Feel free to look around and play. However, before you make any transactions you will need sign few authorisations.</Text> }
+          {!buttonOnly && <Text>Feel free to look around and play. However, before you make any transactions you will need to sign few authorisations.</Text> }
           <RaisedButton 
             background='#555555'
             label={<Text size='small' color='#DDDDDD'><Unlock /> Authorise Yield</Text>}

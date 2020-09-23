@@ -22,6 +22,7 @@ import {
   useTxActive, 
   useSignerAccount, 
   useDebounce,
+  useIsLol,
 } from '../hooks';
 
 import SeriesDescriptor from '../components/SeriesDescriptor';
@@ -66,15 +67,16 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
 
   const [ repayOpen, setRepayOpen ] = useState<boolean>(false);
 
+  /* input values */
+  const [ inputValue, setInputValue ] = useState<any|undefined>(borrowAmount || undefined);
+  const debouncedInput = useDebounce(inputValue, 500);
+    
   /* internal component state */
   const [ borrowPending, setBorrowPending ] = useState<boolean>(false);
   const [ borrowDisabled, setBorrowDisabled ] = useState<boolean>(true);
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
-
-  /* input values */
-  const [ inputValue, setInputValue ] = useState<any|undefined>(borrowAmount || undefined);
-  const debouncedInput = useDebounce(inputValue, 500);
+  const isLol = useIsLol(inputValue);
 
   const [inputRef, setInputRef] = useState<any>(null);
 
@@ -102,7 +104,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
   * Handle input (debounced input) changes:
   * 1. dai to eDai conversion and get APR (eDai needed to compare with the approved allowance)
   * 2. calcalute yield APR
-  * 3. calculate estimated collateralisation ration
+  * 3. calculate estimated collateralisation ratio
   */
   useEffect(() => {
 
@@ -138,7 +140,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
       !account ||
       !hasDelegatedProxy ||   
       !inputValue ||
-      parseFloat(inputValue) === 0
+      parseFloat(inputValue) <= 0
     )? setBorrowDisabled(true): setBorrowDisabled(false);
   }, [ inputValue, hasDelegatedProxy ]);
 
@@ -245,7 +247,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
                 value={inputValue || ''}
                 plain
                 onChange={(event:any) => setInputValue( cleanValue(event.target.value) )}
-                icon={<DaiMark />}
+                icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <DaiMark />}
               />
             </InputWrap>
 

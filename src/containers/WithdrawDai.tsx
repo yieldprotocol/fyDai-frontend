@@ -12,7 +12,7 @@ import { cleanValue } from '../utils';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
 
-import { usePool, useProxy, useSignerAccount, useTxActive, useDebounce } from '../hooks';
+import { usePool, useProxy, useSignerAccount, useTxActive, useDebounce, useIsLol } from '../hooks';
 
 import InputWrap from '../components/InputWrap';
 import TxPending from '../components/TxPending';
@@ -53,6 +53,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
 
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
+  const isLol = useIsLol(inputValue);
 
   const withdrawProcedure = async () => {
     if ( !withdrawDisabled ) {
@@ -83,7 +84,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
       !account ||
       !hasDelegated ||
       !inputValue || 
-      parseFloat(inputValue) === 0
+      parseFloat(inputValue) <= 0
     ) ? setWithdrawDisabled(true): setWithdrawDisabled(false);
   }, [ inputValue, hasDelegated ]);
 
@@ -126,7 +127,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
               value={inputValue || ''}
               plain
               onChange={(event:any) => setInputValue(( cleanValue(event.target.value) ))}
-              icon={<DaiMark />}
+              icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <DaiMark />}
             />
             <RaisedButton 
               label='Maximum'

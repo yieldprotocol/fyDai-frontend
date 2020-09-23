@@ -19,6 +19,7 @@ import {
   useTxActive, 
   useProxy,
   useDebounce,
+  useIsLol,
 } from '../hooks';
 
 import WithdrawDai from './WithdrawDai';
@@ -66,6 +67,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
   const [ lendPending, setLendPending ] = useState<boolean>(false);
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
+  const isLol = useIsLol(inputValue);
 
   const [ APR, setAPR ] = useState<number>();
   const [ eDaiValue, setEDaiValue ] = useState<number>(0);
@@ -112,7 +114,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
       !account ||
       !hasDelegated ||
       !inputValue || 
-      parseFloat(inputValue) === 0
+      parseFloat(inputValue) <= 0
     )? setLendDisabled(true): setLendDisabled(false);
   }, [ inputValue, hasDelegated ]);
 
@@ -199,7 +201,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
                     value={inputValue || ''}
                     plain
                     onChange={(event:any) => setInputValue( cleanValue(event.target.value) )}
-                    icon={<DaiMark />}
+                    icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <DaiMark />}
                   />
                   {account &&
                   <RaisedButton 

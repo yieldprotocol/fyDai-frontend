@@ -98,6 +98,21 @@ export const useDebounce = (value:any, delay:number) => {
   return debouncedValue;
 };
 
+
+export const useIsLol = (value:string|undefined|null) => {
+  
+  const [isLol, setIsLol] = useState<any>();
+  
+  useEffect(()=>{
+    value && parseFloat(value) < 0 && setIsLol(true);
+    // value && isNaN(value as unknown as number) && setIsLol(true);
+    value && parseFloat(value) >= 0 && setIsLol(false);
+    !value && setIsLol(false);
+  }, [value] );
+
+  return isLol;
+};
+
 // export const useParseInput = (value:string|bigNumber) => {
 //   const [debouncedValue, setDebouncedValue] = useState(value);
 //   useEffect(

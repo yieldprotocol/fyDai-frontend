@@ -24,7 +24,8 @@ import {
   useTxActive, 
   useMath, 
   useSignerAccount, 
-  useDebounce
+  useDebounce,
+  useIsLol
 } from '../hooks';
 
 import WithdrawEth from './WithdrawEth';
@@ -74,6 +75,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
 
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
+  const isLol = useIsLol(inputValue);
 
   /* Steps required to deposit and update values */
   const depositProcedure = async () => {
@@ -102,7 +104,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
       txActive ||
       !account ||
       !inputValue ||
-      parseFloat(inputValue) === 0    
+      parseFloat(inputValue) <= 0    
     ) ? setDepositDisabled(true) : setDepositDisabled(false);
   }, [inputValue]);
 
@@ -148,7 +150,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
               disabled={postEthActive}
               plain
               onChange={(event:any) => setInputValue( cleanValue(event.target.value) )}
-              icon={<EthMark />}
+              icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <EthMark />}
             />
             <RaisedButton
               label={(screenSize !== 'small' && !modalView) ? 'Deposit Maximum': 'Max'}

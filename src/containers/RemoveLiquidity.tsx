@@ -12,7 +12,7 @@ import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
 import { UserContext } from '../contexts/UserContext';
 
-import { useSignerAccount, useProxy, useTxActive, useDebounce } from '../hooks';
+import { useSignerAccount, useProxy, useTxActive, useDebounce, useIsLol } from '../hooks';
 
 import InputWrap from '../components/InputWrap';
 import InfoGrid from '../components/InfoGrid';
@@ -51,6 +51,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
 
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
+  const isLol = useIsLol(inputValue);
 
 
   /* Remove Liquidity sequence */
@@ -94,15 +95,15 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
   useEffect(()=>{
     if (
       !account ||
-      !debouncedInput ||
-      (activeSeries?.poolTokens_- debouncedInput <= 0) ||
-      parseFloat(debouncedInput) === 0
+      !inputValue ||
+      (activeSeries?.poolTokens_- inputValue <= 0) ||
+      parseFloat(inputValue) <= 0
     ) {
       setRemoveLiquidityDisabled(true);
     } else {
       setRemoveLiquidityDisabled(false);
     }
-  }, [ debouncedInput ]);
+  }, [ inputValue ]);
 
 
   return (
@@ -132,7 +133,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
                 value={inputValue || ''}
                 plain
                 onChange={(event:any) => setInputValue(( cleanValue(event.target.value) ))}
-                icon={<YieldMark />}
+                icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <YieldMark />}
               />
               <RaisedButton 
                 label='Maximum'

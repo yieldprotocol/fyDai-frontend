@@ -19,7 +19,8 @@ import {
   useTxActive,
   useProxy,
   useToken,
-  useDebounce
+  useDebounce,
+  useIsLol
 } from '../hooks';
 
 import RemoveLiquidity from './RemoveLiquidity';
@@ -68,6 +69,7 @@ const Pool = (props:IPoolProps) => {
   const [ addLiquidityPending, setAddLiquidityPending ] = useState<boolean>(false);
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
+  const isLol = useIsLol(inputValue);
   
   /* Add Liquidity sequence */ 
   const addLiquidityProcedure = async () => { 
@@ -111,7 +113,7 @@ const Pool = (props:IPoolProps) => {
       !account ||
       !hasDelegated ||
       !inputValue ||
-      parseFloat(inputValue) === 0
+      parseFloat(inputValue) <= 0
     )? setAddLiquidityDisabled(true): setAddLiquidityDisabled(false);
   }, [ inputValue, hasDelegated ]);
 
@@ -197,7 +199,7 @@ const Pool = (props:IPoolProps) => {
                     value={inputValue || ''}
                     plain
                     onChange={(event:any) => setInputValue( cleanValue(event.target.value) )}
-                    icon={<DaiMark />}
+                    icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <DaiMark />}
                   />
                   
                   {account &&

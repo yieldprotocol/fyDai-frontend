@@ -10,7 +10,7 @@ import EthMark from '../components/logos/EthMark';
 import { cleanValue } from '../utils';
 
 import { UserContext } from '../contexts/UserContext';
-import { useProxy, useMath, useTxActive, useDebounce } from '../hooks';
+import { useProxy, useMath, useTxActive, useDebounce, useIsLol } from '../hooks';
 
 import ApprovalPending from '../components/ApprovalPending';
 import TxPending from '../components/TxPending';
@@ -58,6 +58,8 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
 
+  const isLol = useIsLol(inputValue);
+
   /* Withdraw execution flow */
   const withdrawProcedure = async () => {
     if (inputValue && !withdrawDisabled ) {
@@ -81,7 +83,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
       const newRatio = estimateRatio((ethPosted.sub( parsedInput )), debtValue); 
       // const newRatio = estimateRatio((ethPosted_ - parseFloat(inputValue)).toString(), debtValue_);
       if (newRatio) {
-        console.log('new ratio', newRatio)
+        console.log('new ratio', newRatio);
         setEstRatio(parseFloat(newRatio.toString()).toFixed(2));
         const newDecrease = collateralPercent_ - parseFloat(newRatio.toString());
         setEstDecrease(newDecrease.toFixed(2));
@@ -95,7 +97,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
       estRatio < 150 ||
       txActive ||
       !inputValue ||
-      parseFloat(inputValue) === 0
+      parseFloat(inputValue) <= 0
     )? setWithdrawDisabled(true) : setWithdrawDisabled(false);
   }, [ inputValue, estRatio ]);
 
@@ -106,7 +108,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
       setErrorMsg('You are not allowed to withdraw below the collateralization ratio'); 
     } else if (estRatio >= 150 && estRatio < 200 ) {
       setErrorMsg(null);
-      setWarningMsg('Your collateralisation ration will put you at risk of liquidation');
+      setWarningMsg('Your collateralisation ratio will put you at risk of liquidation');
     } else {   
       setWarningMsg(null);
       setErrorMsg(null);
@@ -144,8 +146,8 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
                 disabled={!hasDelegated}
                 value={inputValue || ''}
                 plain
-                onChange={(event:any) => setInputValue(( cleanValue(event.target.value) ))}
-                icon={<EthMark />}
+                onChange={(event:any) => setInputValue(cleanValue(event.target.value))}
+                icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <EthMark />}
               />
               <RaisedButton 
                 label='Withdraw maximum'
