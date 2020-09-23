@@ -170,6 +170,7 @@ const YieldHeader = (props: any) => {
       pad={{ horizontal:'small', vertical:'large' }}
       justify='between'
       fill='horizontal'
+      align='center'
     >
       <Box>
         <Image src={theme.dark ? logoLight : logoDark} fit="contain" />
@@ -178,9 +179,8 @@ const YieldHeader = (props: any) => {
       { screenSize === 'small' ? 
         <MobileNav /> 
         : 
-        <Box direction='row' align='start'> 
-          <Nav />
-        </Box>}
+        <Nav />
+      }
 
       <Box>
         {screenSize === 'small' ? (

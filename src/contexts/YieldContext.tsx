@@ -15,7 +15,7 @@ import { IYieldSeries } from '../types';
 const YieldContext = createContext<any>({});
 
 // const eDaiList = ['eDai0', 'eDai1', 'eDai2', 'eDai3', 'eDai4'];
-const eDaiList = ['20Oct', '20Sep', '21Apr', '21Jan', '21Jul'];
+const eDaiList = ['20Sep23', '20Sep24', '20Sep25', '20Dec31', '21Dec31'];
 const seriesColors = ['#cecfc7', '#709fb0', '#ffb8d1', '#a0c1b8', '#f4ebc1', '#ada8b6', '#03a9f4'];
 const contractList = [
   'Controller',
