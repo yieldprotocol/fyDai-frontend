@@ -85,7 +85,15 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
         </Box>}
 
       { account && series?.hasDelegatedPool === false &&
-        <Box direction='row' fill='horizontal' gap='small' justify='between'>
+        <Box 
+          round='small'
+          direction='row' 
+          fill='horizontal' 
+          gap='small' 
+          justify='between' 
+          pad='small' 
+          background={modColor( series.seriesColor, 40)}
+        >
           {!buttonOnly && <Warning />}
           {!buttonOnly && <Text>A once-off authorisation is required to use this series</Text>}
           <RaisedButton 

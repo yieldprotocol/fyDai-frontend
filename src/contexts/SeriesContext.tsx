@@ -126,20 +126,24 @@ const SeriesProvider = ({ children }:any) => {
   };
 
   /* Update a list of series */
-  const updateSeries = async (seriesArr:IYieldSeries[] ) => {
+  const updateSeries = async (seriesArr:IYieldSeries[], firstLoad:boolean ) => {
     if(!yieldLoading) {
       dispatch({ type:'isLoading', payload: true });
 
       /* pre-populate info with cached data if available */
-      const preMap:any = _prePopulateSeriesData(seriesArr);
-      const preSeries: IYieldSeries[] = Array.from(preMap.values());
-      const preSelect = preSeries
-        .filter((x:IYieldSeries)=>!x.isMature())
-        .sort((a:IYieldSeries, b:IYieldSeries)=> a.maturity-b.maturity );
-      dispatch({ type:'setActiveSeries', payload: preMap.get(preSelect[0].maturity) }); 
-
+      if (firstLoad) {
+        const preMap:any = _prePopulateSeriesData(seriesArr);
+        const preSeries: IYieldSeries[] = Array.from(preMap.values());
+        const preSelect = preSeries
+          .filter((x:IYieldSeries)=>!x.isMature())
+          .sort((a:IYieldSeries, b:IYieldSeries)=> a.maturity-b.maturity );
+        dispatch({ type:'setActiveSeries', payload: preMap.get(preSelect[0].maturity) }); 
+      }
+      
       /* Build/re-build series map with data */ 
       const seriesMap:any = await _getSeriesData(seriesArr); 
+
+
       /* Set the active series */
       if (seriesArr.length===1 ){ 
       /* if there was only one series updated set that one as the active series */   
@@ -159,14 +163,14 @@ const SeriesProvider = ({ children }:any) => {
   /* Init all the series once yieldState is not loading and re-init on any user and/or network change */
   useEffect( () => {
     (provider || fallbackProvider) && !yieldLoading && ( async () => {
-      await updateSeries(yieldState.deployedSeries);
+      await updateSeries(yieldState.deployedSeries, true);
     })();
   }, [ provider, fallbackProvider, chainId, account, yieldLoading ]);
 
   /* Actions for updating the series Context */
   const actions = {
-    updateSeries: (series:IYieldSeries[]) => updateSeries(series), /* updates one, or any number of series */
-    updateActiveSeries: () => updateSeries([state.activeSeries]), /* updates only the active series */
+    updateSeries: (series:IYieldSeries[]) => updateSeries(series, false), /* updates one, or any number of series */
+    updateActiveSeries: () => updateSeries([state.activeSeries], false), /* updates only the active series */
     setActiveSeries: (seriesMaturity:string) => dispatch({ type:'setActiveSeries', payload: state.seriesData.get(seriesMaturity) }),
   };
 

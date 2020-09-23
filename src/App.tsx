@@ -105,7 +105,11 @@ const App = (props:any) => {
 
       { !yieldLoading &&
         <Collapsible open={!seriesLoading}>
-          <Authorization />
+          <Grid fill columns={columnsWidth}>
+            <Box background={{ color: '#555555' }} />
+            <Authorization />
+            <Box background={{ color: '#555555' }} />
+          </Grid> 
         </Collapsible>}
 
       <Main 

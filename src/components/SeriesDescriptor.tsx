@@ -105,31 +105,28 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
           </Box>
 
           <Box
-            pad={!delegated? { horizontal:'medium' }: {horizontal:'medium', bottom:'medium' }}
+            pad={!delegated? { horizontal:'medium' }: { horizontal:'medium', bottom:'medium' }}
             // margin={ !delegated? undefined: { bottom:'medium'} }
           >
             <Collapsible open={!seriesState.seriesLoading}>
               { children }
             </Collapsible>
-          </Box>
-          
-          { !delegated && !activeSeries.isMature() && 
-          <Box 
-            fill='horizontal'
-            // background={activeSeries.seriesColor}
-            round='small'
-            pad={{ bottom:'medium' }}
-            // margin={{ bottom:'-15px' }}          
-          >
-            <Box 
-              round='small'
-              pad='small' 
-              fill
-            >
-              <Authorization series={activeSeries} />
-            </Box>
-          </Box>} 
 
+            { !delegated && !activeSeries.isMature() && 
+            <Box 
+              fill='horizontal'
+              round='small'
+              pad={{vertical:'medium' }}        
+            >
+              <Box 
+                round='small'
+                fill
+              >
+                <Authorization series={activeSeries} />
+              </Box>
+            </Box>} 
+          </Box>
+   
         </Box>}
     </>
   );
