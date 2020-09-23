@@ -92,7 +92,7 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
           gap='small' 
           justify='between' 
           pad='small' 
-          background={modColor( series.seriesColor, 40)}
+          // background={modColor( series.seriesColor, 40)}
         >
           {!buttonOnly && <Warning />}
           {!buttonOnly && <Text>A once-off authorisation is required to use this series</Text>}

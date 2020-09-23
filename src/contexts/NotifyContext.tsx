@@ -4,10 +4,10 @@ import { INotification, IReducerAction } from '../types';
 const NotifyContext = React.createContext<any>({});
 const initState = {
   open: false,
-  position: 'top',
+  position: 'right',
   message: '',
   type: 'info',
-  timerMs: 2000,
+  timerMs: 6000,
   callbackAction: null,
   callbackCancel: null,
   fatalOpen: false,
@@ -24,11 +24,11 @@ function notifyReducer(state:INotification, action:IReducerAction) {
         ...state,
         open: true,
         message: action.payload.message,
-        type: action.payload.type? action.payload.type: initState.type,
-        timerMs: action.payload.showFor? action.payload.showFor: initState.timerMs,
-        position: action.payload.position? action.payload.position : initState.position,
-        callbackAction: action.payload.callbackAction? action.payload.callbackAction: null,
-        callbackCancel: action.payload.callbackCancel? action.payload.callbackCancel: null,
+        type: action.payload.type || initState.type,
+        timerMs: action.payload.showFor || initState.timerMs,
+        position: action.payload.position || initState.position,
+        callbackAction: action.payload.callbackAction || null,
+        callbackCancel: action.payload.callbackCancel || null,
       };
     case 'fatal':
       return { 
@@ -79,7 +79,7 @@ const NotifyProvider = ({ children }:any) => {
       } else {
         setTimeout(() => {
           dispatch({ type: '_closeNotify' });
-        }, state.timerMs);
+        }, 3000);
       }
     })();
   }, [state.open]);

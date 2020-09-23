@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useRef, useEffect, useState, useContext } from 'react';
 
 import { Grommet, base, Grid, Main, Box, ResponsiveContext, Text, Nav, Layer, Collapsible } from 'grommet';
 import { deepMerge } from 'grommet/utils';
@@ -66,6 +66,8 @@ const App = (props:any) => {
   // TODO remove for prod
   const [showTestLayer, setShowTestLayer] = useState<boolean>(false);
 
+  const leftSideRef = useRef<any>(null);
+
   const [appReady, setAppReady] = useState<boolean>(false);
 
   const screenSize = useContext(ResponsiveContext);
@@ -79,15 +81,15 @@ const App = (props:any) => {
     }
   }, [screenSize]);
 
+
   useEffect(()=> {
     !yieldLoading && !seriesLoading && setAppReady(true);
-    console.log(yieldLoading, seriesLoading);
-    console.log(hasDelegatedProxy);
+    // console.log(leftSideRef.current);
+
   }, [yieldLoading, seriesLoading, hasDelegatedProxy]);
 
   return (
     <div className="App">
-      <NotifyLayer />
       <ConnectLayer view={showConnectLayer} closeLayer={() => setShowConnectLayer(null)} />
 
       { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
@@ -104,7 +106,7 @@ const App = (props:any) => {
       </Grid>
 
       { !yieldLoading &&
-        <Collapsible open={!seriesLoading}>
+        <Collapsible open={!seriesLoading} ref={leftSideRef}>
           <Grid fill columns={columnsWidth}>
             <Box background={{ color: '#555555' }} />
             <Authorization />
@@ -112,10 +114,13 @@ const App = (props:any) => {
           </Grid> 
         </Collapsible>}
 
+      <NotifyLayer target={leftSideRef.current} columnsWidth={columnsWidth} />
+
       <Main 
         pad={{ bottom:'large' }} 
         direction="row" 
         flex
+        
       >
         <Grid fill columns={columnsWidth}>
           <Box />

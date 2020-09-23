@@ -112,32 +112,12 @@ const YieldHeader = (props: any) => {
         <Layer full>
           <Box background='background' fill>
             <Nav />
-          </Box>        
+          </Box>       
         </Layer>}
       </>
     );
   };
 
-  const NavLink = ({ link, text, disabled }: LinkProps) => (
-    <Box
-      direction="row-responsive"
-      onClick={() => {
-        !disabled && setActiveView(link);
-        setMenuOpen(false);
-      }}
-      gap="small"
-    >
-      <Text
-        weight='bold'
-        // eslint-disable-next-line no-nested-ternary
-        color={disabled ? 'lightgrey' : activeView === link ? 'brand' : 'text-weak'}
-        size={screenSize === 'small' ? 'medium' : 'xlarge'}
-        style={{ textDecoration: activeView === link ? 'underline' : 'none', width: screenSize === 'small' ? '100%' : 'auto' }}
-      >
-        {text}
-      </Text>
-    </Box>
-  );
 
   const Nav = () => (
     <Box
@@ -145,23 +125,31 @@ const YieldHeader = (props: any) => {
       fill={screenSize === 'small' ? 'horizontal' : false}
       gap='medium'
     >
-      {navLinks.map((item) => (
-        <NavLink
-          link={item.link}
-          text={item.text}
-          key={`nav-${item.id}`}
-          disabled={item.disabled}
-        />
-      ))}
+      { 
+      navLinks.map((item) => (
+        <Box
+          direction="row-responsive"
+          onClick={() => {
+            !item.disabled && setActiveView(item.link);
+            setMenuOpen(false);
+          }}
+          gap="small"
+          key={item.id}
+        >
+          <Text
+            weight='bold'
+            // eslint-disable-next-line no-nested-ternary
+            color={item.disabled ? 'lightgrey' : activeView === item.link ? 'brand' : 'text-weak'}
+            size={screenSize === 'small' ? 'medium' : 'xlarge'}
+            style={{ textDecoration: activeView === item.link ? 'underline' : 'none', width: screenSize === 'small' ? '100%' : 'auto' }}
+          >
+            {item.text}
+          </Text>
+        </Box>
+      ))
+    }
     </Box>
   );
-
-  const PendingTxs = () => {
-    if (pendingTxs && pendingTxs.length > 0) {
-      return <Box>{pendingTxs.length} transaction pending...</Box>;
-    }
-    return null;
-  };
 
   const Account = () => {
     return (
@@ -178,23 +166,6 @@ const YieldHeader = (props: any) => {
             }}
             label={<Text size='small'>Connect a wallet</Text>}
           />}
-
-        {/* { !account && 
-        <Box direction="row" fill="horizontal">
-          <Button
-            onClick={() => {
-              setMenuOpen(false);
-              openConnectLayer('CONNECT');
-            }}
-            label="Connect to a wallet"
-            color="border"
-            fill="horizontal"
-            style={{
-              fontWeight: 600,
-              height: screenSize === 'small' ? '2.25rem' : 'auto',
-            }}
-          />
-        </Box>} */}
       </>
     );
   };
@@ -203,31 +174,22 @@ const YieldHeader = (props: any) => {
     <Box
       background='background-front'
       direction='row'
-      pad={{ horizontal:'medium', vertical:'large' }}
+      pad={{ horizontal:'small', vertical:'large' }}
       justify='between'
       fill='horizontal'
     >
-      <Box direction='row' fill='horizontal' gap='medium'>
-        <Box basis='1/4'>
-          <Image src={theme.dark ? logoLight : logoDark} fit="contain" />
-        </Box>
-        
-        { screenSize === 'small' ? 
-          <MobileNav /> 
-          : 
-          <Box direction='row' align='center' width={{ min:'600px', max:'600px'}}> 
-            <Nav />
-            {/* <Menu
-            label={<Text size='xxlarge' weight='bold'>Borrow</Text>}
-            items={[
-              { label: <Text size='xxlarge' weight='bold'>Lend</Text>, onClick: () => {} },
-              { label: <Text size='xxlarge' weight='bold'>Pool</Text>, onClick: () => {} },
-            ]}
-          />    */}
-          </Box>}
+      <Box>
+        <Image src={theme.dark ? logoLight : logoDark} fit="contain" />
       </Box>
-      
-      <Box basis='auto'>
+
+      { screenSize === 'small' ? 
+        <MobileNav /> 
+        : 
+        <Box direction='row' align='start'> 
+          <Nav />
+        </Box>}
+
+      <Box>
         {screenSize === 'small' ? (
           <MenuButton />
         ) : (
@@ -240,6 +202,7 @@ const YieldHeader = (props: any) => {
           </Box>
         )}
       </Box>
+
     </Box>
   );
 };

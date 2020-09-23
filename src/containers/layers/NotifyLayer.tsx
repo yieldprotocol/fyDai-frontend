@@ -1,20 +1,19 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Layer, Box, DropButton, Button, TextInput, Header, Text, Heading, Footer, Collapsible, ThemeContext } from 'grommet';
+import { Layer, Box, DropButton, Button, TextInput, Header, Text, Heading, Footer, Collapsible, ThemeContext, Grid } from 'grommet';
 import {
-  FaCheckCircle as CheckCircle,
-  FaTimes as Close,
-  FaInfoCircle as Info,
-  FaTimesCircle as Error,
-  FaExclamationCircle as Warn,
-} from 'react-icons/fa';
+  FiCheckCircle as CheckCircle,
+  FiX as Close,
+  FiInfo as Info,
+  FiXCircle as Error,
+  FiAlertTriangle as Warn,
+} from 'react-icons/fi';
 
 import { NotifyContext } from '../../contexts/NotifyContext';
 
-function NotifyLayer() {
+function NotifyLayer(target:any, columnsWidth:any) {
 
   const  { state, dispatch }  = useContext<any>(NotifyContext);
-
-  const notificationTypeMap = (_type:string) => {
+  const notificationTypeMap = (_type:string ) => {
     switch(_type) {
       case 'warn' : return { color: 'orange', icon: <Warn /> };
       case 'error' : return { color: 'pink', icon: <Error /> };
@@ -29,28 +28,34 @@ function NotifyLayer() {
       <Layer
         position={state.position}
         modal={false}
-        margin={{ vertical: 'large', horizontal: 'small' }}
+        // margin={{ vertical: 'large', horizontal: 'small' }}
         onEsc={()=>dispatch({ type:'closeNotify' })}
         responsive={false}
         plain
+        target={target.target}
+        full='vertical'
       >
-        <Box
-          fill
-          align="center"
-          direction="row"
-          gap="large"
-          justify="between"
-          round='xsmall'
-          elevation="medium"
-          pad={{ vertical: 'xsmall', horizontal: 'small' }}
-          border={{ size:'small', color: notificationTypeMap(state.type).color }}
-          background={notificationTypeMap(state.type).color}
-        >
-          { notificationTypeMap(state.type).icon }
-          <Box align="center" direction="row" gap="xsmall">
-            <Text>{ state.message }</Text>
-          </Box>
-          <Button icon={<Close />} onClick={()=>dispatch({ type:'closeNotify' })} plain />
+        <Box width='1/2'>
+          <Grid columns={columnsWidth}>
+            {/* <Box background={notificationTypeMap(state.type).color} /> */}
+            <Box />
+            <Box
+              direction="row"
+              justify="center"
+              elevation="xsmall"
+              gap='medium'
+              pad={{ vertical:'small', horizontal:'medium' }}
+              background={notificationTypeMap(state.type).color}
+              align='center'
+            >
+              { notificationTypeMap(state.type).icon }
+              <Box align="center" direction="row" gap="small" pad='small'>
+                <Text>{ state.message }</Text>
+              </Box>
+              <Button icon={<Close />} onClick={()=>dispatch({ type:'closeNotify' })} plain />
+            </Box>
+            <Box background={notificationTypeMap(state.type).color} />
+          </Grid> 
         </Box>
       </Layer>}
 
