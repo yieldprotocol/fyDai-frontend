@@ -284,7 +284,7 @@ export const yieldTheme = {
   },
 
   collapsible: {
-    minSpeed: '100',
+    minSpeed: '500',
   },
   meter: {},
   anchor: {

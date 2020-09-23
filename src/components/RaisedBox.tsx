@@ -5,8 +5,8 @@ import { Box, ResponsiveContext } from 'grommet';
 const StyledBox = styled(Box)`
 border-radius: 8px;
 background: #f8f8f8;
-box-shadow:  29px 29px 31px #dadada, 
-             -29px -29px 31px #ffffff;
+box-shadow:  8px 8px 11px #dadada, 
+             -8px -8px 11px #ffffff;
 
 ${(props:any) => props.background && css`
   background: ${props.background};

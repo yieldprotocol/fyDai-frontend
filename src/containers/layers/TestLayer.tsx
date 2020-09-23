@@ -10,7 +10,7 @@ import { Anchor, Layer, Header, Heading, Footer, Button, Box, Text } from 'gromm
 import * as utils from '../../utils';
 
 // import { getNetworkName }  from '../../hooks/connectionHooks';
-import ProfileButton from '../../components/ProfileButton';
+import ProfileButton from '../../components/AccountButton';
 import { NotifyContext } from '../../contexts/NotifyContext';
 
 import { useSendTx, useCallTx, useController, useProxy, useAuth, useTimeTravel } from '../../hooks';

@@ -31,7 +31,6 @@ import torusImage from '../../assets/images/providers/torus.png';
 
 import { UserContext } from '../../contexts/UserContext';
 
-import ProfileButton from '../../components/ProfileButton';
 import RaisedButton from '../../components/RaisedButton';
 import FlatButton from '../../components/FlatButton';
 import TxHistory from '../../components/TxHistory';

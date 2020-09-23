@@ -12,9 +12,13 @@ import {
   ResponsiveContext,
   Layer,
   Menu,
+  Collapsible,
 } from 'grommet';
 
-import { FiSettings as Gear } from 'react-icons/fi';
+import { 
+  FiSettings as Gear,
+  FiCheckCircle as Check,
+} from 'react-icons/fi';
 
 import logoDark from '../assets/images/logo.svg';
 import logoLight from '../assets/images/logo_light.svg';
@@ -25,6 +29,8 @@ import { YieldContext } from '../contexts/YieldContext';
 import TxStatus from  './TxStatus';
 import FlatButton from './FlatButton';
 import Authorization from './Authorization';
+import RaisedBox from './RaisedBox';
+import AccountButton from './AccountButton';
 
 interface LinkProps {
   link: string;
@@ -40,12 +46,13 @@ const YieldHeader = (props: any) => {
     setActiveView,
   } = props;
 
-  const { state: { pendingTxs } } = useContext(NotifyContext);
+  const { state: { pendingTxs, lastCompletedTx } } = useContext(NotifyContext);
   const { state: { yieldLoading } } = useContext(YieldContext);
   const screenSize = useContext(ResponsiveContext);
 
   // Menu state for mobile later
   const [menuOpen, setMenuOpen] = useState(false);
+  const [txCompleteOpen, setTxCompleteOpen] = useState(false);
 
   const [navLinks] = useState([
     {
@@ -69,10 +76,6 @@ const YieldHeader = (props: any) => {
   ]);
 
   const theme = useContext<any>(ThemeContext);
-
-  useEffect(() => {
-    // (async () => activate(injected, console.log))();
-  }, []);
 
   function toggleMenu() {
     setMenuOpen((prevMenu) => !prevMenu);
@@ -151,24 +154,14 @@ const YieldHeader = (props: any) => {
     </Box>
   );
 
-  const Account = () => {
-    return (
-      <> 
-        { account?
-          <FlatButton
-            onClick={()=>openConnectLayer('ACCOUNT')}
-            label={<Text size='small'>{`${account?.substring(0, 4)}...${account?.substring(account.length - 4)}`} </Text>}
-          /> : 
-          <FlatButton 
-            onClick={() => {
-              setMenuOpen(false);
-              openConnectLayer('CONNECT');
-            }}
-            label={<Text size='small'>Connect a wallet</Text>}
-          />}
-      </>
-    );
-  };
+  useEffect(()=>{
+    lastCompletedTx && pendingTxs.length===0 && setTxCompleteOpen(true);
+    lastCompletedTx && pendingTxs.length===0 && (async () => {
+      setTimeout(() => {
+        setTxCompleteOpen(false);
+      }, 5000);
+    })();
+  }, [lastCompletedTx, pendingTxs ]);
 
   return (
     <Box
@@ -194,11 +187,7 @@ const YieldHeader = (props: any) => {
           <MenuButton />
         ) : (
           <Box direction="row" align="center" gap="small">
-            <TxStatus />
-            <Account />
-            {/* <Box> 
-              <Gear />
-            </Box> */}
+            <AccountButton {...props} />
           </Box>
         )}
       </Box>

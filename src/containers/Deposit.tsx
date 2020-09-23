@@ -218,8 +218,8 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
             direction='row'
             fill='horizontal'
             justify='between' 
+            margin={{ top:'medium' }}
           >
-
             <FlatButton 
               onClick={()=>setActiveView(1)}
               label={
@@ -228,7 +228,6 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
                   <Box><Text size='xsmall' color='text-weak'>back to borrow</Text></Box>   
                 </Box>}
             />
-
             <FlatButton 
               onClick={()=>setWithdrawOpen(true)}
               label={

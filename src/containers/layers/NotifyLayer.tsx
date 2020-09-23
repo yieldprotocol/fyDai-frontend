@@ -9,15 +9,17 @@ import {
 } from 'react-icons/fi';
 
 import { NotifyContext } from '../../contexts/NotifyContext';
+import RaisedButton from '../../components/RaisedButton';
+import FlatButton from '../../components/FlatButton';
 
 function NotifyLayer(target:any, columnsWidth:any) {
 
   const  { state, dispatch }  = useContext<any>(NotifyContext);
   const notificationTypeMap = (_type:string ) => {
     switch(_type) {
-      case 'warn' : return { color: 'orange', icon: <Warn /> };
-      case 'error' : return { color: 'pink', icon: <Error /> };
-      case 'success': return { color: 'lightgreen', icon: <CheckCircle /> };
+      case 'warn' : return { color: '#ffa274', icon: <Text size='small' color='#333333'><Warn /></Text> };
+      case 'error' : return { color: '#ff748c', icon: <Text size='small' color='#333333'><Error /></Text> };
+      case 'success': return { color: '#8cff74', icon: <Text size='small' color='#333333'><CheckCircle /></Text> };
       default: return { color: 'background', icon: <Info /> };
     }
   };
@@ -35,24 +37,31 @@ function NotifyLayer(target:any, columnsWidth:any) {
         target={target.target}
         full='vertical'
       >
-        <Box width='1/2'>
+        <Box 
+          width='1/2' 
+        >
           <Grid columns={columnsWidth}>
             {/* <Box background={notificationTypeMap(state.type).color} /> */}
             <Box />
             <Box
               direction="row"
               justify="center"
-              elevation="xsmall"
+              elevation="large"
               gap='medium'
               pad={{ vertical:'small', horizontal:'medium' }}
               background={notificationTypeMap(state.type).color}
+              round={{ corner:'left', size:'small' }}
               align='center'
             >
               { notificationTypeMap(state.type).icon }
               <Box align="center" direction="row" gap="small" pad='small'>
-                <Text>{ state.message }</Text>
+                <Text size='small' color='#333333'>{ state.message }</Text>
               </Box>
-              <Button icon={<Close />} onClick={()=>dispatch({ type:'closeNotify' })} plain />
+              <RaisedButton
+                background={notificationTypeMap(state.type).color}
+                onClick={()=>dispatch({ type:'closeNotify' })}
+                label={<Text size='small' color='#333333'>Close</Text>}
+              />
             </Box>
             <Box background={notificationTypeMap(state.type).color} />
           </Grid> 

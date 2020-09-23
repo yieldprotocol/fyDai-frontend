@@ -38,8 +38,7 @@ const StyledButton = styled(Button)`
 
 ${(props:any) => props.background && css`
     background: ${ props.background };
-
-    border: 1px solid ${modColor(props.background, -20)};
+    border: 1px solid ${props.background};
     box-shadow:  0px 0px 0px ${modColor(props.background, -20)}, -0px -0px 0px ${modColor(props.background, 10)};
     :active:hover {
       border: 1px solid ${ props.background };
