@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 
-import { Grommet, base, Grid, Main, Box, ResponsiveContext, Nav, Layer } from 'grommet';
+import { Grommet, base, Grid, Main, Box, ResponsiveContext, Text, Nav, Layer, Collapsible } from 'grommet';
 import { deepMerge } from 'grommet/utils';
 import { yieldTheme } from './themes';
 
@@ -92,7 +92,7 @@ const App = (props:any) => {
 
       { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
       { showSeriesLayer  && <SeriesSelector activeView='borrow' close={()=>setShowSeriesLayer(false)} /> }
-        
+
       <Grid fill columns={columnsWidth}>
         <Box background={{ color: 'background-front' }} />
         <YieldHeader
@@ -102,6 +102,11 @@ const App = (props:any) => {
         />
         <Box background={{ color: 'background-front' }} />
       </Grid>
+
+      { !yieldLoading &&
+        <Collapsible open={!seriesLoading}>
+          <Authorization />
+        </Collapsible>}
 
       <Main 
         pad={{ bottom:'large' }} 
@@ -115,7 +120,7 @@ const App = (props:any) => {
             fill="horizontal"
             align="center"
           > 
-            <Box width={{min:'600px'}}>{!yieldLoading && <Authorization buttonOnly />}</Box>
+            
             {activeView === 'BORROW' && <BorrowView />}
             {activeView === 'LEND' && <LendView />}
             {activeView === 'POOL' && <PoolView />}

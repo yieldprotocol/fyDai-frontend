@@ -68,10 +68,18 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
   return (
     <>
       { account && !series && !hasDelegatedProxy &&
-        <Box direction='row' fill='horizontal' gap='small' justify='between'>
-          {!buttonOnly && <Text>Before we start, Yield requires some permissions. </Text> }
+        <Box 
+          fill='horizontal'
+          pad='medium'
+          direction='row'
+          gap='medium'
+          background='#555555'
+          justify='between'
+        >
+          {!buttonOnly && <Text>Feel free to look around and play. However before you make any transactions you will need sign few authorisations.</Text> }
           <RaisedButton 
-            label={buttonOnly?<Text size='small'><Unlock /> Authorization is required to use the Yield Protocol.</Text>:<Text size='small'><Unlock /> Authorise Yield</Text>}
+            background='#555555'
+            label={<Text size='small' color='#DDDDDD'><Unlock /> Authorise Yield</Text>}
             onClick={()=>{authProcedure();}}
           />   
         </Box>}
