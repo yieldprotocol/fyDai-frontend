@@ -149,8 +149,8 @@ const Pool = (props:IPoolProps) => {
               {
                 label: 'Your Pool Tokens',
                 visible: 
-                  (!!account && txActive?.type !== 'ADD_LIQUIDITY' && !activeSeries.isMature()) || 
-                  (activeSeries.isMature() && activeSeries?.poolTokens_>0 ),
+                  (!!account && txActive?.type !== 'ADD_LIQUIDITY' && !activeSeries?.isMature()) || 
+                  (activeSeries?.isMature() && activeSeries?.poolTokens_>0 ),
                 active: true,
                 loading: addLiquidityPending,     
                 value: activeSeries?.poolTokens_,
@@ -160,8 +160,8 @@ const Pool = (props:IPoolProps) => {
               {
                 label: 'Your Pool share',
                 visible: 
-                  (!!account && txActive?.type !== 'ADD_LIQUIDITY' && !activeSeries.isMature()) || 
-                  (activeSeries.isMature() && activeSeries?.poolTokens_>0 ),
+                  (!!account && txActive?.type !== 'ADD_LIQUIDITY' && !activeSeries?.isMature()) || 
+                  (activeSeries?.isMature() && activeSeries?.poolTokens_>0 ),
                 active: true,
                 loading: addLiquidityPending,           
                 value: activeSeries?` ${activeSeries?.poolPercent}%`: '',
@@ -171,8 +171,8 @@ const Pool = (props:IPoolProps) => {
               {
                 label: 'Current Dai Balance',
                 visible: 
-                  (!!account && txActive?.type !== 'ADD_LIQUIDITY' && !activeSeries.isMature()) || 
-                  (activeSeries.isMature() && activeSeries?.poolTokens_>0 ),
+                  (!!account && txActive?.type !== 'ADD_LIQUIDITY' && !activeSeries?.isMature()) || 
+                  (activeSeries?.isMature() && activeSeries?.poolTokens_>0 ),
                 active: true,
                 loading: addLiquidityPending,            
                 value: daiBalance_?`${daiBalance_} DAI`: '0 DAI',

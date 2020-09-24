@@ -93,16 +93,16 @@ const Lend = ({ lendAmount }:ILendProps) => {
 
   /* Handle input (debounce input) changes */
   useEffect(() => {
-    activeSeries && !(activeSeries.isMature()) && !!debouncedInput && ( async () => {
+    activeSeries && !(activeSeries?.isMature()) && !!debouncedInput && ( async () => {
       const preview = await previewPoolTx('sellDai', activeSeries, debouncedInput);
       !(preview instanceof Error) && setEDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
-      !(preview instanceof Error) && setAPR( yieldAPR( ethers.utils.parseEther(debouncedInput), preview, activeSeries.maturity ) );
+      !(preview instanceof Error) && setAPR( yieldAPR( ethers.utils.parseEther(debouncedInput), preview, activeSeries?.maturity ) );
     })();
   }, [activeSeries, debouncedInput]);
 
   /* handle active series loads and changes */
   useEffect(() => {
-    fallbackProvider && account && activeSeries?.eDaiBalance_ && !(activeSeries.isMature()) && ( async () => {
+    fallbackProvider && account && activeSeries?.eDaiBalance_ && !(activeSeries?.isMature()) && ( async () => {
       const preview = await previewPoolTx('SellEDai', activeSeries, activeSeries.eDaiBalance_);
       !(preview instanceof Error) && setCurrentValue( ethers.utils.formatEther(preview));
     })();
@@ -147,8 +147,8 @@ const Lend = ({ lendAmount }:ILendProps) => {
               {
                 label: 'Portfolio Value at Maturity',
                 visible: 
-                  (!!account && !txActive && !activeSeries.isMature()) || 
-                  ( activeSeries.isMature() && activeSeries?.eDaiBalance_>0),
+                  (!!account && !txActive && !activeSeries?.isMature()) || 
+                  ( activeSeries?.isMature() && activeSeries?.eDaiBalance_>0),
                 active: true,
                 loading: lendPending,  
                 value: activeSeries && `${activeSeries?.eDaiBalance_} DAI` || '-',
@@ -157,7 +157,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
               },
               {
                 label: 'Current Value',
-                visible: !!account && !txActive && !activeSeries.isMature(),
+                visible: !!account && !txActive && !activeSeries?.isMature(),
                 active: true,
                 loading: lendPending || !currentValue,           
                 value: currentValue?`${cleanValue(currentValue, 2)} DAI`: '- Dai',
@@ -167,8 +167,8 @@ const Lend = ({ lendAmount }:ILendProps) => {
               {
                 label: 'Dai balance',
                 visible: 
-                  (!!account && !txActive && !activeSeries.isMature()) || 
-                  (activeSeries.isMature() && activeSeries?.eDaiBalance_>0),
+                  (!!account && !txActive && !activeSeries?.isMature()) || 
+                  (activeSeries?.isMature() && activeSeries?.eDaiBalance_>0),
                 active: true,
                 loading: lendPending,            
                 value: daiBalance_?`${daiBalance_} DAI`: '0 DAI',

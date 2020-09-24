@@ -57,7 +57,7 @@ function AprBadge({ activeView, series, animate }:IAprBadgeProps) {
           animation={animate ? { type:'zoomIn', duration:1000, size:'large' } : undefined} 
         >
           <Loading condition={!seriesApr} size='xsmall'>
-            <Text size='xsmall' weight='bold'> { seriesApr } </Text>  
+            <Text size='xsmall'> { seriesApr } </Text>  
           </Loading>
         </Box>}
 
