@@ -174,7 +174,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
                 active: !!inputValue,
                 loading: false,           
                 value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
-                valuePrefix: 'Approx.',
+                valuePrefix: '~',
                 valueExtra: null,
                 // valueExtra: () => (
                 //   <Text color='green' size='medium'> 

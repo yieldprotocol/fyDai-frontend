@@ -184,7 +184,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
               active: inputValue,
               loading: !ethPosted_ && depositPending && ethPosted_ !== 0,           
               value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
-              valuePrefix: 'Approx.',
+              valuePrefix: '~',
               valueExtra: () => (
                 <Text color='green' size='medium'> 
                   { inputValue && collateralPercent_ && ( (estRatio-collateralPercent_) !== 0) && `(+ ${(estRatio-collateralPercent_).toFixed(0)}%)` }

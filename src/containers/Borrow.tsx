@@ -273,7 +273,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
                 active: !!inputValue&&inputValue>0,
                 loading: false,        
                 value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
-                valuePrefix: 'Approx.',
+                valuePrefix: '~',
                 valueExtra: () => (
                   <Text color='red' size='small'> 
                     { inputValue &&
