@@ -72,7 +72,6 @@ export const useProxy = () => {
     [1, { id: 1, desc:'Dai > treasury authenticate ' }],
     [2, { id: 2, desc:'eDai > pool authenticate ' }],
   ]);
-  
 
   // TODO: deal with big number rather also, put this out in a hook
   const valueWithSlippage = (value:BigNumber, minimise:boolean=false ) => {
@@ -93,19 +92,19 @@ export const useProxy = () => {
       yieldProxyAbi,
       signer
     ));
-  }, [signer, deployedContracts]);
+  }, [signer, deployedContracts, yieldProxyAbi ]);
 
   /**
    * @dev Post ETH collateral via yieldProxy
-   * @param {number | BigNumber} amount amount of ETH to post (in normal human numbers or in Wei as a BigNumber)
+   * @param {string | BigNumber} amount amount of ETH to post (asa string in normal human numbers or in Wei as a BigNumber)
    * @note if BigNumber is used make sure it is in WEI
    */
   const postEth = async (
-    amount:number | BigNumber,
+    amount:string | BigNumber,
   ) => {
 
     /* Processing and/or sanitizing input */
-    const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(amount.toString());
+    const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(utils.cleanValue(amount));
     const toAddr = account && ethers.utils.getAddress(account); /* 'to' in this case represents the vault to be depositied into within controller */  
     
     /* Contract interaction */
@@ -125,15 +124,14 @@ export const useProxy = () => {
 
   /**
    * @dev Withdraw ETH collateral via YieldProxy
-   * @param {number|BigNumber} amount amount of ETH to withdraw (in normal human numbers or in Wei as a BigNumber)
+   * @param {string|BigNumber} amount amount of ETH to withdraw (in normal human numbers or in Wei as a BigNumber)
    * @note if BigNumber is used make sure it is in WEI
    */
   const withdrawEth = async (
-    amount:number|BigNumber
+    amount:string|BigNumber
   ) => {
-
     /* Processing and sanitizing input */
-    const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(amount.toString());
+    const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(utils.cleanValue(amount));
     const toAddr = account && ethers.utils.getAddress(account);
 
     /* Contract interaction */
@@ -250,7 +248,6 @@ export const useProxy = () => {
     let minEDai:BigNumber;
     try {
       console.log( await series.isMature() );
-
       if ( await isMature(series.eDaiAddress) ) {  
         try {
           console.log('repay with sig- after maturity');

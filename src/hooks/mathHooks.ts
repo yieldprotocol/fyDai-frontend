@@ -28,7 +28,7 @@ export const useMath = () => {
    */
   const collPrice = (): BigNumber => {
     // TODO: Update this to use ETH-A Oracle - not ilks.spot for market price USD
-    console.log('ETH price:', ethers.utils.formatEther(utils.mulRay(utils.dehumanize(1.5), (ilks.spot)).toString()));
+    console.log('ETH price:', ethers.utils.formatEther(utils.mulRay(ethers.utils.parseEther('1.5'), (ilks.spot)).toString()));
     return utils.mulRay(utils.toRay(1.5), (ilks.spot));
   };
 
@@ -37,7 +37,7 @@ export const useMath = () => {
    * @returns {BigNumber} USD value (in wad/wei precision)
    */
   const collValue = (collateralPosted:BigNumber): BigNumber => {
-    console.log('Collateral Value USD:', ethers.utils.formatEther( utils.mulRay(collateralPosted, collPrice()) ) );
+    // console.log('Collateral Value USD:', ethers.utils.formatEther( utils.mulRay(collateralPosted, collPrice()) ) );
     return utils.mulRay(collateralPosted, collPrice());
   };
 
@@ -60,7 +60,7 @@ export const useMath = () => {
    * @param {BigNumber} _debtValue (wei/wad precision)
    * @returns {BigNumber} in Ray
    */
-  const collRatio = (_collateralValue:BigNumber, _debtValue:BigNumber) => {
+  const collRatio = ( _collateralValue:BigNumber, _debtValue:BigNumber ) => {
     if (_debtValue.eq(0) ) {
       // handle this case better
       return BigNumber.from(0);
@@ -83,20 +83,18 @@ export const useMath = () => {
    * ETH collat value and DAI debt value (in USD) using 
    * normal numbers
    *
-   * @param {number} _collateralAmount  amount of collateral (eg. 10ETH)
-   * @param {number} _debtValue value of dai debt (in USD)
-   * @returns {number}
+   * @param {BigNumber} _collateralAmount  amount of collateral (eg. 10ETH)
+   * @param {BigNumber} _debtValue value of dai debt (in USD)
+   * @returns {BigNumber} 
    */
   // TODO merge this in to the 'collateralization ratio function' above.
-  const estCollRatio = (_collateralAmount:Number, _debtValue:Number) => {
-    if (!_collateralAmount || _debtValue === 0 ) {
+  const estCollRatio = (_collateralAmount:BigNumber, _debtValue:BigNumber) => {
+    if (!_collateralAmount || _debtValue.isZero() ) {
       return undefined;
     }
-    const _colAmnt = ethers.utils.parseEther(_collateralAmount.toString());
-    const _debtVal = ethers.utils.parseEther(_debtValue.toString());
-    const _colVal = utils.mulRay(_colAmnt, collPrice());
-    const _ratio = utils.divRay(_colVal, _debtVal);
-    return parseFloat(utils.mulRay(BigNumber.from('100'), _ratio).toString());
+    const _colVal = utils.mulRay(_collateralAmount, collPrice());
+    const _ratio = utils.divRay(_colVal, _debtValue);
+    return utils.mulRay(BigNumber.from('100'), _ratio).toString();
   };
 
   /**

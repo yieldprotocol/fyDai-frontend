@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useWeb3React } from '@web3-react/core';
 
-import { Anchor, Footer, Button, Box } from 'grommet';
+import { Anchor, Footer, Text, Box } from 'grommet';
 
 import {
   FiSun as Sun,
@@ -15,8 +15,7 @@ import {
 // TODO: use theming context properly - no cheating :)
 import { yieldTheme } from '../themes';
 import { useSignerAccount } from '../hooks';
-
-// import { ConnectionContext } from '../contexts/ConnectionContext';
+import FlatButton from './FlatButton';
 
 const YieldFooter = (props: any) => {
   const {
@@ -24,7 +23,7 @@ const YieldFooter = (props: any) => {
     showTestLayer,
     setDarkMode,
     darkMode,
-    changeConnection,
+    openConnectLayer,
   } = props;
   const { account } = useSignerAccount();
 
@@ -36,6 +35,7 @@ const YieldFooter = (props: any) => {
       align="center"
       fill="horizontal"
       pad={{ horizontal: 'none', vertical: 'medium' }}
+      background='#ffffff00'
     >
       <Box
         direction="row"
@@ -57,12 +57,9 @@ const YieldFooter = (props: any) => {
       </Box>
       <Box>
         {!account && (
-          <Button
-            label="Connect wallet"
-            onClick={() => changeConnection()}
-            style={{
-              fontWeight: 600,
-            }}
+          <FlatButton
+            label={<Text size='small'>Connect wallet</Text>}
+            onClick={() => openConnectLayer()}
           />
         )}
       </Box>

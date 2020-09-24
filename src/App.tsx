@@ -1,12 +1,13 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useRef, useEffect, useState, useContext } from 'react';
 
-import { Grommet, base, Grid, Main, Box, ResponsiveContext, Nav, Layer } from 'grommet';
+import { Grommet, base, Grid, Main, Box, ResponsiveContext, Text, Nav, Layer, Collapsible } from 'grommet';
 import { deepMerge } from 'grommet/utils';
 import { yieldTheme } from './themes';
 
 import { SeriesContext } from './contexts/SeriesContext';
+import { UserContext } from './contexts/UserContext';
+import { YieldContext } from './contexts/YieldContext';
 
-import Dashboard from './views/Dashboard';
 import BorrowView from './views/BorrowView';
 import LendView from './views/LendView';
 import PoolView from './views/PoolView';
@@ -17,12 +18,13 @@ import SeriesSelector from './components/SeriesSelector';
 import YieldMark from './components/logos/YieldMark';
 
 import ConnectLayer from './containers/layers/ConnectLayer';
-import AccountLayer from './containers/layers/AccountLayer';
 import NotifyLayer from './containers/layers/NotifyLayer';
-import AuthsLayer from './containers/layers/AuthsLayer';
 
 // TODO: remove testLayer for prod
 import TestLayer from './containers/layers/TestLayer';
+import Splash from './components/Splash';
+import RaisedBox from './components/RaisedBox';
+import Authorization from './components/Authorization';
 
 // const LendView = React.lazy(() => import('./views/LendView'));
 // const PoolView = React.lazy(() => import('./views/PoolView'));
@@ -50,26 +52,26 @@ const ThemedApp = () => {
 
 const App = (props:any) => {
 
-  const { isLoading } = useContext(SeriesContext);
+  const { state: { seriesLoading, activeSeries } } = useContext(SeriesContext);
+  const { state : { authorizations : { hasDelegatedProxy } } } = useContext(UserContext);
+
+  const { state: { yieldLoading } } = useContext(YieldContext);
 
   // TODO Switch out for react router
   const [activeView, setActiveView] = useState<string>('BORROW');
-  const [accountView, setAccountView] = useState<string>('ACCOUNT');
 
-  const [showConnectLayer, setShowConnectLayer] = useState<boolean>(false);
-  const [showAccountLayer, setShowAccountLayer] = useState<boolean>(false);
-  const [showAuthsLayer, setShowAuthsLayer] = useState<boolean>(false);
-
+  const [showConnectLayer, setShowConnectLayer] = useState<string|null>(null);
   const [showSeriesLayer, setShowSeriesLayer] = useState<boolean>(false);
+
+  // TODO remove for prod
   const [showTestLayer, setShowTestLayer] = useState<boolean>(false);
+
+  const leftSideRef = useRef<any>(null);
+
+  const [appReady, setAppReady] = useState<boolean>(false);
 
   const screenSize = useContext(ResponsiveContext);
   const [columnsWidth, setColumnsWidth] = useState<string[]>(['5%', 'auto', '5%']);
-
-  const changeConnection = () => {
-    setShowAccountLayer(false);
-    setShowConnectLayer(true);
-  };
 
   useEffect(()=> {
     if (screenSize === 'small') { 
@@ -79,71 +81,75 @@ const App = (props:any) => {
     }
   }, [screenSize]);
 
+
+  useEffect(()=> {
+    !yieldLoading && !seriesLoading && setAppReady(true);
+    // console.log(leftSideRef.current);
+
+  }, [yieldLoading, seriesLoading, hasDelegatedProxy]);
+
   return (
     <div className="App">
-      <NotifyLayer />
-      <AuthsLayer open={showAuthsLayer} closeLayer={() => setShowAuthsLayer(false)} />
-      <ConnectLayer view={accountView} open={showConnectLayer} closeLayer={() => setShowConnectLayer(false)} />
-      
+      <ConnectLayer view={showConnectLayer} closeLayer={() => setShowConnectLayer(null)} />
+
       { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
       { showSeriesLayer  && <SeriesSelector activeView='borrow' close={()=>setShowSeriesLayer(false)} /> }
 
-      { showAccountLayer &&
-        <AccountLayer
-          view={accountView}
-          closeLayer={() => setShowAccountLayer(false)}
-          changeWallet={() => changeConnection()}
-        />}
+      <Grid fill columns={columnsWidth}>
+        <Box background={{ color: 'background-front' }} />
+        <YieldHeader
+          openConnectLayer={(v:string) => setShowConnectLayer(v)}
+          activeView={activeView}
+          setActiveView={setActiveView}
+        />
+        <Box background={{ color: 'background-front' }} />
+      </Grid>
 
-      <Box direction="row" height={{ min: '100%' }}>
-        <Box flex height='100%'>
+      { !yieldLoading &&
+        <Collapsible open={!seriesLoading} ref={leftSideRef}>
+          <Grid fill columns={columnsWidth}>
+            <Box background={{ color: '#555555' }} />
+            <Authorization />
+            <Box background={{ color: '#555555' }} />
+          </Grid> 
+        </Collapsible>}
 
-          <Grid fill rows={screenSize === 'small'? ['xsmall', 'auto', 'xsmall']: ['auto', 'flex', 'auto']}>                 
-            <Grid fill columns={columnsWidth}>
-              <Box background={{ color: 'background-front' }} />
-              <YieldHeader
-                openConnectLayer={() => setShowConnectLayer(true)}
-                openAccountLayer={() => setShowAccountLayer(true)}
-                activeView={activeView}
-                setActiveView={setActiveView}
-              />
-              <Box background={{ color: 'background-front' }} />
-            </Grid>
+      <NotifyLayer target={leftSideRef.current} columnsWidth={columnsWidth} />
 
-            {!isLoading &&
-            <Main pad="none" direction="row" flex>
-              <Grid fill columns={columnsWidth}>
-                <Box background="background" />
-                <Box
-                  pad={{ vertical: 'large' }}
-                  fill="horizontal"
-                  align="center"
-                >          
-                  {activeView === 'DASHBOARD' && <Dashboard />}
-                  {activeView === 'BORROW' && <BorrowView />}
-                  {activeView === 'LEND' && <LendView />}
-                  {activeView === 'POOL' && <PoolView />}
-                </Box>               
-                <Box background="background" />
-              </Grid>
-            </Main>}
-              
-            <Grid fill columns={columnsWidth}>
-              <Box background="background" />
-              {screenSize !== 'small' &&
-                <YieldFooter
-                  showTestLayer={showTestLayer}
-                  setShowTestLayer={setShowTestLayer}
-                  darkMode={props.darkMode}
-                  setDarkMode={props.setDarkMode}
-                  changeConnection={changeConnection}
-                />}                  
-              <Box background="background" />      
-            </Grid>
+      <Main 
+        pad={{ bottom:'large' }} 
+        direction="row" 
+        flex
+        
+      >
+        <Grid fill columns={columnsWidth}>
+          <Box />
+          <Box
+            pad={{ vertical: 'large' }}
+            fill="horizontal"
+            align="center"
+          > 
+            
+            {activeView === 'BORROW' && <BorrowView />}
+            {activeView === 'LEND' && <LendView />}
+            {activeView === 'POOL' && <PoolView />}
+          </Box>               
+          <Box />
+        </Grid>
+      </Main>
 
-          </Grid>
-        </Box>
-      </Box>
+      <Grid fill columns={columnsWidth}>
+        <Box />
+        {screenSize !== 'small' &&
+        <YieldFooter
+          showTestLayer={showTestLayer}
+          setShowTestLayer={setShowTestLayer}
+          darkMode={props.darkMode}
+          setDarkMode={props.setDarkMode}
+          openConnectLayer={() => setShowConnectLayer('CONNECT')}
+        />}                  
+        <Box />      
+      </Grid>
 
       {screenSize === 'small' &&    
         <Layer
@@ -165,7 +171,7 @@ const App = (props:any) => {
             <Box>Borrow</Box>
             <Box>Repay</Box>         
           </Nav>
-        </Layer>} 
+        </Layer>}
     </div>
   );
 };

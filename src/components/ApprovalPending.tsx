@@ -41,7 +41,7 @@ const ApprovalPending = React.forwardRef( (props, ref) => {
           round
           background='background-front'
         >
-          <Text weight='bold'>Transaction Approval required</Text>
+          <Text weight='bold'>Transaction approval required</Text>
           <Text>Please check your wallet/provider to approve the transaction</Text>            
         </Box>}
     </Layer>

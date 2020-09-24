@@ -9,7 +9,8 @@ import { SeriesContext } from '../contexts/SeriesContext';
 
 import AprBadge from './AprBadge';
 import Loading from './Loading';
-import { IYieldSeries } from '../types';
+import FlatButton from './FlatButton';
+import RaisedButton from './RaisedButton';
 
 interface ISeriesSelectorProps {
   activeView:string;
@@ -20,13 +21,10 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
 
   const screenSize = useContext(ResponsiveContext);
   const { state: seriesState, actions: seriesActions } = useContext( SeriesContext );
-  const { isLoading, activeSeries, seriesData } = seriesState; 
+  const { seriesLoading, activeSeries, seriesData } = seriesState; 
   const { setActiveSeries } = seriesActions;
 
   const [sortedList, setSortedList] = useState<any>(seriesData);
-  const [firstSort, setFirstSort] = useState<any>('');
-  const [secondSort, setSecondSort] = useState<any>('');
-
 
   const viewMap = new Map([
     ['BORROW', { head: 'DEBT', field: 'ethDebtEDai_' }],
@@ -56,8 +54,6 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
     );
     const mergedMap = new Map([...sortedActive, ...sortedMature]);
     setSortedList(mergedMap);
-
-    // setSortedList(seriesData);
 
   }, [seriesData]);
 
@@ -114,8 +110,8 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
               </Box>}
           </Box>
 
-          <Loading condition={isLoading} size='large'>
-            { !isLoading && [...sortedList.values() ].map((x:any, i:any) => {       
+          <Loading condition={seriesLoading} size='large'>
+            { !seriesLoading && [...sortedList.values() ].map((x:any, i:any) => {       
               const _key = i;
               const field = viewMap.get(activeView.toUpperCase())?.field || '';
 
@@ -146,7 +142,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
                     </Box>
                     <Box fill align={screenSize==='small'?'end':undefined}>
                       <Text size={screenSize} color='brand'>
-                        {x[field].toFixed(2)}
+                        {x[field]}
                       </Text>
                     </Box>                 
                   </Box>
@@ -156,35 +152,32 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
                     { activeSeries && activeSeries.maturity === x.maturity ? 
                       <Button 
                         primary
-                        label='Selected'
+                        label={
+                          <Text size='small'>Selected</Text>           
+                        }
                         icon={<Check />}
                       /> : 
-                      <Button 
+                      <RaisedButton 
                         secondary
-                        label='Select'
+                        label={<Text size='small'>Select</Text>}
                       />}
                   </Box>}
                 </Box>
               );     
             })}
-
           </Loading>        
         </Box>
 
-        <Box alignSelf='start'>
-          <Box
-            round
+        <Box alignSelf='start' margin={{ top:'medium' }}>
+          <FlatButton 
             onClick={()=>close()}
-            hoverIndicator='brand-transparent'
-          // border='all'
-            pad={{ horizontal:'small', vertical:'small' }}
-            justify='center'
-          >
-            <Box direction='row' gap='small' align='center'>
-              <ArrowLeft color='text-weak' />
-              <Text size='xsmall' color='text-weak'> go back </Text>
-            </Box>
-          </Box>
+            label={
+              <Box direction='row' gap='medium' align='center'>
+                <ArrowLeft color='text-weak' />
+                <Text size='small' color='text-weak'> go back </Text>
+              </Box>
+            }
+          />
         </Box>
       </Box>
     </Layer>

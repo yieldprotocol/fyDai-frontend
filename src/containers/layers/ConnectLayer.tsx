@@ -1,11 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
 
-import { UnsupportedChainIdError } from '@web3-react/core';
-import {
-  NoEthereumProviderError,
-  UserRejectedRequestError as UserRejectedRequestErrorInjected,
-} from '@web3-react/injected-connector';
-
 import {
   Anchor,
   Layer,
@@ -18,58 +12,56 @@ import {
   Text,
   ResponsiveContext,
   Paragraph,
+  Collapsible,
 } from 'grommet';
-import {
 
-  useWeb3React,
+import { 
+  FiArrowLeft as ArrowLeft,
+} from 'react-icons/fi';
+
+import { FaCaretDown } from 'react-icons/fa';
+import {
   useConnection,
-  useCachedState, 
   useSignerAccount,
 } from '../../hooks';
 
-import { injected, trezor, walletlink, torus, ledger } from '../../connectors';
-
+import { injected, torus } from '../../connectors';
 import metamaskImage from '../../assets/images/providers/metamask.png';
-import trezorImage from '../../assets/images/providers/trezor.png';
-import walletlinkImage from '../../assets/images/providers/walletlink.png';
 import torusImage from '../../assets/images/providers/torus.png';
-// import noConnectionImage from '../assets/images/noconnection.png';
 
-import { NotifyContext } from '../../contexts/NotifyContext';
 import { UserContext } from '../../contexts/UserContext';
-import ProfileButton from '../../components/ProfileButton';
 
-const ConnectLayer = ({ open, view, closeLayer }: any) => {
+import RaisedButton from '../../components/RaisedButton';
+import FlatButton from '../../components/FlatButton';
+import TxHistory from '../../components/TxHistory';
+
+const ConnectLayer = ({ view, target, closeLayer }: any) => {
 
   const { state: { position } } = useContext(UserContext);
   const screenSize = useContext(ResponsiveContext);
   const { account, provider } = useSignerAccount();
-
   const [ layerView, setLayerView] = useState<string>(view);
-
   const { handleSelectConnector } = useConnection();
+
+  const [ histOpen, setHistOpen] = useState<string>('BORROW');
 
   const connectorList = [
     { name: 'Metamask', image: metamaskImage, connection: injected },
-    { name: 'Tezor', image: trezorImage, connection: trezor },
     { name: 'Torus', image: torusImage, connection: torus },
-    { name: 'Walletlink', image: walletlinkImage, connection: walletlink },
-    { name: 'Ledger', image: walletlinkImage, connection: ledger },
   ];
 
   useEffect(()=>{
     setLayerView(view);
-  }, []);
+  }, [view]);
 
   return (
     <>
-
-    
-      {open && (
+      {layerView && (
         <Layer
           onClickOutside={() => closeLayer(true)}
-          animation="slide"
+          animation='slide'
           onEsc={() => closeLayer(true)}
+          target={target || undefined}
         >
           <Box
             width={screenSize!=='small'?{ min:'600px', max:'750px' }: undefined}
@@ -81,78 +73,97 @@ const ConnectLayer = ({ open, view, closeLayer }: any) => {
               padding: '2rem',
             }}
           >
-            { false ?
+
+            { account && layerView === 'ACCOUNT' &&
               <>
-                <Header 
-                  fill='horizontal'
-                  background='background-mid'
-                  pad={{ horizontal: 'medium', vertical:'large' }}
-                >
-                  <ProfileButton />
-                  <Anchor color='brand' onClick={()=>closeLayer()} size='xsmall' label='Close' />
-                </Header>
-
-                <Box
-                  pad="medium"
-                  align="center"
-                  justify="center"
-                  gap='small'
-                >
-                  <Text size='xsmall'>Connected to:</Text> 
-                  <Text weight="bold"> { provider.network.name } </Text>
-                  <Box direction='row' gap='small'>
-                    <Text size='xsmall'>ETH balance:</Text>
-                    <Text>{ position.ethBalance_ && position.ethBalance_ || '' }</Text>
+                <Box pad="small" gap="small">
+                  <Box direction='row' justify='between'>
+                    <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Connected Wallet</Text>   
+                    <Box round>
+                      <FlatButton
+                        onClick={()=>setLayerView('CONNECT')}
+                        label={<Text size='xsmall'>Change Wallet Provider</Text>}
+                      /> 
+                    </Box>
                   </Box>
-                  {/* <Button fill='horizontal' label='Connect to another wallet' onClick={()=>setShowConnectLayer(true)} /> */}
-                </Box>
-
-                <Box 
-                  align='center'
-                  overflow='auto'
-                >
-                  <Text>Previous TX Info</Text>
-                  <Text>Previous TX Info</Text>
-                  <Text>Previous TX Info</Text>
-                  <Text>Previous TX Info</Text>
-
-                </Box>
-                <Footer pad='medium' gap='xsmall' direction='row' justify='center' align='center'>
-                  <Box round>
-                    <Button 
-                      fill='horizontal'
-                      size='small' 
-                      onClick={()=>setLayerView('CONNECT')}
-                      color='background-front'
-                      label='Change wallet'
-                      hoverIndicator='background'
-                    />
-                  </Box>
-                </Footer>
-              </> 
-
-              :
-
-              <>
-                <Header fill="horizontal" gap="medium">
-                  <Heading
-                    level="2"
-                    style={{
-                      textAlign: 'center',
-                      margin: 'auto',
-                    }}
+                   
+                  <Box
+                    pad={{ vertical:'small' }}
+                    justify="center"
+                    gap='small'
                   >
-                    Connect to a Wallet
-                  </Heading>
-                </Header>
+                    {/* <ProfileButton /> */}
+                    {account}
+                    <Box direction='row' gap='small'>
+                      <Text size='xsmall'>Network:</Text> 
+                      <Text weight="bold"> { provider.network.name } </Text>                   
+                    </Box> 
+
+                    <Box direction='row' gap='small'>
+                      <Text size='xsmall'>ETH balance:</Text>
+                      <Text>{ position.ethBalance_ && position.ethBalance_ || '' }</Text>
+                    </Box>
+
+                    <Box direction='row' gap='small'>
+                      <Text size='xsmall'>DAI balance:</Text>
+                      <Text>{ position.daiBalance_ && position.daiBalance_ || '' }</Text>
+                    </Box>
+                    {/* <Button fill='horizontal' label='Connect to another wallet' onClick={()=>setShowConnectLayer(true)} /> */}
+                  </Box>
+                </Box>
+
+                <Box pad="small" gap="small">
+                  <Box direction='row' justify='between'>
+                    <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Transactions</Text>   
+                    <Box round>
+                      <FlatButton
+                        onClick={()=>setLayerView('HISTORY')}
+                        label={<Text size='xsmall'>View history</Text>}
+                      /> 
+                    </Box>
+                  </Box>  
+                  <Box
+                    pad={{ vertical:'small' }}
+                    justify="center"
+                    gap='small'
+                  >
+                    <Text size='xsmall'>Last complete transaction: txhashofsomething </Text>
+                    <Text size='xsmall'>Pending transactions: txhashofsomething </Text>    
+                  </Box>
+                </Box>
+
+                <Box pad="small" gap="small">
+                  <Box direction='row' justify='between'>
+                    <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Account Settings</Text> 
+                    <Box round>
+                      <FlatButton
+                        onClick={()=>console.log('STILL TO DO!')}
+                        label={<Text size='xsmall'>More settings</Text>}
+                      /> 
+                    </Box>
+                  </Box>  
+                  <Box
+                    pad={{ vertical:'small' }}
+                    justify="center"
+                    gap='small'
+                  >
+                    <Text size='xsmall'>Slippage value: 0.05% </Text> 
+                  </Box>
+                </Box>
+
+              </> }
+
+            { layerView === 'CONNECT' &&      
+              <Box pad="medium" gap="small">
+
                 <Box align="center" pad="medium" gap="small">
+                  <Text size='xxlarge' color='brand' weight='bold'>Connect a wallet</Text>
+
                   <Paragraph>Try connecting with:</Paragraph>
                   {connectorList.map((x) => (
-                    <Button
-                      hoverIndicator="border"
+                    <RaisedButton
                       onClick={() => { handleSelectConnector(x.connection); closeLayer();}}
                       label={x.name}
-                      color="border"
                       fill="horizontal"
                       icon={
                         <Box
@@ -175,30 +186,68 @@ const ConnectLayer = ({ open, view, closeLayer }: any) => {
                       key={x.name}
                     />
                   ))}
-                </Box>
-                <Footer direction="column" pad="medium">
+
                   <Box gap="xsmall" direction="row">
                     <Anchor href="#" label="Help!" size="xsmall" color="brand" />
                     <Text size="xsmall"> I'm not sure what this means.</Text>
                   </Box>
-                  <Box direction="row">
-                    <Button
-                      label="Close"
-                      fill="horizontal"
-                      color="border"
-                      style={{
-                        fontWeight: 600,
-                        height: screenSize === 'small' ? '2.25rem' : 'auto',
-                      }}
-                      onClick={() => closeLayer()}
-                    />
-                  </Box>
-                </Footer>
-              </>}
+                </Box>
 
+              </Box>}
+
+            { account && layerView === 'HISTORY' &&      
+              <Box pad="medium" gap="small"> 
+                <Box direction='row' justify='evenly'>
+                  <FlatButton 
+                    onClick={()=> setHistOpen('BORROW')}
+                    label='Borrowing History'
+                    selected={histOpen==='BORROW'}
+                  />
+                  <FlatButton 
+                    onClick={()=> setHistOpen('LEND')}
+                    label='Lending History'
+                    selected={histOpen==='LEND'}
+                  />
+                  <FlatButton 
+                    onClick={()=> setHistOpen('POOL')}
+                    label='Pool History'
+                    selected={histOpen==='POOL'}
+                  />
+                </Box>
+                <Box>
+                  {histOpen === 'BORROW' && <TxHistory filterTerms={['Bought', 'Repaid', 'Deposited', 'Withdrew']} view='borrow' />}
+                  {histOpen === 'LEND' && <TxHistory filterTerms={['Bought', 'Sold' ]} view='lend' />}
+                  {histOpen === 'POOL' && <TxHistory filterTerms={['Bought', 'Sold' ]} view='pool' />}
+                </Box>
+              </Box> }
+
+            <Footer direction="row-responsive" justify='between' pad="medium" margin={{top:'medium'}}>
+              <FlatButton 
+                onClick={() => {
+                  if (view === 'ACCOUNT' && layerView !== 'ACCOUNT') { 
+                    setLayerView('ACCOUNT');
+                  } else {
+                    closeLayer();
+                  }
+                }}
+                label={
+                  <Box direction='row' gap='medium' align='center'>
+                    <ArrowLeft color='text-weak' />                    
+                    <Text size='xsmall' color='text-weak'> go back  </Text>
+                  </Box>
+                  }
+              />
+              {layerView !== 'ACCOUNT' &&  <FlatButton
+                label={<Text size='xsmall' color='text-weak'>Close</Text>}
+                onClick={()=>closeLayer()}
+              />}
+            </Footer>
           </Box>
         </Layer>
       )}
+
+
+
     </>
   );
 };

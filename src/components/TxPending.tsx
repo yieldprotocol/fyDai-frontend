@@ -9,7 +9,7 @@ interface TransactionPendingProps {
   tx: any;
 }
 
-const TransactionPending = ({ msg, tx }:TransactionPendingProps) => {
+const TxPending = ({ msg, tx }:TransactionPendingProps) => {
 
   const theme:any = useContext(ThemeContext); 
   const txRef = React.useRef<any>(null);
@@ -71,4 +71,4 @@ const TransactionPending = ({ msg, tx }:TransactionPendingProps) => {
   );
 };
 
-export default TransactionPending;
+export default TxPending;

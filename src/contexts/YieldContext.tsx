@@ -15,8 +15,8 @@ import { IYieldSeries } from '../types';
 const YieldContext = createContext<any>({});
 
 // const eDaiList = ['eDai0', 'eDai1', 'eDai2', 'eDai3', 'eDai4'];
-const eDaiList = ['20Oct', '20Sep', '21Apr', '21Jan', '21Jul'];
-const seriesColors = ['#726a95', '#709fb0', '#a0c1b8', '#f4ebc1', '#3f51b5', '#5677fc', '#03a9f4'];
+const eDaiList = ['20Sep23', '20Sep24', '20Sep25', '20Dec31', '21Dec31'];
+const seriesColors = ['#cecfc7', '#709fb0', '#ffb8d1', '#a0c1b8', '#f4ebc1', '#ada8b6', '#03a9f4'];
 const contractList = [
   'Controller',
   'Treasury',
@@ -53,7 +53,7 @@ function reducer(state: any, action: any) {
     case 'isLoading':
       return {
         ...state,
-        isLoading: action.payload,
+        yieldLoading: action.payload,
       };
     default:
       return state;
@@ -61,7 +61,6 @@ function reducer(state: any, action: any) {
 }
 
 const initState = {
-  isLoading: true,
   deployedSeries: [],
   deployedContracts: {},
   feedData: {
@@ -71,11 +70,12 @@ const initState = {
     },
   },
   yieldData: {},
+  yieldLoading: true,
 };
 
 const YieldProvider = ({ children }: any) => {
   const [state, dispatch] = useReducer(reducer, initState);
-  const { provider, fallbackProvider } = useSignerAccount();
+  const { account, provider, fallbackProvider } = useSignerAccount();
   const { dispatch: notifyDispatch } = useContext(NotifyContext);
 
   /* cache|localStorage declarations */
@@ -135,6 +135,7 @@ const YieldProvider = ({ children }: any) => {
               maturity_: new Date(maturity * 1000),
               displayName: moment(maturity * 1000).format('MMMM YYYY'),
               seriesColor: seriesColors[i],
+              seriesContrastColor: utils.invertColor(seriesColors[i]),
             };
           })
         ).then((res: any) => _deployedSeries.push(...res));

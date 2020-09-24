@@ -21,14 +21,18 @@ export const yieldTheme = {
       brand: {
         dark: '#005792',
         light: '#005792',
-        // dark: '#009E83',
-        // light:'#009E83',
+        // dark: '#ffffff',
+        // light:'#000000',
       },
       'brand-transparent': {
         // dark: 'rgba(0, 158, 131, 0.1)',
         // light: 'rgba(0, 158, 131, 0.1)',
         dark: '#0057921A',
         light: '#0057921A',
+      },
+      'brand-light': {
+        dark: '#FFFFFF',
+        light: '#FFFFFF',
       },
       secondary: {
         dark: '#627EEA',
@@ -41,24 +45,27 @@ export const yieldTheme = {
         // light: 'rgb(98, 126, 234, 0.1)',
       },
       background: {
-        // 'dark': '#111111',
-        // 'light': '#FFFFFF',
         dark: '#111111',
-        light: '#F1F5F9',
+        light: '#f8f8f8',
       },
 
       'background-back': {
         dark: '#111111',
-        light: '#EEEEEE',
+        // light: '#EEEEEE',
+        // light: '#d1dbe0',
+        light:'#f1f1f1'
       },
       'background-mid': {
         dark: 'dark-1',
-        light: '#F5FAFF',
+        light:'#f1f1f1'
+
+        // light: '#F5FAFF',
         // light: 'light-3',
       },
       'background-front': {
         dark: '#222222',
-        light: '#ffffff',
+        light:'#f8f8f8'
+        // light: '#ffffff',
         // 'dark': 'dark-1',
         // light: 'light-1',
       },
@@ -256,10 +263,28 @@ export const yieldTheme = {
     `,
   },
   TextInput: {
-
+    color: 'red',
+    // @ts-ignore
+    extend: () => css`
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+        input[type='number'] {
+          -moz-appearance: textfield;
+        }
+        overflow: auto;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+        ::-webkit-scrollbar {
+          display: none;
+        }
+      `,
   },
+
   collapsible: {
-    minSpeed: '100',
+    minSpeed: '500',
   },
   meter: {},
   anchor: {

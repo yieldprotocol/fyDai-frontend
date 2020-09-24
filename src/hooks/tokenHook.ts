@@ -23,7 +23,7 @@ const contractMap = new Map<string, any>([
  */
 export function useToken() {
   // const { state: { provider, account } } = useContext(ConnectionContext);
-  const { signer, provider, account, voidSigner } = useSignerAccount();
+  const { signer, provider, account, voidSigner, fallbackProvider } = useSignerAccount();
   const  { dispatch }  = useContext<any>(NotifyContext);
   const [ approveActive, setApproveActive ] = useState<boolean>(false);
   const { handleTx, handleTxError } = useTxHelpers();
@@ -38,15 +38,16 @@ export function useToken() {
    * @returns {BigNumber} ETH in Wei or token balance.
    */
   const getBalance = async (tokenAddr:string|null=null, contractName:string|null=null, queryAddress:string|null=null) => {  
-    if (!!provider && !!account ) {
+    if (fallbackProvider) {
       const addrToCheck = queryAddress || account;
       if (tokenAddr && contractName) {
-        const contract = new ethers.Contract(tokenAddr, contractMap.get(contractName), provider );
+        const contract = new ethers.Contract(tokenAddr, contractMap.get(contractName), fallbackProvider );
         const balance = await contract.balanceOf(addrToCheck);
         return balance;
       }
-      return provider.getBalance(addrToCheck);
-    } return ethers.BigNumber.from('0');
+      return fallbackProvider.getBalance(addrToCheck);
+    } 
+    return ethers.BigNumber.from('0');
   };
 
   /**

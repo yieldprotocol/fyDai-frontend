@@ -1,29 +1,21 @@
-import React, { Suspense, lazy } from 'react';
+import React from 'react';
 import { Box } from 'grommet';
 import PageHeader from '../components/PageHeader';
-
-const Pool = lazy(() => import('../containers/Pool'));
+import Pool from '../containers/Pool';
+import RaisedBox from '../components/RaisedBox';
 
 const PoolView = () => {
   return (
     <>
-      <PageHeader
+      {/* <PageHeader
         title="Pool"
         subtitle="Description of pool"
         tipPrimary="Tip: Convert your Maker vault"
         tipSecondary="View more tips"
-      />
-      <Box
-        width={{ max:'750px' }}
-        alignSelf='center'
-        fill='horizontal'
-        background='background-front'
-        round='small'
-      >
-        <Suspense fallback={<Box> loading ... </Box>}>
-          <Pool />
-        </Suspense>
-      </Box>
+      /> */}
+      <RaisedBox>
+        <Pool />
+      </RaisedBox>
     </>
   );
 };

@@ -1,7 +1,8 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import { Grid, Box, Text, ResponsiveContext } from 'grommet';
-import Loading from './Loading';
+import { ColorType } from 'grommet/utils';
 
+import Loading from './Loading';
 
 type entry = {
   visible: boolean;
@@ -15,14 +16,15 @@ type entry = {
 
 interface IInfoGridProps {
   entries: entry[];
+  alt?: boolean;
 }
 
-function InfoGrid({ entries }:IInfoGridProps) {
+function InfoGrid({ entries, alt }:IInfoGridProps) {
 
   const screenSize = useContext(ResponsiveContext);
   
   return (
-    <Grid columns={screenSize !== 'small' ? '30%' : '45%'} gap="small" fill>
+    <Grid columns={screenSize !== 'small' ? '30%' : '45%'} gap="small" fill justify='start'>
       {entries.map((x:any, i:number) => {
         const _key = i;
         const ValueExtra = x.valueExtra; 
@@ -31,11 +33,23 @@ function InfoGrid({ entries }:IInfoGridProps) {
             <Box key={_key}>         
               <Box 
                 pad='small' 
-                align='start'
               >
-                <Box gap='small' align='center'>
-                  <Text wordBreak='keep-all' color='text-weak' size='xxsmall'>{x.label}</Text>            
+                <Box
+                  round='large'
+                  gap='small' 
+                  align={alt? 'start': 'center'}
+                >
+                  <Text 
+                    wordBreak='keep-all' 
+                    color={alt? 'brand': 'text-weak'} 
+                    size='xxsmall' 
+                    // weight={alt? 'bold': undefined}
+                  >
+                    {x.label}
+                  </Text> 
+
                   <Loading condition={x.loading} size='small'>
+
                     <Box direction='row-responsive' gap='small'>
                       { x.valuePrefix && screenSize !== 'small' && <Text color={x.active ? 'brand':'brand-transparent'} size='xxsmall'>{x.valuePrefix}</Text> }
                       <Text color={x.active? 'brand':'brand-transparent'} weight='bold' size='medium'> 
@@ -50,8 +64,10 @@ function InfoGrid({ entries }:IInfoGridProps) {
           );
         }
       })}
-    </Grid>
+    </Grid> 
   );
 }
+
+InfoGrid.defaultProps={ alt:false };
 
 export default InfoGrid;

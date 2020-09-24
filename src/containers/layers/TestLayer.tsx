@@ -10,7 +10,7 @@ import { Anchor, Layer, Header, Heading, Footer, Button, Box, Text } from 'gromm
 import * as utils from '../../utils';
 
 // import { getNetworkName }  from '../../hooks/connectionHooks';
-import ProfileButton from '../../components/ProfileButton';
+import ProfileButton from '../../components/AccountButton';
 import { NotifyContext } from '../../contexts/NotifyContext';
 
 import { useSendTx, useCallTx, useController, useProxy, useAuth, useTimeTravel } from '../../hooks';
@@ -80,7 +80,7 @@ const TestLayer = (props:any) => {
   // }, [deployedContracts, postActive, withdrawActive]);
 
   useEffect(()=>{
-    const daiD = utils.dehumanize(1);
+    const daiD = utils.dehumanizeNumber(1);
     const chi  = utils.toRay(1.2);
 
     setDaiDebt( daiD );
@@ -199,9 +199,9 @@ const TestLayer = (props:any) => {
             <Box gap='small'>
 
               New ETH direct deposit/withdraw: 
-              <Button label='Post ETH Collateral via proxy 1.5' disabled={postActive} onClick={()=> postEth(1.5)} />
+              <Button label='Post ETH Collateral via proxy 1.5' disabled={postActive} onClick={()=> postEth('1.5')} />
               <Button primary label='controller addDelegate:EthProxy' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedContracts.YieldProxy], utils.toWei('0'))} />             
-              <Button label='Withdraw ETH via proxy 1.5)' onClick={()=> withdrawEth(1.5 )} />
+              <Button label='Withdraw ETH via proxy 1.5)' onClick={()=> withdrawEth('1.5')} />
               <Button label='6.1 Repay 0.5 eth/weth debt in eDai' onClick={()=> repay('ETH-A', yieldState.deployedSeries[0].maturity, 0.5, 'YDAI' )} />
               <Button label='( 6.2 Repay 0.5 eth/weth debt in Dai) ' onClick={()=> repay('ETH-A', yieldState.deployedSeries[0].maturity, 0.5, 'DAI' )} />
             
@@ -275,7 +275,7 @@ const TestLayer = (props:any) => {
             gap='small'
             overflow='auto'
           > 
-            { seriesData.size > 0 && !seriesState.isLoading ? 
+            { seriesData.size > 0 && !seriesState.seriesLoading ? 
               <Box pad='small' gap='medium' fill>
                 <Box direction='row'>
                   {/* <Text weight='bold'>eDai[0]: {seriesData.get('eDai-2020-09-30').name}</Text> */}

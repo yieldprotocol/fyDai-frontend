@@ -1,20 +1,6 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { BigNumber } from 'ethers';
-
-import { 
-  Box, 
-  TextInput, 
-  Text, 
-  ThemeContext,
-  ResponsiveContext,
-  Collapsible,
-} from 'grommet';
-
-import { 
-  FiInfo as Info,
-  FiArrowRight as ArrowRight,
-} from 'react-icons/fi';
-import { FaEthereum as Ethereum } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import styled, { css } from 'styled-components';
+import { Box, Collapsible } from 'grommet';
 
 import InlineAlert from './InlineAlert';
 
@@ -24,6 +10,17 @@ interface IInputProps {
   disabled?: boolean,
   children:any;
 }
+
+const InsetBox = styled(Box)`
+border-radius: 8px;
+background: #f8f8f8;
+box-shadow: inset 6px 6px 11px #e9e9e9, 
+            inset -6px -6px 11px #ffffff;
+  ${(props:any) => props.background && css`
+    background: ${props.background};
+    color: black;
+  `}
+`;
 
 function InputWrap( { warningMsg, errorMsg, disabled, children }: IInputProps) {
 
@@ -46,17 +43,14 @@ function InputWrap( { warningMsg, errorMsg, disabled, children }: IInputProps) {
 
 
   return (
-    <Box
-     // direction='row-responsive'
+    <InsetBox
       fill='horizontal'
       gap='none'
       align='center'
-      // animation={animation}   
     >
       <Box 
         round={corners}
-        // background='brand-transparent'
-        border={border}   
+        // border={border}   
         direction='row'
         fill='horizontal'
         pad='small'
@@ -64,13 +58,14 @@ function InputWrap( { warningMsg, errorMsg, disabled, children }: IInputProps) {
       >
         {children}   
       </Box>
-
-      <Box fill='horizontal'>
+      <Box 
+        fill='horizontal'    
+      >
         <Collapsible open={!!warningMsg || !!errorMsg}>
           <InlineAlert warnMsg={warningMsg || null} errorMsg={errorMsg || null} />
         </Collapsible>
       </Box>
-    </Box>
+    </InsetBox>
   );
 }
 

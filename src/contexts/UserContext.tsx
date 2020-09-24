@@ -1,7 +1,7 @@
 import React, { useEffect, useContext, createContext, useReducer } from 'react';
 import { ethers } from 'ethers';
 
-import * as utils from '../utils';
+import { cleanValue } from '../utils';
 
 import { YieldContext } from './YieldContext';
 
@@ -43,7 +43,7 @@ function reducer(state: any, action: any) {
         ...state,
         makerData: action.payload,
       };
-    case 'userLoading':
+    case 'isLoading':
       return {
         ...state,
         userLoading: action.payload,
@@ -62,7 +62,7 @@ const initState = {
   },
   authorizations:{},
   preferences:{
-    slippage: 0.005 // default === 0.5%
+    slippage: 0.05 // default === 5%
   },
   makerData:{},
 };
@@ -72,7 +72,6 @@ const UserProvider = ({ children }: any) => {
   const [ state, dispatch ] = useReducer(reducer, initState);
   const { state: yieldState } = useContext(YieldContext);
   const { deployedContracts, deployedSeries } = yieldState;
-
   const { account, provider } = useSignerAccount();
 
   /* cache | localStorage declarations */
@@ -152,17 +151,17 @@ const UserProvider = ({ children }: any) => {
 
     /* parse to human usable */
     const parsedValues = {  
-      ethBalance_ : utils.humanize(ethBalance),
-      daiBalance_ : utils.humanize(daiBalance),
-      ethPosted_ : utils.humanize(ethPosted),
-      ethLocked_ : utils.humanize(ethLocked),
-      ethBorrowingPower_ : utils.humanize(ethBorrowingPower),
-      ethTotalDebtDai_ : utils.humanize(ethTotalDebtDai),  
-      debtValue_ : utils.humanize(ethTotalDebtDai),
-      collateralValue_ : utils.humanize(collateralValue),
+      ethBalance_ : cleanValue(ethers.utils.formatEther(ethBalance), 6),
+      daiBalance_ : cleanValue(ethers.utils.formatEther(daiBalance), 2),
+      ethPosted_ : cleanValue(ethers.utils.formatEther(ethPosted), 6),
+      ethLocked_ : cleanValue(ethers.utils.formatEther(ethLocked), 6),
+      ethBorrowingPower_ : cleanValue(ethers.utils.formatEther(ethBorrowingPower), 2),
+      ethTotalDebtDai_ : cleanValue(ethers.utils.formatEther(ethTotalDebtDai), 2),  
+      debtValue_ : cleanValue(ethers.utils.formatEther(ethTotalDebtDai), 2),
+      collateralValue_ : cleanValue(ethers.utils.formatEther(collateralValue), 2),
       collateralRatio_ : parseFloat(collateralRatio.toString()),
       collateralPercent_ : parseFloat(collateralPercent.toString()),
-      maxDaiAvailable_ : utils.humanize(maxDaiAvailable),
+      maxDaiAvailable_ : cleanValue(ethers.utils.formatEther(maxDaiAvailable), 2),
       // collateralPrice_ : utils.humanize(collateralPrice),
       // minSafeCollateral_ : utils.humanize(minSafeCollateral),
     };
@@ -195,7 +194,7 @@ const UserProvider = ({ children }: any) => {
       deployedContracts.Controller,
       'Controller',
       'Posted',
-      [null, account, null],
+      [ethers.utils.formatBytes32String('ETH-A'), account, null],
       !txHistory ? 0 : txHistory.lastBlock + 1
     )
       .then((res: any) => parseEventList(res))       /* then parse returned values */
@@ -217,7 +216,7 @@ const UserProvider = ({ children }: any) => {
       deployedContracts.Controller,
       'Controller',
       'Borrowed',
-      [],
+      [null, null, account, null],
       !txHistory ? 0 : txHistory.lastBlock + 1
     )
       .then((res: any) => parseEventList(res))        /* then parse returned values */
@@ -311,8 +310,9 @@ const UserProvider = ({ children }: any) => {
 
   const initUser = async () => {
     /* Init start */
-    dispatch({ type: 'userLoading', payload: true });
+    dispatch({ type: 'isLoading', payload: true });
     // TODO: look at splitting these up cleverly, in particular makerData.
+
     await Promise.all([
       _getPosition(),
       _getAuthorizations(),
@@ -322,21 +322,22 @@ const UserProvider = ({ children }: any) => {
     ]);
     console.log('User initialised.');
     /* Init end */
-    dispatch({ type: 'userLoading', payload: false });
+    dispatch({ type: 'isLoading', payload: false });
   };
 
   useEffect(()=>{
+
     // Init everytime it starts or change of user
-    account && !yieldState.isLoading && initUser();
+    !yieldState.yieldLoading && account && initUser();
 
     // If user has changed, rebuild and re-cache the history
     const hist = JSON.parse( (localStorage.getItem('txHistory') || '{}') );
-    if ( !yieldState.isLoading && account && (hist?.account !== account) ) {
+    if ( !yieldState.yieldLoading && account && (hist?.account !== account) ) {
       localStorage.removeItem('txHistory');
       _getTxHistory(true);
       console.log('History updating due to user change');
     }
-  }, [ account, yieldState.isLoading ]);
+  }, [ account, yieldState.yieldLoading ]);
 
   const actions = {
     updatePosition: () => _getPosition(),

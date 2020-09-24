@@ -1,4 +1,5 @@
 import { ethers, BigNumber } from 'ethers';
+import { constants } from 'buffer';
 
 /* constants */
 export const BN_RAY = BigNumber.from('1000000000000000000000000000');
@@ -66,13 +67,58 @@ export const rayToHuman = (x:BigNumber) => {
 
 // @dev Takes a bignumber in WEI, WAD or the like and converts it to human.
 // @return {number}
-export const humanize = (x:BigNumber) => {
+export const humanizeNumber = (x:BigNumber) => {
   return parseFloat(ethers.utils.formatEther(x));
 };
 
 // / @dev Converts a number to WAD precision, for number up to 10 decimal places
-export const dehumanize = (value:number) => {
+export const dehumanizeNumber = (value:number) => {
   const exponent = BigNumber.from('10').pow(BigNumber.from('8'));
   return BigNumber.from(value*10**10).mul(exponent);
 };
 
+export const cleanValue = (input:string, decimals:number=18) => {
+
+  const re = new RegExp(`(\\d+\\.\\d{${decimals}})(\\d)`);
+  const inpu = input.match(re); // inpu = truncated 'input'... get it?
+  if (inpu) {
+    console.log('Value truncated: ', inpu[1]);
+    return inpu[1];
+  }
+  return input.valueOf();
+};
+
+export const modColor = (color:any, amount:any) => {
+  // eslint-disable-next-line prefer-template
+  return '#' + color.replace(/^#/, '').replace(/../g, (col:any) => ('0'+Math.min(255, Math.max(0, parseInt(col, 16) + amount)).toString(16)).substr(-2));
+};
+
+export const contrastColor = (hex:any) => {
+  const hex_ = hex.slice(1);
+  if (hex_.length !== 6) {
+    throw new Error('Invalid HEX color.');
+  }
+  const r = parseInt(hex_.slice(0, 2), 16);
+  const g = parseInt(hex_.slice(2, 4), 16);
+  const b = parseInt(hex_.slice(4, 6), 16);
+
+  return (r * 0.299 + g * 0.587 + b * 0.114) > 186
+    ? 'brand'
+    : 'brand-light';
+};
+
+export const invertColor = (hex:any) => {
+  function padZero(str:string) {
+    const zeros = new Array(2).join('0');
+    return (zeros + str).slice(-2);
+  }
+  const hex_ = hex.slice(1);
+  if (hex_.length !== 6) {
+    throw new Error('Invalid HEX color.');
+  }
+  const r = (255 - parseInt(hex_.slice(0, 2), 16) ).toString(16);
+  const g = (255 - parseInt(hex_.slice(2, 4), 16)).toString(16);
+  const b = (255 - parseInt(hex_.slice(4, 6), 16)).toString(16);
+  // pad each with zeros and return
+  return `#${  padZero(r)  }${padZero(g)  }${padZero(b)}`;
+};

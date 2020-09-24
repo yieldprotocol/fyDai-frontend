@@ -3,7 +3,6 @@ import { Box, Button, Layer, Text, ResponsiveContext } from 'grommet';
 
 import { 
   FiCheckCircle as Check,
-  FiCircle as Circle,
   FiClock as Clock,
   FiUnlock as Unlock,
   FiArrowLeft as ArrowLeft, 
@@ -15,6 +14,8 @@ import { NotifyContext } from '../contexts/NotifyContext';
 import { UserContext } from '../contexts/UserContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { useAuth, useSignerAccount, useTxActive } from '../hooks';
+import RaisedButton from './RaisedButton';
+import { modColor } from '../utils';
 
 interface IAuthorizationProps {
   series?: IYieldSeries|null;
@@ -26,7 +27,7 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
   const { state: { requestedSigs } } = useContext(NotifyContext);
   const { state: { authorizations }, actions: userActions } = useContext(UserContext);
   const { hasDelegatedProxy } = authorizations;
-  const { actions: seriesActions } = useContext(SeriesContext);
+  const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
 
   // flags 
   const [ authPending, setAuthPending ] = useState<boolean>(false);
@@ -66,25 +67,39 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
 
   return (
     <>
-      { !series && !hasDelegatedProxy && account && 
-        <Box direction='row' fill='horizontal' gap='small' justify='between'>
-          {!buttonOnly && <Text>Before we start, Yield requires some permissions. </Text> }
-          <Button 
-            primary={buttonOnly}
-            label={buttonOnly?'Authorization is required to get started':'Authorise Yield'}
+      { account && !series && !hasDelegatedProxy &&
+        <Box 
+          fill='horizontal'
+          pad='medium'
+          direction='row'
+          gap='medium'
+          background='#555555'
+          justify='between'
+        >
+          {!buttonOnly && <Text>Feel free to look around and play. However, before you make any transactions you will need to sign few authorisations.</Text> }
+          <RaisedButton 
+            background='#555555'
+            label={<Text size='small' color='#DDDDDD'><Unlock /> Authorise Yield</Text>}
             onClick={()=>{authProcedure();}}
-            icon={<Unlock />}
-          />        
+          />   
         </Box>}
 
       { account && series?.hasDelegatedPool === false &&
-        <Box direction='row' fill='horizontal' gap='small' justify='between' align='center'>
+        <Box 
+          round='small'
+          direction='row' 
+          fill='horizontal' 
+          gap='small' 
+          justify='between' 
+          pad='small' 
+          // background={modColor( series.seriesColor, 40)}
+        >
           {!buttonOnly && <Warning />}
           {!buttonOnly && <Text>A once-off authorisation is required to use this series</Text>}
-          <Button 
-            label='Unlock Series'
-            onClick={()=>{authProcedure();}}
-            icon={<Unlock />}
+          <RaisedButton 
+            background={modColor( series.seriesColor, 40)}
+            label={<Text size='xsmall'><Unlock /> Unlock Series </Text>}
+            onClick={()=>{authProcedure();}}           
           />        
         </Box>}
 
@@ -99,21 +114,19 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
             pad='large'
             gap='medium'
           >
-            <Text size='medium' weight='bold'> The following signatures are required: </Text>
+            <Text size='large' weight='bold'> The following signatures are required: </Text>
             { requestedSigs.map((x:any, i:number)=> {
               const iKey = i;
               return ( 
                 <Box key={iKey} gap='small' direction='row' justify='between' fill>
-                  <Box basis='10'> 
+                  <Box basis='70' direction='row' gap='small'> 
                     <Text 
                       size='xsmall'
                       color={x.signed?'green':undefined}
                     >
                       {i+1}.
                     </Text>
-                  </Box>
-                
-                  <Box basis='60'> 
+
                     <Text 
                       size='xsmall'
                       color={x.signed?'green':undefined}
@@ -122,16 +135,17 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
                     </Text>
                   </Box>
 
-                  <Box basis='30'> { !x.signed ? 
-                    <Clock /> :
-                    <Box animation='zoomIn'>
-                      <Check color='green' />
-                    </Box>}
+                  <Box basis='30' alignSelf='end'> 
+                    { !x.signed ? 
+                      <Clock /> :
+                      <Box animation='zoomIn'>
+                        <Check color='green' />
+                      </Box>}
                   </Box>
                 </Box>
               );
             })}
-            { !txActive && allSigned && <Text size='xsmall' weight='bold'> Finally, confirm sending the signatures to Yield in a transaction.</Text>}
+            { !txActive && allSigned && <Text size='xsmall' weight='bold'>Finally, confirm sending the signatures to Yield in a transaction...</Text>}
             { txActive && <Text size='xsmall' weight='bold'> Submitting your signed authorisations ... transaction pending.</Text> }
             
             { authPending && txActive &&

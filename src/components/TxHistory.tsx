@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useContext } from 'react';
-import ethers, { BigNumber } from 'ethers';
 import moment from 'moment';
 import { Box, Text, Collapsible, Button } from 'grommet';
 
@@ -8,8 +7,6 @@ import {
   FiChevronUp as ChevronUp,
 } from 'react-icons/fi';
 
-import { YieldContext } from '../contexts/YieldContext';
-import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
 
 interface HistoryProps {
@@ -48,7 +45,7 @@ const TxHistory = ( { filterTerms, view }:HistoryProps) => {
   /* Cpmponent renaming pool events depending on the different views */
   const HistoryItemName = (props:any) => {
     const { item } = props;
-
+    
     if (item.event === 'Bought') {
       return (
         <Box direction='row' gap='xsmall' align='center'>
@@ -62,7 +59,7 @@ const TxHistory = ( { filterTerms, view }:HistoryProps) => {
         </Box>
       );
     } 
-
+    
     if (item.event === 'Sold') {
       return (
         <>
@@ -122,7 +119,8 @@ const TxHistory = ( { filterTerms, view }:HistoryProps) => {
   useEffect(()=> {
     const _txHist = state.txHistory.items;
     const filteredHist = _txHist.filter((x:any) => filterTerms.includes(x.event) );  
-    setTxHistory(filteredHist);
+    const sortedList = filteredHist.sort( (a:any, b:any) => a.date - b.date ); 
+    setTxHistory(sortedList);
   }, [ state.txHistory ]);
 
   useEffect(()=> {
@@ -180,7 +178,7 @@ const TxHistory = ( { filterTerms, view }:HistoryProps) => {
                       <HistoryItemName item={x} />                           
                     </Text>
                   </Box>
-                  <Box basis='25%' align='center'><Text size='xsmall'> {x.amount} </Text></Box>
+                  <Box basis='25%' align='center'><Text size='xsmall'> {x.amount.toFixed(2)} </Text></Box>
                   <Box basis='25%' align='center'><Text size='xsmall'> {moment(x.date_).format('DD MMMM YYYY')} </Text></Box>
                   <Box>
                     <Text size='xsmall'> 
@@ -195,7 +193,7 @@ const TxHistory = ( { filterTerms, view }:HistoryProps) => {
             );
           }):
           <Box align='center'>
-            { state.isLoading ? 
+            { state.userLoading ? 
               <Box pad='xsmall'> 
                 <Text size='xxsmall'>Loading...</Text> 
               </Box>
