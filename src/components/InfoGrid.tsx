@@ -38,6 +38,7 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
                   round='large'
                   gap='small' 
                   align={alt? 'start': 'center'}
+
                 >
                   <Text 
                     wordBreak='keep-all' 
@@ -46,17 +47,19 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
                     // weight={alt? 'bold': undefined}
                   >
                     {x.label}
-                  </Text> 
-
+                  </Text>
                   <Loading condition={x.loading} size='small'>
-
-                    <Box direction='row-responsive' gap='small'>
-                      { x.valuePrefix && screenSize !== 'small' && <Text color={x.active ? 'brand':'brand-transparent'} size='xxsmall'>{x.valuePrefix}</Text> }
+                    <Box direction='row-responsive' gap='xsmall' align='center'>
+                      { x.valuePrefix && 
+                        screenSize !== 'small' && 
+                        <Text color={x.active ? 'brand':'brand-transparent'} size='medium' weight='bold'>
+                          {x.valuePrefix}                     
+                        </Text>}
                       <Text color={x.active? 'brand':'brand-transparent'} weight='bold' size='medium'> 
                         {x.value}
                       </Text>
-                      { x.valueExtra && <ValueExtra />}
-                    </Box> 
+                    </Box>
+                    { x.valueExtra && <ValueExtra />}                  
                   </Loading>
                 </Box> 
               </Box>

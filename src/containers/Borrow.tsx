@@ -276,10 +276,10 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
                 valuePrefix: '~',
                 valueExtra: () => (
                   <Text color='red' size='small'> 
-                    { inputValue &&
+                    {/* { inputValue &&
                         estRatio &&
                         ( (collateralPercent_-estRatio) > 0) &&
-                        `(-${(collateralPercent_-estRatio).toFixed(0)}%)` }
+                        `(-${(collateralPercent_-estRatio).toFixed(0)}%)` } */}
                   </Text>
                 )
               },

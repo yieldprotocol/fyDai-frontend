@@ -90,8 +90,8 @@ const App = (props:any) => {
 
   return (
     <div className="App">
+      
       <ConnectLayer view={showConnectLayer} closeLayer={() => setShowConnectLayer(null)} />
-
       { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
       { showSeriesLayer  && <SeriesSelector activeView='borrow' close={()=>setShowSeriesLayer(false)} /> }
 

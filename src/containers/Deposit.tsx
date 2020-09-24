@@ -52,6 +52,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
     ethPosted,
     ethPosted_,
     collateralPercent_,
+    collRatio_,
     debtValue,
   } = userState.position;
 
@@ -100,8 +101,9 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
   /* Handle deposit disabling deposits */
   useEffect(()=>{
     (
-      (account && ethBalance.eq(ethers.constants.Zero)) ||
-      (account && inputValue && ethers.utils.parseEther(inputValue).gt(ethBalance)) ||
+      (account && ethBalance?.eq(ethers.constants.Zero)) ||
+      (account && inputValue && ethBalance && ethers.utils.parseEther(inputValue).gt(ethBalance)) ||
+      (ethBalance && inputValue && (parseFloat(inputValue)<= 0.05) ) ||
       txActive ||
       !account ||
       !inputValue ||
@@ -110,13 +112,18 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
   }, [inputValue]);
 
   /* Handle input exceptions and warnings */
-  useEffect(()=>{   
+  useEffect(()=>{ 
+    
+    
     if ( ethBalance && debouncedInput && ( ethers.utils.parseEther(debouncedInput).gt(ethBalance) ) ) {
       setWarningMsg(null);
       setErrorMsg('That amount exceeds your available ETH balance'); 
     } else if (ethBalance && debouncedInput && (ethers.utils.parseEther(debouncedInput).eq(ethBalance)) ) {
       setErrorMsg(null);
       setWarningMsg('If you deposit all your ETH you may not be able to make any further transactions!');
+    } else if (debouncedInput && debouncedInput<=0.05) {
+      setErrorMsg('Initial collateral balance must be larger than 0.05 ETH.');
+      setWarningMsg(null);
     } else {
       setWarningMsg(null);
       setErrorMsg(null);
@@ -183,11 +190,11 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
               visible: !!account && collateralPercent_ > 0,
               active: inputValue,
               loading: !ethPosted_ && depositPending && ethPosted_ !== 0,           
-              value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
+              value: (estRatio && estRatio !== 0)? `${estRatio}%`: `${collateralPercent_}%` || '',
               valuePrefix: '~',
               valueExtra: () => (
                 <Text color='green' size='medium'> 
-                  { inputValue && collateralPercent_ && ( (estRatio-collateralPercent_) !== 0) && `(+ ${(estRatio-collateralPercent_).toFixed(0)}%)` }
+                  {/* { inputValue && collateralPercent_ && ( (estRatio-collateralPercent_) !== 0) && `(+ ${(estRatio-collateralPercent_).toFixed(0)}%)` } */}
                 </Text>
               )
             },

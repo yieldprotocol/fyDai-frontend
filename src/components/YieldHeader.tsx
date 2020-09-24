@@ -174,6 +174,7 @@ const YieldHeader = (props: any) => {
     >
       <Box>
         <Image src={theme.dark ? logoLight : logoDark} fit="contain" />
+        {/* <Text size='24px' weight='bold'>YIELD</Text> */}
       </Box>
 
       <Box>
