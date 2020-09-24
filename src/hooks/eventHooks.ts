@@ -1,33 +1,23 @@
-import React from 'react';
+import { useState } from 'react';
 import { ethers }  from 'ethers';
-// import { ConnectionContext } from '../contexts/ConnectionContext';
 
 import { useSignerAccount } from './connectionHooks';
 
-import YDai from '../contracts/YDai.json';
+import EDai from '../contracts/EDai.json';
 import Controller from '../contracts/Controller.json';
-import TestERC20 from '../contracts/TestERC20.json';
-import WETH9 from '../contracts/WETH9.json';
-import GemJoin from '../contracts/GemJoin.json';
-import DaiJoin from '../contracts/DaiJoin.json';
-import Chai from '../contracts/Chai.json';
-import Vat from '../contracts/Vat.json';
-import Pot from '../contracts/Pot.json';
-import EthProxy from '../contracts/EthProxy.json';
+import Dai from '../contracts/Dai.json';
+import YieldProxy from '../contracts/YieldProxy.json';
 import Pool from '../contracts/Pool.json';
+import Vat from '../contracts/Vat.json';
 
+// TODO abstract this out to a higher level
 const contractMap = new Map<string, any>([
-  ['YDai', YDai.abi],
+  ['EDai', EDai.abi],
   ['Controller', Controller.abi],
-  ['Dai', TestERC20.abi],
-  ['Weth', WETH9.abi],
-  ['Chai', Chai.abi],
-  ['WethJoin', GemJoin.abi],
-  ['DaiJoin', DaiJoin.abi],
-  ['Vat', Vat.abi],
-  ['Pot', Pot.abi],
-  ['EthProxy', EthProxy.abi],
+  ['Dai', Dai.abi],
+  ['YieldProxy', YieldProxy.abi],
   ['Pool', Pool.abi],
+  ['Vat', Vat.abi], 
 ]);
 
 /**
@@ -38,10 +28,10 @@ const contractMap = new Map<string, any>([
  * @returns { function } getEvents
  */
 export const useEvents = () => {
-  // const { state: { provider } } = React.useContext(ConnectionContext);
+  // const { state: { provider } } = useContext(ConnectionContext);
   const { provider } = useSignerAccount();
-  const [ eventListenerList, setEventListenerList ] = React.useState<boolean>();
-  const [ isLoading, setIsLoading ] = React.useState<boolean>();
+  const [ eventListenerList, setEventListenerList ] = useState<boolean>();
+  const [ isLoading, setIsLoading ] = useState<boolean>();
 
   /**
    * Setup an event listener.
@@ -79,10 +69,6 @@ export const useEvents = () => {
     const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), provider);
     const filter = contract.filters[filterEvent](...filterArgs);
     const logs = await contract.queryFilter( filter, block, 'latest');
-    // Console.log the values for testing:
-    // logs.forEach((log:any) => {
-    //   console.log(log);
-    // });
     return logs;
   };
 

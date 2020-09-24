@@ -1,20 +1,17 @@
-import React from 'react';
-import { ethers, BigNumber }  from 'ethers';
-import { NotifyContext } from '../contexts/NotifyContext';
-// import { ConnectionContext } from '../contexts/ConnectionContext';
+import { useEffect, useState } from 'react';
+import { ethers }  from 'ethers';
+import { useWeb3React } from '@web3-react/core';
 import { useSignerAccount } from './connectionHooks';
 
 import Migration from '../contracts/Migrations.json';
 
-// ethers.errors.setLogLevel('error');
-
-const migrationAddr = new Map([
-  [1337, process.env.REACT_APP_MIGRATION ],
-  [1, '0x5632d2e2AEdf760F13d0531B18A39782ce9c814F'],
-  [3, '0x5632d2e2AEdf760F13d0531B18A39782ce9c814F'],
-  [4, '0x5632d2e2AEdf760F13d0531B18A39782ce9c814F'],
-  [5, '0x5632d2e2AEdf760F13d0531B18A39782ce9c814F'],
-  [42, '0x5632d2e2AEdf760F13d0531B18A39782ce9c814F'],
+const migrationAddrs = new Map([
+  [1, process.env.REACT_APP_MIGRATION_1],
+  [4, process.env.REACT_APP_MIGRATION_4 ],
+  [5, process.env.REACT_APP_MIGRATION_5 ],
+  [42, process.env.REACT_APP_MIGRATION_42 ],
+  [1337, process.env.REACT_APP_MIGRATION_1337 ],
+  [31337, process.env.REACT_APP_MIGRATION_31337 ],
 ]);
 
 /**
@@ -23,45 +20,49 @@ const migrationAddr = new Map([
  * @returns { boolean } redeemActive
  */
 export const useMigrations = () => {
-
-  // const { state: { signer, account } } = React.useContext(ConnectionContext);
-  const { provider, signer, account } = useSignerAccount();
-
+  const { chainId } = useWeb3React('fallback');
+  const { fallbackProvider } = useSignerAccount();
   const { abi: migrationAbi } = Migration;
-  const  { dispatch }  = React.useContext<any>(NotifyContext);
-  const [ fetchAddressesActive, setFetchAddressesActive ] = React.useState<boolean>(false);
-
-  const [migrationAddress, setMigrationsAddress] = React.useState<string>(migrationAddr.get(1337) || '');
-  React.useEffect(()=>{
-    setMigrationsAddress( migrationAddr.get(1337) || '');
-  }, []);
+  const [migrationsAddress, setMigrationsAddress] = useState<string>( process.env.REACT_APP_MIGRATION_DEFAULT || '');
+  
+  useEffect(()=>{
+    if (chainId) {
+      const migAddr = migrationAddrs.get(chainId);
+      migAddr && setMigrationsAddress(migAddr);
+    } 
+  }, [chainId]);
 
   /**
    * Concurrently fetches Yield Addresses registered with the migrations contract.
-   * 
-   * @param {string[]} contractNameList names address of the yDai series to redeem from.
-   * 
-   * @returns {Map} keyed with contract names
+   * @param {string[]} contractNameList list of contract names registered in the migrations contract.
+   * @returns {Promise<Map>} keyed with contract names
    */
   const getAddresses = async (
     contractNameList:string[],
   ) => {
-    const contract = new ethers.Contract(migrationAddress, migrationAbi, provider );
-    let res = new Map<string, string>();
-    try {
-      const contractAddrs = await Promise.all(
-        contractNameList.map(async (x: string) => {
-          res.set( x, await contract.contracts(ethers.utils.formatBytes32String(x)))
-        })
-      );
-    } catch (e) {
-      console.log(e);
-      res = new Map();
-    }
+    // eslint-disable-next-line no-console
+    console.log('Migration contract called:', migrationsAddress);
+    const contract = new ethers.Contract(migrationsAddress, migrationAbi, fallbackProvider );
+    const res = new Map<string, string>();
+    await Promise.all(
+      contractNameList.map(async (x: string) => {
+        res.set( x, await contract.contracts(ethers.utils.formatBytes32String(x)));
+      })
+    );
     return res;
   };
 
+  /**
+   * Fetches Yield protocol contract version from 
+   * @returns {string} yield protocol version
+   */
+  const getYieldVersion = async (
+  ) => {
+    const contract = new ethers.Contract(migrationsAddress, migrationAbi, fallbackProvider );
+    await contract.version();
+  };
+
   return {
-    getAddresses,
+    getAddresses, getYieldVersion
   } as const;
 };

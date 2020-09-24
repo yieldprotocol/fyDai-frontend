@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 
 import { useWeb3React } from '@web3-react/core';
 
@@ -10,14 +10,27 @@ import {
   Box,
   ThemeContext,
   ResponsiveContext,
+  Layer,
+  Menu,
+  Collapsible,
 } from 'grommet';
-import { FiSettings as Gear } from 'react-icons/fi';
+
+import { 
+  FiSettings as Gear,
+  FiCheckCircle as Check,
+} from 'react-icons/fi';
 
 import logoDark from '../assets/images/logo.svg';
 import logoLight from '../assets/images/logo_light.svg';
-import ProfileButton from './ProfileButton';
+import YieldLogo from './logos/YieldLogo';
 
 import { NotifyContext } from '../contexts/NotifyContext';
+import { YieldContext } from '../contexts/YieldContext';
+import TxStatus from  './TxStatus';
+import FlatButton from './FlatButton';
+import Authorization from './Authorization';
+import RaisedBox from './RaisedBox';
+import AccountButton from './AccountButton';
 
 interface LinkProps {
   link: string;
@@ -27,30 +40,21 @@ interface LinkProps {
 
 const YieldHeader = (props: any) => {
   const { account } = useWeb3React();
-
   const {
     openConnectLayer,
-    openAccountLayer,
     activeView,
     setActiveView,
   } = props;
 
-  const {
-    state: { pendingTxs },
-  } = React.useContext(NotifyContext);
-
-  const screenSize = React.useContext(ResponsiveContext);
+  const { state: { pendingTxs, lastCompletedTx } } = useContext(NotifyContext);
+  const { state: { yieldLoading } } = useContext(YieldContext);
+  const screenSize = useContext(ResponsiveContext);
 
   // Menu state for mobile later
-  const [menuOpen, setMenu] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [txCompleteOpen, setTxCompleteOpen] = useState(false);
 
   const [navLinks] = useState([
-    {
-      link: 'DASHBOARD',
-      text: 'Dashboard',
-      id: 0,
-      disabled: false,
-    },
     {
       link: 'BORROW',
       text: 'Borrow',
@@ -64,33 +68,23 @@ const YieldHeader = (props: any) => {
       disabled: false,
     },
     {
-      link: 'AMM',
+      link: 'POOL',
       text: 'Pool',
       id: 3,
-      disabled: true,
+      disabled: false,
     },
   ]);
 
-  // const { account } = useWeb3React();
-
-  const theme = React.useContext<any>(ThemeContext);
-
-  useEffect(() => {
-    // (async () => activate(injected, console.log))();
-  }, []);
+  const theme = useContext<any>(ThemeContext);
 
   function toggleMenu() {
-    setMenu((prevMenu) => !prevMenu);
-  }
-
-  function closeMenu() {
-    setMenu(false);
+    setMenuOpen((prevMenu) => !prevMenu);
   }
 
   const CloseButton = () => (
     <Box direction="row" fill="horizontal">
       <Button
-        onClick={closeMenu}
+        onClick={()=> setMenuOpen(false)}
         alignSelf="center"
         fill="horizontal"
         style={{
@@ -114,199 +108,91 @@ const YieldHeader = (props: any) => {
     </Button>
   );
 
-  const Logo = () => (
-    <Box
-      onClick={() => setActiveView('DASHBOARD')}
-      direction="row"
-      margin={{
-        right: 'xsmall',
-      }}
-      style={{
-        width: '4.5rem',
-      }}
-    >
-      <Image src={theme.dark ? logoLight : logoDark} fit="contain" />
-    </Box>
-  );
+  const MobileNav = () => {
+    return (
+      <>
+        { menuOpen &&
+        <Layer full>
+          <Box background='background' fill>
+            <Nav />
+          </Box>       
+        </Layer>}
+      </>
+    );
+  };
 
-  const MobileNav = () => (
-    <Box
-      direction="row"
-      style={{
-        backgroundColor: 'white',
-        transition: 'all 0.15s cubic-bezier(0.075, 0.82, 0.165, 1)',
-        transform: menuOpen
-          ? 'translate3d(0, 0, 0)'
-          : 'translate3d(0, -110%, 0)',
-        overflowX: 'hidden',
-        overflowY: 'auto',
-        position: 'fixed',
-        zIndex: 999,
-        height: '100vh',
-        width: '100%',
-        left: 0,
-        top: 0,
-      }}
-      pad={{
-        horizontal: 'large',
-        vertical: 'large',
-      }}
-      fill
-      wrap
-    >
-      <Text
-        textAlign="center"
-        color="text-weak"
-        margin="large"
-        size="xlarge"
-        style={{
-          width: screenSize === 'small' ? '100%' : 'auto',
-        }}
-      >
-        Menu
-      </Text>
-      <Nav />
-      <PendingTxs />
-      <Account />
-      <Settings />
-      <CloseButton />
-    </Box>
-  );
-
-  const NavLink = ({ link, text, disabled }: LinkProps) => (
-    <Box
-      direction="row"
-      onClick={() => {
-        !disabled && setActiveView(link);
-        closeMenu();
-      }}
-      pad={{
-        horizontal: screenSize === 'small' ? 'medium' : 'xsmall',
-        vertical: screenSize === 'small' ? 'medium' : 'xsmall',
-      }}
-      responsive={true}
-      gap="small"
-    >
-      <Text
-        textAlign="center"
-        weight={600}
-        // TODO undo this when pages are ready
-        // eslint-disable-next-line no-nested-ternary
-        color={disabled ? 'lightgrey' : activeView === link ? 'brand' : 'text-weak'}
-        size={screenSize === 'small' ? 'xxlarge' : 'medium'}
-        style={{
-          textDecoration: activeView === link ? 'underline' : 'none',
-          width: screenSize === 'small' ? '100%' : 'auto',
-        }}
-      >
-        {text}
-      </Text>
-    </Box>
-  );
 
   const Nav = () => (
     <Box
       direction={screenSize === 'small' ? 'column' : 'row'}
       fill={screenSize === 'small' ? 'horizontal' : false}
+      gap='medium'
     >
-      {navLinks &&
-        navLinks.map((item) => (
-          <NavLink
-            link={item.link}
-            text={item.text}
-            key={`nav-${item.id}`}
-            disabled={item.disabled}
-          />
-        ))}
+      { 
+      navLinks.map((item) => (
+        <Box
+          direction="row-responsive"
+          onClick={() => {
+            !item.disabled && setActiveView(item.link);
+            setMenuOpen(false);
+          }}
+          gap="small"
+          key={item.id}
+        >
+          <Text
+            weight='bold'
+            // eslint-disable-next-line no-nested-ternary
+            color={item.disabled ? 'lightgrey' : activeView === item.link ? 'brand' : 'text-weak'}
+            size={screenSize === 'small' ? 'medium' : 'xlarge'}
+            style={{ textDecoration: activeView === item.link ? 'underline' : 'none', width: screenSize === 'small' ? '100%' : 'auto' }}
+          >
+            {item.text}
+          </Text>
+        </Box>
+      ))
+    }
     </Box>
   );
 
-  const PendingTxs = () => {
-    if (pendingTxs && pendingTxs.length > 0) {
-      return <Box>{pendingTxs.length} transaction pending...</Box>;
-    }
-    return null;
-  };
-
-  const Account = () => {
-    if (account) {
-      return (
-        <Box>
-          <ProfileButton
-            action={() => openAccountLayer()}
-            account={account || ''}
-          />
-        </Box>
-      );
-    }
-    return (
-      <Box direction="row" fill="horizontal">
-        <Button
-          onClick={() => {
-            closeMenu();
-            openConnectLayer();
-          }}
-          label="Connect to a wallet"
-          color="border"
-          fill="horizontal"
-          style={{
-            fontWeight: 600,
-            height: screenSize === 'small' ? '2.25rem' : 'auto',
-          }}
-        />
-      </Box>
-    );
-  };
-
-  const Settings = () => (
-    <Button
-      style={{
-        textAlign: 'center',
-      }}
-      fill={screenSize === 'small' ? 'horizontal' : false}
-      icon={<Gear />}
-    />
-  );
+  useEffect(()=>{
+    lastCompletedTx && pendingTxs.length===0 && setTxCompleteOpen(true);
+    lastCompletedTx && pendingTxs.length===0 && (async () => {
+      setTimeout(() => {
+        setTxCompleteOpen(false);
+      }, 5000);
+    })();
+  }, [lastCompletedTx, pendingTxs ]);
 
   return (
-    <Header
-      background={{
-        color: 'background-front',
-      }}
-      pad={{
-        horizontal: 'small',
-        vertical: 'none',
-      }}
+    <Box
+      background='background-front'
+      direction='row'
+      pad={{ horizontal:'small', vertical:'large' }}
+      justify='between'
+      fill='horizontal'
+      align='center'
     >
-      <Box
-        direction="row"
-        justify="between"
-        align="center"
-        flex
-        gap="small"
-        pad={{
-          vertical: 'small',
-        }}
-      >
-        {/* Logo and nav */}
-        <Box direction="row" align="center" gap="small">
-          <Logo />
-          {screenSize === 'small' ? <MobileNav /> : <Nav />}
-        </Box>
-        {/* Right nav */}
-        <Box direction="row" align="center" gap="small" justify="end" flex>
-          {screenSize === 'small' ? (
-            <MenuButton />
-          ) : (
-            <Box direction="row" align="center" gap="small">
-              <PendingTxs />
-              <Account />
-              <Settings />
-            </Box>
-          )}
-        </Box>
+      <Box>
+        <Image src={theme.dark ? logoLight : logoDark} fit="contain" />
       </Box>
-    </Header>
+
+      { screenSize === 'small' ? 
+        <MobileNav /> 
+        : 
+        <Nav />
+      }
+
+      <Box>
+        {screenSize === 'small' ? (
+          <MenuButton />
+        ) : (
+          <Box direction="row" align="center" gap="small">
+            <AccountButton {...props} />
+          </Box>
+        )}
+      </Box>
+
+    </Box>
   );
 };
 

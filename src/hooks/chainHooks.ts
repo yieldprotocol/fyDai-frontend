@@ -1,45 +1,33 @@
-import React from 'react';
-import { useWeb3React } from '@web3-react/core';
-import { ethers, BigNumber}  from 'ethers';
-
-import { NotifyContext } from '../contexts/NotifyContext';
-// import { ConnectionContext } from '../contexts/ConnectionContext';
+import { useEffect, useState } from 'react';
+import { ethers }  from 'ethers';
 
 import { useSignerAccount } from './connectionHooks';
 
-import YDai from '../contracts/YDai.json';
+import EDai from '../contracts/EDai.json';
 import Controller from '../contracts/Controller.json';
-import TestERC20 from '../contracts/TestERC20.json';
-import WETH9 from '../contracts/WETH9.json';
-import GemJoin from '../contracts/GemJoin.json';
-import DaiJoin from '../contracts/DaiJoin.json';
-import Chai from '../contracts/Chai.json';
-import Vat from '../contracts/Vat.json';
-import Pot from '../contracts/Pot.json';
-import EthProxy from '../contracts/EthProxy.json';
-import DaiProxy from '../contracts/DaiProxy.json';
+import Dai from '../contracts/Dai.json';
+import YieldProxy from '../contracts/YieldProxy.json';
 import Migrations from '../contracts/Migrations.json';
 import Pool from '../contracts/Pool.json';
+import Vat from '../contracts/Vat.json';
 
 // ethers.errors.setLogLevel('error');
 
 const contractMap = new Map<string, any>([
-  ['YDai', YDai.abi],
+  ['EDai', EDai.abi],
   ['Controller', Controller.abi],
-  ['Dai', TestERC20.abi],
-  ['Weth', WETH9.abi],
-  ['Chai', Chai.abi],
-  ['WethJoin', GemJoin.abi],
-  ['DaiJoin', DaiJoin.abi],
-  ['Vat', Vat.abi],
-  ['Pot', Pot.abi],
-  ['EthProxy', EthProxy.abi],
-  ['DaiProxy', DaiProxy.abi],
+  ['Dai', Dai.abi],
+  ['YieldProxy', YieldProxy.abi],
   ['Migrations', Migrations.abi],
   ['Pool', Pool.abi],
+  ['Vat', Vat.abi], 
 ]);
 
-// TODO: Sanitize all inputs NB!!
+export const useContractAbi = (contractName:string) =>{ 
+  const { abi }  = contractMap.get(contractName);
+  return { abi } as const;
+};
+
 /**
  * SendTx is a generic function to interact with any contract.
  * Primarily used for development/testing, or for once off interactions with a contract.
@@ -48,10 +36,9 @@ const contractMap = new Map<string, any>([
  * @returns { boolean } sendTxActive
  */
 export const useSendTx = () => {
-  // const { state: { signer, account } } = React.useContext(ConnectionContext);
+  // const { state: { signer, account } } = useContext(ConnectionContext);
   const { signer, account } = useSignerAccount();
-  const [ sendTxActive, setSendTxActive ] = React.useState<boolean>();
-
+  const [ sendTxActive, setSendTxActive ] = useState<boolean>();
   /**
    * Send a transaction ()
    * @param {string} contractAddress address of the contract to send to.
@@ -89,15 +76,12 @@ export const useSendTx = () => {
  * @returns { boolean } callTxActive
  */
 export const useCallTx = () => {
-
-  // const { state: { provider, altProvider } } = React.useContext(ConnectionContext);
-  const { signer, provider, account, altProvider, voidSigner } = useSignerAccount();
-
-  const [ callTxActive, setCallTxActive ] = React.useState<boolean>();
+  const { fallbackProvider } = useSignerAccount();
+  const [ callTxActive, setCallTxActive ] = useState<boolean>();
   /**
    * Get data from the blockchain via provider (no signer reqd)
    * @param {string} contractAddress address of the contract to be called
-   * @param {string} contractName name of the contract to call (uses this to get the abi from a contract map)
+   * @param {string} contractName name of the contract to call (this is used to get the abi from a contract map)
    * @param {string} fn name of the function to call 
    * @param {any[]} data array of any arguments required by the contract function 
    */
@@ -108,7 +92,7 @@ export const useCallTx = () => {
     data:any[]
   ) => {
     setCallTxActive(true);
-    const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), provider || altProvider);
+    const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), fallbackProvider);
     const retVal = await contract[fn](...data);
     setCallTxActive(false);
     return retVal;
@@ -116,60 +100,99 @@ export const useCallTx = () => {
   return [ callTx, callTxActive ] as const;
 };
 
-/**
- * Hook for getting native balances and token balances
- * @returns { function } getBalance
- * @returns { boolean } getBalance
- */
-export function useBalances() {
-  // const { state: { provider, account } } = React.useContext(ConnectionContext);
-  const { signer, provider, account, altProvider, voidSigner } = useSignerAccount();
+export const useTimeTravel = () => {
+  const { provider } = useSignerAccount();
+  const [ snapshotNumber, setSnapshotNumber ] = useState<any>('0x1');
+  const [ block, setBlock ] = useState<any>(null);
+  const [ timestamp, setTimestamp ] = useState<number|null>(null);
 
-  /**
-   * Get the user account balance of ETH  (omit args) or an ERC20token (provide args)
-   * 
-   * @param {string} tokenAddr address of the Token, *optional, omit for ETH
-   * @param {string} abi abi of the token (probably ERC20 in most cases) *optional, omit for ETH
-   * 
-   * @returns {BigNumber} ETH in Wei or token balance.
-   */
-  const getBalance = async (tokenAddr:string|null=null, contractName:string|null=null) => {
-    if (!!provider && !!account ) {
-      if (tokenAddr && contractName) {
-        const contract = new ethers.Contract(tokenAddr, contractMap.get(contractName), provider);
-        const balance = await contract.balanceOf(account);
-        return balance;
-      }
-      return provider.getBalance(account);
-    } return ethers.BigNumber.from('0');
+  useEffect(()=>{
+    provider && ( async () => {
+      const { timestamp: ts } = await provider.getBlock(await provider.blockNumber);
+      setTimestamp(ts);
+    })();
+  }, [block]);
+
+  const takeSnapshot = async () => {
+    const res = await fetch('http://localhost:8545', {
+      method:'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: '{"id":1337,"jsonrpc":"2.0","method":"evm_snapshot","params":[]}'
+    });
+    const num = await res.json();
+    // eslint-disable-next-line no-console
+    console.log( 'Snapshot taken', num.result );
+    setSnapshotNumber( num.result );
+    window.localStorage.setItem('snapshot', num.result);
+    setBlock(provider.blockNumber);
   };
 
-  /**
-   * Get the transaction allowance of a user for an ERC20token
-   * @param {string} tokenAddr address of the Token
-   * @param {string} operatorAddr address of the operator whose allowance you are checking
-   * @param {string} tokenName name of the token (probably ERC20 in most cases)
-   * @prarm 
-   * @returns whatever token value
-   */
-  const getTokenAllowance = async (
-    tokenAddress:string,
-    operatorAddress:string,
-    tokenName: string
-  ) => {
-    const fromAddr = account && ethers.utils.getAddress(account);
-    const tokenAddr = ethers.utils.getAddress(tokenAddress);
-    const operatorAddr = ethers.utils.getAddress(operatorAddress);
-    const contract = new ethers.Contract( tokenAddr, contractMap.get(tokenName), provider );
-    let res;
-    try {
-      res = await contract.allowance(fromAddr, operatorAddr);
-    }  catch (e) {
-      console.log(e);
-      res = ethers.BigNumber.from('0');
-    }
-    return parseFloat(ethers.utils.formatEther(res));
+  const revertToSnapshot = async () => {
+    const res = await fetch('http://localhost:8545', {
+      method:'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: `{"id":1337,"jsonrpc":"2.0","method":"evm_revert","params":["${window.localStorage.getItem('snapshot')}"]}`
+    });
+    // eslint-disable-next-line no-console
+    console.log('Reverted to Snapshot', (await res.json()).result );
+    takeSnapshot();
+    setBlock(provider.blockNumber);
+    window.localStorage.clear();
+    window.location.reload();
   };
 
-  return { getTokenAllowance, getBalance } as const;
-}
+  const revertToT0 = async () => {
+    const res = await fetch('http://localhost:8545', {
+      method:'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: '{"id":1337,"jsonrpc":"2.0","method":"evm_revert","params":["0x1"]}'
+    });
+    // eslint-disable-next-line no-console
+    console.log('Reverted to first snapshot', (await res.json()).result );
+    takeSnapshot();
+    setBlock(provider.blockNumber);
+    window.localStorage.clear();
+    window.location.reload();
+  };
+
+  const advanceTime = async (time:string) => {
+    const res = await fetch('http://localhost:8545', {
+      method:'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: `{"id":1337,"jsonrpc":"2.0","method":"evm_increaseTime","params":[${time}]}`
+    });
+    // eslint-disable-next-line no-console
+    console.log(await res.json()); 
+    setBlock(provider.blockNumber);
+    window.location.reload();
+  };
+
+  const advanceBlock = async () => {
+    const res = await fetch('http://localhost:8545', {
+      method:'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: '{"id":1337,"jsonrpc":"2.0","method":"evm_mine","params":[]}'
+    });
+    // eslint-disable-next-line no-console
+    console.log(await res.json());
+    setBlock(provider.blockNumber);
+    console.log('new block:', provider.blockNumber);
+  };
+
+  const advanceTimeAndBlock = async (time:string) =>{
+    await advanceTime(time);
+    await advanceBlock();
+  };
+
+  return { advanceTimeAndBlock, revertToSnapshot, takeSnapshot, snapshotNumber, revertToT0, block, timestamp } as const;
+};

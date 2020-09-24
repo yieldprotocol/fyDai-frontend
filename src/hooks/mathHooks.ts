@@ -1,39 +1,26 @@
-import React from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { ethers, BigNumber }  from 'ethers';
 import * as utils from '../utils';
 
-import { YieldContext } from '../contexts/YieldContext'; // TODO sort out this cyclic ref (not critical)
+import { YieldContext } from '../contexts/YieldContext';
 
 /**
  * Hook for Yield maths functions
  * 
  * ( not really 'hooks' - but beneficial to keep app logic together.)
  * 
- * @returns { function } addEventListner
- * @returns { function } removeEventListener
+ * @returns { function } collPrice 
+ * @returns { function } collValue 
  * @returns { function } getEvents
+ * 
  */
 export const useMath = () => {
-
-  const { state: { feedData, yieldData } } = React.useContext(YieldContext);
-
-  const [ethPosted, setEthPosted] = React.useState<any>(BigNumber.from('0'));
-  React.useEffect(()=>{
-    yieldData && setEthPosted(yieldData.ethPosted);
-  }, [yieldData]);
-
-  const [ilks, setIlks] = React.useState<any>();
-  React.useEffect(()=>{
+  const { state: { feedData } } = useContext(YieldContext);
+  const [ ilks, setIlks ] = useState<any>();
+  
+  useEffect(()=>{
     feedData.ilks && setIlks(feedData.ilks);
   }, [feedData]);
-
-  /**
-   * Gets the amount of collateral posted in Wei
-   * @returns {BigNumber}
-   */
-  const collAmount = (): BigNumber => {
-    return ethPosted;
-  };
 
   /**
    * Calculates the USD value per unit collateral
@@ -41,7 +28,7 @@ export const useMath = () => {
    */
   const collPrice = (): BigNumber => {
     // TODO: Update this to use ETH-A Oracle - not ilks.spot for market price USD
-    console.log('ETH price:', ethers.utils.formatEther(utils.mulRay(utils.toWad(1.5), (ilks.spot)).toString()));
+    console.log('ETH price:', ethers.utils.formatEther(utils.mulRay(ethers.utils.parseEther('1.5'), (ilks.spot)).toString()));
     return utils.mulRay(utils.toRay(1.5), (ilks.spot));
   };
 
@@ -50,15 +37,15 @@ export const useMath = () => {
    * @returns {BigNumber} USD value (in wad/wei precision)
    */
   const collValue = (collateralPosted:BigNumber): BigNumber => {
-    console.log('Collateral Value USD:', ethers.utils.formatEther( utils.mulRay(collAmount(), collPrice()) ) );
+    // console.log('Collateral Value USD:', ethers.utils.formatEther( utils.mulRay(collateralPosted, collPrice()) ) );
     return utils.mulRay(collateralPosted, collPrice());
   };
 
   /**
-   * Calculates value of debt (yDaiDebt at maturity or Dai) at current DAI price
+   * Calculates value of debt (eDaiDebt at maturity or Dai) at current Dai price
    * the rate used is the rate and spot price of Dai.
-   * @param {BigNumber} _amount yDai amount (= amount of Dai at maturity)
-   * @returns
+   * @param {BigNumber} _amount eDai amount (= amount of Dai at maturity)
+   * @returns 
    */
   const debtValAdj = (_amount:BigNumber ) => {
     // this would require a DAI/USD (ratio fluctuations? ) but maybe just assume it will be 1 at maturity?
@@ -67,18 +54,17 @@ export const useMath = () => {
 
   /**
    * Calculates the collateralisation ratio 
-   * ETH collat value and DAI debt value (in USD)
+   * ETH collat value and Dai debt value (in USD)
    *
    * @param {BigNumber} _collateralValue (wei/wad precision)
    * @param {BigNumber} _debtValue (wei/wad precision)
    * @returns {BigNumber} in Ray
    */
-  const collRatio = (_collateralValue:BigNumber, _debtValue:BigNumber) => {
+  const collRatio = ( _collateralValue:BigNumber, _debtValue:BigNumber ) => {
     if (_debtValue.eq(0) ) {
       // handle this case better
       return BigNumber.from(0);
     }
-    console.log('colRatio in RAY :', utils.divRay(_collateralValue, _debtValue).toString());
     return utils.divRay(_collateralValue, _debtValue);
   };
 
@@ -89,7 +75,6 @@ export const useMath = () => {
    * @returns {BigNumber} percentage as a big number
    */
   const collPercent = ( _collateralizationRate:BigNumber ) => {
-    console.log('collat %:', utils.mulRay(BigNumber.from('100'), _collateralizationRate).toString());
     return utils.mulRay(BigNumber.from('100'), _collateralizationRate);
   };
 
@@ -98,22 +83,18 @@ export const useMath = () => {
    * ETH collat value and DAI debt value (in USD) using 
    * normal numbers
    *
-   * @param {number} _collateralAmount  amount of collateral (eg. 10ETH)
-   * @param {number} _debtValue value of dai debt (in USD)
-   * @returns {number}
+   * @param {BigNumber} _collateralAmount  amount of collateral (eg. 10ETH)
+   * @param {BigNumber} _debtValue value of dai debt (in USD)
+   * @returns {BigNumber} 
    */
   // TODO merge this in to the 'collateralization ratio function' above.
-  const estCollRatio = (_collateralAmount:Number, _debtValue:Number) => {
-    if (!_collateralAmount || _debtValue === 0 ) {
-      // TODO handle this better
+  const estCollRatio = (_collateralAmount:BigNumber, _debtValue:BigNumber) => {
+    if (!_collateralAmount || _debtValue.isZero() ) {
       return undefined;
     }
-    const _colAmnt = ethers.utils.parseEther(_collateralAmount.toString());
-    const _debtVal = ethers.utils.parseEther(_debtValue.toString());
-    const _colVal = utils.mulRay(_colAmnt, collPrice());
-    const _ratio = utils.divRay(_colVal, _debtVal);
-    console.log( parseFloat(utils.mulRay(BigNumber.from('100'), _ratio).toString()) );
-    return parseFloat(utils.mulRay(BigNumber.from('100'), _ratio).toString());
+    const _colVal = utils.mulRay(_collateralAmount, collPrice());
+    const _ratio = utils.divRay(_colVal, _debtValue);
+    return utils.mulRay(BigNumber.from('100'), _ratio).toString();
   };
 
   /**
@@ -127,7 +108,6 @@ export const useMath = () => {
   const minSafeColl=(_debtValue:BigNumber, _liquidationRatio:number, _collateralPrice:BigNumber)=> {
     const _s = utils.divRay( utils.toRay(_liquidationRatio), _collateralPrice);
     const _msc = utils.mulRay(_debtValue, _s);
-    console.log('minSafeColl:', ethers.utils.formatEther(_msc).toString());
     return _msc;
   };
 
@@ -161,43 +141,88 @@ export const useMath = () => {
    * @param {number} _liquidationRatio eg. 1.5
    * @returns {BigNumber} in wei/wad precision
    */
-  const daiAvailable =(_collateralValue:BigNumber, _debtValue:BigNumber, _liquidationRatio:number) =>{
+  const daiAvailable = (
+    _collateralValue:BigNumber, 
+    _debtValue:BigNumber, 
+    _liquidationRatio:number
+  ) =>{
     const maxSafeDebtValue = utils.divRay(_collateralValue, utils.toRay(_liquidationRatio));
     const _max = _debtValue.lt(maxSafeDebtValue) ? maxSafeDebtValue.sub(_debtValue) : BigNumber.from('0');
-    console.log('max debt:', ethers.utils.formatEther(_max).toString());
     return _max;
+  };
+
+  /**
+   * Percentage holding of the Pool 
+   *
+   * @param { BigNumber } _supply // current [Dai] price per unit y[Dai]
+   * @param { BigNumber } _balance// y[Dai] amount/price at maturity
+   * 
+   * @returns { number } human readable number as a percent.
+   */
+  const poolPercent =(
+    _supply: BigNumber,
+    _balance: BigNumber,
+  )=> {
+    if (!_supply.isZero()) {
+      return  ( parseFloat(ethers.utils.formatEther(_balance)) / parseFloat(ethers.utils.formatEther(_supply)))*100;
+    }
+    return 0;
+  };
+
+  /**
+   * Split a certain amount of Dai liquidity into its eDai and Dai componetnts
+   * 
+   * @param {BigNumber} daiAmount // amount dai to split
+   * @param { BigNumber } _daiReserves// Dai reserves
+   * @param { BigNumber } _eDaiReserves// eDai reservers
+   * 
+   * @returns  [ BigNumber, BigNumber ] returns an array of [dai, eDai] 
+   */
+  const splitDaiLiquidity =(
+    _daiAmount: BigNumber,
+    _daiReserves: BigNumber,
+    _eDaiReserves: BigNumber,
+  )=> {
+    const daiPortion = _daiAmount.mul(_daiReserves).div(_eDaiReserves.add(_daiReserves));
+    const eDaiPortion = _daiAmount.sub(daiPortion);
+    return [daiPortion, eDaiPortion];
   };
 
   /**
    * Annualised Yield Rate
    *
-   * @param { BigNumber } _rate // current [Dai] price per unit y[Dai].
-   * @param { BigNumber } _return // y[Dai] amount/price at maturity.
-   * @param { number } _maturity  // date of maturity 
-   * @param { number } _fromDate // ***optional*** start date - defaults to now(). 
+   * @param { BigNumber } _rate // current [Dai] price per unit y[Dai]
+   * @param { BigNumber } _amount // y[Dai] amount at maturity
+   * @param { number } _maturity  // date of maturity
+   * @param { number } _fromDate // ***optional*** start date - defaults to now()
    * 
-   * @returns { number }
+   * @returns { number } human readable number.
    */
   const yieldAPR =(
     _rate: BigNumber,
-    _return: BigNumber,
+    _amount: BigNumber,
     _maturity:number,
     _fromDate:number= (Math.round(new Date().getTime() / 1000)), // if not provided, defaults to current time.
   )=> {
-    const secsToMaturity = _maturity - _fromDate;
-    const propOfYear = secsToMaturity/utils.SECONDS_PER_YEAR;
 
-    const priceRatio = parseFloat(ethers.utils.formatEther(_return)) / parseFloat(ethers.utils.formatEther(_rate));
-    const powRatio = 1 / propOfYear;
-    const apr = Math.pow(priceRatio, powRatio) - 1;
-
-    return apr;
-
+    if (
+      _maturity > Math.round(new Date().getTime() / 1000)
+    ) {
+      const secsToMaturity = _maturity - _fromDate;
+      const propOfYear = secsToMaturity/utils.SECONDS_PER_YEAR;
+      const priceRatio = parseFloat(ethers.utils.formatEther(_amount)) / parseFloat(ethers.utils.formatEther(_rate));
+      const powRatio = 1 / propOfYear;
+      const apr = Math.pow(priceRatio, powRatio) - 1;
+      return apr*100;
+    }
+    return 0;
   };
 
   return {
     yieldAPR,
-    collAmount,
+    poolPercent,
+    splitDaiLiquidity,
+    liquidationPrice,
     collValue,
     collPrice,
     debtValAdj,

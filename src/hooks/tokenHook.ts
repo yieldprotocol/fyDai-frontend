@@ -1,41 +1,18 @@
-import React from 'react';
-import { useWeb3React } from '@web3-react/core';
-import { ethers, BigNumber }  from 'ethers';
+import { useState, useContext } from 'react';
+import { ethers }  from 'ethers';
 
 import { NotifyContext } from '../contexts/NotifyContext';
-// import { ConnectionContext } from '../contexts/ConnectionContext';
 
 import { useSignerAccount } from './connectionHooks';
 
-import YDai from '../contracts/YDai.json';
-import Controller from '../contracts/Controller.json';
-import TestERC20 from '../contracts/TestERC20.json';
-import WETH9 from '../contracts/WETH9.json';
-import GemJoin from '../contracts/GemJoin.json';
-import DaiJoin from '../contracts/DaiJoin.json';
-import Chai from '../contracts/Chai.json';
-import Vat from '../contracts/Vat.json';
-import Pot from '../contracts/Pot.json';
-import EthProxy from '../contracts/EthProxy.json';
-import DaiProxy from '../contracts/DaiProxy.json';
-import Migrations from '../contracts/Migrations.json';
+import EDai from '../contracts/EDai.json';
+import Dai from '../contracts/Dai.json';
 import Pool from '../contracts/Pool.json';
-
-// ethers.errors.setLogLevel('error');
+import { useTxHelpers } from './appHooks';
 
 const contractMap = new Map<string, any>([
-  ['YDai', YDai.abi],
-  ['Controller', Controller.abi],
-  ['Dai', TestERC20.abi],
-  ['Weth', WETH9.abi],
-  ['Chai', Chai.abi],
-  ['WethJoin', GemJoin.abi],
-  ['DaiJoin', DaiJoin.abi],
-  ['Vat', Vat.abi],
-  ['Pot', Pot.abi],
-  ['EthProxy', EthProxy.abi],
-  ['DaiProxy', DaiProxy.abi],
-  ['Migrations', Migrations.abi],
+  ['EDai', EDai.abi],
+  ['Dai', Dai.abi],
   ['Pool', Pool.abi],
 ]);
 
@@ -45,29 +22,32 @@ const contractMap = new Map<string, any>([
  * @returns { boolean } getBalance
  */
 export function useToken() {
-  // const { state: { provider, account } } = React.useContext(ConnectionContext);
-  const { signer, provider, account, altProvider, voidSigner } = useSignerAccount();
-
-  const  { dispatch }  = React.useContext<any>(NotifyContext);
-  const [ approveActive, setApproveActive ] = React.useState<boolean>(false);
+  // const { state: { provider, account } } = useContext(ConnectionContext);
+  const { signer, provider, account, voidSigner, fallbackProvider } = useSignerAccount();
+  const  { dispatch }  = useContext<any>(NotifyContext);
+  const [ approveActive, setApproveActive ] = useState<boolean>(false);
+  const { handleTx, handleTxError } = useTxHelpers();
 
   /**
    * Get the user account balance of ETH  (omit args) or an ERC20token (provide args)
    * 
    * @param {string} tokenAddr address of the Token, *optional, omit for ETH
-   * @param {string} abi abi of the token (probably ERC20 in most cases) *optional, omit for ETH
+   * @param {string} contractName abi of the token (probably ERC20 in most cases) *optional, omit for ETH
+   *  @param {string} queryAddress what address to query *optional, omit for ETH DEFAULTS to current user
    * 
    * @returns {BigNumber} ETH in Wei or token balance.
    */
-  const getBalance = async (tokenAddr:string|null=null, contractName:string|null=null) => {
-    if (!!provider && !!account ) {
+  const getBalance = async (tokenAddr:string|null=null, contractName:string|null=null, queryAddress:string|null=null) => {  
+    if (fallbackProvider) {
+      const addrToCheck = queryAddress || account;
       if (tokenAddr && contractName) {
-        const contract = new ethers.Contract(tokenAddr, contractMap.get(contractName), provider);
-        const balance = await contract.balanceOf(account);
+        const contract = new ethers.Contract(tokenAddr, contractMap.get(contractName), fallbackProvider );
+        const balance = await contract.balanceOf(addrToCheck);
         return balance;
       }
-      return provider.getBalance(account);
-    } return ethers.BigNumber.from('0');
+      return fallbackProvider.getBalance(addrToCheck);
+    } 
+    return ethers.BigNumber.from('0');
   };
 
   /**
@@ -119,22 +99,20 @@ export function useToken() {
     setApproveActive(true);
     const contract = new ethers.Contract(
       tokenAddr,
-      YDai.abi,
+      EDai.abi,
       signer
     );
     try {
       tx = await contract.approve(marketAddr, parsedAmount);
     } catch (e) {
-      dispatch({ type: 'notify', payload:{ message:'Transaction was aborted or it failed.', type:'error' } } );
-      dispatch({ type: 'txComplete', payload:{ tx } } );
+      handleTxError('Transaction was aborted or it failed.', tx, e);
       setApproveActive(false);
       return;
     }
     /* Transaction reporting & tracking */
     dispatch({ type: 'txPending', payload:{ tx, message: `Token approval of ${amount} pending...` } } );
-    await tx.wait();
+    await handleTx(tx);
     setApproveActive(false);
-    dispatch({ type: 'txComplete', payload:{ tx } } );
   };
 
   return { approveToken, approveActive, getTokenAllowance, getBalance } as const;

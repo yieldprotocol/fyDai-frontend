@@ -1,15 +1,12 @@
-import React from 'react';
-import ethers, { BigNumber } from 'ethers';
+import React, { useEffect, useState, useContext } from 'react';
 import moment from 'moment';
-import { Box, Text, Collapsible } from 'grommet';
+import { Box, Text, Collapsible, Button } from 'grommet';
 
 import {
   FiChevronDown as ChevronDown,
   FiChevronUp as ChevronUp,
 } from 'react-icons/fi';
 
-import { YieldContext } from '../contexts/YieldContext';
-import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
 
 interface HistoryProps {
@@ -21,15 +18,14 @@ const EtherscanButton = (props:any) => {
   const { txHash } = props;
   return (
     <Box
-      // pad='xsmall'
       border
       round
-      hoverIndicator='brand-transparent'
-      onClick={()=> { console.log(txHash);}}   
+      hoverIndicator='brand'
+      onClick={()=>{ window.open( `https://etherscan.io/tx/${txHash}`, '_blank');}} 
+      pad={{ horizontal:'small' }}
     >
       <Text 
         size='xxsmall'
-        alignSelf='center'
       >
         View on Etherscan
       </Text>
@@ -39,17 +35,17 @@ const EtherscanButton = (props:any) => {
 
 const TxHistory = ( { filterTerms, view }:HistoryProps) => {
 
-  const { state, actions } = React.useContext(UserContext);
+  const { state, actions } = useContext(UserContext);
 
-  const [ txHistory, setTxHistory] = React.useState<any>([]);
-  const [ itemOpen, setItemOpen ] = React.useState<any>(null);
+  const [ txHistory, setTxHistory] = useState<any>([]);
+  const [ itemOpen, setItemOpen ] = useState<any>(null);
 
   // TODO NBNBNBNB improve preciseness of logic. may require a component split
 
   /* Cpmponent renaming pool events depending on the different views */
   const HistoryItemName = (props:any) => {
     const { item } = props;
-
+    
     if (item.event === 'Bought') {
       return (
         <Box direction='row' gap='xsmall' align='center'>
@@ -63,7 +59,7 @@ const TxHistory = ( { filterTerms, view }:HistoryProps) => {
         </Box>
       );
     } 
-
+    
     if (item.event === 'Sold') {
       return (
         <>
@@ -106,14 +102,13 @@ const TxHistory = ( { filterTerms, view }:HistoryProps) => {
         { (item.event === 'Bought' && view === 'borrow') && 
         <Box>
           <Text size='xxsmall'>Amount owed @ maturity</Text>
-          <Text size='xsmall'>{Math.abs(item.yDai_).toFixed(2)} Dai</Text>
+          <Text size='xsmall'>{Math.abs(item.eDai_).toFixed(2)} Dai</Text>
         </Box> }
         { (item.event === 'Sold' && view === 'lend') && 
         <Box>
           <Text size='xxsmall'>Amount redeemable @ maturity</Text>
-          <Text size='xsmall'>{Math.abs(item.yDai_).toFixed(2)} Dai</Text>
+          <Text size='xsmall'>{Math.abs(item.eDai_).toFixed(2)} Dai</Text>
         </Box> }
-
         <Box alignSelf='end'>
           <EtherscanButton txHash={item.transactionHash} />
         </Box>
@@ -121,13 +116,14 @@ const TxHistory = ( { filterTerms, view }:HistoryProps) => {
     );
   };
 
-  React.useEffect(()=> {
+  useEffect(()=> {
     const _txHist = state.txHistory.items;
     const filteredHist = _txHist.filter((x:any) => filterTerms.includes(x.event) );  
-    setTxHistory(filteredHist);
+    const sortedList = filteredHist.sort( (a:any, b:any) => a.date - b.date ); 
+    setTxHistory(sortedList);
   }, [ state.txHistory ]);
 
-  React.useEffect(()=> {
+  useEffect(()=> {
   }, [ txHistory ]);
 
   return (
@@ -169,6 +165,7 @@ const TxHistory = ( { filterTerms, view }:HistoryProps) => {
                 pad='small'          
                 gap='xsmall'             
                 hoverIndicator='background-mid'
+                background={itemOpen === key_ ? 'background-mid' : undefined}
                 onClick={itemOpen === key_ ? ()=>setItemOpen(null):()=>setItemOpen(key_)}
               >         
                 <Box
@@ -181,7 +178,7 @@ const TxHistory = ( { filterTerms, view }:HistoryProps) => {
                       <HistoryItemName item={x} />                           
                     </Text>
                   </Box>
-                  <Box basis='25%' align='center'><Text size='xsmall'> {x.amount} </Text></Box>
+                  <Box basis='25%' align='center'><Text size='xsmall'> {x.amount.toFixed(2)} </Text></Box>
                   <Box basis='25%' align='center'><Text size='xsmall'> {moment(x.date_).format('DD MMMM YYYY')} </Text></Box>
                   <Box>
                     <Text size='xsmall'> 
@@ -196,7 +193,7 @@ const TxHistory = ( { filterTerms, view }:HistoryProps) => {
             );
           }):
           <Box align='center'>
-            { state.isLoading ? 
+            { state.userLoading ? 
               <Box pad='xsmall'> 
                 <Text size='xxsmall'>Loading...</Text> 
               </Box>

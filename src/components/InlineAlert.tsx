@@ -1,4 +1,4 @@
-import React from 'react'; 
+import React, { useEffect, useState, useContext } from 'react'; 
 import { Box, Text, defaultProps } from 'grommet';
 
 interface ErrorDisplayProps {
@@ -13,30 +13,31 @@ const defaultHeadings = {
   errorHead: 'Oops!',
 };
 
+// linear-gradient(to top, #efa1a1, #f1b6c6, #eecde1, #eee4f1, #f8f8f8);
+
+
 const InlineAlert = ({ warnMsg, errorMsg, warnHead, errorHead }:ErrorDisplayProps) => {
 
   return (
     <>
       { warnMsg &&
       <Box 
-        border={{ color:'orange' }} 
         fill
-        round='small'
+        round={{ corner:'bottom', size:'small' }}
         pad='small'
       >
         <Text weight='bold' color='orange'>{warnHead}</Text>  
-        <Text color='orange'>{warnMsg}</Text>
+        <Text color='orange' size='xsmall'>{warnMsg}</Text>
       </Box> }
 
       { errorMsg &&
       <Box
-        border={{ color:'red' }}
         fill
-        round='small'
+        round={{ corner:'bottom', size:'small' }}
         pad='small'
       >
         <Text weight='bold' color='red'>{errorHead}</Text>  
-        <Text color='red'>{errorMsg}</Text>
+        <Text color='red' size='xsmall'>{errorMsg}</Text>
       </Box> }    
     </>
   );

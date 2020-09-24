@@ -1,117 +1,179 @@
-import React from 'react';
+import React, { useRef, useEffect, useState, useContext } from 'react';
 
-import { Grommet, base, Grid, Main, Box } from 'grommet';
+import { Grommet, base, Grid, Main, Box, ResponsiveContext, Text, Nav, Layer, Collapsible } from 'grommet';
 import { deepMerge } from 'grommet/utils';
 import { yieldTheme } from './themes';
 
-import { useWeb3React } from './hooks';
+import { SeriesContext } from './contexts/SeriesContext';
+import { UserContext } from './contexts/UserContext';
+import { YieldContext } from './contexts/YieldContext';
 
-import Dashboard from './views/Dashboard';
 import BorrowView from './views/BorrowView';
 import LendView from './views/LendView';
-import Amm from './views/Amm';
+import PoolView from './views/PoolView';
 
 import YieldHeader from './components/YieldHeader';
 import YieldFooter from './components/YieldFooter';
-// import YieldSidebar from './components/YieldSidebar';
+import SeriesSelector from './components/SeriesSelector';
+import YieldMark from './components/logos/YieldMark';
 
 import ConnectLayer from './containers/layers/ConnectLayer';
-import AccountLayer from './containers/layers/AccountLayer';
 import NotifyLayer from './containers/layers/NotifyLayer';
+
 // TODO: remove testLayer for prod
 import TestLayer from './containers/layers/TestLayer';
+import Splash from './components/Splash';
+import RaisedBox from './components/RaisedBox';
+import Authorization from './components/Authorization';
 
-import SeriesSelector from './components/SeriesSelector';
+// const LendView = React.lazy(() => import('./views/LendView'));
+// const PoolView = React.lazy(() => import('./views/PoolView'));
+// const BorrowView = React.lazy(() => import('./views/BorrowView'));
+// const Dashboard = React.lazy(() => import('./views/Dashboard'));
 
-const App = () =>  {
+const ThemedApp = () => {
+  const [darkMode, setDarkMode] = useState(false);
+  const [partyMode, setPartyMode] = useState(false);
+  return (
+    <Grommet
+      theme={deepMerge(base, yieldTheme)}
+      themeMode={darkMode ? 'dark' : 'light'}
+      full
+    >
+      <App 
+        darkMode={darkMode}
+        setDarkMode={setDarkMode}
+        partyMode={partyMode}
+        setPartyMode={setPartyMode}
+      />     
+    </Grommet>
+  );
+};
 
-  // TODO: Better connection error supporting
-  const { connector, library, chainId, account, activate, deactivate, active, error } = useWeb3React();
+const App = (props:any) => {
 
-  React.useEffect(()=> {
-    library && (async () => console.log(await library.getSigner()))();
-  }, [account]);
+  const { state: { seriesLoading, activeSeries } } = useContext(SeriesContext);
+  const { state : { authorizations : { hasDelegatedProxy } } } = useContext(UserContext);
 
-  const [darkmode, setDarkmode] = React.useState(false);
+  const { state: { yieldLoading } } = useContext(YieldContext);
+
   // TODO Switch out for react router
-  const [activeView, setActiveView] = React.useState<string>('BORROW');
+  const [activeView, setActiveView] = useState<string>('BORROW');
 
-  const [showConnectLayer, setShowConnectLayer] = React.useState<boolean>(false);
-  const [showAccountLayer, setShowAccountLayer] = React.useState<boolean>(false);
-  const [showSeriesLayer, setShowSeriesLayer] = React.useState<boolean>(false);
-  const [showTestLayer, setShowTestLayer] = React.useState<boolean>(false);
+  const [showConnectLayer, setShowConnectLayer] = useState<string|null>(null);
+  const [showSeriesLayer, setShowSeriesLayer] = useState<boolean>(false);
 
-  const changeConnection = () => {
-    setShowAccountLayer(false);
-    setShowConnectLayer(true);
-  };
+  // TODO remove for prod
+  const [showTestLayer, setShowTestLayer] = useState<boolean>(false);
 
-  const columnsWidth = ['5%', 'auto', '5%'];
+  const leftSideRef = useRef<any>(null);
+
+  const [appReady, setAppReady] = useState<boolean>(false);
+
+  const screenSize = useContext(ResponsiveContext);
+  const [columnsWidth, setColumnsWidth] = useState<string[]>(['5%', 'auto', '5%']);
+
+  useEffect(()=> {
+    if (screenSize === 'small') { 
+      setColumnsWidth(['0%', 'auto', '0%']);
+    } else {
+      setColumnsWidth(['5%', 'auto', '5%']);
+    }
+  }, [screenSize]);
+
+
+  useEffect(()=> {
+    !yieldLoading && !seriesLoading && setAppReady(true);
+    // console.log(leftSideRef.current);
+
+  }, [yieldLoading, seriesLoading, hasDelegatedProxy]);
 
   return (
     <div className="App">
-      <Grommet
-        theme={deepMerge(base, yieldTheme)}
-        themeMode={darkmode ? 'dark' : 'light'}
-        full
+      <ConnectLayer view={showConnectLayer} closeLayer={() => setShowConnectLayer(null)} />
+
+      { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
+      { showSeriesLayer  && <SeriesSelector activeView='borrow' close={()=>setShowSeriesLayer(false)} /> }
+
+      <Grid fill columns={columnsWidth}>
+        <Box background={{ color: 'background-front' }} />
+        <YieldHeader
+          openConnectLayer={(v:string) => setShowConnectLayer(v)}
+          activeView={activeView}
+          setActiveView={setActiveView}
+        />
+        <Box background={{ color: 'background-front' }} />
+      </Grid>
+
+      { !yieldLoading &&
+        <Collapsible open={!seriesLoading} ref={leftSideRef}>
+          <Grid fill columns={columnsWidth}>
+            <Box background={{ color: '#555555' }} />
+            <Authorization />
+            <Box background={{ color: '#555555' }} />
+          </Grid> 
+        </Collapsible>}
+
+      <NotifyLayer target={leftSideRef.current} columnsWidth={columnsWidth} />
+
+      <Main 
+        pad={{ bottom:'large' }} 
+        direction="row" 
+        flex
+        
       >
-        <NotifyLayer />
-        <ConnectLayer open={showConnectLayer} closeLayer={() => setShowConnectLayer(false)} />
-        { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
-        { showSeriesLayer  && <SeriesSelector activeView='borrow' close={()=>setShowSeriesLayer(false)} /> }
-        { showAccountLayer &&
-          <AccountLayer
-            closeLayer={() => setShowAccountLayer(false)}
-            changeWallet={() => changeConnection()}
-          /> }
+        <Grid fill columns={columnsWidth}>
+          <Box />
+          <Box
+            pad={{ vertical: 'large' }}
+            fill="horizontal"
+            align="center"
+          > 
+            
+            {activeView === 'BORROW' && <BorrowView />}
+            {activeView === 'LEND' && <LendView />}
+            {activeView === 'POOL' && <PoolView />}
+          </Box>               
+          <Box />
+        </Grid>
+      </Main>
 
-        <Box direction="row" height={{ min: '100%' }}>
-          <Box flex>
-            <Grid fill rows={['auto', 'flex', 'auto']}>
-              <Grid fill columns={columnsWidth}>
-                <Box background={{ color: 'background-front' }} />
-                <YieldHeader
-                  openConnectLayer={() => setShowConnectLayer(true)}
-                  openAccountLayer={() => setShowAccountLayer(true)}
-                  activeView={activeView}
-                  setActiveView={setActiveView}
-                />
-                <Box background={{ color: 'background-front' }} />
-              </Grid>
+      <Grid fill columns={columnsWidth}>
+        <Box />
+        {screenSize !== 'small' &&
+        <YieldFooter
+          showTestLayer={showTestLayer}
+          setShowTestLayer={setShowTestLayer}
+          darkMode={props.darkMode}
+          setDarkMode={props.setDarkMode}
+          openConnectLayer={() => setShowConnectLayer('CONNECT')}
+        />}                  
+        <Box />      
+      </Grid>
 
-              <Main pad="none" direction="row" flex>
-                <Grid fill columns={columnsWidth}>
-                  <Box background="background" />
-                  <Box align="center">
-                    {activeView === 'DASHBOARD' && <Dashboard />}
-                    {activeView === 'BORROW' && (
-                      <BorrowView  />
-                    )}
-                    {activeView === 'LEND' && (
-                      <LendView  />
-                    )}
-                    {activeView === 'AMM' && <Amm />}
-                  </Box>
-                  <Box background="background" />
-                </Grid>
-              </Main>
-              <Grid fill columns={columnsWidth}>
-                <Box background="background" />
-                <YieldFooter
-                  showTestLayer={showTestLayer}
-                  setShowTestLayer={setShowTestLayer}
-                  darkmode={darkmode}
-                  setDarkmode={setDarkmode}
-                  changeConnection={changeConnection}
-                />
-                <Box background="background" />
-              </Grid>
-            </Grid>
-          </Box>
-        </Box>
-      </Grommet>
+      {screenSize === 'small' &&    
+        <Layer
+          position='bottom'
+          modal={false}
+          responsive={false}
+          full='horizontal'
+        >
+          <Nav 
+            direction="row"
+            background="background-mid"          
+            round={{ corner:'top', size:'small' }}
+            elevation='small'
+            pad="medium"
+            justify='evenly'
+          >
+            <Box><YieldMark /></Box>
+            <Box>Collateral</Box>
+            <Box>Borrow</Box>
+            <Box>Repay</Box>         
+          </Nav>
+        </Layer>}
     </div>
   );
 };
 
-export default App;
+export default ThemedApp;

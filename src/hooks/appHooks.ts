@@ -1,25 +1,57 @@
-import React from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { NotifyContext } from '../contexts/NotifyContext';
 
 /* Simple Hook for checking if a transaction family/families are in process */
 export const useTxActive = (typeList:string[]) => {
-  const { state: { pendingTxs } } = React.useContext(NotifyContext);
-  const [txActive, setTxActive] = React.useState<any>(null);
-
+  const { state: { pendingTxs } } = useContext(NotifyContext);
+  const [txActive, setTxActive] = useState<any>(null);
   const upperTypeList = typeList.map( (x:any) => x.toUpperCase() );
-
-  React.useEffect(()=>{
+  useEffect(()=>{
     setTxActive(pendingTxs.find( (x:any)=> upperTypeList.includes(x.type) ));
-  }, [ pendingTxs ]);
-
+  }, [ pendingTxs, upperTypeList ]);
   return [txActive] as const; 
 };
 
-/* Simple Hook for caching retrieved data */
+export const useTxHelpers = () => { 
+
+  const  { dispatch }  = useContext<any>(NotifyContext);
+
+  /* Notification Helpers */
+  const txComplete = (tx:any) => {
+    dispatch({ type: 'txComplete', payload:{ tx } } );
+  };
+  
+  const handleTxError = (msg:string, tx: any, e:any) => {
+    // eslint-disable-next-line no-console
+    console.log(e.message);
+    dispatch({ type: 'notify', payload:{ message: msg, type:'error' } } );
+    txComplete(tx);
+  };
+  
+  const handleTx = async (tx:any) => {
+    await tx.wait()
+      .then((receipt:any) => {
+        dispatch({ type: 'txComplete', payload:{ tx } } );
+        txComplete(tx);
+        console.log(receipt);  
+      }, ( error:any ) => {
+        // tease out the reason for the error here. 
+        handleTxError('error', tx, error);
+        // This is entered if the status of the receipt is failure
+        // return error.checkCall() .then((err:any) => {
+        //   console.log('Error', err);
+        //   handleTxError('error', tx, err);
+        // });
+      });
+  };
+  return { handleTx, txComplete, handleTxError };
+};
+
+/* Simple Hook for caching & retrieved data */
 export const useCachedState = (key:string, initialValue:any) => {
   // const genKey = `${chainId}_${key}` || key;
   const genKey = key;
-  const [storedValue, setStoredValue] = React.useState(
+  const [storedValue, setStoredValue] = useState(
     () => {
       try {
         const item = window.localStorage.getItem(genKey);
@@ -46,36 +78,57 @@ export const useCachedState = (key:string, initialValue:any) => {
   return [storedValue, setValue] as const;
 };
 
-export const useDebounce = () => {
-  console.log('unBoing,..Debounc\'d');
+export const useDebounce = (value:any, delay:number) => {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+  useEffect(
+    () => {
+      /* Update debounced value after delay */
+      const handler = setTimeout(() => {
+        setDebouncedValue(value);
+      }, delay);
+      /* Cancel the timeout if value changes (also on delay change or unmount)
+      This is how we prevent debounced value from updating if value is changed ...
+      .. within the delay period. Timeout gets cleared and restarted. */
+      return () => {
+        clearTimeout(handler);
+      };
+    },
+    [value, delay] /* Only re-call effect if value or delay changes */ 
+  );
+  return debouncedValue;
 };
 
-export const useAsync = (asyncFunction:any, immediate = true) => {
-  // const [pending, setPending] = useState(false);
-  // const [value, setValue] = useState(null);
-  // const [error, setError] = useState(null);
+
+export const useIsLol = (value:string|undefined|null) => {
   
-  // // The execute function wraps asyncFunction and
-  // // handles setting state for pending, value, and error.
-  // // useCallback ensures the below useEffect is not called
-  // // on every render, but only if asyncFunction changes.
-  // const execute = useCallback(() => {
-  //   setPending(true);
-  //   setValue(null);
-  //   setError(null);
-  //   return asyncFunction()
-  //     .then((response:any) => setValue(response))
-  //     .catch((e:any) => setError(e))
-  //     .finally(() => setPending(false));
-  // }, [asyncFunction]);
+  const [isLol, setIsLol] = useState<any>();
   
-  // // Call execute if we want to fire it right away.
-  // // Otherwise execute can be called later, such as
-  // // in an onClick handler.
-  // useEffect(() => {
-  //   if (immediate) {
-  //     execute();
-  //   }
-  // }, [execute, immediate]);
-  // return { execute, pending, value, error };
+  useEffect(()=>{
+    value && parseFloat(value) < 0 && setIsLol(true);
+    // value && isNaN(value as unknown as number) && setIsLol(true);
+    value && parseFloat(value) >= 0 && setIsLol(false);
+    !value && setIsLol(false);
+  }, [value] );
+
+  return isLol;
 };
+
+// export const useParseInput = (value:string|bigNumber) => {
+//   const [debouncedValue, setDebouncedValue] = useState(value);
+//   useEffect(
+//     () => {
+//       /* Update debounced value after delay */
+//       const handler = setTimeout(() => {
+//         setDebouncedValue(value);
+//       }, delay);
+//       /* Cancel the timeout if value changes (also on delay change or unmount)
+//       This is how we prevent debounced value from updating if value is changed ...
+//       .. within the delay period. Timeout gets cleared and restarted. */
+//       return () => {
+//         clearTimeout(handler);
+//       };
+//     },
+//     [value, delay] /* Only re-call effect if value or delay changes */ 
+//   );
+//   return debouncedValue;
+// };

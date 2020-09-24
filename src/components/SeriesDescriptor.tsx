@@ -1,94 +1,137 @@
-import React, { useState, useContext } from 'react';
-import { Box, Text, ThemeContext } from 'grommet';
+import React, { useState, useContext, useEffect } from 'react';
+import { Box, Text, ThemeContext, ResponsiveContext, Button, Collapsible } from 'grommet';
 
-import { ScaleLoader } from 'react-spinners';
+import { FiLayers as ChangeSeries } from 'react-icons/fi';
+import { modColor, invertColor, contrastColor } from '../utils';
+
+
 import { SeriesContext } from '../contexts/SeriesContext';
 
 import SeriesSelector from './SeriesSelector';
+import AprBadge from './AprBadge';
+import Authorization from './Authorization';
+import Loading from './Loading';
+import RaisedButton from './RaisedButton';
 
 interface ISeriesDescriptorProps {
   activeView: string;
-  minified?: boolean;  
+  minified?: boolean;
+  children?:any;
 }
 
-function SeriesDescriptor( props: ISeriesDescriptorProps, children:any) {
+function SeriesDescriptor( props: ISeriesDescriptorProps ) {
 
-  const { activeView, minified } = props;
-
-  const theme:any = React.useContext(ThemeContext);
-  const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
+  const { activeView, minified, children } = props;
+  const screenSize = useContext(ResponsiveContext);
+  const { state: seriesState } = useContext(SeriesContext);
   const { activeSeries } = seriesState; 
-
   const [ selectorOpen, setSelectorOpen ] = useState<boolean>(false);
-  const [ description, setDescription ] = useState<string>( activeSeries?.displayName || '');
+  const [ delegated, setDelegated ] = useState<boolean>(true);
 
-  /* Set Series description/display name */
-  React.useEffect(()=>{
-    activeSeries && setDescription(activeSeries.displayName);
-    activeSeries && activeSeries.yieldAPR_ !== Infinity &&
-      setDescription(`${activeSeries.yieldAPR_}% ${activeSeries.displayName}`);
+
+  useEffect(()=>{
+    activeSeries && setDelegated(activeSeries.hasDelegatedPool);
   }, [ activeSeries ]);
 
   return (
     <>
       {selectorOpen && <SeriesSelector activeView={activeView} close={()=>setSelectorOpen(false)} /> }
-      <Box
-        direction='row-responsive'
-        fill='horizontal'
-        gap='small'
-        align='center'
-      >
-        <Box 
-          round='xsmall'
-          background='brand-transparent'
-          border='all'
-          onClick={()=>setSelectorOpen(true)}
-        // hoverIndicator='brand'
-          direction='row'
+
+      {activeSeries &&
+        <Box
+          alignSelf="center"
           fill
+        // round={{ corner:'top', size:'small' }}
+        // pad={{ horizontal:'small' }}
+          round='small'
           pad='small'
-          flex
-          justify='between'
+          gap='small'
+        // background=${modColor( activeSeries?.seriesColor, 30)}
+          background={`linear-gradient(to right, 
+          ${modColor( activeSeries?.seriesColor, -40)}, 
+          ${modColor( activeSeries?.seriesColor, -10)}, 
+          ${modColor( activeSeries?.seriesColor, 10)}, 
+          ${modColor( activeSeries?.seriesColor, 40)}, 
+          ${modColor( activeSeries?.seriesColor, 40)})`}
+          margin={{ bottom:'-16px' }}
         >
-          { !activeSeries ? 
-            <ScaleLoader color={theme?.global?.colors['brand-transparent'].dark} height='13' /> : 
-            <Text color='brand' size='large'>{ description }</Text>}
 
-          { activeSeries && 
-            activeView === 'borrow' && 
-            activeSeries.yieldAPR_ === Infinity &&        
-            <Box 
-              round
-              border='all'
-              direction='row'
-              pad={{ horizontal:'small' }}
-              align='center'
-              background='orange'
-            >
-              <Text size='xxsmall'>
-                Limited Liquidity            
-              </Text>
-            </Box>}
-        </Box>
-
-        <Box justify='center'>
+          {/* <Text alignSelf='start' size='xlarge' color='text' weight='bold'>Selected series</Text> */}
           <Box
-            round
-            onClick={()=>setSelectorOpen(true)}
-            hoverIndicator='brand-transparent'
-            border='all'
-            // border={{ color:'brand' }}
-            pad={{ horizontal:'small', vertical:'small' }}
-            justify='center'
+            direction='row-responsive'
+            fill='horizontal'
+            gap='small'
+            align='center'
           >
-            <Text size='xsmall'>Change series</Text>
+            <Box 
+              round='xsmall'
+            // background='background-mid'
+            // border='all'
+              onClick={()=>setSelectorOpen(true)}
+              direction='row'
+              fill
+              pad='small'
+              flex
+              justify='between'
+            >
+            
+              {activeSeries &&
+              <Box 
+                direction='row' 
+                gap='small'
+              >             
+                <AprBadge activeView={activeView} series={activeSeries} animate />
+                <Text size='xlarge' weight='bold'>            
+                  { activeSeries?.displayName }
+                </Text>
+              </Box>}
+
+              <RaisedButton
+                background={modColor( activeSeries?.seriesColor, 40)}
+                label={(screenSize !== 'small' ) ?        
+                  <Box align='center' direction='row' gap='small'>
+                    <ChangeSeries />
+                    <Text size='xsmall'>
+                      Change Series              
+                    </Text>
+                  </Box>
+                  : 
+                  <Box align='center'>
+                    <ChangeSeries />
+                  </Box>}
+                onClick={()=>setSelectorOpen(true)}
+              />
+            </Box>
           </Box>
-        </Box>
-      </Box>
+
+          <Box
+            pad={!delegated? { horizontal:'medium' }: { horizontal:'medium', bottom:'medium' }}
+            // margin={ !delegated? undefined: { bottom:'medium'} }
+          >
+            <Collapsible open={!seriesState.seriesLoading}>
+              { children }
+            </Collapsible>
+
+            { !delegated && !activeSeries.isMature() && 
+            <Box 
+              fill='horizontal'
+              round='small'
+              pad={{vertical:'medium' }}        
+            >
+              <Box 
+                round='small'
+                fill
+              >
+                <Authorization series={activeSeries} />
+              </Box>
+            </Box>} 
+          </Box>
+   
+        </Box>}
     </>
   );
 }
 
-SeriesDescriptor.defaultProps={ minified:false };
+SeriesDescriptor.defaultProps={ minified:false, children:null };
 
 export default SeriesDescriptor; 

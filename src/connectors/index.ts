@@ -1,36 +1,23 @@
 import { InjectedConnector } from '@web3-react/injected-connector';
 import { NetworkConnector } from '@web3-react/network-connector';
-// import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
 import { WalletLinkConnector } from '@web3-react/walletlink-connector';
 import { LedgerConnector } from '@web3-react/ledger-connector';
 import { TrezorConnector } from '@web3-react/trezor-connector';
-// import { FrameConnector } from '@web3-react/frame-connector';
-// import { AuthereumConnector } from '@web3-react/authereum-connector';
 import { FortmaticConnector } from '@web3-react/fortmatic-connector';
-// import { PortisConnector } from '@web3-react/portis-connector';
-// import { SquarelinkConnector } from '@web3-react/squarelink-connector';
 import { TorusConnector } from '@web3-react/torus-connector';
 
 const POLLING_INTERVAL = 12000;
 
 const RPC_URLS: { [chainId: number]: string } = {
-  1: 'https://mainnet.infura.io/v3/60ab76e16df54c808e50a79975b4779f', // process.env.RPC_URL_1 as string,
-  4: 'https://rinkeby.infura.io/v3/60ab76e16df54c808e50a79975b4779f'// process.env.RPC_URL_4 as string
+  1: process.env.REACT_APP_RPC_URL_1 as string,
+  4: process.env.REACT_APP_RPC_URL_4 as string,
+  5: process.env.REACT_APP_RPC_URL_5 as string,
+  42: process.env.REACT_APP_RPC_URL_42 as string,
+  1337: process.env.REACT_APP_RPC_URL_1337 as string,
+  31337: process.env.REACT_APP_RPC_URL_31337 as string,
 };
 
-export const injected = new InjectedConnector({ supportedChainIds: [1, 3, 4, 5, 42, 5777, 1337] });
-
-export const network = new NetworkConnector({
-  urls: { 1: RPC_URLS[1], 4: RPC_URLS[4] },
-  defaultChainId: 1
-});
-
-// export const walletconnect = new WalletConnectConnector({
-//   rpc: { 1: RPC_URLS[1] },
-//   bridge: 'https://bridge.walletconnect.org',
-//   qrcode: true,
-//   pollingInterval: POLLING_INTERVAL
-// });
+export const injected = new InjectedConnector({ supportedChainIds: [5, 42, 31337] });
 
 export const walletlink = new WalletLinkConnector({
   url: RPC_URLS[1],
@@ -47,9 +34,7 @@ export const trezor = new TrezorConnector({
   manifestAppUrl: 'http://localhost:1234'
 });
 
-// export const frame = new FrameConnector({ supportedChainIds: [1] });
-
-// export const authereum = new AuthereumConnector({ chainId: 42 });
+export const torus = new TorusConnector({ chainId: 1 });
 
 export const fortmatic = new FortmaticConnector({ apiKey: process.env.FORTMATIC_API_KEY as string, chainId: 4 });
 
@@ -60,4 +45,13 @@ export const fortmatic = new FortmaticConnector({ apiKey: process.env.FORTMATIC_
 //   networks: [1, 100]
 // });
 
-export const torus = new TorusConnector({ chainId: 1 });
+// export const walletconnect = new WalletConnectConnector({
+//   rpc: { 1: RPC_URLS[1] },
+//   bridge: 'https://bridge.walletconnect.org',
+//   qrcode: true,
+//   pollingInterval: POLLING_INTERVAL
+// });
+
+// export const authereum = new AuthereumConnector({ chainId: 42 });
+
+// export const frame = new FrameConnector({ supportedChainIds: [1] });

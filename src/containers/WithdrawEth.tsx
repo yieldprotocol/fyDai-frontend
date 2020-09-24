@@ -1,21 +1,24 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Box, Layer, Button, Image, TextInput, Text, CheckBox } from 'grommet';
+import { Box, Layer, Keyboard, TextInput, Text, ResponsiveContext } from 'grommet';
+import ethers from 'ethers';
+
 import { 
-  FiInfo as Info,
   FiArrowLeft as ArrowLeft,
 } from 'react-icons/fi';
-import { FaEthereum as Ethereum } from 'react-icons/fa';
-import { SeriesContext } from '../contexts/SeriesContext';
-import { YieldContext } from '../contexts/YieldContext';
+import EthMark from '../components/logos/EthMark';
+
+import { cleanValue } from '../utils';
+
 import { UserContext } from '../contexts/UserContext';
+import { useProxy, useMath, useTxActive, useDebounce, useIsLol } from '../hooks';
 
-import { useProxy, useController, useMath } from '../hooks';
-
-import { NotifyContext } from '../contexts/NotifyContext';
-import InlineAlert from '../components/InlineAlert';
-import OnceOffAuthorize from '../components/OnceOffAuthorize';
 import ApprovalPending from '../components/ApprovalPending';
-import TransactionPending from '../components/TransactionPending';
+import TxPending from '../components/TxPending';
+import InfoGrid from '../components/InfoGrid';
+import InputWrap from '../components/InputWrap';
+import RaisedButton from '../components/RaisedButton';
+import ActionButton from '../components/ActionButton';
+import FlatButton from '../components/FlatButton';
 
 interface IWithDrawProps {
   close?: any;
@@ -23,234 +26,214 @@ interface IWithDrawProps {
 
 const WithdrawEth = ({ close }:IWithDrawProps) => {
 
-  const { state: { deployedContracts }, actions: yieldActions } = useContext(YieldContext);
+  const screenSize = useContext(ResponsiveContext);
 
-  const { state: { delegations, position }, actions: userActions } = useContext(UserContext);
+  const { state: { position }, actions: userActions } = useContext(UserContext);
   const {
-    ethBalance_,
+    ethPosted,
     ethPosted_,
+    ethLocked,
     ethLocked_,
     collateralPercent_,
+    debtValue,
     debtValue_,
   } = position;
 
+  const { withdrawEth, withdrawEthActive }  = useProxy();
+  const { estCollRatio: estimateRatio } = useMath();
+  const [ txActive ] = useTxActive(['WITHDRAW']);
+
+  const [ inputValue, setInputValue ] = useState<string>();
+  const debouncedInput = useDebounce(inputValue, 500);
+  const [inputRef, setInputRef] = useState<any>(null);
 
   const [ estRatio, setEstRatio ] = useState<any>();
   const [ estDecrease, setEstDecrease ] = useState<any>();
+  const [ maxWithdraw, setMaxWithdraw ] = useState<string>();
 
-  const [ maxWithdraw, setMaxWithdraw ] = useState<number>(0);
-  const [ inputValue, setInputValue ] = useState<any>();
-  const [ hasDelegated, setHasDelegated ] = useState<boolean>( delegations.ethProxy || false);
+  const [ hasDelegated, setHasDelegated ] = useState<boolean>( true );
 
-  const [ withdrawDisabled, setWithdrawDisabled ] = useState<boolean>(false);
-  const [ indicatorColor, setIndicatorColor ] = useState<string>('brand');
+  const [ withdrawDisabled, setWithdrawDisabled ] = useState<boolean>(true);
+  const [ withdrawPending, setWithdrawPending ] = useState<boolean>(false);
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
 
-  const { withdrawEth, withdrawEthActive }  = useProxy();
-  const { addControllerDelegate, checkControllerDelegate } = useController();
-  const { estCollRatio: estimateRatio } = useMath();
+  const isLol = useIsLol(inputValue);
 
-  const withdrawProcedure = async (value:number) => {
-    await withdrawEth(deployedContracts.EthProxy, value);
-    userActions.updatePosition();
-    close();
+  /* Withdraw execution flow */
+  const withdrawProcedure = async () => {
+    if (inputValue && !withdrawDisabled ) {
+      setWithdrawPending(true);
+      await withdrawEth(inputValue);
+      userActions.updatePosition();
+      setWithdrawPending(false);
+      close();
+    }
   };
 
-  const delegateProcedure = async () => {
-    await addControllerDelegate(deployedContracts.Controller, deployedContracts.EthProxy);
-    const res = await checkControllerDelegate(deployedContracts.Controller, deployedContracts.EthProxy);
-    setHasDelegated(res);
-  };
-
-  // TODO: maybe split into a custom hook
-  const { state: { pendingTxs } } = React.useContext(NotifyContext);
-
-  const [txActive, setTxActive] = React.useState<any>(null);
+  /* Calculate maximum available to withdraw */
   useEffect(()=>{
-    setTxActive(pendingTxs.find((x:any)=> ( x.type === 'WITHDRAW' || x.type === 'APPROVAL')));
-  }, [ pendingTxs ]);
-
-  useEffect(()=>{
-    setMaxWithdraw(ethPosted_ - ethLocked_);
+    setMaxWithdraw( ethers.utils.formatEther(ethPosted.sub(ethLocked) )) ;
   }, [ethPosted_, ethLocked_]);
 
-  /* show warnings and errors with collateralisation ratio levels */
+  /* Calculate collateralization Ratio based on input */ 
   useEffect(()=>{
-
-    if (estRatio < 150) {
-      setWithdrawDisabled(true);
-      setIndicatorColor('red');
-      setWarningMsg(null);
-      setErrorMsg('You are not allowed to withdraw below the collateralization ratio'); 
-    } else if (estRatio >= 150 && estRatio < 250 ) {
-      setIndicatorColor('orange');
-      setErrorMsg(null);
-      setWarningMsg('Your collateralisation ration will put you at risk of liquidation');
-    } else {
-      setWithdrawDisabled(false);
-      setIndicatorColor('brand');
-      setWarningMsg(null);
-      setErrorMsg(null);
-    }
-  }, [ estRatio ]);
-
-  useEffect(()=>{
-
-    if ( (inputValue > maxWithdraw) ){
-      setWithdrawDisabled(true);
-    } else { 
-      setWithdrawDisabled(false);
-    }
-    if ( (ethPosted_ > inputValue) && inputValue && debtValue_) {
-      const newRatio = estimateRatio((ethPosted_- parseFloat(inputValue)), debtValue_); 
+    const parsedInput = ethers.utils.parseEther(debouncedInput || '0');
+    if ( debouncedInput && ethPosted.gt(parsedInput) && debtValue_) {
+      const newRatio = estimateRatio((ethPosted.sub( parsedInput )), debtValue); 
+      // const newRatio = estimateRatio((ethPosted_ - parseFloat(inputValue)).toString(), debtValue_);
       if (newRatio) {
-        setEstRatio(newRatio.toFixed(2));
-        const newDecrease = collateralPercent_ - newRatio ;
+        console.log('new ratio', newRatio);
+        setEstRatio(parseFloat(newRatio.toString()).toFixed(2));
+        const newDecrease = collateralPercent_ - parseFloat(newRatio.toString());
         setEstDecrease(newDecrease.toFixed(2));
       }
     }
-  }, [ inputValue ]);
+  }, [ debouncedInput ]);
 
-  /* startup effects, if any */
+  /* Withdraw disabled logic */
   useEffect(()=>{
-    (async () => {
-    })();
-  }, []);
+    ( 
+      estRatio < 150 ||
+      txActive ||
+      !inputValue ||
+      parseFloat(inputValue) <= 0
+    )? setWithdrawDisabled(true) : setWithdrawDisabled(false);
+  }, [ inputValue, estRatio ]);
+
+  /* show warnings and errors with collateralisation ratio levels and inputs */
+  useEffect(()=>{
+    if ( debouncedInput && maxWithdraw && (debouncedInput > maxWithdraw) ) {
+      setWarningMsg(null);
+      setErrorMsg('You are not allowed to withdraw below the collateralization ratio'); 
+    } else if (estRatio >= 150 && estRatio < 200 ) {
+      setErrorMsg(null);
+      setWarningMsg('Your collateralisation ratio will put you at risk of liquidation');
+    } else {   
+      setWarningMsg(null);
+      setErrorMsg(null);
+    }
+  }, [ estRatio, debouncedInput ]);
 
   return (
-    <Layer onClickOutside={()=>close()}>
-      <Box 
-        width={{ max:'750px' }}
-        alignSelf='center'
-        fill='horizontal'
-        background='background-front'
-        round='medium'
-        pad='large'
+    <Layer 
+      onClickOutside={()=>close()}
+    >
+      <Keyboard 
+        onEsc={() => { inputValue? setInputValue(undefined): close();}}
+        onEnter={()=> withdrawProcedure()}
+        onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
+        target='document'
       >
-        { !txActive && !withdrawEthActive && 
-        <Box align='center' flex='grow' justify='between' gap='large'>
-          <Box gap='medium' align='center' fill='horizontal'>
+        { !txActive && !withdrawPending && 
+          <Box 
+            width={screenSize!=='small'?{ min:'600px', max:'600px' }: undefined}
+            alignSelf='center'
+            fill
+            background='background-front'
+            round='small'
+            pad='large'
+            gap='medium'
+            justify='between'
+          >        
             <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to withdraw</Text>
 
-            {!hasDelegated && 
-            <OnceOffAuthorize 
-              authProcedure={delegateProcedure}
-              authMsg='Authorise ETH withdrawals'
-              txPending={txActive?.type === 'DELEGATION'}
-            />}
+            <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={withdrawDisabled}>
+              <TextInput
+                ref={(el:any) => {el && el.focus(); setInputRef(el);}} 
+                type="number"
+                placeholder='ETH'
+                disabled={!hasDelegated}
+                value={inputValue || ''}
+                plain
+                onChange={(event:any) => setInputValue(cleanValue(event.target.value))}
+                icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <EthMark />}
+              />
+              <RaisedButton 
+                label='Withdraw maximum'
+                disabled={!hasDelegated}
+                onClick={()=>setInputValue(maxWithdraw)}
+              />
+            </InputWrap>
+        
+            <InfoGrid entries={[
+              {
+                label: 'Max withdraw',
+                visible: true,
+                active: hasDelegated,
+                loading: false, 
+                value: maxWithdraw? `${parseFloat(maxWithdraw).toFixed(4)} Eth` : '-',
+                valuePrefix: null,
+                valueExtra: null, 
+              },
+              {
+                label: 'Ratio after Withdraw',
+                visible: collateralPercent_ > 0,
+                active: !!inputValue,
+                loading: false,           
+                value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
+                valuePrefix: 'Approx.',
+                valueExtra: null,
+                // valueExtra: () => (
+                //   <Text color='green' size='medium'> 
+                //     { inputValue && collateralPercent_ && ( (estRatio-collateralPercent_) !== 0) && `(+ ${(estRatio-collateralPercent_).toFixed(0)}%)` }
+                //   </Text>
+                // )
+              },
+            ]}
+            />
+
+            <ActionButton
+              onClick={()=> withdrawProcedure()}
+              label={`Withdraw ${inputValue || ''} Eth`}
+              disabled={withdrawDisabled}
+            />  
           
-            <Box
-              direction='row-responsive'
-              fill='horizontal'
-              gap='small'
-              align='center'
-            >
-              <Box 
-                round='medium'
-                // background='brand-transparent'
-                border='all'
-                direction='row'
-                fill='horizontal'
-                pad='small'
-                flex
-              >
-                <TextInput
-                  type="number"
-                  placeholder='ETH'
-                  disabled={withdrawEthActive}
-                  value={inputValue || ''}
-                  plain
-                  onChange={(event:any) => setInputValue(event.target.value)}
-                  icon={<Ethereum />}
-                />
-              </Box>
-
-              <Box justify='center'>
-                <Box
-                  round
-                  onClick={()=>setInputValue(maxWithdraw)}
-                  hoverIndicator='brand-transparent'
-                  border='all'
-                  pad={{ horizontal:'small', vertical:'small' }}
-                  justify='center'
-                >
-                  <Text size='xsmall'>Use max</Text>
-                </Box>
-              </Box>
+            <Box alignSelf='start' margin={{ top:'medium' }}>
+              <FlatButton 
+                onClick={()=>close()}
+                label={
+                  <Box direction='row' gap='medium' align='center'>
+                    <ArrowLeft color='text-weak' />
+                    <Text size='small' color='text-weak'> { !withdrawPending? 'cancel, and go back.': 'go back'}</Text>
+                  </Box>
+                }
+              />
             </Box>
-          </Box>
+            
+          </Box>}
 
-          <Box fill direction='row-responsive' justify='between'>
-            <Box gap='small' alignSelf='start' align='center'>
-              <Text color='text-weak' size='xsmall'>
-                Max withdraw
-              </Text>
-              <Box direction='row' gap='small'>
-                {/* <Text color='brand' size='xxsmall'>approx.</Text>  */}
-                <Text 
-                  color='brand'
-                  weight='bold'
-                  size='medium'
-                  onClick={()=>setInputValue(maxWithdraw)}
-                > {ethPosted_ ? `${maxWithdraw.toFixed(2)} Eth` : '-' }
-                </Text>
-              </Box>
-            </Box>
-
-            { (collateralPercent_ > 0) &&
-            <Box gap='small' alignSelf='start' align='center'>
-              <Text color='text-weak' size='xsmall'>Collateralization Ratio after withdraw</Text>
-              <Box direction='row' gap='small'>
-                <Text color={!inputValue? 'brand-transparent': indicatorColor} size='xxsmall'>approx.</Text> 
-                <Text color={!inputValue? 'brand-transparent': indicatorColor} weight='bold' size='medium'> 
-                  {(estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '' }
-                </Text>
-              </Box>
-            </Box>}
-
-          </Box>
-
-          <InlineAlert warnMsg={warningMsg} errorMsg={errorMsg} />
-
-          <Box
-            fill='horizontal'
-            round='medium'
-            background={( !(inputValue>0) || withdrawDisabled && hasDelegated ) ? 'brand-transparent' : 'brand'}
-            onClick={( !(inputValue>0) || withdrawDisabled && hasDelegated )? ()=>{}:()=> withdrawProcedure(inputValue)}
-            align='center'
-            pad='small'
-          >
-            <Text
-              weight='bold'
-              size='large'
-              color={( !(inputValue>0) || withdrawDisabled && hasDelegated ) ? 'text-xweak' : 'text'}
-            >
-              {`Withdraw ${inputValue || ''} Eth`}
-            </Text>
-          </Box>
+        { withdrawPending && !txActive && <ApprovalPending /> }
           
+        { txActive && 
+        <Box 
+          width={{ max:'600px' }}
+          alignSelf='center'
+          fill
+          background='background-front'
+          round='small'
+          pad='large'
+          gap='medium'
+          justify='between'
+        > 
+          <TxPending msg={`You are withdrawing ${inputValue} ETH`} tx={txActive} />
+
           <Box alignSelf='start'>
             <Box
               round
               onClick={()=>close()}
               hoverIndicator='brand-transparent'
-          // border='all'
               pad={{ horizontal:'small', vertical:'small' }}
               justify='center'
             >
               <Box direction='row' gap='small' align='center'>
                 <ArrowLeft color='text-weak' />
-                <Text size='xsmall' color='text-weak'> { !withdrawEthActive? 'cancel, and go back.': 'go back'}  </Text>
+                <Text size='xsmall' color='text-weak'> { !withdrawPending? 'cancel, and go back.': 'go back'}  </Text>
               </Box>
             </Box>
           </Box>
         </Box>}
-
-        { withdrawEthActive && !txActive && <ApprovalPending /> }
-        { txActive && <TransactionPending msg={`You made a withdrawal of ${inputValue} Eth.`} tx={txActive} /> }
-
-      </Box>
+      </Keyboard>
     </Layer>
   );
 };

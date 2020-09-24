@@ -1,67 +1,76 @@
-import React from 'react';
-import { Anchor, Text, Box, Layer, Header } from 'grommet';
+import React, { useEffect, useState, useContext } from 'react';
+import { Text, Box, Layer, ResponsiveContext, Button } from 'grommet';
 import { 
-  FiInfo as Info,
   FiArrowLeft as ArrowLeft,
   FiCheck as Check,
 } from 'react-icons/fi';
 
-import { IYieldSeries } from '../types';
-import { YieldContext } from '../contexts/YieldContext';
-
 import { SeriesContext } from '../contexts/SeriesContext';
 
-import YieldSeriesSummary from './YieldSeriesSummary';
-// import YieldSeries from '../../components/YieldSeries';
+import AprBadge from './AprBadge';
+import Loading from './Loading';
+import FlatButton from './FlatButton';
+import RaisedButton from './RaisedButton';
 
 interface ISeriesSelectorProps {
   activeView:string;
   close:any;
 }
 
-
 const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
 
-  const [showMore, setShowMore] = React.useState<boolean>(false);
-  const [openIndex, setOpenIndex] = React.useState<number | null >(null);
-  const [seriesList, setSeriesList] = React.useState<IYieldSeries[]>([]);
-  
-  // const refsArray = React.useRef([]);
-  // const elementsRef = React.useRef(seriesList.map(() => createRef()));
-  // TODO: convert to reducer if get more
-
-  // const { state } = React.useContext( YieldContext );
-
-  const { state: seriesState, actions: seriesActions } = React.useContext( SeriesContext );
-
-  const { isLoading, activeSeries, seriesData } = seriesState; 
+  const screenSize = useContext(ResponsiveContext);
+  const { state: seriesState, actions: seriesActions } = useContext( SeriesContext );
+  const { seriesLoading, activeSeries, seriesData } = seriesState; 
   const { setActiveSeries } = seriesActions;
+
+  const [sortedList, setSortedList] = useState<any>(seriesData);
+
+  const viewMap = new Map([
+    ['BORROW', { head: 'DEBT', field: 'ethDebtEDai_' }],
+    ['LEND', { head: 'BALANCE', field: 'eDaiBalance_' }],
+    ['POOL', { head: 'POOL PERCENTAGE', field: 'poolPercent' }],
+  ]);
 
   const handleSelectSeries = (seriesMaturity: number) => {
     setActiveSeries(seriesMaturity);
     close();
   };
 
-  React.useEffect(() => {
-    !isLoading && setSeriesList(seriesData);
-  }, [ seriesState ]);
+  /* filter by isMature, then sort by maturity date  */
+  useEffect(()=>{
 
-  // React.useEffect(() => {
-  //   !state.isLoading && setSeriesList(state.deployedSeries);
-  // }, [ state.isLoading ]);
+    const sortedActive = new Map([...seriesData.entries()]
+      .filter((x:any)=> !(x[1].isMature()) )
+      .sort()
+    );
+    const sortedMature = new Map([...seriesData.entries()]
+      .filter((x:any)=> x[1].isMature() )
+      .sort(
+        (a:any, b:any)=>{
+          return ( a[0]>b[0] ? 0:-1 );
+        }
+      )
+    );
+    const mergedMap = new Map([...sortedActive, ...sortedMature]);
+    setSortedList(mergedMap);
+
+  }, [seriesData]);
 
   return (
     <Layer
       onClickOutside={()=>close()}
       onEsc={()=>close()}
+      responsive={true}
+      animation='slide'  
     >
       <Box
-        round='medium'
-        fill='horizontal'
+        round='small'
+        fill
         background='background-front'
         pad={{ horizontal: 'medium', vertical:'large' }}
         gap='medium'
-        width={{ max:'750px', min:'600px' }}
+        width={screenSize!=='small'?{ min:'600px', max:'750px' }: undefined}
       >
         <Box gap='medium'>
           <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Choose a series</Text>
@@ -71,124 +80,106 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
         <Box 
           gap='none'
         >
-          <Box direction='row' justify='between' pad='medium'>
-            <Box>
-              <Text alignSelf='start' size='medium' color='text-weak'>APR</Text>
+          <Box 
+            direction='row'
+            pad='medium'
+            fill='horizontal'
+            justify='between'
+            gap='small'
+          >
+            <Box basis={screenSize==='small'?'30%':'20%'}>
+              <Text size='small' color='text-weak'>APR</Text>
             </Box>
-            <Box>
-              <Text alignSelf='start' size='medium' color='text-weak'>SERIES NAME</Text>
+
+            <Box fill='horizontal' direction='row' justify='between' gap='small'>
+
+              <Box fill align={screenSize==='small'?'end':undefined}>
+                <Text size='small' color='text-weak'>SERIES NAME</Text>
+              </Box>
+
+              <Box fill align={screenSize==='small'?'end':undefined}>
+                <Text size='small' color='text-weak'>
+                  { viewMap.get(activeView.toUpperCase())?.head }         
+                </Text>
+              </Box>
             </Box>
-            <Box>
-              <Text alignSelf='start' size='medium' color='text-weak'>
-                { activeView.toUpperCase() === 'BORROW'? 'DEBT' : 'BALANCE' }               
-              </Text>
-            </Box>
-            <Box>
-              <Text alignSelf='start' size='medium' color='text-weak'>SELECT</Text>
-            </Box>
+
+            { screenSize !== 'small' && 
+              <Box direction='row' justify='end' basis='25%'>
+                <Text size='small' color='text-weak'> </Text>
+              </Box>}
           </Box>
 
-          {isLoading && 'Loading'}
-          {activeSeries && 
+          <Loading condition={seriesLoading} size='large'>
+            { !seriesLoading && [...sortedList.values() ].map((x:any, i:any) => {       
+              const _key = i;
+              const field = viewMap.get(activeView.toUpperCase())?.field || '';
 
-          <Box
-            direction='row' 
-            justify='between'
-            onClick={()=>handleSelectSeries(activeSeries.maturity)}
-            hoverIndicator='background-mid'
-            border='top'
-            fill
-            pad='medium'
-          >
+              return ( 
+                <Box
+                  key={_key}
+                  direction='row' 
+                  justify='between'
+                  onClick={()=>handleSelectSeries(x.maturity)}
+                  hoverIndicator='background-mid'
+                  background={activeSeries.maturity === x.maturity ?'background-mid':undefined}
+                  border='top'
+                  fill='horizontal'
+                  pad='medium'
+                  gap='small'
+                >
+                  <Box basis={screenSize==='small'?'30%':'20%'} align='center'>
+                    <Box direction='row'>
+                      <AprBadge activeView={activeView} series={x} />
+                    </Box>
+                  </Box>
 
-            {  ( activeSeries && activeSeries.yieldAPR_ === Infinity ) ? 
-              <Box 
-                round 
-                border='all'
-                direction='row'
-                pad={{ horizontal:'small' }}
-                align='center'
-                background='orange'
-              >
-                <Text size='xxsmall'>
-                  { activeView.toUpperCase() === 'BORROW'? 'Limited Liquidity': 'Not Available' }         
-                </Text>
-              </Box>
-              :
-              <Box>
-                <Text alignSelf='start' size='medium' color='brand'>
-                  {activeSeries.yieldAPR_}%
-                </Text>
-              </Box>}
+                  <Box fill='horizontal' direction='row' justify='between' gap='small'>
+                    <Box fill align={screenSize==='small'?'start':'start'}>
+                      <Text size={screenSize} color='brand'>
+                        {x.displayName}
+                      </Text>
+                    </Box>
+                    <Box fill align={screenSize==='small'?'end':undefined}>
+                      <Text size={screenSize} color='brand'>
+                        {x[field]}
+                      </Text>
+                    </Box>                 
+                  </Box>
 
-            <Box>
-              <Text alignSelf='start' size='medium' color='brand'>
-                {activeSeries.displayName}
-              </Text>
-            </Box>
-            <Box>
-              <Text alignSelf='start' size='medium' color='brand'>
-                {activeView.toUpperCase() === 'BORROW'? 
-                  activeSeries.ethDebtYDai_.toFixed(2) :
-                  activeSeries.yDaiBalance_.toFixed(2)} Dai
-              </Text>
-            </Box>
-            <Box>
-              <Box 
-                round
-                background='brand'
-                pad={{ horizontal:'medium', vertical:'xsmall' }}
-                direction='row'
-                gap='xsmall'
-                align='center'
-              >
-                <Text> Selected </Text>
-                <Check />
-              </Box>
-            </Box>
-          </Box>}
+                  { screenSize !== 'small' && 
+                  <Box basis='25%' direction='row' justify='end'>
+                    { activeSeries && activeSeries.maturity === x.maturity ? 
+                      <Button 
+                        primary
+                        label={
+                          <Text size='small'>Selected</Text>           
+                        }
+                        icon={<Check />}
+                      /> : 
+                      <RaisedButton 
+                        secondary
+                        label={<Text size='small'>Select</Text>}
+                      />}
+                  </Box>}
+                </Box>
+              );     
+            })}
+          </Loading>        
         </Box>
 
-        {/* {seriesData.forEach((x:any, i:number) => {
-          console.log(x)
-          return (
-            <Box
-              key={x.name}
-              id={x.name}
-              ref={(el:any) => {refs.current[i] = el;}}
-            >
-              <Box 
-                direction='row' 
-                justify='between'
-                gap='xsmall'
-                onClick={()=>console.log(x)}
-                hoverIndicator='background-mid'
-              >
-                <Box> {x.yieldPercent_}</Box>
-                <Box> {x.displayName} </Box>
-                <Box> {x.wethDebtDai_} </Box>
-                <Box> 'ACTION'</Box>
-              </Box>
-            </Box>
-          );
-        })} */}
-        <Box alignSelf='start'>
-          <Box
-            round
+        <Box alignSelf='start' margin={{ top:'medium' }}>
+          <FlatButton 
             onClick={()=>close()}
-            hoverIndicator='brand-transparent'
-          // border='all'
-            pad={{ horizontal:'small', vertical:'small' }}
-            justify='center'
-          >
-            <Box direction='row' gap='small' align='center'>
-              <ArrowLeft color='text-weak' />
-              <Text size='xsmall' color='text-weak'> go back </Text>
-            </Box>
-          </Box>
+            label={
+              <Box direction='row' gap='medium' align='center'>
+                <ArrowLeft color='text-weak' />
+                <Text size='small' color='text-weak'> go back </Text>
+              </Box>
+            }
+          />
         </Box>
       </Box>
-
     </Layer>
   );
 };
