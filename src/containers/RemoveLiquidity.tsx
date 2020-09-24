@@ -96,7 +96,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
     if (
       !account ||
       !inputValue ||
-      (activeSeries?.poolTokens_- inputValue <= 0) ||
+      (activeSeries?.poolTokens?.sub(ethers.utils.parseEther(inputValue)) < 0) ||
       parseFloat(inputValue) <= 0
     ) {
       setRemoveLiquidityDisabled(true);
