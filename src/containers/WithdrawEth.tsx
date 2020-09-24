@@ -104,12 +104,13 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
 
   /* show warnings and errors with collateralization ratio levels and inputs */
   useEffect(()=>{
+
     if ( debouncedInput && maxWithdraw && (debouncedInput > maxWithdraw) ) {
       setWarningMsg(null);
-      setErrorMsg('You are not allowed to withdraw below the collateralization ratio'); 
+      setErrorMsg('That exceeds the amount of ETH you can withdraw right now.');
     } else if (estRatio >= 150 && estRatio < 200 ) {
       setErrorMsg(null);
-      setWarningMsg('Your collateralization ratio will put you at risk of liquidation');
+      setWarningMsg('A collateralization ratio of close to 150% will put you at risk of liquidation');
     } else {   
       setWarningMsg(null);
       setErrorMsg(null);
