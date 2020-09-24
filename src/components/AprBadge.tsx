@@ -38,8 +38,10 @@ function AprBadge({ activeView, series, animate }:IAprBadgeProps) {
         align='center'
         gap='small'
       >
-        <Clock />
-        <Text size='xxsmall'>  
+        <Text size='xsmall'>
+          <Clock />
+        </Text>
+        <Text size='xsmall'>  
           Mature       
         </Text>
       </Box>}
@@ -54,8 +56,8 @@ function AprBadge({ activeView, series, animate }:IAprBadgeProps) {
           justify='center'
           animation={animate ? { type:'zoomIn', duration:1000, size:'large' } : undefined} 
         >
-          <Loading condition={!seriesApr} size='xxsmall'>
-            <Text size='xxsmall'> { seriesApr } </Text>  
+          <Loading condition={!seriesApr} size='xsmall'>
+            <Text size='xsmall' weight='bold'> { seriesApr } </Text>  
           </Loading>
         </Box>}
 

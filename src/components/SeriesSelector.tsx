@@ -87,7 +87,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
             justify='between'
             gap='small'
           >
-            <Box basis={screenSize==='small'?'30%':'20%'}>
+            <Box basis={screenSize==='small'?'30%':'30%'}>
               <Text size='small' color='text-weak'>APR</Text>
             </Box>
 
@@ -128,7 +128,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
                   pad='medium'
                   gap='small'
                 >
-                  <Box basis={screenSize==='small'?'30%':'20%'} align='center'>
+                  <Box basis={screenSize==='small'?'30%':'30%'} align='center'>
                     <Box direction='row'>
                       <AprBadge activeView={activeView} series={x} />
                     </Box>
