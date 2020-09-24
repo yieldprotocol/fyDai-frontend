@@ -20,19 +20,21 @@ export const yieldTheme = {
     colors: {
       brand: {
         dark: '#005792',
-        light: '#005792',
+        light: '#224870',
         // dark: '#ffffff',
         // light:'#000000',
       },
       'brand-transparent': {
-        // dark: 'rgba(0, 158, 131, 0.1)',
-        // light: 'rgba(0, 158, 131, 0.1)',
+
+        // dark: '#0057921A',
+        // light: '#0057921A',
         dark: '#0057921A',
-        light: '#0057921A',
+        light: '#2248701A',
+        
       },
       'brand-light': {
         dark: '#FFFFFF',
-        light: '#FFFFFF',
+        light: '#AEA3B0',
       },
       secondary: {
         dark: '#627EEA',
@@ -75,7 +77,7 @@ export const yieldTheme = {
       },
       text: {
         dark: '#EEEEEE',
-        light: '#005792',
+        light: '#224870',
       },
       'text-strong': {
         dark: '#FFFFFF',
@@ -83,7 +85,7 @@ export const yieldTheme = {
       },
       'text-weak': {
         dark: '#CCCCCC',
-        light: '#78859A',
+        light: '#8499B1',
       },
       'text-xweak': {
         dark: '#999999',
