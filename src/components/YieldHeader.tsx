@@ -176,11 +176,12 @@ const YieldHeader = (props: any) => {
         <Image src={theme.dark ? logoLight : logoDark} fit="contain" />
       </Box>
 
-      { screenSize === 'small' ? 
-        <MobileNav /> 
-        : 
-        <Nav />
-      }
+      <Box>
+        { screenSize === 'small' ? 
+          <MobileNav /> 
+          : 
+          <Nav />}
+      </Box>
 
       <Box>
         {screenSize === 'small' ? (
@@ -191,7 +192,6 @@ const YieldHeader = (props: any) => {
           </Box>
         )}
       </Box>
-
     </Box>
   );
 };

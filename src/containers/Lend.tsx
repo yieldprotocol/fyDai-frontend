@@ -271,7 +271,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
                   onClick={()=>setWithdrawDaiOpen(true)}
                   label={
                     <Box direction='row' gap='small' align='center'>
-                      <Box><Text size='xsmall' color='text-weak'>alternatively, <Text weight='bold'>close</Text> your position in this series</Text></Box>
+                      <Box><Text size='xsmall' color='text-weak'><Text weight='bold'>close</Text> your position in this series</Text></Box>
                       <ArrowRight color='text-weak' />
                     </Box>
                 }

@@ -204,7 +204,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
                 active: maxDaiAvailable_,
                 loading: borrowPending,
                 value: maxDaiAvailable_? `${maxDaiAvailable_} DAI`: '0 DAI',           
-                valuePrefix: 'Approx.',
+                valuePrefix: '~',
                 valueExtra: null,
               },
             ]} 
@@ -332,7 +332,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
                 onClick={()=>setRepayOpen(true)}
                 label={
                   <Box direction='row' gap='small' align='center'>
-                    <Box><Text size='xsmall' color='text-weak'>alternatively, <Text weight='bold'>repay</Text> series debt</Text></Box>
+                    <Box><Text size='xsmall' color='text-weak'><Text weight='bold'>repay</Text> series debt</Text></Box>
                     <ArrowRight color='text-weak' />
                   </Box>
                 }

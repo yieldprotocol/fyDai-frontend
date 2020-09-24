@@ -235,7 +235,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
               onClick={()=>setWithdrawOpen(true)}
               label={
                 <Box direction='row' gap='small' align='center'>
-                  <Box><Text size='xsmall' color='text-weak'>or,  <Text weight='bold'>withdraw</Text> collateral</Text></Box>
+                  <Box><Text size='xsmall' color='text-weak'><Text weight='bold'>withdraw</Text> collateral</Text></Box>
                   <ArrowRight color='text-weak' />
                 </Box> }
             />
