@@ -77,7 +77,7 @@ const Pool = (props:IPoolProps) => {
     if (inputValue && !addLiquidityDisabled ) {
       setAddLiquidityPending(true);
       await addLiquidity( activeSeries, inputValue );
-      setInputValue('');
+      setInputValue(undefined);
       await Promise.all([
         userActions.updatePosition(),
         seriesActions.updateActiveSeries()

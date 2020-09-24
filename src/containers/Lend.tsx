@@ -82,7 +82,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
         activeSeries,
         inputValue
       );
-      setInputValue('');
+      setInputValue(undefined);
       await Promise.all([
         userActions.updatePosition(),
         seriesActions.updateActiveSeries()

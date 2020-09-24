@@ -65,6 +65,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
     if (inputValue && !withdrawDisabled ) {
       setWithdrawPending(true);
       await withdrawEth(inputValue);
+      setInputValue(undefined);
       userActions.updatePosition();
       setWithdrawPending(false);
       close();

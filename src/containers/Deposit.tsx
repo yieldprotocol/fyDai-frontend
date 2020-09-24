@@ -82,6 +82,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
     if (inputValue && !depositDisabled ) {
       setDepositPending(true);
       await postEth(inputValue);
+      setInputValue(undefined);
       await userActions.updatePosition();
       setDepositPending(false);
     }

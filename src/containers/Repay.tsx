@@ -69,7 +69,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
       setRepayPending(true);
       /* repay using proxy */
       await repayDaiDebt(activeSeries, 'ETH-A', value);
-      setInputValue('');
+      setInputValue(undefined);
       if (activeSeries?.isMature()) {
         await Promise.all([
           userActions.updatePosition(),
