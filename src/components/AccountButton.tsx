@@ -66,7 +66,7 @@ const AccountButton = (props: any) => {
     lastCompletedTx && pendingTxs.length===0 && (async () => {
       setTimeout(() => {
         setTxCompleteOpen(false);
-      }, 5000);
+      }, 6000);
     })();
   }, [lastCompletedTx, pendingTxs ]);
   

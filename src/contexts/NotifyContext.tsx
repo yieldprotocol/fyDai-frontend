@@ -7,7 +7,7 @@ const initState = {
   position: 'right',
   message: '',
   type: 'info',
-  timerMs: 6000,
+  timerMs: 8000,
   callbackAction: null,
   callbackCancel: null,
   fatalOpen: false,
