@@ -107,127 +107,127 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
 
 
   return (
-    <Layer onClickOutside={()=>close()}>
-      <Keyboard 
-        onEsc={() => { inputValue? setInputValue(undefined): close();}}
-        onEnter={()=> removeLiquidityProcedure(inputValue)}
-        onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
-        target='document'
+    <Keyboard 
+      onEsc={() => { inputValue? setInputValue(undefined): close();}}
+      onEnter={()=> removeLiquidityProcedure(inputValue)}
+      onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
+      target='document'
+    >
+      {!txActive && !removeLiquidityPending && 
+      <Box 
+        width={screenSize!=='small'?{ min:'600px', max:'600px' }: undefined}
+        alignSelf='center'
+        fill
+        background='background-front'
+        round='small'
+        pad='large'
+        gap='medium'
       >
-        {!txActive && !removeLiquidityPending && 
-          <Box 
-            width={screenSize!=='small'?{ min:'600px', max:'600px' }: undefined}
-            alignSelf='center'
-            fill
-            background='background-front'
-            round='small'
-            pad='large'
-            gap='medium'
-          >
-            <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Remove Liquidity Tokens</Text>
-            <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={removeLiquidityDisabled}>
-              <TextInput
-                ref={(el:any) => {el && el.focus(); setInputRef(el);}} 
-                type="number"
-                placeholder='Tokens to remove'
-                value={inputValue || ''}
-                plain
-                onChange={(event:any) => setInputValue(( cleanValue(event.target.value) ))}
-                icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <YieldMark />}
-              />
-              <RaisedButton 
-                label='Maximum'
-                onClick={()=>setInputValue( activeSeries?.poolTokens_ )}
-              />
-            </InputWrap>
+        <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Remove Liquidity Tokens</Text>
+        <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={removeLiquidityDisabled}>
+          <TextInput
+            ref={(el:any) => {el && el.focus(); setInputRef(el);}} 
+            type="number"
+            placeholder='Tokens to remove'
+            value={inputValue || ''}
+            plain
+            onChange={(event:any) => setInputValue(( cleanValue(event.target.value) ))}
+            icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <YieldMark />}
+          />
+          <RaisedButton 
+            label='Maximum'
+            onClick={()=>setInputValue( ethers.utils.formatEther(activeSeries?.poolTokens) )}
+          />
+        </InputWrap>
 
-            <InfoGrid entries={[
-              {
-                label: 'Current Token Balance',
-                visible: true,
-                active: true,
-                loading: false,     
-                value: activeSeries?.poolTokens_,
-                valuePrefix: null,
-                valueExtra: null, 
-              },
-              {
-                label: 'Share of the Pool After withdraw',
-                visible: true,
-                active: inputValue,
-                loading: calculating,           
-                value: parseFloat(newShare)>=0 ? `${newShare}%`: '',
-                valuePrefix: null,
-                valueExtra: null, 
-              },
-              {
-                label: 'Like what you see?',
-                visible: false,
-                active: inputValue,
-                loading: false,            
-                value: '',
-                valuePrefix: null,
-                valueExtra: () => (
-                  <Button
-                    color='brand-transparent'
-                    label={<Text size='xsmall' color='brand'>Connect a wallet</Text>}
-                    onClick={()=>console.log('still to implement')}
-                    hoverIndicator='brand-transparent'
-                  /> 
-                )
-              },
-            ]}
-            />
-
-            <ActionButton
-              onClick={()=> removeLiquidityProcedure(inputValue)}
-              label={`Remove ${inputValue || ''} tokens`}
-              disabled={removeLiquidityDisabled}
-            />
-
-            <Box alignSelf='start' margin={{ top:'medium' }}>
-              <FlatButton 
-                onClick={()=>close()}
-                label={
-                  <Box direction='row' gap='medium' align='center'>
-                    <ArrowLeft color='text-weak' />
-                    <Text size='small' color='text-weak'> go back </Text>
-                  </Box>
-                }
-              />
-            </Box>
-          </Box>}
-        { removeLiquidityPending && !txActive && <ApprovalPending /> }   
-        { txActive && 
-          <Box 
-            width={{ max:'600px' }}
-            alignSelf='center'
-            fill
-            background='background-front'
-            round='small'
-            pad='large'
-            gap='medium'
-            justify='between'
-          > 
-            <TxPending msg={`You are removing ${inputValue} liquidity tokens`} tx={txActive} />
-                
-            <Box alignSelf='start'>
-              <Box
-                round
-                onClick={()=>close()}
+        <InfoGrid entries={[
+          {
+            label: 'Current Token Balance',
+            visible: true,
+            active: true,
+            loading: false,     
+            value: activeSeries?.poolTokens_,
+            valuePrefix: null,
+            valueExtra: null, 
+          },
+          {
+            label: 'Share of the Pool After withdraw',
+            visible: true,
+            active: inputValue,
+            loading: calculating,           
+            value: parseFloat(newShare)>=0 ? `${newShare}%`: '',
+            valuePrefix: null,
+            valueExtra: null, 
+          },
+          {
+            label: 'Like what you see?',
+            visible: false,
+            active: inputValue,
+            loading: false,            
+            value: '',
+            valuePrefix: null,
+            valueExtra: () => (
+              <Button
+                color='brand-transparent'
+                label={<Text size='xsmall' color='brand'>Connect a wallet</Text>}
+                onClick={()=>console.log('still to implement')}
                 hoverIndicator='brand-transparent'
-                pad={{ horizontal:'small', vertical:'small' }}
-                justify='center'
-              >
-                <Box direction='row' gap='small' align='center'>
-                  <ArrowLeft color='text-weak' />
-                  <Text size='xsmall' color='text-weak'> { !removeLiquidityPending? 'cancel, and go back.': 'go back'}  </Text>
-                </Box>
+              /> 
+            )
+          },
+        ]}
+        />
+
+        <ActionButton
+          onClick={()=> removeLiquidityProcedure(inputValue)}
+          label={`Remove ${inputValue || ''} tokens`}
+          disabled={removeLiquidityDisabled}
+        />
+
+        {!activeSeries?.isMature() &&
+        <Box alignSelf='start' margin={{ top:'medium' }}>
+          <FlatButton 
+            onClick={()=>close()}
+            label={
+              <Box direction='row' gap='medium' align='center'>
+                <ArrowLeft color='text-weak' />
+                <Text size='small' color='text-weak'> go back </Text>
               </Box>
+                }
+          />
+        </Box>}
+        
+      </Box>}
+      { removeLiquidityPending && !txActive && <ApprovalPending /> }   
+      { txActive && 
+      <Box 
+        width={{ max:'600px' }}
+        alignSelf='center'
+        fill
+        background='background-front'
+        round='small'
+        pad='large'
+        gap='medium'
+        justify='between'
+      > 
+        <TxPending msg={`You are removing ${inputValue} liquidity tokens`} tx={txActive} />
+                
+        <Box alignSelf='start'>
+          <Box
+            round
+            onClick={()=>close()}
+            hoverIndicator='brand-transparent'
+            pad={{ horizontal:'small', vertical:'small' }}
+            justify='center'
+          >
+            <Box direction='row' gap='small' align='center'>
+              <ArrowLeft color='text-weak' />
+              <Text size='xsmall' color='text-weak'> { !removeLiquidityPending? 'cancel, and go back.': 'go back'}  </Text>
             </Box>
-          </Box>}
-      </Keyboard>
-    </Layer>
+          </Box>
+        </Box>
+      </Box>}
+    </Keyboard>
   );
 };
 

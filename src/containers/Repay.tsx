@@ -106,14 +106,13 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
   }, [ activeSeries ]);
 
   return (
-    <Layer onClickOutside={()=>close()}>
-      <Keyboard 
-        onEsc={() => setInputValue(undefined)}
-        onEnter={()=> repayProcedure(inputValue)}
-        onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
-        target='document'
-      >
-        { !txActive &&
+    <Keyboard 
+      onEsc={() => setInputValue(undefined)}
+      onEnter={()=> repayProcedure(inputValue)}
+      onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
+      target='document'
+    >
+      { !txActive &&
         <Box
           width={{ min: '600px', max: '600px' }}
           alignSelf="center"
@@ -152,6 +151,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
                     disabled={repayDisabled}
                   />
 
+                  {!activeSeries?.isMature() &&
                   <Box alignSelf='start' margin={{ top:'medium' }}> 
                     <FlatButton 
                       onClick={()=>close()}
@@ -159,9 +159,10 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
                         <Box direction='row' gap='medium' align='center'>
                           <ArrowLeft color='text-weak' />
                           <Text size='xsmall' color='text-weak'> go back </Text>
-                        </Box>}
+                        </Box>
+                      }
                     />
-                  </Box>
+                  </Box>}
           
                 </Box> :
                 <Box 
@@ -187,11 +188,10 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
             </Box>
           </Box>
         </Box>}
-        { repayActive && !txActive && <ApprovalPending /> }
+      { repayActive && !txActive && <ApprovalPending /> }
 
-        { txActive && <TxPending msg={`You are repaying ${inputValue} DAI`} tx={txActive} /> }
-      </Keyboard>
-    </Layer>
+      { txActive && <TxPending msg={`You are repaying ${inputValue} DAI`} tx={txActive} /> }
+    </Keyboard>
   );
 }
 

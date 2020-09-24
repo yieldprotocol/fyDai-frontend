@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { ethers } from 'ethers';
-import { Keyboard, Box, Button, TextInput, Text, ResponsiveContext, Collapsible } from 'grommet';
+import { Keyboard, Box, Button, TextInput, Text, ResponsiveContext, Collapsible, Layer } from 'grommet';
 
 import { 
   FiClock as Clock,
@@ -35,6 +35,7 @@ import RaisedButton from '../components/RaisedButton';
 import FlatButton from '../components/FlatButton';
 import Repay from './Repay';
 import Loading from '../components/Loading';
+import SeriesMatureBox from '../components/SeriesMatureBox';
 
 interface IBorrowProps {
   borrowAmount?:number|null;
@@ -176,7 +177,10 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
       target='document'   
     >
 
-      { repayOpen && <Repay close={()=>setRepayOpen(false)} /> }
+      { repayOpen && 
+        <Layer onClickOutside={()=>setRepayOpen(false)}>
+          <Repay close={()=>setRepayOpen(false)} />      
+        </Layer>}
 
       <Collapsible open={!!activeSeries}>
         <SeriesDescriptor activeView='borrow'>
@@ -185,7 +189,9 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
             entries={[
               {
                 label: 'Current Debt',
-                visible: (!activeSeries?.isMature() && !txActive)  || (activeSeries?.isMature() && activeSeries?.ethDebtEDai_ > 0 ),
+                visible: 
+                  (!activeSeries?.isMature() && !txActive)  || 
+                  (activeSeries?.isMature() && activeSeries?.ethDebtEDai_ > 0 ),
                 active: true,
                 loading: borrowPending,    
                 value: activeSeries?.ethDebtEDai_? `${activeSeries.ethDebtEDai_} DAI`: '0 DAI',
@@ -194,26 +200,12 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
               },
               {
                 label: 'Max Borrowing Power',
-                visible: !txActive && activeSeries && !activeSeries.isMature()  && !!account,
+                visible: !txActive && activeSeries && !activeSeries.isMature() && !!account,
                 active: maxDaiAvailable_,
                 loading: borrowPending,
                 value: maxDaiAvailable_? `${maxDaiAvailable_} DAI`: '0 DAI',           
                 valuePrefix: 'Approx.',
                 valueExtra: null,
-              },
-              {
-                label: 'Repay Debt',
-                visible: !txActive && !!account && activeSeries?.isMature() && activeSeries?.ethDebtEDai_ > 0,
-                active: true,
-                loading: false,    
-                value: '',
-                valuePrefix: null,
-                valueExtra: () => (
-                  <RaisedButton
-                    label={<Text size='xsmall' color='brand'>Repay debt</Text>}
-                    onClick={() => setActiveView(2)}
-                  /> 
-                ),
               },
             ]} 
           />
@@ -231,7 +223,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
         pad="large"
         gap='small'
       >
-
+        
         <Box gap='small' align='center' fill='horizontal'>
           {/* <Loading condition={seriesState.seriesLoading} size='large'> */}
 
@@ -333,38 +325,28 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
           </Box>}
        
 
-          { activeSeries?.ethDebtEDai_ > 0 &&
-          <Box alignSelf='end' margin={{ top:'medium' }}>
-            <FlatButton 
-              onClick={()=>setRepayOpen(true)}
-              label={
-                <Box direction='row' gap='small' align='center'>
-                  <Box><Text size='xsmall' color='text-weak'>alternatively, <Text weight='bold'>repay</Text> series debt</Text></Box>
-                  <ArrowRight color='text-weak' />
-                </Box>
+          { !activeSeries?.isMature() &&
+            activeSeries?.ethDebtEDai?.gt(ethers.constants.Zero) &&
+            <Box alignSelf='end' margin={{ top:'medium' }}>
+              <FlatButton 
+                onClick={()=>setRepayOpen(true)}
+                label={
+                  <Box direction='row' gap='small' align='center'>
+                    <Box><Text size='xsmall' color='text-weak'>alternatively, <Text weight='bold'>repay</Text> series debt</Text></Box>
+                    <ArrowRight color='text-weak' />
+                  </Box>
                 }
-            />
-          </Box>}
+              />
+            </Box>}
 
-          { activeSeries && activeSeries.isMature() &&
-          <Box 
-            gap='medium' 
-            margin={{ vertical:'large' }}  
-            pad='medium'     
-            round='small'
-            fill='horizontal'
-            border='all'
-          >    
-            <Box direction='row' gap='small' align='center' fill>          
-              <Box>
-                <Clock />
-              </Box>
-              <Box> 
-                <Text size='small' color='brand'> This series has matured.</Text>         
-              </Box>
-            </Box>             
-          </Box>}
-          {/* </Loading> */}
+          { activeSeries?.isMature() &&
+            <SeriesMatureBox />}
+            
+          { !txActive && 
+            !!account && 
+            activeSeries?.isMature() && 
+            activeSeries?.ethDebtEDai.gt(ethers.constants.Zero) && 
+            <Repay />}
         </Box>
       </Box>}
 
@@ -372,6 +354,8 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
       {/* If there is a transaction active, show the applicable view */}
       { borrowActive && !txActive && <ApprovalPending /> } 
       { txActive && <TxPending msg={`You are borrowing ${inputValue} DAI`} tx={txActive} /> }
+
+
     </Keyboard>
   );
 };

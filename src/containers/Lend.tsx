@@ -34,6 +34,7 @@ import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
 import Loading from '../components/Loading';
+import SeriesMatureBox from '../components/SeriesMatureBox';
 
 interface ILendProps {
   lendAmount?:any
@@ -145,16 +146,18 @@ const Lend = ({ lendAmount }:ILendProps) => {
             entries={[
               {
                 label: 'Portfolio Value at Maturity',
-                visible: !!account && !txActive,
+                visible: 
+                  (!!account && !txActive && !activeSeries.isMature()) || 
+                  ( activeSeries.isMature() && activeSeries?.eDaiBalance_>0),
                 active: true,
-                loading: lendPending,     
+                loading: lendPending,  
                 value: activeSeries && `${activeSeries?.eDaiBalance_} DAI` || '-',
                 valuePrefix: null,
-                valueExtra: null, 
+                valueExtra: null,
               },
               {
                 label: 'Current Value',
-                visible: !!account && !txActive,
+                visible: !!account && !txActive && !activeSeries.isMature(),
                 active: true,
                 loading: lendPending || !currentValue,           
                 value: currentValue?`${cleanValue(currentValue, 2)} DAI`: '- Dai',
@@ -163,7 +166,9 @@ const Lend = ({ lendAmount }:ILendProps) => {
               },
               {
                 label: 'Dai balance',
-                visible: !!account && !txActive,
+                visible: 
+                  (!!account && !txActive && !activeSeries.isMature()) || 
+                  (activeSeries.isMature() && activeSeries?.eDaiBalance_>0),
                 active: true,
                 loading: lendPending,            
                 value: daiBalance_?`${daiBalance_} DAI`: '0 DAI',
@@ -174,7 +179,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
           />
         </SeriesDescriptor>
       </Collapsible>
-      
+   
       {/* If there is no applicable transaction active, show the lending page */}
       { !txActive &&
       <Box
@@ -273,13 +278,16 @@ const Lend = ({ lendAmount }:ILendProps) => {
                 />
               </Box>}
             </>}
+          
+          { activeSeries?.isMature() &&
+            <SeriesMatureBox />}
+            
+          { !txActive && 
+            !!account && 
+            activeSeries?.isMature() && 
+            activeSeries?.eDaiBalance?.gt(ethers.constants.Zero) && 
+            <Redeem />}
 
-          {/* If the series is mature show the redeem view */}
-          { (activeSeries?.isMature()) &&
-            <Box fill gap='medium' margin={{ vertical:'large' }}>
-              <Redeem />
-            </Box>}
-          {/* </Loading> */}
         </Box>
       </Box>}
 

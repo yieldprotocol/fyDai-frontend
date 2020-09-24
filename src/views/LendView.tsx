@@ -26,11 +26,8 @@ const LendView = ({ activeView }:LendProps) => {
         tipPrimary="Tip: Convert your Maker vault"
         tipSecondary="View more tips"
       /> */}
-      <RaisedBox>
-        { activeSeries?.isMature() === false  && 
-          <Lend />}
-        { activeSeries?.isMature() === true && 
-          <Redeem />}      
+      <RaisedBox> 
+        <Lend />
       </RaisedBox>
     </>
   );

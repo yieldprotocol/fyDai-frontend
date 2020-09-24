@@ -1,8 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { Box, Text } from 'grommet';
-import { 
-  FiClock as Clock,
-} from 'react-icons/fi';
 
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
@@ -13,8 +10,7 @@ import InlineAlert from '../components/InlineAlert';
 import ApprovalPending from '../components/ApprovalPending';
 import TxPending from '../components/TxPending';
 import ActionButton from '../components/ActionButton';
-import SeriesDescriptor from '../components/SeriesDescriptor';
-import InfoGrid from '../components/InfoGrid';
+import SeriesMatureBox from '../components/SeriesMatureBox';
 
 interface IRedeemProps {
   close?:any,
@@ -53,74 +49,21 @@ const Redeem  = ({ close }:IRedeemProps)  => {
   }, [activeSeries]);
 
   return (
-    <>
-      <SeriesDescriptor activeView='lend'> 
-        {/* <InfoGrid 
-      alt
-      entries={[
-        {
-          label: 'Current Debt',
-          visible: !!account && !txActive,
-          active: true,
-          loading: false,     
-          value: activeSeries?.ethDebtEDai_? `${activeSeries.ethDebtEDai_} DAI`: '0 DAI',
-          valuePrefix: null,
-          valueExtra: null, 
-        },
-        {
-          label: 'Dai balance',
-          visible: !!account && !txActive,
-          active: true,
-          loading: repayPending,            
-          value: daiBalance_?`${daiBalance_} DAI`: '-',
-          valuePrefix: null,
-          valueExtra: null,
-        },
-      ]}
-    /> */}
-      </SeriesDescriptor>
+    
+    <Box flex='grow' align='center' fill='horizontal'>
+      <InlineAlert warnMsg={warningMsg} errorMsg={errorMsg} />
+      { txActive?.type !== 'REDEEM' &&
+      <>
+        <ActionButton
+          onClick={()=>redeemProcedure()} 
+          label={`Redeem ${activeSeries?.eDaiBalance_ || ''} Dai`}
+          disabled={redeemDisabled}
+        />
+      </>}
 
-      <Box
-        width={{ max:'600px' }}
-        alignSelf='center'
-        fill='horizontal'
-        background='background-front'
-        round='small'
-        pad='large'
-        gap='medium'
-      >
-        <Box flex='grow' align='center' fill='horizontal'>
-          <InlineAlert warnMsg={warningMsg} errorMsg={errorMsg} />
-          { txActive?.type !== 'REDEEM' &&
-          <Box 
-            gap='medium' 
-            margin={{ vertical:'large' }}  
-            pad='medium'     
-            round='small'
-            fill='horizontal'
-            border='all'
-          >    
-            <Box direction='row' gap='small' align='center' fill>          
-              <Box>
-                <Clock />
-              </Box>
-              <Box> 
-                <Text size='small' color='brand'> This series has matured.</Text>         
-              </Box>
-            </Box>
-
-            <ActionButton
-              onClick={()=>redeemProcedure()} 
-              label={`Redeem ${activeSeries?.eDaiBalance_ || ''} Dai`}
-              disabled={redeemDisabled}
-            />
-                        
-          </Box>}
-          { redeemActive && !txActive && <ApprovalPending /> } 
-          { txActive && <TxPending msg={`You are redeeming ${activeSeries?.eDaiBalance_.toFixed(4)} DAI`} tx={txActive} /> }
-        </Box>
-      </Box>
-    </>
+      { redeemActive && !txActive && <ApprovalPending /> } 
+      { txActive && <TxPending msg={`You are redeeming ${activeSeries?.eDaiBalance_.toFixed(4)} DAI`} tx={txActive} /> }
+    </Box>
   );
 };
 

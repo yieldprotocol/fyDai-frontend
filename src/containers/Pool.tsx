@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { ethers } from 'ethers';
-import { Box, Button, Keyboard, TextInput, Text, ResponsiveContext, Collapsible } from 'grommet';
+import { Box, Button, Keyboard, TextInput, Text, ResponsiveContext, Collapsible, Layer } from 'grommet';
 
 import { 
   FiArrowRight as ArrowRight,
@@ -34,6 +34,7 @@ import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
 import Loading from '../components/Loading';
+import SeriesMatureBox from '../components/SeriesMatureBox';
 
 interface IPoolProps {
   // lendAmount?:any
@@ -135,7 +136,10 @@ const Pool = (props:IPoolProps) => {
       onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
       target='document'
     >
-      { removeLiquidityOpen && <RemoveLiquidity close={()=>setRemoveLiquidityOpen(false)} /> }
+      { removeLiquidityOpen && 
+        <Layer onClickOutside={()=>setRemoveLiquidityOpen(false)}>
+          <RemoveLiquidity close={()=>setRemoveLiquidityOpen(false)} /> 
+        </Layer>}
 
       <Collapsible open={!!activeSeries}> 
         <SeriesDescriptor activeView='pool'> 
@@ -144,7 +148,9 @@ const Pool = (props:IPoolProps) => {
             entries={[
               {
                 label: 'Your Pool Tokens',
-                visible: !!account && txActive?.type !== 'ADD_LIQUIDITY',
+                visible: 
+                  (!!account && txActive?.type !== 'ADD_LIQUIDITY' && !activeSeries.isMature()) || 
+                  (activeSeries.isMature() && activeSeries?.poolTokens_>0 ),
                 active: true,
                 loading: addLiquidityPending,     
                 value: activeSeries?.poolTokens_,
@@ -153,7 +159,9 @@ const Pool = (props:IPoolProps) => {
               },
               {
                 label: 'Your Pool share',
-                visible: !!account && txActive?.type !== 'ADD_LIQUIDITY',
+                visible: 
+                  (!!account && txActive?.type !== 'ADD_LIQUIDITY' && !activeSeries.isMature()) || 
+                  (activeSeries.isMature() && activeSeries?.poolTokens_>0 ),
                 active: true,
                 loading: addLiquidityPending,           
                 value: activeSeries?` ${activeSeries?.poolPercent}%`: '',
@@ -162,7 +170,9 @@ const Pool = (props:IPoolProps) => {
               },
               {
                 label: 'Current Dai Balance',
-                visible: !!account && txActive?.type !== 'ADD_LIQUIDITY',
+                visible: 
+                  (!!account && txActive?.type !== 'ADD_LIQUIDITY' && !activeSeries.isMature()) || 
+                  (activeSeries.isMature() && activeSeries?.poolTokens_>0 ),
                 active: true,
                 loading: addLiquidityPending,            
                 value: daiBalance_?`${daiBalance_} DAI`: '0 DAI',
@@ -205,7 +215,7 @@ const Pool = (props:IPoolProps) => {
                   {account &&
                   <RaisedButton 
                     label={screenSize !== 'small' ? 'Add Maximum': 'Maximum'}
-                    onClick={()=>setInputValue(daiBalance_)}
+                    onClick={()=>setInputValue(ethers.utils.formatEther(daiBalance))}
                   />}
                 </InputWrap>
 
@@ -239,7 +249,6 @@ const Pool = (props:IPoolProps) => {
                 />
               </Box> 
             
-  
               <Box gap='small' fill='horizontal' align='center'>
                 <ActionButton
                   onClick={()=>addLiquidityProcedure()} 
@@ -249,41 +258,30 @@ const Pool = (props:IPoolProps) => {
               </Box>
             </>}
 
-          { activeSeries?.poolTokens_>0 &&
+          { activeSeries?.isMature() &&
+            <SeriesMatureBox />}
+            
+
+          { !activeSeries?.isMature() &&
+            activeSeries?.poolTokens_>0 &&
             <Box alignSelf='end' margin={{ top:'medium' }}>
               <FlatButton 
                 onClick={()=>setRemoveLiquidityOpen(true)}
                 label={
                   <Box direction='row' gap='small' align='center'>
-                    { activeSeries?.isMature() ? 
-                      <Box><Text size='xsmall' color='text-weak'><Text weight='bold'>Remove</Text> existing Liquidity from this series</Text></Box>
-                      :
-                      <Text size='xsmall' color='text-weak'>alternatively, <Text weight='bold'>Remove Liquidity</Text> from this series</Text>}
+                    <Text size='xsmall' color='text-weak'>alternatively, <Text weight='bold'>Remove Liquidity</Text> from this series</Text>
                     <ArrowRight color='text-weak' />
                   </Box>
                 }  
               />
             </Box>}
 
-          { activeSeries && activeSeries.isMature() &&
-            <Box 
-              gap='medium' 
-              margin={{ vertical:'large' }}  
-              pad='medium'     
-              round='small'
-              fill='horizontal'
-              border='all'
-            >    
-              <Box direction='row' gap='small' align='center' fill>          
-                <Box>
-                  <Clock />
-                </Box>
-                <Box> 
-                  <Text size='small' color='brand'> This series has matured.</Text>         
-                </Box>
-              </Box>             
-            </Box>}
-          {/* </Loading> */}
+          { !txActive && 
+            !!account && 
+            activeSeries?.isMature() && 
+            activeSeries?.poolTokens?.gt(ethers.constants.Zero) && 
+            <RemoveLiquidity />}
+
         </Box>
       </Box>}
 
