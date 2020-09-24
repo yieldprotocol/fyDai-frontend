@@ -62,7 +62,7 @@ const Redeem  = ({ close }:IRedeemProps)  => {
       </>}
 
       { redeemActive && !txActive && <ApprovalPending /> } 
-      { txActive && <TxPending msg={`You are redeeming ${activeSeries?.eDaiBalance_.toFixed(4)} DAI`} tx={txActive} /> }
+      { txActive && <TxPending msg={`You are redeeming ${activeSeries?.eDaiBalance_} DAI`} tx={txActive} /> }
     </Box>
   );
 };
