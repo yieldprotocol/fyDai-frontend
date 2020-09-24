@@ -70,11 +70,17 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
       /* repay using proxy */
       await repayDaiDebt(activeSeries, 'ETH-A', value);
       setInputValue('');
-      await Promise.all([
-        userActions.updatePosition(),
-        seriesActions.updateActiveSeries()
-      ]);
-      setRepayPending(false);     
+      if (activeSeries?.isMature()) {
+        await Promise.all([
+          userActions.updatePosition(),
+          seriesActions.updateActiveSeries()
+        ]);
+      } else {
+        userActions.updatePosition();
+        seriesActions.updateActiveSeries();
+      }
+      setRepayPending(false);
+      !activeSeries?.isMature() && close();    
     }
   };
 
