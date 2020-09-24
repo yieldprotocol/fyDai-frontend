@@ -53,7 +53,7 @@ export const useMath = () => {
   };
 
   /**
-   * Calculates the collateralisation ratio 
+   * Calculates the collateralization ratio 
    * ETH collat value and Dai debt value (in USD)
    *
    * @param {BigNumber} _collateralValue (wei/wad precision)
@@ -69,7 +69,7 @@ export const useMath = () => {
   };
 
   /**
-   * Calculates the collateralisation percentage from a RAY ratio
+   * Calculates the collateralization percentage from a RAY ratio
    *
    * @param {BigNumber} _collateralizationRate(Ray precision)
    * @returns {BigNumber} percentage as a big number
@@ -79,7 +79,7 @@ export const useMath = () => {
   };
 
   /**
-   * Calculates an ESTIMATE of the collateralisation ratio 
+   * Calculates an ESTIMATE of the collateralization ratio 
    * ETH collat value and DAI debt value (in USD) using 
    * normal numbers
    *

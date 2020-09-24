@@ -89,7 +89,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
   }, [ inputValue, hasDelegated ]);
 
 
-  /* show warnings and errors with collateralisation ratio levels and inputs */
+  /* show warnings and errors with collateralization ratio levels and inputs */
   useEffect(()=>{
     if ( debouncedInput && maxWithdraw && (debouncedInput > maxWithdraw) ) {
       setWarningMsg(null);

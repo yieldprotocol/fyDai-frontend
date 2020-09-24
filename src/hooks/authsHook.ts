@@ -158,7 +158,7 @@ export const useAuth = () => {
 
 
   /**
-   * Series/Pool authorisations that are required for each series.
+   * Series/Pool authorizations that are required for each series.
    * 
    * @param eDaiAddress series eDai address to be authorised
    * @param poolAddress series pool address to be authorised

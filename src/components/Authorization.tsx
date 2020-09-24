@@ -76,10 +76,10 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
           background='#555555'
           justify='between'
         >
-          {!buttonOnly && <Text>Feel free to look around and play. However, before you make any transactions you will need to sign few authorisations.</Text> }
+          {!buttonOnly && <Text>Feel free to look around and play. However, before you make any transactions you will need to sign few authorizations.</Text> }
           <RaisedButton 
             background='#555555'
-            label={<Text size='small' color='#DDDDDD'><Unlock /> Authorise Yield</Text>}
+            label={<Text size='small' color='#DDDDDD'><Unlock /> Authorize Yield</Text>}
             onClick={()=>{authProcedure();}}
           />   
         </Box>}
@@ -95,7 +95,7 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
           // background={modColor( series.seriesColor, 40)}
         >
           {!buttonOnly && <Warning />}
-          {!buttonOnly && <Text>A once-off authorisation is required to use this series</Text>}
+          {!buttonOnly && <Text>A once-off authorization is required to use this series</Text>}
           <RaisedButton 
             background={modColor( series.seriesColor, 40)}
             label={<Text size='xsmall'><Unlock /> Unlock Series </Text>}
@@ -146,7 +146,7 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
               );
             })}
             { !txActive && allSigned && <Text size='xsmall' weight='bold'>Finally, confirm sending the signatures to Yield in a transaction...</Text>}
-            { txActive && <Text size='xsmall' weight='bold'> Submitting your signed authorisations ... transaction pending.</Text> }
+            { txActive && <Text size='xsmall' weight='bold'> Submitting your signed authorizations ... transaction pending.</Text> }
             
             { authPending && txActive &&
             <Box alignSelf='start'>

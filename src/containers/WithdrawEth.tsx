@@ -101,14 +101,14 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
     )? setWithdrawDisabled(true) : setWithdrawDisabled(false);
   }, [ inputValue, estRatio ]);
 
-  /* show warnings and errors with collateralisation ratio levels and inputs */
+  /* show warnings and errors with collateralization ratio levels and inputs */
   useEffect(()=>{
     if ( debouncedInput && maxWithdraw && (debouncedInput > maxWithdraw) ) {
       setWarningMsg(null);
       setErrorMsg('You are not allowed to withdraw below the collateralization ratio'); 
     } else if (estRatio >= 150 && estRatio < 200 ) {
       setErrorMsg(null);
-      setWarningMsg('Your collateralisation ratio will put you at risk of liquidation');
+      setWarningMsg('Your collateralization ratio will put you at risk of liquidation');
     } else {   
       setWarningMsg(null);
       setErrorMsg(null);

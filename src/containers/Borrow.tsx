@@ -105,7 +105,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
   * Handle input (debounced input) changes:
   * 1. dai to eDai conversion and get APR (eDai needed to compare with the approved allowance)
   * 2. calcalute yield APR
-  * 3. calculate estimated collateralisation ratio
+  * 3. calculate estimated collateralization ratio
   */
   useEffect(() => {
 
