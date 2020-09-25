@@ -1,6 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import styled, { css } from 'styled-components';
 import { Box, Button, Text } from 'grommet';
+import Authorization from './Authorization';
+
+import { SeriesContext } from '../contexts/SeriesContext';
+
 
 const StyledBox = styled(Box)`
   background: #f8f8f8;
@@ -36,23 +40,47 @@ const StyledBox = styled(Box)`
 
 function ActionButton({ ...props }:any ) {
 
+  const { state: seriesState } = useContext(SeriesContext);
+  const { activeSeries } = seriesState; 
+
   return (
     <>
-      <StyledBox 
-        {...props} 
-        fill='horizontal'
-        // background={props.disabled ? undefined : 'brand'} 
-        align='center'
-        pad='small'
-      >
-        <Text 
-          weight='bold'
-          size='large'
-          color={props.disabled ? 'background' : 'brand'}
+      { props.hasDelegatedPool ? 
+        <StyledBox 
+          {...props} 
+          fill='horizontal'
+          align='center'
+          pad='small'
         >
-          {props.label}
-        </Text>
-      </StyledBox>
+          <Text 
+            weight='bold'
+            size='large'
+            color={props.disabled ? 'background' : 'brand'}
+          >
+            {props.label}
+          </Text>
+        </StyledBox>   
+        :
+        <Authorization 
+          authWrap
+          series={activeSeries}
+        >
+          <StyledBox 
+            {...props} 
+            fill='horizontal'
+            align='center'
+            pad='small'
+            onClick={()=>{ }}
+          >
+            <Text 
+              weight='bold'
+              size='large'
+              color={props.disabled ? 'background' : 'brand'}
+            >
+              Please unlock this series first
+            </Text>
+          </StyledBox>
+        </Authorization>}
     </>
   );
 }
@@ -60,23 +88,3 @@ function ActionButton({ ...props }:any ) {
 
 
 export default ActionButton;
-
-
-// {/* <> 
-//         <Box
-//           fill='horizontal'
-//           round='small'
-//           background={repayDisabled ? 'brand-transparent' : 'brand'}
-//           onClick={()=>repayProcedure(inputValue)}
-//           align='center'
-//           pad='small'
-//         >
-//           <Text 
-//             weight='bold'
-//             size='large'
-//             color={repayDisabled ? 'text-xweak' : 'text'}
-//           >
-//             {`Repay ${inputValue || ''} DAI`}
-//           </Text>
-//         </Box>
-//       </>  */}

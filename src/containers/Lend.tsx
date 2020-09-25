@@ -117,7 +117,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
       !inputValue || 
       parseFloat(inputValue) <= 0
     )? setLendDisabled(true): setLendDisabled(false);
-  }, [ inputValue, hasDelegated ]);
+  }, [ inputValue, hasDelegated]);
 
   /* handle exceptions, errors and warnings */
   useEffect(() => {
@@ -260,6 +260,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
                   onClick={()=>lendProcedure()}
                   label={`Lend ${inputValue || ''} DAI`}
                   disabled={lendDisabled}
+                  hasDelegatedPool={activeSeries.hasDelegatedPool}
                 />       
               </Box>
 
@@ -269,7 +270,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
                   onClick={()=>setWithdrawDaiOpen(true)}
                   label={
                     <Box direction='row' gap='small' align='center'>
-                      <Box><Text size='xsmall' color='text-weak'><Text weight='bold'>close</Text> your position in this series</Text></Box>
+                      <Box><Text size='xsmall' color='text-weak'><Text weight='bold' color={activeSeries.seriesColor}>close</Text> your position in this series</Text></Box>
                       <ArrowRight color='text-weak' />
                     </Box>
                 }

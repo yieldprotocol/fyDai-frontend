@@ -36,6 +36,7 @@ import FlatButton from '../components/FlatButton';
 import Repay from './Repay';
 import Loading from '../components/Loading';
 import SeriesMatureBox from '../components/SeriesMatureBox';
+import Authorization from '../components/Authorization';
 
 interface IBorrowProps {
   borrowAmount?:number|null;
@@ -139,7 +140,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
       (ethPosted && ethPosted.eq(ethers.constants.Zero) ) ||
       (inputValue && maxDaiAvailable && ethers.utils.parseEther(inputValue).gte(maxDaiAvailable)) ||
       !account ||
-      !hasDelegatedProxy ||   
+      !hasDelegatedProxy ||  
       !inputValue ||
       parseFloat(inputValue) <= 0
     )? setBorrowDisabled(true): setBorrowDisabled(false);
@@ -210,7 +211,6 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
         />
       </SeriesDescriptor>
       
-
       { txActive?.type !== 'BORROW' && txActive?.type !== 'BUY' &&  
       <Box
         width={{ max: '600px' }}
@@ -319,9 +319,9 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
               onClick={()=>borrowProcedure()}
               label={`Borrow ${inputValue || ''} DAI`}
               disabled={borrowDisabled}
+              hasDelegatedPool={activeSeries.hasDelegatedPool}
             />}
           </Box>}
-       
 
           { !activeSeries?.isMature() &&
             activeSeries?.ethDebtEDai?.gt(ethers.constants.Zero) &&
@@ -330,7 +330,11 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
                 onClick={()=>setRepayOpen(true)}
                 label={
                   <Box direction='row' gap='small' align='center'>
-                    <Box><Text size='xsmall' color='text-weak'><Text weight='bold'>repay</Text> series debt</Text></Box>
+                    <Box>
+                      <Text size='xsmall' color='text-weak'>
+                        <Text weight='bold' color={activeSeries.seriesColor}>repay</Text> series debt
+                      </Text>
+                    </Box>
                     <ArrowRight color='text-weak' />
                   </Box>
                 }

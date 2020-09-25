@@ -116,7 +116,7 @@ const Pool = (props:IPoolProps) => {
       !inputValue ||
       parseFloat(inputValue) <= 0
     )? setAddLiquidityDisabled(true): setAddLiquidityDisabled(false);
-  }, [ inputValue, hasDelegated ]);
+  }, [ inputValue, hasDelegated]);
 
   /* handle warnings input errors */
   useEffect(() => {
@@ -252,6 +252,7 @@ const Pool = (props:IPoolProps) => {
                   onClick={()=>addLiquidityProcedure()} 
                   label={`Supply ${inputValue || ''} DAI`}
                   disabled={addLiquidityDisabled}
+                  hasDelegatedPool={activeSeries.hasDelegatedPool}
                 />
               </Box>
             </>}
@@ -267,7 +268,7 @@ const Pool = (props:IPoolProps) => {
                 onClick={()=>setRemoveLiquidityOpen(true)}
                 label={
                   <Box direction='row' gap='small' align='center'>
-                    <Text size='xsmall' color='text-weak'><Text weight='bold'>Remove Liquidity</Text> from this series</Text>
+                    <Text size='xsmall' color='text-weak'><Text weight='bold' color={activeSeries.seriesColor}>Remove Liquidity</Text> from this series</Text>
                     <ArrowRight color='text-weak' />
                   </Box>
                 }  

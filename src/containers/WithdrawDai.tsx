@@ -140,6 +140,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
             onClick={()=> withdrawProcedure()}
             label={`Reclaim ${inputValue || ''} Dai`}
             disabled={withdrawDisabled}
+            hasDelegatedPool={activeSeries.hasDelegatedPool}
           />
           
           <Box alignSelf='start' margin={{ top:'medium' }}>

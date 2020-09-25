@@ -98,9 +98,10 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
       estRatio < 150 ||
       txActive ||
       !inputValue ||
+      !hasDelegated ||
       parseFloat(inputValue) <= 0
     )? setWithdrawDisabled(true) : setWithdrawDisabled(false);
-  }, [ inputValue, estRatio ]);
+  }, [ inputValue, estRatio, hasDelegated ]);
 
   /* show warnings and errors with collateralization ratio levels and inputs */
   useEffect(()=>{
@@ -189,6 +190,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
               onClick={()=> withdrawProcedure()}
               label={`Withdraw ${inputValue || ''} Eth`}
               disabled={withdrawDisabled}
+              hasDelegatedPool={true}
             />  
           
             <Box alignSelf='start' margin={{ top:'medium' }}>

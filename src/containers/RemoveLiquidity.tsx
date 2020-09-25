@@ -190,6 +190,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
           onClick={()=> removeLiquidityProcedure(inputValue)}
           label={`Remove ${inputValue || ''} tokens`}
           disabled={removeLiquidityDisabled}
+          hasDelegatedPool={activeSeries.hasDelegatedPool}
         />
 
         {!activeSeries?.isMature() &&

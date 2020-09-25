@@ -19,10 +19,12 @@ import { modColor } from '../utils';
 
 interface IAuthorizationProps {
   series?: IYieldSeries|null;
+  authWrap?: boolean;
   buttonOnly?: boolean;
+  children?:any;
 }
 
-const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => { 
+const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorizationProps) => { 
   const screenSize = useContext(ResponsiveContext);
   const { state: { requestedSigs } } = useContext(NotifyContext);
   const { state: { authorizations }, actions: userActions } = useContext(UserContext);
@@ -67,7 +69,14 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
 
   return (
     <>
-      { account && !series && !hasDelegatedProxy &&
+
+      { account && series && authWrap && 
+        <Box fill='horizontal' onClick={()=>{authProcedure();}}> 
+          {children} 
+        </Box>}
+
+
+      { account && !series && !hasDelegatedProxy && !authWrap && 
         <Box 
           fill='horizontal'
           pad='medium'
@@ -84,7 +93,7 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
           />   
         </Box>}
 
-      { account && series?.hasDelegatedPool === false &&
+      { account && series?.hasDelegatedPool === false && !authWrap &&
         <Box 
           round='small'
           direction='row' 
@@ -169,5 +178,5 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
     </>);
 };
 
-Authorization.defaultProps={ series:null, buttonOnly:false };
+Authorization.defaultProps={ series:null, buttonOnly:false, authWrap:false, children:null };
 export default Authorization;

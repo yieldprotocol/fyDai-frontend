@@ -37,6 +37,7 @@ import TxPending from '../components/TxPending';
 import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
+import Authorization from '../components/Authorization';
 
 interface DepositProps {
   /* deposit amount prop is for quick linking into component */
@@ -220,6 +221,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
               onClick={()=>depositProcedure()}
               label={`Deposit ${inputValue || ''} Eth`}
               disabled={depositDisabled}
+              hasDelegatedPool={true}
             /> }
 
           { ethPosted_ > 0 &&
