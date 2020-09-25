@@ -189,7 +189,8 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
           entries={[
             {
               label: 'Current Debt',
-              visible: 
+              visible:
+                  !!account &&
                   (!activeSeries?.isMature() && !txActive)  || 
                   (activeSeries?.isMature() && activeSeries?.ethDebtDai_ > 0 ),
               active: true,
