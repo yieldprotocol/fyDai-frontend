@@ -20,7 +20,7 @@ export const yieldTheme = {
     colors: {
       brand: {
         dark: '#005792',
-        light: '#224870',
+        light: '#005792',
         // dark: '#ffffff',
         // light:'#000000',
       },
@@ -29,7 +29,7 @@ export const yieldTheme = {
         // dark: '#0057921A',
         // light: '#0057921A',
         dark: '#0057921A',
-        light: '#2248701A',
+        light: '#0057921A',
         
       },
       'brand-light': {
@@ -77,7 +77,7 @@ export const yieldTheme = {
       },
       text: {
         dark: '#EEEEEE',
-        light: '#224870',
+        light: '#005792',
       },
       'text-strong': {
         dark: '#FFFFFF',
@@ -85,7 +85,7 @@ export const yieldTheme = {
       },
       'text-weak': {
         dark: '#CCCCCC',
-        light: '#8499B1',
+        light: '#5f767e',
       },
       'text-xweak': {
         dark: '#999999',

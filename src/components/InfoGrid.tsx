@@ -1,8 +1,10 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { Grid, Box, Text, ResponsiveContext } from 'grommet';
-import { ColorType } from 'grommet/utils';
 
 import Loading from './Loading';
+
+import { SeriesContext } from '../contexts/SeriesContext';
+import { modColor, invertColor, contrastColor } from '../utils';
 
 type entry = {
   visible: boolean;
@@ -22,9 +24,18 @@ interface IInfoGridProps {
 function InfoGrid({ entries, alt }:IInfoGridProps) {
 
   const screenSize = useContext(ResponsiveContext);
+  const { state:{ activeSeries } } = useContext(SeriesContext);
+
+  const [normalText, setNormalText] = useState<string>();
+  const [weakText, setWeakText] = useState<string>();
+
+  useEffect(()=>{
+    activeSeries && setNormalText( alt? `${modColor(activeSeries.seriesColor, -150)}`: 'brand');
+    activeSeries && setWeakText( alt? `${modColor(activeSeries.seriesColor, 10)}`: 'text-weak');
+  }, [activeSeries]);
   
   return (
-    <Grid columns={screenSize !== 'small' ? '30%' : '45%'} gap="small" fill justify='start'>
+    <Grid columns={screenSize !== 'small' ? '30%' : '45%'} gap="small" fill justify='start' >
       {entries.map((x:any, i:number) => {
         const _key = i;
         const ValueExtra = x.valueExtra; 
@@ -38,11 +49,10 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
                   round='large'
                   gap='small' 
                   align={alt? 'start': 'center'}
-
                 >
                   <Text 
                     wordBreak='keep-all' 
-                    color={alt? 'brand': 'text-weak'} 
+                    color={alt? normalText: weakText} 
                     size='xxsmall' 
                     // weight={alt? 'bold': undefined}
                   >
@@ -52,10 +62,10 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
                     <Box direction='row-responsive' gap='xsmall' align='center'>
                       { x.valuePrefix && 
                         screenSize !== 'small' && 
-                        <Text color={x.active ? 'brand':'brand-transparent'} size='medium' weight='bold'>
+                        <Text color={x.active ? normalText:weakText} size='medium' weight='bold'>
                           {x.valuePrefix}                     
                         </Text>}
-                      <Text color={x.active? 'brand':'brand-transparent'} weight='bold' size='medium'> 
+                      <Text color={x.active? normalText:weakText} weight='bold' size='medium'> 
                         {x.value}
                       </Text>
                     </Box>
@@ -67,7 +77,7 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
           );
         }
       })}
-    </Grid> 
+    </Grid>
   );
 }
 

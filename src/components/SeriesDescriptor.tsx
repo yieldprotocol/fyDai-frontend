@@ -15,13 +15,12 @@ import RaisedButton from './RaisedButton';
 
 interface ISeriesDescriptorProps {
   activeView: string;
-  minified?: boolean;
   children?:any;
 }
 
 function SeriesDescriptor( props: ISeriesDescriptorProps ) {
 
-  const { activeView, minified, children } = props;
+  const { activeView, children } = props;
   const screenSize = useContext(ResponsiveContext);
   const { state: seriesState } = useContext(SeriesContext);
   const { activeSeries } = seriesState; 
@@ -81,7 +80,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
                 gap='small'
               >             
                 <AprBadge activeView={activeView} series={activeSeries} animate />
-                <Text size='xlarge' weight='bold'>            
+                <Text size='large' weight='bold' color={modColor(activeSeries?.seriesColor, -150)}>            
                   { activeSeries?.displayName }
                 </Text>
               </Box>}
@@ -90,8 +89,8 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
                 background={modColor( activeSeries?.seriesColor, 40)}
                 label={(screenSize !== 'small' ) ?        
                   <Box align='center' direction='row' gap='small'>
-                    <ChangeSeries />
-                    <Text size='xsmall'>
+                    <Text size='xsmall' color={modColor(activeSeries?.seriesColor, -150)}> <ChangeSeries /> </Text>
+                    <Text size='xsmall' color={modColor(activeSeries?.seriesColor, -150)}>
                       Change Series              
                     </Text>
                   </Box>
@@ -116,7 +115,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
             <Box 
               fill='horizontal'
               round='small'
-              pad={{vertical:'medium' }}        
+              pad={{ vertical:'medium' }}        
             >
               <Box 
                 round='small'

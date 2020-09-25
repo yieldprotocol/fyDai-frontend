@@ -77,7 +77,7 @@ const AccountButton = (props: any) => {
         direction='row'
         align='center'
         pad={{ top:'2px', bottom:'2px', horizontal:'2px' }}
-        background='#f0f0f0'
+        background={account?'#f0f0f0':undefined}
       > 
         { (account && pendingTxs.length===0 && !txCompleteOpen)? 
           <Box pad={{ left:'small', right:'large' }} direction='row' gap='small' align='center'>
@@ -93,7 +93,7 @@ const AccountButton = (props: any) => {
             pad={{ vertical: 'xsmall', left:'small', right:'25px' }}
             round
             // eslint-disable-next-line no-nested-ternary
-            background={pendingTxs.length>0 ? 'orange': txCompleteOpen ? 'lightgreen': undefined}
+            background={pendingTxs.length>0 ? 'orange': txCompleteOpen ? '#519872': undefined}
           >
             {pendingTxs.length>0 && <Text size='small'> Transaction pending ... </Text>}
 
@@ -105,6 +105,7 @@ const AccountButton = (props: any) => {
 
         { account ?
           <FlatButton
+            selected
             background='#f0f0f0'
             onClick={()=>openConnectLayer('ACCOUNT')}
             label={

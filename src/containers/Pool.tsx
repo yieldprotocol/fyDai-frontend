@@ -141,48 +141,46 @@ const Pool = (props:IPoolProps) => {
           <RemoveLiquidity close={()=>setRemoveLiquidityOpen(false)} /> 
         </Layer>}
 
-      <Collapsible open={!!activeSeries}> 
-        <SeriesDescriptor activeView='pool'> 
-          <InfoGrid 
-            alt
-            entries={[
-              {
-                label: 'Your Pool Tokens',
-                visible: 
+      <SeriesDescriptor activeView='pool'> 
+        <InfoGrid 
+          alt
+          entries={[
+            {
+              label: 'Your Pool Tokens',
+              visible: 
                   (!!account && txActive?.type !== 'ADD_LIQUIDITY' && !activeSeries?.isMature()) || 
                   (activeSeries?.isMature() && activeSeries?.poolTokens_>0 ),
-                active: true,
-                loading: addLiquidityPending,     
-                value: activeSeries?.poolTokens_,
-                valuePrefix: null,
-                valueExtra: null, 
-              },
-              {
-                label: 'Your Pool share',
-                visible: 
+              active: true,
+              loading: addLiquidityPending,     
+              value: activeSeries?.poolTokens_,
+              valuePrefix: null,
+              valueExtra: null, 
+            },
+            {
+              label: 'Your Pool share',
+              visible: 
                   (!!account && txActive?.type !== 'ADD_LIQUIDITY' && !activeSeries?.isMature()) || 
                   (activeSeries?.isMature() && activeSeries?.poolTokens_>0 ),
-                active: true,
-                loading: addLiquidityPending,           
-                value: activeSeries?` ${activeSeries?.poolPercent}%`: '',
-                valuePrefix: null,
-                valueExtra: null,
-              },
-              {
-                label: 'Current Dai Balance',
-                visible: 
+              active: true,
+              loading: addLiquidityPending,           
+              value: activeSeries?` ${activeSeries?.poolPercent}%`: '',
+              valuePrefix: null,
+              valueExtra: null,
+            },
+            {
+              label: 'Current Dai Balance',
+              visible: 
                   (!!account && txActive?.type !== 'ADD_LIQUIDITY' && !activeSeries?.isMature()) || 
                   (activeSeries?.isMature() && activeSeries?.poolTokens_>0 ),
-                active: true,
-                loading: addLiquidityPending,            
-                value: daiBalance_?`${daiBalance_} DAI`: '0 DAI',
-                valuePrefix: null,
-                valueExtra: null,
-              },
-            ]}
-          /> 
-        </SeriesDescriptor> 
-      </Collapsible>   
+              active: true,
+              loading: addLiquidityPending,            
+              value: daiBalance_?`${daiBalance_} DAI`: '0 DAI',
+              valuePrefix: null,
+              valueExtra: null,
+            },
+          ]}
+        /> 
+      </SeriesDescriptor>   
 
       { !txActive &&
       <Box

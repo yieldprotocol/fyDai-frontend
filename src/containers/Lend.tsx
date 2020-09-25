@@ -139,46 +139,44 @@ const Lend = ({ lendAmount }:ILendProps) => {
     >
       { withdrawDaiOpen && <WithdrawDai close={()=>setWithdrawDaiOpen(false)} /> }
 
-      <Collapsible open={!!activeSeries}> 
-        <SeriesDescriptor activeView='lend'>
-          <InfoGrid 
-            alt 
-            entries={[
-              {
-                label: 'Portfolio Value at Maturity',
-                visible: 
+      <SeriesDescriptor activeView='lend'>
+        <InfoGrid 
+          alt 
+          entries={[
+            {
+              label: 'Portfolio Value at Maturity',
+              visible: 
                   (!!account && !txActive && !activeSeries?.isMature()) || 
                   ( activeSeries?.isMature() && activeSeries?.eDaiBalance_>0),
-                active: true,
-                loading: lendPending,  
-                value: activeSeries && `${activeSeries?.eDaiBalance_} DAI` || '-',
-                valuePrefix: null,
-                valueExtra: null,
-              },
-              {
-                label: 'Current Value',
-                visible: !!account && !txActive && !activeSeries?.isMature(),
-                active: true,
-                loading: lendPending || !currentValue,           
-                value: currentValue?`${cleanValue(currentValue, 2)} DAI`: '- Dai',
-                valuePrefix: null,
-                valueExtra: null,
-              },
-              {
-                label: 'Dai balance',
-                visible: 
+              active: true,
+              loading: lendPending,  
+              value: activeSeries && `${activeSeries?.eDaiBalance_} DAI` || '-',
+              valuePrefix: null,
+              valueExtra: null,
+            },
+            {
+              label: 'Current Value',
+              visible: !!account && !txActive && !activeSeries?.isMature(),
+              active: true,
+              loading: lendPending || !currentValue,           
+              value: currentValue?`${cleanValue(currentValue, 2)} DAI`: '- Dai',
+              valuePrefix: null,
+              valueExtra: null,
+            },
+            {
+              label: 'Dai balance',
+              visible: 
                   (!!account && !txActive && !activeSeries?.isMature()) || 
                   (activeSeries?.isMature() && activeSeries?.eDaiBalance_>0),
-                active: true,
-                loading: lendPending,            
-                value: daiBalance_?`${daiBalance_} DAI`: '0 DAI',
-                valuePrefix: null,
-                valueExtra: null,
-              },
-            ]}
-          />
-        </SeriesDescriptor>
-      </Collapsible>
+              active: true,
+              loading: lendPending,            
+              value: daiBalance_?`${daiBalance_} DAI`: '0 DAI',
+              valuePrefix: null,
+              valueExtra: null,
+            },
+          ]}
+        />
+      </SeriesDescriptor>
    
       {/* If there is no applicable transaction active, show the lending page */}
       { !txActive &&

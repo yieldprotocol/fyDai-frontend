@@ -10,9 +10,9 @@ interface IActionSelectorProps {
 }
 
 const StyledBox = styled(Box)`
-  background: #f8f8f8;
+  background: #f0f0f0;
   border-radius: 25px;
-  border-color: #f8f8f8;
+  border-color: #f0f0f0;
   transition: all 0.3s ease-in-out;
 
   ${(props:any) => !(props.border) && css`
@@ -64,22 +64,19 @@ function BorrowSelector({ setActiveView, activeView }:IActionSelectorProps) {
   
   return (
     <>
-      <Box
-        pad={{ horizontal:'medium', vertical :'medium' }}
-        alignSelf="center"
-        width={{ max: '600px' }}
-        fill="horizontal"
-      >
+      <Box align='start'>
         <Box
+          align='start'
+          round
           direction="row"
           gap="medium"
-          fill="horizontal"
           justify='start'
+          background='#f0f0f0'
+          pad='2px'
         >
-
           <Box gap='small' align='center'>
             <StyledBox
-              pad={{ horizontal: 'large', vertical: 'xsmall' }}
+              pad={{ horizontal: 'medium', vertical: 'xsmall' }}
               onClick={() => setActiveView(1)}
               border={activeView !== 1 ? undefined : 'all'}
             >
@@ -93,7 +90,7 @@ function BorrowSelector({ setActiveView, activeView }:IActionSelectorProps) {
             {/* <Text size='xxsmall' color='brand'>Step 1</Text> */}
             <StyledBox
               round='large'
-              pad={{ horizontal: 'large', vertical: 'xsmall' }}
+              pad={{ horizontal: 'medium', vertical: 'xsmall' }}
               onClick={() => toggleActiveView()}
               border={activeView !== 0 ? undefined : 'all'}
             >
