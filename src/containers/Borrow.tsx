@@ -182,35 +182,33 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
           <Repay close={()=>setRepayOpen(false)} />      
         </Layer>}
 
-      <Collapsible open={!!activeSeries}>
-        <SeriesDescriptor activeView='borrow'>
-          <InfoGrid
-            alt
-            entries={[
-              {
-                label: 'Current Debt',
-                visible: 
+      <SeriesDescriptor activeView='borrow'>
+        <InfoGrid
+          alt
+          entries={[
+            {
+              label: 'Current Debt',
+              visible: 
                   (!activeSeries?.isMature() && !txActive)  || 
-                  (activeSeries?.isMature() && activeSeries?.ethDebtEDai_ > 0 ),
-                active: true,
-                loading: borrowPending,    
-                value: activeSeries?.ethDebtEDai_? `${activeSeries.ethDebtEDai_} DAI`: '0 DAI',
-                valuePrefix: null,
-                valueExtra: null, 
-              },
-              {
-                label: 'Max Borrowing Power',
-                visible: !txActive && activeSeries && !activeSeries.isMature() && !!account,
-                active: maxDaiAvailable_,
-                loading: borrowPending,
-                value: maxDaiAvailable_? `${maxDaiAvailable_} DAI`: '0 DAI',           
-                valuePrefix: '~',
-                valueExtra: null,
-              },
-            ]} 
-          />
-        </SeriesDescriptor>
-      </Collapsible>
+                  (activeSeries?.isMature() && activeSeries?.ethDebtDai_ > 0 ),
+              active: true,
+              loading: borrowPending,    
+              value: activeSeries?.ethDebtDai_? `${activeSeries.ethDebtDai_} DAI`: '0 DAI',
+              valuePrefix: null,
+              valueExtra: null, 
+            },
+            {
+              label: 'Max Borrowing Power',
+              visible: !txActive && activeSeries && !activeSeries.isMature() && !!account,
+              active: maxDaiAvailable_,
+              loading: borrowPending,
+              value: maxDaiAvailable_? `${maxDaiAvailable_} DAI`: '0 DAI',           
+              valuePrefix: '~',
+              valueExtra: null,
+            },
+          ]}
+        />
+      </SeriesDescriptor>
       
 
       { txActive?.type !== 'BORROW' && txActive?.type !== 'BUY' &&  
