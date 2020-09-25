@@ -57,6 +57,8 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
   const debouncedInput = useDebounce(inputValue, 500);
   const [inputRef, setInputRef] = useState<any>(null);
 
+  const [maxRepay, setMaxRepay] = useState<any>();
+
   const [ repayPending, setRepayPending ] = useState<boolean>(false);
   const [ repayDisabled, setRepayDisabled ] = useState<boolean>(true);
 
@@ -83,6 +85,11 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
       !activeSeries?.isMature() && close();    
     }
   };
+
+  useEffect(()=>{
+    daiBalance && activeSeries?.ethDebtDai && daiBalance.gt(activeSeries?.ethDebtDai) && setMaxRepay(activeSeries.ethDebtDai);
+    daiBalance && activeSeries?.ethDebtDai && daiBalance.lt(activeSeries.ethDebtDai) && setMaxRepay(daiBalance);
+  }, [daiBalance, activeSeries]);
 
   /* Repay disabling logic */
   useEffect(()=>{
@@ -118,6 +125,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
       onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
       target='document'
     >
+
       { !txActive &&
         <Box
           width={{ min: '600px', max: '600px' }}
@@ -147,14 +155,53 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
                     />
                     <RaisedButton 
                       label={screenSize !== 'small' ? 'Repay Maximum': 'Maximum'}
-                      onClick={()=>setInputValue(ethers.utils.formatEther(daiBalance))}
+                      onClick={()=>setInputValue(ethers.utils.formatEther(maxRepay))}
                     />
                   </InputWrap>
+
+
+                  <InfoGrid 
+                    entries={[
+                      {
+                        label: 'Total amount owed',
+                        visible: true,
+                        active: true,
+                        loading: repayPending,    
+                        value: activeSeries?.ethDebtEDai_? `${activeSeries.ethDebtEDai_} DAI`: '0 DAI',
+                        valuePrefix: null,
+                        valueExtra: null, 
+                      }, 
+                      {
+                        label: 'Cost to repay today',
+                        visible: true,
+                        active: true,
+                        loading: false,    
+                        value:  activeSeries?.ethDebtDai_? `${activeSeries.ethDebtDai_} DAI`: '0 DAI',
+                        valuePrefix: null,
+                        valueExtra: null,
+                      },
+                      {
+                        label: 'Owed after repayment',
+                        visible: true,
+                        active: !!inputValue&&inputValue>0,
+                        loading: false,    
+                        value: activeSeries?.ethDebtDai_ ? 
+                          ( activeSeries.ethDebtDai_ - parseFloat(debouncedInput)>0 ? 
+                            activeSeries.ethDebtDai_ - parseFloat(debouncedInput) 
+                            : 0
+                          ).toFixed(2) : '- DAI',
+
+                        valuePrefix: null,
+                        valueExtra: null, 
+                      },
+                    ]}
+                  />
 
                   <ActionButton
                     onClick={()=>repayProcedure(inputValue)}
                     label={`Repay ${inputValue || ''} DAI`}
                     disabled={repayDisabled}
+                    hasDelegatedPool={true}
                   />
 
                   {!activeSeries?.isMature() &&
