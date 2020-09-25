@@ -135,7 +135,7 @@ const YieldProvider = ({ children }: any) => {
               maturity_: new Date(maturity * 1000),
               displayName: moment(maturity * 1000).format('MMMM YYYY'),
               seriesColor: seriesColors[i],
-              seriesContrastColor: utils.invertColor(seriesColors[i]),
+              seriesTextColor: utils.modColor(seriesColors[i], -150),
             };
           })
         ).then((res: any) => _deployedSeries.push(...res));

@@ -94,11 +94,11 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
           pad='small' 
           // background={modColor( series.seriesColor, 40)}
         >
-          {!buttonOnly && <Warning />}
-          {!buttonOnly && <Text>A once-off authorization is required to use this series</Text>}
+          {!buttonOnly && <Text color={series.seriesTextColor}> <Warning /> </Text>}
+          {!buttonOnly && <Text size='small' color={series.seriesTextColor}>A once-off authorization is required to use this series</Text>}
           <RaisedButton 
             background={modColor( series.seriesColor, 40)}
-            label={<Text size='xsmall'><Unlock /> Unlock Series </Text>}
+            label={<Text size='xsmall' color={series.seriesTextColor}><Unlock /> Unlock Series </Text>}
             onClick={()=>{authProcedure();}}           
           />        
         </Box>}

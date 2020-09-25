@@ -80,7 +80,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
                 gap='small'
               >             
                 <AprBadge activeView={activeView} series={activeSeries} animate />
-                <Text size='large' weight='bold' color={modColor(activeSeries?.seriesColor, -150)}>            
+                <Text size='large' weight='bold' color={activeSeries?.seriesTextColor}>            
                   { activeSeries?.displayName }
                 </Text>
               </Box>}
@@ -89,8 +89,8 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
                 background={modColor( activeSeries?.seriesColor, 40)}
                 label={(screenSize !== 'small' ) ?        
                   <Box align='center' direction='row' gap='small'>
-                    <Text size='xsmall' color={modColor(activeSeries?.seriesColor, -150)}> <ChangeSeries /> </Text>
-                    <Text size='xsmall' color={modColor(activeSeries?.seriesColor, -150)}>
+                    <Text size='xsmall' color={activeSeries?.seriesTextColor}> <ChangeSeries /> </Text>
+                    <Text size='xsmall' color={activeSeries?.seriesTextColor}>
                       Change Series              
                     </Text>
                   </Box>

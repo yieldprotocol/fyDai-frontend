@@ -21,6 +21,7 @@ export interface IYieldSeries {
   id?: string;
   currentValue?: any;
   seriesColor?: string;
+  seriesTextColor?:string;
   wethDebtDai?: BigNumber;
   wethDebtDai_?: number;
   wethDebtEDai?: BigNumber;

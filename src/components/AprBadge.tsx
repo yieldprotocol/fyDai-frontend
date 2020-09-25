@@ -37,11 +37,12 @@ function AprBadge({ activeView, series, animate }:IAprBadgeProps) {
         pad={{ horizontal:'small', vertical:'none' }}
         align='center'
         gap='small'
+        background={series.seriesColor}
       >
-        <Text size='xsmall'>
+        <Text size='xsmall' color={series?.seriesTextColor}>
           <Clock />
         </Text>
-        <Text size='xsmall'>  
+        <Text size='xsmall' color={series?.seriesTextColor}>  
           Mature       
         </Text>
       </Box>}
@@ -57,7 +58,7 @@ function AprBadge({ activeView, series, animate }:IAprBadgeProps) {
           animation={animate ? { type:'zoomIn', duration:1000, size:'large' } : undefined} 
         >
           <Loading condition={!seriesApr} size='xsmall'>
-            <Text size='xsmall'> { seriesApr } </Text>  
+            <Text size='xsmall' color={series?.seriesTextColor}> { seriesApr } </Text>  
           </Loading>
         </Box>}
 
@@ -73,7 +74,7 @@ function AprBadge({ activeView, series, animate }:IAprBadgeProps) {
             gap='xsmall'
           >
             <Warning />       
-            <Text size='xxsmall'>
+            <Text size='xxsmall' color={series?.seriesTextColor}>
               {series.poolState.reason} 
             </Text>
           </Box>}
