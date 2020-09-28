@@ -101,7 +101,7 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
           gap='small' 
           justify='between' 
           pad='small' 
-          // background={modColor( series.seriesColor, 40)}
+          // background={modColor( series.seriesColor, -40)}
         >
           {!buttonOnly && <Text color={series.seriesTextColor}> <Warning /> </Text>}
           {!buttonOnly && <Text size='small' color={series.seriesTextColor}>A once-off authorization is required to use this series</Text>}

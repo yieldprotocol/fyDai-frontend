@@ -40,15 +40,13 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
         <Box
           alignSelf="center"
           fill
-        // round={{ corner:'top', size:'small' }}
-        // pad={{ horizontal:'small' }}
           round='small'
           pad='small'
           gap='small'
         // background=${modColor( activeSeries?.seriesColor, 30)}
           background={`linear-gradient(to right, 
           ${modColor( activeSeries?.seriesColor, -40)}, 
-          ${modColor( activeSeries?.seriesColor, -10)}, 
+          ${modColor( activeSeries?.seriesColor, -40)}, 
           ${modColor( activeSeries?.seriesColor, 10)}, 
           ${modColor( activeSeries?.seriesColor, 40)}, 
           ${modColor( activeSeries?.seriesColor, 40)})`}
@@ -104,7 +102,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
           </Box>
 
           <Box
-            pad={!delegated? { horizontal:'medium' }: { horizontal:'medium', bottom:'medium' }}
+            pad={!delegated? { horizontal:'none' }: { horizontal:'none', bottom:'medium' }}
             // margin={ !delegated? undefined: { bottom:'medium'} }
           >
             <Collapsible open={!seriesState.seriesLoading}>
@@ -131,6 +129,6 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
   );
 }
 
-SeriesDescriptor.defaultProps={ minified:false, children:null };
+SeriesDescriptor.defaultProps={ children:null };
 
 export default SeriesDescriptor; 
