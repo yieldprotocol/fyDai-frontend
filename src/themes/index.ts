@@ -85,11 +85,11 @@ export const yieldTheme = {
       },
       'text-weak': {
         dark: '#CCCCCC',
-        light: '#5f767e',
+        light: '#5f767e96',
       },
       'text-xweak': {
         dark: '#999999',
-        light: '#ffffff',
+        light: '#5f767e1A',
       },
       border: {
         // dark: '#444444',

@@ -121,7 +121,10 @@ const Lend = ({ lendAmount }:ILendProps) => {
 
   /* handle exceptions, errors and warnings */
   useEffect(() => {
-    if ( daiBalance && debouncedInput && ethers.utils.parseEther(debouncedInput).gt(daiBalance)  ) {
+    if ( false ) {
+      setWarningMsg(null);
+      setErrorMsg('There is not enough liquidity to support a transaction of that size just yet.'); 
+    } else if ( daiBalance && debouncedInput && ethers.utils.parseEther(debouncedInput).gt(daiBalance)  ) {
       setWarningMsg(null);
       setErrorMsg('That amount exceeds the amount of Dai you have'); 
     } else {
