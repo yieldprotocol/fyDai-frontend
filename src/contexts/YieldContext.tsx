@@ -16,7 +16,7 @@ const YieldContext = createContext<any>({});
 
 // const eDaiList = ['eDai0', 'eDai1', 'eDai2', 'eDai3', 'eDai4'];
 const eDaiList = ['20Sep25', '20Sep28', '20Sep29', '20Dec31', '21Dec31'];
-const seriesColors = ["#82d4bb","#ff86c8","#ffa3a5","#ffbf81","#ffdc5e","#a2c5ac"]// ['#cecfc7', '#709fb0', '#ffb8d1', '#a0c1b8', '#f4ebc1', '#ada8b6', '#03a9f4'];
+const seriesColors = ['#82d4bb', '#ff86c8', '#ffa3a5', '#ffbf81', '#ffdc5e', '#a2c5ac'];// ['#cecfc7', '#709fb0', '#ffb8d1', '#a0c1b8', '#f4ebc1', '#ada8b6', '#03a9f4'];
 const contractList = [
   'Controller',
   'Treasury',

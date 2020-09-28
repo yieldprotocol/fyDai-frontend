@@ -13,6 +13,7 @@ import {
   FiArrowRight as ArrowRight,
   FiArrowLeft as ArrowLeft,
 } from 'react-icons/fi';
+import { FaBullseye } from 'react-icons/fa';
 import EthMark from '../components/logos/EthMark';
 
 import { cleanValue } from '../utils';
@@ -38,6 +39,8 @@ import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
 import Authorization from '../components/Authorization';
+import SeriesDescriptor from '../components/SeriesDescriptor';
+import CollateralDescriptor from '../components/CollateralDescriptor';
 
 interface DepositProps {
   /* deposit amount prop is for quick linking into component */
@@ -150,6 +153,45 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
       onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.slice(0, -1))}
       target='document'
     >
+      <CollateralDescriptor>
+        <InfoGrid
+          entries={[
+            {
+              label: 'Current Collateral',
+              visible: !!account,
+              active: true,
+              loading: depositPending || txActive?.type ==='WITHDRAW',     
+              value: ethPosted_ ? `${ethPosted_} Eth` : '0 Eth',
+              valuePrefix: null,
+              valueExtra: null,
+            },
+            {
+              label: 'Collateralization Ratio',
+              visible: !!account && collateralPercent_ > 0,
+              active: collateralPercent_ > 0,
+              loading: !ethPosted_ && depositPending && ethPosted_ !== 0,            
+              value: (collateralPercent_ && (collateralPercent_ !== 0))? `${collateralPercent_}%`: '',
+              valuePrefix: null,
+              valueExtra: null, 
+            },
+            {
+              label: 'Did you know?',
+              visible: true,
+              active: true,
+              loading: false,            
+              value: '',
+              valuePrefix: null,
+              valueExtra: ()=> ( 
+                <Box>
+                  <Text size='xxsmall'>Collateral posted can be used to borrow Dai from any Yield series.</Text>                 
+                </Box>
+              ), 
+            },
+
+          ]}
+        />
+      </CollateralDescriptor>
+      
       { withdrawOpen && <WithdrawEth close={()=>setWithdrawOpen(false)} /> }    
       { (!txActive || txActive?.type === 'WITHDRAW') &&
         <Box
@@ -180,24 +222,24 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
           </InputWrap>
 
           <InfoGrid entries={[
-            {
-              label: 'Current Collateral',
-              visible: !!account,
-              active: true,
-              loading: depositPending || txActive?.type ==='WITHDRAW',     
-              value: ethPosted_ ? `${ethPosted_} Eth` : '0 Eth',
-              valuePrefix: null,
-              valueExtra: null,
-            },
-            {
-              label: 'Collateralization Ratio',
-              visible: !!account && collateralPercent_ > 0,
-              active: collateralPercent_ > 0,
-              loading: !ethPosted_ && depositPending && ethPosted_ !== 0,            
-              value: (collateralPercent_ && (collateralPercent_ !== 0))? `${collateralPercent_}%`: '',
-              valuePrefix: null,
-              valueExtra: null, 
-            },
+            // {
+            //   label: 'Current Collateral',
+            //   visible: !!account,
+            //   active: true,
+            //   loading: depositPending || txActive?.type ==='WITHDRAW',     
+            //   value: ethPosted_ ? `${ethPosted_} Eth` : '0 Eth',
+            //   valuePrefix: null,
+            //   valueExtra: null,
+            // },
+            // {
+            //   label: 'Collateralization Ratio',
+            //   visible: !!account && collateralPercent_ > 0,
+            //   active: collateralPercent_ > 0,
+            //   loading: !ethPosted_ && depositPending && ethPosted_ !== 0,            
+            //   value: (collateralPercent_ && (collateralPercent_ !== 0))? `${collateralPercent_}%`: '',
+            //   valuePrefix: null,
+            //   valueExtra: null, 
+            // },
             {
               label: 'Ratio after Deposit',
               visible: !!account && collateralPercent_ > 0,
@@ -259,7 +301,8 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
                 <Box direction='row' gap='small' align='center'>
                   <ArrowLeft color='text-weak' />
                   <Box><Text size='xsmall' color='text-weak'>back to borrow</Text></Box>   
-                </Box>}
+                </Box>
+}
             />
             <FlatButton 
               onClick={()=>setWithdrawOpen(true)}
@@ -267,7 +310,8 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
                 <Box direction='row' gap='small' align='center'>
                   <Box><Text size='xsmall' color='text-weak'><Text weight='bold'>withdraw</Text> collateral</Text></Box>
                   <ArrowRight color='text-weak' />
-                </Box> }
+                </Box>
+}
             />
           </Box>}
        

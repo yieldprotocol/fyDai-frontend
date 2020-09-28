@@ -26,16 +26,18 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
   const screenSize = useContext(ResponsiveContext);
   const { state:{ activeSeries } } = useContext(SeriesContext);
 
-  const [normalText, setNormalText] = useState<string>();
-  const [weakText, setWeakText] = useState<string>();
+  const [normalText, setNormalText] = useState<string>(!alt? 'brand': `${modColor(activeSeries.seriesColor, -150)}`);
+  const [xWeakText, setXWeakText] = useState<string>(!alt? 'text-xweak':`${modColor(activeSeries.seriesColor, 10)}`);
+  const [weakText, setWeakText] = useState<string>(!alt? 'text-weak':`${modColor(activeSeries.seriesColor, 10)}`);
 
-  useEffect(()=>{
-    activeSeries && setNormalText( alt? `${modColor(activeSeries.seriesColor, -150)}`: 'brand');
-    activeSeries && setWeakText( alt? `${modColor(activeSeries.seriesColor, 10)}`: 'text-weak');
-  }, [activeSeries]);
+  // useEffect(()=>{
+  //   activeSeries && setNormalText( !alt? 'brand': `${modColor(activeSeries.seriesColor, -150)}`);
+  //   activeSeries && setXWeakText( !alt? 'text-xweak':`${modColor(activeSeries.seriesColor, 10)}`);
+  //   activeSeries && setWeakText( !alt? 'text-weak':`${modColor(activeSeries.seriesColor, 10)}`);
+  // }, [activeSeries]);
   
   return (
-    <Grid columns={screenSize !== 'small' ? '30%' : '45%'} gap="small" fill justify='start' >
+    <Grid columns={screenSize !== 'small' ? '30%' : '45%'} gap="small" fill justify='start'>
       {entries.map((x:any, i:number) => {
         const _key = i;
         const ValueExtra = x.valueExtra; 
@@ -62,10 +64,10 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
                     <Box direction='row-responsive' gap='xsmall' align='center'>
                       { x.valuePrefix && 
                         screenSize !== 'small' && 
-                        <Text color={x.active ? normalText:weakText} size='medium' weight='bold'>
+                        <Text color={x.active ? normalText:xWeakText} size='medium' weight='bold'>
                           {x.valuePrefix}                     
                         </Text>}
-                      <Text color={x.active? normalText:weakText} weight='bold' size='medium'> 
+                      <Text color={x.active? normalText:xWeakText} weight='bold' size='medium'> 
                         {x.value}
                       </Text>
                     </Box>
