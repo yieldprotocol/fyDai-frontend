@@ -31,7 +31,6 @@ import RaisedBox from './RaisedBox';
 import EthLogo from './logos/EthLogo';
 import EthMark from './logos/EthMark';
 import DaiMark from './logos/DaiMark';
-import { unstable_renderSubtreeIntoContainer } from 'react-dom';
 import Loading from './Loading';
 
 
