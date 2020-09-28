@@ -30,11 +30,11 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
   const [xWeakText, setXWeakText] = useState<string>(!alt? 'text-xweak':`${modColor(activeSeries.seriesColor, 10)}`);
   const [weakText, setWeakText] = useState<string>(!alt? 'text-weak':`${modColor(activeSeries.seriesColor, 10)}`);
 
-  // useEffect(()=>{
-  //   activeSeries && setNormalText( !alt? 'brand': `${modColor(activeSeries.seriesColor, -150)}`);
-  //   activeSeries && setXWeakText( !alt? 'text-xweak':`${modColor(activeSeries.seriesColor, 10)}`);
-  //   activeSeries && setWeakText( !alt? 'text-weak':`${modColor(activeSeries.seriesColor, 10)}`);
-  // }, [activeSeries]);
+  useEffect(()=>{
+    activeSeries && setNormalText( !alt? 'brand': `${modColor(activeSeries.seriesColor, -150)}`);
+    activeSeries && setXWeakText( !alt? 'text-xweak':`${modColor(activeSeries.seriesColor, 10)}`);
+    activeSeries && setWeakText( !alt? 'text-weak':`${modColor(activeSeries.seriesColor, 10)}`);
+  }, [activeSeries]);
   
   return (
     <Grid columns={screenSize !== 'small' ? '30%' : '45%'} gap="small" fill justify='start'>

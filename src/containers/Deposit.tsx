@@ -222,24 +222,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
           </InputWrap>
 
           <InfoGrid entries={[
-            // {
-            //   label: 'Current Collateral',
-            //   visible: !!account,
-            //   active: true,
-            //   loading: depositPending || txActive?.type ==='WITHDRAW',     
-            //   value: ethPosted_ ? `${ethPosted_} Eth` : '0 Eth',
-            //   valuePrefix: null,
-            //   valueExtra: null,
-            // },
-            // {
-            //   label: 'Collateralization Ratio',
-            //   visible: !!account && collateralPercent_ > 0,
-            //   active: collateralPercent_ > 0,
-            //   loading: !ethPosted_ && depositPending && ethPosted_ !== 0,            
-            //   value: (collateralPercent_ && (collateralPercent_ !== 0))? `${collateralPercent_}%`: '',
-            //   valuePrefix: null,
-            //   valueExtra: null, 
-            // },
+
             {
               label: 'Ratio after Deposit',
               visible: !!account && collateralPercent_ > 0,
