@@ -52,15 +52,15 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
     ethBalance,
     ethPosted,
     ethPosted_,
+    maxDaiAvailable_,
     collateralPercent_,
-    collRatio_,
     debtValue,
   } = userState.position;
 
   const screenSize = useContext(ResponsiveContext);
 
   const { postEth, postEthActive }  = useProxy();
-  const { estCollRatio: estimateRatio } = useMath();
+  const { estCollRatio: estimateRatio, collValue } = useMath();
   const [ txActive ] = useTxActive(['DEPOSIT', 'WITHDRAW']);
   const { account } = useSignerAccount();
 
@@ -70,6 +70,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
   const [inputRef, setInputRef] = useState<any>(null);
 
   const [ estRatio, setEstRatio ] = useState<any>(0);
+  const [ estPower, setEstPower ] = useState<any>(0);
 
   const [ withdrawOpen, setWithdrawOpen ] = useState<boolean>(false);
   const [ depositPending, setDepositPending ] = useState<boolean>(false);
@@ -95,8 +96,20 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
     /* 1. Adjust estimated ratio based on input changes */
     if (debouncedInput && ethPosted && debtValue) {
       const newRatio = estimateRatio((ethPosted.add(ethers.utils.parseEther(debouncedInput) )), debtValue); 
-      newRatio && setEstRatio(parseFloat(newRatio.toString()).toFixed(0));
+      newRatio && setEstRatio(cleanValue(newRatio, 0));
     }
+    /* 2. Roughly estimate the new borrowing power */
+    if (debouncedInput) {
+      const val = collValue(ethers.utils.parseEther(debouncedInput));
+      const newPower = parseFloat(ethers.utils.formatEther(val))/1.5;
+      if (maxDaiAvailable_) {
+        const pl = parseFloat(maxDaiAvailable_)+newPower;
+        setEstPower( pl.toFixed(2));
+      } else {
+        setEstPower(newPower.toFixed(2));
+      }
+    }
+
   }, [debouncedInput]);
 
   /* Handle deposit disabling deposits */
@@ -114,8 +127,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
 
   /* Handle input exceptions and warnings */
   useEffect(()=>{ 
-    
-    
+     
     if ( ethBalance && debouncedInput && ( ethers.utils.parseEther(debouncedInput).gt(ethBalance) ) ) {
       setWarningMsg(null);
       setErrorMsg('That amount exceeds your available ETH balance'); 
@@ -198,6 +210,15 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
                   {/* { inputValue && collateralPercent_ && ( (estRatio-collateralPercent_) !== 0) && `(+ ${(estRatio-collateralPercent_).toFixed(0)}%)` } */}
                 </Text>
               )
+            },
+            {
+              label: 'Borrowing Power after deposit',
+              visible: !!account,
+              active: debouncedInput,
+              loading: !ethPosted_ && depositPending && ethPosted_ !== 0,
+              value: estPower? `${estPower} DAI`: '0 DAI',           
+              valuePrefix: '~',
+              valueExtra: null,
             },
             {
               label: 'First connect a wallet!',
