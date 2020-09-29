@@ -91,7 +91,6 @@ const UserProvider = ({ children }: any) => {
 
   const {
     collValue,
-    collPrice,
     collRatio,
     collPercent,
     yieldAPR,

@@ -61,6 +61,9 @@ export const useMath = () => {
    * @returns {BigNumber} in Ray
    */
   const collRatio = ( _collateralValue:BigNumber, _debtValue:BigNumber ) => {
+
+    console.log(_collateralValue.toString())
+    console.log(_debtValue.toString())
     if (_debtValue.eq(0) ) {
       // handle this case better
       return BigNumber.from(0);

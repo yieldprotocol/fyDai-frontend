@@ -4,7 +4,7 @@ import { Box, Button, Text } from 'grommet';
 import Authorization from './Authorization';
 
 import { SeriesContext } from '../contexts/SeriesContext';
-
+import { UserContext } from '../contexts/UserContext';
 
 const StyledBox = styled(Box)`
   background: #f8f8f8;
@@ -29,7 +29,7 @@ const StyledBox = styled(Box)`
   :active:hover {
     box-shadow:  0px 0px 0px #dfdfdf, 
         -0px -0px 0px #ffffff;
-    }
+    } 
   :hover {
     transform: scale(1.01);
     box-shadow:  8px 8px 11px #dfdfdf,  
@@ -41,26 +41,50 @@ const StyledBox = styled(Box)`
 function ActionButton({ ...props }:any ) {
 
   const { state: seriesState } = useContext(SeriesContext);
-  const { activeSeries } = seriesState; 
+  const { activeSeries } = seriesState;
+  
+  const { state: userState, actions: userActions } = useContext(UserContext);
+  const { authorizations: { hasDelegatedProxy } } = userState;
 
   return (
     <>
-      { props.hasDelegatedPool ? 
-        <StyledBox 
-          {...props} 
-          fill='horizontal'
-          align='center'
-          pad='small'
+      { hasDelegatedProxy && props.hasDelegatedPool &&
+      <StyledBox 
+        {...props} 
+        fill='horizontal'
+        align='center'
+        pad='small'
+      >
+        <Text 
+          weight='bold'
+          size='large'
+          color={props.disabled ? 'background' : 'brand'}
         >
-          <Text 
-            weight='bold'
-            size='large'
-            color={props.disabled ? 'background' : 'brand'}
+          {props.label}
+        </Text>
+      </StyledBox>}
+
+      { !hasDelegatedProxy &&   
+        <Authorization 
+          authWrap
+        >
+          <StyledBox 
+            {...props} 
+            fill='horizontal'
+            align='center'
+            pad='small'
+            onClick={()=>{ }}
           >
-            {props.label}
-          </Text>
-        </StyledBox>   
-        :
+            <Text 
+              size='medium'
+              color={props.disabled ? 'background' : 'brand'}
+            >
+              Please authorise Yield before making any transactions
+            </Text>
+          </StyledBox>
+        </Authorization>}
+
+      { hasDelegatedProxy && !props.hasDelegatedPool &&
         <Authorization 
           authWrap
           series={activeSeries}
@@ -73,8 +97,7 @@ function ActionButton({ ...props }:any ) {
             onClick={()=>{ }}
           >
             <Text 
-              weight='bold'
-              size='large'
+              size='medium'
               color={props.disabled ? 'background' : 'brand'}
             >
               Please unlock this series first

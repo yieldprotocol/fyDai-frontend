@@ -55,7 +55,7 @@ export const useEDai = () => {
    * @param {string} eDaiAddress address of the eDai series to check.
    * @returns {boolean}
    */
-  const isMature = async (
+  const hasBeenMatured = async (
     eDaiAddress:string,
   ) => {
     const eDaiAddr = ethers.utils.getAddress(eDaiAddress);
@@ -72,6 +72,6 @@ export const useEDai = () => {
   };
 
   return {
-    isMature, redeem, redeemActive
+    hasBeenMatured, redeem, redeemActive
   } as const;
 };

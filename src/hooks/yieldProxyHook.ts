@@ -53,7 +53,7 @@ export const useProxy = () => {
   const { previewPoolTx } = usePool();
   const { splitDaiLiquidity } = useMath();
   const { getBalance } = useToken();
-  const { isMature } = useEDai();
+  const { hasBeenMatured } = useEDai();
   const { handleTx, handleTxError } = useTxHelpers();
   
   /* Activity flags */
@@ -248,7 +248,7 @@ export const useProxy = () => {
     let minEDai:BigNumber;
     try {
       console.log( await series.isMature() );
-      if ( await isMature(series.eDaiAddress) ) {  
+      if ( await hasBeenMatured(series.eDaiAddress) ) {  
         try {
           console.log('repay with sig- after maturity');
           /* Repay using a signature authorizing treasury */
@@ -398,7 +398,7 @@ export const useProxy = () => {
     let minEDai:BigNumber;
     setRemoveLiquidityActive(true);
     try {
-      if ( !(await isMature(series.eDaiAddress)) ) {
+      if ( !(await hasBeenMatured(series.eDaiAddress)) ) {
         console.log('removing liquidity BEFORE maturity'); 
         /* calculate expected trade values and factor in slippage */
         // const preview = await previewPoolTx('selldai', series, daiUsed);

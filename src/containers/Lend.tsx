@@ -95,8 +95,17 @@ const Lend = ({ lendAmount }:ILendProps) => {
   useEffect(() => {
     activeSeries && !(activeSeries?.isMature()) && !!debouncedInput && ( async () => {
       const preview = await previewPoolTx('sellDai', activeSeries, debouncedInput);
-      !(preview instanceof Error) && setEDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
-      !(preview instanceof Error) && setAPR( yieldAPR( ethers.utils.parseEther(debouncedInput), preview, activeSeries?.maturity ) );
+      if (!(preview instanceof Error)) {
+        setEDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
+        setAPR( yieldAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) );      
+      } else {
+        /* if the market doesnt have liquidity just estimate from rate */
+        const rate = await previewPoolTx('sellDai', activeSeries, 1);
+        !(rate instanceof Error) && setEDaiValue(debouncedInput*parseFloat((ethers.utils.formatEther(rate))));
+        (rate instanceof Error) && setEDaiValue(0);
+        setLendDisabled(true);
+        setErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
+      }
     })();
   }, [activeSeries, debouncedInput]);
 

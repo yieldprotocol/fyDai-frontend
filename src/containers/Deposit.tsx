@@ -225,7 +225,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
 
             {
               label: 'Ratio after Deposit',
-              visible: !!account && collateralPercent_ > 0,
+              visible: !!account,
               active: inputValue,
               loading: !ethPosted_ && depositPending && ethPosted_ !== 0,           
               value: (estRatio && estRatio !== 0)? `${estRatio}%`: `${collateralPercent_}%` || '',

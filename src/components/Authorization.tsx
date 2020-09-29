@@ -69,7 +69,7 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
 
   return (
     <>
-      { account && series && authWrap && 
+      { account && authWrap && 
         <Box fill='horizontal' onClick={()=>{authProcedure();}}> 
           {children} 
         </Box>}
