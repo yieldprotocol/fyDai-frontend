@@ -77,7 +77,7 @@ export const dehumanizeNumber = (value:number) => {
   return BigNumber.from(value*10**10).mul(exponent);
 };
 
-export const cleanValue = (input:string, decimals:number=18) => {
+export const cleanValue = (input:string, decimals:number=12) => {
 
   const re = new RegExp(`(\\d+\\.\\d{${decimals}})(\\d)`);
   const inpu = input.match(re); // inpu = truncated 'input'... get it?

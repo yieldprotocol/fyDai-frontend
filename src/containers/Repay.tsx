@@ -149,7 +149,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
                       placeholder={screenSize !== 'small' ? 'Enter the amount of Dai to Repay': 'DAI'}
                       value={inputValue || ''}
                       plain
-                      onChange={(event:any) => setInputValue(( cleanValue(event.target.value) ))}
+                      onChange={(event:any) => setInputValue(( cleanValue(event.target.value, 6) ))}
                       icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <DaiMark />}
                     />
                     <RaisedButton 

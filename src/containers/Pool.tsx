@@ -206,7 +206,7 @@ const Pool = (props:IPoolProps) => {
                     placeholder={screenSize !== 'small' ? 'Enter the amount of Dai Liquidity to add': 'DAI'}
                     value={inputValue || ''}
                     plain
-                    onChange={(event:any) => setInputValue( cleanValue(event.target.value) )}
+                    onChange={(event:any) => setInputValue( cleanValue(event.target.value, 6) )}
                     icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <DaiMark />}
                   />
                   
