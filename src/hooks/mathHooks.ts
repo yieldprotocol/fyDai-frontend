@@ -210,10 +210,13 @@ export const useMath = () => {
     ) {
       const secsToMaturity = _maturity - _fromDate;
       const propOfYear = secsToMaturity/utils.SECONDS_PER_YEAR;
-      const priceRatio = parseFloat(ethers.utils.formatEther(_amount)) / parseFloat(ethers.utils.formatEther(_rate));
+      const priceRatio = parseFloat(_amount.toString()) / parseFloat(_rate.toString());
       const powRatio = 1 / propOfYear;
       const apr = Math.pow(priceRatio, powRatio) - 1;
-      return apr*100;
+      if(apr>0 && apr<100) {
+        return apr*100;
+      }
+      return 0;
     }
     return 0;
   };
