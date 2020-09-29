@@ -24,6 +24,7 @@ import {
 import { NotifyContext } from '../contexts/NotifyContext';
 import { YieldContext } from '../contexts/YieldContext';
 import { UserContext } from '../contexts/UserContext';
+import { SeriesContext } from '../contexts/SeriesContext';
 
 import FlatButton from './FlatButton';
 import Authorization from './Authorization';
@@ -49,25 +50,20 @@ const AccountButton = (props: any) => {
   const screenSize = useContext(ResponsiveContext);
 
   const { state: { position } } = useContext(UserContext);
+  const { state: { activeSeries } } = useContext(SeriesContext);
 
   // Menu state for mobile later
   const [txCompleteOpen, setTxCompleteOpen] = useState(false);
 
-  // useEffect(()=>{
-  //   (async () => {
-  //     setAccLabel(`${account?.substring(0, 4)}...${account?.substring(account.length - 4)}`);
-  //     // setConnectorImage(()=>useConnectorImage);
-  //   })(); 
-  // }, [account]);
-
   useEffect(()=>{
-    lastCompletedTx && pendingTxs.length===0 && setTxCompleteOpen(true);
-    lastCompletedTx && pendingTxs.length===0 && (async () => {
+    lastCompletedTx?.transactionHash && pendingTxs.length===0 && setTxCompleteOpen(true);
+    lastCompletedTx?.transactionHash && pendingTxs.length===0 && (async () => {
       setTimeout(() => {
         setTxCompleteOpen(false);
-      }, 6000);
+      }, 10000);
     })();
-  }, [lastCompletedTx, pendingTxs ]);
+
+  }, [pendingTxs, lastCompletedTx ]);
   
   return (
     <Box> 
@@ -75,32 +71,45 @@ const AccountButton = (props: any) => {
         round
         direction='row'
         align='center'
-        pad={{ top:'2px', bottom:'2px', horizontal:'2px' }}
         background={account?'#f0f0f0':undefined}
       > 
-        { (account && pendingTxs.length===0 && !txCompleteOpen)? 
+        { pendingTxs.length===0 && !txCompleteOpen &&
           <Box pad={{ left:'small', right:'large' }} direction='row' gap='small' align='center'>
             <Text size='xsmall'><DaiMark /></Text>
             <Loading condition={!position.daiBalance} size='xsmall'>
               <Text size='xsmall' textAlign='center'>{position?.daiBalance_} </Text>
             </Loading>
-          </Box>    
-          :        
-          <Box 
-            direction='row'
-            margin={{ right:'-20px' }}
-            pad={{ vertical: 'xsmall', left:'small', right:'25px' }}
-            round
-            // eslint-disable-next-line no-nested-ternary
-            background={pendingTxs.length>0 ? 'orange': txCompleteOpen ? '#519872': undefined}
-          >
-            {pendingTxs.length>0 && <Text size='small'> Transaction pending ... </Text>}
+          </Box>}
+        
+        {pendingTxs.length>0 &&  
+        <Box 
+          direction='row'
+          margin={{ right:'-20px' }}
+          pad={{ vertical: 'xsmall', left:'small', right:'25px' }}
+          round
+        >
+          <Text size='small'> Transaction pending ... </Text>
+        </Box>}
 
-            {lastCompletedTx && pendingTxs.length===0 && txCompleteOpen && 
-              <Text color='green' textAlign='center' size='small'> 
-                <Check />  Transaction Complete. 
-              </Text>}       
-          </Box> }
+        { txCompleteOpen && 
+          <>    
+            <Box
+              direction='row'
+              margin={{ right:'-20px' }}
+              pad={{ vertical: 'xsmall', left:'small', right:'25px' }}
+              round
+              // background='#519872'
+            >
+              {lastCompletedTx?.status === 1? 
+                <Text color='green' textAlign='center' size='small'>              
+                  <Check /> Transaction Complete
+                </Text>
+                :
+                <Text color='red' textAlign='center' size='small'>              
+                  Transaction failed
+                </Text>}
+            </Box> 
+          </>}
 
         { account ?
           <FlatButton

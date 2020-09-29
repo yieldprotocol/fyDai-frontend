@@ -44,8 +44,8 @@ function notifyReducer(state:INotification, action:IReducerAction) {
     case 'txComplete':
       return {
         ...state,
-        pendingTxs: state.pendingTxs.filter( (x:any) => x.tx.hash !== action.payload.tx.hash),
-        lastCompletedTx: action.payload.tx,
+        pendingTxs: state.pendingTxs.filter( (x:any) => x.tx.hash !== action.payload.transactionHash),
+        lastCompletedTx: action.payload,
       };
     case 'requestSigs':
       return {

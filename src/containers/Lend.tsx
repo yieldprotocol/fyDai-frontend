@@ -167,7 +167,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
               valueExtra: null,
             },
             {
-              label: 'Dai balance',
+              label: 'Dai Balance',
               visible: 
                   (!!account && !txActive && !activeSeries?.isMature()) || 
                   (activeSeries?.isMature() && activeSeries?.eDaiBalance_>0),

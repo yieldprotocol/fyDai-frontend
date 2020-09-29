@@ -23,7 +23,6 @@ import {
   useIsLol,
 } from '../hooks';
 
-import SeriesDescriptor from '../components/SeriesDescriptor';
 import ApprovalPending from '../components/ApprovalPending';
 import TxPending from '../components/TxPending';
 import InfoGrid from '../components/InfoGrid';
@@ -242,7 +241,6 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
           </Box>
         </Box>}
       { repayActive && !txActive && <ApprovalPending /> }
-
       { txActive && <TxPending msg={`You are repaying ${inputValue} DAI`} tx={txActive} /> }
     </Keyboard>
   );

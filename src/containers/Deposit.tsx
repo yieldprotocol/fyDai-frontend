@@ -183,7 +183,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
               valuePrefix: null,
               valueExtra: ()=> ( 
                 <Box>
-                  <Text size='xxsmall'>Collateral posted can be used to borrow Dai from any Yield series.</Text>                 
+                  <Text size='xxsmall'>Collateral posted here can be used to borrow Dai from any Yield series.</Text>                 
                 </Box>
               ), 
             },

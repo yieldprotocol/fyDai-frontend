@@ -17,31 +17,29 @@ export const useTxHelpers = () => {
   const  { dispatch }  = useContext<any>(NotifyContext);
 
   /* Notification Helpers */
-  const txComplete = (tx:any) => {
-    dispatch({ type: 'txComplete', payload:{ tx } } );
+  const txComplete = (receipt:any) => {
+    console.log(receipt);
+    dispatch({ type: 'txComplete', payload: receipt } );
   };
   
-  const handleTxError = (msg:string, tx: any, e:any) => {
-    // eslint-disable-next-line no-console
-    console.log(e.message);
-    dispatch({ type: 'notify', payload:{ message: msg, type:'error' } } );
-    txComplete(tx);
+  const handleTxError = (msg:string, receipt: any, e:any) => {
+    /* silence user rejection errors */
+    if (e.code === 4001 ) {
+      txComplete(receipt);
+    } else {
+      // eslint-disable-next-line no-console
+      console.log(e.message);
+      dispatch({ type: 'notify', payload:{ message: msg, type:'error' } } );
+      txComplete(receipt);
+    }
   };
   
   const handleTx = async (tx:any) => {
     await tx.wait()
       .then((receipt:any) => {
-        dispatch({ type: 'txComplete', payload:{ tx } } );
-        txComplete(tx);
-        console.log(receipt);  
+        txComplete(receipt);
       }, ( error:any ) => {
-        // tease out the reason for the error here. 
-        handleTxError('error', tx, error);
-        // This is entered if the status of the receipt is failure
-        // return error.checkCall() .then((err:any) => {
-        //   console.log('Error', err);
-        //   handleTxError('error', tx, err);
-        // });
+        handleTxError('Error: Transaction failed. Please see console', tx, error);
       });
   };
   return { handleTx, txComplete, handleTxError };
@@ -59,7 +57,6 @@ export const useCachedState = (key:string, initialValue:any) => {
         return item ? JSON.parse(item) : initialValue;
       } catch (error) {
         // If error also return initialValue and handle error - needs work
-        console.log(error);
         return initialValue;
       }
     }

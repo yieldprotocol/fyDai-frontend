@@ -67,9 +67,10 @@ export const useProxy = () => {
   const [ sellActive, setSellActive ] = useState<boolean>(false);
 
   const { abi: yieldProxyAbi } = YieldProxy;
+
   /* Temporary signing messages */
   const auths = new Map([
-    [1, { id: 1, desc:'Dai > treasury authenticate ' }],
+    [1, { id: 1, desc:'Authorize Yield to move Dai to repay debt.' }],
     [2, { id: 2, desc:'eDai > pool authenticate ' }],
   ]);
 
@@ -233,7 +234,6 @@ export const useProxy = () => {
     const toAddr = account && ethers.utils.getAddress(account);
     const fromAddr = account && ethers.utils.getAddress(account);
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
-    const eDaiAddr = ethers.utils.getAddress(series.eDaiAddress);
     const parsedMaturity = series.maturity.toString();
     // const minEDai = ethers.utils.parseEther(minimumEDaiRepayment.toString());
 
