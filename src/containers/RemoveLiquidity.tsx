@@ -123,7 +123,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
     >
       {!txActive && !removeLiquidityPending && 
       <Box 
-        width={screenSize!=='small'?{ min:'600px', max:'600px' }: undefined}
+        width={screenSize!=='small'?{ min:'640px', max:'640px' }: undefined}
         alignSelf='center'
         fill
         background='background-front'

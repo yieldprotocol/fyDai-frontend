@@ -87,6 +87,7 @@ const AccountButton = (props: any) => {
           margin={{ right:'-20px' }}
           pad={{ vertical: 'xsmall', left:'small', right:'25px' }}
           round
+          animation='slideLeft'
         >
           <Text size='small'> Transaction pending ... </Text>
         </Box>}
@@ -98,6 +99,7 @@ const AccountButton = (props: any) => {
               margin={{ right:'-20px' }}
               pad={{ vertical: 'xsmall', left:'small', right:'25px' }}
               round
+              animation='slideLeft'
               // background='#519872'
             >
               {lastCompletedTx?.status === 1? 

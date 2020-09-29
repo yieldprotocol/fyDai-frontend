@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useContext } from 'react';
+import React, { useRef, useEffect, useState, useContext, Suspense } from 'react';
 
 import { Grommet, base, Grid, Main, Box, ResponsiveContext, Text, Nav, Layer, Collapsible } from 'grommet';
 import { deepMerge } from 'grommet/utils';
@@ -35,18 +35,20 @@ const ThemedApp = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [partyMode, setPartyMode] = useState(false);
   return (
-    <Grommet
-      theme={deepMerge(base, yieldTheme)}
-      themeMode={darkMode ? 'dark' : 'light'}
-      full
-    >
-      <App 
-        darkMode={darkMode}
-        setDarkMode={setDarkMode}
-        partyMode={partyMode}
-        setPartyMode={setPartyMode}
-      />     
-    </Grommet>
+    <Suspense fallback={null}>
+      <Grommet
+        theme={deepMerge(base, yieldTheme)}
+        themeMode={darkMode ? 'dark' : 'light'}
+        full
+      >
+        <App 
+          darkMode={darkMode}
+          setDarkMode={setDarkMode}
+          partyMode={partyMode}
+          setPartyMode={setPartyMode}
+        />     
+      </Grommet>
+    </Suspense>
   );
 };
 
@@ -89,8 +91,8 @@ const App = (props:any) => {
   }, [yieldLoading, seriesLoading, hasDelegatedProxy]);
 
   return (
+
     <div className="App">
-      
       <ConnectLayer view={showConnectLayer} closeLayer={() => setShowConnectLayer(null)} />
       { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
       { showSeriesLayer  && <SeriesSelector activeView='borrow' close={()=>setShowSeriesLayer(false)} /> }
@@ -120,7 +122,6 @@ const App = (props:any) => {
         pad={{ bottom:'large' }} 
         direction="row" 
         flex
-        
       >
         <Grid fill columns={columnsWidth}>
           <Box />
@@ -141,13 +142,13 @@ const App = (props:any) => {
       <Grid fill columns={columnsWidth}>
         <Box />
         {screenSize !== 'small' &&
-        <YieldFooter
-          showTestLayer={showTestLayer}
-          setShowTestLayer={setShowTestLayer}
-          darkMode={props.darkMode}
-          setDarkMode={props.setDarkMode}
-          openConnectLayer={() => setShowConnectLayer('CONNECT')}
-        />}                  
+          <YieldFooter
+            showTestLayer={showTestLayer}
+            setShowTestLayer={setShowTestLayer}
+            darkMode={props.darkMode}
+            setDarkMode={props.setDarkMode}
+            openConnectLayer={() => setShowConnectLayer('CONNECT')}
+          />}                  
         <Box />      
       </Grid>
 

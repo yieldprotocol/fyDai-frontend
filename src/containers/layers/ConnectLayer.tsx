@@ -64,7 +64,7 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
           target={target || undefined}
         >
           <Box
-            width={screenSize!=='small'?{ min:'600px', max:'750px' }: undefined}
+            width={screenSize!=='small'?{ min:'640px', max:'640px' }: undefined}
             background="background-front"
             direction="column"
             fill="vertical"
