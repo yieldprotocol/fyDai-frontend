@@ -106,7 +106,7 @@ const AccountButton = (props: any) => {
                 <Text color='green' textAlign='center' size='small'>              
                   <Check /> Transaction Complete
                 </Text>}
-              {lastCompletedTx?.status !== 0 &&
+              {lastCompletedTx?.status !== 1 &&
                 <Text color='red' textAlign='center' size='small'>              
                   Transaction failed
                 </Text>}
