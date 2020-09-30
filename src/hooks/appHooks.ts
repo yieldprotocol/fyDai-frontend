@@ -18,7 +18,6 @@ export const useTxHelpers = () => {
 
   /* Notification Helpers */
   const txComplete = (receipt:any) => {
-    console.log(receipt);
     dispatch({ type: 'txComplete', payload: receipt } );
   };
   

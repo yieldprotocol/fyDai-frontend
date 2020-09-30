@@ -46,7 +46,7 @@ const TxPending = ({ msg, tx }:TransactionPendingProps) => {
           round='small'
           border='all'
           hoverIndicator='brand-transparent'
-          onClick={()=>{ window.open( `https://rinkeby.etherscan.io/tx/${tx.tx.hash}`, '_blank');}} 
+          onClick={()=>{ window.open( `https://kovan.etherscan.io/tx/${tx.tx.hash}`, '_blank');}} 
           align='center'
           pad={{ horizontal:'large' }}
         >

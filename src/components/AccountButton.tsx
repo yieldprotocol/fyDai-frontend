@@ -102,11 +102,11 @@ const AccountButton = (props: any) => {
               animation='slideLeft'
               // background='#519872'
             >
-              {lastCompletedTx?.status === 1? 
+              {lastCompletedTx?.status === 1 &&
                 <Text color='green' textAlign='center' size='small'>              
                   <Check /> Transaction Complete
-                </Text>
-                :
+                </Text>}
+              {lastCompletedTx?.status !== 0 &&
                 <Text color='red' textAlign='center' size='small'>              
                   Transaction failed
                 </Text>}

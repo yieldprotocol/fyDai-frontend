@@ -467,11 +467,9 @@ export const useProxy = () => {
         minEDaiOut = ethers.utils.parseEther('0');
         // throw(preview);
       }
-
       tx = await proxyContract.sellDai(poolAddr, toAddr, parsedDaiIn, minEDaiOut, overrides);
-
     } catch (e) {
-      handleTxError('Error selling', tx, e );   
+      handleTxError('Error selling', tx, e );
       setSellActive(false);
       return;
     }
