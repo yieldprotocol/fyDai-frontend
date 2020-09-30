@@ -1,6 +1,7 @@
 import { InjectedConnector } from '@web3-react/injected-connector';
 import { NetworkConnector } from '@web3-react/network-connector';
 import { WalletLinkConnector } from '@web3-react/walletlink-connector';
+import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
 import { LedgerConnector } from '@web3-react/ledger-connector';
 import { TrezorConnector } from '@web3-react/trezor-connector';
 import { FortmaticConnector } from '@web3-react/fortmatic-connector';
@@ -35,22 +36,20 @@ export const trezor = new TrezorConnector({
 });
 
 export const torus = new TorusConnector({ chainId: 1 });
-
 export const fortmatic = new FortmaticConnector({ apiKey: process.env.FORTMATIC_API_KEY as string, chainId: 4 });
 
 // export const portis = new PortisConnector({ dAppId: process.env.PORTIS_DAPP_ID as string, networks: [1, 100] });
-
 // export const squarelink = new SquarelinkConnector({
 //   clientId: process.env.SQUARELINK_CLIENT_ID as string,
 //   networks: [1, 100]
 // });
 
-// export const walletconnect = new WalletConnectConnector({
-//   rpc: { 1: RPC_URLS[1] },
-//   bridge: 'https://bridge.walletconnect.org',
-//   qrcode: true,
-//   pollingInterval: POLLING_INTERVAL
-// });
+export const walletconnect = new WalletConnectConnector({
+  rpc: { 1: RPC_URLS[1]  },
+  bridge: 'https://bridge.walletconnect.org',
+  qrcode: true,
+  pollingInterval: POLLING_INTERVAL
+});
 
 // export const authereum = new AuthereumConnector({ chainId: 42 });
 

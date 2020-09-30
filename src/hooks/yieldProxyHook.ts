@@ -54,7 +54,7 @@ export const useProxy = () => {
   const { splitDaiLiquidity } = useMath();
   const { getBalance } = useToken();
   const { hasBeenMatured } = useEDai();
-  const { handleTx, handleTxError } = useTxHelpers();
+  const { handleTx, handleTxBuildError } = useTxHelpers();
   
   /* Activity flags */
   const [ postEthActive, setPostEthActive ] = useState<boolean>(false);
@@ -114,7 +114,7 @@ export const useProxy = () => {
     try {
       tx = await proxyContract.post(toAddr, { value: parsedAmount }); 
     } catch (e) {
-      handleTxError('Error depositing ETH', tx, e ); 
+      handleTxBuildError(e);
       setPostEthActive(false);
       return;
     }
@@ -141,7 +141,7 @@ export const useProxy = () => {
     try {
       tx = await proxyContract.withdraw(toAddr, parsedAmount);
     } catch (e) {
-      handleTxError('Error Withdrawing ETH', tx, e);
+      handleTxBuildError(e);
       setWithdrawEthActive(false);
       return;
     }
@@ -176,12 +176,13 @@ export const useProxy = () => {
     // const maxEDai = ethers.utils.parseEther(maximumEDai.toString());
 
     const overrides = { 
-      gasLimit: BigNumber.from('1000000')
+      gasLimit: BigNumber.from('21000')
     };
 
     setBorrowActive(true);
     let tx:any;
     let maxEDai:BigNumber;
+
     try {
       /* Calculate expected trade values and factor in slippage */
       const preview = await previewPoolTx('buydai', series, daiToBorrow); 
@@ -191,7 +192,6 @@ export const useProxy = () => {
         // minEDai = ethers.utils.parseEther('1000000');
         throw(preview);
       }
-
       tx = await proxyContract.borrowDaiForMaximumEDai( 
         poolAddr, 
         collatType,
@@ -203,10 +203,11 @@ export const useProxy = () => {
       );
 
     } catch (e) {
-      handleTxError('Error Borrowing Dai', tx, e);
+      handleTxBuildError(e); 
       setBorrowActive(false);
       return;
     }
+
     dispatch({ type: 'txPending', payload:{ tx, message: `Borrowing ${daiToBorrow} Dai pending...`, type:'BORROW' } } );
     await handleTx(tx);
     setBorrowActive(false);
@@ -265,7 +266,7 @@ export const useProxy = () => {
           dispatch({ type: 'signed', payload: auths.get(1) });
           dispatch({ type: 'requestSigs', payload: [] });
         } catch (e) { 
-          handleTxError('Signing error', tx, e);
+          handleTxBuildError(e);
           dispatch({ type: 'requestSigs', payload: [] });
           setRepayActive(false);
           return;
@@ -304,8 +305,7 @@ export const useProxy = () => {
       }      
       
     } catch (e) {
-      console.log(e);
-      handleTxError('Error Repaying Dai', tx, e);
+      handleTxBuildError(e);
       setRepayActive(false);
       return;
     }
@@ -361,7 +361,7 @@ export const useProxy = () => {
 
       tx = await proxyContract.addLiquidity(poolAddr, parsedDaiUsed, maxEDai, overrides);
     } catch (e) {
-      handleTxError('Error Adding liquidity', tx, e);
+      handleTxBuildError(e);
       setAddLiquidityActive(false);
       return;
     }
@@ -420,7 +420,7 @@ export const useProxy = () => {
         tx = await proxyContract.removeLiquidityMature(poolAddr, parsedTokens, overrides );
       }
     } catch (e) {
-      handleTxError('Error Removing liquidity', tx, e);
+      handleTxBuildError(e);
       setRemoveLiquidityActive(false);
       return;
     }
@@ -469,7 +469,7 @@ export const useProxy = () => {
       }
       tx = await proxyContract.sellDai(poolAddr, toAddr, parsedDaiIn, minEDaiOut, overrides);
     } catch (e) {
-      handleTxError('Error selling', tx, e );
+      handleTxBuildError(e);
       setSellActive(false);
       return;
     }
@@ -515,8 +515,7 @@ export const useProxy = () => {
       // const maxEDaiIn = ethers.utils.parseEther('1000000');
       tx = await proxyContract.buyDai(poolAddr, toAddr, parsedDaiOut, maxEDaiIn);
     } catch (e) {
-      console.log(e);
-      handleTxError('Error buying Dai', tx, e );   
+      handleTxBuildError(e);  
       setBuyActive(false);
       return;
     }
@@ -575,7 +574,7 @@ export const useProxy = () => {
         dispatch({ type: 'signed', payload: auths.get(2) });
         dispatch({ type: 'requestSigs', payload: [] });
       } catch (e) { 
-        handleTxError('Signing error', tx, e);
+        handleTxBuildError(e);
         dispatch({ type: 'requestSigs', payload: [] });
         setRepayActive(false);
         return;
@@ -590,8 +589,7 @@ export const useProxy = () => {
         overrides
       );
     } catch (e) {
-      console.log(e);
-      handleTxError('Error buying back Dai', tx, e );   
+      handleTxBuildError(e);  
       setBuyActive(false);
       return;
     }

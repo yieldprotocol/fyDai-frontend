@@ -15,22 +15,37 @@ export const useTxActive = (typeList:string[]) => {
 export const useTxHelpers = () => { 
 
   const  { dispatch }  = useContext<any>(NotifyContext);
-
+  
   /* Notification Helpers */
-  const txComplete = (receipt:any) => {
+  const txComplete = (receipt:any) => {  
     dispatch({ type: 'txComplete', payload: receipt } );
   };
-  
-  const handleTxError = (msg:string, receipt: any, e:any) => {
+
+  const handleTxBuildError = (error:any) => {
     /* silence user rejection errors */
-    if (e.code === 4001 ) {
-      txComplete(receipt);
+    if ( error.code === 4001 ) {
+      dispatch({ 
+        type: 'notify', 
+        payload: { message: 'Transaction rejected by user.' } 
+      });    
     } else {
       // eslint-disable-next-line no-console
-      console.log(e.message);
-      dispatch({ type: 'notify', payload:{ message: msg, type:'error' } } );
-      txComplete(receipt);
+      console.log(error.message);
+      dispatch({ 
+        type: 'notify', 
+        payload: { message: 'The transaction was rejected by the wallet provider. Please see console', type:'error' } 
+      });
     }
+  };
+
+  const handleTxError = (msg:string, receipt: any, error:any) => {
+    // eslint-disable-next-line no-console
+    console.log(error.message);
+    dispatch({ 
+      type: 'notify', 
+      payload:{ message: msg, type:'error' } 
+    });
+    txComplete(receipt);
   };
   
   const handleTx = async (tx:any) => {
@@ -41,7 +56,7 @@ export const useTxHelpers = () => {
         handleTxError('Error: Transaction failed. Please see console', tx, error);
       });
   };
-  return { handleTx, txComplete, handleTxError };
+  return { handleTx, txComplete, handleTxBuildError };
 };
 
 /* Simple Hook for caching & retrieved data */

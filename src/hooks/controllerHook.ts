@@ -38,7 +38,7 @@ export const useController = () => {
   /* controller contract for reading, calls */
   const [controllerProvider, setControllerProvider] = useState<any>();
 
-  const { handleTx, handleTxError } = useTxHelpers();
+  const { handleTx, handleTxBuildError } = useTxHelpers();
 
   useEffect(()=>{
 
@@ -80,7 +80,7 @@ export const useController = () => {
     try {
       tx = await controllerContract.post(collateralBytes, fromAddr, toAddr, parsedAmount);
     } catch (e) {
-      handleTxError('Transaction was aborted or it failed.', tx, e);
+      handleTxBuildError(e);
       setPostActive(false);
       return;
     }
@@ -111,7 +111,7 @@ export const useController = () => {
     try {
       tx = await controllerContract.withdraw(collateralBytes, fromAddr, toAddr, parsedAmount);
     } catch (e) {
-      handleTxError('Error Withdrawing funds', tx, e);
+      handleTxBuildError(e);
       setWithdrawActive(false);
       return;
     }
@@ -147,7 +147,7 @@ export const useController = () => {
     try {
       tx = await controllerContract.borrow(collateralBytes, matdate, fromAddr, toAddr, parsedAmount);
     } catch (e) {
-      handleTxError('Transaction was aborted or it failed.', tx, e );
+      handleTxBuildError(e);
       setBorrowActive(false);
       return;
     }
@@ -188,7 +188,7 @@ export const useController = () => {
         tx = await controllerContract.repayDai(collateralBytes, maturity, fromAddr, toAddr, parsedAmount);
       }
     } catch (e) {
-      handleTxError('Transaction was aborted or it failed.', tx, e );
+      handleTxBuildError(e);
       setRepayActive(false);
       return;
     }

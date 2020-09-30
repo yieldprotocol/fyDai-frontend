@@ -19,7 +19,7 @@ export const usePool = () => {
   const [ buyActive, setBuyActive ] = useState<boolean>(false);
   const [ callActive, setCallActive ] = useState<boolean>(false);
 
-  const { handleTx, handleTxError } = useTxHelpers();
+  const { handleTx, handleTxBuildError } = useTxHelpers();
 
   /**
    * @dev Sell eDai for Dai ( Chai )
@@ -48,7 +48,7 @@ export const usePool = () => {
     try {
       tx = await contract.sellEDai(fromAddr, toAddr, parsedAmount, overrides);
     } catch (e) {
-      handleTxError('Error Selling eDai', tx, e);
+      handleTxBuildError(e);
       setSellActive(false);
       return;
     }
@@ -85,7 +85,7 @@ export const usePool = () => {
     try {
       tx = await contract.buyEDai(fromAddr, toAddr, parsedAmount, overrides);
     } catch (e) {
-      handleTxError('Error Buying eDai', tx, e);
+      handleTxBuildError(e);
       setSellActive(false);
       return;
     }
@@ -122,7 +122,7 @@ export const usePool = () => {
     try {
       tx = await contract.sellDai(fromAddr, toAddr, parsedAmount, overrides);
     } catch (e) {
-      handleTxError('Error Selling Dai', tx, e);
+      handleTxBuildError(e);
       setSellActive(false);
       return;
     }
@@ -162,7 +162,7 @@ export const usePool = () => {
     try {
       tx = await contract.buyDai(fromAddr, toAddr, parsedAmount, overrides );
     } catch (e) {
-      handleTxError('Error Buying Dai', tx, e);
+      handleTxBuildError(e);
       setBuyActive(false);
       return;
     }
@@ -193,7 +193,7 @@ export const usePool = () => {
     try {
       tx = await contract.addDelegate(delegatedAddr);
     } catch (e) {
-      handleTxError('Add delegate transaction was aborted or it failed.', tx, e);
+      handleTxBuildError(e);
       return;
     }
     /* Transaction reporting & tracking */

@@ -19,7 +19,7 @@ export const useEDai = () => {
   const  { dispatch }  = useContext<any>(NotifyContext);
   const [ redeemActive, setRedeemActive ] = useState<boolean>(false);
   
-  const { handleTx, handleTxError } = useTxHelpers();
+  const { handleTx, handleTxBuildError } = useTxHelpers();
 
   /**
    * @dev Redeems eDai for dai after maturity
@@ -41,7 +41,7 @@ export const useEDai = () => {
     try {
       tx = await contract.redeem(fromAddr, toAddr, parsedAmount);
     } catch (e) {
-      handleTxError('Error Redeeming funds.', tx, e);
+      handleTxBuildError(e);
       setRedeemActive(false);
       return;
     }

@@ -67,7 +67,7 @@ export const useAuth = () => {
 
   const [authActive, setAuthActive] = useState<boolean>(false);
 
-  const { handleTx, handleTxError } = useTxHelpers();
+  const { handleTx, handleTxBuildError } = useTxHelpers();
 
   const sendForSig = (_provider: any, method: string, params?: any[]) => new Promise<any>((resolve, reject) => {
     const payload = {
@@ -147,7 +147,7 @@ export const useAuth = () => {
     try {
       tx = await proxyContract.onboard(fromAddr, daiPermitSig, controllerSig, overrides);
     } catch (e) {
-      handleTxError('Error authorizing contracts', tx, e);
+      handleTxBuildError(e);
       setAuthActive(false);
       return;
     }
@@ -229,7 +229,7 @@ export const useAuth = () => {
     try {
       tx = await proxyContract.authorizePool(poolAddr, fromAddr, daiSig, eDaiSig, poolSig, overrides);
     } catch (e) {
-      handleTxError('Error authorizing contracts', tx, e);
+      handleTxBuildError(e);
       setAuthActive(false);
       return;
     }
