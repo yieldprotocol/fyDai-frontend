@@ -44,12 +44,17 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
           pad='small'
           gap='small'
         // background=${modColor( activeSeries?.seriesColor, 30)}
-          background={`linear-gradient(to right, 
-          ${modColor( activeSeries?.seriesColor, -40)}, 
-          ${modColor( activeSeries?.seriesColor, -40)}, 
-          ${modColor( activeSeries?.seriesColor, 10)}, 
+          background={`linear-gradient(to bottom right, 
+          ${modColor( '#add8e6', -40)}, 
+          ${modColor( '#add8e6', -20)},
+          ${modColor( '#add8e6', 10)},
+          ${modColor( '#add8e6', 0)},
           ${modColor( activeSeries?.seriesColor, 40)}, 
-          ${modColor( activeSeries?.seriesColor, 40)})`}
+          ${modColor( activeSeries?.seriesColor, 40)}, 
+          ${modColor( activeSeries?.seriesColor, 40)}, 
+          ${modColor( activeSeries?.seriesColor, 40)}, 
+          ${modColor( activeSeries?.seriesColor, 0)}, 
+          ${modColor( activeSeries?.seriesColor, 0)})`}
           margin={{ bottom:'-16px' }}
         >
 

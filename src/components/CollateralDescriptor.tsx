@@ -34,7 +34,7 @@ function CollateralDescriptor( props: ICollateralDescriptorProps ) {
         pad='small'
         gap='small'
         // background=${modColor( activeSeries?.seriesColor, 30)}
-        background="linear-gradient(to right, #82d4bb, #ffa3a5, #ffbf81, #ffdc5e, #a2c5ac, #ff86c8 )"
+        background="linear-gradient(to bottom right, #82d4bb, #ffa3a5, #ffbf81, #ffdc5e, #a2c5ac, #ff86c8 )"
         margin={{ bottom:'-16px' }}
       >
 
