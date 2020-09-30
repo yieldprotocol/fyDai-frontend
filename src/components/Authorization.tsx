@@ -115,7 +115,7 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
           onClickOutside={()=>closeAuth()}
         >
           <Box 
-            width={screenSize!=='small'?{ min:'640px', max:'640px' }: undefined}
+            width={screenSize!=='small'?{ min:'600px', max:'600px' }: undefined}
             round
             background='background'
             pad='large'

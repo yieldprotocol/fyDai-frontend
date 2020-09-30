@@ -19,7 +19,7 @@ const ApprovalPending = React.forwardRef( (props, ref) => {
     >
       {  sigsRequested ? 
         <Box 
-          width={screenSize!=='small'?{ min:'640px', max:'640px' }: undefined}
+          width={screenSize!=='small'?{ min:'600px', max:'600px' }: undefined}
           pad="medium"
           gap="small"
           round
