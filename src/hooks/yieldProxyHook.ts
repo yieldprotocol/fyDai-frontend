@@ -171,12 +171,10 @@ export const useProxy = () => {
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const toAddr = account && ethers.utils.getAddress(account);
     const parsedMaturity = series.maturity.toString();
-
     const collatType = ethers.utils.formatBytes32String(collateralType);
-    // const maxEDai = ethers.utils.parseEther(maximumEDai.toString());
 
     const overrides = { 
-      gasLimit: BigNumber.from('21000')
+      gasLimit: BigNumber.from('500000')
     };
 
     setBorrowActive(true);
@@ -213,7 +211,6 @@ export const useProxy = () => {
     setBorrowActive(false);
   };
 
-
   /**
    * @dev Repay an amount of eDai debt in Controller using a given amount of Dai exchanged for eDai at pool rates, with a minimum of eDai debt required to be paid.
    * Post maturity the user is asked for a signature allowing the treasury access to dai
@@ -236,10 +233,8 @@ export const useProxy = () => {
     const fromAddr = account && ethers.utils.getAddress(account);
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const parsedMaturity = series.maturity.toString();
-    // const minEDai = ethers.utils.parseEther(minimumEDaiRepayment.toString());
 
     const overrides = {
-    // nonce: signer.getTransactionCount().then( (nonce:any) => nonce + queue),
       gasLimit: BigNumber.from('1000000')
     };
 
@@ -248,7 +243,7 @@ export const useProxy = () => {
     let daiPermitSig:any;
     let minEDai:BigNumber;
     try {
-      console.log( await series.isMature() );
+
       if ( await hasBeenMatured(series.eDaiAddress) ) {  
         try {
           console.log('repay with sig- after maturity');
@@ -281,8 +276,8 @@ export const useProxy = () => {
           overrides
         );
 
-      } else {
-        console.log('repay with no signature - before maturity');
+      } else if ( !series.isMature() ) {
+        console.log('Repay with no signature - before maturity');
         /* calculate expected trade values and factor in slippage */
         const preview = await previewPoolTx('selldai', series, repaymentInDai);
         if ( !(preview instanceof Error) ) {
@@ -302,7 +297,9 @@ export const useProxy = () => {
           dai,
           overrides
         );
-      }      
+      } else {
+        console.log('Series has passed its maturity date, but has not yet been matured');
+      }     
       
     } catch (e) {
       handleTxBuildError(e);
@@ -313,7 +310,6 @@ export const useProxy = () => {
     await handleTx(tx);
     setRepayActive(false);
   };
-
 
   /**
    * LIQUIDITY SECTION
@@ -399,7 +395,7 @@ export const useProxy = () => {
     setRemoveLiquidityActive(true);
     try {
       if ( !(await hasBeenMatured(series.eDaiAddress)) ) {
-        console.log('removing liquidity BEFORE maturity'); 
+        console.log('Removing liquidity BEFORE maturity'); 
         /* calculate expected trade values and factor in slippage */
         // const preview = await previewPoolTx('selldai', series, daiUsed);
         // if ( !(preview instanceof Error) ) {
