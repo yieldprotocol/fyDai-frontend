@@ -8,30 +8,12 @@ import {
 } from 'react-icons/fi';
 
 import { UserContext } from '../contexts/UserContext';
+import EtherscanButton from './EtherscanButton';
 
 interface HistoryProps {
   filterTerms: string[];
   view: string; // borrow, lend, pool
 }
-
-const EtherscanButton = (props:any) => {
-  const { txHash } = props;
-  return (
-    <Box
-      border
-      round
-      hoverIndicator='brand'
-      onClick={()=>{ window.open( `https://etherscan.io/tx/${txHash}`, '_blank');}} 
-      pad={{ horizontal:'small' }}
-    >
-      <Text 
-        size='xxsmall'
-      >
-        View on Etherscan
-      </Text>
-    </Box>
-  );
-};
 
 const TxHistory = ( { filterTerms, view }:HistoryProps) => {
 

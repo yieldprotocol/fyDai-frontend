@@ -50,7 +50,7 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
                 <Box
                   round='large'
                   gap='small' 
-                  align={alt? 'start': 'center'}
+                  align='start'
                 >
                   <Text 
                     wordBreak='keep-all' 
