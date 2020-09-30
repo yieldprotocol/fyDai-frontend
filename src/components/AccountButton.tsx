@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 
 import { useWeb3React } from '@web3-react/core';
 
@@ -13,6 +13,7 @@ import {
   Layer,
   Menu,
   Collapsible,
+  Drop
 } from 'grommet';
 
 import { 
@@ -33,11 +34,16 @@ import EthLogo from './logos/EthLogo';
 import EthMark from './logos/EthMark';
 import DaiMark from './logos/DaiMark';
 import Loading from './Loading';
+import EtherscanButton from './EtherscanButton';
 
 
 const AccountButton = (props: any) => {
 
   const { account } = useWeb3React();
+  const pendingRef:any = useRef(null);
+  const completeRef:any = useRef(null);
+
+  const [ over, setOver] = useState<boolean>(false);
 
   const {
     openConnectLayer,
@@ -64,6 +70,34 @@ const AccountButton = (props: any) => {
     })();
 
   }, [pendingTxs, lastCompletedTx ]);
+
+  const abbreviateAddr = (addr:string) => {
+    return `${addr?.substring(0, 4)}...${addr?.substring(addr.length - 4)}`; 
+  };
+
+  const DropBox = () => {
+
+    return ( 
+      <Drop
+        target={completeRef.current}
+        align={{ top: 'bottom' }}
+        plain
+      >
+
+        {lastCompletedTx &&
+        <Box
+          pad='small'
+          background='#f0f0f0'
+        >
+
+          { abbreviateAddr(lastCompletedTx.transactionHash) }
+          {lastCompletedTx.status}
+          <EtherscanButton tx={lastCompletedTx.transactionHash} />
+        </Box>}
+
+      </Drop>);
+
+  };
   
   return (
     <Box> 
@@ -72,6 +106,8 @@ const AccountButton = (props: any) => {
         direction='row'
         align='center'
         background={account?'#f0f0f0':undefined}
+        onMouseOver={() => setOver(true)}
+        onMouseLeave={() => setOver(false)}
       > 
         { pendingTxs.length===0 && !txCompleteOpen &&
           <Box pad={{ left:'small', right:'large' }} direction='row' gap='small' align='center'>
@@ -82,19 +118,38 @@ const AccountButton = (props: any) => {
           </Box>}
         
         {pendingTxs.length>0 &&  
-        <Box 
-          direction='row'
-          margin={{ right:'-20px' }}
-          pad={{ vertical: 'xsmall', left:'small', right:'25px' }}
-          round
-          animation='slideLeft'
-        >
-          <Text size='small'> Transaction pending ... </Text>
-        </Box>}
+          <Box
+            ref={pendingRef}
+            direction='row'
+            margin={{ right:'-20px' }}
+            pad={{ vertical: 'xsmall', left:'small', right:'25px' }}
+            round
+            animation='slideLeft'
+          >
+            <Text size='small'> Transaction pending ... </Text>
+          </Box>}
+
+        { pendingRef.current && over && 
+        (       
+          <Drop
+            plain 
+            target={pendingRef.current}
+            align={{ top: 'bottom' }}
+          >
+            {pendingTxs.length>0 && 
+              <Box     
+                pad='small'
+                background='#f0f0f0'
+              >
+                {pendingTxs[0].tx.hash}
+                <EtherscanButton tx={pendingTxs[0].tx.hash} />
+              </Box>}
+          </Drop>)}
 
         { txCompleteOpen && 
           <>    
             <Box
+              ref={completeRef}
               direction='row'
               margin={{ right:'-20px' }}
               pad={{ vertical: 'xsmall', left:'small', right:'25px' }}
@@ -111,6 +166,8 @@ const AccountButton = (props: any) => {
                   Transaction failed
                 </Text>}
             </Box> 
+            { completeRef.current && over && <DropBox />}
+                
           </>}
 
         { account ?
@@ -121,7 +178,7 @@ const AccountButton = (props: any) => {
             label={
               <Box gap='small' direction='row' align='center'>
                 <Text size='small'>
-                  {`${account?.substring(0, 4)}...${account?.substring(account.length - 4)}`}
+                  { abbreviateAddr(account) }
                 </Text>
                 <Gear />
               </Box>
