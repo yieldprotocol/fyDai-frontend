@@ -37,6 +37,7 @@ const BorrowView = ({
       alignSelf='center'
       fill='horizontal'
       round='small'
+      align='center'
     >
       {/* <PageHeader
         title="Borrow"
