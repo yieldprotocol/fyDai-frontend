@@ -104,7 +104,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
     /* 2. Roughly estimate the new borrowing power */
     if (debouncedInput) {
       const val = collValue(ethers.utils.parseEther(debouncedInput));
-      const newPower = parseFloat(ethers.utils.formatEther(val))/1.5;
+      const newPower = parseFloat(ethers.utils.formatEther(val))/2;
       if (maxDaiAvailable_) {
         const pl = parseFloat(maxDaiAvailable_)+newPower;
         setEstPower( pl.toFixed(2));
