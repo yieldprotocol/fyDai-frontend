@@ -158,11 +158,6 @@ export const yieldTheme = {
         radius: '24px',
       },
     },
-    drop: {
-      border: {
-        radius: '24px',
-      },
-    },
     borderSize: {
       xsmall: '1px',
       small: '2px',
@@ -664,7 +659,6 @@ export const yieldTheme = {
       positon: fixed;
     `,
   },
-
   tabs: {
     gap: 'small',
     // 'pad': 'xsmall',
