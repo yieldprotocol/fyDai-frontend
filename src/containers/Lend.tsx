@@ -28,7 +28,7 @@ import Redeem from './Redeem';
 import InputWrap from '../components/InputWrap';
 import InfoGrid from '../components/InfoGrid';
 import ApprovalPending from '../components/ApprovalPending';
-import TxPending from '../components/TxPending';
+import TxStatus from '../components/TxStatus';
 import SeriesDescriptor from '../components/SeriesDescriptor';
 import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
@@ -304,7 +304,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
 
       {/* If there is a transaction active, show the applicable view */}
       { sellActive && !txActive && <ApprovalPending /> }
-      { txActive && <TxPending msg={`You are lending ${inputValue} DAI`} tx={txActive} /> }
+      { txActive && <TxStatus msg={`You are lending ${inputValue} DAI`} tx={txActive} /> }
     </Keyboard>
   );
 };

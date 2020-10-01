@@ -15,7 +15,7 @@ import { UserContext } from '../contexts/UserContext';
 import { usePool, useProxy, useSignerAccount, useTxActive, useDebounce, useIsLol } from '../hooks';
 
 import InputWrap from '../components/InputWrap';
-import TxPending from '../components/TxPending';
+import TxStatus from '../components/TxStatus';
 import ApprovalPending from '../components/ApprovalPending';
 import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
@@ -169,7 +169,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
             gap='medium'
             justify='between'
           > 
-            <TxPending msg={`You are closing ${inputValue} DAI`} tx={txActive} />
+            <TxStatus msg={`You are closing ${inputValue} DAI`} tx={txActive} />
                 
             <Box alignSelf='start'>
               <Box

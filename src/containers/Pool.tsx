@@ -28,7 +28,7 @@ import RemoveLiquidity from './RemoveLiquidity';
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
 import ApprovalPending from '../components/ApprovalPending';
-import TxPending from '../components/TxPending';
+import TxStatus from '../components/TxStatus';
 import SeriesDescriptor from '../components/SeriesDescriptor';
 import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
@@ -285,7 +285,7 @@ const Pool = (props:IPoolProps) => {
       </Box>}
 
       { addLiquidityActive && !txActive && <ApprovalPending /> } 
-      { txActive && <TxPending msg={`You are adding ${inputValue} DAI liquidity to the pool.`} tx={txActive} /> }
+      { txActive && <TxStatus msg={`You are adding ${inputValue} DAI liquidity to the pool.`} tx={txActive} /> }
     </Keyboard>
   );
 };

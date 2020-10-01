@@ -8,7 +8,7 @@ import { useEDai, useTxActive } from '../hooks';
 
 import InlineAlert from '../components/InlineAlert';
 import ApprovalPending from '../components/ApprovalPending';
-import TxPending from '../components/TxPending';
+import TxStatus from '../components/TxStatus';
 import ActionButton from '../components/ActionButton';
 
 interface IRedeemProps {
@@ -68,7 +68,7 @@ const Redeem  = ({ close }:IRedeemProps)  => {
       </>}
 
       { redeemActive && !txActive && <ApprovalPending /> } 
-      { txActive && <TxPending msg={`You are redeeming ${activeSeries?.eDaiBalance_} DAI`} tx={txActive} /> }
+      { txActive && <TxStatus msg={`You are redeeming ${activeSeries?.eDaiBalance_} DAI`} tx={txActive} /> }
     </Box>
   );
 };

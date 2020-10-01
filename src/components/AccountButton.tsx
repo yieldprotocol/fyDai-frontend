@@ -19,6 +19,7 @@ import {
 import { 
   FiSettings as Gear,
   FiCheckCircle as Check,
+  FiArrowLeft as ArrowLeft,
 } from 'react-icons/fi';
 
 
@@ -35,7 +36,6 @@ import EthMark from './logos/EthMark';
 import DaiMark from './logos/DaiMark';
 import Loading from './Loading';
 import EtherscanButton from './EtherscanButton';
-import TxPending from './TxPending';
 import TxStatus from './TxStatus';
 
 
@@ -115,7 +115,7 @@ const AccountButton = (props: any) => {
         onClickOutside={()=>setPendingLayerOpen(false)}
         onEsc={()=>setPendingLayerOpen(false)}
       >
-        <TxPending msg='tx pending' tx={pendingTxs[pendingTxs.length-1]} />      
+        <TxStatus msg='tx pending' tx={pendingTxs[pendingTxs.length-1]} />      
       </Layer>}
 
       { completeLayerOpen && txCompleteOpen &&  
@@ -132,10 +132,28 @@ const AccountButton = (props: any) => {
         onClickOutside={()=>setTxStatusOpen(false)}
         onEsc={()=>setTxStatusOpen(false)}
       >
-        <TxStatus msg='tx pending' tx={pendingTxs[pendingTxs.length-1]} />
+        <Box 
+          fill
+          background="background-front"
+          round='small'
+          pad="none"
+          align='center'
+          gap='medium'   
+        >
+          <TxStatus msg='tx pending' tx={pendingTxs[pendingTxs.length-1]} />
+          <Box alignSelf='start' pad='medium'> 
+            <FlatButton 
+              onClick={()=>setTxStatusOpen(false)}
+              label={
+                <Box direction='row' gap='medium' align='center'>
+                  <ArrowLeft color='text-weak' />
+                  <Text size='xsmall' color='text-weak'> go back </Text>
+                </Box>
+              }
+            />
+          </Box>
+        </Box>
       </Layer>}
-
-
 
       { pendingTxs.length===0 && !txCompleteOpen &&
       <Box pad={{ left:'small', right:'large' }} direction='row' gap='small' align='center'>

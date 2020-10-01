@@ -24,7 +24,7 @@ import {
 } from '../hooks';
 
 import ApprovalPending from '../components/ApprovalPending';
-import TxPending from '../components/TxPending';
+import TxStatus from '../components/TxStatus';
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
 import RaisedButton from '../components/RaisedButton';
@@ -241,7 +241,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
           </Box>
         </Box>}
       { repayActive && !txActive && <ApprovalPending /> }
-      { txActive && <TxPending msg={`You are repaying ${inputValue} DAI`} tx={txActive} /> }
+      { txActive && <TxStatus msg={`You are repaying ${inputValue} DAI`} tx={txActive} /> }
     </Keyboard>
   );
 }

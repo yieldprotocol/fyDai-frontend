@@ -13,7 +13,7 @@ import { UserContext } from '../contexts/UserContext';
 import { useProxy, useMath, useTxActive, useDebounce, useIsLol } from '../hooks';
 
 import ApprovalPending from '../components/ApprovalPending';
-import TxPending from '../components/TxPending';
+import TxStatus from '../components/TxStatus';
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
 import RaisedButton from '../components/RaisedButton';
@@ -218,7 +218,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
           gap='medium'
           justify='between'
         > 
-          <TxPending msg={`You are withdrawing ${inputValue} ETH`} tx={txActive} />
+          <TxStatus msg={`You are withdrawing ${inputValue} ETH`} tx={txActive} />
 
           <Box alignSelf='start'>
             <Box
