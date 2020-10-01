@@ -120,8 +120,6 @@ const App = (props:any) => {
 
       <Main 
         pad={{ bottom:'large' }} 
-        direction="row" 
-        flex
       >
         <Grid fill columns={columnsWidth}>
           <Box />
@@ -129,8 +127,7 @@ const App = (props:any) => {
             pad={{ vertical: 'large' }}
             fill="horizontal"
             align="center"
-          > 
-            
+          >     
             {activeView === 'BORROW' && <BorrowView />}
             {activeView === 'LEND' && <LendView />}
             {activeView === 'POOL' && <PoolView />}
