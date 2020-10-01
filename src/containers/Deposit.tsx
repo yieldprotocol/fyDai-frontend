@@ -202,7 +202,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
           pad='large'
           gap='medium'
         >
-          <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to deposit</Text>
+          <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to deposit</Text>
 
           <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={depositDisabled}>
             <TextInput

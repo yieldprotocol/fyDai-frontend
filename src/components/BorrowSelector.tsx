@@ -80,7 +80,7 @@ function BorrowSelector({ setActiveView, activeView }:IActionSelectorProps) {
               onClick={() => setActiveView(1)}
               border={activeView !== 1 ? undefined : 'all'}
             >
-              <Text size="small">
+              <Text size="small" color={activeView !== 0 ? 'text' : 'text-weak'}>
                 Borrow Dai
               </Text>
             </StyledBox>
@@ -94,7 +94,7 @@ function BorrowSelector({ setActiveView, activeView }:IActionSelectorProps) {
               onClick={() => toggleActiveView()}
               border={activeView !== 0 ? undefined : 'all'}
             >
-              <Text size="small">
+              <Text size="small" color={activeView !== 1 ? 'text' : 'text-weak'}>
                 Manage Collateral
               </Text>
               {/* {position.ethPosted>0 && <CheckCircle color="green" />} */}

@@ -137,7 +137,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
             gap='medium'
             justify='between'
           >        
-            <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to withdraw</Text>
+            <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to withdraw</Text>
 
             <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={withdrawDisabled}>
               <TextInput

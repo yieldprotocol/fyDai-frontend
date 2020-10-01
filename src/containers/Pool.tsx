@@ -198,7 +198,7 @@ const Pool = (props:IPoolProps) => {
           { !(activeSeries?.isMature()) && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
             <>
               <Box fill gap='medium'>
-                <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Add liquidity</Text>
+                <Text alignSelf='start' size='large' color='text' weight='bold'>Add liquidity</Text>
                 <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={addLiquidityDisabled}>
                   <TextInput
                     ref={(el:any) => {el && !removeLiquidityOpen && el.focus(); setInputRef(el);}} 

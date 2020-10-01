@@ -140,7 +140,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
               { (activeSeries?.ethDebtEDai.gt(ethers.constants.Zero)) ?
              
                 <Box gap='medium' align='center' fill='horizontal'>
-                  <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to Repay</Text>
+                  <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to Repay</Text>
 
                   <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={repayDisabled}>
                     <TextInput

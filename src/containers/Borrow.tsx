@@ -241,7 +241,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
 
           { !activeSeries?.isMature() && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
           <Box gap='medium' align='center' fill='horizontal'>
-            <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to borrow</Text>
+            <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to borrow</Text>
 
             <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={borrowDisabled}>
               <TextInput

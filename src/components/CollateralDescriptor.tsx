@@ -93,7 +93,7 @@ function CollateralDescriptor( props: ICollateralDescriptorProps ) {
         </Box>
 
         <Box
-          pad={!delegated? { horizontal:'none' }: { horizontal:'none', bottom:'medium' }}
+          pad={!delegated? { horizontal:'medium' }: { horizontal:'medium', bottom:'medium' }}
         >
           <Collapsible open={!seriesState.seriesLoading}>
             { children }

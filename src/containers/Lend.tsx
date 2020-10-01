@@ -207,7 +207,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
           { !activeSeries?.isMature() && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
             <>
               <Box fill gap='medium'>
-                <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to lend</Text>
+                <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to lend</Text>
                 <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={lendDisabled}>
                   <TextInput
                     ref={(el:any) => {el && !withdrawDaiOpen && el.focus(); setInputRef(el);}}

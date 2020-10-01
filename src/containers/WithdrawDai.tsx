@@ -119,7 +119,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
           pad='large'
           gap='medium'
         >
-          <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to close</Text>
+          <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to close</Text>
           <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={withdrawDisabled}>
             <TextInput
               ref={(el:any) => {el && el.focus(); setInputRef(el);}} 
