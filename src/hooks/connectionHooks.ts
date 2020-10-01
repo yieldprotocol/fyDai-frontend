@@ -101,7 +101,7 @@ const useInactiveListener = (suppress: boolean = false) => {
         console.log("Handling 'network!Changed' event with payload", networkId);
         // activate(injected);
         if ((cachedChainId !== networkId) && active){
-          console.log('NETWORK cahnge actions');
+          console.log('NETWORK change actions');
           // localStorage.clear();
           // // eslint-disable-next-line no-restricted-globals
           // location.reload();

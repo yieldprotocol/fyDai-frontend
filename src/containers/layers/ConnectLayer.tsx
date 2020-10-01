@@ -249,8 +249,6 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
         </Layer>
       )}
 
-
-
     </>
   );
 };

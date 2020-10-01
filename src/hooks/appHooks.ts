@@ -1,5 +1,6 @@
 import { useEffect, useState, useContext } from 'react';
 import { NotifyContext } from '../contexts/NotifyContext';
+import { IYieldSeries } from '../types';
 
 /* Simple Hook for checking if a transaction family/families are in process */
 export const useTxActive = (typeList:string[]) => {
@@ -48,7 +49,8 @@ export const useTxHelpers = () => {
     txComplete(receipt);
   };
   
-  const handleTx = async (tx:any) => {
+  const handleTx = async (tx:any, msg?:string, series?: IYieldSeries) => {
+
     await tx.wait()
       .then((receipt:any) => {
         txComplete(receipt);
@@ -61,7 +63,6 @@ export const useTxHelpers = () => {
 
 /* Simple Hook for caching & retrieved data */
 export const useCachedState = (key:string, initialValue:any) => {
-  // const genKey = `${chainId}_${key}` || key;
   const genKey = key;
   const [storedValue, setStoredValue] = useState(
     () => {

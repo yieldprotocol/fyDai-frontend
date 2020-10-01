@@ -10,7 +10,7 @@ interface IActionSelectorProps {
 }
 
 const StyledBox = styled(Box)`
-  background: #f0f0f0;
+  
   border-radius: 25px;
   border-color: #f0f0f0;
   transition: all 0.3s ease-in-out;
@@ -71,7 +71,7 @@ function BorrowSelector({ setActiveView, activeView }:IActionSelectorProps) {
           direction="row"
           gap="medium"
           justify='start'
-          background='#f0f0f0'
+          // background='#f0f0f0'
           pad='2px'
         >
           <Box gap='small' align='center'>

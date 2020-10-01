@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { ethers } from 'ethers';
-import { Keyboard, Box, Button, TextInput, Text, ResponsiveContext, Collapsible, Layer } from 'grommet';
+import { Keyboard, Box, TextInput, Text, ResponsiveContext, Collapsible, Layer } from 'grommet';
 
 import { 
   FiClock as Clock,
@@ -294,7 +294,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
                     <RaisedButton
                       label={<Text size='xsmall' color='brand'>Connect a wallet</Text>}
                       onClick={()=>console.log('still to implement')}
-                    /> 
+                    />
                   </Box>
                 )
               },

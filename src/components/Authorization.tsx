@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Box, Button, Layer, Text, ResponsiveContext } from 'grommet';
+import { Box, Layer, Text, ResponsiveContext } from 'grommet';
 
 import { 
   FiCheckCircle as Check,

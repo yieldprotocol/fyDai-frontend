@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import moment from 'moment';
-import { Box, Text, ThemeContext, ResponsiveContext, Button } from 'grommet';
+import { Box, Text } from 'grommet';
 
 import {
   FiClock as Clock,
