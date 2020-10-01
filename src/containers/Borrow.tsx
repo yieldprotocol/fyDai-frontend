@@ -28,7 +28,7 @@ import {
 import SeriesDescriptor from '../components/SeriesDescriptor';
 import InputWrap from '../components/InputWrap';
 import ApprovalPending from '../components/ApprovalPending';
-import TxPending from '../components/TxPending';
+import TxStatus from '../components/TxStatus';
 import InfoGrid from '../components/InfoGrid';
 import ActionButton from '../components/ActionButton';
 import RaisedButton from '../components/RaisedButton';
@@ -177,7 +177,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
       onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
       target='document'   
     >
-
+      
       { repayOpen && 
         <Layer onClickOutside={()=>setRepayOpen(false)}>
           <Repay close={()=>setRepayOpen(false)} />      
@@ -356,7 +356,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
 
       {/* If there is a transaction active, show the applicable view */}
       { borrowActive && !txActive && <ApprovalPending /> } 
-      { txActive && <TxPending msg={`You are borrowing ${inputValue} DAI`} tx={txActive} /> }
+      { txActive && <TxStatus msg={`You are borrowing ${inputValue} DAI`} tx={txActive} /> }
 
 
     </Keyboard>

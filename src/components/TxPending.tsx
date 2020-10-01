@@ -32,14 +32,10 @@ const TxPending = ({ msg, tx }:TransactionPendingProps) => {
       align='center'
       gap='medium'
     >
-
-      <Text size='xlarge' color='brand' weight='bold'>Transaction pending </Text>
+      <Text size='xlarge' color='brand' weight='bold'>Transaction pending... </Text>
       <Text>{msg}</Text>
-
       <ScaleLoader color={theme?.global?.colors?.brand.dark || 'grey'} height='25px' />
-
       <EtherscanButton tx={tx.tx.hash} />
-
       <Box direction='row' gap='xsmall'>
         <Text size='xsmall' ref={txRef}> { tx.tx.hash } </Text>
         <Box

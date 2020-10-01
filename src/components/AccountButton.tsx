@@ -36,14 +36,15 @@ import DaiMark from './logos/DaiMark';
 import Loading from './Loading';
 import EtherscanButton from './EtherscanButton';
 import TxPending from './TxPending';
+import TxStatus from './TxStatus';
 
 
 const AccountButton = (props: any) => {
 
   const { account } = useWeb3React();
+
   const pendingRef:any = useRef(null);
   const completeRef:any = useRef(null);
-
   const [ over, setOver] = useState<boolean>(false);
 
   const {
@@ -59,7 +60,12 @@ const AccountButton = (props: any) => {
   const { state: { position } } = useContext(UserContext);
   const { state: { activeSeries } } = useContext(SeriesContext);
 
-  // Menu state for mobile later
+  // layer flags
+  // const [pendingLayerOpen, setPendingLayerOpen] = useState(false);
+  // const [completeLayerOpen, setCompleteLayerOpen] = useState(false);
+  const [txStatusOpen, setTxStatusOpen] = useState(false);
+
+
   const [txCompleteOpen, setTxCompleteOpen] = useState(false);
 
   useEffect(()=>{
@@ -101,15 +107,35 @@ const AccountButton = (props: any) => {
       direction='row'
       align='center'
       background={account?'#f0f0f0':undefined}
-      onMouseOver={() => setOver(true)}
-      onMouseLeave={() => setOver(false)}
+      // onMouseOver={() => setOver(true)}
+      // onMouseLeave={() => setOver(false)}
     > 
-
-      { pendingTxs.length>0 &&  
-      <Layer>
-        {console.log(pendingTxs[0])}
-        <TxPending msg='some message' tx={pendingTxs[0].tx.tx} />
+      {/* { pendingTxs.length>0 && pendingLayerOpen &&   
+      <Layer 
+        onClickOutside={()=>setPendingLayerOpen(false)}
+        onEsc={()=>setPendingLayerOpen(false)}
+      >
+        <TxPending msg='tx pending' tx={pendingTxs[pendingTxs.length-1]} />      
       </Layer>}
+
+      { completeLayerOpen && txCompleteOpen &&  
+      <Layer 
+        onClickOutside={()=>setPendingLayerOpen(false)}
+        onEsc={()=>setPendingLayerOpen(false)}
+      >
+        Soimething
+      </Layer>} */}
+
+      { txStatusOpen && 
+
+      <Layer 
+        onClickOutside={()=>setTxStatusOpen(false)}
+        onEsc={()=>setTxStatusOpen(false)}
+      >
+        <TxStatus msg='tx pending' tx={pendingTxs[pendingTxs.length-1]} />
+      </Layer>}
+
+
 
       { pendingTxs.length===0 && !txCompleteOpen &&
       <Box pad={{ left:'small', right:'large' }} direction='row' gap='small' align='center'>
@@ -127,29 +153,13 @@ const AccountButton = (props: any) => {
         pad={{ vertical: 'xsmall', left:'small', right:'25px' }}
         round
         animation='slideLeft'
+        onClick={()=>setTxStatusOpen(true)}
       >
-        <Text size='small'> Transaction pending ... </Text>
-        
-        { pendingRef.current && over && 
-        <Drop
-          plain 
-          target={pendingRef.current}
-          align={{ top: 'bottom' }}
-        >
-            {pendingTxs.length>0 && 
-              <Box     
-                pad='small'
-                background='#f0f0f0'
-              >
-                {pendingTxs[0].tx.hash}
-                <EtherscanButton txHash={pendingTxs[0].tx.hash} />
-              </Box>}
-        </Drop>}
+        <Text size='small'> Transaction pending ... </Text>   
+        { pendingRef.current && over && <DropBox />}
       </Box>}
 
-
-
-      { txCompleteOpen && 
+      { txCompleteOpen &&
       <>    
         <Box
           ref={completeRef}
@@ -158,6 +168,7 @@ const AccountButton = (props: any) => {
           pad={{ vertical: 'xsmall', left:'small', right:'25px' }}
           round
           animation='slideLeft'
+          onClick={()=>setTxStatusOpen(true)}
         >
           {lastCompletedTx?.status === 1 &&
           <Text color='green' textAlign='center' size='small'>              

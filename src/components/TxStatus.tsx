@@ -1,71 +1,80 @@
 import React, { useState, useContext } from 'react';
-import { Box, Drop } from 'grommet';
+import { Box, Text, Drop, ThemeContext } from 'grommet';
 
+import { FiCopy as Copy } from 'react-icons/fi';
+
+import { ScaleLoader } from 'react-spinners';
 import { NotifyContext } from '../contexts/NotifyContext';
+import EtherscanButton from './EtherscanButton';
 
+interface TxStatusProps {
+  msg:string;
+  tx: any;
+}
 
-const TxStatus= () => {
+const TxStatus= ({ msg, tx }:TxStatusProps) => {
 
   const {
     state: { pendingTxs, lastCompletedTx },
   } = useContext(NotifyContext);
-  const [over, setOver] = useState<boolean>(false);
 
-  const ref = React.useRef() as React.MutableRefObject<HTMLInputElement>;
+  const theme:any = useContext(ThemeContext); 
+  const txRef = React.useRef<any>(null);
+
+  const handleCopy = () => {
+    console.log(txRef.current); 
+    // txRef.current?.innerText;
+    document.execCommand('copy');
+  };
 
   return (
     <>
-      <Box 
-        ref={ref}
-        onMouseOver={() => setOver(true)}
-        onMouseLeave={() => setOver(false)}
-        onFocus={() => setOver(true)}
-        onBlur={() => setOver(false)}     
-      >
-        { pendingTxs && pendingTxs.length > 0 &&
-        <Box       
-          round
-          animation='zoomIn'
-          border='all'
-          background='orange' 
-          pad={{ horizontal: 'small' }}
-        >
-          {pendingTxs.length} transaction pending...
-        </Box>}
-
-        { pendingTxs.length === 0 && lastCompletedTx &&
+      { pendingTxs && pendingTxs.length > 0 &&
         <Box
-          round='xsmall'
-          border='all'
-          animation='zoomIn'
-          background='brand-transparent' 
-          pad={{ horizontal: 'small' }}
+          alignSelf="center"
+          fill
+          background="background-front"
+          round='small'
+          pad="large"
+          align='center'
+          gap='medium'
         >
-          Transaction complete.
+          <Text size='xlarge' color='brand' weight='bold'>Transaction pending...</Text>
+          <Text>{msg}</Text>
+          <ScaleLoader color={theme?.global?.colors?.brand.dark || 'grey'} height='25px' />
+          <EtherscanButton txHash={tx.tx.hash} />
+          <Box direction='row' gap='xsmall'>
+            <Text size='xsmall' ref={txRef}> { tx.tx.hash } </Text>
+            <Box
+              onClick={()=>handleCopy()}
+            >
+              <Copy /> 
+            </Box>    
+          </Box>
         </Box>}
 
-
-      </Box>
-
-      {ref.current && over &&
-      <Drop
-        align={{ top: 'bottom', left: 'left' }}
-        target={ref.current}
+      { pendingTxs.length === 0 && lastCompletedTx &&
+      <Box
+        alignSelf="center"
+        fill
+        background="background-front"
+        round='small'
+        pad="large"
+        align='center'
+        gap='medium'
       >
-        <Box 
-          round='xsmall'
-        >
-          {/* {lastCompletedTx.hash} */}
-
-          { pendingTxs.map((x:any, i:number)=>{
-            const _key = i; 
-            return ( <Box key={_key}> {x.tx.hash} </Box>)
- 
-          })}
-
+        <Text size='xlarge' color='brand' weight='bold'>Transaction Complete. </Text>
+        <Text>{lastCompletedTx.status}</Text>
+        <EtherscanButton txHash={lastCompletedTx.transactionHash} />
+        <Box direction='row' gap='xsmall'>
+          <Text size='xsmall' ref={txRef}> { lastCompletedTx.transactionHash } </Text>
+          <Box
+            onClick={()=>handleCopy()}
+          >
+            <Copy /> 
+          </Box>
         </Box>
-      </Drop>}
-
+      </Box>}
     </>
   );
 };
