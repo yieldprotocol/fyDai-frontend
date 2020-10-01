@@ -20,6 +20,8 @@ import {
   FiCheckCircle as Check,
 } from 'react-icons/fi';
 
+import styled from 'styled-components';
+
 import logoDark from '../assets/images/logo.svg';
 import logoLight from '../assets/images/logo_light.svg';
 import YieldLogo from './logos/YieldLogo';
@@ -31,6 +33,17 @@ import FlatButton from './FlatButton';
 import Authorization from './Authorization';
 import AccountButton from './AccountButton';
 
+
+const StyledText = styled(Text)`
+  transition: all 0.5s ease-in-out;
+  :active:hover {
+    transform: scale(1.25);
+    }
+  :hover {
+    transform: scale(1.25);
+  }
+`;
+
 interface LinkProps {
   link: string;
   text: string;
@@ -40,7 +53,6 @@ interface LinkProps {
 const YieldHeader = (props: any) => {
   const { account } = useWeb3React();
   const {
-    openConnectLayer,
     activeView,
     setActiveView,
   } = props;
@@ -138,7 +150,7 @@ const YieldHeader = (props: any) => {
           gap="small"
           key={item.id}
         >
-          <Text
+          <StyledText
             weight='bold'
             // eslint-disable-next-line no-nested-ternary
             color={item.disabled ? 'lightgrey' : activeView === item.link ? 'brand' : 'text-weak'}
@@ -150,7 +162,7 @@ const YieldHeader = (props: any) => {
 
           >
             {item.text}
-          </Text>
+          </StyledText>
         </Box>
       ))
     }
@@ -177,7 +189,6 @@ const YieldHeader = (props: any) => {
     >
       <Box>
         <Image src={theme.dark ? logoLight : logoDark} fit="contain" />
-        {/* <Text size='24px' weight='bold'>YIELD</Text> */}
       </Box>
 
       <Box>

@@ -74,7 +74,7 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
           {children} 
         </Box>}
 
-      { account && !series && !hasDelegatedProxy && !authWrap && 
+      { !hasDelegatedProxy && account && !authWrap && !series && 
         <Box 
           fill='horizontal'
           pad='medium'

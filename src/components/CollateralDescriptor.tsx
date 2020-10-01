@@ -1,11 +1,11 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Box, Text, ThemeContext, ResponsiveContext, Button, Collapsible } from 'grommet';
-
-import { FiLayers as ChangeSeries } from 'react-icons/fi';
-import { modColor, invertColor, contrastColor } from '../utils';
+import { Box, Text, ThemeContext, ResponsiveContext, Image, Collapsible } from 'grommet';
 
 
 import { SeriesContext } from '../contexts/SeriesContext';
+
+import logoDark from '../assets/images/logo.svg';
+import logoLight from '../assets/images/logo_light.svg';
 
 import SeriesSelector from './SeriesSelector';
 import AprBadge from './AprBadge';
@@ -20,7 +20,9 @@ interface ICollateralDescriptorProps {
 function CollateralDescriptor( props: ICollateralDescriptorProps ) {
 
   const { children } = props;
+  const theme = useContext<any>(ThemeContext);
   const screenSize = useContext(ResponsiveContext);
+
   const { state: seriesState } = useContext(SeriesContext);
   const [ selectorOpen, setSelectorOpen ] = useState<boolean>(false);
   const [ delegated, setDelegated ] = useState<boolean>(true);
@@ -60,11 +62,15 @@ function CollateralDescriptor( props: ICollateralDescriptorProps ) {
             <Box 
               direction='row' 
               gap='small'
+              align='center'
             >             
               {/* <AprBadge activeView={activeView} series={activeSeries} animate /> */}
+              <Box height='60%'>
+                <Image src={theme.dark ? logoLight : logoDark} fit="contain" />
+              </Box>
 
-              <Text size='large' weight='bold' color='brand'>            
-                Yield Collateral 
+              <Text size='large' weight='bold' color='brand'> 
+                Collateral 
               </Text>
             </Box>
 
