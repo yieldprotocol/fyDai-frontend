@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import styled, { css } from 'styled-components';
-import { Box, Button, Text } from 'grommet';
+import { Box, Text } from 'grommet';
 import Authorization from './Authorization';
 
 import { SeriesContext } from '../contexts/SeriesContext';
@@ -58,7 +58,7 @@ function ActionButton({ ...props }:any ) {
         <Text 
           weight='bold'
           size='large'
-          color={props.disabled ? 'background' : 'brand'}
+          color={props.disabled ? 'background' : activeSeries?.seriesTextColor }
         >
           {props.label}
         </Text>
@@ -77,7 +77,7 @@ function ActionButton({ ...props }:any ) {
           >
             <Text 
               size='medium'
-              color={props.disabled ? 'background' : 'brand'}
+              color={props.disabled ? 'background' : activeSeries?.seriesTextColor}
             >
               Please authorise Yield before making any transactions
             </Text>
@@ -98,7 +98,7 @@ function ActionButton({ ...props }:any ) {
           >
             <Text 
               size='medium'
-              color={props.disabled ? 'background' : 'brand'}
+              color={props.disabled ? 'background' : activeSeries?.seriesTextColor}
             >
               Please unlock this series first
             </Text>

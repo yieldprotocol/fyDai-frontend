@@ -35,6 +35,7 @@ import EthMark from './logos/EthMark';
 import DaiMark from './logos/DaiMark';
 import Loading from './Loading';
 import EtherscanButton from './EtherscanButton';
+import TxPending from './TxPending';
 
 
 const AccountButton = (props: any) => {
@@ -76,7 +77,6 @@ const AccountButton = (props: any) => {
   };
 
   const DropBox = () => {
-
     return ( 
       <Drop
         target={completeRef.current}
@@ -93,7 +93,6 @@ const AccountButton = (props: any) => {
           <EtherscanButton txHash={lastCompletedTx.transactionHash} />
         </Box>}
       </Drop>);
-
   };
   
   return (
@@ -105,6 +104,13 @@ const AccountButton = (props: any) => {
       onMouseOver={() => setOver(true)}
       onMouseLeave={() => setOver(false)}
     > 
+
+      { pendingTxs.length>0 &&  
+      <Layer>
+        {console.log(pendingTxs[0])}
+        <TxPending msg='some message' tx={pendingTxs[0].tx.tx} />
+      </Layer>}
+
       { pendingTxs.length===0 && !txCompleteOpen &&
       <Box pad={{ left:'small', right:'large' }} direction='row' gap='small' align='center'>
         <Text size='xsmall'><DaiMark /></Text>

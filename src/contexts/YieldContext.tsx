@@ -117,7 +117,7 @@ const YieldProvider = ({ children }: any) => {
         const _poolList = await getAddresses(eDaiList.map((x:any)=> `eDaiLP${x}`));
 
         console.log(_poolList);
-
+        
         const _seriesList = Array.from(_list.values());
 
         await Promise.all(
@@ -135,7 +135,7 @@ const YieldProvider = ({ children }: any) => {
               maturity_: new Date(maturity * 1000),
               displayName: moment(maturity * 1000).format('MMMM YYYY'),
               seriesColor: seriesColors[i],
-              seriesTextColor: utils.modColor(seriesColors[i], -150),
+              seriesTextColor: utils.modColor(seriesColors[i], -120),
             };
           })
         ).then((res: any) => _deployedSeries.push(...res));
