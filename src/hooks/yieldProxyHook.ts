@@ -244,7 +244,7 @@ export const useProxy = () => {
     let minEDai:BigNumber;
     try {
 
-      if ( await hasBeenMatured(series.eDaiAddress) ) {  
+      if ( series.isMature() ) {  
         try {
           console.log('repay with sig- after maturity');
           /* Repay using a signature authorizing treasury */
