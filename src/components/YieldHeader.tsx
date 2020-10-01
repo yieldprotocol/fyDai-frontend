@@ -29,7 +29,6 @@ import { YieldContext } from '../contexts/YieldContext';
 import TxStatus from  './TxStatus';
 import FlatButton from './FlatButton';
 import Authorization from './Authorization';
-import RaisedBox from './RaisedBox';
 import AccountButton from './AccountButton';
 
 interface LinkProps {
@@ -144,7 +143,11 @@ const YieldHeader = (props: any) => {
             // eslint-disable-next-line no-nested-ternary
             color={item.disabled ? 'lightgrey' : activeView === item.link ? 'brand' : 'text-weak'}
             size={screenSize === 'small' ? 'medium' : 'xlarge'}
-            style={{ textDecoration: activeView === item.link ? 'none' : 'none', width: screenSize === 'small' ? '100%' : 'auto' }}
+            style={{ 
+              textDecoration: activeView === item.link ? 'none' : 'none', 
+              width: screenSize === 'small' ? '100%' : 'auto',           
+            }}
+
           >
             {item.text}
           </Text>

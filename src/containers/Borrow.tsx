@@ -224,7 +224,20 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
       >
         
         <Box gap='small' align='center' fill='horizontal'>
-          {/* <Loading condition={seriesState.seriesLoading} size='large'> */}
+          {/* 
+          { activeSeries && !activeSeries.hasDelegatedPool && !activeSeries.isMature() && 
+            <Box 
+              fill='horizontal'
+              round='small'
+              pad={{ vertical:'medium' }}        
+            >
+              <Box 
+                round='small'
+                fill
+              >
+                <Authorization series={activeSeries} />
+              </Box>
+            </Box>}  */}
 
           { !activeSeries?.isMature() && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
           <Box gap='medium' align='center' fill='horizontal'>

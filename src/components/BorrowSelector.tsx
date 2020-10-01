@@ -12,7 +12,7 @@ interface IActionSelectorProps {
 const StyledBox = styled(Box)`
   
   border-radius: 25px;
-  border-color: #f0f0f0;
+  border:'none'
   transition: all 0.3s ease-in-out;
 
   ${(props:any) => !(props.border) && css`

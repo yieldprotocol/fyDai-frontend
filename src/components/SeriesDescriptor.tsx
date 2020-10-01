@@ -107,7 +107,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
           </Box>
 
           <Box
-            pad={!delegated? { horizontal:'none' }: { horizontal:'none', bottom:'medium' }}
+            pad={!delegated? { horizontal:'medium' }: { horizontal:'medium', bottom:'medium' }}
             // margin={ !delegated? undefined: { bottom:'medium'} }
           >
             <Collapsible open={!seriesState.seriesLoading}>

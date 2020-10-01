@@ -22,10 +22,8 @@ const StyledBox = styled(Box)`
   `}
 
   ${(props:any) => !(props.disabled) && css`
-  
   box-shadow:  6px 6px 11px #dfdfdf,  
   -6px -6px 11px #ffffff;
-
   :active:hover {
     box-shadow:  0px 0px 0px #dfdfdf, 
         -0px -0px 0px #ffffff;
@@ -43,12 +41,12 @@ function ActionButton({ ...props }:any ) {
   const { state: seriesState } = useContext(SeriesContext);
   const { activeSeries } = seriesState;
   
-  const { state: userState, actions: userActions } = useContext(UserContext);
+  const { state: userState } = useContext(UserContext);
   const { authorizations: { hasDelegatedProxy } } = userState;
 
   return (
     <>
-      { hasDelegatedProxy && props.hasDelegatedPool &&
+      { hasDelegatedProxy && props.hasDelegatedPool && !props.disabled &&
       <StyledBox 
         {...props} 
         fill='horizontal'
@@ -58,13 +56,13 @@ function ActionButton({ ...props }:any ) {
         <Text 
           weight='bold'
           size='large'
-          color={props.disabled ? 'background' : activeSeries?.seriesTextColor }
+          color={props.disabled ? 'background' : activeSeries?.seriesTextColor}
         >
           {props.label}
         </Text>
       </StyledBox>}
 
-      { !hasDelegatedProxy &&   
+      { !hasDelegatedProxy && !props.disabled &&    
         <Authorization 
           authWrap
         >
@@ -84,7 +82,7 @@ function ActionButton({ ...props }:any ) {
           </StyledBox>
         </Authorization>}
 
-      { hasDelegatedProxy && !props.hasDelegatedPool &&
+      { hasDelegatedProxy && !props.hasDelegatedPool && !props.disabled &&
         <Authorization 
           authWrap
           series={activeSeries}
@@ -104,10 +102,25 @@ function ActionButton({ ...props }:any ) {
             </Text>
           </StyledBox>
         </Authorization>}
+
+      { props.disabled && 
+        <StyledBox 
+          {...props} 
+          fill='horizontal'
+          align='center'
+          pad='small'
+          onClick={()=>{ }}
+        >
+          <Text 
+            size='medium'
+            color={props.disabled ? 'background' : activeSeries?.seriesTextColor}
+          >
+            Dummy box click this if you are a bot.
+          </Text>
+        </StyledBox>}
     </>
   );
 }
-
 
 
 export default ActionButton;
