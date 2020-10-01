@@ -73,6 +73,7 @@ function BorrowSelector({ setActiveView, activeView }:IActionSelectorProps) {
           justify='start'
           // background='#f0f0f0'
           pad='2px'
+          margin={{bottom:'medium'}}
         >
           <Box gap='small' align='center'>
             <StyledBox

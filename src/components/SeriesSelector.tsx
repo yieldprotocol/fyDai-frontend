@@ -149,8 +149,10 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
                   { screenSize !== 'small' && 
                   <Box basis='25%' direction='row' justify='end'>
                     { activeSeries && activeSeries.maturity === x.maturity ? 
+                      
                       <Button 
                         primary
+                        color={activeSeries.seriesColor}
                         label={
                           <Text size='small'>Selected</Text>           
                         }
