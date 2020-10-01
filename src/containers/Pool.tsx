@@ -237,7 +237,7 @@ const Pool = (props:IPoolProps) => {
                     valueExtra: () => (
                       <Button
                         color='brand-transparent'
-                        label={<Text size='xsmall' color='brand'>Connect a wallet</Text>}
+                        label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Connect a wallet</Text></Box>}
                         onClick={()=>console.log('still to implement')}
                         hoverIndicator='brand-transparent'
                       /> 

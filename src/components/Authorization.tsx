@@ -91,7 +91,7 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
           />   
         </Box>}
 
-      { account && series?.hasDelegatedPool === false && !authWrap &&
+      { hasDelegatedProxy &&  account && series?.hasDelegatedPool === false && !authWrap &&
         <Box 
           round='small'
           direction='row' 
@@ -106,10 +106,11 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
           <Box>
             <RaisedButton 
               background={modColor( series.seriesColor, 40)}
-              label={ <Text size='xsmall' color={series.seriesTextColor}><Unlock /> {screenSize==='small'? '' : 'Unlock Series'}</Text>}
+              label={<Text size='xsmall' color={series.seriesTextColor}><Unlock /> {screenSize==='small'? '' : 'Unlock Series'}</Text>}
               onClick={()=>{authProcedure();}}
             />   
-          </Box>     
+          </Box>
+             
         </Box>}
 
       { authActive && layerOpen &&

@@ -305,7 +305,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
                 valueExtra: () => (
                   <Box>
                     <RaisedButton
-                      label={<Text size='xsmall' color='brand'>Connect a wallet</Text>}
+                      label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Connect a wallet</Text></Box>}
                       onClick={()=>console.log('still to implement')}
                     />
                   </Box>
@@ -321,7 +321,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
                 valueExtra: () => (
                   <RaisedButton
                     color={inputValue? 'brand': 'brand-transparent'}
-                    label={<Text size='xsmall' color='brand'>Deposit collateral</Text>}
+                    label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Deposit collateral</Text></Box>}
                     onClick={() => setActiveView(0)}
                   /> 
                 )

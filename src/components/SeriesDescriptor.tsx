@@ -67,8 +67,6 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
           >
             <Box 
               round='xsmall'
-            // background='background-mid'
-            // border='all'
               onClick={()=>setSelectorOpen(true)}
               direction='row'
               fill
@@ -108,9 +106,8 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
 
           <Box
             pad={!delegated? { horizontal:'medium' }: { horizontal:'medium', bottom:'medium' }}
-            // margin={ !delegated? undefined: { bottom:'medium'} }
           >
-            <Collapsible open={!seriesState.seriesLoading}>
+            <Collapsible open={seriesState && !seriesState.seriesLoading}>
               { children }
             </Collapsible>
 
