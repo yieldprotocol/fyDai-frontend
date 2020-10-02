@@ -17,10 +17,10 @@ function NotifyLayer(target:any, columnsWidth:any) {
   const  { state, dispatch }  = useContext<any>(NotifyContext);
   const notificationTypeMap = (_type:string ) => {
     switch(_type) {
-      case 'warn' : return { color: '#ffb997', icon: <Text size='small' color='#333333'><Warn /></Text> };
-      case 'error' : return { color: '#f8a0a0', icon: <Text size='small' color='#333333'><Error /></Text> };
-      case 'success': return { color: '#519872', icon: <Text size='small' color='#333333'><CheckCircle /></Text> };
-      default: return { color: 'background', icon: <Info /> };
+      case 'warn' : return { color: '#ffb997', icon: <Text size='small' color='#333333'><Warn /></Text>, textColor: '#333333'};
+      case 'error' : return { color: '#f8a0a0', icon: <Text size='small' color='#333333'><Error /></Text>, textColor: '#333333' };
+      case 'success': return { color: '#519872', icon: <Text size='small' color='#333333'><CheckCircle /></Text>, textColor: '#333333'};
+      default: return { color: '#555555', icon: <Text size='small' color='#DDDDDD'><Info /></Text>, textColor: '#DDDDDD'  };
     }
   };
 
@@ -30,7 +30,6 @@ function NotifyLayer(target:any, columnsWidth:any) {
       <Layer
         position={state.position}
         modal={false}
-        // margin={{ vertical: 'large', horizontal: 'small' }}
         onEsc={()=>dispatch({ type:'closeNotify' })}
         responsive={false}
         plain
@@ -41,7 +40,6 @@ function NotifyLayer(target:any, columnsWidth:any) {
           width='1/2' 
         >
           <Grid columns={columnsWidth}>
-            {/* <Box background={notificationTypeMap(state.type).color} /> */}
             <Box />
             <Box
               direction="row"
@@ -55,13 +53,13 @@ function NotifyLayer(target:any, columnsWidth:any) {
             >
               { notificationTypeMap(state.type).icon }
               <Box align="center" direction="row" gap="small" pad='small'>
-                <Text size='small' color='#333333'>{ state.message }</Text>
+                <Text size='small' color={notificationTypeMap(state.type).textColor}>{ state.message }</Text>
               </Box>
-              <RaisedButton
+              {/* <RaisedButton
                 background={notificationTypeMap(state.type).color}
                 onClick={()=>dispatch({ type:'closeNotify' })}
-                label={<Text size='small' color='#333333'>Close</Text>}
-              />
+                label={<Text size='small' color={notificationTypeMap(state.type).textColor}>Close</Text>}
+              /> */}
             </Box>
             <Box background={notificationTypeMap(state.type).color} />
           </Grid> 
@@ -74,8 +72,6 @@ function NotifyLayer(target:any, columnsWidth:any) {
         modal={true}
         margin={{ vertical: 'large', horizontal: 'large' }}
         onEsc={()=>dispatch({ type:'closeNotify' })}
-        // responsive={true}
-        // plain  
       >
         <Box
           fill

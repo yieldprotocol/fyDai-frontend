@@ -116,7 +116,9 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
           </Box> 
   
           { !seriesState.seriesLoading && !delegated && !activeSeries.isMature() &&
-            <Authorization series={activeSeries} />}
+            <Collapsible open={!delegated}>
+              <Authorization series={activeSeries} />
+            </Collapsible>}
         </Box>}
     </>
   );
