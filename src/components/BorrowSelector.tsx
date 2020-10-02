@@ -10,9 +10,9 @@ interface IActionSelectorProps {
 }
 
 const StyledBox = styled(Box)`
-  background: #f8f8f8;
+  
   border-radius: 25px;
-  border-color: #f8f8f8;
+  border:'none'
   transition: all 0.3s ease-in-out;
 
   ${(props:any) => !(props.border) && css`
@@ -64,26 +64,24 @@ function BorrowSelector({ setActiveView, activeView }:IActionSelectorProps) {
   
   return (
     <>
-      <Box
-        pad={{ horizontal:'medium', vertical :'medium' }}
-        alignSelf="center"
-        width={{ max: '600px' }}
-        fill="horizontal"
-      >
+      <Box align='start'>
         <Box
+          align='start'
+          round
           direction="row"
           gap="medium"
-          fill="horizontal"
           justify='start'
+          // background='#f0f0f0'
+          pad='2px'
+          margin={{bottom:'medium'}}
         >
-
           <Box gap='small' align='center'>
             <StyledBox
-              pad={{ horizontal: 'large', vertical: 'xsmall' }}
+              pad={{ horizontal: 'medium', vertical: 'xsmall' }}
               onClick={() => setActiveView(1)}
               border={activeView !== 1 ? undefined : 'all'}
             >
-              <Text size="small">
+              <Text size="small" color={activeView !== 0 ? 'text' : 'text-weak'}>
                 Borrow Dai
               </Text>
             </StyledBox>
@@ -93,11 +91,11 @@ function BorrowSelector({ setActiveView, activeView }:IActionSelectorProps) {
             {/* <Text size='xxsmall' color='brand'>Step 1</Text> */}
             <StyledBox
               round='large'
-              pad={{ horizontal: 'large', vertical: 'xsmall' }}
+              pad={{ horizontal: 'medium', vertical: 'xsmall' }}
               onClick={() => toggleActiveView()}
               border={activeView !== 0 ? undefined : 'all'}
             >
-              <Text size="small">
+              <Text size="small" color={activeView !== 1 ? 'text' : 'text-weak'}>
                 Manage Collateral
               </Text>
               {/* {position.ethPosted>0 && <CheckCircle color="green" />} */}

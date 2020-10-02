@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { ethers } from 'ethers';
-import { Keyboard, Box, Button, TextInput, Text, ResponsiveContext, Collapsible, Layer } from 'grommet';
+import { Keyboard, Box, TextInput, Text, ResponsiveContext, Collapsible, Layer } from 'grommet';
 
 import { 
   FiClock as Clock,
@@ -28,7 +28,7 @@ import {
 import SeriesDescriptor from '../components/SeriesDescriptor';
 import InputWrap from '../components/InputWrap';
 import ApprovalPending from '../components/ApprovalPending';
-import TxPending from '../components/TxPending';
+import TxStatus from '../components/TxStatus';
 import InfoGrid from '../components/InfoGrid';
 import ActionButton from '../components/ActionButton';
 import RaisedButton from '../components/RaisedButton';
@@ -36,6 +36,7 @@ import FlatButton from '../components/FlatButton';
 import Repay from './Repay';
 import Loading from '../components/Loading';
 import SeriesMatureBox from '../components/SeriesMatureBox';
+import Authorization from '../components/Authorization';
 
 interface IBorrowProps {
   borrowAmount?:number|null;
@@ -105,7 +106,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
   * Handle input (debounced input) changes:
   * 1. dai to eDai conversion and get APR (eDai needed to compare with the approved allowance)
   * 2. calcalute yield APR
-  * 3. calculate estimated collateralisation ratio
+  * 3. calculate estimated collateralization ratio
   */
   useEffect(() => {
 
@@ -139,7 +140,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
       (ethPosted && ethPosted.eq(ethers.constants.Zero) ) ||
       (inputValue && maxDaiAvailable && ethers.utils.parseEther(inputValue).gte(maxDaiAvailable)) ||
       !account ||
-      !hasDelegatedProxy ||   
+      !hasDelegatedProxy ||  
       !inputValue ||
       parseFloat(inputValue) <= 0
     )? setBorrowDisabled(true): setBorrowDisabled(false);
@@ -176,43 +177,41 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
       onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
       target='document'   
     >
-
+      
       { repayOpen && 
         <Layer onClickOutside={()=>setRepayOpen(false)}>
           <Repay close={()=>setRepayOpen(false)} />      
         </Layer>}
 
-      <Collapsible open={!!activeSeries}>
-        <SeriesDescriptor activeView='borrow'>
-          <InfoGrid
-            alt
-            entries={[
-              {
-                label: 'Current Debt',
-                visible: 
+      <SeriesDescriptor activeView='borrow'>
+        <InfoGrid
+          alt
+          entries={[
+            {
+              label: 'Current Debt',
+              visible:
+                  !!account &&
                   (!activeSeries?.isMature() && !txActive)  || 
-                  (activeSeries?.isMature() && activeSeries?.ethDebtEDai_ > 0 ),
-                active: true,
-                loading: borrowPending,    
-                value: activeSeries?.ethDebtEDai_? `${activeSeries.ethDebtEDai_} DAI`: '0 DAI',
-                valuePrefix: null,
-                valueExtra: null, 
-              },
-              {
-                label: 'Max Borrowing Power',
-                visible: !txActive && activeSeries && !activeSeries.isMature() && !!account,
-                active: maxDaiAvailable_,
-                loading: borrowPending,
-                value: maxDaiAvailable_? `${maxDaiAvailable_} DAI`: '0 DAI',           
-                valuePrefix: 'Approx.',
-                valueExtra: null,
-              },
-            ]} 
-          />
-        </SeriesDescriptor>
-      </Collapsible>
+                  (activeSeries?.isMature() && activeSeries?.ethDebtDai_ > 0 ),
+              active: true,
+              loading: borrowPending,    
+              value: activeSeries?.ethDebtDai_? `${activeSeries.ethDebtDai_} DAI`: '0 DAI',
+              valuePrefix: null,
+              valueExtra: null, 
+            },
+            {
+              label: 'Max Borrowing Power',
+              visible: !txActive && activeSeries && !activeSeries.isMature() && !!account,
+              active: maxDaiAvailable_,
+              loading: borrowPending,
+              value: maxDaiAvailable_? `${maxDaiAvailable_} DAI`: '0 DAI',           
+              valuePrefix: '~',
+              valueExtra: null,
+            },
+          ]}
+        />
+      </SeriesDescriptor>
       
-
       { txActive?.type !== 'BORROW' && txActive?.type !== 'BUY' &&  
       <Box
         width={{ max: '600px' }}
@@ -225,11 +224,24 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
       >
         
         <Box gap='small' align='center' fill='horizontal'>
-          {/* <Loading condition={seriesState.seriesLoading} size='large'> */}
+          {/* 
+          { activeSeries && !activeSeries.hasDelegatedPool && !activeSeries.isMature() && 
+            <Box 
+              fill='horizontal'
+              round='small'
+              pad={{ vertical:'medium' }}        
+            >
+              <Box 
+                round='small'
+                fill
+              >
+                <Authorization series={activeSeries} />
+              </Box>
+            </Box>}  */}
 
           { !activeSeries?.isMature() && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
           <Box gap='medium' align='center' fill='horizontal'>
-            <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to borrow</Text>
+            <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to borrow</Text>
 
             <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={borrowDisabled}>
               <TextInput
@@ -273,13 +285,13 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
                 active: !!inputValue&&inputValue>0,
                 loading: false,        
                 value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
-                valuePrefix: 'Approx.',
+                valuePrefix: '~',
                 valueExtra: () => (
                   <Text color='red' size='small'> 
-                    { inputValue &&
+                    {/* { inputValue &&
                         estRatio &&
                         ( (collateralPercent_-estRatio) > 0) &&
-                        `(-${(collateralPercent_-estRatio).toFixed(0)}%)` }
+                        `(-${(collateralPercent_-estRatio).toFixed(0)}%)` } */}
                   </Text>
                 )
               },
@@ -293,9 +305,9 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
                 valueExtra: () => (
                   <Box>
                     <RaisedButton
-                      label={<Text size='xsmall' color='brand'>Connect a wallet</Text>}
+                      label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Connect a wallet</Text></Box>}
                       onClick={()=>console.log('still to implement')}
-                    /> 
+                    />
                   </Box>
                 )
               },
@@ -309,7 +321,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
                 valueExtra: () => (
                   <RaisedButton
                     color={inputValue? 'brand': 'brand-transparent'}
-                    label={<Text size='xsmall' color='brand'>Deposit collateral</Text>}
+                    label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Deposit collateral</Text></Box>}
                     onClick={() => setActiveView(0)}
                   /> 
                 )
@@ -321,9 +333,9 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
               onClick={()=>borrowProcedure()}
               label={`Borrow ${inputValue || ''} DAI`}
               disabled={borrowDisabled}
+              hasDelegatedPool={activeSeries.hasDelegatedPool}
             />}
           </Box>}
-       
 
           { !activeSeries?.isMature() &&
             activeSeries?.ethDebtEDai?.gt(ethers.constants.Zero) &&
@@ -332,7 +344,11 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
                 onClick={()=>setRepayOpen(true)}
                 label={
                   <Box direction='row' gap='small' align='center'>
-                    <Box><Text size='xsmall' color='text-weak'>alternatively, <Text weight='bold'>repay</Text> series debt</Text></Box>
+                    <Box>
+                      <Text size='xsmall' color='text-weak'>
+                        <Text weight='bold' color={activeSeries.seriesColor}>repay</Text> series debt
+                      </Text>
+                    </Box>
                     <ArrowRight color='text-weak' />
                   </Box>
                 }
@@ -353,7 +369,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
 
       {/* If there is a transaction active, show the applicable view */}
       { borrowActive && !txActive && <ApprovalPending /> } 
-      { txActive && <TxPending msg={`You are borrowing ${inputValue} DAI`} tx={txActive} /> }
+      { txActive && <TxStatus msg={`You are borrowing ${inputValue} DAI`} tx={txActive} /> }
 
 
     </Keyboard>

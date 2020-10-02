@@ -25,9 +25,11 @@ import {
   useSignerAccount,
 } from '../../hooks';
 
-import { injected, torus } from '../../connectors';
+import { injected, torus, walletconnect } from '../../connectors';
 import metamaskImage from '../../assets/images/providers/metamask.png';
 import torusImage from '../../assets/images/providers/torus.png';
+
+import walletConnectImage from '../../assets/images/providers/walletconnect.png';
 
 import { UserContext } from '../../contexts/UserContext';
 
@@ -47,6 +49,7 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
 
   const connectorList = [
     { name: 'Metamask', image: metamaskImage, connection: injected },
+    { name: 'Wallet Connect', image: walletConnectImage, connection: walletconnect },
     { name: 'Torus', image: torusImage, connection: torus },
   ];
 
@@ -64,7 +67,7 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
           target={target || undefined}
         >
           <Box
-            width={screenSize!=='small'?{ min:'600px', max:'750px' }: undefined}
+            width={screenSize!=='small'?{ min:'600px', max:'600px' }: undefined}
             background="background-front"
             direction="column"
             fill="vertical"
@@ -245,8 +248,6 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
           </Box>
         </Layer>
       )}
-
-
 
     </>
   );

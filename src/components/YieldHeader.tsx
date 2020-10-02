@@ -20,6 +20,8 @@ import {
   FiCheckCircle as Check,
 } from 'react-icons/fi';
 
+import styled from 'styled-components';
+
 import logoDark from '../assets/images/logo.svg';
 import logoLight from '../assets/images/logo_light.svg';
 import YieldLogo from './logos/YieldLogo';
@@ -29,8 +31,18 @@ import { YieldContext } from '../contexts/YieldContext';
 import TxStatus from  './TxStatus';
 import FlatButton from './FlatButton';
 import Authorization from './Authorization';
-import RaisedBox from './RaisedBox';
 import AccountButton from './AccountButton';
+
+
+const StyledText = styled(Text)`
+  transition: all 0.5s ease-in-out;
+  :active:hover {
+    transform: scale(1.25);
+    }
+  :hover {
+    transform: scale(1.25);
+  }
+`;
 
 interface LinkProps {
   link: string;
@@ -41,7 +53,6 @@ interface LinkProps {
 const YieldHeader = (props: any) => {
   const { account } = useWeb3React();
   const {
-    openConnectLayer,
     activeView,
     setActiveView,
   } = props;
@@ -139,15 +150,19 @@ const YieldHeader = (props: any) => {
           gap="small"
           key={item.id}
         >
-          <Text
+          <StyledText
             weight='bold'
             // eslint-disable-next-line no-nested-ternary
             color={item.disabled ? 'lightgrey' : activeView === item.link ? 'brand' : 'text-weak'}
             size={screenSize === 'small' ? 'medium' : 'xlarge'}
-            style={{ textDecoration: activeView === item.link ? 'underline' : 'none', width: screenSize === 'small' ? '100%' : 'auto' }}
+            style={{ 
+              textDecoration: activeView === item.link ? 'none' : 'none', 
+              width: screenSize === 'small' ? '100%' : 'auto',           
+            }}
+
           >
             {item.text}
-          </Text>
+          </StyledText>
         </Box>
       ))
     }
@@ -176,11 +191,12 @@ const YieldHeader = (props: any) => {
         <Image src={theme.dark ? logoLight : logoDark} fit="contain" />
       </Box>
 
-      { screenSize === 'small' ? 
-        <MobileNav /> 
-        : 
-        <Nav />
-      }
+      <Box>
+        { screenSize === 'small' ? 
+          <MobileNav /> 
+          : 
+          <Nav />}
+      </Box>
 
       <Box>
         {screenSize === 'small' ? (
@@ -191,7 +207,6 @@ const YieldHeader = (props: any) => {
           </Box>
         )}
       </Box>
-
     </Box>
   );
 };

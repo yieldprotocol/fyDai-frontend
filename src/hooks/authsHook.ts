@@ -44,11 +44,12 @@ const createTypedDelegableData = (message: IDelegableMessage, domain: IDomain) =
 };
 
 const auths = new Map([
-  [1, { id: 1, desc:'Allow the Yield Proxy contract to interact with the Yield protocol on your behalf' }],
-  [2, { id: 2, desc:'Allow the Yield Proxy contract to interact with Dai on your behalf' }],
-  [3, { id: 3, desc:'Allow the Yield Proxy contract to interact with this series on your behalf' }],
-  [4, { id: 4, desc:'Allow the Yield Series to trade Dai on your behalf' }],
-  [5, { id: 5, desc:'Allow the Yield Series to trade eDai on your behalf' }],
+  [1, { id: 1, desc:'Allow the Yield smart contracts to interact on your behalf' }],
+  [2, { id: 2, desc:'Allow the Yield smart contracts to interact with Dai on your behalf' }],
+  
+  [3, { id: 3, desc:'Allow the Yield smart contracts to interact with this series on your behalf' }],
+  [4, { id: 4, desc:'Allow the Yield smart contracts to trade Dai on your behalf' }],
+  [5, { id: 5, desc:'Allow the Yield smart contracts to trade eDai on your behalf' }],
 ]);
 
 export const useAuth = () => {
@@ -66,7 +67,7 @@ export const useAuth = () => {
 
   const [authActive, setAuthActive] = useState<boolean>(false);
 
-  const { handleTx, handleTxError } = useTxHelpers();
+  const { handleTx, handleTxBuildError } = useTxHelpers();
 
   const sendForSig = (_provider: any, method: string, params?: any[]) => new Promise<any>((resolve, reject) => {
     const payload = {
@@ -146,7 +147,7 @@ export const useAuth = () => {
     try {
       tx = await proxyContract.onboard(fromAddr, daiPermitSig, controllerSig, overrides);
     } catch (e) {
-      handleTxError('Error authorizing contracts', tx, e);
+      handleTxBuildError(e);
       setAuthActive(false);
       return;
     }
@@ -158,7 +159,7 @@ export const useAuth = () => {
 
 
   /**
-   * Series/Pool authorisations that are required for each series.
+   * Series/Pool authorizations that are required for each series.
    * 
    * @param eDaiAddress series eDai address to be authorised
    * @param poolAddress series pool address to be authorised
@@ -228,7 +229,7 @@ export const useAuth = () => {
     try {
       tx = await proxyContract.authorizePool(poolAddr, fromAddr, daiSig, eDaiSig, poolSig, overrides);
     } catch (e) {
-      handleTxError('Error authorizing contracts', tx, e);
+      handleTxBuildError(e);
       setAuthActive(false);
       return;
     }

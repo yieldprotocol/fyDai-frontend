@@ -8,9 +8,8 @@ import { useEDai, useTxActive } from '../hooks';
 
 import InlineAlert from '../components/InlineAlert';
 import ApprovalPending from '../components/ApprovalPending';
-import TxPending from '../components/TxPending';
+import TxStatus from '../components/TxStatus';
 import ActionButton from '../components/ActionButton';
-import SeriesMatureBox from '../components/SeriesMatureBox';
 
 interface IRedeemProps {
   close?:any,
@@ -21,13 +20,17 @@ const Redeem  = ({ close }:IRedeemProps)  => {
   const { activeSeries } = seriesState;
   const { actions: userActions } = useContext(UserContext);
 
+  const { hasBeenMatured, redeem, redeemActive } = useEDai();
+  const [ txActive ] = useTxActive(['redeem']);
+
   const [ redeemPending, setRedeemPending] = useState<boolean>(false);
   const [ redeemDisabled, setRedeemDisabled] = useState<boolean>(true);
+  const [ matured, setMatured ] = useState<boolean>(false);
+  
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
 
-  const { redeem, redeemActive } = useEDai();
-  const [ txActive ] = useTxActive(['redeem']);
+
 
   const redeemProcedure = async () =>{
     if(!redeemDisabled) {
@@ -43,11 +46,13 @@ const Redeem  = ({ close }:IRedeemProps)  => {
 
   /* redeem button disabled logic */ 
   useEffect( () => {
-    parseFloat(activeSeries?.eDaiBalance_) > 0 ? 
-      setRedeemDisabled(false) 
-      : setRedeemDisabled(true);  
-  }, [activeSeries]);
 
+    ( async () => setMatured(await hasBeenMatured(activeSeries.eDaiAddress)))();
+    parseFloat(activeSeries?.eDaiBalance_) > 0 && matured ? 
+      setRedeemDisabled(false) 
+      : setRedeemDisabled(true);
+  }, [activeSeries]);
+ 
   return (
     
     <Box flex='grow' align='center' fill='horizontal'>
@@ -58,11 +63,12 @@ const Redeem  = ({ close }:IRedeemProps)  => {
           onClick={()=>redeemProcedure()} 
           label={`Redeem ${activeSeries?.eDaiBalance_ || ''} Dai`}
           disabled={redeemDisabled}
+          hasDelegatedPool={true}
         />
       </>}
 
       { redeemActive && !txActive && <ApprovalPending /> } 
-      { txActive && <TxPending msg={`You are redeeming ${activeSeries?.eDaiBalance_} DAI`} tx={txActive} /> }
+      { txActive && <TxStatus msg={`You are redeeming ${activeSeries?.eDaiBalance_} DAI`} tx={txActive} /> }
     </Box>
   );
 };

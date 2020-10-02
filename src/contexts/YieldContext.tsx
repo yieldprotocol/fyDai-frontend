@@ -15,8 +15,8 @@ import { IYieldSeries } from '../types';
 const YieldContext = createContext<any>({});
 
 // const eDaiList = ['eDai0', 'eDai1', 'eDai2', 'eDai3', 'eDai4'];
-const eDaiList = ['20Sep23', '20Sep24', '20Sep25', '20Dec31', '21Dec31'];
-const seriesColors = ['#cecfc7', '#709fb0', '#ffb8d1', '#a0c1b8', '#f4ebc1', '#ada8b6', '#03a9f4'];
+const eDaiList = ['20Oct1', '20Sep30', '20Dec31', '21Dec31'];
+const seriesColors = ['#82d4bb', '#ff86c8', '#ffa3a5', '#ffbf81', '#ffdc5e', '#a2c5ac'];// ['#cecfc7', '#709fb0', '#ffb8d1', '#a0c1b8', '#f4ebc1', '#ada8b6', '#03a9f4'];
 const contractList = [
   'Controller',
   'Treasury',
@@ -117,7 +117,7 @@ const YieldProvider = ({ children }: any) => {
         const _poolList = await getAddresses(eDaiList.map((x:any)=> `eDaiLP${x}`));
 
         console.log(_poolList);
-
+        
         const _seriesList = Array.from(_list.values());
 
         await Promise.all(
@@ -135,7 +135,8 @@ const YieldProvider = ({ children }: any) => {
               maturity_: new Date(maturity * 1000),
               displayName: moment(maturity * 1000).format('MMMM YYYY'),
               seriesColor: seriesColors[i],
-              seriesContrastColor: utils.invertColor(seriesColors[i]),
+              seriesTextColor: '#333333',
+              // seriesTextColor: utils.modColor(seriesColors[i], -120),
             };
           })
         ).then((res: any) => _deployedSeries.push(...res));

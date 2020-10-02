@@ -9,12 +9,11 @@ interface ErrorDisplayProps {
 }
 
 const defaultHeadings = { 
-  warnHead: 'Procced with Caution',
-  errorHead: 'Oops!',
+  warnHead: '',
+  errorHead: '',
 };
 
 // linear-gradient(to top, #efa1a1, #f1b6c6, #eecde1, #eee4f1, #f8f8f8);
-
 
 const InlineAlert = ({ warnMsg, errorMsg, warnHead, errorHead }:ErrorDisplayProps) => {
 

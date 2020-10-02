@@ -1,8 +1,10 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { Grid, Box, Text, ResponsiveContext } from 'grommet';
-import { ColorType } from 'grommet/utils';
 
 import Loading from './Loading';
+
+import { SeriesContext } from '../contexts/SeriesContext';
+import { modColor, invertColor, contrastColor } from '../utils';
 
 type entry = {
   visible: boolean;
@@ -22,6 +24,17 @@ interface IInfoGridProps {
 function InfoGrid({ entries, alt }:IInfoGridProps) {
 
   const screenSize = useContext(ResponsiveContext);
+  const { state:{ activeSeries } } = useContext(SeriesContext);
+
+  const [normalText, setNormalText] = useState<string>(!alt? 'brand': activeSeries.seriesTextColor);
+  const [xWeakText, setXWeakText] = useState<string>(!alt? 'text-xweak':`${modColor(activeSeries.seriesColor, 10)}`);
+  const [weakText, setWeakText] = useState<string>(!alt? 'text-weak':`${modColor(activeSeries.seriesColor, 10)}`);
+
+  useEffect(()=>{
+    activeSeries && setNormalText( !alt? 'brand': activeSeries.seriesTextColor);
+    activeSeries && setXWeakText( !alt? 'text-xweak':`${modColor(activeSeries.seriesColor, 10)}`);
+    activeSeries && setWeakText( !alt? 'text-weak':`${modColor(activeSeries.seriesColor, 10)}`);
+  }, [activeSeries]);
   
   return (
     <Grid columns={screenSize !== 'small' ? '30%' : '45%'} gap="small" fill justify='start'>
@@ -37,26 +50,28 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
                 <Box
                   round='large'
                   gap='small' 
-                  align={alt? 'start': 'center'}
+                  align='start'
                 >
                   <Text 
                     wordBreak='keep-all' 
-                    color={alt? 'brand': 'text-weak'} 
+                    color={alt? 'text-weak': 'text-weak'} 
                     size='xxsmall' 
                     // weight={alt? 'bold': undefined}
                   >
                     {x.label}
-                  </Text> 
-
+                  </Text>
                   <Loading condition={x.loading} size='small'>
-
-                    <Box direction='row-responsive' gap='small'>
-                      { x.valuePrefix && screenSize !== 'small' && <Text color={x.active ? 'brand':'brand-transparent'} size='xxsmall'>{x.valuePrefix}</Text> }
-                      <Text color={x.active? 'brand':'brand-transparent'} weight='bold' size='medium'> 
+                    <Box direction='row-responsive' gap='xsmall' align='center'>
+                      { x.valuePrefix && 
+                        screenSize !== 'small' && 
+                        <Text color={x.active ? activeSeries.seriesTextColor:'text-xweak'} size='medium' weight='bold'>
+                          {x.valuePrefix}                     
+                        </Text>}
+                      <Text color={x.active? activeSeries.seriesTextColor:'text-xweak'} weight='bold' size='medium'> 
                         {x.value}
                       </Text>
-                      { x.valueExtra && <ValueExtra />}
-                    </Box> 
+                    </Box>
+                    { x.valueExtra && <ValueExtra />}                  
                   </Loading>
                 </Box> 
               </Box>
@@ -64,7 +79,7 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
           );
         }
       })}
-    </Grid> 
+    </Grid>
   );
 }
 

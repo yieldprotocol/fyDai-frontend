@@ -17,9 +17,9 @@ function NotifyLayer(target:any, columnsWidth:any) {
   const  { state, dispatch }  = useContext<any>(NotifyContext);
   const notificationTypeMap = (_type:string ) => {
     switch(_type) {
-      case 'warn' : return { color: '#ffa274', icon: <Text size='small' color='#333333'><Warn /></Text> };
-      case 'error' : return { color: '#ff748c', icon: <Text size='small' color='#333333'><Error /></Text> };
-      case 'success': return { color: '#8cff74', icon: <Text size='small' color='#333333'><CheckCircle /></Text> };
+      case 'warn' : return { color: '#ffb997', icon: <Text size='small' color='#333333'><Warn /></Text> };
+      case 'error' : return { color: '#f8a0a0', icon: <Text size='small' color='#333333'><Error /></Text> };
+      case 'success': return { color: '#519872', icon: <Text size='small' color='#333333'><CheckCircle /></Text> };
       default: return { color: 'background', icon: <Info /> };
     }
   };

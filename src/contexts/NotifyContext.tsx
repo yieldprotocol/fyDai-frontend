@@ -7,7 +7,7 @@ const initState = {
   position: 'right',
   message: '',
   type: 'info',
-  timerMs: 6000,
+  timerMs: 8000,
   callbackAction: null,
   callbackCancel: null,
   fatalOpen: false,
@@ -44,8 +44,8 @@ function notifyReducer(state:INotification, action:IReducerAction) {
     case 'txComplete':
       return {
         ...state,
-        pendingTxs: state.pendingTxs.filter( (x:any) => x.tx.hash !== action.payload.tx.hash),
-        lastCompletedTx: action.payload.tx,
+        pendingTxs: state.pendingTxs.filter( (x:any) => x.tx.hash !== ( action.payload.transactionHash || action.payload.hash)  ),
+        lastCompletedTx: action.payload,
       };
     case 'requestSigs':
       return {

@@ -1,5 +1,6 @@
 import { useEffect, useState, useContext } from 'react';
 import { NotifyContext } from '../contexts/NotifyContext';
+import { IYieldSeries } from '../types';
 
 /* Simple Hook for checking if a transaction family/families are in process */
 export const useTxActive = (typeList:string[]) => {
@@ -15,41 +16,53 @@ export const useTxActive = (typeList:string[]) => {
 export const useTxHelpers = () => { 
 
   const  { dispatch }  = useContext<any>(NotifyContext);
-
+  
   /* Notification Helpers */
-  const txComplete = (tx:any) => {
-    dispatch({ type: 'txComplete', payload:{ tx } } );
+  const txComplete = (receipt:any) => {  
+    dispatch({ type: 'txComplete', payload: receipt } );
   };
-  
-  const handleTxError = (msg:string, tx: any, e:any) => {
+
+  const handleTxBuildError = (error:any) => {
+    /* silence user rejection errors */
+    if ( error.code === 4001 ) {
+      dispatch({ 
+        type: 'notify', 
+        payload: { message: 'Transaction rejected by user.' } 
+      });    
+    } else {
+      // eslint-disable-next-line no-console
+      console.log(error.message);
+      dispatch({ 
+        type: 'notify', 
+        payload: { message: 'The transaction was rejected by the wallet provider. Please see console', type:'error' } 
+      });
+    }
+  };
+
+  const handleTxError = (msg:string, receipt: any, error:any) => {
     // eslint-disable-next-line no-console
-    console.log(e.message);
-    dispatch({ type: 'notify', payload:{ message: msg, type:'error' } } );
-    txComplete(tx);
+    console.log(error.message);
+    dispatch({ 
+      type: 'notify', 
+      payload:{ message: msg, type:'error' } 
+    });
+    txComplete(receipt);
   };
   
-  const handleTx = async (tx:any) => {
+  const handleTx = async (tx:any, msg?:string, series?: IYieldSeries) => {
+
     await tx.wait()
       .then((receipt:any) => {
-        dispatch({ type: 'txComplete', payload:{ tx } } );
-        txComplete(tx);
-        console.log(receipt);  
+        txComplete(receipt);
       }, ( error:any ) => {
-        // tease out the reason for the error here. 
-        handleTxError('error', tx, error);
-        // This is entered if the status of the receipt is failure
-        // return error.checkCall() .then((err:any) => {
-        //   console.log('Error', err);
-        //   handleTxError('error', tx, err);
-        // });
+        handleTxError('Error: Transaction failed. Please see console', tx, error);
       });
   };
-  return { handleTx, txComplete, handleTxError };
+  return { handleTx, txComplete, handleTxBuildError };
 };
 
 /* Simple Hook for caching & retrieved data */
 export const useCachedState = (key:string, initialValue:any) => {
-  // const genKey = `${chainId}_${key}` || key;
   const genKey = key;
   const [storedValue, setStoredValue] = useState(
     () => {
@@ -59,7 +72,6 @@ export const useCachedState = (key:string, initialValue:any) => {
         return item ? JSON.parse(item) : initialValue;
       } catch (error) {
         // If error also return initialValue and handle error - needs work
-        console.log(error);
         return initialValue;
       }
     }

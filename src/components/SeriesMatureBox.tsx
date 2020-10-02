@@ -4,6 +4,7 @@ import { Box, Text } from 'grommet';
 import { 
   FiClock as Clock,
 } from 'react-icons/fi';
+import FlatButton from './FlatButton';
 
 const SeriesMatureBox = () => {
   return (
@@ -15,13 +16,17 @@ const SeriesMatureBox = () => {
       border='all'
       pad='small'
     >    
-      <Box direction='row' gap='small' align='center' fill>          
+      <Box direction='row' gap='small' justify='center' fill>          
         <Box>
           <Clock />
         </Box>
         <Box> 
           <Text size='small' color='brand'> This series has matured.</Text>         
         </Box>
+        {/* <FlatButton 
+          label='explore teh other series'
+          onClick={()=>console.log('explore others')}
+        /> */}
       </Box>             
     </Box>
   );

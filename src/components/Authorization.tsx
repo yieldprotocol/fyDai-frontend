@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Box, Button, Layer, Text, ResponsiveContext } from 'grommet';
+import { Box, Layer, Text, ResponsiveContext } from 'grommet';
 
 import { 
   FiCheckCircle as Check,
@@ -19,10 +19,12 @@ import { modColor } from '../utils';
 
 interface IAuthorizationProps {
   series?: IYieldSeries|null;
+  authWrap?: boolean;
   buttonOnly?: boolean;
+  children?:any;
 }
 
-const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => { 
+const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorizationProps) => { 
   const screenSize = useContext(ResponsiveContext);
   const { state: { requestedSigs } } = useContext(NotifyContext);
   const { state: { authorizations }, actions: userActions } = useContext(UserContext);
@@ -67,7 +69,12 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
 
   return (
     <>
-      { account && !series && !hasDelegatedProxy &&
+      { account && authWrap && 
+        <Box fill='horizontal' onClick={()=>{authProcedure();}}> 
+          {children} 
+        </Box>}
+
+      { !hasDelegatedProxy && account && !authWrap && !series && 
         <Box 
           fill='horizontal'
           pad='medium'
@@ -76,31 +83,34 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
           background='#555555'
           justify='between'
         >
-          {!buttonOnly && <Text>Feel free to look around and play. However, before you make any transactions you will need to sign few authorisations.</Text> }
+          {!buttonOnly && <Text>Feel free to look around and play. However, before you make any transactions you will need to sign a few authorizations.</Text> }
           <RaisedButton 
             background='#555555'
-            label={<Text size='small' color='#DDDDDD'><Unlock /> Authorise Yield</Text>}
+            label={<Text size='small' color='#DDDDDD'><Unlock /> Authorize Yield</Text>}
             onClick={()=>{authProcedure();}}
           />   
         </Box>}
 
-      { account && series?.hasDelegatedPool === false &&
+      { hasDelegatedProxy &&  account && series?.hasDelegatedPool === false && !authWrap &&
         <Box 
           round='small'
           direction='row' 
-          fill='horizontal' 
+          // fill='horizontal' 
           gap='small' 
-          justify='between' 
+          // justify='between' 
           pad='small' 
-          // background={modColor( series.seriesColor, 40)}
+          // background={modColor( series.seriesColor, -40)}
         >
-          {!buttonOnly && <Warning />}
-          {!buttonOnly && <Text>A once-off authorisation is required to use this series</Text>}
-          <RaisedButton 
-            background={modColor( series.seriesColor, 40)}
-            label={<Text size='xsmall'><Unlock /> Unlock Series </Text>}
-            onClick={()=>{authProcedure();}}           
-          />        
+          {!buttonOnly && <Text color={series.seriesTextColor}> <Warning /> </Text>}
+          {!buttonOnly && <Text size='xsmall' color={series.seriesTextColor}>A once-off authorization is required to use this series</Text>}
+          <Box>
+            <RaisedButton 
+              background={modColor( series.seriesColor, 40)}
+              label={<Text size='xsmall' color={series.seriesTextColor}><Unlock /> {screenSize==='small'? '' : 'Unlock Series'}</Text>}
+              onClick={()=>{authProcedure();}}
+            />   
+          </Box>
+             
         </Box>}
 
       { authActive && layerOpen &&
@@ -108,7 +118,7 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
           onClickOutside={()=>closeAuth()}
         >
           <Box 
-            width={screenSize!=='small'?{ min:'600px', max:'750px' }: undefined}
+            width={screenSize!=='small'?{ min:'600px', max:'600px' }: undefined}
             round
             background='background'
             pad='large'
@@ -146,7 +156,7 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
               );
             })}
             { !txActive && allSigned && <Text size='xsmall' weight='bold'>Finally, confirm sending the signatures to Yield in a transaction...</Text>}
-            { txActive && <Text size='xsmall' weight='bold'> Submitting your signed authorisations ... transaction pending.</Text> }
+            { txActive && <Text size='xsmall' weight='bold'> Submitting your signed authorizations ... transaction pending.</Text> }
             
             { authPending && txActive &&
             <Box alignSelf='start'>
@@ -169,5 +179,5 @@ const Authorization = ({ series, buttonOnly }:IAuthorizationProps) => {
     </>);
 };
 
-Authorization.defaultProps={ series:null, buttonOnly:false };
+Authorization.defaultProps={ series:null, buttonOnly:false, authWrap:false, children:null };
 export default Authorization;

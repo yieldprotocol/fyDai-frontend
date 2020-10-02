@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import moment from 'moment';
-import { Box, Text, ThemeContext, ResponsiveContext, Button } from 'grommet';
+import { Box, Text } from 'grommet';
 
 import {
   FiClock as Clock,
@@ -37,9 +37,12 @@ function AprBadge({ activeView, series, animate }:IAprBadgeProps) {
         pad={{ horizontal:'small', vertical:'none' }}
         align='center'
         gap='small'
+        background={series.seriesColor}
       >
-        <Clock />
-        <Text size='xxsmall'>  
+        <Text size='xsmall' color={series?.seriesTextColor}>
+          <Clock />
+        </Text>
+        <Text size='xsmall' color={series?.seriesTextColor}>  
           Mature       
         </Text>
       </Box>}
@@ -52,10 +55,10 @@ function AprBadge({ activeView, series, animate }:IAprBadgeProps) {
           pad={{ horizontal:'small', vertical:'none' }} 
           align='center'
           justify='center'
-          animation={animate ? { type:'zoomIn', duration:1000, size:'large' } : undefined} 
+          animation={animate ? { type:'zoomIn', duration:1000, size:'xlarge' } : undefined} 
         >
-          <Loading condition={!seriesApr} size='xxsmall'>
-            <Text size='xxsmall'> { seriesApr } </Text>  
+          <Loading condition={!seriesApr} size='xsmall'>
+            <Text size='xsmall' color={series?.seriesTextColor}> { seriesApr } </Text>  
           </Loading>
         </Box>}
 
@@ -71,7 +74,7 @@ function AprBadge({ activeView, series, animate }:IAprBadgeProps) {
             gap='xsmall'
           >
             <Warning />       
-            <Text size='xxsmall'>
+            <Text size='xxsmall' color={series?.seriesTextColor}>
               {series.poolState.reason} 
             </Text>
           </Box>}

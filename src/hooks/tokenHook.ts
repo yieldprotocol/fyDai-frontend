@@ -26,7 +26,7 @@ export function useToken() {
   const { signer, provider, account, voidSigner, fallbackProvider } = useSignerAccount();
   const  { dispatch }  = useContext<any>(NotifyContext);
   const [ approveActive, setApproveActive ] = useState<boolean>(false);
-  const { handleTx, handleTxError } = useTxHelpers();
+  const { handleTx, handleTxBuildError } = useTxHelpers();
 
   /**
    * Get the user account balance of ETH  (omit args) or an ERC20token (provide args)
@@ -105,7 +105,7 @@ export function useToken() {
     try {
       tx = await contract.approve(marketAddr, parsedAmount);
     } catch (e) {
-      handleTxError('Transaction was aborted or it failed.', tx, e);
+      handleTxBuildError(e);
       setApproveActive(false);
       return;
     }

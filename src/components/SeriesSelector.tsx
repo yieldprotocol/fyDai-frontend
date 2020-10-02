@@ -70,13 +70,12 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
         background='background-front'
         pad={{ horizontal: 'medium', vertical:'large' }}
         gap='medium'
-        width={screenSize!=='small'?{ min:'600px', max:'750px' }: undefined}
+        width={screenSize!=='small'?{ min:'600px', max:'600px' }: undefined}
       >
         <Box gap='medium'>
           <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Choose a series</Text>
           <Text alignSelf='start' size='medium' color='text-weak'>Select a series from the list below</Text>
         </Box>
-
         <Box 
           gap='none'
         >
@@ -87,7 +86,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
             justify='between'
             gap='small'
           >
-            <Box basis={screenSize==='small'?'30%':'20%'}>
+            <Box basis={screenSize==='small'?'30%':'30%'}>
               <Text size='small' color='text-weak'>APR</Text>
             </Box>
 
@@ -128,7 +127,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
                   pad='medium'
                   gap='small'
                 >
-                  <Box basis={screenSize==='small'?'30%':'20%'} align='center'>
+                  <Box basis={screenSize==='small'?'30%':'30%'} align='center'>
                     <Box direction='row'>
                       <AprBadge activeView={activeView} series={x} />
                     </Box>
@@ -150,8 +149,10 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
                   { screenSize !== 'small' && 
                   <Box basis='25%' direction='row' justify='end'>
                     { activeSeries && activeSeries.maturity === x.maturity ? 
+                      
                       <Button 
                         primary
+                        color={activeSeries.seriesColor}
                         label={
                           <Text size='small'>Selected</Text>           
                         }

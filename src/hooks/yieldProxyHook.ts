@@ -53,8 +53,8 @@ export const useProxy = () => {
   const { previewPoolTx } = usePool();
   const { splitDaiLiquidity } = useMath();
   const { getBalance } = useToken();
-  const { isMature } = useEDai();
-  const { handleTx, handleTxError } = useTxHelpers();
+  const { hasBeenMatured } = useEDai();
+  const { handleTx, handleTxBuildError } = useTxHelpers();
   
   /* Activity flags */
   const [ postEthActive, setPostEthActive ] = useState<boolean>(false);
@@ -67,9 +67,10 @@ export const useProxy = () => {
   const [ sellActive, setSellActive ] = useState<boolean>(false);
 
   const { abi: yieldProxyAbi } = YieldProxy;
+
   /* Temporary signing messages */
   const auths = new Map([
-    [1, { id: 1, desc:'Dai > treasury authenticate ' }],
+    [1, { id: 1, desc:'Authorize Yield to move Dai to repay debt.' }],
     [2, { id: 2, desc:'eDai > pool authenticate ' }],
   ]);
 
@@ -113,7 +114,7 @@ export const useProxy = () => {
     try {
       tx = await proxyContract.post(toAddr, { value: parsedAmount }); 
     } catch (e) {
-      handleTxError('Error depositing ETH', tx, e ); 
+      handleTxBuildError(e);
       setPostEthActive(false);
       return;
     }
@@ -140,7 +141,7 @@ export const useProxy = () => {
     try {
       tx = await proxyContract.withdraw(toAddr, parsedAmount);
     } catch (e) {
-      handleTxError('Error Withdrawing ETH', tx, e);
+      handleTxBuildError(e);
       setWithdrawEthActive(false);
       return;
     }
@@ -170,17 +171,16 @@ export const useProxy = () => {
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const toAddr = account && ethers.utils.getAddress(account);
     const parsedMaturity = series.maturity.toString();
-
     const collatType = ethers.utils.formatBytes32String(collateralType);
-    // const maxEDai = ethers.utils.parseEther(maximumEDai.toString());
 
     const overrides = { 
-      gasLimit: BigNumber.from('1000000')
+      gasLimit: BigNumber.from('500000')
     };
 
     setBorrowActive(true);
     let tx:any;
     let maxEDai:BigNumber;
+
     try {
       /* Calculate expected trade values and factor in slippage */
       const preview = await previewPoolTx('buydai', series, daiToBorrow); 
@@ -190,7 +190,6 @@ export const useProxy = () => {
         // minEDai = ethers.utils.parseEther('1000000');
         throw(preview);
       }
-
       tx = await proxyContract.borrowDaiForMaximumEDai( 
         poolAddr, 
         collatType,
@@ -202,15 +201,15 @@ export const useProxy = () => {
       );
 
     } catch (e) {
-      handleTxError('Error Borrowing Dai', tx, e);
+      handleTxBuildError(e); 
       setBorrowActive(false);
       return;
     }
+
     dispatch({ type: 'txPending', payload:{ tx, message: `Borrowing ${daiToBorrow} Dai pending...`, type:'BORROW' } } );
     await handleTx(tx);
     setBorrowActive(false);
   };
-
 
   /**
    * @dev Repay an amount of eDai debt in Controller using a given amount of Dai exchanged for eDai at pool rates, with a minimum of eDai debt required to be paid.
@@ -233,12 +232,9 @@ export const useProxy = () => {
     const toAddr = account && ethers.utils.getAddress(account);
     const fromAddr = account && ethers.utils.getAddress(account);
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
-    const eDaiAddr = ethers.utils.getAddress(series.eDaiAddress);
     const parsedMaturity = series.maturity.toString();
-    // const minEDai = ethers.utils.parseEther(minimumEDaiRepayment.toString());
 
     const overrides = {
-    // nonce: signer.getTransactionCount().then( (nonce:any) => nonce + queue),
       gasLimit: BigNumber.from('1000000')
     };
 
@@ -247,8 +243,8 @@ export const useProxy = () => {
     let daiPermitSig:any;
     let minEDai:BigNumber;
     try {
-      console.log( await series.isMature() );
-      if ( await isMature(series.eDaiAddress) ) {  
+
+      if ( series.isMature() ) {  
         try {
           console.log('repay with sig- after maturity');
           /* Repay using a signature authorizing treasury */
@@ -265,7 +261,7 @@ export const useProxy = () => {
           dispatch({ type: 'signed', payload: auths.get(1) });
           dispatch({ type: 'requestSigs', payload: [] });
         } catch (e) { 
-          handleTxError('Signing error', tx, e);
+          handleTxBuildError(e);
           dispatch({ type: 'requestSigs', payload: [] });
           setRepayActive(false);
           return;
@@ -280,8 +276,8 @@ export const useProxy = () => {
           overrides
         );
 
-      } else {
-        console.log('repay with no signature - before maturity');
+      } else if ( !series.isMature() ) {
+        console.log('Repay with no signature - before maturity');
         /* calculate expected trade values and factor in slippage */
         const preview = await previewPoolTx('selldai', series, repaymentInDai);
         if ( !(preview instanceof Error) ) {
@@ -301,11 +297,12 @@ export const useProxy = () => {
           dai,
           overrides
         );
-      }      
+      } else {
+        console.log('Series has passed its maturity date, but has not yet been matured');
+      }     
       
     } catch (e) {
-      console.log(e);
-      handleTxError('Error Repaying Dai', tx, e);
+      handleTxBuildError(e);
       setRepayActive(false);
       return;
     }
@@ -313,7 +310,6 @@ export const useProxy = () => {
     await handleTx(tx);
     setRepayActive(false);
   };
-
 
   /**
    * LIQUIDITY SECTION
@@ -361,7 +357,7 @@ export const useProxy = () => {
 
       tx = await proxyContract.addLiquidity(poolAddr, parsedDaiUsed, maxEDai, overrides);
     } catch (e) {
-      handleTxError('Error Adding liquidity', tx, e);
+      handleTxBuildError(e);
       setAddLiquidityActive(false);
       return;
     }
@@ -398,8 +394,8 @@ export const useProxy = () => {
     let minEDai:BigNumber;
     setRemoveLiquidityActive(true);
     try {
-      if ( !(await isMature(series.eDaiAddress)) ) {
-        console.log('removing liquidity BEFORE maturity'); 
+      if ( !(await hasBeenMatured(series.eDaiAddress)) ) {
+        console.log('Removing liquidity BEFORE maturity'); 
         /* calculate expected trade values and factor in slippage */
         // const preview = await previewPoolTx('selldai', series, daiUsed);
         // if ( !(preview instanceof Error) ) {
@@ -420,7 +416,7 @@ export const useProxy = () => {
         tx = await proxyContract.removeLiquidityMature(poolAddr, parsedTokens, overrides );
       }
     } catch (e) {
-      handleTxError('Error Removing liquidity', tx, e);
+      handleTxBuildError(e);
       setRemoveLiquidityActive(false);
       return;
     }
@@ -467,11 +463,9 @@ export const useProxy = () => {
         minEDaiOut = ethers.utils.parseEther('0');
         // throw(preview);
       }
-
       tx = await proxyContract.sellDai(poolAddr, toAddr, parsedDaiIn, minEDaiOut, overrides);
-
     } catch (e) {
-      handleTxError('Error selling', tx, e );   
+      handleTxBuildError(e);
       setSellActive(false);
       return;
     }
@@ -517,8 +511,7 @@ export const useProxy = () => {
       // const maxEDaiIn = ethers.utils.parseEther('1000000');
       tx = await proxyContract.buyDai(poolAddr, toAddr, parsedDaiOut, maxEDaiIn);
     } catch (e) {
-      console.log(e);
-      handleTxError('Error buying Dai', tx, e );   
+      handleTxBuildError(e);  
       setBuyActive(false);
       return;
     }
@@ -577,7 +570,7 @@ export const useProxy = () => {
         dispatch({ type: 'signed', payload: auths.get(2) });
         dispatch({ type: 'requestSigs', payload: [] });
       } catch (e) { 
-        handleTxError('Signing error', tx, e);
+        handleTxBuildError(e);
         dispatch({ type: 'requestSigs', payload: [] });
         setRepayActive(false);
         return;
@@ -592,8 +585,7 @@ export const useProxy = () => {
         overrides
       );
     } catch (e) {
-      console.log(e);
-      handleTxError('Error buying back Dai', tx, e );   
+      handleTxBuildError(e);  
       setBuyActive(false);
       return;
     }

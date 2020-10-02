@@ -13,7 +13,7 @@ import { UserContext } from '../contexts/UserContext';
 import { useProxy, useMath, useTxActive, useDebounce, useIsLol } from '../hooks';
 
 import ApprovalPending from '../components/ApprovalPending';
-import TxPending from '../components/TxPending';
+import TxStatus from '../components/TxStatus';
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
 import RaisedButton from '../components/RaisedButton';
@@ -28,7 +28,8 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
 
   const screenSize = useContext(ResponsiveContext);
 
-  const { state: { position }, actions: userActions } = useContext(UserContext);
+  const { state: { position, authorizations }, actions: userActions } = useContext(UserContext);
+  const { hasDelegatedProxy } = authorizations;
   const {
     ethPosted,
     ethPosted_,
@@ -38,7 +39,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
     debtValue,
     debtValue_,
   } = position;
-
+  
   const { withdrawEth, withdrawEthActive }  = useProxy();
   const { estCollRatio: estimateRatio } = useMath();
   const [ txActive ] = useTxActive(['WITHDRAW']);
@@ -50,8 +51,6 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
   const [ estRatio, setEstRatio ] = useState<any>();
   const [ estDecrease, setEstDecrease ] = useState<any>();
   const [ maxWithdraw, setMaxWithdraw ] = useState<string>();
-
-  const [ hasDelegated, setHasDelegated ] = useState<boolean>( true );
 
   const [ withdrawDisabled, setWithdrawDisabled ] = useState<boolean>(true);
   const [ withdrawPending, setWithdrawPending ] = useState<boolean>(false);
@@ -65,6 +64,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
     if (inputValue && !withdrawDisabled ) {
       setWithdrawPending(true);
       await withdrawEth(inputValue);
+      setInputValue(undefined);
       userActions.updatePosition();
       setWithdrawPending(false);
       close();
@@ -93,22 +93,23 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
 
   /* Withdraw disabled logic */
   useEffect(()=>{
-    ( 
-      estRatio < 150 ||
+    ( estRatio < 150 ||
       txActive ||
       !inputValue ||
+      !hasDelegatedProxy ||
       parseFloat(inputValue) <= 0
     )? setWithdrawDisabled(true) : setWithdrawDisabled(false);
-  }, [ inputValue, estRatio ]);
+  }, [ inputValue, estRatio, hasDelegatedProxy ]);
 
-  /* show warnings and errors with collateralisation ratio levels and inputs */
+  /* show warnings and errors with collateralization ratio levels and inputs */
   useEffect(()=>{
+
     if ( debouncedInput && maxWithdraw && (debouncedInput > maxWithdraw) ) {
       setWarningMsg(null);
-      setErrorMsg('You are not allowed to withdraw below the collateralization ratio'); 
+      setErrorMsg('That exceeds the amount of ETH you can withdraw right now.');
     } else if (estRatio >= 150 && estRatio < 200 ) {
       setErrorMsg(null);
-      setWarningMsg('Your collateralisation ratio will put you at risk of liquidation');
+      setWarningMsg('A collateralization ratio of close to 150% will put you at risk of liquidation');
     } else {   
       setWarningMsg(null);
       setErrorMsg(null);
@@ -136,14 +137,14 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
             gap='medium'
             justify='between'
           >        
-            <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to withdraw</Text>
+            <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to withdraw</Text>
 
             <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={withdrawDisabled}>
               <TextInput
                 ref={(el:any) => {el && el.focus(); setInputRef(el);}} 
                 type="number"
                 placeholder='ETH'
-                disabled={!hasDelegated}
+                disabled={!hasDelegatedProxy}
                 value={inputValue || ''}
                 plain
                 onChange={(event:any) => setInputValue(cleanValue(event.target.value))}
@@ -151,7 +152,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
               />
               <RaisedButton 
                 label='Withdraw maximum'
-                disabled={!hasDelegated}
+                disabled={!hasDelegatedProxy}
                 onClick={()=>setInputValue(maxWithdraw)}
               />
             </InputWrap>
@@ -160,7 +161,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
               {
                 label: 'Max withdraw',
                 visible: true,
-                active: hasDelegated,
+                active: hasDelegatedProxy,
                 loading: false, 
                 value: maxWithdraw? `${parseFloat(maxWithdraw).toFixed(4)} Eth` : '-',
                 valuePrefix: null,
@@ -172,7 +173,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
                 active: !!inputValue,
                 loading: false,           
                 value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
-                valuePrefix: 'Approx.',
+                valuePrefix: '~',
                 valueExtra: null,
                 // valueExtra: () => (
                 //   <Text color='green' size='medium'> 
@@ -187,6 +188,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
               onClick={()=> withdrawProcedure()}
               label={`Withdraw ${inputValue || ''} Eth`}
               disabled={withdrawDisabled}
+              hasDelegatedPool={true}
             />  
           
             <Box alignSelf='start' margin={{ top:'medium' }}>
@@ -216,7 +218,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
           gap='medium'
           justify='between'
         > 
-          <TxPending msg={`You are withdrawing ${inputValue} ETH`} tx={txActive} />
+          <TxStatus msg={`You are withdrawing ${inputValue} ETH`} tx={txActive} />
 
           <Box alignSelf='start'>
             <Box

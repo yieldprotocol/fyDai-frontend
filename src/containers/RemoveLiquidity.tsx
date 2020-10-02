@@ -17,7 +17,7 @@ import { useSignerAccount, useProxy, useTxActive, useDebounce, useIsLol } from '
 import InputWrap from '../components/InputWrap';
 import InfoGrid from '../components/InfoGrid';
 import ApprovalPending from '../components/ApprovalPending';
-import TxPending from '../components/TxPending';
+import TxStatus from '../components/TxStatus';
 import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
@@ -59,7 +59,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
     if ( !removeLiquidityDisabled ) {
       setRemoveLiquidityPending(true);
       await removeLiquidity(activeSeries, value);
-
+      setInputValue(undefined);
       if (activeSeries?.isMature()) {
         await Promise.all([
           userActions.updatePosition(),
@@ -131,7 +131,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
         pad='large'
         gap='medium'
       >
-        <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Remove Liquidity Tokens</Text>
+        <Text alignSelf='start' size='large' color='text' weight='bold'>Remove Liquidity Tokens</Text>
         <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={removeLiquidityDisabled}>
           <TextInput
             ref={(el:any) => {el && el.focus(); setInputRef(el);}} 
@@ -190,6 +190,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
           onClick={()=> removeLiquidityProcedure(inputValue)}
           label={`Remove ${inputValue || ''} tokens`}
           disabled={removeLiquidityDisabled}
+          hasDelegatedPool={activeSeries.hasDelegatedPool}
         />
 
         {!activeSeries?.isMature() &&
@@ -218,7 +219,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
         gap='medium'
         justify='between'
       > 
-        <TxPending msg={`You are removing ${inputValue} liquidity tokens`} tx={txActive} />
+        <TxStatus msg={`You are removing ${inputValue} liquidity tokens`} tx={txActive} />
                 
         <Box alignSelf='start'>
           <Box

@@ -53,7 +53,7 @@ export const useMath = () => {
   };
 
   /**
-   * Calculates the collateralisation ratio 
+   * Calculates the collateralization ratio 
    * ETH collat value and Dai debt value (in USD)
    *
    * @param {BigNumber} _collateralValue (wei/wad precision)
@@ -61,6 +61,7 @@ export const useMath = () => {
    * @returns {BigNumber} in Ray
    */
   const collRatio = ( _collateralValue:BigNumber, _debtValue:BigNumber ) => {
+
     if (_debtValue.eq(0) ) {
       // handle this case better
       return BigNumber.from(0);
@@ -69,7 +70,7 @@ export const useMath = () => {
   };
 
   /**
-   * Calculates the collateralisation percentage from a RAY ratio
+   * Calculates the collateralization percentage from a RAY ratio
    *
    * @param {BigNumber} _collateralizationRate(Ray precision)
    * @returns {BigNumber} percentage as a big number
@@ -79,7 +80,7 @@ export const useMath = () => {
   };
 
   /**
-   * Calculates an ESTIMATE of the collateralisation ratio 
+   * Calculates an ESTIMATE of the collateralization ratio 
    * ETH collat value and DAI debt value (in USD) using 
    * normal numbers
    *
@@ -210,10 +211,13 @@ export const useMath = () => {
     ) {
       const secsToMaturity = _maturity - _fromDate;
       const propOfYear = secsToMaturity/utils.SECONDS_PER_YEAR;
-      const priceRatio = parseFloat(ethers.utils.formatEther(_amount)) / parseFloat(ethers.utils.formatEther(_rate));
+      const priceRatio = parseFloat(_amount.toString()) / parseFloat(_rate.toString());
       const powRatio = 1 / propOfYear;
       const apr = Math.pow(priceRatio, powRatio) - 1;
-      return apr*100;
+      if(apr>0 && apr<100) {
+        return apr*100;
+      }
+      return 0;
     }
     return 0;
   };

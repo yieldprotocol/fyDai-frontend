@@ -15,13 +15,12 @@ import RaisedButton from './RaisedButton';
 
 interface ISeriesDescriptorProps {
   activeView: string;
-  minified?: boolean;
   children?:any;
 }
 
 function SeriesDescriptor( props: ISeriesDescriptorProps ) {
 
-  const { activeView, minified, children } = props;
+  const { activeView, children } = props;
   const screenSize = useContext(ResponsiveContext);
   const { state: seriesState } = useContext(SeriesContext);
   const { activeSeries } = seriesState; 
@@ -41,18 +40,21 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
         <Box
           alignSelf="center"
           fill
-        // round={{ corner:'top', size:'small' }}
-        // pad={{ horizontal:'small' }}
           round='small'
           pad='small'
           gap='small'
         // background=${modColor( activeSeries?.seriesColor, 30)}
-          background={`linear-gradient(to right, 
-          ${modColor( activeSeries?.seriesColor, -40)}, 
-          ${modColor( activeSeries?.seriesColor, -10)}, 
-          ${modColor( activeSeries?.seriesColor, 10)}, 
+          background={`linear-gradient(to bottom right, 
+          ${modColor( '#add8e6', -40)}, 
+          ${modColor( '#add8e6', -20)},
+          ${modColor( '#add8e6', 10)},
+          ${modColor( '#add8e6', 0)},
           ${modColor( activeSeries?.seriesColor, 40)}, 
-          ${modColor( activeSeries?.seriesColor, 40)})`}
+          ${modColor( activeSeries?.seriesColor, 40)}, 
+          ${modColor( activeSeries?.seriesColor, 40)}, 
+          ${modColor( activeSeries?.seriesColor, 40)}, 
+          ${modColor( activeSeries?.seriesColor, 0)}, 
+          ${modColor( activeSeries?.seriesColor, 0)})`}
           margin={{ bottom:'-16px' }}
         >
 
@@ -65,8 +67,6 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
           >
             <Box 
               round='xsmall'
-            // background='background-mid'
-            // border='all'
               onClick={()=>setSelectorOpen(true)}
               direction='row'
               fill
@@ -81,7 +81,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
                 gap='small'
               >             
                 <AprBadge activeView={activeView} series={activeSeries} animate />
-                <Text size='xlarge' weight='bold'>            
+                <Text size='large' weight='bold' color={activeSeries?.seriesTextColor}>            
                   { activeSeries?.displayName }
                 </Text>
               </Box>}
@@ -90,8 +90,8 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
                 background={modColor( activeSeries?.seriesColor, 40)}
                 label={(screenSize !== 'small' ) ?        
                   <Box align='center' direction='row' gap='small'>
-                    <ChangeSeries />
-                    <Text size='xsmall'>
+                    <Text size='xsmall' color={activeSeries?.seriesTextColor}> <ChangeSeries /> </Text>
+                    <Text size='xsmall' color={activeSeries?.seriesTextColor}>
                       Change Series              
                     </Text>
                   </Box>
@@ -106,9 +106,8 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
 
           <Box
             pad={!delegated? { horizontal:'medium' }: { horizontal:'medium', bottom:'medium' }}
-            // margin={ !delegated? undefined: { bottom:'medium'} }
           >
-            <Collapsible open={!seriesState.seriesLoading}>
+            <Collapsible open={seriesState && !seriesState.seriesLoading}>
               { children }
             </Collapsible>
 
@@ -116,7 +115,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
             <Box 
               fill='horizontal'
               round='small'
-              pad={{vertical:'medium' }}        
+              pad={{ vertical:'medium' }}        
             >
               <Box 
                 round='small'
@@ -132,6 +131,6 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
   );
 }
 
-SeriesDescriptor.defaultProps={ minified:false, children:null };
+SeriesDescriptor.defaultProps={ children:null };
 
 export default SeriesDescriptor; 

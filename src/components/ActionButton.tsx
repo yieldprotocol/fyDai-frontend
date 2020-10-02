@@ -1,6 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import styled, { css } from 'styled-components';
-import { Box, Button, Text } from 'grommet';
+import { Box, Text } from 'grommet';
+import Authorization from './Authorization';
+
+import { SeriesContext } from '../contexts/SeriesContext';
+import { UserContext } from '../contexts/UserContext';
 
 const StyledBox = styled(Box)`
   background: #f8f8f8;
@@ -18,14 +22,12 @@ const StyledBox = styled(Box)`
   `}
 
   ${(props:any) => !(props.disabled) && css`
-  
   box-shadow:  6px 6px 11px #dfdfdf,  
   -6px -6px 11px #ffffff;
-
   :active:hover {
     box-shadow:  0px 0px 0px #dfdfdf, 
         -0px -0px 0px #ffffff;
-    }
+    } 
   :hover {
     transform: scale(1.01);
     box-shadow:  8px 8px 11px #dfdfdf,  
@@ -36,47 +38,89 @@ const StyledBox = styled(Box)`
 
 function ActionButton({ ...props }:any ) {
 
+  const { state: seriesState } = useContext(SeriesContext);
+  const { activeSeries } = seriesState;
+  
+  const { state: userState } = useContext(UserContext);
+  const { authorizations: { hasDelegatedProxy } } = userState;
+
   return (
     <>
+      { hasDelegatedProxy && props.hasDelegatedPool && !props.disabled &&
       <StyledBox 
         {...props} 
         fill='horizontal'
-        // background={props.disabled ? undefined : 'brand'} 
         align='center'
         pad='small'
       >
         <Text 
           weight='bold'
           size='large'
-          color={props.disabled ? 'background' : 'brand'}
+          color={props.disabled ? 'background' : activeSeries?.seriesTextColor}
         >
           {props.label}
         </Text>
-      </StyledBox>
+      </StyledBox>}
+
+      { !hasDelegatedProxy && !props.disabled &&    
+        <Authorization 
+          authWrap
+        >
+          <StyledBox 
+            {...props} 
+            fill='horizontal'
+            align='center'
+            pad='small'
+            onClick={()=>{ }}
+          >
+            <Text 
+              size='medium'
+              color={props.disabled ? 'background' : activeSeries?.seriesTextColor}
+            >
+              Please authorise Yield before making any transactions
+            </Text>
+          </StyledBox>
+        </Authorization>}
+
+      { hasDelegatedProxy && !props.hasDelegatedPool && !props.disabled &&
+        <Authorization 
+          authWrap
+          series={activeSeries}
+        >
+          <StyledBox 
+            {...props} 
+            fill='horizontal'
+            align='center'
+            pad='small'
+            onClick={()=>{ }}
+          >
+            <Text 
+              size='medium'
+              color={props.disabled ? 'background' : activeSeries?.seriesTextColor}
+            >
+              Please unlock this series first
+            </Text>
+          </StyledBox>
+        </Authorization>}
+
+      { props.disabled && 
+        <StyledBox 
+          {...props} 
+          fill='horizontal'
+          align='center'
+          pad='small'
+          onClick={()=>{ }}
+        >
+          <Text 
+            size='medium'
+            color={props.disabled ? 'background' : activeSeries?.seriesTextColor}
+          >
+            Dummy box click this if you are a bot.
+          </Text>
+        </StyledBox>}
     </>
   );
 }
 
 
-
 export default ActionButton;
-
-
-// {/* <> 
-//         <Box
-//           fill='horizontal'
-//           round='small'
-//           background={repayDisabled ? 'brand-transparent' : 'brand'}
-//           onClick={()=>repayProcedure(inputValue)}
-//           align='center'
-//           pad='small'
-//         >
-//           <Text 
-//             weight='bold'
-//             size='large'
-//             color={repayDisabled ? 'text-xweak' : 'text'}
-//           >
-//             {`Repay ${inputValue || ''} DAI`}
-//           </Text>
-//         </Box>
-//       </>  */}

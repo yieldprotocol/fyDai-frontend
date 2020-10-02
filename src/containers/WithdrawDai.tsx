@@ -15,7 +15,7 @@ import { UserContext } from '../contexts/UserContext';
 import { usePool, useProxy, useSignerAccount, useTxActive, useDebounce, useIsLol } from '../hooks';
 
 import InputWrap from '../components/InputWrap';
-import TxPending from '../components/TxPending';
+import TxStatus from '../components/TxStatus';
 import ApprovalPending from '../components/ApprovalPending';
 import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
@@ -62,6 +62,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
         activeSeries,
         inputValue,
       );
+      setInputValue(undefined);
       userActions.updatePosition();
       seriesActions.updateActiveSeries();
       setWithdrawDaiPending(false);
@@ -89,7 +90,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
   }, [ inputValue, hasDelegated ]);
 
 
-  /* show warnings and errors with collateralisation ratio levels and inputs */
+  /* show warnings and errors with collateralization ratio levels and inputs */
   useEffect(()=>{
     if ( debouncedInput && maxWithdraw && (debouncedInput > maxWithdraw) ) {
       setWarningMsg(null);
@@ -118,7 +119,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
           pad='large'
           gap='medium'
         >
-          <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to close</Text>
+          <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to close</Text>
           <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={withdrawDisabled}>
             <TextInput
               ref={(el:any) => {el && el.focus(); setInputRef(el);}} 
@@ -139,6 +140,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
             onClick={()=> withdrawProcedure()}
             label={`Reclaim ${inputValue || ''} Dai`}
             disabled={withdrawDisabled}
+            hasDelegatedPool={activeSeries.hasDelegatedPool}
           />
           
           <Box alignSelf='start' margin={{ top:'medium' }}>
@@ -167,7 +169,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
             gap='medium'
             justify='between'
           > 
-            <TxPending msg={`You are closing ${inputValue} DAI`} tx={txActive} />
+            <TxStatus msg={`You are closing ${inputValue} DAI`} tx={txActive} />
                 
             <Box alignSelf='start'>
               <Box

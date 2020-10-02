@@ -28,7 +28,7 @@ import Redeem from './Redeem';
 import InputWrap from '../components/InputWrap';
 import InfoGrid from '../components/InfoGrid';
 import ApprovalPending from '../components/ApprovalPending';
-import TxPending from '../components/TxPending';
+import TxStatus from '../components/TxStatus';
 import SeriesDescriptor from '../components/SeriesDescriptor';
 import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
@@ -82,7 +82,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
         activeSeries,
         inputValue
       );
-      setInputValue('');
+      setInputValue(undefined);
       await Promise.all([
         userActions.updatePosition(),
         seriesActions.updateActiveSeries()
@@ -93,16 +93,25 @@ const Lend = ({ lendAmount }:ILendProps) => {
 
   /* Handle input (debounce input) changes */
   useEffect(() => {
-    activeSeries && !(activeSeries.isMature()) && !!debouncedInput && ( async () => {
+    activeSeries && !(activeSeries?.isMature()) && !!debouncedInput && ( async () => {
       const preview = await previewPoolTx('sellDai', activeSeries, debouncedInput);
-      !(preview instanceof Error) && setEDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
-      !(preview instanceof Error) && setAPR( yieldAPR( ethers.utils.parseEther(debouncedInput), preview, activeSeries.maturity ) );
+      if (!(preview instanceof Error)) {
+        setEDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
+        setAPR( yieldAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) );      
+      } else {
+        /* if the market doesnt have liquidity just estimate from rate */
+        const rate = await previewPoolTx('sellDai', activeSeries, 1);
+        !(rate instanceof Error) && setEDaiValue(debouncedInput*parseFloat((ethers.utils.formatEther(rate))));
+        (rate instanceof Error) && setEDaiValue(0);
+        setLendDisabled(true);
+        setErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
+      }
     })();
   }, [activeSeries, debouncedInput]);
 
   /* handle active series loads and changes */
   useEffect(() => {
-    fallbackProvider && account && activeSeries?.eDaiBalance_ && !(activeSeries.isMature()) && ( async () => {
+    fallbackProvider && account && activeSeries?.eDaiBalance_ && !(activeSeries?.isMature()) && ( async () => {
       const preview = await previewPoolTx('SellEDai', activeSeries, activeSeries.eDaiBalance_);
       !(preview instanceof Error) && setCurrentValue( ethers.utils.formatEther(preview));
     })();
@@ -117,11 +126,14 @@ const Lend = ({ lendAmount }:ILendProps) => {
       !inputValue || 
       parseFloat(inputValue) <= 0
     )? setLendDisabled(true): setLendDisabled(false);
-  }, [ inputValue, hasDelegated ]);
+  }, [ inputValue, hasDelegated]);
 
   /* handle exceptions, errors and warnings */
   useEffect(() => {
-    if ( daiBalance && debouncedInput && ethers.utils.parseEther(debouncedInput).gt(daiBalance)  ) {
+    if ( false ) {
+      setWarningMsg(null);
+      setErrorMsg('There is not enough liquidity to support a transaction of that size just yet.'); 
+    } else if ( daiBalance && debouncedInput && ethers.utils.parseEther(debouncedInput).gt(daiBalance)  ) {
       setWarningMsg(null);
       setErrorMsg('That amount exceeds the amount of Dai you have'); 
     } else {
@@ -139,46 +151,44 @@ const Lend = ({ lendAmount }:ILendProps) => {
     >
       { withdrawDaiOpen && <WithdrawDai close={()=>setWithdrawDaiOpen(false)} /> }
 
-      <Collapsible open={!!activeSeries}> 
-        <SeriesDescriptor activeView='lend'>
-          <InfoGrid 
-            alt 
-            entries={[
-              {
-                label: 'Portfolio Value at Maturity',
-                visible: 
-                  (!!account && !txActive && !activeSeries.isMature()) || 
-                  ( activeSeries.isMature() && activeSeries?.eDaiBalance_>0),
-                active: true,
-                loading: lendPending,  
-                value: activeSeries && `${activeSeries?.eDaiBalance_} DAI` || '-',
-                valuePrefix: null,
-                valueExtra: null,
-              },
-              {
-                label: 'Current Value',
-                visible: !!account && !txActive && !activeSeries.isMature(),
-                active: true,
-                loading: lendPending || !currentValue,           
-                value: currentValue?`${cleanValue(currentValue, 2)} DAI`: '- Dai',
-                valuePrefix: null,
-                valueExtra: null,
-              },
-              {
-                label: 'Dai balance',
-                visible: 
-                  (!!account && !txActive && !activeSeries.isMature()) || 
-                  (activeSeries.isMature() && activeSeries?.eDaiBalance_>0),
-                active: true,
-                loading: lendPending,            
-                value: daiBalance_?`${daiBalance_} DAI`: '0 DAI',
-                valuePrefix: null,
-                valueExtra: null,
-              },
-            ]}
-          />
-        </SeriesDescriptor>
-      </Collapsible>
+      <SeriesDescriptor activeView='lend'>
+        <InfoGrid 
+          alt 
+          entries={[
+            {
+              label: 'Portfolio Value at Maturity',
+              visible: 
+                  (!!account && !txActive && !activeSeries?.isMature()) || 
+                  ( activeSeries?.isMature() && activeSeries?.eDaiBalance_>0),
+              active: true,
+              loading: lendPending,  
+              value: activeSeries && `${activeSeries?.eDaiBalance_} DAI` || '-',
+              valuePrefix: null,
+              valueExtra: null,
+            },
+            {
+              label: 'Current Value',
+              visible: !!account && !txActive && !activeSeries?.isMature(),
+              active: true,
+              loading: lendPending || !currentValue,           
+              value: currentValue?`${cleanValue(currentValue, 2)} DAI`: '- Dai',
+              valuePrefix: null,
+              valueExtra: null,
+            },
+            {
+              label: 'Dai Balance',
+              visible: 
+                  (!!account && !txActive && !activeSeries?.isMature()) || 
+                  (activeSeries?.isMature() && activeSeries?.eDaiBalance_>0),
+              active: true,
+              loading: lendPending,            
+              value: daiBalance_?`${daiBalance_} DAI`: '0 DAI',
+              valuePrefix: null,
+              valueExtra: null,
+            },
+          ]}
+        />
+      </SeriesDescriptor>
    
       {/* If there is no applicable transaction active, show the lending page */}
       { !txActive &&
@@ -197,7 +207,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
           { !activeSeries?.isMature() && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
             <>
               <Box fill gap='medium'>
-                <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Amount to lend</Text>
+                <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to lend</Text>
                 <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={lendDisabled}>
                   <TextInput
                     ref={(el:any) => {el && !withdrawDaiOpen && el.focus(); setInputRef(el);}}
@@ -205,7 +215,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
                     placeholder={screenSize !== 'small' ? 'Enter the amount of Dai to lend': 'DAI'}
                     value={inputValue || ''}
                     plain
-                    onChange={(event:any) => setInputValue( cleanValue(event.target.value) )}
+                    onChange={(event:any) => setInputValue( cleanValue(event.target.value, 6) )}
                     icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <DaiMark />}
                   />
                   {account &&
@@ -248,7 +258,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
                     valuePrefix: null,
                     valueExtra: () => (
                       <RaisedButton
-                        label={<Text size='small'>Connect a wallet</Text>}
+                        label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Connect a wallet</Text></Box>}
                         onClick={()=>console.log('still to implement')}
                       /> 
                     )
@@ -262,6 +272,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
                   onClick={()=>lendProcedure()}
                   label={`Lend ${inputValue || ''} DAI`}
                   disabled={lendDisabled}
+                  hasDelegatedPool={activeSeries.hasDelegatedPool}
                 />       
               </Box>
 
@@ -271,7 +282,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
                   onClick={()=>setWithdrawDaiOpen(true)}
                   label={
                     <Box direction='row' gap='small' align='center'>
-                      <Box><Text size='xsmall' color='text-weak'>alternatively, <Text weight='bold'>close</Text> your position in this series</Text></Box>
+                      <Box><Text size='xsmall' color='text-weak'><Text weight='bold' color={activeSeries.seriesColor}>close</Text> your position in this series</Text></Box>
                       <ArrowRight color='text-weak' />
                     </Box>
                 }
@@ -293,7 +304,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
 
       {/* If there is a transaction active, show the applicable view */}
       { sellActive && !txActive && <ApprovalPending /> }
-      { txActive && <TxPending msg={`You are lending ${inputValue} DAI`} tx={txActive} /> }
+      { txActive && <TxStatus msg={`You are lending ${inputValue} DAI`} tx={txActive} /> }
     </Keyboard>
   );
 };
