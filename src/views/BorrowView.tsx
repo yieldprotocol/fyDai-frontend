@@ -13,6 +13,7 @@ import Borrow from '../containers/Borrow';
 import Repay from '../containers/Repay';
 
 import CollateralSummary from '../components/CollateralSummary';
+import FlatButton from '../components/FlatButton';
 
 // const Deposit = lazy(() => import('../containers/Deposit'));
 // const Borrow = lazy(() => import('../containers/Borrow'));
@@ -29,6 +30,8 @@ const BorrowView = ({
   const [ activeView, setActiveView ] = useState<number>( 
     activeViewFromProps || 1
   );
+
+  const [ collateralOpen, setCollateralOpen ] = useState<boolean>(false);
 
   return (
     <Box 
@@ -47,7 +50,21 @@ const BorrowView = ({
       /> */}
 
       <BorrowSelector activeView={activeView} setActiveView={setActiveView} />
+
+
+
       <RaisedBox>
+
+        {/* <Box>
+          <Box direction='row'>
+            Collateralization ration: 100% 
+            <FlatButton label='manage collateral' onClick={()=>setCollateralOpen(!collateralOpen)} /> 
+          </Box>     
+          <Collapsible open={collateralOpen}>
+            <Deposit setActiveView={setActiveView} />
+          </Collapsible>
+        </Box> */}
+
         <Box
           width={{ max: '600px' }}
           alignSelf="center"
@@ -55,6 +72,11 @@ const BorrowView = ({
           background="background-front"
           round='small'
         > 
+          {/* <Collapsible open={!collateralOpen}>
+            {activeView === 1 && <Borrow setActiveView={setActiveView} /> }
+            {activeView === 2 && <Repay setActiveView={setActiveView} />}
+          </Collapsible> */}
+
           {activeView === 0 && <Deposit setActiveView={setActiveView} /> }  
           {activeView === 1 && <Borrow setActiveView={setActiveView} /> }
           {activeView === 2 && <Repay setActiveView={setActiveView} />}

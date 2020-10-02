@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Box, Layer, Keyboard, TextInput, Text, ResponsiveContext } from 'grommet';
+import { Box, Layer, Keyboard, TextInput, Text, ResponsiveContext, Collapsible } from 'grommet';
 import ethers from 'ethers';
 
 import { 
@@ -44,7 +44,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
   const { estCollRatio: estimateRatio } = useMath();
   const [ txActive ] = useTxActive(['WITHDRAW']);
 
-  const [ inputValue, setInputValue ] = useState<string>();
+  const [ inputValue, setInputValue ] = useState<any>();
   const debouncedInput = useDebounce(inputValue, 500);
   const [inputRef, setInputRef] = useState<any>(null);
 
@@ -156,33 +156,37 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
                 onClick={()=>setInputValue(maxWithdraw)}
               />
             </InputWrap>
-        
-            <InfoGrid entries={[
-              {
-                label: 'Max withdraw',
-                visible: true,
-                active: hasDelegatedProxy,
-                loading: false, 
-                value: maxWithdraw? `${parseFloat(maxWithdraw).toFixed(4)} Eth` : '-',
-                valuePrefix: null,
-                valueExtra: null, 
-              },
-              {
-                label: 'Ratio after Withdraw',
-                visible: collateralPercent_ > 0,
-                active: !!inputValue,
-                loading: false,           
-                value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
-                valuePrefix: '~',
-                valueExtra: null,
-                // valueExtra: () => (
-                //   <Text color='green' size='medium'> 
-                //     { inputValue && collateralPercent_ && ( (estRatio-collateralPercent_) !== 0) && `(+ ${(estRatio-collateralPercent_).toFixed(0)}%)` }
-                //   </Text>
-                // )
-              },
-            ]}
-            />
+
+            <Box fill>
+              <Collapsible open={!!inputValue&&inputValue>0}>
+                <InfoGrid entries={[
+                  {
+                    label: 'Max withdraw',
+                    visible: true,
+                    active: hasDelegatedProxy,
+                    loading: false, 
+                    value: maxWithdraw? `${parseFloat(maxWithdraw).toFixed(4)} Eth` : '-',
+                    valuePrefix: null,
+                    valueExtra: null, 
+                  },
+                  {
+                    label: 'Ratio after Withdraw',
+                    visible: collateralPercent_ > 0,
+                    active: !!inputValue,
+                    loading: false,           
+                    value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
+                    valuePrefix: '~',
+                    valueExtra: null,
+                    // valueExtra: () => (
+                    //   <Text color='green' size='medium'> 
+                    //     { inputValue && collateralPercent_ && ( (estRatio-collateralPercent_) !== 0) && `(+ ${(estRatio-collateralPercent_).toFixed(0)}%)` }
+                    //   </Text>
+                    // )
+                  },
+                ]}
+                />
+              </Collapsible>
+            </Box>
 
             <ActionButton
               onClick={()=> withdrawProcedure()}

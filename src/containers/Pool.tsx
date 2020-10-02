@@ -167,17 +167,17 @@ const Pool = (props:IPoolProps) => {
               valuePrefix: null,
               valueExtra: null,
             },
-            {
-              label: 'Current Dai Balance',
-              visible: 
-                  (!!account && txActive?.type !== 'ADD_LIQUIDITY' && !activeSeries?.isMature()) || 
-                  (activeSeries?.isMature() && activeSeries?.poolTokens_>0 ),
-              active: true,
-              loading: addLiquidityPending,            
-              value: daiBalance_?`${daiBalance_} DAI`: '0 DAI',
-              valuePrefix: null,
-              valueExtra: null,
-            },
+            // {
+            //   label: 'Dai Balance',
+            //   visible:
+            //       (!!account && txActive?.type !== 'ADD_LIQUIDITY' && !activeSeries?.isMature()) || 
+            //       (activeSeries?.isMature() && activeSeries?.poolTokens_>0 ),
+            //   active: true,
+            //   loading: addLiquidityPending,            
+            //   value: daiBalance_?`${daiBalance_} DAI`: '0 DAI',
+            //   valuePrefix: null,
+            //   valueExtra: null,
+            // },
           ]}
         /> 
       </SeriesDescriptor>   
@@ -217,34 +217,40 @@ const Pool = (props:IPoolProps) => {
                   />}
                 </InputWrap>
 
-                <InfoGrid entries={[
-                  {
-                    label: 'Share of the Pool after adding liquidity',
-                    visible: true,
-                    active: inputValue,
-                    loading: calculating,           
-                    value: newShare? `${newShare}%`: '',
-                    valuePrefix: null,
-                    valueExtra: null,
-                  },
-                  {
-                    label: 'Like what you see?',
-                    visible: !account && inputValue>0,
-                    active: inputValue,
-                    loading: false,            
-                    value: '',
-                    valuePrefix: null,
-                    valueExtra: () => (
-                      <Button
-                        color='brand-transparent'
-                        label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Connect a wallet</Text></Box>}
-                        onClick={()=>console.log('still to implement')}
-                        hoverIndicator='brand-transparent'
-                      /> 
-                    )
-                  },
-                ]}
-                />
+                <Box fill>
+                  <Collapsible open={!!inputValue&&inputValue>0}>
+
+                    <InfoGrid entries={[
+                      {
+                        label: 'Share of the Pool after adding liquidity',
+                        visible: true,
+                        active: inputValue,
+                        loading: calculating,           
+                        value: newShare? `${newShare}%`: '',
+                        valuePrefix: null,
+                        valueExtra: null,
+                      },
+                      {
+                        label: 'Like what you see?',
+                        visible: !account && inputValue>0,
+                        active: inputValue,
+                        loading: false,            
+                        value: '',
+                        valuePrefix: null,
+                        valueExtra: () => (
+                          <Button
+                            color='brand-transparent'
+                            label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Connect a wallet</Text></Box>}
+                            onClick={()=>console.log('still to implement')}
+                            hoverIndicator='brand-transparent'
+                          /> 
+                        )
+                      },
+                    ]}
+                    />
+                  </Collapsible>
+                </Box>
+
               </Box> 
             
               <Box gap='small' fill='horizontal' align='center'>

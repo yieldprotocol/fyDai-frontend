@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { ethers } from 'ethers';
-import { Box, Button, Layer, TextInput, Text, Keyboard, ThemeContext, ResponsiveContext } from 'grommet';
+import { Box, Button, Layer, TextInput, Text, Keyboard, ThemeContext, ResponsiveContext, Collapsible } from 'grommet';
 import { 
   FiArrowLeft as ArrowLeft,
 } from 'react-icons/fi';
@@ -147,44 +147,47 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
             onClick={()=>setInputValue( ethers.utils.formatEther(activeSeries?.poolTokens) )}
           />
         </InputWrap>
-
-        <InfoGrid entries={[
-          {
-            label: 'Current Token Balance',
-            visible: true,
-            active: true,
-            loading: false,     
-            value: activeSeries?.poolTokens_,
-            valuePrefix: null,
-            valueExtra: null, 
-          },
-          {
-            label: 'Share of the Pool After withdraw',
-            visible: true,
-            active: inputValue,
-            loading: calculating,           
-            value: parseFloat(newShare)>=0 ? `${newShare}%`: '',
-            valuePrefix: null,
-            valueExtra: null, 
-          },
-          {
-            label: 'Like what you see?',
-            visible: false,
-            active: inputValue,
-            loading: false,            
-            value: '',
-            valuePrefix: null,
-            valueExtra: () => (
-              <Button
-                color='brand-transparent'
-                label={<Text size='xsmall' color='brand'>Connect a wallet</Text>}
-                onClick={()=>console.log('still to implement')}
-                hoverIndicator='brand-transparent'
-              /> 
-            )
-          },
-        ]}
-        />
+        <Box fill>
+          <Collapsible open={!!inputValue&&inputValue>0}>
+            <InfoGrid entries={[
+              {
+                label: 'Current Token Balance',
+                visible: true,
+                active: true,
+                loading: false,     
+                value: activeSeries?.poolTokens_,
+                valuePrefix: null,
+                valueExtra: null, 
+              },
+              {
+                label: 'Share of the Pool After withdraw',
+                visible: true,
+                active: inputValue,
+                loading: calculating,           
+                value: parseFloat(newShare)>=0 ? `${newShare}%`: '',
+                valuePrefix: null,
+                valueExtra: null, 
+              },
+              {
+                label: 'Like what you see?',
+                visible: false,
+                active: inputValue,
+                loading: false,            
+                value: '',
+                valuePrefix: null,
+                valueExtra: () => (
+                  <Button
+                    color='brand-transparent'
+                    label={<Text size='xsmall' color='brand'>Connect a wallet</Text>}
+                    onClick={()=>console.log('still to implement')}
+                    hoverIndicator='brand-transparent'
+                  /> 
+                )
+              },
+            ]}
+            />
+          </Collapsible>
+        </Box>
 
         <ActionButton
           onClick={()=> removeLiquidityProcedure(inputValue)}

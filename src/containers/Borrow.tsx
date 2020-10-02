@@ -188,7 +188,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
           alt
           entries={[
             {
-              label: 'Current Debt',
+              label: 'Dai Debt Owed',
               visible:
                   !!account &&
                   (!activeSeries?.isMature() && !txActive)  || 
@@ -255,79 +255,84 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
               />
             </InputWrap>
 
-            <InfoGrid entries={[
-              {
-                label: 'Estimated APR',
-                visible: true,
-                active: !!inputValue&&inputValue>0,
-                loading: false,    
-                value: APR?`${APR.toFixed(2)}%`: `${activeSeries? activeSeries.yieldAPR_: ''}%`,
-                valuePrefix: null,
-                valueExtra: null, 
-              },
-              {
-                label: 'Approx. Dai owed at maturity',
-                visible: true,
-                active: !!inputValue&&inputValue>0,
-                loading: false,          
-                value: `${eDaiValue.toFixed(2)} DAI`,
-                valuePrefix: null,
-                // valueExtra: () => (
-                //   <Text size='xxsmall'>
-                //     {activeSeries && Moment(activeSeries.maturity_).format('DD MMMM YYYY')}
-                //   </Text>
-                // ),
-              },
+            <Box fill>
+              <Collapsible open={!!inputValue&&inputValue>0}>
+                <InfoGrid entries={[
+                  {
+                    label: 'Estimated APR',
+                    visible: !!inputValue,
+                    active: !!inputValue&&inputValue>0,
+                    loading: false,    
+                    value: APR?`${APR.toFixed(2)}%`: `${activeSeries? activeSeries.yieldAPR_: ''}%`,
+                    valuePrefix: null,
+                    valueExtra: null, 
+                  },
+                  {
+                    label: 'Dai owed at maturity',
+                    visible: !!inputValue,
+                    active: !!inputValue&&inputValue>0,
+                    loading: false,          
+                    value: `${eDaiValue.toFixed(2)} DAI`,
+                    valuePrefix: '',
+                    // valueExtra: () => (
+                    //   <Text size='xsmall'>
+                    //     {activeSeries && Moment(activeSeries.maturity_).format('DD MMMM YYYY')}
+                    //   </Text>
+                    // ),
+                  },
 
-              {
-                label: 'Ratio after Borrow',
-                visible: !!account && position.ethPosted_>0,
-                active: !!inputValue&&inputValue>0,
-                loading: false,        
-                value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
-                valuePrefix: '~',
-                valueExtra: () => (
-                  <Text color='red' size='small'> 
-                    {/* { inputValue &&
+                  {
+                    label: 'Ratio after Borrow',
+                    visible: !!inputValue && !!account && position.ethPosted_>0,
+                    active: !!inputValue&&inputValue>0,
+                    loading: false,        
+                    value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
+                    valuePrefix: '',
+                    valueExtra: () => (
+                      <Text color='red' size='small'> 
+                        {/* { inputValue &&
                         estRatio &&
                         ( (collateralPercent_-estRatio) > 0) &&
                         `(-${(collateralPercent_-estRatio).toFixed(0)}%)` } */}
-                  </Text>
-                )
-              },
-              {
-                label: 'Like what you see?',
-                visible: !account && !!inputValue&&inputValue>0,
-                active: !!inputValue&&inputValue>0,
-                loading: false,            
-                value: '',
-                valuePrefix: null,
-                valueExtra: () => (
-                  <Box>
-                    <RaisedButton
-                      label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Connect a wallet</Text></Box>}
-                      onClick={()=>console.log('still to implement')}
-                    />
-                  </Box>
-                )
-              },
-              {
-                label: 'Want to borrow Dai?',
-                visible: !!inputValue&&inputValue>0 && !!account && position.ethPosted <= 0,
-                active: !!inputValue,
-                loading: false,            
-                value: '',
-                valuePrefix: null,
-                valueExtra: () => (
-                  <RaisedButton
-                    color={inputValue? 'brand': 'brand-transparent'}
-                    label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Deposit collateral</Text></Box>}
-                    onClick={() => setActiveView(0)}
-                  /> 
-                )
-              },
-            ]}
-            />
+                      </Text>
+                    )
+                  },
+                  {
+                    label: 'Like what you see?',
+                    visible: !account && !!inputValue&&inputValue>0,
+                    active: !!inputValue&&inputValue>0,
+                    loading: false,            
+                    value: '',
+                    valuePrefix: null,
+                    valueExtra: () => (
+                      <Box>
+                        <RaisedButton
+                          label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Connect a wallet</Text></Box>}
+                          onClick={()=>console.log('still to implement')}
+                        />
+                      </Box>
+                    )
+                  },
+                  {
+                    label: 'Want to borrow Dai?',
+                    visible: !!inputValue&&inputValue>0 && !!account && position.ethPosted <= 0,
+                    active: !!inputValue,
+                    loading: false,            
+                    value: '',
+                    valuePrefix: null,
+                    valueExtra: () => (
+                      <RaisedButton
+                        color={inputValue? 'brand': 'brand-transparent'}
+                        label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Deposit collateral</Text></Box>}
+                        onClick={() => setActiveView(0)}
+                      /> 
+                    )
+                  },
+                ]}
+                />
+              </Collapsible>
+            </Box>
+
             { account &&  
             <ActionButton
               onClick={()=>borrowProcedure()}

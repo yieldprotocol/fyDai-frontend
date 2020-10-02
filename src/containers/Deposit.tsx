@@ -6,7 +6,8 @@ import {
   Keyboard,
   TextInput, 
   Text,
-  ResponsiveContext,
+  ResponsiveContext, 
+  Collapsible
 } from 'grommet';
 
 import {
@@ -183,7 +184,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
               valuePrefix: null,
               valueExtra: ()=> ( 
                 <Box>
-                  <Text size='xxsmall'>Collateral posted here can be used to borrow Dai from any Yield series.</Text>                 
+                  <Text size='xsmall'>Collateral posted here can be used to borrow Dai from any Yield series.</Text>                 
                 </Box>
               ), 
             },
@@ -221,46 +222,49 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
             />
           </InputWrap>
 
-          <InfoGrid entries={[
-
-            {
-              label: 'Ratio after Deposit',
-              visible: !!account && collateralPercent_ > 0,
-              active: debouncedInput && collateralPercent_ > 0,
-              loading: !ethPosted_ && depositPending && ethPosted_ !== 0,           
-              value: (estRatio && estRatio !== 0)? `${estRatio}%`: `${collateralPercent_}%` || '',
-              valuePrefix: '~',
-              valueExtra: () => (
-                <Text color='green' size='medium'> 
-                  {/* { inputValue && collateralPercent_ && ( (estRatio-collateralPercent_) !== 0) && `(+ ${(estRatio-collateralPercent_).toFixed(0)}%)` } */}
-                </Text>
-              )
-            },
-            {
-              label: 'Borrowing Power after deposit',
-              visible: !!account,
-              active: debouncedInput,
-              loading: !ethPosted_ && depositPending && ethPosted_ !== 0,
-              value: estPower? `${estPower} DAI`: '0 DAI',           
-              valuePrefix: '~',
-              valueExtra: null,
-            },
-            {
-              label: 'First connect a wallet!',
-              visible: !account && inputValue,
-              active: inputValue,
-              loading: false,            
-              value: '',
-              valuePrefix: null,
-              valueExtra: () => (
-                <RaisedButton
-                  label={<Text size='small'>Connect a wallet</Text>}
-                  onClick={()=>console.log('still to implement')}
-                /> 
-              )
-            },
-          ]}
-          />
+          <Box fill>
+            <Collapsible open={!!inputValue&&inputValue>0}>
+              <InfoGrid entries={[
+                {
+                  label: 'Ratio after Deposit',
+                  visible: !!account && collateralPercent_ > 0,
+                  active: debouncedInput && collateralPercent_ > 0,
+                  loading: !ethPosted_ && depositPending && ethPosted_ !== 0,           
+                  value: (estRatio && estRatio !== 0)? `${estRatio}%`: `${collateralPercent_}%` || '',
+                  valuePrefix: '~',
+                  valueExtra: () => (
+                    <Text color='green' size='medium'> 
+                      {/* { inputValue && collateralPercent_ && ( (estRatio-collateralPercent_) !== 0) && `(+ ${(estRatio-collateralPercent_).toFixed(0)}%)` } */}
+                    </Text>
+                  )
+                },
+                {
+                  label: 'Borrowing Power after deposit',
+                  visible: !!account,
+                  active: debouncedInput,
+                  loading: !ethPosted_ && depositPending && ethPosted_ !== 0,
+                  value: estPower? `${estPower} DAI`: '0 DAI',           
+                  valuePrefix: '~',
+                  valueExtra: null,
+                },
+                {
+                  label: 'First connect a wallet!',
+                  visible: !account && inputValue,
+                  active: inputValue,
+                  loading: false,            
+                  value: '',
+                  valuePrefix: null,
+                  valueExtra: () => (
+                    <RaisedButton
+                      label={<Text size='small'>Connect a wallet</Text>}
+                      onClick={()=>console.log('still to implement')}
+                    /> 
+                  )
+                },
+              ]}
+              />
+            </Collapsible>
+          </Box>
 
           {account &&  
             <ActionButton

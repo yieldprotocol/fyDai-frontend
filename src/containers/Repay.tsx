@@ -1,6 +1,6 @@
 import React, { useEffect, useContext, useState } from 'react';
 import { ethers } from 'ethers';
-import { Box, Button, TextInput, Text, ResponsiveContext, Keyboard, Layer } from 'grommet';
+import { Box, Button, TextInput, Text, ResponsiveContext, Keyboard, Layer, Collapsible } from 'grommet';
 
 import { 
   FiCheckCircle as Check,
@@ -158,43 +158,46 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
                     />
                   </InputWrap>
 
+                  <Box fill>
+                    <Collapsible open={true}>
+                      <InfoGrid 
+                        entries={[
+                          {
+                            label: 'Total amount owed',
+                            visible: false,
+                            active: true,
+                            loading: repayPending,    
+                            value: activeSeries?.ethDebtEDai_? `${activeSeries.ethDebtEDai_} DAI`: '0 DAI',
+                            valuePrefix: null,
+                            valueExtra: null, 
+                          }, 
+                          {
+                            label: 'Cost to repay all now',
+                            visible: true,
+                            active: true,
+                            loading: false,    
+                            value:  activeSeries?.ethDebtDai_? `${activeSeries.ethDebtDai_} DAI`: '0 DAI',
+                            valuePrefix: null,
+                            valueExtra: null,
+                          },
+                          {
+                            label: `Owed after repayment of ${inputValue} DAI`,
+                            visible: !!inputValue&&inputValue>0,
+                            active: !!inputValue&&inputValue>0,
+                            loading: false,    
+                            value: activeSeries?.ethDebtDai_ ? 
+                              ( activeSeries.ethDebtDai_ - parseFloat(debouncedInput)>0 ? 
+                                activeSeries.ethDebtDai_ - parseFloat(debouncedInput) 
+                                : 0
+                              ).toFixed(2) : '- DAI',
 
-                  <InfoGrid 
-                    entries={[
-                      {
-                        label: 'Total amount owed',
-                        visible: true,
-                        active: true,
-                        loading: repayPending,    
-                        value: activeSeries?.ethDebtEDai_? `${activeSeries.ethDebtEDai_} DAI`: '0 DAI',
-                        valuePrefix: null,
-                        valueExtra: null, 
-                      }, 
-                      {
-                        label: 'Cost to repay today',
-                        visible: true,
-                        active: true,
-                        loading: false,    
-                        value:  activeSeries?.ethDebtDai_? `${activeSeries.ethDebtDai_} DAI`: '0 DAI',
-                        valuePrefix: null,
-                        valueExtra: null,
-                      },
-                      {
-                        label: 'Owed after repayment',
-                        visible: true,
-                        active: !!inputValue&&inputValue>0,
-                        loading: false,    
-                        value: activeSeries?.ethDebtDai_ ? 
-                          ( activeSeries.ethDebtDai_ - parseFloat(debouncedInput)>0 ? 
-                            activeSeries.ethDebtDai_ - parseFloat(debouncedInput) 
-                            : 0
-                          ).toFixed(2) : '- DAI',
-
-                        valuePrefix: null,
-                        valueExtra: null, 
-                      },
-                    ]}
-                  />
+                            valuePrefix: null,
+                            valueExtra: null, 
+                          },
+                        ]}
+                      />
+                    </Collapsible>
+                  </Box>
 
                   <ActionButton
                     onClick={()=>repayProcedure(inputValue)}

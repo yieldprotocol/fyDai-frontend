@@ -225,47 +225,52 @@ const Lend = ({ lendAmount }:ILendProps) => {
                   />}
                 </InputWrap>
 
-                <InfoGrid entries={[
-                  {
-                    label: 'Estimated APR',
-                    visible: true,
-                    active: inputValue,
-                    loading: false,     
-                    value: APR?`${APR.toFixed(2)}%`: `${activeSeries? activeSeries.yieldAPR_: ''}%`,
-                    valuePrefix: null,
-                    valueExtra: null, 
-                  },
-                  {
-                    label: 'Approx. Dai received at maturity',
-                    visible: true,
-                    active: inputValue,
-                    loading: false,           
-                    value: `${eDaiValue.toFixed(2)} DAI`,
-                    valuePrefix: null,
-                    valueExtra: null,
-                    //   valueExtra: () => (
-                    //   <Text size='xxsmall'>
-                    //     {activeSeries && Moment(activeSeries.maturity_).format('DD MMMM YYYY')}
-                    //   </Text>
-                    // ),
-                  },
-                  {
-                    label: 'Like what you see?',
-                    visible: !account && inputValue>0,
-                    active: inputValue,
-                    loading: false,            
-                    value: '',
-                    valuePrefix: null,
-                    valueExtra: () => (
-                      <RaisedButton
-                        label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Connect a wallet</Text></Box>}
-                        onClick={()=>console.log('still to implement')}
-                      /> 
-                    )
-                  },
-                ]}
-                />
+                <Box fill>
+                  <Collapsible open={!!inputValue&&inputValue>0}>
+                    <InfoGrid entries={[
+                      {
+                        label: 'Estimated APR',
+                        visible: true,
+                        active: inputValue,
+                        loading: false,     
+                        value: APR?`${APR.toFixed(2)}%`: `${activeSeries? activeSeries.yieldAPR_: ''}%`,
+                        valuePrefix: null,
+                        valueExtra: null, 
+                      },
+                      {
+                        label: 'Approx. Dai received at maturity',
+                        visible: true,
+                        active: inputValue,
+                        loading: false,           
+                        value: `${eDaiValue.toFixed(2)} DAI`,
+                        valuePrefix: null,
+                        valueExtra: null,
+                        //   valueExtra: () => (
+                        //   <Text size='xsmall'>
+                        //     {activeSeries && Moment(activeSeries.maturity_).format('DD MMMM YYYY')}
+                        //   </Text>
+                        // ),
+                      },
+                      {
+                        label: 'Like what you see?',
+                        visible: !account && inputValue>0,
+                        active: inputValue,
+                        loading: false,            
+                        value: '',
+                        valuePrefix: null,
+                        valueExtra: () => (
+                          <RaisedButton
+                            label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Connect a wallet</Text></Box>}
+                            onClick={()=>console.log('still to implement')}
+                          /> 
+                        )
+                      },
+                    ]}
+                    />
+                  </Collapsible>
+                </Box>
               </Box>
+              
 
               <Box gap='small' fill='horizontal' align='center' pad={{ vertical:'small' }}>
                 <ActionButton
