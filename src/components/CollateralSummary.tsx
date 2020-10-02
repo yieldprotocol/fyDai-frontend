@@ -72,7 +72,6 @@ function CollateralSummary({ setActiveView, activeView }:IActionSelectorProps) {
   
   return (
     <Box gap='small' align='end'>
-      {/* <Text size='xxsmall' color='brand'>Step 1</Text> */}
       <StyledBox
         round='large'
         pad={{ horizontal: 'large', vertical: 'xsmall' }}
