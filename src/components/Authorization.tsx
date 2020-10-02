@@ -91,22 +91,25 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
           />   
         </Box>}
 
-      { hasDelegatedProxy &&  account && series?.hasDelegatedPool === false && !authWrap &&
+      { hasDelegatedProxy && account && series?.hasDelegatedPool === false && !authWrap &&
         <Box 
-          round='small'
+          // round='small'
           direction='row' 
-          // fill='horizontal' 
-          gap='small' 
-          // justify='between' 
-          pad='small' 
-          // background={modColor( series.seriesColor, -40)}
+          gap='small'
+          pad='medium'
+          justify='around'
+          background='#555555'
         >
-          {!buttonOnly && <Text color={series.seriesTextColor}> <Warning /> </Text>}
-          {!buttonOnly && <Text size='xsmall' color={series.seriesTextColor}>A once-off authorization is required to use this series</Text>}
+          {/* {!buttonOnly && <Text color={series.seriesTextColor}> <Warning /> </Text>}
+          {!buttonOnly && <Text size='xsmall' color={series.seriesTextColor}>A once-off authorization is required to use this series</Text>} */}
+          {!buttonOnly && <Text color='#DDDDDD'> <Warning /> </Text>}
+          {!buttonOnly && <Text size='xsmall' color='#DDDDDD'>A once-off authorization is required to use this series</Text>}
           <Box>
             <RaisedButton 
-              background={modColor( series.seriesColor, 40)}
-              label={<Text size='xsmall' color={series.seriesTextColor}><Unlock /> {screenSize==='small'? '' : 'Unlock Series'}</Text>}
+              // background={modColor( series.seriesColor, 40)}
+              // label={<Text size='xsmall' color={series.seriesTextColor}><Unlock /> {screenSize==='small'? '' : 'Unlock Series'}</Text>}
+              background='#555555'
+              label={<Text size='xsmall' color='#DDDDDD'><Unlock /> {screenSize==='small'? '' : 'Unlock Series'}</Text>}
               onClick={()=>{authProcedure();}}
             />   
           </Box>
@@ -120,7 +123,7 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
           <Box 
             width={screenSize!=='small'?{ min:'600px', max:'600px' }: undefined}
             round
-            background='background'
+            background='white'
             pad='large'
             gap='medium'
           >

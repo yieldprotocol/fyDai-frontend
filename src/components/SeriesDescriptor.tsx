@@ -27,7 +27,6 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
   const [ selectorOpen, setSelectorOpen ] = useState<boolean>(false);
   const [ delegated, setDelegated ] = useState<boolean>(true);
 
-
   useEffect(()=>{
     activeSeries && setDelegated(activeSeries.hasDelegatedPool);
   }, [ activeSeries ]);
@@ -35,15 +34,15 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
   return (
     <>
       {selectorOpen && <SeriesSelector activeView={activeView} close={()=>setSelectorOpen(false)} /> }
-
       {activeSeries &&
         <Box
           alignSelf="center"
           fill
           round='small'
-          pad='small'
           gap='small'
-        // background=${modColor( activeSeries?.seriesColor, 30)}
+          pad={{ bottom:'small' }}
+
+          // background=${modColor( activeSeries?.seriesColor, 30)}
           background={`linear-gradient(to bottom right, 
           ${modColor( '#add8e6', -40)}, 
           ${modColor( '#add8e6', -20)},
@@ -57,75 +56,67 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
           ${modColor( activeSeries?.seriesColor, 0)})`}
           margin={{ bottom:'-16px' }}
         >
-
-          {/* <Text alignSelf='start' size='xlarge' color='text' weight='bold'>Selected series</Text> */}
           <Box
-            direction='row-responsive'
-            fill='horizontal'
-            gap='small'
-            align='center'
+            pad='small'  
           >
-            <Box 
-              round='xsmall'
-              onClick={()=>setSelectorOpen(true)}
-              direction='row'
-              fill
-              pad='small'
-              flex
-              justify='between'
-            >
-            
-              {activeSeries &&
-              <Box 
-                direction='row' 
-                gap='small'
-              >             
-                <AprBadge activeView={activeView} series={activeSeries} animate />
-                <Text size='large' weight='bold' color={activeSeries?.seriesTextColor}>            
-                  { activeSeries?.displayName }
-                </Text>
-              </Box>}
 
-              <RaisedButton
-                background={modColor( activeSeries?.seriesColor, 40)}
-                label={(screenSize !== 'small' ) ?        
-                  <Box align='center' direction='row' gap='small'>
-                    <Text size='xsmall' color={activeSeries?.seriesTextColor}> <ChangeSeries /> </Text>
-                    <Text size='xsmall' color={activeSeries?.seriesTextColor}>
-                      Change Series              
-                    </Text>
-                  </Box>
-                  : 
-                  <Box align='center'>
-                    <ChangeSeries />
-                  </Box>}
-                onClick={()=>setSelectorOpen(true)}
-              />
-            </Box>
-          </Box>
-
-          <Box
-            pad={!delegated? { horizontal:'medium' }: { horizontal:'medium', bottom:'medium' }}
-          >
-            <Collapsible open={seriesState && !seriesState.seriesLoading}>
-              { children }
-            </Collapsible>
-
-            { !delegated && !activeSeries.isMature() && 
-            <Box 
+            {/* <Text alignSelf='start' size='xlarge' color='text' weight='bold'>Selected series</Text> */}
+            <Box
+              direction='row-responsive'
               fill='horizontal'
-              round='small'
-              pad={{ vertical:'medium' }}        
+              gap='small'
+              align='center'
             >
               <Box 
-                round='small'
+                round='xsmall'
+                onClick={()=>setSelectorOpen(true)}
+                direction='row'
                 fill
+                pad='small'
+                flex
+                justify='between'
               >
-                <Authorization series={activeSeries} />
+            
+                {activeSeries &&
+                <Box 
+                  direction='row' 
+                  gap='small'
+                >             
+                  <AprBadge activeView={activeView} series={activeSeries} animate />
+                  <Text size='large' weight='bold' color={activeSeries?.seriesTextColor}>            
+                    { activeSeries?.displayName }
+                  </Text>
+                </Box>}
+
+                <RaisedButton
+                  background={modColor( activeSeries?.seriesColor, 40)}
+                  label={(screenSize !== 'small' ) ?        
+                    <Box align='center' direction='row' gap='small'>
+                      <Text size='xsmall' color={activeSeries?.seriesTextColor}> <ChangeSeries /> </Text>
+                      <Text size='xsmall' color={activeSeries?.seriesTextColor}>
+                        Change Series              
+                      </Text>
+                    </Box>
+                    : 
+                    <Box align='center'>
+                      <ChangeSeries />
+                    </Box>}
+                  onClick={()=>setSelectorOpen(true)}
+                />
               </Box>
-            </Box>} 
-          </Box>
-   
+            </Box>
+
+            <Box
+              pad={!delegated? { horizontal:'medium' }: { horizontal:'medium', bottom:'medium' }}
+            >
+              <Collapsible open={seriesState && !seriesState.seriesLoading}>
+                { children }
+              </Collapsible>
+            </Box> 
+          </Box> 
+  
+          { !seriesState.seriesLoading && !delegated && !activeSeries.isMature() &&
+            <Authorization series={activeSeries} />}
         </Box>}
     </>
   );
