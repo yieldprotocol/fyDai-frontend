@@ -45,4 +45,10 @@ ReactDOM.render(
   document.getElementById('root')
 );
 
-serviceWorker.register();
+serviceWorker.register({ 
+  // TODO handle the update
+  onUpdate: ()=> {
+    console.log('A newer version of the app is available');
+    // window.location.reload();
+  } 
+}); 
