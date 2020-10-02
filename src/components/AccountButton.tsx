@@ -157,9 +157,9 @@ const AccountButton = (props: any) => {
 
       { pendingTxs.length===0 && !txCompleteOpen &&
       <Box pad={{ left:'small', right:'large' }} direction='row' gap='small' align='center'>
-        <Text size='xsmall'><DaiMark /></Text>
+        <DaiMark />
         <Loading condition={!position.daiBalance} size='xsmall'>
-          <Text size='xsmall' textAlign='center'>{position?.daiBalance_} </Text>
+          <Text size='xsmall' weight='bold' >{position?.daiBalance_} DAI </Text>
         </Loading>
       </Box>}
         
