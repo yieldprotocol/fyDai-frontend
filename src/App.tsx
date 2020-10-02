@@ -25,6 +25,7 @@ import TestLayer from './containers/layers/TestLayer';
 import Splash from './components/Splash';
 import RaisedBox from './components/RaisedBox';
 import Authorization from './components/Authorization';
+import MiniDash from './containers/MiniDash';
 
 // const LendView = React.lazy(() => import('./views/LendView'));
 // const PoolView = React.lazy(() => import('./views/PoolView'));
@@ -61,6 +62,7 @@ const App = (props:any) => {
 
   // TODO Switch out for react router
   const [activeView, setActiveView] = useState<string>('BORROW');
+  const [borrowActiveView, setBorrowActiveView] = useState<number>(1);
 
   const [showConnectLayer, setShowConnectLayer] = useState<string|null>(null);
   const [showSeriesLayer, setShowSeriesLayer] = useState<boolean>(false);
@@ -127,7 +129,9 @@ const App = (props:any) => {
             pad={{ vertical: 'large' }}
             fill="horizontal"
             align="center"
-          >     
+            gap='medium'
+          >  
+            {/* <MiniDash activeView={activeView} /> */}
             {activeView === 'BORROW' && <BorrowView />}
             {activeView === 'LEND' && <LendView />}
             {activeView === 'POOL' && <PoolView />}

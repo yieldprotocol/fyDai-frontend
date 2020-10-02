@@ -58,37 +58,15 @@ function CollateralDescriptor( props: ICollateralDescriptorProps ) {
             flex
             justify='between'
           >
-
             <Box 
               direction='row' 
               gap='small'
               align='center'
-            >             
-              {/* <AprBadge activeView={activeView} series={activeSeries} animate /> */}
-              <Box height='60%'>
-                <Image src={theme.dark ? logoLight : logoDark} fit="contain" />
-              </Box>
-
+            >
               <Text size='large' weight='bold' color='brand'> 
-                Collateral 
+                Manage Collateral 
               </Text>
             </Box>
-
-            {/* <RaisedButton
-              background='#ff86c8'
-              label={(screenSize !== 'small' ) ?        
-                <Box align='center' direction='row' gap='small'>
-                  <Text size='xsmall' color='brand'> <ChangeSeries /> </Text>
-                  <Text size='xsmall' color='brand'>
-                    Change Series              
-                  </Text>
-                </Box>
-                : 
-                <Box align='center'>
-                  <ChangeSeries />
-                </Box>}
-              onClick={()=>setSelectorOpen(true)}
-            /> */}
           </Box>
         </Box>
 
@@ -98,9 +76,7 @@ function CollateralDescriptor( props: ICollateralDescriptorProps ) {
           <Collapsible open={!seriesState.seriesLoading}>
             { children }
           </Collapsible>
-
         </Box>
-   
       </Box>
     </>
   );
