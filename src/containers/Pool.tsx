@@ -253,7 +253,7 @@ const Pool = (props:IPoolProps) => {
 
               </Box> 
             
-              <Box gap='small' fill='horizontal' align='center'>
+              <Box gap='small' fill='horizontal' align='center' pad={{ vertical:'small' }}>
                 <ActionButton
                   onClick={()=>addLiquidityProcedure()} 
                   label={`Supply ${inputValue || ''} DAI`}

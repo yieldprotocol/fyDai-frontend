@@ -66,6 +66,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
               fill='horizontal'
               gap='small'
               align='center'
+              pad={{vertical:'small'}}
             >
               <Box 
                 round='xsmall'
@@ -107,7 +108,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
 
             <Box
               // pad={!delegated? { horizontal:'medium' }: { horizontal:'medium', bottom:'medium' }}
-              pad={ {horizontal:'medium' }}
+              pad={{ horizontal:'medium' }}
             >
               <Collapsible open={seriesState && !seriesState.seriesLoading}>
                 { children }

@@ -118,10 +118,11 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
 
       <Collapsible open={detailsOpen}>
         <Box 
-          pad={{ horizontal:'small' }} 
+          pad={{ horizontal:'small', top:'small' }} 
           direction='row-responsive' 
           gap='medium' 
           justify='start'
+
         >
           {visibleEntries.map((x:any, i:number) => {
             const _key = i;
