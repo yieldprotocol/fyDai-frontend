@@ -1,7 +1,6 @@
 import React, { useContext } from 'react';
 import { Box } from 'grommet';
 import { SeriesContext } from '../contexts/SeriesContext';
-import PageHeader from '../components/PageHeader';
 
 import Lend from '../containers/Lend';
 import Redeem from '../containers/Redeem';
@@ -20,12 +19,6 @@ const LendView = ({ activeView }:LendProps) => {
   const { activeSeries } = seriesState;
   return (
     <>
-      {/* <PageHeader
-        title="Lend"
-        subtitle="Description of lending"
-        tipPrimary="Tip: Convert your Maker vault"
-        tipSecondary="View more tips"
-      /> */}
       <RaisedBox> 
         <Lend />
       </RaisedBox>

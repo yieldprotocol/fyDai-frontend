@@ -5,7 +5,6 @@ import { Box, Collapsible, Stack } from 'grommet';
 
 
 import RaisedBox from '../components/RaisedBox';
-import PageHeader from '../components/PageHeader';
 import BorrowSelector from '../components/BorrowSelector';
 
 import Deposit from '../containers/Deposit';
@@ -40,19 +39,7 @@ const BorrowView = ({
       round='small'
       align='center'
     >
-      {/* <PageHeader
-        title="Borrow"
-        subtitle="Description of borrowing"
-        tipPrimary="Tip: Convert your Maker vault"
-        tipSecondary="View more tips"
-      /> */}
-
-      <BorrowSelector activeView={activeView} setActiveView={setActiveView} />
-
-
-
       <RaisedBox>
-
         <Box
           width={{ max: '600px' }}
           alignSelf="center"
@@ -60,6 +47,10 @@ const BorrowView = ({
           background="background-front"
           round='small'
         > 
+          {/* <ReactCardFlip isFlipped={activeView === 0}>
+            <Borrow setActiveView={setActiveView} />
+            <Deposit setActiveView={setActiveView} />
+          </ReactCardFlip> */}
 
           {activeView === 0 && <Deposit setActiveView={setActiveView} /> }  
           {activeView === 1 && <Borrow setActiveView={setActiveView} /> }
