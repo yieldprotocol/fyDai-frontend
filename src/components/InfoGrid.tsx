@@ -38,7 +38,7 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
 
   const [ detailsOpen, setDetailsOpen ] = useState<boolean>(false);
 
-  const [visibleEntries, setVisibleEntries] = useState<number>(0);
+  const [visibleEntries, setVisibleEntries] = useState<any[]>([]);
 
   const [normalText, setNormalText] = useState<string>(!alt? 'brand': activeSeries?.seriesTextColor);
   const [xWeakText, setXWeakText] = useState<string>(!alt? 'text-xweak':`${modColor(activeSeries?.seriesColor, 10)}`);
@@ -51,7 +51,7 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
   }, [activeSeries]);
 
   useEffect(()=>{
-    setVisibleEntries((entries.filter((x:any)=>x.visible===true)).length);
+    setVisibleEntries((entries.filter((x:any)=>x.visible===true)));
   }, [entries]);
 
   
@@ -63,13 +63,12 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
         gap='small' 
         justify='start'
       >
-        {entries.map((x:any, i:number) => {
+        {visibleEntries.map((x:any, i:number) => {
           const _key = i;
           const ValueExtra = x.valueExtra;
           const Value = x.value;
           const Label = x.label;
-
-          if (x.visible && i < 3) {
+          if (i < 3) {
             return (             
               <Box
                 key={_key}
@@ -124,7 +123,7 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
           gap='medium' 
           justify='start'
         >
-          {entries.map((x:any, i:number) => {
+          {visibleEntries.map((x:any, i:number) => {
             const _key = i;
             const ValueExtra = x.valueExtra; 
             const Value = x.value;
@@ -178,7 +177,7 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
         </Box>
       </Collapsible>
   
-      { visibleEntries > 3 && 
+      { visibleEntries.length > 3 && 
       <Box 
         onClick={()=>setDetailsOpen(!detailsOpen)}
         direction='row' 

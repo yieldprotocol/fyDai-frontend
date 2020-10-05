@@ -274,10 +274,12 @@ const Lend = ({ lendAmount }:ILendProps) => {
                         value: '',
                         valuePrefix: null,
                         valueExtra: () => (
-                          <RaisedButton
-                            label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Connect a wallet</Text></Box>}
-                            onClick={()=>console.log('still to implement')}
-                          /> 
+                          <Box pad={{ top:'small' }}>
+                            <RaisedButton
+                              label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Connect a wallet</Text></Box>}
+                              onClick={()=>console.log('still to implement')}
+                            /> 
+                          </Box>
                         )
                       },
                     ]}

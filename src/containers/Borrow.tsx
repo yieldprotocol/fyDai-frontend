@@ -55,6 +55,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
     maxDaiAvailable_,
     ethTotalDebtDai_,
     collateralPercent_,
+    daiBalance_,
   } = position;
 
   const screenSize = useContext(ResponsiveContext);
@@ -238,23 +239,15 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
             },
             {
               label: 'Borrowing Power',
-              labelExtra: 'based on posted collateral',
+              labelExtra: 'based on collateral posted',
               visible: !txActive && activeSeries && !activeSeries.isMature() && !!account,
               active: maxDaiAvailable_,
               loading: borrowPending,
               value: maxDaiAvailable_? `${maxDaiAvailable_} DAI`: '0 DAI',           
-              valuePrefix: '~',
+              valuePrefix: null,
               valueExtra: null,
             },
-            // {
-            //   label: 'Dai Balance',
-            //   visible: !txActive && activeSeries && !activeSeries.isMature() && !!account,
-            //   active: !!inputValue&&inputValue>0,
-            //   loading: false,        
-            //   value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
-            //   valuePrefix: '',
-            //   valueExtra: null,
-            // },
+
             {
               label: 'Total Debt',
               labelExtra: 'across all yield series',
@@ -273,6 +266,17 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
               value: (collateralPercent_ && (collateralPercent_ !== 0))? `${collateralPercent_}%`: '',
               valuePrefix: null,
               valueExtra: null, 
+            },
+            {
+              label: 'Dai Balance',
+              visible: 
+                  (!!account && !txActive && !activeSeries?.isMature()) || 
+                  (activeSeries?.isMature() && activeSeries?.eDaiBalance_>0),
+              active: true,
+              loading: borrowPending,            
+              value: daiBalance_?`${daiBalance_} DAI`: '0 DAI',
+              valuePrefix: null,
+              valueExtra: null,
             },
 
           ]}
@@ -336,12 +340,28 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
                     //   </Text>
                     // ),
                   },
-
+                  {
+                    label: 'Like what you see?',
+                    // labelExtra: 'the first step is to:',
+                    visible: !account && inputValue>0,
+                    active: inputValue,
+                    loading: false,            
+                    value: '',
+                    valuePrefix: null,
+                    valueExtra: () => (
+                      <Box pad={{ top:'small' }}>
+                        <RaisedButton
+                          label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Connect a wallet</Text></Box>}
+                          onClick={()=>console.log('still to implement')}
+                        /> 
+                      </Box>
+                    )
+                  },
                   {
                     label: 'Collateralization Ratio',
                     labelExtra: `after borrowing ${inputValue && cleanValue(inputValue, 2)} Dai`,
                     visible: !!inputValue && !!account && position.ethPosted_>0,
-                    active: !!inputValue&&inputValue>0,
+                    active: true,
                     loading: false,        
                     value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
                     valuePrefix: '',
@@ -352,22 +372,6 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
                         ( (collateralPercent_-estRatio) > 0) &&
                         `(-${(collateralPercent_-estRatio).toFixed(0)}%)` } */}
                       </Text>
-                    )
-                  },
-                  {
-                    label: 'Like what you see?',
-                    visible: !account && !!inputValue&&inputValue>0,
-                    active: !!inputValue&&inputValue>0,
-                    loading: false,            
-                    value: '',
-                    valuePrefix: null,
-                    valueExtra: () => (
-                      <Box>
-                        <RaisedButton
-                          label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Connect a wallet</Text></Box>}
-                          onClick={()=>console.log('still to implement')}
-                        />
-                      </Box>
                     )
                   },
                   {
