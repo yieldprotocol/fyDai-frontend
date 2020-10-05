@@ -285,7 +285,9 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
               hasDelegatedPool={true}
             /> }
 
-          { ethPosted_ > 0 &&
+
+
+          
 
           <Box 
             direction='row'
@@ -302,6 +304,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
                 </Box>
 }
             />
+            { ethPosted_ > 0 &&
             <FlatButton 
               onClick={()=>setWithdrawOpen(true)}
               label={
@@ -310,8 +313,8 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
                   <ArrowRight color='text-weak' />
                 </Box>
 }
-            />
-          </Box>}
+            />}
+          </Box>
        
         </Box>}
       { postEthActive && !txActive && <ApprovalPending /> } 

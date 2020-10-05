@@ -250,7 +250,6 @@ const Pool = (props:IPoolProps) => {
                     />
                   </Collapsible>
                 </Box>
-
               </Box> 
             
               <Box gap='small' fill='horizontal' align='center' pad={{ vertical:'small' }}>
@@ -266,7 +265,6 @@ const Pool = (props:IPoolProps) => {
           { activeSeries?.isMature() &&
             <SeriesMatureBox />}
             
-
           { !activeSeries?.isMature() &&
             activeSeries?.poolTokens_>0 &&
             <Box alignSelf='end' margin={{ top:'medium' }}>

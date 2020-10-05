@@ -45,7 +45,7 @@ function CollateralDescriptor( props: ICollateralDescriptorProps ) {
           fill='horizontal'
           gap='small'
           align='center'
-          pad='medium'
+          pad={{ horizontal:'large', vertical:'medium' }}
           justify='between'
         >
           <Box 
@@ -53,7 +53,6 @@ function CollateralDescriptor( props: ICollateralDescriptorProps ) {
             gap='small'
             align='center'
           >
-            <EthMark />
             <Text size='large' weight='bold' color='brand'> 
               Manage ETH Collateral 
             </Text>
@@ -64,7 +63,7 @@ function CollateralDescriptor( props: ICollateralDescriptorProps ) {
             label={
               <Box align='center' direction='row' gap='small'>
                 <Text size='xsmall'>
-                  Back to Borrow             
+                  Back to Borrow           
                 </Text>
               </Box>
           }

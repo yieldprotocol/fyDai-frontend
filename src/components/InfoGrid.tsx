@@ -36,7 +36,7 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
   const screenSize = useContext(ResponsiveContext);
   const { state:{ activeSeries } } = useContext(SeriesContext);
 
-  const [ detailsOpen, setDetailsOpen ] = useState<boolean>(false);
+  const [ detailsOpen, setDetailsOpen ] = useState<boolean>();
 
   const [visibleEntries, setVisibleEntries] = useState<any[]>([]);
 
@@ -122,7 +122,6 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
           direction='row-responsive' 
           gap='medium' 
           justify='start'
-
         >
           {visibleEntries.map((x:any, i:number) => {
             const _key = i;

@@ -287,7 +287,6 @@ const Lend = ({ lendAmount }:ILendProps) => {
                 </Box>
               </Box>
               
-
               <Box gap='small' fill='horizontal' align='center' pad={{ vertical:'small' }}>
                 <ActionButton
                   onClick={()=>lendProcedure()}

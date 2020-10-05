@@ -263,9 +263,9 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
               visible: !txActive && activeSeries && !activeSeries.isMature() && !!account,
               active: collateralPercent_ > 0,
               loading: false,            
-              value: (collateralPercent_ && (collateralPercent_ !== 0))? `${collateralPercent_}%`: '',
+              value: (collateralPercent_ && (collateralPercent_ !== 0))? `${collateralPercent_}%`: '0%',
               valuePrefix: null,
-              valueExtra: null, 
+              valueExtra: null,  
             },
             {
               label: 'Dai Balance',
