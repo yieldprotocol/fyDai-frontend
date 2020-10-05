@@ -37,10 +37,14 @@ export const useEDai = () => {
     const toAddr = fromAddr;
     const eDaiAddr = ethers.utils.getAddress(eDaiAddress);
 
+    const overrides = {
+      gasLimit: BigNumber.from('500000')
+    };
+
     setRedeemActive(true);
     const contract = new ethers.Contract( eDaiAddr, eDaiAbi, signer );
     try {
-      tx = await contract.redeem(fromAddr, toAddr, parsedAmount);
+      tx = await contract.redeem(fromAddr, toAddr, parsedAmount, overrides);
     } catch (e) {
       handleTxBuildError(e);
       setRedeemActive(false);
