@@ -89,8 +89,17 @@ export const cleanValue = (input:string, decimals:number=12) => {
 };
 
 export const modColor = (color:any, amount:any) => {
+  let c;
+  let cT;
+  if (color.length === 9 || color.length === 8 ) {
+    c=color.substring(0, color.length - 2);
+    cT=color.slice(-2);
+  } else {
+    c=color;
+    cT='FF';
+  }
   // eslint-disable-next-line prefer-template
-  return '#' + color.replace(/^#/, '').replace(/../g, (col:any) => ('0'+Math.min(255, Math.max(0, parseInt(col, 16) + amount)).toString(16)).substr(-2));
+  return '#' + c.replace(/^#/, '').replace(/../g, (col:any) => ('0'+Math.min(255, Math.max(0, parseInt(col, 16) + amount)).toString(16)).substr(-2))+ cT;
 };
 
 export const contrastColor = (hex:any) => {
