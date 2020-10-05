@@ -4,15 +4,9 @@ import { useWeb3React } from '@web3-react/core';
 
 import {
   Text,
-  Image,
-  Header,
-  Button,
   Box,
-  ThemeContext,
   ResponsiveContext,
   Layer,
-  Menu,
-  Collapsible,
   Drop
 } from 'grommet';
 
@@ -29,14 +23,11 @@ import { UserContext } from '../contexts/UserContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 
 import FlatButton from './FlatButton';
-import Authorization from './Authorization';
-import RaisedBox from './RaisedBox';
-import EthLogo from './logos/EthLogo';
-import EthMark from './logos/EthMark';
 import DaiMark from './logos/DaiMark';
 import Loading from './Loading';
 import EtherscanButton from './EtherscanButton';
 import TxStatus from './TxStatus';
+import { abbreviateHash } from '../utils';
 
 
 const AccountButton = (props: any) => {
@@ -78,10 +69,6 @@ const AccountButton = (props: any) => {
 
   }, [pendingTxs, lastCompletedTx ]);
 
-  const abbreviateAddr = (addr:string) => {
-    return `${addr?.substring(0, 4)}...${addr?.substring(addr.length - 4)}`; 
-  };
-
   const DropBox = () => {
     return ( 
       <Drop
@@ -94,7 +81,7 @@ const AccountButton = (props: any) => {
           pad='small'
           background='#f0f0f0'
         >
-          { abbreviateAddr(lastCompletedTx.transactionHash) }
+          { abbreviateHash(lastCompletedTx.transactionHash) }
           {lastCompletedTx.status}
           <EtherscanButton txHash={lastCompletedTx.transactionHash} />
         </Box>}
@@ -107,27 +94,9 @@ const AccountButton = (props: any) => {
       direction='row'
       align='center'
       background={account?'#f0f0f0':undefined}
-      // onMouseOver={() => setOver(true)}
-      // onMouseLeave={() => setOver(false)}
     > 
-      {/* { pendingTxs.length>0 && pendingLayerOpen &&   
-      <Layer 
-        onClickOutside={()=>setPendingLayerOpen(false)}
-        onEsc={()=>setPendingLayerOpen(false)}
-      >
-        <TxStatus msg='tx pending' tx={pendingTxs[pendingTxs.length-1]} />      
-      </Layer>}
-
-      { completeLayerOpen && txCompleteOpen &&  
-      <Layer 
-        onClickOutside={()=>setPendingLayerOpen(false)}
-        onEsc={()=>setPendingLayerOpen(false)}
-      >
-        Soimething
-      </Layer>} */}
 
       { txStatusOpen && 
-
       <Layer 
         onClickOutside={()=>setTxStatusOpen(false)}
         onEsc={()=>setTxStatusOpen(false)}
@@ -209,7 +178,7 @@ const AccountButton = (props: any) => {
           label={
             <Box gap='small' direction='row' align='center'>
               <Text size='small'>
-                { abbreviateAddr(account) }
+                { abbreviateHash(account) }
               </Text>
               <Gear />
             </Box>

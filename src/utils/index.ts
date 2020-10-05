@@ -77,8 +77,9 @@ export const dehumanizeNumber = (value:number) => {
   return BigNumber.from(value*10**10).mul(exponent);
 };
 
-export const cleanValue = (input:string, decimals:number=12) => {
 
+/* Trunctate a string value to a certain number of 'decimal' point */
+export const cleanValue = (input:string, decimals:number=12) => {
   const re = new RegExp(`(\\d+\\.\\d{${decimals}})(\\d)`);
   const inpu = input.match(re); // inpu = truncated 'input'... get it?
   if (inpu) {
@@ -88,6 +89,15 @@ export const cleanValue = (input:string, decimals:number=12) => {
   return input.valueOf();
 };
 
+/* handle Address/hash shortening */
+
+export const abbreviateHash = (addr:string) => {
+  return `${addr?.substring(0, 4)}...${addr?.substring(addr.length - 4)}`; 
+};
+
+/**
+ * color functions
+ * */
 export const modColor = (color:any, amount:any) => {
   let c;
   let cT;

@@ -6,6 +6,7 @@ import { FiCopy as Copy } from 'react-icons/fi';
 import { ScaleLoader } from 'react-spinners';
 import { NotifyContext } from '../contexts/NotifyContext';
 import EtherscanButton from './EtherscanButton';
+import { abbreviateHash } from '../utils';
 
 interface TxStatusProps {
   msg:string;
@@ -42,15 +43,15 @@ const TxStatus= ({ msg, tx }:TxStatusProps) => {
           <Text size='xlarge' color='brand' weight='bold'>Transaction pending...</Text>
           <Text>{msg}</Text>
           <ScaleLoader color={theme?.global?.colors?.brand.dark || 'grey'} height='25px' />
-          <EtherscanButton txHash={tx.tx.hash} />
           <Box direction='row' gap='xsmall'>
-            <Text size='xsmall' ref={txRef}> { tx.tx.hash } </Text>
+            <Text size='xsmall' ref={txRef}> { abbreviateHash(tx.tx.hash) } </Text>
             <Box
               onClick={()=>handleCopy()}
             >
               <Copy /> 
             </Box>    
           </Box>
+          <EtherscanButton txHash={tx.tx.hash} />
         </Box>}
 
       { pendingTxs.length === 0 && lastCompletedTx &&
@@ -65,15 +66,15 @@ const TxStatus= ({ msg, tx }:TxStatusProps) => {
       >
         <Text size='xlarge' color='brand' weight='bold'>Transaction Complete. </Text>
         <Text>{lastCompletedTx.status}</Text>
-        <EtherscanButton txHash={lastCompletedTx.transactionHash} />
         <Box direction='row' gap='xsmall'>
-          <Text size='xsmall' ref={txRef}> { lastCompletedTx.transactionHash } </Text>
+          <Text size='xsmall' ref={txRef}> { abbreviateHash(lastCompletedTx.transactionHash) } </Text>
           <Box
             onClick={()=>handleCopy()}
           >
             <Copy /> 
           </Box>
         </Box>
+        <EtherscanButton txHash={lastCompletedTx.transactionHash} />
       </Box>}
     </>
   );
