@@ -234,7 +234,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
             <Collapsible open={!!inputValue&&inputValue>0}> 
               <InfoGrid entries={[
                 {
-                  label: 'New Collateralization Ratio',
+                  label: 'Collateralization Ratio',
                   labelExtra: `after posting ${inputValue && cleanValue(inputValue, 2)} ETH`,
                   visible: !!account && collateralPercent_ > 0,
                   active: debouncedInput && collateralPercent_ > 0,
