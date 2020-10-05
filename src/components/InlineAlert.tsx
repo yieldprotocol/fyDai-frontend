@@ -1,6 +1,10 @@
 import React, { useEffect, useState, useContext } from 'react'; 
 import { Box, Text, defaultProps } from 'grommet';
 
+import { 
+  FiAlertCircle as AlertCircle,
+} from 'react-icons/fi';
+
 interface ErrorDisplayProps {
   warnMsg: string | null;
   errorMsg: string | null;
@@ -23,7 +27,7 @@ const InlineAlert = ({ warnMsg, errorMsg, warnHead, errorHead }:ErrorDisplayProp
       <Box 
         fill
         round={{ corner:'bottom', size:'small' }}
-        pad='small'
+        pad='medium'
       >
         <Text weight='bold' color='orange'>{warnHead}</Text>  
         <Text color='orange' size='xsmall'>{warnMsg}</Text>
@@ -33,11 +37,11 @@ const InlineAlert = ({ warnMsg, errorMsg, warnHead, errorHead }:ErrorDisplayProp
       <Box
         fill
         round={{ corner:'bottom', size:'small' }}
-        pad='small'
+        pad='medium'
       >
         <Text weight='bold' color='red'>{errorHead}</Text>  
         <Text color='red' size='xsmall'>{errorMsg}</Text>
-      </Box> }    
+      </Box> }
     </>
   );
 };
