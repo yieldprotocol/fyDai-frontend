@@ -1,7 +1,9 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { Box, Text, ThemeContext, ResponsiveContext, Button, Collapsible } from 'grommet';
 
-import { FiLayers as ChangeSeries } from 'react-icons/fi';
+import { 
+  FiLayers as ChangeSeries
+} from 'react-icons/fi';
 import { modColor, invertColor, contrastColor } from '../utils';
 
 
@@ -59,8 +61,6 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
           <Box
             pad='small'  
           >
-
-            {/* <Text alignSelf='start' size='xlarge' color='text' weight='bold'>Selected series</Text> */}
             <Box
               direction='row-responsive'
               fill='horizontal'
@@ -76,7 +76,6 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
                 flex
                 justify='between'
               >
-            
                 {activeSeries &&
                 <Box 
                   direction='row' 
@@ -107,7 +106,8 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
             </Box>
 
             <Box
-              pad={!delegated? { horizontal:'medium' }: { horizontal:'medium', bottom:'medium' }}
+              // pad={!delegated? { horizontal:'medium' }: { horizontal:'medium', bottom:'medium' }}
+              pad={ {horizontal:'medium' }}
             >
               <Collapsible open={seriesState && !seriesState.seriesLoading}>
                 { children }
@@ -118,7 +118,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
           { !seriesState.seriesLoading && !delegated && !activeSeries.isMature() &&
             <Collapsible open={!delegated}>
               <Authorization series={activeSeries} />
-            </Collapsible>}
+            </Collapsible>}       
         </Box>}
     </>
   );

@@ -155,6 +155,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
       target='document'
     >
       <CollateralDescriptor>
+
         <InfoGrid
           entries={[
             {
@@ -168,7 +169,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
             },
             {
               label: 'Collateralization Ratio',
-              visible: !!account && collateralPercent_ > 0,
+              visible: !!account,
               active: collateralPercent_ > 0,
               loading: !ethPosted_ && depositPending && ethPosted_ !== 0,            
               value: (collateralPercent_ && (collateralPercent_ !== 0))? `${collateralPercent_}%`: '',
@@ -176,19 +177,26 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
               valueExtra: null, 
             },
             {
-              label: 'Did you know?',
-              visible: true,
-              active: true,
-              loading: false,            
-              value: '',
+              label: 'Potential Max Ratio',
+              labelExtra: '(if you post all your ETH)',
+              visible: !!account,
+              active: collateralPercent_ > 0,
+              loading: !ethPosted_ && depositPending && ethPosted_ !== 0,            
+              value: (collateralPercent_ && (collateralPercent_ !== 0))? `${collateralPercent_}%`: '',
               valuePrefix: null,
-              valueExtra: ()=> ( 
-                <Box>
-                  <Text size='xsmall'>Collateral posted here can be used to borrow Dai from any Yield series.</Text>                 
-                </Box>
-              ), 
+              valueExtra: null, 
             },
-
+            // {
+            //   label: 'Did you know?',
+            //   visible: true,
+            //   active: true,
+            //   loading: false,            
+            //   value:'',
+            //   valuePrefix: null,
+            //   valueExtra: ()=> ( 
+            //     <Text size='xxsmall'>Collateral posted here can be used to borrow Dai from any Yield series.</Text>
+            //   ), 
+            // },
           ]}
         />
       </CollateralDescriptor>
@@ -223,10 +231,11 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
           </InputWrap>
 
           <Box fill>
-            <Collapsible open={!!inputValue&&inputValue>0}>
+            <Collapsible open={!!inputValue&&inputValue>0}> 
               <InfoGrid entries={[
                 {
-                  label: 'Ratio after Deposit',
+                  label: 'New Collateralization Ratio',
+                  labelExtra: `after posting ${inputValue && cleanValue(inputValue, 2)} ETH`,
                   visible: !!account && collateralPercent_ > 0,
                   active: debouncedInput && collateralPercent_ > 0,
                   loading: !ethPosted_ && depositPending && ethPosted_ !== 0,           
@@ -239,7 +248,8 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
                   )
                 },
                 {
-                  label: 'Borrowing Power after deposit',
+                  label: 'Borrowing Power',
+                  labelExtra: `after posting ${inputValue && cleanValue(inputValue, 2)} ETH`,
                   visible: !!account,
                   active: debouncedInput,
                   loading: !ethPosted_ && depositPending && ethPosted_ !== 0,
@@ -249,6 +259,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
                 },
                 {
                   label: 'First connect a wallet!',
+
                   visible: !account && inputValue,
                   active: inputValue,
                   loading: false,            

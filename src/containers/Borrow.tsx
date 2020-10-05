@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { ethers } from 'ethers';
-import { Keyboard, Box, TextInput, Text, ResponsiveContext, Collapsible, Layer } from 'grommet';
+import { Keyboard, Box, TextInput, Text, ResponsiveContext, Collapsible, Layer, Stack } from 'grommet';
 
 import { 
   FiClock as Clock,
@@ -9,7 +9,7 @@ import {
 
 import DaiMark from '../components/logos/DaiMark';
 
-import { cleanValue } from '../utils';
+import { cleanValue, modColor } from '../utils';
 
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
@@ -53,6 +53,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
     ethPosted,
     maxDaiAvailable,
     maxDaiAvailable_,
+    ethTotalDebtDai_,
     collateralPercent_,
   } = position;
 
@@ -183,12 +184,48 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
           <Repay close={()=>setRepayOpen(false)} />      
         </Layer>}
 
+      {/* <Stack anchor='top-left'> */}
+
       <SeriesDescriptor activeView='borrow'>
+
+
         <InfoGrid
           alt
           entries={[
             {
-              label: 'Dai Debt Owed',
+              label: null,
+              visible: true,
+              active: true,
+              loading: false,
+              value:null,
+              valuePrefix: null,
+              valueExtra: ()=>(
+                <>
+                  <Box
+                    width='210px'
+                    margin={screenSize!=='small'?{ left:'-52px' }: { left:'-25px' }}
+                    background='#555555FA' 
+                    pad='small'
+                    round={{ corner:'right', size:'xsmall' }}
+                    elevation='small'
+                  >
+                    <FlatButton            
+                      onClick={()=>setActiveView(0)}
+                      label={<Text size='xsmall' color='#DDDDDD'> Manage Collateral</Text>}
+                      background='#55555580'
+                    />            
+                  </Box>
+                  <Box
+                    background='#555555FA'
+                    margin={{ left:'-52px' }}
+                    width='2px'
+                    height='2px'
+                  />             
+                </>)
+            },
+            {
+              label: 'Dai Debt + Interest',
+              labelExtra: 'owed at maturity',
               visible:
                   !!account &&
                   (!activeSeries?.isMature() && !txActive)  || 
@@ -200,7 +237,8 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
               valueExtra: null, 
             },
             {
-              label: 'Max Borrowing Power',
+              label: 'Borrowing Power',
+              labelExtra: 'based on posted collateral',
               visible: !txActive && activeSeries && !activeSeries.isMature() && !!account,
               active: maxDaiAvailable_,
               loading: borrowPending,
@@ -208,9 +246,39 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
               valuePrefix: '~',
               valueExtra: null,
             },
+            // {
+            //   label: 'Dai Balance',
+            //   visible: !txActive && activeSeries && !activeSeries.isMature() && !!account,
+            //   active: !!inputValue&&inputValue>0,
+            //   loading: false,        
+            //   value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
+            //   valuePrefix: '',
+            //   valueExtra: null,
+            // },
+            {
+              label: 'Total Debt',
+              labelExtra: 'across all yield series',
+              visible: !txActive && activeSeries && !activeSeries.isMature() && !!account,
+              active: true,
+              loading: false,        
+              value: ethTotalDebtDai_? `${ethTotalDebtDai_} DAI`: '0 DAI', 
+              valuePrefix: null,
+              valueExtra: null,
+            },
+            {
+              label: 'Collateralization Ratio',
+              visible: !txActive && activeSeries && !activeSeries.isMature() && !!account,
+              active: collateralPercent_ > 0,
+              loading: false,            
+              value: (collateralPercent_ && (collateralPercent_ !== 0))? `${collateralPercent_}%`: '',
+              valuePrefix: null,
+              valueExtra: null, 
+            },
+
           ]}
         />
       </SeriesDescriptor>
+
       
       { txActive?.type !== 'BORROW' && txActive?.type !== 'BUY' &&  
       <Box
@@ -224,20 +292,6 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
       >
         
         <Box gap='small' align='center' fill='horizontal'>
-          {/* 
-          { activeSeries && !activeSeries.hasDelegatedPool && !activeSeries.isMature() && 
-            <Box 
-              fill='horizontal'
-              round='small'
-              pad={{ vertical:'medium' }}        
-            >
-              <Box 
-                round='small'
-                fill
-              >
-                <Authorization series={activeSeries} />
-              </Box>
-            </Box>}  */}
 
           { !activeSeries?.isMature() && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
           <Box gap='medium' align='center' fill='horizontal'>
@@ -260,6 +314,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
                 <InfoGrid entries={[
                   {
                     label: 'Estimated APR',
+                    labelExtra: `if ${inputValue && cleanValue(inputValue, 2)} Dai are borrowed`,
                     visible: !!inputValue,
                     active: !!inputValue&&inputValue>0,
                     loading: false,    
@@ -268,7 +323,8 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
                     valueExtra: null, 
                   },
                   {
-                    label: 'Dai owed at maturity',
+                    label: 'Dai that will be owed',
+                    labelExtra: 'at maturity',
                     visible: !!inputValue,
                     active: !!inputValue&&inputValue>0,
                     loading: false,          
@@ -282,7 +338,8 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
                   },
 
                   {
-                    label: 'Ratio after Borrow',
+                    label: 'Collateralization Ratio',
+                    labelExtra: `after borrowing ${inputValue && cleanValue(inputValue, 2)} Dai`,
                     visible: !!inputValue && !!account && position.ethPosted_>0,
                     active: !!inputValue&&inputValue>0,
                     loading: false,        
@@ -328,6 +385,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
                       /> 
                     )
                   },
+
                 ]}
                 />
               </Collapsible>

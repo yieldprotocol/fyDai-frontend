@@ -22,10 +22,7 @@ import NotifyLayer from './containers/layers/NotifyLayer';
 
 // TODO: remove testLayer for prod
 import TestLayer from './containers/layers/TestLayer';
-import Splash from './components/Splash';
-import RaisedBox from './components/RaisedBox';
 import Authorization from './components/Authorization';
-import MiniDash from './containers/MiniDash';
 
 // const LendView = React.lazy(() => import('./views/LendView'));
 // const PoolView = React.lazy(() => import('./views/PoolView'));
@@ -99,7 +96,7 @@ const App = (props:any) => {
       { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
       { showSeriesLayer  && <SeriesSelector activeView='borrow' close={()=>setShowSeriesLayer(false)} /> }
 
-      <Grid fill columns={columnsWidth}>
+      <Grid fill columns={columnsWidth} justify='center'>
         <Box background={{ color: 'background-front' }} />
         <YieldHeader
           openConnectLayer={(v:string) => setShowConnectLayer(v)}
@@ -140,7 +137,7 @@ const App = (props:any) => {
         </Grid>
       </Main>
 
-      <Grid fill columns={columnsWidth}>
+      <Grid fill columns={columnsWidth} justify='center'>
         <Box />
         {screenSize !== 'small' &&
           <YieldFooter

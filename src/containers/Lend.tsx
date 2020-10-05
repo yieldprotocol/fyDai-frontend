@@ -156,7 +156,8 @@ const Lend = ({ lendAmount }:ILendProps) => {
           alt 
           entries={[
             {
-              label: 'Portfolio Value at Maturity',
+              label: 'Portfolio Value',
+              labelExtra: 'at maturity',
               visible: 
                   (!!account && !txActive && !activeSeries?.isMature()) || 
                   ( activeSeries?.isMature() && activeSeries?.eDaiBalance_>0),
@@ -168,10 +169,21 @@ const Lend = ({ lendAmount }:ILendProps) => {
             },
             {
               label: 'Current Value',
+              labelExtra: 'if closing your position now',
               visible: !!account && !txActive && !activeSeries?.isMature(),
               active: true,
               loading: lendPending || !currentValue,           
               value: currentValue?`${cleanValue(currentValue, 2)} DAI`: '- Dai',
+              valuePrefix: null,
+              valueExtra: null,
+            },
+            {
+              label: null,
+              labelExtra: null,
+              visible: !!account && !txActive && !activeSeries?.isMature(),
+              active: true,
+              loading: false,           
+              value: null,
               valuePrefix: null,
               valueExtra: null,
             },
@@ -230,6 +242,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
                     <InfoGrid entries={[
                       {
                         label: 'Estimated APR',
+                        labelExtra: `if lending ${inputValue && cleanValue(inputValue, 2)} Dai`,
                         visible: true,
                         active: inputValue,
                         loading: false,     
@@ -238,7 +251,8 @@ const Lend = ({ lendAmount }:ILendProps) => {
                         valueExtra: null, 
                       },
                       {
-                        label: 'Approx. Dai received at maturity',
+                        label: 'Dai received',
+                        labelExtra: 'at maturity',
                         visible: true,
                         active: inputValue,
                         loading: false,           
@@ -253,6 +267,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
                       },
                       {
                         label: 'Like what you see?',
+                        labelExtra: 'the first step is to:',
                         visible: !account && inputValue>0,
                         active: inputValue,
                         loading: false,            
