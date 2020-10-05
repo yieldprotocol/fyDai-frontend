@@ -12,6 +12,8 @@ import AprBadge from './AprBadge';
 import Authorization from './Authorization';
 import Loading from './Loading';
 import RaisedButton from './RaisedButton';
+import { modColor } from '../utils';
+import EthMark from './logos/EthMark';
 
 interface ICollateralDescriptorProps {
   children?:any;
@@ -35,41 +37,41 @@ function CollateralDescriptor( props: ICollateralDescriptorProps ) {
         round='small'
         pad='small'
         gap='small'
-        // background=${modColor( activeSeries?.seriesColor, 30)}
-        background="linear-gradient(to bottom right, #82d4bb, #ffa3a5, #ffbf81, #ffdc5e, #a2c5ac, #ff86c8 )"
+        background="linear-gradient(to bottom right, #82d4bb, #ffa3a5, #ffbf81, #ffdc5e, #add8e6, #add8e6, #add8e6, #a2c5ac, #a2c5ac, #ff86c8 )"
         margin={{ bottom:'-16px' }}
       >
-
-        {/* <Text alignSelf='start' size='xlarge' color='text' weight='bold'>Selected series</Text> */}
         <Box
           direction='row-responsive'
           fill='horizontal'
           gap='small'
           align='center'
+          pad='medium'
+          justify='between'
         >
           <Box 
-            round='xsmall'
-            // background='background-mid'
-            // border='all'
-            onClick={()=>setSelectorOpen(true)}
-            direction='row'
-            fill
-            pad='small'
-            flex
-            justify='between'
+            direction='row' 
+            gap='small'
+            align='center'
           >
-            <Box 
-              direction='row' 
-              gap='small'
-              align='center'
-            >
-              <Text size='large' weight='bold' color='brand'> 
-                Manage Collateral 
-              </Text>
-            </Box>
+            <EthMark />
+            <Text size='large' weight='bold' color='brand'> 
+              Manage ETH Collateral 
+            </Text>
           </Box>
-        </Box>
 
+          <RaisedButton
+            background='#add8e6'
+            label={
+              <Box align='center' direction='row' gap='small'>
+                <Text size='xsmall'>
+                  Back to Borrow             
+                </Text>
+              </Box>
+          }
+            onClick={()=>setSelectorOpen(true)}
+          />
+        </Box>
+        
         <Box
           pad={!delegated? { horizontal:'medium' }: { horizontal:'medium', bottom:'medium' }}
         >

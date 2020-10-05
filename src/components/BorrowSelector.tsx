@@ -75,7 +75,7 @@ function BorrowSelector({ setActiveView, activeView }:IActionSelectorProps) {
           pad='2px'
           margin={{bottom:'medium'}}
         >
-          <Box gap='small' align='center'>
+          {/* <Box gap='small' align='center'>
             <StyledBox
               pad={{ horizontal: 'medium', vertical: 'xsmall' }}
               onClick={() => setActiveView(1)}
@@ -85,7 +85,7 @@ function BorrowSelector({ setActiveView, activeView }:IActionSelectorProps) {
                 Borrow Dai
               </Text>
             </StyledBox>
-          </Box>
+          </Box> */}
 
           <Box gap='small' align='end'>
             <StyledBox
@@ -93,6 +93,7 @@ function BorrowSelector({ setActiveView, activeView }:IActionSelectorProps) {
               pad={{ horizontal: 'medium', vertical: 'xsmall' }}
               onClick={() => toggleActiveView()}
               border={activeView !== 0 ? undefined : 'all'}
+              
             >
               <Text size="small" color={activeView !== 1 ? 'text' : 'text-weak'}>
                 Manage Collateral

@@ -92,21 +92,6 @@ const YieldHeader = (props: any) => {
     setMenuOpen((prevMenu) => !prevMenu);
   }
 
-  const CloseButton = () => (
-    <Box direction="row" fill="horizontal">
-      <Button
-        onClick={()=> setMenuOpen(false)}
-        alignSelf="center"
-        fill="horizontal"
-        style={{
-          textAlign: 'center',
-        }}
-      >
-        Close
-      </Button>
-    </Box>
-  );
-
   const MenuButton = () => (
     <Button
       onClick={toggleMenu}
@@ -153,7 +138,7 @@ const YieldHeader = (props: any) => {
           <StyledText
             weight='bold'
             // eslint-disable-next-line no-nested-ternary
-            color={item.disabled ? 'lightgrey' : activeView === item.link ? 'brand' : 'text-weak'}
+            color={item.disabled ? 'lightgrey' : activeView === item.link ? 'brand' : 'text-xweak'}
             size={screenSize === 'small' ? 'medium' : 'xlarge'}
             style={{ 
               textDecoration: activeView === item.link ? 'none' : 'none', 
@@ -186,6 +171,7 @@ const YieldHeader = (props: any) => {
       justify='between'
       fill='horizontal'
       align='center'
+      // width={{ max:'1200px' }}
     >
       <Box>
         <Image src={theme.dark ? logoLight : logoDark} fit="contain" />
