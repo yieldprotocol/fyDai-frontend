@@ -10,6 +10,7 @@ import InlineAlert from '../components/InlineAlert';
 import ApprovalPending from '../components/ApprovalPending';
 import TxStatus from '../components/TxStatus';
 import ActionButton from '../components/ActionButton';
+import { cleanValue } from '../utils';
 
 interface IRedeemProps {
   close?:any,
@@ -30,12 +31,11 @@ const Redeem  = ({ close }:IRedeemProps)  => {
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
 
-
-
   const redeemProcedure = async () =>{
     if(!redeemDisabled) {
       setRedeemPending(true);
-      await redeem(activeSeries.eDaiAddress, activeSeries.eDaiBalance);
+
+      await redeem(activeSeries.eDaiAddress, activeSeries.eDaiBalance.toString());
       await Promise.all([
         userActions.updatePosition(),
         seriesActions.updateActiveSeries()

@@ -6,6 +6,7 @@ import EDai from '../contracts/EDai.json';
 import { NotifyContext } from '../contexts/NotifyContext';
 import { useSignerAccount } from './connectionHooks';
 import { useTxHelpers } from './appHooks';
+import { cleanValue } from '../utils';
 
 /**
  * Hook for interacting with the yield 'eDAI' Contract
@@ -24,14 +25,14 @@ export const useEDai = () => {
   /**
    * @dev Redeems eDai for dai after maturity
    * @param {string} eDaiAddress address of the eDai series to redeem from.
-   * @param {BigNumber} amount in exact eDai available to burn
+   * @param {BigNumber} amount in exact eDai available to burn precision
    */
   const redeem = async (
     eDaiAddress:string,
-    amount: number
+    amount: string|BigNumber
   ) => {
     let tx:any;
-    const parsedAmount = amount;
+    const parsedAmount = BigNumber.isBigNumber(amount)? amount : (cleanValue(amount));
     const fromAddr = account && ethers.utils.getAddress(account);
     const toAddr = fromAddr;
     const eDaiAddr = ethers.utils.getAddress(eDaiAddress);
