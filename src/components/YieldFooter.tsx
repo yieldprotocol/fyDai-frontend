@@ -74,13 +74,13 @@ const YieldFooter = (props: any) => {
         <Text size='xsmall' color='text-weak'>
           This software is in ALHPA v0.1
         </Text>
-        {/* <Anchor
+        <Anchor
           onClick={() => setShowTestLayer(!showTestLayer)}
           color={showTestLayer ? yieldTheme.global.colors.brand.light : 'grey'}
         >
           <Test size={IconSize} />
         </Anchor>
-        <Anchor
+        {/* <Anchor
           onClick={()=>setDarkMode(!darkMode)}
           color={yieldTheme.global.colors.brand.light}
         >

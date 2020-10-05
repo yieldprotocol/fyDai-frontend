@@ -44,14 +44,19 @@ const Redeem  = ({ close }:IRedeemProps)  => {
     }
   };
 
+  /* Set if the series is mature */ 
+  useEffect( () => {
+    ( async () => activeSeries && setMatured(await hasBeenMatured(activeSeries.eDaiAddress)))();
+    ( async () => activeSeries && console.log(await hasBeenMatured(activeSeries.eDaiAddress)))();
+    activeSeries && console.log(activeSeries.isMature());
+  }, [activeSeries]);
+
   /* redeem button disabled logic */ 
   useEffect( () => {
-
-    ( async () => setMatured(await hasBeenMatured(activeSeries.eDaiAddress)))();
     parseFloat(activeSeries?.eDaiBalance_) > 0 && matured ? 
       setRedeemDisabled(false) 
       : setRedeemDisabled(true);
-  }, [activeSeries]);
+  }, [activeSeries, matured]);
  
   return (
     
@@ -66,7 +71,6 @@ const Redeem  = ({ close }:IRedeemProps)  => {
           hasDelegatedPool={true}
         />
       </>}
-
       { redeemActive && !txActive && <ApprovalPending /> } 
       { txActive && <TxStatus msg={`You are redeeming ${activeSeries?.eDaiBalance_} DAI`} tx={txActive} /> }
     </Box>

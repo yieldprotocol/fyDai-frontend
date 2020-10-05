@@ -40,7 +40,7 @@ interface ILendProps {
   openConnectLayer:any;
   lendAmount?:any
 }
-  
+
 const Lend = ({ openConnectLayer, lendAmount }:ILendProps) => {
 
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
