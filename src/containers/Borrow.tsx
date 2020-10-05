@@ -376,17 +376,20 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
                   },
                   {
                     label: 'Want to borrow Dai?',
+                    labelExtra: '',
                     visible: !!inputValue&&inputValue>0 && !!account && position.ethPosted <= 0,
                     active: !!inputValue,
                     loading: false,            
                     value: '',
                     valuePrefix: null,
                     valueExtra: () => (
-                      <RaisedButton
-                        color={inputValue? 'brand': 'brand-transparent'}
-                        label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Deposit collateral</Text></Box>}
-                        onClick={() => setActiveView(0)}
-                      /> 
+                      <Box pad={{ top:'small' }}>
+                        <RaisedButton
+                          color={inputValue? 'brand': 'brand-transparent'}
+                          label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Deposit collateral</Text></Box>}
+                          onClick={() => setActiveView(0)}
+                        /> 
+                      </Box>
                     )
                   },
 

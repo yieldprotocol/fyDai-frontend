@@ -54,7 +54,6 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
     setVisibleEntries((entries.filter((x:any)=>x.visible===true)));
   }, [entries]);
 
-  
   return (
     <>
       <Box 

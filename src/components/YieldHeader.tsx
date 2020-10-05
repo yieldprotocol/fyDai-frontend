@@ -63,7 +63,6 @@ const YieldHeader = (props: any) => {
 
   // Menu state for mobile later
   const [menuOpen, setMenuOpen] = useState(false);
-  const [txCompleteOpen, setTxCompleteOpen] = useState(false);
 
   const [navLinks] = useState([
     {
@@ -153,15 +152,6 @@ const YieldHeader = (props: any) => {
     }
     </Box>
   );
-
-  useEffect(()=>{
-    lastCompletedTx && pendingTxs.length===0 && setTxCompleteOpen(true);
-    lastCompletedTx && pendingTxs.length===0 && (async () => {
-      setTimeout(() => {
-        setTxCompleteOpen(false);
-      }, 5000);
-    })();
-  }, [lastCompletedTx, pendingTxs ]);
 
   return (
     <Box

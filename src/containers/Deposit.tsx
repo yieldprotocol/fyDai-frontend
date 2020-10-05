@@ -258,18 +258,20 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
                   valueExtra: null,
                 },
                 {
-                  label: 'First connect a wallet!',
-
-                  visible: !account && inputValue,
+                  label: '',
+                  labelExtra:'Connect a wallet to get started',
+                  visible: !account && !!inputValue,
                   active: inputValue,
                   loading: false,            
                   value: '',
                   valuePrefix: null,
                   valueExtra: () => (
-                    <RaisedButton
-                      label={<Text size='small'>Connect a wallet</Text>}
-                      onClick={()=>console.log('still to implement')}
-                    /> 
+                    <Box pad={{ top:'small' }}>
+                      <RaisedButton
+                        label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Connect a wallet</Text></Box>}
+                        onClick={()=>console.log('still to implement')}
+                      /> 
+                    </Box>
                   )
                 },
               ]}
