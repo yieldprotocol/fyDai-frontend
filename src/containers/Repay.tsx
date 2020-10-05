@@ -154,7 +154,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
                     />
                     <RaisedButton 
                       label={screenSize !== 'small' ? 'Repay Maximum': 'Maximum'}
-                      onClick={()=>setInputValue(ethers.utils.formatEther(maxRepay))}
+                      onClick={()=>setInputValue( cleanValue(ethers.utils.formatEther(maxRepay)) )}
                     />
                   </InputWrap>
 
@@ -172,19 +172,19 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
                             valueExtra: null, 
                           }, 
                           {
-                            label: 'Cost to repay all now',
+                            label: 'Cost to repay all debt now',
                             visible: true,
                             active: true,
                             loading: false,    
-                            value:  activeSeries?.ethDebtDai_? `${activeSeries.ethDebtDai_} DAI`: '0 DAI',
+                            value:  activeSeries?.ethDebtDai_? `${cleanValue(activeSeries.ethDebtDai_, 2)} DAI`: '0 DAI',
                             valuePrefix: null,
                             valueExtra: null,
                           },
                           {
-                            label: `Owed after repayment of ${inputValue} DAI`,
+                            label: `Owed after repayment of ${inputValue && cleanValue(inputValue, 2)} DAI`,
                             visible: !!inputValue&&inputValue>0,
                             active: !!inputValue&&inputValue>0,
-                            loading: false,    
+                            loading: false,
                             value: activeSeries?.ethDebtDai_ ? 
                               ( activeSeries.ethDebtDai_ - parseFloat(debouncedInput)>0 ? 
                                 activeSeries.ethDebtDai_ - parseFloat(debouncedInput) 
