@@ -37,10 +37,11 @@ import Loading from '../components/Loading';
 import SeriesMatureBox from '../components/SeriesMatureBox';
 
 interface IPoolProps {
+  openConnectLayer:any;
   // lendAmount?:any
 }
   
-const Pool = (props:IPoolProps) => {
+const Pool = ({ openConnectLayer }:IPoolProps) => {
   const { state: { deployedContracts } } = useContext(YieldContext);
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { activeSeries } = seriesState;
@@ -238,12 +239,12 @@ const Pool = (props:IPoolProps) => {
                         value: '',
                         valuePrefix: null,
                         valueExtra: () => (
-                          <Button
-                            color='brand-transparent'
-                            label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Connect a wallet</Text></Box>}
-                            onClick={()=>console.log('still to implement')}
-                            hoverIndicator='brand-transparent'
-                          /> 
+                          <Box pad={{ top:'small' }}>
+                            <RaisedButton
+                              label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Connect a wallet</Text></Box>}
+                              onClick={() => openConnectLayer()}
+                            /> 
+                          </Box>
                         )
                       },
                     ]}

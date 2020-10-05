@@ -37,10 +37,11 @@ import Loading from '../components/Loading';
 import SeriesMatureBox from '../components/SeriesMatureBox';
 
 interface ILendProps {
+  openConnectLayer:any;
   lendAmount?:any
 }
   
-const Lend = ({ lendAmount }:ILendProps) => {
+const Lend = ({ openConnectLayer, lendAmount }:ILendProps) => {
 
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { activeSeries } = seriesState;
@@ -276,7 +277,7 @@ const Lend = ({ lendAmount }:ILendProps) => {
                           <Box pad={{ top:'small' }}>
                             <RaisedButton
                               label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Connect a wallet</Text></Box>}
-                              onClick={()=>console.log('still to implement')}
+                              onClick={() => openConnectLayer()}
                             /> 
                           </Box>
                         )

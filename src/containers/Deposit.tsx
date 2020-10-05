@@ -46,11 +46,13 @@ import CollateralDescriptor from '../components/CollateralDescriptor';
 interface DepositProps {
   /* deposit amount prop is for quick linking into component */
   setActiveView: any;
+  openConnectLayer:any;
   modalView?:boolean;
   depositAmount?:string|BigNumber;
+
 }
 
-const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
+const Deposit = ({ openConnectLayer, setActiveView, modalView, depositAmount }:DepositProps) => {
   const { state: userState, actions: userActions } = useContext(UserContext);
   const {
     ethBalance,
@@ -269,7 +271,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
                     <Box pad={{ top:'small' }}>
                       <RaisedButton
                         label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Connect a wallet</Text></Box>}
-                        onClick={()=>console.log('still to implement')}
+                        onClick={() => openConnectLayer()}
                       /> 
                     </Box>
                   )

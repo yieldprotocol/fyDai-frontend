@@ -10,17 +10,18 @@ import RaisedBox from '../components/RaisedBox';
 // const Redeem = lazy(() => import('../containers/Redeem'));
 
 interface LendProps {
+  openConnectLayer:any;
   activeView?: string;
 }
 
-const LendView = ({ activeView }:LendProps) => {
+const LendView = ({ openConnectLayer, activeView }:LendProps) => {
 
   const { state: seriesState } = useContext(SeriesContext);
   const { activeSeries } = seriesState;
   return (
     <>
       <RaisedBox> 
-        <Lend />
+        <Lend openConnectLayer={openConnectLayer} />
       </RaisedBox>
     </>
   );

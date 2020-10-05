@@ -40,10 +40,11 @@ import Authorization from '../components/Authorization';
 
 interface IBorrowProps {
   borrowAmount?:number|null;
+  openConnectLayer:any;
   setActiveView?:any; 
 }
 
-const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
+const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) => {
 
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { activeSeries } = seriesState; 
@@ -352,7 +353,7 @@ const Borrow = ({ setActiveView, borrowAmount }:IBorrowProps) => {
                       <Box pad={{ top:'small' }}>
                         <RaisedButton
                           label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Connect a wallet</Text></Box>}
-                          onClick={()=>console.log('still to implement')}
+                          onClick={() => openConnectLayer()}
                         /> 
                       </Box>
                     )

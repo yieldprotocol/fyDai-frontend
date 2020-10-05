@@ -2,11 +2,11 @@ import React from 'react';
 import Pool from '../containers/Pool';
 import RaisedBox from '../components/RaisedBox';
 
-const PoolView = () => {
+const PoolView = (props:any) => {
   return (
     <>
       <RaisedBox>
-        <Pool />
+        <Pool openConnectLayer={props.openConnectLayer} />
       </RaisedBox>
     </>
   );

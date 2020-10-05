@@ -128,9 +128,9 @@ const App = (props:any) => {
             
           >  
             {/* <MiniDash activeView={activeView} /> */}
-            {activeView === 'BORROW' && <BorrowView />}
-            {activeView === 'LEND' && <LendView />}
-            {activeView === 'POOL' && <PoolView />}
+            {activeView === 'BORROW' && <BorrowView openConnectLayer={(v:string) => setShowConnectLayer('CONNECT')} />}
+            {activeView === 'LEND' && <LendView openConnectLayer={(v:string) => setShowConnectLayer('CONNECT')} />}
+            {activeView === 'POOL' && <PoolView openConnectLayer={(v:string) => setShowConnectLayer('CONNECT')} />}
           </Box>               
           <Box />
         </Grid>

@@ -19,12 +19,11 @@ import FlatButton from '../components/FlatButton';
 // const Repay = lazy(() => import('../containers/Repay'));
 
 interface BorrowProps {
+  openConnectLayer:any;
   activeView?: number;
 }
 
-const BorrowView = ({
-  activeView: activeViewFromProps,
-}: BorrowProps) => {
+const BorrowView = ({activeView:activeViewFromProps, openConnectLayer }: BorrowProps) => {
   
   const [ activeView, setActiveView ] = useState<number>( 
     activeViewFromProps || 1
@@ -52,8 +51,8 @@ const BorrowView = ({
             <Deposit setActiveView={setActiveView} />
           </ReactCardFlip> */}
 
-          {activeView === 0 && <Deposit setActiveView={setActiveView} /> }  
-          {activeView === 1 && <Borrow setActiveView={setActiveView} /> }
+          {activeView === 0 && <Deposit setActiveView={setActiveView} openConnectLayer={openConnectLayer} /> }  
+          {activeView === 1 && <Borrow setActiveView={setActiveView} openConnectLayer={openConnectLayer} /> }
           {activeView === 2 && <Repay setActiveView={setActiveView} />}
         </Box>
       </RaisedBox>
