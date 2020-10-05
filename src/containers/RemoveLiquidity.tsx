@@ -139,12 +139,12 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
             placeholder='Tokens to remove'
             value={inputValue || ''}
             plain
-            onChange={(event:any) => setInputValue(( cleanValue(event.target.value) ))}
+            onChange={(event:any) => setInputValue(( cleanValue(event.target.value), 6 ))}
             icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <YieldMark />}
           />
           <RaisedButton 
             label='Maximum'
-            onClick={()=>setInputValue( ethers.utils.formatEther(activeSeries?.poolTokens) )}
+            onClick={()=>setInputValue( cleanValue(ethers.utils.formatEther(activeSeries?.poolTokens), 6) )}
           />
         </InputWrap>
         <Box fill>

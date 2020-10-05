@@ -214,7 +214,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                   {account &&
                   <RaisedButton 
                     label={screenSize !== 'small' ? 'Add Maximum': 'Maximum'}
-                    onClick={()=>setInputValue(ethers.utils.formatEther(daiBalance))}
+                    onClick={()=>setInputValue(cleanValue(ethers.utils.formatEther(daiBalance), 6))}
                   />}
                 </InputWrap>
 

@@ -154,7 +154,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
                     />
                     <RaisedButton 
                       label={screenSize !== 'small' ? 'Repay Maximum': 'Maximum'}
-                      onClick={()=>setInputValue( cleanValue(ethers.utils.formatEther(maxRepay)) )}
+                      onClick={()=>setInputValue( cleanValue(ethers.utils.formatEther(maxRepay), 6) )}
                     />
                   </InputWrap>
 

@@ -74,7 +74,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
     fallbackProvider && account && activeSeries.eDaiBalance && (async () => {
       const preview = await previewPoolTx('sellEDai', activeSeries, activeSeries.eDaiBalance);
       if (!(preview instanceof Error)) {
-        setMaxWithdraw(cleanValue(ethers.utils.formatEther(preview)));
+        setMaxWithdraw(cleanValue(ethers.utils.formatEther(preview), 6));
       }
     })();
   }, [account, activeSeries.eDaiBalance, fallbackProvider]);
@@ -127,7 +127,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
               placeholder='DAI'
               value={inputValue || ''}
               plain
-              onChange={(event:any) => setInputValue(( cleanValue(event.target.value) ))}
+              onChange={(event:any) => setInputValue(( cleanValue(event.target.value, 6)))}
               icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <DaiMark />}
             />
             <RaisedButton 
