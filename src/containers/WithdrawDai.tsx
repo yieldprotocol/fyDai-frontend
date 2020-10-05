@@ -74,7 +74,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
     fallbackProvider && account && activeSeries.eDaiBalance && (async () => {
       const preview = await previewPoolTx('sellEDai', activeSeries, activeSeries.eDaiBalance);
       if (!(preview instanceof Error)) {
-        setMaxWithdraw(ethers.utils.formatEther(preview));
+        setMaxWithdraw(cleanValue(ethers.utils.formatEther(preview)));
       }
     })();
   }, [account, activeSeries.eDaiBalance, fallbackProvider]);

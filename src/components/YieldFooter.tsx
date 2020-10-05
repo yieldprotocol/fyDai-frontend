@@ -71,6 +71,9 @@ const YieldFooter = (props: any) => {
           top: '2px',
         }}
       >
+        <Text size='xsmall' color='text-weak'>
+          This software is in ALHPA v0.1
+        </Text>
         {/* <Anchor
           onClick={() => setShowTestLayer(!showTestLayer)}
           color={showTestLayer ? yieldTheme.global.colors.brand.light : 'grey'}

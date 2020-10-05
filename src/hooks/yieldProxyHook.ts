@@ -71,7 +71,7 @@ export const useProxy = () => {
   /* Temporary signing messages */
   const auths = new Map([
     [1, { id: 1, desc:'Authorize Yield to move Dai to repay debt.' }],
-    [2, { id: 2, desc:'eDai > pool authenticate ' }],
+    [2, { id: 2, desc:'Authorize Yield to move your fyDai tokens to repay Dai debt.' }],
   ]);
 
   // TODO: deal with big number rather also, put this out in a hook
