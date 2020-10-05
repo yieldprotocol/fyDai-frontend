@@ -118,15 +118,14 @@ const App = (props:any) => {
       <NotifyLayer target={leftSideRef.current} columnsWidth={columnsWidth} />
 
       <Main 
-        pad={{ bottom:'large' }} 
+        pad={{ bottom:'large' }}
       >
-        <Grid fill columns={columnsWidth}>
+        <Grid columns={columnsWidth}>
           <Box />
           <Box
             pad={{ vertical: 'large' }}
-            fill="horizontal"
-            align="center"
-            gap='medium'
+            align='center'
+            
           >  
             {/* <MiniDash activeView={activeView} /> */}
             {activeView === 'BORROW' && <BorrowView />}

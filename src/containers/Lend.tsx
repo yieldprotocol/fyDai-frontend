@@ -267,7 +267,6 @@ const Lend = ({ lendAmount }:ILendProps) => {
                       },
                       {
                         label: 'Like what you see?',
-                        labelExtra: 'the first step is to:',
                         visible: !account && inputValue>0,
                         active: inputValue,
                         loading: false,            

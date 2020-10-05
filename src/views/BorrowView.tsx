@@ -35,7 +35,7 @@ const BorrowView = ({
       gap='small'
       width={{ max:'600px' }}
       alignSelf='center'
-      fill='horizontal'
+      fill
       round='small'
       align='center'
     >
