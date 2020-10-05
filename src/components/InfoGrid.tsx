@@ -55,7 +55,7 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
   }, [entries]);
 
   return (
-    <>
+    <Box>
       <Box 
         pad={{ horizontal:'small' }} 
         direction='row-responsive' 
@@ -187,7 +187,7 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
       > 
         {!detailsOpen?<ChevronDown size='25px' /> : <ChevronUp size='25px' />}  
       </Box> }
-    </>
+    </Box>
   );
 }
 
