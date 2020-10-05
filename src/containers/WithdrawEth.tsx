@@ -153,7 +153,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
               <RaisedButton 
                 label='Withdraw maximum'
                 disabled={!hasDelegatedProxy}
-                onClick={()=>setInputValue(maxWithdraw)}
+                onClick={()=>maxWithdraw && setInputValue(cleanValue(maxWithdraw))}
               />
             </InputWrap>
 
