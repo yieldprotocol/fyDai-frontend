@@ -154,7 +154,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
       onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.slice(0, -1))}
       target='document'
     >
-      <CollateralDescriptor>
+      <CollateralDescriptor backToBorrow={()=>setActiveView(1)}>
 
         <InfoGrid
           entries={[
@@ -286,9 +286,6 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
             /> }
 
 
-
-          
-
           <Box 
             direction='row'
             fill='horizontal'
@@ -302,7 +299,7 @@ const Deposit = ({ setActiveView, modalView, depositAmount }:DepositProps) => {
                   <ArrowLeft color='text-weak' />
                   <Box><Text size='xsmall' color='text-weak'>back to borrow</Text></Box>   
                 </Box>
-}
+            }
             />
             { ethPosted_ > 0 &&
             <FlatButton 

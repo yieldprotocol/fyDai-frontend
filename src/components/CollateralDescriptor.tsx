@@ -16,12 +16,13 @@ import { modColor } from '../utils';
 import EthMark from './logos/EthMark';
 
 interface ICollateralDescriptorProps {
+  backToBorrow:any;
   children?:any;
 }
 
 function CollateralDescriptor( props: ICollateralDescriptorProps ) {
 
-  const { children } = props;
+  const { backToBorrow, children } = props;
   const theme = useContext<any>(ThemeContext);
   const screenSize = useContext(ResponsiveContext);
 
@@ -67,7 +68,7 @@ function CollateralDescriptor( props: ICollateralDescriptorProps ) {
                 </Text>
               </Box>
           }
-            onClick={()=>setSelectorOpen(true)}
+            onClick={()=>backToBorrow()}
           />
         </Box>
         
