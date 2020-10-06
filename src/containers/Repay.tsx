@@ -137,7 +137,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
           <Box flex='grow' justify='between'>
             <Box gap='medium' align='center' fill='horizontal'>
 
-              { (activeSeries?.ethDebtEDai.gt(ethers.constants.Zero)) ?
+              { (activeSeries?.ethDebtFyDai.gt(ethers.constants.Zero)) ?
              
                 <Box gap='medium' align='center' fill='horizontal'>
                   <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to Repay</Text>
@@ -167,7 +167,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
                             visible: false,
                             active: true,
                             loading: repayPending,    
-                            value: activeSeries?.ethDebtEDai_? `${activeSeries.ethDebtEDai_} DAI`: '0 DAI',
+                            value: activeSeries?.ethDebtFyDai_? `${activeSeries.ethDebtFyDai_} DAI`: '0 DAI',
                             valuePrefix: null,
                             valueExtra: null, 
                           }, 

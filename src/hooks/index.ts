@@ -19,7 +19,7 @@ import { useMigrations } from './migrationHook';
 import { useController } from './controllerHook';
 import { useProxy } from './yieldProxyHook';
 import { usePool } from './poolHook';
-import { useEDai } from './eDaiHook';
+import { useFyDai } from './fyDaiHook';
 
 export {
   usePool,
@@ -33,7 +33,7 @@ export {
   useAuth,
   useProxy,
   useController,
-  useEDai,
+  useFyDai,
   useMigrations,
 
   useEvents,

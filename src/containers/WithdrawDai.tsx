@@ -71,13 +71,13 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
   };
 
   useEffect(()=> {
-    fallbackProvider && account && activeSeries.eDaiBalance && (async () => {
-      const preview = await previewPoolTx('sellEDai', activeSeries, activeSeries.eDaiBalance);
+    fallbackProvider && account && activeSeries.fyDaiBalance && (async () => {
+      const preview = await previewPoolTx('sellFyDai', activeSeries, activeSeries.fyDaiBalance);
       if (!(preview instanceof Error)) {
         setMaxWithdraw(cleanValue(ethers.utils.formatEther(preview), 6));
       }
     })();
-  }, [account, activeSeries.eDaiBalance, fallbackProvider]);
+  }, [account, activeSeries.fyDaiBalance, fallbackProvider]);
 
   /* Withdraw DAi button disabling logic */
   useEffect(()=>{

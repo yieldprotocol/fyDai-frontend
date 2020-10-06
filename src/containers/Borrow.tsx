@@ -86,7 +86,7 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
   const [inputRef, setInputRef] = useState<any>(null);
 
   /* token balances and calculated values */
-  const [ eDaiValue, setEDaiValue ] = useState<number>(0);
+  const [ fyDaiValue, setFyDaiValue ] = useState<number>(0);
   const [ APR, setAPR ] = useState<number>();
   const [ estRatio, setEstRatio ] = useState<number>(0);
 
@@ -107,7 +107,7 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
 
   /* 
   * Handle input (debounced input) changes:
-  * 1. dai to eDai conversion and get APR (eDai needed to compare with the approved allowance)
+  * 1. dai to fyDai conversion and get APR (fyDai needed to compare with the approved allowance)
   * 2. calcalute yield APR
   * 3. calculate estimated collateralization ratio
   */
@@ -124,13 +124,13 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
     activeSeries && debouncedInput>0 && ( async () => {
       const preview = await previewPoolTx('buyDai', activeSeries, debouncedInput);
       if (!(preview instanceof Error)) {
-        setEDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
+        setFyDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
         setAPR( yieldAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries.maturity ) );      
       } else {
         /* if the market doesnt have liquidity just estimate from rate */
         const rate = await previewPoolTx('buyDai', activeSeries, 1);
-        !(rate instanceof Error) && setEDaiValue(debouncedInput*parseFloat((ethers.utils.formatEther(rate))));
-        (rate instanceof Error) && setEDaiValue(0);
+        !(rate instanceof Error) && setFyDaiValue(debouncedInput*parseFloat((ethers.utils.formatEther(rate))));
+        (rate instanceof Error) && setFyDaiValue(0);
         setBorrowDisabled(true);
         setErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
       }
@@ -272,7 +272,7 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
               label: 'Dai Balance',
               visible: 
                   (!!account && !txActive && !activeSeries?.isMature()) || 
-                  (activeSeries?.isMature() && activeSeries?.eDaiBalance_>0),
+                  (activeSeries?.isMature() && activeSeries?.fyDaiBalance_>0),
               active: true,
               loading: borrowPending,            
               value: daiBalance_?`${daiBalance_} DAI`: '0 DAI',
@@ -333,7 +333,7 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
                     visible: !!inputValue,
                     active: !!inputValue&&inputValue>0,
                     loading: false,          
-                    value: `${eDaiValue.toFixed(2)} DAI`,
+                    value: `${fyDaiValue.toFixed(2)} DAI`,
                     valuePrefix: '',
                     // valueExtra: () => (
                     //   <Text size='xsmall'>
@@ -409,7 +409,7 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
           </Box>}
 
           { !activeSeries?.isMature() &&
-            activeSeries?.ethDebtEDai?.gt(ethers.constants.Zero) &&
+            activeSeries?.ethDebtFyDai?.gt(ethers.constants.Zero) &&
             <Box alignSelf='end' margin={{ top:'medium' }}>
               <FlatButton 
                 onClick={()=>setRepayOpen(true)}
@@ -432,7 +432,7 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
           { !txActive && 
             !!account && 
             activeSeries?.isMature() && 
-            activeSeries?.ethDebtEDai.gt(ethers.constants.Zero) && 
+            activeSeries?.ethDebtFyDai.gt(ethers.constants.Zero) && 
             <Repay />}
         </Box>
       </Box>}

@@ -14,8 +14,8 @@ import { IYieldSeries } from '../types';
 
 const YieldContext = createContext<any>({});
 
-// const eDaiList = ['eDai0', 'eDai1', 'eDai2', 'eDai3', 'eDai4'];
-const eDaiList = ['20Oct1', '20Sep30', '20Dec31', '21Dec31'];
+// const fyDaiList = ['fyDai0', 'fyDai1', 'fyDai2', 'fyDai3', 'fyDai4'];
+const fyDaiList = ['20Oct1', '20Sep30', '20Dec31', '21Dec31'];
 const seriesColors = ['#82d4bb', '#ff86c8', '#ffa3a5', '#ffbf81', '#ffdc5e', '#a2c5ac'];// ['#cecfc7', '#709fb0', '#ffb8d1', '#a0c1b8', '#f4ebc1', '#ada8b6', '#03a9f4'];
 const contractList = [
   'Controller',
@@ -111,10 +111,10 @@ const YieldProvider = ({ children }: any) => {
       }
 
       /* Load series specific contract addrs */
-      if (!cachedSeries || (cachedSeries.length !== eDaiList.length) || forceUpdate) {
+      if (!cachedSeries || (cachedSeries.length !== fyDaiList.length) || forceUpdate) {
 
-        const _list = await getAddresses(eDaiList.map((x:any)=> `eDai${x}`));
-        const _poolList = await getAddresses(eDaiList.map((x:any)=> `eDaiLP${x}`));
+        const _list = await getAddresses(fyDaiList.map((x:any)=> `fyDai${x}`));
+        const _poolList = await getAddresses(fyDaiList.map((x:any)=> `fyDaiLP${x}`));
 
         console.log(_poolList);
         
@@ -123,12 +123,12 @@ const YieldProvider = ({ children }: any) => {
         await Promise.all(
           _seriesList.map(async (x: string, i: number) => {
 
-            const symbol = await callTx(x, 'EDai', 'symbol', []);
-            const maturity = await callTx(x, 'EDai', 'maturity', []);
+            const symbol = await callTx(x, 'FyDai', 'symbol', []);
+            const maturity = await callTx(x, 'FyDai', 'maturity', []);
             const poolAddress = _poolList.get(`${symbol.slice(0, 4)}LP${symbol.slice(4)}`); 
 
             return {
-              eDaiAddress: x,
+              fyDaiAddress: x,
               symbol,
               maturity: maturity.toNumber(),
               poolAddress,

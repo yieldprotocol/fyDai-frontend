@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react';
 import { ethers, BigNumber }  from 'ethers';
 
-import EDai from '../contracts/EDai.json';
+import FyDai from '../contracts/FYDai.json';
 
 import { NotifyContext } from '../contexts/NotifyContext';
 import { useSignerAccount } from './connectionHooks';
@@ -13,36 +13,36 @@ import { cleanValue } from '../utils';
  * @returns { function } redeem
  * @returns { boolean } redeemActive
  */
-export const useEDai = () => {
+export const useFyDai = () => {
 
   const { provider, signer, account } = useSignerAccount();
-  const { abi: eDaiAbi } = EDai;
+  const { abi: fyDaiAbi } = FyDai;
   const  { dispatch }  = useContext<any>(NotifyContext);
   const [ redeemActive, setRedeemActive ] = useState<boolean>(false);
   
   const { handleTx, handleTxBuildError } = useTxHelpers();
 
   /**
-   * @dev Redeems eDai for dai after maturity
-   * @param {string} eDaiAddress address of the eDai series to redeem from.
-   * @param {BigNumber} amount in exact eDai available to burn precision
+   * @dev Redeems fyDai for dai after maturity
+   * @param {string} fyDaiAddress address of the fyDai series to redeem from.
+   * @param {BigNumber} amount in exact fyDai available to burn precision
    */
   const redeem = async (
-    eDaiAddress:string,
+    fyDaiAddress:string,
     amount: string|BigNumber
   ) => {
     let tx:any;
     const parsedAmount = BigNumber.isBigNumber(amount)? amount : (cleanValue(amount));
     const fromAddr = account && ethers.utils.getAddress(account);
     const toAddr = fromAddr;
-    const eDaiAddr = ethers.utils.getAddress(eDaiAddress);
+    const fyDaiAddr = ethers.utils.getAddress(fyDaiAddress);
 
     const overrides = {
       gasLimit: BigNumber.from('500000')
     };
 
     setRedeemActive(true);
-    const contract = new ethers.Contract( eDaiAddr, eDaiAbi, signer );
+    const contract = new ethers.Contract( fyDaiAddr, fyDaiAbi, signer );
     try {
       tx = await contract.redeem(fromAddr, toAddr, parsedAmount, overrides);
     } catch (e) {
@@ -56,15 +56,15 @@ export const useEDai = () => {
   };
 
   /**
-   * @dev eDai Series is Mature or not?
-   * @param {string} eDaiAddress address of the eDai series to check.
+   * @dev fyDai Series is Mature or not?
+   * @param {string} fyDaiAddress address of the fyDai series to check.
    * @returns {boolean}
    */
   const hasBeenMatured = async (
-    eDaiAddress:string,
+    fyDaiAddress:string,
   ) => {
-    const eDaiAddr = ethers.utils.getAddress(eDaiAddress);
-    const contract = new ethers.Contract( eDaiAddr, eDaiAbi, provider );
+    const fyDaiAddr = ethers.utils.getAddress(fyDaiAddress);
+    const contract = new ethers.Contract( fyDaiAddr, fyDaiAbi, provider );
     let res;
     try {
       res = await contract.isMature();

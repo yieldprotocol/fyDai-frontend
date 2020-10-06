@@ -43,7 +43,7 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
   const authProcedure = async () => {
     setAuthPending(true);
     !series && await yieldAuth();
-    series && await poolAuth(series.eDaiAddress, series.poolAddress);
+    series && await poolAuth(series.fyDaiAddress, series.poolAddress);
     await Promise.all([
       userActions.updateAuthorizations(),
       seriesActions.updateActiveSeries()

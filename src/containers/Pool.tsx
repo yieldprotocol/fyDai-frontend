@@ -93,9 +93,9 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
 
     const daiReserves = await getBalance(deployedContracts.Dai, 'Dai', activeSeries.poolAddress);
     console.log(daiReserves);
-    const eDaiReserves = await getBalance(activeSeries.eDaiAddress, 'EDai', activeSeries.poolAddress);
-    console.log(eDaiReserves);
-    const tokens_ = ethers.utils.parseEther(debouncedInput).mul(daiReserves).div(eDaiReserves.add(daiReserves));
+    const fyDaiReserves = await getBalance(activeSeries.fyDaiAddress, 'FyDai', activeSeries.poolAddress);
+    console.log(fyDaiReserves);
+    const tokens_ = ethers.utils.parseEther(debouncedInput).mul(daiReserves).div(fyDaiReserves.add(daiReserves));
     const newBalance = tokens_.add(activeSeries.poolTokens); 
     const percent= ( parseFloat(ethers.utils.formatEther(newBalance)) / parseFloat(ethers.utils.formatEther(activeSeries.totalSupply)) )*100;
     setNewShare(percent.toFixed(5)) ;

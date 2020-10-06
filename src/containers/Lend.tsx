@@ -72,7 +72,7 @@ const Lend = ({ openConnectLayer, lendAmount }:ILendProps) => {
   const isLol = useIsLol(inputValue);
 
   const [ APR, setAPR ] = useState<number>();
-  const [ eDaiValue, setEDaiValue ] = useState<number>(0);
+  const [ fyDaiValue, setFyDaiValue ] = useState<number>(0);
   const [ currentValue, setCurrentValue ] = useState<string>();
   
   /* Lend execution flow */
@@ -97,13 +97,13 @@ const Lend = ({ openConnectLayer, lendAmount }:ILendProps) => {
     activeSeries && !(activeSeries?.isMature()) && !!debouncedInput && ( async () => {
       const preview = await previewPoolTx('sellDai', activeSeries, debouncedInput);
       if (!(preview instanceof Error)) {
-        setEDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
+        setFyDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
         setAPR( yieldAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) );      
       } else {
         /* if the market doesnt have liquidity just estimate from rate */
         const rate = await previewPoolTx('sellDai', activeSeries, 1);
-        !(rate instanceof Error) && setEDaiValue(debouncedInput*parseFloat((ethers.utils.formatEther(rate))));
-        (rate instanceof Error) && setEDaiValue(0);
+        !(rate instanceof Error) && setFyDaiValue(debouncedInput*parseFloat((ethers.utils.formatEther(rate))));
+        (rate instanceof Error) && setFyDaiValue(0);
         setLendDisabled(true);
         setErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
       }
@@ -112,8 +112,8 @@ const Lend = ({ openConnectLayer, lendAmount }:ILendProps) => {
 
   /* handle active series loads and changes */
   useEffect(() => {
-    fallbackProvider && account && activeSeries?.eDaiBalance_ && !(activeSeries?.isMature()) && ( async () => {
-      const preview = await previewPoolTx('SellEDai', activeSeries, activeSeries.eDaiBalance_);
+    fallbackProvider && account && activeSeries?.fyDaiBalance_ && !(activeSeries?.isMature()) && ( async () => {
+      const preview = await previewPoolTx('SellFyDai', activeSeries, activeSeries.fyDaiBalance_);
       !(preview instanceof Error) && setCurrentValue( ethers.utils.formatEther(preview));
     })();
   }, [ activeSeries, account, fallbackProvider ]);
@@ -161,10 +161,10 @@ const Lend = ({ openConnectLayer, lendAmount }:ILendProps) => {
               labelExtra: 'at maturity',
               visible: 
                   (!!account && !txActive && !activeSeries?.isMature()) || 
-                  ( activeSeries?.isMature() && activeSeries?.eDaiBalance_>0),
+                  ( activeSeries?.isMature() && activeSeries?.fyDaiBalance_>0),
               active: true,
               loading: lendPending,  
-              value: activeSeries && `${activeSeries?.eDaiBalance_} DAI` || '-',
+              value: activeSeries && `${activeSeries?.fyDaiBalance_} DAI` || '-',
               valuePrefix: null,
               valueExtra: null,
             },
@@ -192,7 +192,7 @@ const Lend = ({ openConnectLayer, lendAmount }:ILendProps) => {
               label: 'Dai Balance',
               visible: 
                   (!!account && !txActive && !activeSeries?.isMature()) || 
-                  (activeSeries?.isMature() && activeSeries?.eDaiBalance_>0),
+                  (activeSeries?.isMature() && activeSeries?.fyDaiBalance_>0),
               active: true,
               loading: lendPending,            
               value: daiBalance_?`${daiBalance_} DAI`: '0 DAI',
@@ -257,7 +257,7 @@ const Lend = ({ openConnectLayer, lendAmount }:ILendProps) => {
                         visible: true,
                         active: inputValue,
                         loading: false,           
-                        value: `${eDaiValue.toFixed(2)} DAI`,
+                        value: `${fyDaiValue.toFixed(2)} DAI`,
                         valuePrefix: null,
                         valueExtra: null,
                         //   valueExtra: () => (
@@ -297,7 +297,7 @@ const Lend = ({ openConnectLayer, lendAmount }:ILendProps) => {
                 />       
               </Box>
 
-              { activeSeries?.eDaiBalance_ > 0 &&
+              { activeSeries?.fyDaiBalance_ > 0 &&
               <Box alignSelf='end' margin={{ top:'medium' }}>
                 <FlatButton 
                   onClick={()=>setWithdrawDaiOpen(true)}
@@ -317,7 +317,7 @@ const Lend = ({ openConnectLayer, lendAmount }:ILendProps) => {
           { !txActive && 
             !!account && 
             activeSeries?.isMature() && 
-            activeSeries?.eDaiBalance?.gt(ethers.constants.Zero) && 
+            activeSeries?.fyDaiBalance?.gt(ethers.constants.Zero) && 
             <Redeem />}
 
         </Box>

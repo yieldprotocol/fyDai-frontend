@@ -3,7 +3,7 @@ import { ethers }  from 'ethers';
 
 import { useSignerAccount } from './connectionHooks';
 
-import EDai from '../contracts/EDai.json';
+import FyDai from '../contracts/FYDai.json';
 import Controller from '../contracts/Controller.json';
 import Dai from '../contracts/Dai.json';
 import YieldProxy from '../contracts/YieldProxy.json';
@@ -14,7 +14,7 @@ import Vat from '../contracts/Vat.json';
 // ethers.errors.setLogLevel('error');
 
 const contractMap = new Map<string, any>([
-  ['EDai', EDai.abi],
+  ['FyDai', FyDai.abi],
   ['Controller', Controller.abi],
   ['Dai', Dai.abi],
   ['YieldProxy', YieldProxy.abi],

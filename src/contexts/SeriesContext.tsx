@@ -71,45 +71,45 @@ const SeriesProvider = ({ children }:any) => {
       seriesArr.map( async (x:IYieldSeries, i:number) => {
         const _x = { ...x, isMature: ()=>( x.maturity < Math.round(new Date().getTime() / 1000)) };
         /* with no user */
-        const [ sellEDaiRate, totalSupply ] = await Promise.all([
-          await previewPoolTx('sellEDai', _x, 1),
+        const [ sellFyDaiRate, totalSupply ] = await Promise.all([
+          await previewPoolTx('sellFyDai', _x, 1),
           await callTx(_x.poolAddress, 'Pool', 'totalSupply', []),
         ]);
 
         /* with user */
-        const [ poolTokens, hasDelegatedPool, ethDebtDai, ethDebtEDai, eDaiBalance] =  account && await Promise.all([
+        const [ poolTokens, hasDelegatedPool, ethDebtDai, ethDebtFyDai, fyDaiBalance] =  account && await Promise.all([
           getBalance(_x.poolAddress, 'Pool', account),
           checkPoolDelegate(_x.poolAddress, deployedContracts.YieldProxy),
           debtDai('ETH-A', _x.maturity ),
-          callTx(deployedContracts.Controller, 'Controller', 'debtEDai', [utils.ETH, _x.maturity, account]),
-          getBalance(_x.eDaiAddress, 'EDai', account),
+          callTx(deployedContracts.Controller, 'Controller', 'debtFyDai', [utils.ETH, _x.maturity, account]),
+          getBalance(_x.fyDaiAddress, 'FyDai', account),
         ]) || [];
 
         return {
           ..._x,
-          sellEDaiRate: !(sellEDaiRate instanceof Error)? sellEDaiRate : BigNumber.from('0'),
+          sellFyDaiRate: !(sellFyDaiRate instanceof Error)? sellFyDaiRate : BigNumber.from('0'),
           totalSupply,
           poolTokens: poolTokens || BigNumber.from('0'),
           hasDelegatedPool: hasDelegatedPool || false, // TODO check this
           ethDebtDai: ethDebtDai || BigNumber.from('0'),
-          ethDebtEDai : ethDebtEDai || BigNumber.from('0'),
-          eDaiBalance : eDaiBalance || BigNumber.from('0'),
+          ethDebtFyDai : ethDebtFyDai || BigNumber.from('0'),
+          fyDaiBalance : fyDaiBalance || BigNumber.from('0'),
         };
       })
     );
 
     /* Parse the data */
     const _parsedSeriesData = _seriesData.reduce((acc: Map<string, any>, x:any) => {
-      const yieldAPR = calcAPR(x.sellEDaiRate, ethers.utils.parseEther('1'), x.maturity);
+      const yieldAPR = calcAPR(x.sellFyDaiRate, ethers.utils.parseEther('1'), x.maturity);
       const poolPercent = calcPercent(x.totalSupply, x.poolTokens).toFixed(4);
       const poolState = checkPoolState(x);
       return acc.set(
         x.maturity,
         { ...x,
-          sellEDaiRate_: utils.cleanValue(ethers.utils.formatEther(x.sellEDaiRate), 2),
+          sellFyDaiRate_: utils.cleanValue(ethers.utils.formatEther(x.sellFyDaiRate), 2),
           totalSupply_: utils.cleanValue(ethers.utils.formatEther(x.totalSupply), 2),
-          eDaiBalance_: utils.cleanValue(ethers.utils.formatEther(x.eDaiBalance), 2),
-          ethDebtEDai_: utils.cleanValue(ethers.utils.formatEther(x.ethDebtEDai), 2),
+          fyDaiBalance_: utils.cleanValue(ethers.utils.formatEther(x.fyDaiBalance), 2),
+          ethDebtFyDai_: utils.cleanValue(ethers.utils.formatEther(x.ethDebtFyDai), 2),
           ethDebtDai_: utils.cleanValue(ethers.utils.formatEther(x.ethDebtDai), 2),
           poolTokens_: utils.cleanValue(ethers.utils.formatEther(x.poolTokens), 6),
           yieldAPR_: yieldAPR.toFixed(2),

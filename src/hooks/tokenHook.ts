@@ -5,13 +5,13 @@ import { NotifyContext } from '../contexts/NotifyContext';
 
 import { useSignerAccount } from './connectionHooks';
 
-import EDai from '../contracts/EDai.json';
+import FyDai from '../contracts/FYDai.json';
 import Dai from '../contracts/Dai.json';
 import Pool from '../contracts/Pool.json';
 import { useTxHelpers } from './appHooks';
 
 const contractMap = new Map<string, any>([
-  ['EDai', EDai.abi],
+  ['FyDai', FyDai.abi],
   ['Dai', Dai.abi],
   ['Pool', Pool.abi],
 ]);
@@ -99,7 +99,7 @@ export function useToken() {
     setApproveActive(true);
     const contract = new ethers.Contract(
       tokenAddr,
-      EDai.abi,
+      FyDai.abi,
       signer
     );
     try {

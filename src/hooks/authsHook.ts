@@ -49,7 +49,7 @@ const auths = new Map([
   
   [3, { id: 3, desc:'Allow the Yield smart contracts to interact with this series on your behalf' }],
   [4, { id: 4, desc:'Allow the Yield smart contracts to trade Dai on your behalf' }],
-  [5, { id: 5, desc:'Allow the Yield smart contracts to trade eDai on your behalf' }],
+  [5, { id: 5, desc:'Allow the Yield smart contracts to trade fyDai on your behalf' }],
 ]);
 
 export const useAuth = () => {
@@ -161,21 +161,21 @@ export const useAuth = () => {
   /**
    * Series/Pool authorizations that are required for each series.
    * 
-   * @param eDaiAddress series eDai address to be authorised
+   * @param fyDaiAddress series fyDai address to be authorised
    * @param poolAddress series pool address to be authorised
    * 
    */
   const poolAuth = async (
-    eDaiAddress:string,
+    fyDaiAddress:string,
     poolAddress:string
   ) => {
     /* Sanitise input */
     const poolContract = new ethers.Contract( poolAddress, Pool.abi, provider);
-    const eDaiAddr = ethers.utils.getAddress(eDaiAddress);
+    const fyDaiAddr = ethers.utils.getAddress(fyDaiAddress);
     const poolAddr = ethers.utils.getAddress(poolAddress);
     let poolSig;
     let daiSig;
-    let eDaiSig;
+    let fyDaiSig;
 
     const overrides = { 
       gasLimit: BigNumber.from('1000000')
@@ -213,10 +213,10 @@ export const useAuth = () => {
       daiSig = ethers.utils.joinSignature(dResult);
       dispatch({ type: 'signed', payload: auths.get(4) });
 
-      /* eDai permit proxy */
+      /* fyDai permit proxy */
       // @ts-ignore
-      const yResult = await signERC2612Permit(provider.provider, eDaiAddr, fromAddr, proxyAddr, MAX_INT);
-      eDaiSig = ethers.utils.joinSignature(yResult);
+      const yResult = await signERC2612Permit(provider.provider, fyDaiAddr, fromAddr, proxyAddr, MAX_INT);
+      fyDaiSig = ethers.utils.joinSignature(yResult);
       dispatch({ type: 'signed', payload: auths.get(5) });
 
     } catch (e) {
@@ -227,7 +227,7 @@ export const useAuth = () => {
     /* Broadcast signatures */
     let tx:any;
     try {
-      tx = await proxyContract.authorizePool(poolAddr, fromAddr, daiSig, eDaiSig, poolSig, overrides);
+      tx = await proxyContract.authorizePool(poolAddr, fromAddr, daiSig, fyDaiSig, poolSig, overrides);
     } catch (e) {
       handleTxBuildError(e);
       setAuthActive(false);

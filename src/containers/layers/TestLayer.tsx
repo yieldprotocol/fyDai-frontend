@@ -179,7 +179,7 @@ const TestLayer = (props:any) => {
                 <Button primary label='controller addDelegate:EthProxy' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedContracts.YieldProxy], utils.toWei('0'))} />             
                 <Button primary label='controller addDelegate:DaiProxy[0]' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedSeries[0].yieldProxyAddress], utils.toWei('0'))} />
 
-                <Button primary label='pool[0] addDelegate: eDai[0]' onClick={()=> sendTx(deployedSeries[0].poolAddress, 'Pool', 'addDelegate', [deployedSeries[0].eDaiAddress], utils.toWei('0'))} />
+                <Button primary label='pool[0] addDelegate: fyDai[0]' onClick={()=> sendTx(deployedSeries[0].poolAddress, 'Pool', 'addDelegate', [deployedSeries[0].fyDaiAddress], utils.toWei('0'))} />
                 <Button primary label='pool[0] addDelegate: yieldProxy[0]' onClick={()=> sendTx(deployedSeries[0].poolAddress, 'Pool', 'addDelegate', [deployedContracts.YieldProxy], utils.toWei('0'))} />
                 <Button primary label='Pool[0] addDelegate: yieldProxy[0]' onClick={()=> sendTx(deployedSeries[0].poolAddress, 'Pool', 'addDelegate', [deployedSeries[0].yieldProxyAddress], utils.toWei('0'))} />
 
@@ -202,7 +202,7 @@ const TestLayer = (props:any) => {
               <Button label='Post ETH Collateral via proxy 1.5' disabled={postActive} onClick={()=> postEth('1.5')} />
               <Button primary label='controller addDelegate:EthProxy' onClick={()=> sendTx(deployedContracts.Controller, 'Controller', 'addDelegate', [deployedContracts.YieldProxy], utils.toWei('0'))} />             
               <Button label='Withdraw ETH via proxy 1.5)' onClick={()=> withdrawEth('1.5')} />
-              <Button label='6.1 Repay 0.5 eth/weth debt in eDai' onClick={()=> repay('ETH-A', yieldState.deployedSeries[0].maturity, 0.5, 'YDAI' )} />
+              <Button label='6.1 Repay 0.5 eth/weth debt in fyDai' onClick={()=> repay('ETH-A', yieldState.deployedSeries[0].maturity, 0.5, 'YDAI' )} />
               <Button label='( 6.2 Repay 0.5 eth/weth debt in Dai) ' onClick={()=> repay('ETH-A', yieldState.deployedSeries[0].maturity, 0.5, 'DAI' )} />
             
             </Box>}
@@ -257,13 +257,13 @@ const TestLayer = (props:any) => {
               <Button label='5.Borrow 0.5 with chai' onClick={()=> borrow('CHAI', deployedSeries[0].maturity, 0.5 )} />
 
               Chai repay; 
-              <Button label='(6.1 Repay 0.5 chaidebt in eDai)' onClick={()=> repay('CHAI', deployedSeries[0].maturity, 0.5, 'YDAI' )} />
+              <Button label='(6.1 Repay 0.5 chaidebt in fyDai)' onClick={()=> repay('CHAI', deployedSeries[0].maturity, 0.5, 'YDAI' )} />
               <Button label=' 6.2 Repay 0.5 chaidebt in Dai ' onClick={()=> repay('CHAI', deployedSeries[0].maturity, 0.5, 'DAI' )} />
             </Box>}
 
             { flow === 'MATURITY' && 
             <Box gap='small'>
-              <Button label='Mature eDai' onClick={()=> account && console.log('not mature')} />
+              <Button label='Mature fyDai' onClick={()=> account && console.log('not mature')} />
               <Button label='Redeem Dai' onClick={()=> account && console.log('not mature')} />
             </Box>}
           </Box>
@@ -278,7 +278,7 @@ const TestLayer = (props:any) => {
             { seriesData.size > 0 && !seriesState.seriesLoading ? 
               <Box pad='small' gap='medium' fill>
                 <Box direction='row'>
-                  {/* <Text weight='bold'>eDai[0]: {seriesData.get('eDai-2020-09-30').name}</Text> */}
+                  {/* <Text weight='bold'>fyDai[0]: {seriesData.get('fyDai-2020-09-30').name}</Text> */}
                 </Box>
                 <Box gap='small'>
                   <Text weight='bold'>Posted collateral:</Text>
@@ -306,7 +306,7 @@ const TestLayer = (props:any) => {
 
           <Button 
             label='mature Active series' 
-            onClick={()=> sendTx(activeSeries.eDaiAddress, 'EDai', 'mature', [], ethers.BigNumber.from(0) )}
+            onClick={()=> sendTx(activeSeries.fyDaiAddress, 'FyDai', 'mature', [], ethers.BigNumber.from(0) )}
           />
 
         </Box>
@@ -354,7 +354,7 @@ const TestLayer = (props:any) => {
             label='poolAuth' 
             primary
             onClick={async ()=> {
-              await poolAuth(deployedSeries[0].eDaiAddress, deployedSeries[0].poolAddress);
+              await poolAuth(deployedSeries[0].fyDaiAddress, deployedSeries[0].poolAddress);
             }}
           />
 
