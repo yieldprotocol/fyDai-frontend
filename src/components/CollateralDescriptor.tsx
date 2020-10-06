@@ -38,7 +38,7 @@ function CollateralDescriptor( props: ICollateralDescriptorProps ) {
         round='small'
         pad='small'
         gap='small'
-        background="linear-gradient(to bottom right, #82d4bb, #ffa3a5, #ffbf81, #ffdc5e, #add8e6, #add8e6, #add8e6, #a2c5ac, #a2c5ac, #ff86c8 )"
+        background="linear-gradient(to bottom right, #f0817f, #ff86c8, #82d4bb, #6ab6f1, #cb90c9, #aed175, #add8e6, #add8e6, #add8e6, #add8e6, #add8e6, #add8e6, #ffdc5c, #ffbf81, #95a4db)" // ['#ff86c8', '#82d4bb', '#6ab6f1', '#cb90c9', '#aed175', '#f0817f', '#ffbf81', '#95a4db', '#ffdc5c']
         margin={{ bottom:'-16px' }}
       >
         <Box
