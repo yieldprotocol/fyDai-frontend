@@ -245,8 +245,8 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
                       <Text size='xxlarge'>👈</Text>}
                   </Box>
                   <Box gap='xsmall'>
-                    <Box direction='row' gap='small'> 
-                      <Text color='text-weak'> Step 1: </Text>
+                    <Box> 
+                      <Text color='text-weak'> Before borrowing</Text>
                       <Text weight='bold' color='text-weak'> Deposit Collateral </Text>
                     </Box>
                     <Text size='xxsmall' color='text-weak'>

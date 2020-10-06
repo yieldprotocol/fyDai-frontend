@@ -84,13 +84,11 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
           justify='between'
         >
           {!buttonOnly && <Text>Feel free to look around and play. However, before you make any transactions you will need to sign a few authorizations.</Text> }
-          <Box pad='xsmall'>
-            <RaisedButton 
-              background='#555555'
-              label={<Text size='small' color='#DDDDDD'><Unlock /> Authorize Yield</Text>}
-              onClick={()=>{authProcedure();}}
-            />   
-          </Box>
+          <RaisedButton 
+            background='#555555'
+            label={<Box pad={{ horizontal:'medium', vertical:'small' }} align='center'><Text size='small' color='#DDDDDD'><Unlock /> Authorize Yield</Text></Box>}
+            onClick={()=>{authProcedure();}}
+          />
         </Box>}
 
       { hasDelegatedProxy && account && series?.hasDelegatedPool === false && !authWrap &&
