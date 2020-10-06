@@ -91,7 +91,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
                 <RaisedButton
                   background={modColor( activeSeries?.seriesColor, 40)}
                   label={(screenSize !== 'small' ) ?        
-                    <Box align='center' direction='row' gap='small'>
+                    <Box align='center' direction='row' gap='small' pad='xsmall'>
                       <Text size='xsmall' color={activeSeries?.seriesTextColor}> <ChangeSeries /> </Text>
                       <Text size='xsmall' color={activeSeries?.seriesTextColor}>
                         Change Series              

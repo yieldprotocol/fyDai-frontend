@@ -62,7 +62,7 @@ function CollateralDescriptor( props: ICollateralDescriptorProps ) {
           <RaisedButton
             background='#add8e6'
             label={
-              <Box align='center' direction='row' gap='small'>
+              <Box align='center' direction='row' gap='small' pad='xsmall'>
                 <Text size='xsmall'>
                   Back to Borrow           
                 </Text>
