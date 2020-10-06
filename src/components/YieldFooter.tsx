@@ -72,7 +72,7 @@ const YieldFooter = (props: any) => {
         }}
       >
         <Text size='xsmall' color='text-weak'>
-          This software is in ALHPA v0.1
+          This software is in ALPHA v0.1
         </Text>
         <Anchor
           onClick={() => setShowTestLayer(!showTestLayer)}
