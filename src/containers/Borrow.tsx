@@ -52,6 +52,7 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
   const { position, authorizations: { hasDelegatedProxy } } = userState;
   const { 
     ethPosted,
+    ethPosted_,
     maxDaiAvailable,
     maxDaiAvailable_,
     ethTotalDebtDai_,
@@ -204,7 +205,7 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
               valueExtra: ()=>(
                 <>
                   <Box
-                    width='210px'
+                    width={{ min:'175px' }}
                     margin={screenSize!=='small'?{ left:'-52px' }: { left:'-25px' }}
                     background='#555555FA' 
                     pad='small'
@@ -226,6 +227,49 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
                 </>)
             },
             {
+              label: null,
+              labelExtra: null,
+              visible:
+                  !!account &&
+                  parseFloat(ethPosted_) === 0,
+              active: true,
+              loading: false,    
+              value: null,
+              valuePrefix: null,
+              valueExtra: ()=>(
+                <Box width={{ min:'300px' }} direction='row' align='center' gap='small'> 
+                  <Box align='center'> 
+                    {screenSize==='small'? 
+                      <Text size='xxlarge'>👆</Text>
+                      :
+                      <Text size='xxlarge'>👈</Text>}
+                  </Box>
+                  <Box gap='xsmall'>
+                    <Box direction='row' gap='small'> 
+                      <Text color='text-weak'> Step 1: </Text>
+                      <Text weight='bold' color='text-weak'> Deposit Collateral </Text>
+                    </Box>
+                    <Text size='xxsmall' color='text-weak'>
+                      Use the 'manage collateral' button to post some ETH
+                    </Text>
+                  </Box>
+                </Box>)
+            },
+            /* dummy placeholder */
+            {
+              label: null,
+              labelExtra: null,
+              visible:
+                  !!account &&
+                  parseFloat(ethPosted_) === 0,
+              active: true,
+              loading: false,    
+              value: null,
+              valuePrefix: null,
+              valueExtra:null,
+            },
+
+            {
               label: 'Dai Debt + Interest',
               labelExtra: 'owed at maturity',
               visible:
@@ -241,7 +285,7 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
             {
               label: 'Borrowing Power',
               labelExtra: 'based on collateral posted',
-              visible: !txActive && activeSeries && !activeSeries.isMature() && !!account,
+              visible: !txActive && activeSeries && !activeSeries.isMature() && !!account && parseFloat(ethPosted_) > 0,
               active: maxDaiAvailable_,
               loading: borrowPending,
               value: maxDaiAvailable_? `${maxDaiAvailable_} DAI`: '0 DAI',           
@@ -261,7 +305,7 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
             },
             {
               label: 'Collateralization Ratio',
-              visible: !txActive && activeSeries && !activeSeries.isMature() && !!account,
+              visible: !txActive && activeSeries && !activeSeries.isMature() && !!account && parseFloat(ethPosted_) > 0,
               active: collateralPercent_ > 0,
               loading: false,            
               value: (collateralPercent_ && (collateralPercent_ !== 0))? `${collateralPercent_}%`: '0%',

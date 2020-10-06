@@ -77,7 +77,7 @@ function ActionButton({ ...props }:any ) {
               size='medium'
               color={props.disabled ? 'background' : activeSeries?.seriesTextColor}
             >
-              Please authorise Yield before making any transactions
+              Please authorize Yield before going any further
             </Text>
           </StyledBox>
         </Authorization>}

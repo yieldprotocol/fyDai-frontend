@@ -2,7 +2,7 @@ import { css } from 'styled-components';
 
 export const yieldTheme = {
   name: 'yieldTheme',
-  rounding: 24,
+  rounding: 16,
   spacing: 20,
   pad: 'medium',
   defaultMode: 'light',
@@ -60,7 +60,6 @@ export const yieldTheme = {
       'background-mid': {
         dark: 'dark-1',
         light:'#f1f1f1'
-
         // light: '#F5FAFF',
         // light: 'light-3',
       },
