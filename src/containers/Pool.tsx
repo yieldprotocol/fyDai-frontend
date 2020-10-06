@@ -93,7 +93,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
 
     const daiReserves = await getBalance(deployedContracts.Dai, 'Dai', activeSeries.poolAddress);
     console.log(daiReserves);
-    const fyDaiReserves = await getBalance(activeSeries.fyDaiAddress, 'FyDai', activeSeries.poolAddress);
+    const fyDaiReserves = await getBalance(activeSeries.fyDaiAddress, 'FYDai', activeSeries.poolAddress);
     console.log(fyDaiReserves);
     const tokens_ = ethers.utils.parseEther(debouncedInput).mul(daiReserves).div(fyDaiReserves.add(daiReserves));
     const newBalance = tokens_.add(activeSeries.poolTokens); 

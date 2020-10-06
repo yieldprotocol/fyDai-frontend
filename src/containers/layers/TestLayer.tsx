@@ -306,7 +306,7 @@ const TestLayer = (props:any) => {
 
           <Button 
             label='mature Active series' 
-            onClick={()=> sendTx(activeSeries.fyDaiAddress, 'FyDai', 'mature', [], ethers.BigNumber.from(0) )}
+            onClick={()=> sendTx(activeSeries.fyDaiAddress, 'FYDai', 'mature', [], ethers.BigNumber.from(0) )}
           />
 
         </Box>

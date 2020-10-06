@@ -72,7 +72,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
 
   useEffect(()=> {
     fallbackProvider && account && activeSeries.fyDaiBalance && (async () => {
-      const preview = await previewPoolTx('sellFyDai', activeSeries, activeSeries.fyDaiBalance);
+      const preview = await previewPoolTx('sellFYDai', activeSeries, activeSeries.fyDaiBalance);
       if (!(preview instanceof Error)) {
         setMaxWithdraw(cleanValue(ethers.utils.formatEther(preview), 6));
       }

@@ -24,8 +24,8 @@ export interface IYieldSeries {
   seriesTextColor?:string;
   wethDebtDai?: BigNumber;
   wethDebtDai_?: number;
-  wethDebtFyDai?: BigNumber;
-  wethDebtFyDai_?: number;
+  wethDebtFYDai?: BigNumber;
+  wethDebtFYDai_?: number;
   yieldAPR?: number;
   yieldAPR_?: string;
 }
@@ -49,8 +49,8 @@ export interface IUser {
   ethBalance_?: number;
   ethPosted?: BigNumber;
   ethPosted_?: number;
-  totalDebtFyDai?: BigNumber;
-  totalDebtFyDai_?: number;
+  totalDebtFYDai?: BigNumber;
+  totalDebtFYDai_?: number;
   ethAvailable?:BigNumber;
   ethAvailable_?:BigNumber;
 }

@@ -30,7 +30,7 @@ export const usePool = () => {
    *
    * @return Amount of chai that will be deposited on `to` wallet
    */
-  const sellFyDai = async (
+  const sellFYDai = async (
     poolAddress:string,
     fyDaiIn: number,
   ) => {
@@ -46,7 +46,7 @@ export const usePool = () => {
     setSellActive(true);
     const contract = new ethers.Contract( marketAddr, poolAbi, signer );
     try {
-      tx = await contract.sellFyDai(fromAddr, toAddr, parsedAmount, overrides);
+      tx = await contract.sellFYDai(fromAddr, toAddr, parsedAmount, overrides);
     } catch (e) {
       handleTxBuildError(e);
       setSellActive(false);
@@ -66,7 +66,7 @@ export const usePool = () => {
    * @param {number} fyDaiOut Amount of fyDai being bought that will be deposited in `to` wallet
    * @return Amount of chai/Dai that will be taken from `from` wallet
    */
-  const buyFyDai = async (
+  const buyFYDai = async (
     fyDaiAddress:string,
     poolAddress:string,
     fyDaiOut: number
@@ -83,7 +83,7 @@ export const usePool = () => {
     setSellActive(true);
     const contract = new ethers.Contract( marketAddr, poolAbi, signer );
     try {
-      tx = await contract.buyFyDai(fromAddr, toAddr, parsedAmount, overrides);
+      tx = await contract.buyFYDai(fromAddr, toAddr, parsedAmount, overrides);
     } catch (e) {
       handleTxBuildError(e);
       setSellActive(false);
@@ -234,9 +234,9 @@ export const usePool = () => {
   /**
    * @dev Preview buy/sell transactions
    * 
-   * sellFyDai -> Returns how much Dai would be obtained by selling x fyDai
+   * sellFYDai -> Returns how much Dai would be obtained by selling x fyDai
    * buyDai -> Returns how much fyDai would be required to buy x Dai
-   * buyFyDai -> Returns how much Dai would be required to buy x fyDai
+   * buyFYDai -> Returns how much Dai would be required to buy x fyDai
    * sellDai -> Returns how much fyDai would be obtained by selling x Dai
    * 
    * @param {string} txType string represnting transaction type //TODO tyescript it out
@@ -268,9 +268,9 @@ export const usePool = () => {
           case 'SELLDAI': 
             value = await contract.sellDaiPreview(parsedAmount); break;
           case 'BUYEDAI':
-            value = await contract.buyFyDaiPreview(parsedAmount); break;
+            value = await contract.buyFYDaiPreview(parsedAmount); break;
           case 'SELLEDAI':
-            value = await contract.sellFyDaiPreview(parsedAmount); break;
+            value = await contract.sellFYDaiPreview(parsedAmount); break;
           default: 
             value = await BigNumber.from('0');
         } 
@@ -306,8 +306,8 @@ export const usePool = () => {
   };
 
   return {  
-    sellFyDai,
-    buyFyDai,
+    sellFYDai,
+    buyFYDai,
     sellDai,
     buyDai, 
     sellActive, 

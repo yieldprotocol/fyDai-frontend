@@ -157,7 +157,7 @@ export const useController = () => {
   };
 
   /**
-   * Repay fyDai debt directly with either Dai or FyDai.
+   * Repay fyDai debt directly with either Dai or FYDai.
    * @note Direct transaction with no pool trading.
    * 
    * @param {string} collateral 'ETH-A' || 'CHAI' (use ETH-A for ETH collateral pool)
@@ -183,7 +183,7 @@ export const useController = () => {
     setRepayActive(true);
     try {
       if (typeCaps === 'EDAI') {
-        tx = await controllerContract.repayFyDai(collateralBytes, maturity, fromAddr, toAddr, parsedAmount);
+        tx = await controllerContract.repayFYDai(collateralBytes, maturity, fromAddr, toAddr, parsedAmount);
       } else if (typeCaps === 'DAI') {
         tx = await controllerContract.repayDai(collateralBytes, maturity, fromAddr, toAddr, parsedAmount);
       }

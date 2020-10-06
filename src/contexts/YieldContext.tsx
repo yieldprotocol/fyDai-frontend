@@ -14,9 +14,9 @@ import { IYieldSeries } from '../types';
 
 const YieldContext = createContext<any>({});
 
-// const fyDaiList = ['fyDai0', 'fyDai1', 'fyDai2', 'fyDai3', 'fyDai4'];
-const fyDaiList = ['20Oct1', '20Sep30', '20Dec31', '21Dec31'];
-const seriesColors = ['#82d4bb', '#ff86c8', '#ffa3a5', '#ffbf81', '#ffdc5e', '#a2c5ac'];// ['#cecfc7', '#709fb0', '#ffb8d1', '#a0c1b8', '#f4ebc1', '#ada8b6', '#03a9f4'];
+const fyDaiList = ['20Oct5', '20Oct6', '20Oct9', '20Oct31', '20Dec31', '21Mar31', '21Jun30', '21Sep30', '21Dec31'];
+// const fyDaiLPList = ['fyDaiLP20Oct5', 'fyDaiLP20Oct6', 'fyDaiLP20Oct9', 'fyDaiLP20Oct31', 'fyDaiLP20Dec31', 'fyDaiLP21Mar31', 'fyDaiLP21Jun30', 'fyDaiLP21Sep30', 'fyDaiLP21Dec31'];
+const seriesColors = ['#ff86c8', '#82d4bb', '#6ab6f1', '#cb90c9', '#aed175', '#f0817f', '#ffbf81', '#95a4db', '#ffdc5c']; // ['#82d4bb', '#ff86c8', '#ffa3a5', '#ffbf81', '#ffdc5e', '#a2c5ac'];
 const contractList = [
   'Controller',
   'Treasury',
@@ -115,7 +115,10 @@ const YieldProvider = ({ children }: any) => {
 
         const _list = await getAddresses(fyDaiList.map((x:any)=> `fyDai${x}`));
         const _poolList = await getAddresses(fyDaiList.map((x:any)=> `fyDaiLP${x}`));
+        // const _list = await getAddresses(fyDaiList);
+        // const _poolList = await getAddresses(fyDaiLPList);
 
+        console.log(_list);
         console.log(_poolList);
         
         const _seriesList = Array.from(_list.values());
@@ -123,9 +126,9 @@ const YieldProvider = ({ children }: any) => {
         await Promise.all(
           _seriesList.map(async (x: string, i: number) => {
 
-            const symbol = await callTx(x, 'FyDai', 'symbol', []);
-            const maturity = await callTx(x, 'FyDai', 'maturity', []);
-            const poolAddress = _poolList.get(`${symbol.slice(0, 4)}LP${symbol.slice(4)}`); 
+            const symbol = await callTx(x, 'FYDai', 'symbol', []);
+            const maturity = await callTx(x, 'FYDai', 'maturity', []);
+            const poolAddress = _poolList.get(`${symbol.slice(0, 5)}LP${symbol.slice(5)}`); 
 
             return {
               fyDaiAddress: x,

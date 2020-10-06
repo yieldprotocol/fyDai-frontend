@@ -3,7 +3,7 @@ import { ethers }  from 'ethers';
 
 import { useSignerAccount } from './connectionHooks';
 
-import FyDai from '../contracts/FYDai.json';
+import FYDai from '../contracts/FYDai.json';
 import Controller from '../contracts/Controller.json';
 import Dai from '../contracts/Dai.json';
 import YieldProxy from '../contracts/YieldProxy.json';
@@ -12,7 +12,7 @@ import Vat from '../contracts/Vat.json';
 
 // TODO abstract this out to a higher level
 const contractMap = new Map<string, any>([
-  ['FyDai', FyDai.abi],
+  ['FYDai', FYDai.abi],
   ['Controller', Controller.abi],
   ['Dai', Dai.abi],
   ['YieldProxy', YieldProxy.abi],

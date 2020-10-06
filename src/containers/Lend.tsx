@@ -72,7 +72,7 @@ const Lend = ({ openConnectLayer, lendAmount }:ILendProps) => {
   const isLol = useIsLol(inputValue);
 
   const [ APR, setAPR ] = useState<number>();
-  const [ fyDaiValue, setFyDaiValue ] = useState<number>(0);
+  const [ fyDaiValue, setFYDaiValue ] = useState<number>(0);
   const [ currentValue, setCurrentValue ] = useState<string>();
   
   /* Lend execution flow */
@@ -97,13 +97,13 @@ const Lend = ({ openConnectLayer, lendAmount }:ILendProps) => {
     activeSeries && !(activeSeries?.isMature()) && !!debouncedInput && ( async () => {
       const preview = await previewPoolTx('sellDai', activeSeries, debouncedInput);
       if (!(preview instanceof Error)) {
-        setFyDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
+        setFYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
         setAPR( yieldAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) );      
       } else {
         /* if the market doesnt have liquidity just estimate from rate */
         const rate = await previewPoolTx('sellDai', activeSeries, 1);
-        !(rate instanceof Error) && setFyDaiValue(debouncedInput*parseFloat((ethers.utils.formatEther(rate))));
-        (rate instanceof Error) && setFyDaiValue(0);
+        !(rate instanceof Error) && setFYDaiValue(debouncedInput*parseFloat((ethers.utils.formatEther(rate))));
+        (rate instanceof Error) && setFYDaiValue(0);
         setLendDisabled(true);
         setErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
       }
@@ -113,7 +113,7 @@ const Lend = ({ openConnectLayer, lendAmount }:ILendProps) => {
   /* handle active series loads and changes */
   useEffect(() => {
     fallbackProvider && account && activeSeries?.fyDaiBalance_ && !(activeSeries?.isMature()) && ( async () => {
-      const preview = await previewPoolTx('SellFyDai', activeSeries, activeSeries.fyDaiBalance_);
+      const preview = await previewPoolTx('SellFYDai', activeSeries, activeSeries.fyDaiBalance_);
       !(preview instanceof Error) && setCurrentValue( ethers.utils.formatEther(preview));
     })();
   }, [ activeSeries, account, fallbackProvider ]);

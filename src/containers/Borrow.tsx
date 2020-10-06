@@ -86,7 +86,7 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
   const [inputRef, setInputRef] = useState<any>(null);
 
   /* token balances and calculated values */
-  const [ fyDaiValue, setFyDaiValue ] = useState<number>(0);
+  const [ fyDaiValue, setFYDaiValue ] = useState<number>(0);
   const [ APR, setAPR ] = useState<number>();
   const [ estRatio, setEstRatio ] = useState<number>(0);
 
@@ -124,13 +124,13 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
     activeSeries && debouncedInput>0 && ( async () => {
       const preview = await previewPoolTx('buyDai', activeSeries, debouncedInput);
       if (!(preview instanceof Error)) {
-        setFyDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
+        setFYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
         setAPR( yieldAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries.maturity ) );      
       } else {
         /* if the market doesnt have liquidity just estimate from rate */
         const rate = await previewPoolTx('buyDai', activeSeries, 1);
-        !(rate instanceof Error) && setFyDaiValue(debouncedInput*parseFloat((ethers.utils.formatEther(rate))));
-        (rate instanceof Error) && setFyDaiValue(0);
+        !(rate instanceof Error) && setFYDaiValue(debouncedInput*parseFloat((ethers.utils.formatEther(rate))));
+        (rate instanceof Error) && setFYDaiValue(0);
         setBorrowDisabled(true);
         setErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
       }
@@ -409,7 +409,7 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
           </Box>}
 
           { !activeSeries?.isMature() &&
-            activeSeries?.ethDebtFyDai?.gt(ethers.constants.Zero) &&
+            activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) &&
             <Box alignSelf='end' margin={{ top:'medium' }}>
               <FlatButton 
                 onClick={()=>setRepayOpen(true)}
@@ -432,7 +432,7 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
           { !txActive && 
             !!account && 
             activeSeries?.isMature() && 
-            activeSeries?.ethDebtFyDai.gt(ethers.constants.Zero) && 
+            activeSeries?.ethDebtFYDai.gt(ethers.constants.Zero) && 
             <Repay />}
         </Box>
       </Box>}

@@ -4,7 +4,7 @@ import { Box, Text } from 'grommet';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
 
-import { useFyDai, useTxActive } from '../hooks';
+import { useFYDai, useTxActive } from '../hooks';
 
 import InlineAlert from '../components/InlineAlert';
 import ApprovalPending from '../components/ApprovalPending';
@@ -21,7 +21,7 @@ const Redeem  = ({ close }:IRedeemProps)  => {
   const { activeSeries } = seriesState;
   const { actions: userActions } = useContext(UserContext);
 
-  const { hasBeenMatured, redeem, redeemActive } = useFyDai();
+  const { hasBeenMatured, redeem, redeemActive } = useFYDai();
   const [ txActive ] = useTxActive(['redeem']);
 
   const [ redeemPending, setRedeemPending] = useState<boolean>(false);

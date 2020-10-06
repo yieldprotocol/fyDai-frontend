@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react';
 import { ethers, BigNumber }  from 'ethers';
 
-import FyDai from '../contracts/FYDai.json';
+import FYDai from '../contracts/FYDai.json';
 
 import { NotifyContext } from '../contexts/NotifyContext';
 import { useSignerAccount } from './connectionHooks';
@@ -13,10 +13,10 @@ import { cleanValue } from '../utils';
  * @returns { function } redeem
  * @returns { boolean } redeemActive
  */
-export const useFyDai = () => {
+export const useFYDai = () => {
 
   const { provider, signer, account } = useSignerAccount();
-  const { abi: fyDaiAbi } = FyDai;
+  const { abi: fyDaiAbi } = FYDai;
   const  { dispatch }  = useContext<any>(NotifyContext);
   const [ redeemActive, setRedeemActive ] = useState<boolean>(false);
   
