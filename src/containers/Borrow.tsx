@@ -52,6 +52,7 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
   const { position, authorizations: { hasDelegatedProxy } } = userState;
   const { 
     ethPosted,
+    ethPosted_,
     maxDaiAvailable,
     maxDaiAvailable_,
     ethTotalDebtDai_,
@@ -86,7 +87,7 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
   const [inputRef, setInputRef] = useState<any>(null);
 
   /* token balances and calculated values */
-  const [ eDaiValue, setEDaiValue ] = useState<number>(0);
+  const [ fyDaiValue, setFYDaiValue ] = useState<number>(0);
   const [ APR, setAPR ] = useState<number>();
   const [ estRatio, setEstRatio ] = useState<number>(0);
 
@@ -107,7 +108,7 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
 
   /* 
   * Handle input (debounced input) changes:
-  * 1. dai to eDai conversion and get APR (eDai needed to compare with the approved allowance)
+  * 1. dai to fyDai conversion and get APR (fyDai needed to compare with the approved allowance)
   * 2. calcalute yield APR
   * 3. calculate estimated collateralization ratio
   */
@@ -124,13 +125,13 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
     activeSeries && debouncedInput>0 && ( async () => {
       const preview = await previewPoolTx('buyDai', activeSeries, debouncedInput);
       if (!(preview instanceof Error)) {
-        setEDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
+        setFYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
         setAPR( yieldAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries.maturity ) );      
       } else {
         /* if the market doesnt have liquidity just estimate from rate */
         const rate = await previewPoolTx('buyDai', activeSeries, 1);
-        !(rate instanceof Error) && setEDaiValue(debouncedInput*parseFloat((ethers.utils.formatEther(rate))));
-        (rate instanceof Error) && setEDaiValue(0);
+        !(rate instanceof Error) && setFYDaiValue(debouncedInput*parseFloat((ethers.utils.formatEther(rate))));
+        (rate instanceof Error) && setFYDaiValue(0);
         setBorrowDisabled(true);
         setErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
       }
@@ -204,7 +205,7 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
               valueExtra: ()=>(
                 <>
                   <Box
-                    width='210px'
+                    width={{ min:'175px' }}
                     margin={screenSize!=='small'?{ left:'-52px' }: { left:'-25px' }}
                     background='#555555FA' 
                     pad='small'
@@ -226,6 +227,49 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
                 </>)
             },
             {
+              label: null,
+              labelExtra: null,
+              visible:
+                  !!account &&
+                  parseFloat(ethPosted_) === 0,
+              active: true,
+              loading: false,    
+              value: null,
+              valuePrefix: null,
+              valueExtra: ()=>(
+                <Box width={{ min:'300px' }} direction='row' align='center' gap='small'> 
+                  <Box align='center'> 
+                    {screenSize==='small'? 
+                      <Text size='xxlarge'>👆</Text>
+                      :
+                      <Text size='xxlarge'>👈</Text>}
+                  </Box>
+                  <Box gap='xsmall'>
+                    <Box> 
+                      <Text color='text-weak'> Before borrowing</Text>
+                      <Text weight='bold' color='text-weak'> Deposit Collateral </Text>
+                    </Box>
+                    <Text size='xxsmall' color='text-weak'>
+                      Use the 'manage collateral' button to post some ETH
+                    </Text>
+                  </Box>
+                </Box>)
+            },
+            /* dummy placeholder */
+            {
+              label: null,
+              labelExtra: null,
+              visible:
+                  !!account &&
+                  parseFloat(ethPosted_) === 0,
+              active: true,
+              loading: false,    
+              value: null,
+              valuePrefix: null,
+              valueExtra:null,
+            },
+
+            {
               label: 'Dai Debt + Interest',
               labelExtra: 'owed at maturity',
               visible:
@@ -241,7 +285,7 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
             {
               label: 'Borrowing Power',
               labelExtra: 'based on collateral posted',
-              visible: !txActive && activeSeries && !activeSeries.isMature() && !!account,
+              visible: !txActive && activeSeries && !activeSeries.isMature() && !!account && parseFloat(ethPosted_) > 0,
               active: maxDaiAvailable_,
               loading: borrowPending,
               value: maxDaiAvailable_? `${maxDaiAvailable_} DAI`: '0 DAI',           
@@ -261,7 +305,7 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
             },
             {
               label: 'Collateralization Ratio',
-              visible: !txActive && activeSeries && !activeSeries.isMature() && !!account,
+              visible: !txActive && activeSeries && !activeSeries.isMature() && !!account && parseFloat(ethPosted_) > 0,
               active: collateralPercent_ > 0,
               loading: false,            
               value: (collateralPercent_ && (collateralPercent_ !== 0))? `${collateralPercent_}%`: '0%',
@@ -272,7 +316,7 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
               label: 'Dai Balance',
               visible: 
                   (!!account && !txActive && !activeSeries?.isMature()) || 
-                  (activeSeries?.isMature() && activeSeries?.eDaiBalance_>0),
+                  (activeSeries?.isMature() && activeSeries?.fyDaiBalance_>0),
               active: true,
               loading: borrowPending,            
               value: daiBalance_?`${daiBalance_} DAI`: '0 DAI',
@@ -333,7 +377,7 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
                     visible: !!inputValue,
                     active: !!inputValue&&inputValue>0,
                     loading: false,          
-                    value: `${eDaiValue.toFixed(2)} DAI`,
+                    value: `${fyDaiValue.toFixed(2)} DAI`,
                     valuePrefix: '',
                     // valueExtra: () => (
                     //   <Text size='xsmall'>
@@ -409,7 +453,7 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
           </Box>}
 
           { !activeSeries?.isMature() &&
-            activeSeries?.ethDebtEDai?.gt(ethers.constants.Zero) &&
+            activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) &&
             <Box alignSelf='end' margin={{ top:'medium' }}>
               <FlatButton 
                 onClick={()=>setRepayOpen(true)}
@@ -432,7 +476,7 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
           { !txActive && 
             !!account && 
             activeSeries?.isMature() && 
-            activeSeries?.ethDebtEDai.gt(ethers.constants.Zero) && 
+            activeSeries?.ethDebtFYDai.gt(ethers.constants.Zero) && 
             <Repay />}
         </Box>
       </Box>}

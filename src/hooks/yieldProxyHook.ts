@@ -15,7 +15,7 @@ import { useSignerAccount } from './connectionHooks';
 import { usePool } from './poolHook';
 import { useMath } from './mathHooks';
 import { useToken } from './tokenHook';
-import { useEDai } from './eDaiHook';
+import { useFYDai } from './fyDaiHook';
 import { useTxHelpers } from './appHooks';
 
 
@@ -29,7 +29,7 @@ import { useTxHelpers } from './appHooks';
  * @returns { function } buyDai
  * @returns { function } sellDai
  * @returns { function } addDaiLiquidity
- * @returns { function } removeDaiLiquidity
+ * @returns { function } removfyDaiLiquidity
  * 
  * @returns { boolean } postActive
  * @returns { boolean } withdrawActive
@@ -53,7 +53,7 @@ export const useProxy = () => {
   const { previewPoolTx } = usePool();
   const { splitDaiLiquidity } = useMath();
   const { getBalance } = useToken();
-  const { hasBeenMatured } = useEDai();
+  const { hasBeenMatured } = useFYDai();
   const { handleTx, handleTxBuildError } = useTxHelpers();
   
   /* Activity flags */
@@ -152,14 +152,14 @@ export const useProxy = () => {
 
 
   /**
-   * @dev Borrow eDai from Controller and sell it immediately for Dai, for a maximum eDai debt.
+   * @dev Borrow fyDai from Controller and sell it immediately for Dai, for a maximum fyDai debt.
    * Must have approved the operator with `controller.addDelegate(controllerDai.address)`.
    * 
    * @param {IYieldSeries} series the yield series to interact with.
    * @param {string} collateralType type of collateral eg. 'ETH-A'
    * @param {number} daiToBorrow Exact amount of Dai that should be obtained.
    * 
-   * @return Amount of eDai that will be taken from `from` wallet
+   * @return Amount of fyDai that will be taken from `from` wallet
    *
    */
   const borrowDai = async (
@@ -179,23 +179,23 @@ export const useProxy = () => {
 
     setBorrowActive(true);
     let tx:any;
-    let maxEDai:BigNumber;
+    let maxFYDai:BigNumber;
 
     try {
       /* Calculate expected trade values and factor in slippage */
       const preview = await previewPoolTx('buydai', series, daiToBorrow); 
       if ( !(preview instanceof Error) ) {
-        maxEDai = valueWithSlippage(preview);
+        maxFYDai = valueWithSlippage(preview);
       } else {
-        // minEDai = ethers.utils.parseEther('1000000');
+        // minFYDai = ethers.utils.parseEther('1000000');
         throw(preview);
       }
-      tx = await proxyContract.borrowDaiForMaximumEDai( 
+      tx = await proxyContract.borrowDaiForMaximumFYDai( 
         poolAddr, 
         collatType,
         parsedMaturity, 
         toAddr, 
-        maxEDai, 
+        maxFYDai, 
         dai, 
         overrides 
       );
@@ -212,7 +212,7 @@ export const useProxy = () => {
   };
 
   /**
-   * @dev Repay an amount of eDai debt in Controller using a given amount of Dai exchanged for eDai at pool rates, with a minimum of eDai debt required to be paid.
+   * @dev Repay an amount of fyDai debt in Controller using a given amount of Dai exchanged for fyDai at pool rates, with a minimum of fyDai debt required to be paid.
    * Post maturity the user is asked for a signature allowing the treasury access to dai
    * 
    * @param {IYieldSeries} series the yield series to interact with.
@@ -241,7 +241,7 @@ export const useProxy = () => {
     setRepayActive(true);
     let tx:any;
     let daiPermitSig:any;
-    let minEDai:BigNumber;
+    let minFYDai:BigNumber;
     try {
 
       if ( series.isMature() ) {  
@@ -281,19 +281,19 @@ export const useProxy = () => {
         /* calculate expected trade values and factor in slippage */
         const preview = await previewPoolTx('selldai', series, repaymentInDai);
         if ( !(preview instanceof Error) ) {
-          minEDai = valueWithSlippage(preview, true);
+          minFYDai = valueWithSlippage(preview, true);
         } else {
           // testing
-          minEDai = ethers.utils.parseEther('0');
+          minFYDai = ethers.utils.parseEther('0');
           // throw(preview);
         }
 
-        tx = await proxyContract.repayMinimumEDaiDebtForDai(
+        tx = await proxyContract.repayMinimumFYDaiDebtForDai(
           poolAddr,
           collatType,
           parsedMaturity,
           toAddr,
-          minEDai,
+          minFYDai,
           dai,
           overrides
         );
@@ -335,27 +335,27 @@ export const useProxy = () => {
       value: ethers.utils.parseEther('0')
     };
 
-    /* calculate minimum expected eDai value and factor in slippage */
+    /* calculate minimum expected fyDai value and factor in slippage */
     const daiReserves = await getBalance(deployedContracts.Dai, 'Dai', poolAddr);
-    const eDaiReserves = await getBalance(series.eDaiAddress, 'EDai', poolAddr);
-    const [ , eDaiSplit ] = splitDaiLiquidity( parsedDaiUsed, daiReserves, eDaiReserves );
+    const fyDaiReserves = await getBalance(series.fyDaiAddress, 'FYDai', poolAddr);
+    const [ , fyDaiSplit ] = splitDaiLiquidity( parsedDaiUsed, daiReserves, fyDaiReserves );
 
     /* Contract interaction */
     let tx:any;
-    let maxEDai:BigNumber;
+    let maxFYDai:BigNumber;
     setAddLiquidityActive(true);
     try {
       /* Calculate expected trade values and factor in slippage */
-      const preview = await previewPoolTx('sellDai', series, eDaiSplit);
+      const preview = await previewPoolTx('sellDai', series, fyDaiSplit);
       if ( !(preview instanceof Error) ) {
-        maxEDai = valueWithSlippage(preview);
+        maxFYDai = valueWithSlippage(preview);
       } else {
         // testing
-        maxEDai = ethers.utils.parseEther('1000000');
+        maxFYDai = ethers.utils.parseEther('1000000');
         // throw(preview);
       }
 
-      tx = await proxyContract.addLiquidity(poolAddr, parsedDaiUsed, maxEDai, overrides);
+      tx = await proxyContract.addLiquidity(poolAddr, parsedDaiUsed, maxFYDai, overrides);
     } catch (e) {
       handleTxBuildError(e);
       setAddLiquidityActive(false);
@@ -391,10 +391,10 @@ export const useProxy = () => {
     /* Contract interaction */
     let tx:any;
     let minDai:BigNumber;
-    let minEDai:BigNumber;
+    let minFYDai:BigNumber;
     setRemoveLiquidityActive(true);
     try {
-      if ( !(await hasBeenMatured(series.eDaiAddress)) ) {
+      if ( !(await hasBeenMatured(series.fyDaiAddress)) ) {
         console.log('Removing liquidity BEFORE maturity'); 
         /* calculate expected trade values and factor in slippage */
         // const preview = await previewPoolTx('selldai', series, daiUsed);
@@ -408,8 +408,8 @@ export const useProxy = () => {
 
         // TODO dont use this testing with slippage etc. 
         minDai = ethers.utils.parseEther('0');
-        minEDai = ethers.utils.parseEther('0');
-        tx = await proxyContract.removeLiquidityEarlyDaiPool(poolAddr, parsedTokens, minDai, minEDai, overrides );
+        minFYDai = ethers.utils.parseEther('0');
+        tx = await proxyContract.removeLiquidityEarlyDaiPool(poolAddr, parsedTokens, minDai, minFYDai, overrides );
 
       } else {
         console.log('removing liquidity AFTER maturity');
@@ -431,7 +431,7 @@ export const useProxy = () => {
    */
 
   /**
-   * @dev Sell Dai for eDai
+   * @dev Sell Dai for fyDai
    * 
    * @param {IYieldSeries} series series to act on.
    * @param daiIn Amount of dai being bought (if in BigNumber make sure its in Wei. )
@@ -451,19 +451,19 @@ export const useProxy = () => {
 
     /* Contract interaction */
     let tx:any;
-    let minEDaiOut:BigNumber;
+    let minFYDaiOut:BigNumber;
     setSellActive(true);
     try {
       /* calculate expected trade values and factor in slippage */
       const preview = await previewPoolTx('selldai', series, daiIn);
       if ( !(preview instanceof Error) ) {
-        minEDaiOut = valueWithSlippage(preview, true);
+        minFYDaiOut = valueWithSlippage(preview, true);
       } else {
       // temp min for testing */
-        minEDaiOut = ethers.utils.parseEther('0');
+        minFYDaiOut = ethers.utils.parseEther('0');
         // throw(preview);
       }
-      tx = await proxyContract.sellDai(poolAddr, toAddr, parsedDaiIn, minEDaiOut, overrides);
+      tx = await proxyContract.sellDai(poolAddr, toAddr, parsedDaiIn, minFYDaiOut, overrides);
     } catch (e) {
       handleTxBuildError(e);
       setSellActive(false);
@@ -475,7 +475,7 @@ export const useProxy = () => {
   };
 
   /**
-   * @dev LEGACY Buy Dai with eDai - USE BUY DAI WITH SIGNATURE
+   * @dev LEGACY Buy Dai with fyDai - USE BUY DAI WITH SIGNATURE
    * @param {IYieldSeries} series yield series to act on.
    * @param daiOut Amount of dai being bought
    * */ 
@@ -494,22 +494,22 @@ export const useProxy = () => {
 
     /* Contract interaction */
     let tx:any;
-    let maxEDaiIn:BigNumber;
+    let maxFYDaiIn:BigNumber;
     setBuyActive(true);
     try {
       /* calculate expected trade values and factor in slippage */
       const preview = await previewPoolTx('buydai', series, daiOut);
       if ( !(preview instanceof Error) ) {
-        maxEDaiIn = valueWithSlippage(preview);
+        maxFYDaiIn = valueWithSlippage(preview);
       } else {
 
         // temp max bignumber for testing */
-        maxEDaiIn = ethers.utils.parseEther('1000000');
+        maxFYDaiIn = ethers.utils.parseEther('1000000');
         // throw(preview);
       }
       // temp max bignumber for testing */
-      // const maxEDaiIn = ethers.utils.parseEther('1000000');
-      tx = await proxyContract.buyDai(poolAddr, toAddr, parsedDaiOut, maxEDaiIn);
+      // const maxFYDaiIn = ethers.utils.parseEther('1000000');
+      tx = await proxyContract.buyDai(poolAddr, toAddr, parsedDaiOut, maxFYDaiIn);
     } catch (e) {
       handleTxBuildError(e);  
       setBuyActive(false);
@@ -521,7 +521,7 @@ export const useProxy = () => {
   };
 
   /**
-   * @dev Buy Dai with eDai
+   * @dev Buy Dai with fyDai
    * @param {IYieldSeries} series yield series to act on.
    * @param daiOut Amount of dai being bought
    * */ 
@@ -531,7 +531,7 @@ export const useProxy = () => {
   ) => {
     /* Processing and/or sanitizing input */
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
-    const eDaiAddr = ethers.utils.getAddress(series.eDaiAddress);
+    const fyDaiAddr = ethers.utils.getAddress(series.fyDaiAddress);
     const parsedDaiOut = BigNumber.isBigNumber(daiOut)? daiOut : ethers.utils.parseEther(daiOut.toString());
     const toAddr = account && ethers.utils.getAddress(account);
     const fromAddr = account && ethers.utils.getAddress(account);
@@ -542,31 +542,31 @@ export const useProxy = () => {
 
     /* Contract interaction */
     let tx:any;
-    let maxEDaiIn:BigNumber;
-    let eDaiPermitSig:any;
+    let maxFYDaiIn:BigNumber;
+    let fyDaiPermitSig:any;
     setBuyActive(true);
     try { 
       /* calculate expected trade values and factor in slippage */
       const preview = await previewPoolTx('buydai', series, daiOut);
       if ( !(preview instanceof Error) ) {
-        maxEDaiIn = valueWithSlippage(preview);
+        maxFYDaiIn = valueWithSlippage(preview);
       } else {
         // temp max bignumber for testing */
-        maxEDaiIn = ethers.utils.parseEther('1000000');
+        maxFYDaiIn = ethers.utils.parseEther('1000000');
         // throw(preview);
       }
 
-      /* Get the user signature authorizing eDai to interact with Dai */
+      /* Get the user signature authorizing fyDai to interact with Dai */
       try {
         dispatch({ type: 'requestSigs', payload:[ auths.get(2) ] });
         const result = await signERC2612Permit(
           provider.provider, 
-          eDaiAddr,
+          fyDaiAddr,
           // @ts-ignore 
           fromAddr, 
           poolAddr
         );
-        eDaiPermitSig = ethers.utils.joinSignature(result);
+        fyDaiPermitSig = ethers.utils.joinSignature(result);
         dispatch({ type: 'signed', payload: auths.get(2) });
         dispatch({ type: 'requestSigs', payload: [] });
       } catch (e) { 
@@ -580,8 +580,8 @@ export const useProxy = () => {
         poolAddr, 
         toAddr, 
         parsedDaiOut, 
-        maxEDaiIn, 
-        eDaiPermitSig,
+        maxFYDaiIn, 
+        fyDaiPermitSig,
         overrides
       );
     } catch (e) {
@@ -594,11 +594,11 @@ export const useProxy = () => {
     setBuyActive(false);
   };
 
-  // buyDaiWithSignature(address pool, address to, uint128 daiOut, uint128 maxEDaiIn, bytes memory signature)
+  // buyDaiWithSignature(address pool, address to, uint128 daiOut, uint128 maxFYDaiIn, bytes memory signature)
 
   // TODO Add these two ONLY if required
-  const sellEDai = () => {};
-  const buyEDai = () => {};
+  const sellFYDai = () => {};
+  const buyFYDai = () => {};
 
   /**
    * SPLITTER SECTION
@@ -607,7 +607,7 @@ export const useProxy = () => {
   // @dev Transfer debt and collateral from MakerDAO to Yield
   // Needs vat.hope(splitter.address, { from: user });
   // Needs controller.addDelegate(splitter.address, { from: user });
-  // @param pool The pool to trade in (and therefore eDai series to borrow)
+  // @param pool The pool to trade in (and therefore fyDai series to borrow)
   // @param user Vault to migrate.
   // @param wethAmount weth to move from MakerDAO to Yield. Needs to be high enough to collateralize the dai debt in Yield,
   // and low enough to make sure that debt left in MakerDAO is also collateralized.
@@ -620,13 +620,13 @@ export const useProxy = () => {
   // @dev Transfer debt and collateral from Yield to MakerDAO
   // Needs vat.hope(splitter.address, { from: user });
   // Needs controller.addDelegate(splitter.address, { from: user });
-  // @param pool The pool to trade in (and therefore eDai series to migrate)
+  // @param pool The pool to trade in (and therefore fyDai series to migrate)
   // @param user Vault to migrate.
-  // @param eDaiAmount eDai debt to move from Yield to MakerDAO.
+  // @param fyDaiAmount fyDai debt to move from Yield to MakerDAO.
   // @param wethAmount weth to move from Yield to MakerDAO. Needs to be high enough to collateralize the dai debt in MakerDAO,
   // and low enough to make sure that debt left in Yield is also collateralized.
   const yieldToMaker = () => {
-    //  yieldToMaker(address pool, address user, uint256 eDaiAmount, uint256 wethAmount)
+    //  yieldToMaker(address pool, address user, uint256 fyDaiAmount, uint256 wethAmount)
   };
 
   // Splitter Views
@@ -635,13 +635,13 @@ export const useProxy = () => {
   const wethForDai = () => {
     // wethForDai(uint256 daiAmount) public view returns (uint256)
   };
-  // @dev Amount of eDai debt that will result from migrating Dai debt from MakerDAO to Yield
-  const eDaiForDai = () => {
-    // eDaiForDai(address pool, uint256 daiAmount)
+  // @dev Amount of fyDai debt that will result from migrating Dai debt from MakerDAO to Yield
+  const fyDaiForDai = () => {
+    // fyDaiForDai(address pool, uint256 daiAmount)
   };
-  // @dev Amount of dai debt that will result from migrating eDai debt from Yield to MakerDAO
-  const daiForEDai = () => {
-    // daiForEDai(address pool, uint256 eDaiAmount)
+  // @dev Amount of dai debt that will result from migrating fyDai debt from Yield to MakerDAO
+  const daiForFYDai = () => {
+    // daiForFYDai(address pool, uint256 fyDaiAmount)
   };
 
 
@@ -663,8 +663,8 @@ export const useProxy = () => {
     sellDai, sellActive,
     buyDai, buyActive,
     buyDaiNoSignature,
-    // sellEDai,
-    // buyEDai,
+    // sellFYDai,
+    // buyFYDai,
 
     /* Splitter fns */
     makerToYield,
@@ -672,8 +672,8 @@ export const useProxy = () => {
 
     /* Splitter views */
     wethForDai,
-    eDaiForDai,
-    daiForEDai
+    fyDaiForDai,
+    daiForFYDai
 
   } as const;
 };

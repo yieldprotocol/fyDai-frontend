@@ -55,7 +55,7 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
   }, [entries]);
 
   return (
-    <>
+    <Box>
       <Box 
         pad={{ horizontal:'small' }} 
         direction='row-responsive' 
@@ -115,66 +115,68 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
         })}
       </Box>
 
-      <Collapsible open={detailsOpen}>
-        <Box 
-          pad={{ horizontal:'small', top:'small' }} 
-          direction='row-responsive' 
-          gap='medium' 
-          justify='start'
-        >
-          {visibleEntries.map((x:any, i:number) => {
-            const _key = i;
-            const ValueExtra = x.valueExtra; 
-            const Value = x.value;
-            const Label = x.label;
+      <Box>
+        <Collapsible open={detailsOpen}>
+          <Box 
+            pad={{ horizontal:'small', top:'small' }} 
+            direction='row-responsive' 
+            gap='medium' 
+            justify='start'
+          >
+            {visibleEntries.map((x:any, i:number) => {
+              const _key = i;
+              const ValueExtra = x.valueExtra; 
+              const Value = x.value;
+              const Label = x.label;
 
-            if (x.visible && i>=3 && i<6 ) {
-              return (       
-                <Box
-                  key={_key}
-                  pad='small' 
-                  round='large'
-                  gap='xsmall'
-                  width={{ min:'30%' }}
-                >
-                  <Box>
-                    <Text 
-                      color={alt? 'text-weak': 'text-weak'} 
-                      size='xsmall'
-                    >
-                      { (typeof Label === 'function')? <Label />: Label }
-                    </Text>
+              if (x.visible && i>=3 && i<6 ) {
+                return (       
+                  <Box
+                    key={_key}
+                    pad='small' 
+                    round='large'
+                    gap='xsmall'
+                    width={{ min:'30%' }}
+                  >
+                    <Box>
+                      <Text 
+                        color={alt? 'text-weak': 'text-weak'} 
+                        size='xsmall'
+                      >
+                        { (typeof Label === 'function')? <Label />: Label }
+                      </Text>
 
-                    <Text 
-                      color={alt? 'text-xweak': 'text-xweak'} 
-                      size='xxsmall'
-                    >
-                      { x.labelExtra}
-                    </Text>
-                  </Box> 
-                  <Loading condition={x.loading} size='small'>
-                    <Box direction='row-responsive' gap='xsmall' align='center'>
-                      { x.valuePrefix && 
+                      <Text 
+                        color={alt? 'text-xweak': 'text-xweak'} 
+                        size='xxsmall'
+                      >
+                        { x.labelExtra}
+                      </Text>
+                    </Box> 
+                    <Loading condition={x.loading} size='small'>
+                      <Box direction='row-responsive' gap='xsmall' align='center'>
+                        { x.valuePrefix && 
                         screenSize !== 'small' && 
                         <Text color={x.active ? activeSeries?.seriesTextColor:'text-xweak'} size='medium' weight='bold'>
                           {x.valuePrefix}                     
                         </Text>}
-                      <Text color={x.active? activeSeries?.seriesTextColor:'text-xweak'} weight='bold' size='medium'> 
-                        { (typeof Value === 'function')? <Value />: Value }
-                      </Text>
-                    </Box>     
-                    { x.valueExtra && (typeof ValueExtra === 'function')? 
-                      <ValueExtra />  :
-                      <Text color={alt? 'text-weak': 'text-weak'} size='xxsmall'> 
-                        { ValueExtra }
-                      </Text>}                 
-                  </Loading>
-                </Box>
-              );
-            }
-          })}
-        </Box>
-      </Collapsible>
+                        <Text color={x.active? activeSeries?.seriesTextColor:'text-xweak'} weight='bold' size='medium'> 
+                          { (typeof Value === 'function')? <Value />: Value }
+                        </Text>
+                      </Box>     
+                      { x.valueExtra && (typeof ValueExtra === 'function')? 
+                        <ValueExtra />  :
+                        <Text color={alt? 'text-weak': 'text-weak'} size='xxsmall'> 
+                          { ValueExtra }
+                        </Text>}                 
+                    </Loading>
+                  </Box>
+                );
+              }
+            })}
+          </Box>
+        </Collapsible>
+      </Box>
   
       { visibleEntries.length > 3 && 
       <Box 
@@ -187,7 +189,7 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
       > 
         {!detailsOpen?<ChevronDown size='25px' /> : <ChevronUp size='25px' />}  
       </Box> }
-    </>
+    </Box>
   );
 }
 

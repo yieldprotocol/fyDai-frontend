@@ -4,7 +4,7 @@ import { Box, Text } from 'grommet';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
 
-import { useEDai, useTxActive } from '../hooks';
+import { useFYDai, useTxActive } from '../hooks';
 
 import InlineAlert from '../components/InlineAlert';
 import ApprovalPending from '../components/ApprovalPending';
@@ -21,7 +21,7 @@ const Redeem  = ({ close }:IRedeemProps)  => {
   const { activeSeries } = seriesState;
   const { actions: userActions } = useContext(UserContext);
 
-  const { hasBeenMatured, redeem, redeemActive } = useEDai();
+  const { hasBeenMatured, redeem, redeemActive } = useFYDai();
   const [ txActive ] = useTxActive(['redeem']);
 
   const [ redeemPending, setRedeemPending] = useState<boolean>(false);
@@ -35,7 +35,7 @@ const Redeem  = ({ close }:IRedeemProps)  => {
     if(!redeemDisabled) {
       setRedeemPending(true);
 
-      await redeem(activeSeries.eDaiAddress, activeSeries.eDaiBalance.toString());
+      await redeem(activeSeries.fyDaiAddress, activeSeries.fyDaiBalance.toString());
       await Promise.all([
         userActions.updatePosition(),
         seriesActions.updateActiveSeries()
@@ -46,14 +46,14 @@ const Redeem  = ({ close }:IRedeemProps)  => {
 
   /* Set if the series is mature */ 
   useEffect( () => {
-    ( async () => activeSeries && setMatured(await hasBeenMatured(activeSeries.eDaiAddress)))();
-    ( async () => activeSeries && console.log(await hasBeenMatured(activeSeries.eDaiAddress)))();
+    ( async () => activeSeries && setMatured(await hasBeenMatured(activeSeries.fyDaiAddress)))();
+    ( async () => activeSeries && console.log(await hasBeenMatured(activeSeries.fyDaiAddress)))();
     activeSeries && console.log(activeSeries.isMature());
   }, [activeSeries]);
 
   /* redeem button disabled logic */ 
   useEffect( () => {
-    parseFloat(activeSeries?.eDaiBalance_) > 0 && matured ? 
+    parseFloat(activeSeries?.fyDaiBalance_) > 0 && matured ? 
       setRedeemDisabled(false) 
       : setRedeemDisabled(true);
   }, [activeSeries, matured]);
@@ -66,13 +66,13 @@ const Redeem  = ({ close }:IRedeemProps)  => {
       <>
         <ActionButton
           onClick={()=>redeemProcedure()} 
-          label={`Redeem ${activeSeries?.eDaiBalance_ || ''} Dai`}
+          label={`Redeem ${activeSeries?.fyDaiBalance_ || ''} Dai`}
           disabled={redeemDisabled}
           hasDelegatedPool={true}
         />
       </>}
       { redeemActive && !txActive && <ApprovalPending /> } 
-      { txActive && <TxStatus msg={`You are redeeming ${activeSeries?.eDaiBalance_} DAI`} tx={txActive} /> }
+      { txActive && <TxStatus msg={`You are redeeming ${activeSeries?.fyDaiBalance_} DAI`} tx={txActive} /> }
     </Box>
   );
 };

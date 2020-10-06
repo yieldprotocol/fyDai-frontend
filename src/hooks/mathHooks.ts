@@ -42,9 +42,9 @@ export const useMath = () => {
   };
 
   /**
-   * Calculates value of debt (eDaiDebt at maturity or Dai) at current Dai price
+   * Calculates value of debt (fyDaiDebt at maturity or Dai) at current Dai price
    * the rate used is the rate and spot price of Dai.
-   * @param {BigNumber} _amount eDai amount (= amount of Dai at maturity)
+   * @param {BigNumber} _amount fyDai amount (= amount of Dai at maturity)
    * @returns 
    */
   const debtValAdj = (_amount:BigNumber ) => {
@@ -171,22 +171,22 @@ export const useMath = () => {
   };
 
   /**
-   * Split a certain amount of Dai liquidity into its eDai and Dai componetnts
+   * Split a certain amount of Dai liquidity into its fyDai and Dai componetnts
    * 
    * @param {BigNumber} daiAmount // amount dai to split
    * @param { BigNumber } _daiReserves// Dai reserves
-   * @param { BigNumber } _eDaiReserves// eDai reservers
+   * @param { BigNumber } _fyDaiReserves// fyDai reservers
    * 
-   * @returns  [ BigNumber, BigNumber ] returns an array of [dai, eDai] 
+   * @returns  [ BigNumber, BigNumber ] returns an array of [dai, fyDai] 
    */
   const splitDaiLiquidity =(
     _daiAmount: BigNumber,
     _daiReserves: BigNumber,
-    _eDaiReserves: BigNumber,
+    _fyDaiReserves: BigNumber,
   )=> {
-    const daiPortion = _daiAmount.mul(_daiReserves).div(_eDaiReserves.add(_daiReserves));
-    const eDaiPortion = _daiAmount.sub(daiPortion);
-    return [daiPortion, eDaiPortion];
+    const daiPortion = _daiAmount.mul(_daiReserves).div(_fyDaiReserves.add(_daiReserves));
+    const fyDaiPortion = _daiAmount.sub(daiPortion);
+    return [daiPortion, fyDaiPortion];
   };
 
   /**

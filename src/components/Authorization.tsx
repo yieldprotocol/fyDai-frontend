@@ -43,7 +43,7 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
   const authProcedure = async () => {
     setAuthPending(true);
     !series && await yieldAuth();
-    series && await poolAuth(series.eDaiAddress, series.poolAddress);
+    series && await poolAuth(series.fyDaiAddress, series.poolAddress);
     await Promise.all([
       userActions.updateAuthorizations(),
       seriesActions.updateActiveSeries()
@@ -78,7 +78,7 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
         <Box 
           fill='horizontal'
           pad='medium'
-          direction='row'
+          direction='row-responsive'
           gap='medium'
           background='#555555'
           justify='between'
@@ -86,9 +86,9 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
           {!buttonOnly && <Text>Feel free to look around and play. However, before you make any transactions you will need to sign a few authorizations.</Text> }
           <RaisedButton 
             background='#555555'
-            label={<Text size='small' color='#DDDDDD'><Unlock /> Authorize Yield</Text>}
+            label={<Box pad={{ horizontal:'medium', vertical:'small' }} align='center'><Text size='small' color='#DDDDDD'><Unlock /> Authorize Yield</Text></Box>}
             onClick={()=>{authProcedure();}}
-          />   
+          />
         </Box>}
 
       { hasDelegatedProxy && account && series?.hasDelegatedPool === false && !authWrap &&

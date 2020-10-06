@@ -27,8 +27,8 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
   const [sortedList, setSortedList] = useState<any>(seriesData);
 
   const viewMap = new Map([
-    ['BORROW', { head: 'DEBT', field: 'ethDebtEDai_' }],
-    ['LEND', { head: 'BALANCE', field: 'eDaiBalance_' }],
+    ['BORROW', { head: 'DEBT', field: 'ethDebtFYDai_' }],
+    ['LEND', { head: 'BALANCE', field: 'fyDaiBalance_' }],
     ['POOL', { head: 'POOL PERCENTAGE', field: 'poolPercent' }],
   ]);
 
