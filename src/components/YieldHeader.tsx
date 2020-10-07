@@ -16,9 +16,8 @@ import {
 } from 'grommet';
 
 import { 
-  FiSettings as Gear,
-  FiCheckCircle as Check,
-} from 'react-icons/fi';
+  VscTelescope as Telescope,
+} from 'react-icons/vsc';
 
 import styled from 'styled-components';
 
@@ -122,6 +121,7 @@ const YieldHeader = (props: any) => {
       direction={screenSize === 'small' ? 'column' : 'row'}
       fill={screenSize === 'small' ? 'horizontal' : false}
       gap='medium'
+      align='center'
     >
       { 
       navLinks.map((item) => (
@@ -150,6 +150,11 @@ const YieldHeader = (props: any) => {
         </Box>
       ))
     }
+      <FlatButton 
+        onClick={()=>console.log('xys')}
+        label={<Box pad={{ horizontal:'small' }}><Telescope /></Box>}
+      />
+      
     </Box>
   );
 
