@@ -41,7 +41,6 @@ function InputWrap( { warningMsg, errorMsg, disabled, children }: IInputProps) {
     }
   }, [errorMsg, warningMsg]);
 
-
   return (
     <InsetBox
       fill='horizontal'

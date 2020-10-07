@@ -124,8 +124,7 @@ const App = (props:any) => {
           <Box />
           <Box
             pad={{ vertical: 'large' }}
-            align='center'
-            
+            align='center'         
           >  
             {/* <MiniDash activeView={activeView} /> */}
             {activeView === 'BORROW' && <BorrowView openConnectLayer={(v:string) => setShowConnectLayer('CONNECT')} />}

@@ -1,10 +1,6 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { BigNumber } from 'ethers';
+import React, { useContext } from 'react';
 
 import { 
-  Box, 
-  TextInput, 
-  Text, 
   ThemeContext,
 } from 'grommet';
 
@@ -19,7 +15,6 @@ interface ILoadingProps {
 function Loading({ condition, size, children }:ILoadingProps) {
 
   const theme:any = useContext(ThemeContext);
-  
   return (
     <>
       { condition ? 

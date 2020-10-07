@@ -6,8 +6,10 @@ import Authorization from './Authorization';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
 
+const color = '#f8f8f8';
+
 const StyledBox = styled(Box)`
-  background: #f8f8f8;
+  background: ${color};
   border-radius: 8px;
   transition: all 0.3s ease-in-out;
 
