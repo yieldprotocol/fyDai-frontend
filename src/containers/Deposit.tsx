@@ -40,6 +40,7 @@ import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
 import CollateralDescriptor from '../components/CollateralDescriptor';
+import { YieldContext } from '../contexts/YieldContext';
 
 interface DepositProps {
   /* deposit amount prop is for quick linking into component */
@@ -54,12 +55,16 @@ const Deposit = ({ openConnectLayer, setActiveView, modalView, depositAmount }:D
   const { state: userState, actions: userActions } = useContext(UserContext);
   const {
     ethBalance,
+    ethBalance_,
     ethPosted,
     ethPosted_,
     maxDaiAvailable_,
     collateralPercent_,
     debtValue,
   } = userState.position;
+
+  const { state: yieldState } = useContext(YieldContext);
+  const { ethPrice_ } = yieldState.feedData;
 
   const screenSize = useContext(ResponsiveContext);
 
@@ -72,7 +77,6 @@ const Deposit = ({ openConnectLayer, setActiveView, modalView, depositAmount }:D
   const debouncedInput = useDebounce(inputValue, 500);
 
   const [inputRef, setInputRef] = useState<any>(null);
-
 
   const [ estRatio, setEstRatio ] = useState<any>(0);
   const [ estPower, setEstPower ] = useState<any>(0);
@@ -100,15 +104,16 @@ const Deposit = ({ openConnectLayer, setActiveView, modalView, depositAmount }:D
 
   // useEffect(()=>{
   //   /* Roughly estimate the nmaximum borrowing power based on ETH balance */
-  //   const val = collValue(ethBalance);
-  //   const newPower = parseFloat(ethers.utils.formatEther(val))/2;
-  //   if (maxDaiAvailable_) {
-  //     const pl = parseFloat(maxDaiAvailable_) + newPower;
-  //     setMaxPower(pl.toFixed(2));
-  //   } else {
-  //     setMaxPower(newPower.toFixed(2));
+  //     const val = ethBalance*yieldState.feedData;
+  //     const newPower = parseFloat(ethers.utils.formatEther(val))/2;
+  //     if (maxDaiAvailable_) {
+  //       const pl = parseFloat(maxDaiAvailable_) + newPower;
+  //       setMaxPower(pl.toFixed(2));
+  //     } else {
+  //       setMaxPower(newPower.toFixed(2));
+  //     }
   //   }
-  // }, [ethBalance]);
+  // }, [ethBalance] );
 
   /* Handle debounced input value changes */
   useEffect(()=>{
@@ -172,18 +177,20 @@ const Deposit = ({ openConnectLayer, setActiveView, modalView, depositAmount }:D
 
         <InfoGrid
           entries={[
-            // {
-            //   label: 'Potential Max Borrowing Power',
-            //   labelExtra: '(if you post all your ETH )',
-            //   visible: !!account,
-            //   active: true,
-            //   loading: !ethBalance,            
-            //   value: maxPower? `${maxPower} DAI`: '0 DAI', 
-            //   valuePrefix: null,
-            //   valueExtra: null, 
-            // },
             {
-              label: 'Post some ETH collateral to start borrowing',
+              label: 'Max Borrowing Power',
+              labelExtra: 'based on your ETH balance',
+              visible: !!account,
+              active: true,
+              loading: !ethPosted_ && depositPending && ethPosted_ !== 0, 
+              value: ethPrice_ && `${((ethPrice_*ethBalance_)/2).toFixed(2)} DAI`,           
+              // value: (maxPower && (maxPower !== 0))? `maxPower DAI`: '',
+              valuePrefix: null,
+              valueExtra: null, 
+            },
+            
+            {
+              label: 'Did you know?', // 'Post some ETH collateral to start borrowing',
               labelExtra: null,
               visible:
                   !!account &&
@@ -193,27 +200,29 @@ const Deposit = ({ openConnectLayer, setActiveView, modalView, depositAmount }:D
               value: null,
               valuePrefix: null,
               valueExtra: ()=>( 
-                <Box width={{ min:'200px' }}>
+                <Box>
                   <Text size='xxsmall' color='text-weak'>
                     Collateral posted here can be used to borrow Dai from any one of the Yield series.
                   </Text>
                 </Box>),
             },
             /* dummy placeholder */
-            {
-              label: null,
-              labelExtra: null,
-              visible:
-                  !!account &&
-                  parseFloat(ethPosted_) === 0,
-              active: true,
-              loading: false,    
-              value: null,
-              valuePrefix: null,
-              valueExtra:null,
-            },
+            // {
+            //   label: null,
+            //   labelExtra: null,
+            //   visible:
+            //       !!account &&
+            //       parseFloat(ethPosted_) === 0,
+            //   active: true,
+            //   loading: false,    
+            //   value: null,
+            //   valuePrefix: null,
+            //   valueExtra:null,
+            // },
+
             {
               label: 'Current Collateral',
+              labelExtra: 'posted in the Yield Protocol',
               visible: !!account && parseFloat(ethPosted_) > 0,
               active: true,
               loading: depositPending || txActive?.type ==='WITHDRAW',     
@@ -221,10 +230,12 @@ const Deposit = ({ openConnectLayer, setActiveView, modalView, depositAmount }:D
               valuePrefix: null,
               valueExtra: null,
             },
+
             {
               label: 'Collateralization Ratio',
-              visible: !!account && parseFloat(ethPosted_) > 0,
-              active: collateralPercent_ > 0,
+              labelExtra: 'based on ETH posted',
+              visible: !!account && collateralPercent_ > 0,
+              active: true,
               loading: !ethPosted_ && depositPending && ethPosted_ !== 0,            
               value: (collateralPercent_ && (collateralPercent_ !== 0))? `${collateralPercent_}%`: '',
               valuePrefix: null,
@@ -280,12 +291,12 @@ const Deposit = ({ openConnectLayer, setActiveView, modalView, depositAmount }:D
               <InfoGrid entries={[
                 {
                   label: 'Collateralization Ratio',
-                  labelExtra: `after posting ${inputValue && cleanValue(inputValue, 2)} ETH`,
+                  labelExtra: `est. after posting ${inputValue && cleanValue(inputValue, 2)} ETH`,
                   visible: !!account && collateralPercent_ > 0,
                   active: debouncedInput && collateralPercent_ > 0,
                   loading: !ethPosted_ && depositPending && ethPosted_ !== 0,           
                   value: (estRatio && estRatio !== 0)? `${estRatio}%`: `${collateralPercent_}%` || '',
-                  valuePrefix: '~',
+                  valuePrefix: null,
                   valueExtra: () => (
                     <Text color='green' size='medium'> 
                       {/* { inputValue && collateralPercent_ && ( (estRatio-collateralPercent_) !== 0) && `(+ ${(estRatio-collateralPercent_).toFixed(0)}%)` } */}
@@ -294,12 +305,12 @@ const Deposit = ({ openConnectLayer, setActiveView, modalView, depositAmount }:D
                 },
                 {
                   label: 'Borrowing Power',
-                  labelExtra: `after posting ${inputValue && cleanValue(inputValue, 2)} ETH`,
+                  labelExtra: `est. after posting ${inputValue && cleanValue(inputValue, 2)} ETH`,
                   visible: !!account,
                   active: debouncedInput,
                   loading: !ethPosted_ && depositPending && ethPosted_ !== 0,
                   value: estPower? `${estPower} DAI`: '0 DAI',           
-                  valuePrefix: '~',
+                  valuePrefix: null,
                   valueExtra: null,
                 },
                 {

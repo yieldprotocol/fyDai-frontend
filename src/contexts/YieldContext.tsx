@@ -68,6 +68,7 @@ const initState = {
       rate: null, // localStorage.getItem(feedData.ilks.EthA.rate)
       spot: null, // localStorage.getItem(feedData.ilks.EthA.spot)
     },
+    ethPrice: {},
   },
   yieldData: {},
   yieldLoading: true,
@@ -174,6 +175,7 @@ const YieldProvider = ({ children }: any) => {
       _state = state.feedData;
     }
     const _ilks = await callTx(_deployedContracts.Vat, 'Vat', 'ilks', [ethers.utils.formatBytes32String('ETH-A') ]);
+    const ethPrice = utils.mulRay(utils.toRay(1.5), (_ilks.spot));
     /* parse and return feed data if reqd. */
     const _feedData = {
       ..._state,
@@ -182,6 +184,8 @@ const YieldProvider = ({ children }: any) => {
         spot_: utils.rayToHuman(_ilks.spot),
         rate_: utils.rayToHuman(_ilks.rate),
       },
+      ethPrice,
+      ethPrice_: ethers.utils.formatEther( utils.mulRay(ethers.utils.parseEther('1.5'), (_ilks.spot)).toString()) ,
     };
     setCachedFeed(_feedData);
     return _feedData;

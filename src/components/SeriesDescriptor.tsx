@@ -81,7 +81,8 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
                 <Box 
                   direction='row' 
                   gap='small'
-                >             
+                  align='center'
+                >         
                   <AprBadge activeView={activeView} series={activeSeries} animate />
                   <Text size='large' weight='bold' color={activeSeries?.seriesTextColor}>            
                     { activeSeries?.displayName }

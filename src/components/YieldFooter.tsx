@@ -55,14 +55,14 @@ const YieldFooter = (props: any) => {
           <Info size={IconSize} />
         </Anchor>
       </Box>
-      <Box>
+      {/* <Box>
         {!account && (
           <FlatButton
             label={<Text size='small'>Connect wallet</Text>}
             onClick={() => openConnectLayer()}
           />
         )}
-      </Box>
+      </Box> */}
       <Box
         direction="row"
         gap={IconGap}

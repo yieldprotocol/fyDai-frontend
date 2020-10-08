@@ -11,7 +11,7 @@ import {
 
 import DaiMark from '../components/logos/DaiMark';
 
-import { cleanValue } from '../utils';
+import { abbreviateHash, cleanValue } from '../utils';
 
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
@@ -206,7 +206,7 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
           entries={[
             {
               label: null,
-              visible: true,
+              visible: !!account,
               active: true,
               loading: false,
               value:null,
@@ -255,7 +255,7 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
                   </Box>
                   <Box gap='xsmall'>
                     <Box> 
-                      <Text color='text-weak'> Before borrowing</Text>
+                      {/* <Text color='text-weak'> Before borrowing</Text> */}
                       <Text weight='bold' color='text-weak'> Deposit Collateral </Text>
                     </Box>
                     <Text size='xxsmall' color='text-weak'>
@@ -264,6 +264,7 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
                   </Box>
                 </Box>)
             },
+
             /* dummy placeholder */
             {
               label: null,
@@ -314,6 +315,7 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
             },
             {
               label: 'Collateralization Ratio',
+              labelExtra: 'based on ETH posted',
               visible: !txActive && activeSeries && !activeSeries.isMature() && !!account && parseFloat(ethPosted_) > 0,
               active: collateralPercent_ > 0,
               loading: false,            
@@ -323,6 +325,7 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
             },
             {
               label: 'Dai Balance',
+              labelExtra: abbreviateHash('0x6b175474e89094c44da98b954eedeac495271d0f'),
               visible: 
                   (!!account && !txActive && !activeSeries?.isMature()) || 
                   (activeSeries?.isMature() && activeSeries?.fyDaiBalance_>0),

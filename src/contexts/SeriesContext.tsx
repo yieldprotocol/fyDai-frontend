@@ -120,6 +120,7 @@ const SeriesProvider = ({ children }:any) => {
       );
     }, state.seriesData);
 
+    console.log(_parsedSeriesData);
     /* Update state and return  */
     dispatch( { type:'updateSeries', payload: _parsedSeriesData });
     return _parsedSeriesData;

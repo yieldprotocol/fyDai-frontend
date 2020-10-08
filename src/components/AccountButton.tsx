@@ -125,7 +125,7 @@ const AccountButton = (props: any) => {
         </Box>
       </Layer>}
 
-      { pendingTxs.length===0 && !txCompleteOpen &&
+      { pendingTxs.length===0 && !txCompleteOpen && account &&
       <Box pad={{ left:'small', right:'large' }} direction='row' gap='small' align='center'>
         <DaiMark />
         <Loading condition={!position.daiBalance} size='xsmall'>
@@ -167,8 +167,7 @@ const AccountButton = (props: any) => {
             Transaction failed
           </Text>}
         </Box> 
-        { completeRef.current && over && <DropBox />}
-                
+        { completeRef.current && over && <DropBox />}               
       </>}
 
       { account ?

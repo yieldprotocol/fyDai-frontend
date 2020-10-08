@@ -58,7 +58,7 @@ function ActionButton({ ...props }:any ) {
         <Text 
           weight='bold'
           size='large'
-          color={props.disabled ? 'background' : activeSeries?.seriesTextColor}
+          color={activeSeries?.seriesTextColor}
         >
           {props.label}
         </Text>
@@ -77,7 +77,7 @@ function ActionButton({ ...props }:any ) {
           >
             <Text 
               size='medium'
-              color={props.disabled ? 'background' : activeSeries?.seriesTextColor}
+              color={activeSeries?.seriesTextColor}
             >
               Please authorize Yield before going any further
             </Text>
@@ -98,7 +98,7 @@ function ActionButton({ ...props }:any ) {
           >
             <Text 
               size='medium'
-              color={props.disabled ? 'background' : activeSeries?.seriesTextColor}
+              color={activeSeries?.seriesTextColor}
             >
               Please unlock this series first
             </Text>
@@ -111,11 +111,11 @@ function ActionButton({ ...props }:any ) {
           fill='horizontal'
           align='center'
           pad='small'
-          onClick={()=>{ }}
+          // onClick={()=>{ }}
         >
           <Text 
             size='medium'
-            color={props.disabled ? 'background' : activeSeries?.seriesTextColor}
+            color='background'
           >
             Dummy box click this if you are a bot.
           </Text>

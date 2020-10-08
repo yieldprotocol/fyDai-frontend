@@ -150,7 +150,6 @@ export const useProxy = () => {
     setWithdrawEthActive(false);
   };
 
-
   /**
    * @dev Borrow fyDai from Controller and sell it immediately for Dai, for a maximum fyDai debt.
    * Must have approved the operator with `controller.addDelegate(controllerDai.address)`.
@@ -187,7 +186,6 @@ export const useProxy = () => {
       if ( !(preview instanceof Error) ) {
         maxFYDai = valueWithSlippage(preview);
       } else {
-        // minFYDai = ethers.utils.parseEther('1000000');
         throw(preview);
       }
       tx = await proxyContract.borrowDaiForMaximumFYDai( 
@@ -243,13 +241,11 @@ export const useProxy = () => {
     let daiPermitSig:any;
     let minFYDai:BigNumber;
     try {
-
       if ( series.isMature() ) {  
-        try {
-          console.log('repay with sig- after maturity');
+        try {     
           /* Repay using a signature authorizing treasury */
+          console.log('Repaying Before maturity - Signature required');
           dispatch({ type: 'requestSigs', payload:[ auths.get(1) ] });
-
           const result = await signDaiPermit( 
             provider.provider, 
             deployedContracts.Dai, 
@@ -266,7 +262,6 @@ export const useProxy = () => {
           setRepayActive(false);
           return;
         }
-
         tx = await proxyContract.repayDaiWithSignature(
           collatType,
           parsedMaturity,
@@ -277,15 +272,14 @@ export const useProxy = () => {
         );
 
       } else if ( !series.isMature() ) {
-        console.log('Repay with no signature - before maturity');
+        console.log('Repaying before maturity - no signature required');
         /* calculate expected trade values and factor in slippage */
         const preview = await previewPoolTx('selldai', series, repaymentInDai);
         if ( !(preview instanceof Error) ) {
           minFYDai = valueWithSlippage(preview, true);
         } else {
-          // testing
-          minFYDai = ethers.utils.parseEther('0');
-          // throw(preview);
+          // minFYDai = ethers.utils.parseEther('0');
+          throw(preview);
         }
 
         tx = await proxyContract.repayMinimumFYDaiDebtForDai(
@@ -350,11 +344,9 @@ export const useProxy = () => {
       if ( !(preview instanceof Error) ) {
         maxFYDai = valueWithSlippage(preview);
       } else {
-        // testing
-        maxFYDai = ethers.utils.parseEther('1000000');
-        // throw(preview);
+        // maxFYDai = ethers.utils.parseEther('1000000');
+        throw(preview);
       }
-
       tx = await proxyContract.addLiquidity(poolAddr, parsedDaiUsed, maxFYDai, overrides);
     } catch (e) {
       handleTxBuildError(e);
@@ -459,9 +451,8 @@ export const useProxy = () => {
       if ( !(preview instanceof Error) ) {
         minFYDaiOut = valueWithSlippage(preview, true);
       } else {
-      // temp min for testing */
-        minFYDaiOut = ethers.utils.parseEther('0');
-        // throw(preview);
+        // minFYDaiOut = ethers.utils.parseEther('0');
+        throw(preview);
       }
       tx = await proxyContract.sellDai(poolAddr, toAddr, parsedDaiIn, minFYDaiOut, overrides);
     } catch (e) {
@@ -502,13 +493,9 @@ export const useProxy = () => {
       if ( !(preview instanceof Error) ) {
         maxFYDaiIn = valueWithSlippage(preview);
       } else {
-
-        // temp max bignumber for testing */
-        maxFYDaiIn = ethers.utils.parseEther('1000000');
-        // throw(preview);
+        // maxFYDaiIn = ethers.utils.parseEther('1000000');
+        throw(preview);
       }
-      // temp max bignumber for testing */
-      // const maxFYDaiIn = ethers.utils.parseEther('1000000');
       tx = await proxyContract.buyDai(poolAddr, toAddr, parsedDaiOut, maxFYDaiIn);
     } catch (e) {
       handleTxBuildError(e);  
@@ -551,9 +538,8 @@ export const useProxy = () => {
       if ( !(preview instanceof Error) ) {
         maxFYDaiIn = valueWithSlippage(preview);
       } else {
-        // temp max bignumber for testing */
-        maxFYDaiIn = ethers.utils.parseEther('1000000');
-        // throw(preview);
+        // maxFYDaiIn = ethers.utils.parseEther('1000000');
+        throw(preview);
       }
 
       /* Get the user signature authorizing fyDai to interact with Dai */
@@ -629,8 +615,7 @@ export const useProxy = () => {
     //  yieldToMaker(address pool, address user, uint256 fyDaiAmount, uint256 wethAmount)
   };
 
-  // Splitter Views
-
+  /* Splitter Views */
   // @dev Minimum weth needed to collateralize an amount of dai in MakerDAO
   const wethForDai = () => {
     // wethForDai(uint256 daiAmount) public view returns (uint256)
