@@ -1,15 +1,17 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { ethers } from 'ethers';
-import { Keyboard, Box, TextInput, Text, ResponsiveContext, Collapsible, Layer, Stack } from 'grommet';
+import { Keyboard, Box, TextInput, Text, ResponsiveContext, Collapsible, Layer } from 'grommet';
 
 import { 
-  FiClock as Clock,
   FiArrowRight as ArrowRight,
 } from 'react-icons/fi';
+import { 
+  VscHistory as History,
+} from 'react-icons/vsc';
 
 import DaiMark from '../components/logos/DaiMark';
 
-import { cleanValue, modColor } from '../utils';
+import { cleanValue } from '../utils';
 
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
@@ -34,9 +36,9 @@ import ActionButton from '../components/ActionButton';
 import RaisedButton from '../components/RaisedButton';
 import FlatButton from '../components/FlatButton';
 import Repay from './Repay';
-import Loading from '../components/Loading';
 import SeriesMatureBox from '../components/SeriesMatureBox';
-import Authorization from '../components/Authorization';
+import TxHistory from '../components/TxHistory';
+import HistoryWrap from '../components/HistoryWrap';
 
 interface IBorrowProps {
   borrowAmount?:number|null;
@@ -72,6 +74,7 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
   const [ txActive ] = useTxActive(['BORROW', 'BUY' ]);
 
   const [ repayOpen, setRepayOpen ] = useState<boolean>(false);
+  const [ histOpen, setHistOpen ] = useState<boolean>(false);
 
   /* input values */
   const [ inputValue, setInputValue ] = useState<any|undefined>(borrowAmount || undefined);
@@ -98,6 +101,7 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
       autoSell && await borrowDai(activeSeries, 'ETH-A', inputValue);
       !autoSell && await borrow('ETH-A', activeSeries.maturity, inputValue);
       setInputValue(undefined);
+      userActions.updateHistory();
       await Promise.all([
         userActions.updatePosition(),
         seriesActions.updateActiveSeries()
@@ -180,18 +184,23 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
       onEnter={()=> borrowProcedure(inputValue)}
       onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
       target='document'   
-    >
-      
+    >     
       { repayOpen && 
-        <Layer onClickOutside={()=>setRepayOpen(false)}>
+        <Layer 
+          onClickOutside={()=>setRepayOpen(false)}
+        >
           <Repay close={()=>setRepayOpen(false)} />      
         </Layer>}
 
-      {/* <Stack anchor='top-left'> */}
+      { histOpen && 
+      <HistoryWrap closeLayer={()=>setHistOpen(false)}>
+        <TxHistory 
+          filterTerms={['Borrowed', 'Deposited', 'Withdrew', 'Repaid' ]}
+          series={activeSeries}
+        />
+      </HistoryWrap>}
 
       <SeriesDescriptor activeView='borrow'>
-
-
         <InfoGrid
           alt
           entries={[
@@ -452,7 +461,23 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
             />}
           </Box>}
 
-          { !activeSeries?.isMature() &&
+          <Box direction='row' fill justify='between'>
+            { activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) && 
+            <Box alignSelf='start' margin={{ top:'medium' }}>
+              <FlatButton 
+                onClick={()=>setHistOpen(true)}
+                label={
+                  <Box direction='row' gap='small' align='center'>
+                    <Text size='xsmall' color='text-xweak'><History /></Text>                
+                    <Text size='xsmall' color='text-xweak'>
+                      Series Borrow History
+                    </Text>              
+                  </Box>
+                }
+              />
+            </Box>}
+
+            { !activeSeries?.isMature() &&
             activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) &&
             <Box alignSelf='end' margin={{ top:'medium' }}>
               <FlatButton 
@@ -469,6 +494,8 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
                 }
               />
             </Box>}
+          </Box>
+
 
           { activeSeries?.isMature() &&
             <SeriesMatureBox />}
@@ -485,7 +512,6 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
       {/* If there is a transaction active, show the applicable view */}
       { borrowActive && !txActive && <ApprovalPending /> } 
       { txActive && <TxStatus msg={`You are borrowing ${inputValue} DAI`} tx={txActive} /> }
-
 
     </Keyboard>
   );

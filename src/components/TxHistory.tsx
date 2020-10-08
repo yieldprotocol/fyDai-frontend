@@ -9,68 +9,38 @@ import {
 
 import { UserContext } from '../contexts/UserContext';
 import EtherscanButton from './EtherscanButton';
+import { IYieldSeries } from '../types';
+import Loading from './Loading';
 
 interface HistoryProps {
   filterTerms: string[];
-  view: string; // borrow, lend, pool
+  series: IYieldSeries | null;
 }
 
-const TxHistory = ( { filterTerms, view }:HistoryProps) => {
+const TxHistory = ( { filterTerms, series }:HistoryProps) => {
 
   const { state, actions } = useContext(UserContext);
-
   const [ txHistory, setTxHistory] = useState<any>([]);
   const [ itemOpen, setItemOpen ] = useState<any>(null);
 
-  // TODO NBNBNBNB improve preciseness of logic. may require a component split
-
-  /* Cpmponent renaming pool events depending on the different views */
   const HistoryItemName = (props:any) => {
-    const { item } = props;
-    
-    if (item.event === 'Bought') {
+    const { item } = props; 
+    if ( item.event) {
       return (
         <Box direction='row' gap='xsmall' align='center'>
-          <Text size='xsmall' color='secondary'>
-            { view === 'borrow' ? 'Borrowed' : 'Withdrew Dai' }           
-          </Text>
+          <Text size='xsmall' color='text-weak'>{item.event}</Text>
           <Text size='xxsmall'> 
-            { moment.unix(item.maturity).format('MMMM YYYY') } 
-            { view === 'borrow' &&  `@ ${item.APR.toFixed(2)}%` }
+            { (item.event === 'Deposited' || item.event === 'Withdrew') && `${item.collateral} collateral`}
+            { (item.event === 'Added' || item.event === 'Removed') && 'liquidity Tokens '}
+            { item.maturity && moment.unix(item.maturity).format('MMMM YYYY') } 
+            { item.APR && `@ ${item.APR.toFixed(2)}%` }
           </Text>
         </Box>
       );
-    } 
-    
-    if (item.event === 'Sold') {
-      return (
-        <>
-          { view === 'lend' &&
-          <Box direction='row' gap='xsmall' align='center'>
-            <Text size='xsmall' color='secondary'>
-              Lent               
-            </Text>
-            <Text size='xxsmall'> 
-              { `${moment.unix(item.maturity).format('MMMM YYYY') } @ ${item.APR.toFixed(2)}%` }
-            </Text>  
-          </Box>}
-        </>
-      );
-    } 
-
-    /* cases covered: DEPOSIT, WITHDRAW, and REPAID */
+    }
     return (
-      <Box direction='row' gap='xsmall' align='center'>
-        <Text size='xsmall' color='secondary'>
-          { item.event === 'Repaid'? 'Repaid Debt' : item.event }
-        </Text>
-        <Text size='xxsmall'> 
-          { (item.event === 'Withdrew' || item.event === 'Deposited') ? 
-            `${item.collateral} collateral` 
-            : `${moment.unix(item.maturity).format('MMMM YYYY') }`}  
-        </Text>
-      </Box>
-    );  
+      <Box />
+    );
   };
 
   const HistoryItemInfo = (props:any) => {
@@ -81,16 +51,18 @@ const TxHistory = ( { filterTerms, view }:HistoryProps) => {
         justify='between'
         pad='small'     
       > 
-        { (item.event === 'Bought' && view === 'borrow') && 
+        { (item.event === 'Borrowed') && 
         <Box>
           <Text size='xxsmall'>Amount owed @ maturity</Text>
           <Text size='xsmall'>{Math.abs(item.fyDai_).toFixed(2)} Dai</Text>
         </Box> }
-        { (item.event === 'Sold' && view === 'lend') && 
+        
+        { (item.event === 'Lent' ) && 
         <Box>
           <Text size='xxsmall'>Amount redeemable @ maturity</Text>
           <Text size='xsmall'>{Math.abs(item.fyDai_).toFixed(2)} Dai</Text>
         </Box> }
+
         <Box alignSelf='end'>
           <EtherscanButton txHash={item.transactionHash} />
         </Box>
@@ -99,14 +71,17 @@ const TxHistory = ( { filterTerms, view }:HistoryProps) => {
   };
 
   useEffect(()=> {
+    let seriesFilteredHist;
     const _txHist = state.txHistory.items;
-    const filteredHist = _txHist.filter((x:any) => filterTerms.includes(x.event) );  
-    const sortedList = filteredHist.sort( (a:any, b:any) => a.date - b.date ); 
+    const filteredHist = _txHist.filter((x:any) => filterTerms.includes(x.event));
+    if ( series ) {
+      seriesFilteredHist = filteredHist.filter((x:any) => (x.maturity === series.maturity) || (x.maturity === null) );
+    } else {
+      seriesFilteredHist = filteredHist;
+    }
+    const sortedList = seriesFilteredHist.sort( (a:any, b:any) => a.date - b.date ); 
     setTxHistory(sortedList);
   }, [ state.txHistory ]);
-
-  useEffect(()=> {
-  }, [ txHistory ]);
 
   return (
     <Box
@@ -138,7 +113,6 @@ const TxHistory = ( { filterTerms, view }:HistoryProps) => {
         gap='xsmall'
       >
         <Box flex={false}>
-
           { txHistory.length > 0 ? txHistory.map((x:any, i:number)=>{
             const key_ = i;
             return (            
@@ -157,7 +131,7 @@ const TxHistory = ( { filterTerms, view }:HistoryProps) => {
                 >
                   <Box basis='50%'>
                     <Text size='xsmall'>
-                      <HistoryItemName item={x} />                           
+                      <HistoryItemName item={x} />                       
                     </Text>
                   </Box>
                   <Box basis='25%' align='center'><Text size='xsmall'> {x.amount.toFixed(2)} </Text></Box>
@@ -174,15 +148,12 @@ const TxHistory = ( { filterTerms, view }:HistoryProps) => {
               </Box> 
             );
           }):
-          <Box align='center'>
-            { state.userLoading ? 
-              <Box pad='xsmall'> 
-                <Text size='xxsmall'>Loading...</Text> 
-              </Box>
-              : 
+          <Box align='center' pad='medium'>
+            <Loading condition={state.userLoading} size='large'>
               <Box pad='xsmall'> 
                 <Text size='xxsmall'> No history yet.</Text>
-              </Box>} 
+              </Box>
+            </Loading>
           </Box>}
         </Box>
       </Box>

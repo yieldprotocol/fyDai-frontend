@@ -65,6 +65,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
       setWithdrawPending(true);
       await withdrawEth(inputValue);
       setInputValue(undefined);
+      userActions.updateHistory();
       userActions.updatePosition();
       setWithdrawPending(false);
       close();

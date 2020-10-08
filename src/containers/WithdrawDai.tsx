@@ -63,6 +63,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
         inputValue,
       );
       setInputValue(undefined);
+      userActions.updateHistory();
       userActions.updatePosition();
       seriesActions.updateActiveSeries();
       setWithdrawDaiPending(false);

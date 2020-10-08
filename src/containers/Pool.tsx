@@ -4,8 +4,11 @@ import { Box, Button, Keyboard, TextInput, Text, ResponsiveContext, Collapsible,
 
 import { 
   FiArrowRight as ArrowRight,
-  FiClock as Clock
 } from 'react-icons/fi';
+import { 
+  VscHistory as History,
+} from 'react-icons/vsc';
+
 import DaiMark from '../components/logos/DaiMark';
 
 import { cleanValue } from '../utils';
@@ -35,6 +38,8 @@ import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
 import Loading from '../components/Loading';
 import SeriesMatureBox from '../components/SeriesMatureBox';
+import TxHistory from '../components/TxHistory';
+import HistoryWrap from '../components/HistoryWrap';
 
 interface IPoolProps {
   openConnectLayer:any;
@@ -65,6 +70,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
   const [inputRef, setInputRef] = useState<any>(null);
 
   const [ removeLiquidityOpen, setRemoveLiquidityOpen ] = useState<boolean>(false);
+  const [ histOpen, setHistOpen ] = useState<boolean>(false);
 
   const [ addLiquidityDisabled, setAddLiquidityDisabled ] = useState<boolean>(true);
 
@@ -79,6 +85,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
       setAddLiquidityPending(true);
       await addLiquidity( activeSeries, inputValue );
       setInputValue(undefined);
+      userActions.updateHistory();
       await Promise.all([
         userActions.updatePosition(),
         seriesActions.updateActiveSeries()
@@ -141,6 +148,14 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
         <Layer onClickOutside={()=>setRemoveLiquidityOpen(false)}>
           <RemoveLiquidity close={()=>setRemoveLiquidityOpen(false)} /> 
         </Layer>}
+
+      { histOpen && 
+        <HistoryWrap closeLayer={()=>setHistOpen(false)}>
+          <TxHistory 
+            filterTerms={[ 'Added', 'Removed' ]}
+            series={activeSeries}
+          />
+        </HistoryWrap>}
 
       <SeriesDescriptor activeView='pool'> 
         <InfoGrid 
@@ -265,8 +280,25 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
 
           { activeSeries?.isMature() &&
             <SeriesMatureBox />}
-            
-          { !activeSeries?.isMature() &&
+
+
+          <Box direction='row' fill justify='between'>
+            { activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) && 
+            <Box alignSelf='start' margin={{ top:'medium' }}>
+              <FlatButton 
+                onClick={()=>setHistOpen(true)}
+                label={
+                  <Box direction='row' gap='small' align='center'>
+                    <Text size='xsmall' color='text-xweak'><History /></Text>                
+                    <Text size='xsmall' color='text-xweak'>
+                      Series Pool History
+                    </Text>              
+                  </Box>
+                }
+              />
+            </Box>}
+
+            { !activeSeries?.isMature() &&
             activeSeries?.poolTokens_>0 &&
             <Box alignSelf='end' margin={{ top:'medium' }}>
               <FlatButton 
@@ -279,6 +311,9 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                 }  
               />
             </Box>}
+          </Box>
+
+
 
           { !txActive && 
             !!account && 

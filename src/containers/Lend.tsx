@@ -5,6 +5,10 @@ import { Box, Button, Keyboard, TextInput, Text, ResponsiveContext, Collapsible 
 import { 
   FiArrowRight as ArrowRight,
 } from 'react-icons/fi';
+import { 
+  VscHistory as History,
+} from 'react-icons/vsc';
+
 import DaiMark from '../components/logos/DaiMark';
 
 import { cleanValue } from '../utils';
@@ -35,6 +39,8 @@ import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
 import Loading from '../components/Loading';
 import SeriesMatureBox from '../components/SeriesMatureBox';
+import TxHistory from '../components/TxHistory';
+import HistoryWrap from '../components/HistoryWrap';
 
 interface ILendProps {
   openConnectLayer:any;
@@ -60,6 +66,7 @@ const Lend = ({ openConnectLayer, lendAmount }:ILendProps) => {
   const [ hasDelegated, setHasDelegated ] = useState<boolean>(true);
 
   const [ withdrawDaiOpen, setWithdrawDaiOpen ] = useState<boolean>(false);
+  const [ histOpen, setHistOpen ] = useState<boolean>(false);
   
   const [ inputValue, setInputValue ] = useState<any>();
   const debouncedInput = useDebounce(inputValue, 500);
@@ -84,6 +91,7 @@ const Lend = ({ openConnectLayer, lendAmount }:ILendProps) => {
         inputValue
       );
       setInputValue(undefined);
+      userActions.updateHistory();
       await Promise.all([
         userActions.updatePosition(),
         seriesActions.updateActiveSeries()
@@ -151,6 +159,14 @@ const Lend = ({ openConnectLayer, lendAmount }:ILendProps) => {
       target='document'
     >
       { withdrawDaiOpen && <WithdrawDai close={()=>setWithdrawDaiOpen(false)} /> }
+
+      { histOpen && 
+      <HistoryWrap closeLayer={()=>setHistOpen(false)}>
+        <TxHistory 
+          filterTerms={['Lent', 'Closed']}
+          series={activeSeries}
+        />
+      </HistoryWrap>}
 
       <SeriesDescriptor activeView='lend'>
         <InfoGrid 
@@ -297,18 +313,38 @@ const Lend = ({ openConnectLayer, lendAmount }:ILendProps) => {
                 />       
               </Box>
 
-              { activeSeries?.fyDaiBalance_ > 0 &&
-              <Box alignSelf='end' margin={{ top:'medium' }}>
-                <FlatButton 
-                  onClick={()=>setWithdrawDaiOpen(true)}
-                  label={
-                    <Box direction='row' gap='small' align='center'>
-                      <Box><Text size='xsmall' color='text-weak'><Text weight='bold' color={activeSeries.seriesColor}>close</Text> your position in this series</Text></Box>
-                      <ArrowRight color='text-weak' />
-                    </Box>
+              <Box direction='row' fill justify='between'>
+                { activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) && 
+                <Box alignSelf='start' margin={{ top:'medium' }}>
+                  <FlatButton 
+                    onClick={()=>setHistOpen(true)}
+                    label={
+                      <Box direction='row' gap='small' align='center'>
+                        <Text size='xsmall' color='text-xweak'><History /></Text>                
+                        <Text size='xsmall' color='text-xweak'>
+                          Series Lend History
+                        </Text>              
+                      </Box>
                 }
-                />
-              </Box>}
+                  />
+                </Box>}
+
+                { activeSeries?.fyDaiBalance_ > 0 &&
+                <Box alignSelf='end' margin={{ top:'medium' }}>
+                  <FlatButton 
+                    onClick={()=>setWithdrawDaiOpen(true)}
+                    label={
+                      <Box direction='row' gap='small' align='center'>
+                        <Box><Text size='xsmall' color='text-weak'><Text weight='bold' color={activeSeries.seriesColor}>close</Text> your position in this series</Text></Box>
+                        <ArrowRight color='text-weak' />
+                      </Box>
+                }
+                  />
+                </Box>}
+              </Box>
+
+
+
             </>}
           
           { activeSeries?.isMature() &&

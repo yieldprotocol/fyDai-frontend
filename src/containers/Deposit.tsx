@@ -92,6 +92,7 @@ const Deposit = ({ openConnectLayer, setActiveView, modalView, depositAmount }:D
       setDepositPending(true);
       await postEth(inputValue);
       setInputValue(undefined);
+      userActions.updateHistory();
       await userActions.updatePosition();
       setDepositPending(false);
     }

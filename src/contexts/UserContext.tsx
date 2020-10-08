@@ -183,13 +183,17 @@ const UserProvider = ({ children }: any) => {
   /**
    * @dev gets user balances from required tokens,and ETH native.
    */
-  const _getTxHistory = async ( forceUpdate:boolean=false ) => {
+  const _getTxHistory = async ( forceUpdate:boolean ) => {
     const _lastBlock = await provider.getBlockNumber();
 
     /* Get transaction history (from cache first or rebuild if an update is forced) */
-    forceUpdate && window.localStorage.removeItem('txHistory') && console.log('Re-building txHistory...');
+    // forceUpdate && window.localStorage.removeItem('txHistory') && console.log('Re-building txHistory...');
+    // (hist?.account !== account) && window.localStorage.removeItem('txHistory') && console.log('Re-building txHistory...');
 
-    const postedHistory = await getEventHistory(
+    forceUpdate && setTxHistory({}) && console.log('Re-building txHistory...');
+    // (txHistory?.account !== account) && window.localStorage.removeItem('txHistory') && console.log('Re-building txHistory...');
+
+    const collateralHistory = await getEventHistory(
       deployedContracts.Controller,
       'Controller',
       'Posted',
@@ -202,6 +206,7 @@ const UserProvider = ({ children }: any) => {
           return {
             ...x,
             event: x.args_[2]>0 ? 'Deposited' : 'Withdrew',
+            type: 'controller_posted',
             collateral: ethers.utils.parseBytes32String(x.args_[0]),
             maturity: null,
             amount: Math.abs( parseFloat(ethers.utils.formatEther( x.args_[2] )) ),
@@ -210,12 +215,12 @@ const UserProvider = ({ children }: any) => {
           };
         });     
       });
-        
-    const borrowedHistory = await getEventHistory(
+    
+    const repayHistory = await getEventHistory(
       deployedContracts.Controller,
       'Controller',
       'Borrowed',
-      [null, null, account, null],
+      [ ethers.utils.formatBytes32String('ETH-A'), null, account, null],
       !txHistory ? 0 : txHistory.lastBlock + 1
     )
       .then((res: any) => parseEventList(res))        /* then parse returned values */
@@ -223,7 +228,8 @@ const UserProvider = ({ children }: any) => {
         return parsedList.map((x:any) => {
           return {
             ...x,
-            event: x.args_[3]>0 ? 'Borrowed' : 'Repaid',
+            event: x.args_[3]<0? 'Repaid' : 'Borrowed_direct',
+            type: 'controller_borrowed',
             collateral: ethers.utils.parseBytes32String(x.args_[0]),
             maturity: parseInt(x.args_[1], 10),
             amount: Math.abs( parseFloat(ethers.utils.formatEther( x.args_[3] )) ),
@@ -232,8 +238,9 @@ const UserProvider = ({ children }: any) => {
           };
         });     
       });
-    
-    const poolHistory = await deployedSeries.reduce( async ( accP: any, cur:any) => {
+
+    // Trade(uint256 maturity, address indexed from, address indexed to, int256 daiTokens, int256 fyDaiTokens);
+    const tradeHistory = await deployedSeries.reduce( async ( accP: any, cur:any) => {
       const acc = await accP; 
       const _seriesHist = await getEventHistory(
         cur.poolAddress, 
@@ -245,12 +252,20 @@ const UserProvider = ({ children }: any) => {
         .then((res:any) => parseEventList(res))     /* then parse returned values */
         .then((parsedList: any) => {                /* then add extra info and calculated values */
           return parsedList.map((x:any) => {
+            let evnt;
+            const proxyTrade = (x.args[1] !== x.args[2]); 
+            if (x.args_[3]>0) {
+              proxyTrade ? evnt='Borrowed' : evnt='Closed';
+            } else { 
+              evnt = 'Lent';
+            }
             return {
               ...x,
-              event: x.args_[3]>0 ? 'Bought' : 'Sold',
+              event: evnt,
+              type: 'pool_trade',
               from: x.args[1],
               to:  x.args[2],
-              autoTraded: x.args[1] !== x.args[2],
+              proxyTraded: proxyTrade,
               maturity: parseInt(x.args_[0], 10),
               amount: Math.abs( parseFloat(ethers.utils.formatEther( x.args_[3] )) ),
               dai: x.args[3].abs(),
@@ -258,6 +273,74 @@ const UserProvider = ({ children }: any) => {
               APR: yieldAPR( x.args[3].abs(),  x.args[4].abs(), parseInt(x.args_[0], 10), x.date), 
               dai_: ethers.utils.formatEther( x.args_[3] ),
               fyDai_: ethers.utils.formatEther( x.args_[4] ),
+            };
+          }); 
+        });
+      return [...acc, ..._seriesHist];
+    }, Promise.resolve([]) );
+
+    // Liquidity(uint256 maturity, address indexed from, address indexed to, int256 daiTokens, int256 fyDaiTokens, int256 poolTokens);
+    const addLiquidityHistory = await deployedSeries.reduce( async ( accP: any, cur:any) => {
+      const acc = await accP; 
+      const _seriesHist = await getEventHistory(
+        cur.poolAddress, 
+        'Pool', 
+        'Liquidity',
+        [null, null, account, null, null, null],
+        !txHistory?0:txHistory.lastBlock+1
+      )
+        .then((res:any) => parseEventList(res))     /* then parse returned values */
+        .then((parsedList: any) => {                /* then add extra info and calculated values */
+          return parsedList.map((x:any) => {
+            return {
+              ...x,
+              event: 'Added',
+              type: 'pool_liquidity',
+              from: x.args[1],
+              to:  x.args[2],
+              proxyTraded: x.args[1] !== x.args[2],
+              maturity: parseInt(x.args_[0], 10),
+              amount: Math.abs( parseFloat(ethers.utils.formatEther( x.args_[5] )) ),
+              dai: x.args[3].abs(),
+              fyDai: x.args[4].abs(),
+              poolTokens: x.args[5].abs(),
+              dai_: ethers.utils.formatEther( x.args_[3] ),
+              fyDai_: ethers.utils.formatEther( x.args_[4] ),
+              poolTokens_: ethers.utils.formatEther( x.args_[5] ),
+            };
+          }); 
+        });
+      return [...acc, ..._seriesHist];
+    }, Promise.resolve([]) );
+
+    // Liquidity(uint256 maturity, address indexed from, address indexed to, int256 daiTokens, int256 fyDaiTokens, int256 poolTokens);
+    const removeLiquidityHistory = await deployedSeries.reduce( async ( accP: any, cur:any) => {
+      const acc = await accP; 
+      const _seriesHist = await getEventHistory(
+        cur.poolAddress, 
+        'Pool', 
+        'Liquidity',
+        [null, account, null, null, null, null],
+        !txHistory?0:txHistory.lastBlock+1
+      )
+        .then((res:any) => parseEventList(res))     /* then parse returned values */
+        .then((parsedList: any) => {                /* then add extra info and calculated values */
+          return parsedList.map((x:any) => {
+            return {
+              ...x,
+              event: 'Removed',
+              type: 'pool_liquidity',
+              from: x.args[1],
+              to:  x.args[2],
+              proxyTraded: x.args[1] !== x.args[2],
+              maturity: parseInt(x.args_[0], 10),
+              amount: Math.abs( parseFloat(ethers.utils.formatEther( x.args_[5] )) ),
+              dai: x.args[3].abs(),
+              fyDai: x.args[4].abs(),
+              poolTokens: x.args[5].abs(),
+              dai_: ethers.utils.formatEther( x.args_[3] ),
+              fyDai_: ethers.utils.formatEther( x.args_[4] ),
+              poolTokens_: ethers.utils.formatEther( x.args_[5] ),
             };
           }); 
         });
@@ -273,9 +356,11 @@ const UserProvider = ({ children }: any) => {
     );
     
     const updatedHistory = [
-      ...postedHistory,
-      ...borrowedHistory,
-      ...poolHistory,
+      ...collateralHistory,
+      ...repayHistory,
+      ...tradeHistory,
+      ...addLiquidityHistory,
+      ...removeLiquidityHistory,
     ];
 
     const _payload = {
@@ -308,14 +393,18 @@ const UserProvider = ({ children }: any) => {
   };
 
   const initUser = async () => {
+    
     /* Init start */
+    // const hist = JSON.parse( (localStorage.getItem('txHistory') || '{}') );
+    // const newAcc = (hist?.account !== account);
+
     dispatch({ type: 'isLoading', payload: true });
     // TODO: look at splitting these up cleverly, in particular makerData.
 
     await Promise.all([
       _getPosition(),
       _getAuthorizations(),
-      _getTxHistory(),
+      _getTxHistory(false),
       _getPreferences(),
       _getMakerData(),
     ]);
@@ -331,7 +420,7 @@ const UserProvider = ({ children }: any) => {
 
     // If user has changed, rebuild and re-cache the history
     const hist = JSON.parse( (localStorage.getItem('txHistory') || '{}') );
-    if ( !yieldState.yieldLoading && account && (hist?.account !== account) ) {
+    if ( account && (hist?.account !== account) ) {
       localStorage.removeItem('txHistory');
       _getTxHistory(true);
       console.log('History updating due to user change');
@@ -341,10 +430,8 @@ const UserProvider = ({ children }: any) => {
   const actions = {
     updatePosition: () => _getPosition(),
     updateAuthorizations: () => _getAuthorizations(),
-
-    updateHistory: () => _getTxHistory(),
+    updateHistory: () => _getTxHistory(false),
     rebuildHistory: () => _getTxHistory(true),
-
     updateMakerData: () => console.log('makerData update fn'),
     updatePreferences: () => console.log('preference update fn'),
     resetPreferences: () => console.log('preferences reset fn'),

@@ -34,8 +34,8 @@ const Redeem  = ({ close }:IRedeemProps)  => {
   const redeemProcedure = async () =>{
     if(!redeemDisabled) {
       setRedeemPending(true);
-
       await redeem(activeSeries.fyDaiAddress, activeSeries.fyDaiBalance.toString());
+      userActions.updateHistory();
       await Promise.all([
         userActions.updatePosition(),
         seriesActions.updateActiveSeries()

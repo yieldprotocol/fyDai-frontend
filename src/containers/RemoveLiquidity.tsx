@@ -60,6 +60,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
       setRemoveLiquidityPending(true);
       await removeLiquidity(activeSeries, value);
       setInputValue(undefined);
+      userActions.updateHistory();
       if (activeSeries?.isMature()) {
         await Promise.all([
           userActions.updatePosition(),
@@ -139,7 +140,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
             placeholder='Tokens to remove'
             value={inputValue || ''}
             plain
-            onChange={(event:any) => setInputValue(( cleanValue(event.target.value), 6 ))}
+            onChange={(event:any) => setInputValue(( cleanValue(event.target.value, 6)))}
             icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <YieldMark />}
           />
           <RaisedButton 

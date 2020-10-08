@@ -4,22 +4,17 @@ import {
   Anchor,
   Layer,
   Image,
-  Header,
-  Heading,
   Footer,
-  Button,
   Box,
   Text,
   ResponsiveContext,
   Paragraph,
-  Collapsible,
 } from 'grommet';
 
 import { 
   FiArrowLeft as ArrowLeft,
 } from 'react-icons/fi';
 
-import { FaCaretDown } from 'react-icons/fa';
 import {
   useConnection,
   useSignerAccount,
@@ -32,6 +27,7 @@ import torusImage from '../../assets/images/providers/torus.png';
 import walletConnectImage from '../../assets/images/providers/walletconnect.png';
 
 import { UserContext } from '../../contexts/UserContext';
+import { YieldContext } from '../../contexts/YieldContext';
 
 import RaisedButton from '../../components/RaisedButton';
 import FlatButton from '../../components/FlatButton';
@@ -40,6 +36,8 @@ import TxHistory from '../../components/TxHistory';
 const ConnectLayer = ({ view, target, closeLayer }: any) => {
 
   const { state: { position } } = useContext(UserContext);
+  const { state: { deployedSeries } } = useContext(YieldContext);
+
   const screenSize = useContext(ResponsiveContext);
   const { account, provider } = useSignerAccount();
   const [ layerView, setLayerView] = useState<string>(view);
@@ -218,13 +216,13 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                   />
                 </Box>
                 <Box>
-                  {histOpen === 'BORROW' && <TxHistory filterTerms={['Bought', 'Repaid', 'Deposited', 'Withdrew']} view='borrow' />}
-                  {histOpen === 'LEND' && <TxHistory filterTerms={['Bought', 'Sold' ]} view='lend' />}
-                  {histOpen === 'POOL' && <TxHistory filterTerms={['Bought', 'Sold' ]} view='pool' />}
+                  {histOpen === 'BORROW' && <TxHistory filterTerms={['Borrowed', 'Repaid', 'Deposited', 'Withdrew']} series={null} />}
+                  {histOpen === 'LEND' && <TxHistory filterTerms={['Closed', 'Lent' ]} series={null} />}
+                  {histOpen === 'POOL' && <TxHistory filterTerms={['Added', 'Removed' ]} series={null} />}
                 </Box>
               </Box> }
 
-            <Footer direction="row-responsive" justify='between' pad="medium" margin={{top:'medium'}}>
+            <Footer direction="row-responsive" justify='between' pad="medium" margin={{ top:'medium' }}>
               <FlatButton 
                 onClick={() => {
                   if (view === 'ACCOUNT' && layerView !== 'ACCOUNT') { 

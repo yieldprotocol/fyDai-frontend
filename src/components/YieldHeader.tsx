@@ -149,12 +149,7 @@ const YieldHeader = (props: any) => {
           </StyledText>
         </Box>
       ))
-    }
-      <FlatButton 
-        onClick={()=>console.log('xys')}
-        label={<Box pad={{ horizontal:'small' }}><Telescope /></Box>}
-      />
-      
+    }    
     </Box>
   );
 
@@ -179,7 +174,7 @@ const YieldHeader = (props: any) => {
           <Nav />}
       </Box>
 
-      <Box>
+      <Box direction='row' gap='small'>
         {screenSize === 'small' ? (
           <MenuButton />
         ) : (
@@ -187,6 +182,10 @@ const YieldHeader = (props: any) => {
             <AccountButton {...props} />
           </Box>
         )}
+        <FlatButton 
+          onClick={()=>console.log('xys')}
+          label={<Box pad={{ horizontal:'small' }}><Telescope /></Box>}
+        />
       </Box>
     </Box>
   );
