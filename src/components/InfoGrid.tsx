@@ -182,12 +182,13 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
       <Box 
         onClick={()=>setDetailsOpen(!detailsOpen)}
         direction='row' 
-        fill 
-        justify='center'
-        hoverIndicator='#5555551A'
+        // fill 
+        justify='end'
+        // hoverIndicator='#5555551A'
         pad='small'
       > 
-        {!detailsOpen?<ChevronDown size='25px' /> : <ChevronUp size='25px' />}  
+        {/* {!detailsOpen?<ChevronDown size='25px' /> : <ChevronUp size='25px' />}   */}
+        {!detailsOpen?<Text size='xxsmall' color='text-weak'> more info </Text> : <Text size='xxsmall' color='text-weak'> less info </Text>}
       </Box> }
     </Box>
   );
