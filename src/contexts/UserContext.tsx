@@ -187,10 +187,10 @@ const UserProvider = ({ children }: any) => {
     const _lastBlock = await provider.getBlockNumber();
 
     /* Get transaction history (from cache first or rebuild if an update is forced) */
-    // forceUpdate && window.localStorage.removeItem('txHistory') && console.log('Re-building txHistory...');
+    forceUpdate && window.localStorage.removeItem('txHistory') && console.log('Re-building txHistory...');
     // (hist?.account !== account) && window.localStorage.removeItem('txHistory') && console.log('Re-building txHistory...');
 
-    forceUpdate && setTxHistory({}) && console.log('Re-building txHistory...');
+    // forceUpdate && setTxHistory({}) && console.log('Re-building txHistory...');
     // (txHistory?.account !== account) && window.localStorage.removeItem('txHistory') && console.log('Re-building txHistory...');
 
     const collateralHistory = await getEventHistory(
