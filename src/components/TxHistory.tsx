@@ -28,7 +28,7 @@ const TxHistory = ( { filterTerms, series }:HistoryProps) => {
     if ( item.event) {
       return (
         <Box direction='row' gap='xsmall' align='center'>
-          <Text size='xsmall' color='text-weak'>{item.event}</Text>
+          <Text size='xsmall' color={series?.seriesColor || 'text-weak'}>{item.event}</Text>
           <Text size='xxsmall'> 
             { (item.event === 'Deposited' || item.event === 'Withdrew') && `${item.collateral} collateral`}
             { (item.event === 'Added' || item.event === 'Removed') && 'liquidity Tokens '}

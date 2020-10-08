@@ -38,7 +38,7 @@ export const useMath = () => {
    */
   const collValue = (collateralPosted:BigNumber): BigNumber => {
     // console.log('Collateral Value USD:', ethers.utils.formatEther( utils.mulRay(collateralPosted, collPrice()) ) );
-    return utils.mulRay(collateralPosted, collPrice());
+    return utils.mulRay(collateralPosted, feedData.ethPrice);
   };
 
   /**

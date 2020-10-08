@@ -102,18 +102,14 @@ const Deposit = ({ openConnectLayer, setActiveView, modalView, depositAmount }:D
     }
   };
 
-  // useEffect(()=>{
-  //   /* Roughly estimate the nmaximum borrowing power based on ETH balance */
-  //     const val = ethBalance*yieldState.feedData;
-  //     const newPower = parseFloat(ethers.utils.formatEther(val))/2;
-  //     if (maxDaiAvailable_) {
-  //       const pl = parseFloat(maxDaiAvailable_) + newPower;
-  //       setMaxPower(pl.toFixed(2));
-  //     } else {
-  //       setMaxPower(newPower.toFixed(2));
-  //     }
-  //   }
-  // }, [ethBalance] );
+  useEffect(()=>{
+    /* Roughly estimate the nmaximum borrowing power based on ETH balance */
+    const newPower = (ethBalance_*ethPrice_)/2;
+    if (maxDaiAvailable_) {
+      const pl = parseFloat(maxDaiAvailable_) + newPower;
+      setMaxPower(pl.toFixed(2));
+    }
+  }, [ethBalance, maxDaiAvailable_]);
 
   /* Handle debounced input value changes */
   useEffect(()=>{
@@ -174,7 +170,7 @@ const Deposit = ({ openConnectLayer, setActiveView, modalView, depositAmount }:D
       target='document'
     >
       <CollateralDescriptor backToBorrow={()=>setActiveView(1)}>
-
+        
         <InfoGrid
           entries={[
             {
@@ -183,7 +179,7 @@ const Deposit = ({ openConnectLayer, setActiveView, modalView, depositAmount }:D
               visible: !!account,
               active: true,
               loading: !ethPosted_ && depositPending && ethPosted_ !== 0, 
-              value: ethPrice_ && `${((ethPrice_*ethBalance_)/2).toFixed(2)} DAI`,           
+              value: maxPower && `${maxPower} DAI`,           
               // value: (maxPower && (maxPower !== 0))? `maxPower DAI`: '',
               valuePrefix: null,
               valueExtra: null, 
@@ -200,8 +196,7 @@ const Deposit = ({ openConnectLayer, setActiveView, modalView, depositAmount }:D
             //   value: null,
             //   valuePrefix: null,
             //   valueExtra:null,
-            // },
-            
+            // },        
             {
               label: 'Did you know?', // 'Post some ETH collateral to start borrowing',
               labelExtra: null,
@@ -219,8 +214,6 @@ const Deposit = ({ openConnectLayer, setActiveView, modalView, depositAmount }:D
                   </Text>
                 </Box>),
             },
-
-
             {
               label: 'Current Collateral',
               labelExtra: 'posted in the Yield Protocol',
@@ -291,6 +284,16 @@ const Deposit = ({ openConnectLayer, setActiveView, modalView, depositAmount }:D
             <Collapsible open={!!inputValue&&inputValue>0}> 
               <InfoGrid entries={[
                 {
+                  label: 'Borrowing Power',
+                  labelExtra: `est. after posting ${inputValue && cleanValue(inputValue, 2)} ETH`,
+                  visible: !!account,
+                  active: debouncedInput,
+                  loading: !ethPosted_ && depositPending && ethPosted_ !== 0,
+                  value: estPower? `${estPower} DAI`: '0 DAI',           
+                  valuePrefix: null,
+                  valueExtra: null,
+                },
+                {
                   label: 'Collateralization Ratio',
                   labelExtra: `est. after posting ${inputValue && cleanValue(inputValue, 2)} ETH`,
                   visible: !!account && collateralPercent_ > 0,
@@ -303,16 +306,6 @@ const Deposit = ({ openConnectLayer, setActiveView, modalView, depositAmount }:D
                       {/* { inputValue && collateralPercent_ && ( (estRatio-collateralPercent_) !== 0) && `(+ ${(estRatio-collateralPercent_).toFixed(0)}%)` } */}
                     </Text>
                   )
-                },
-                {
-                  label: 'Borrowing Power',
-                  labelExtra: `est. after posting ${inputValue && cleanValue(inputValue, 2)} ETH`,
-                  visible: !!account,
-                  active: debouncedInput,
-                  loading: !ethPosted_ && depositPending && ethPosted_ !== 0,
-                  value: estPower? `${estPower} DAI`: '0 DAI',           
-                  valuePrefix: null,
-                  valueExtra: null,
                 },
                 {
                   label: '',

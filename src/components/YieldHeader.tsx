@@ -167,7 +167,7 @@ const YieldHeader = (props: any) => {
         <Image src={theme.dark ? logoLight : logoDark} fit="contain" />
       </Box>
 
-      <Box>
+      <Box alignSelf='center'>
         { screenSize === 'small' ? 
           <MobileNav /> 
           : 
