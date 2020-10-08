@@ -70,6 +70,10 @@ const TxHistory = ( { filterTerms, series }:HistoryProps) => {
     );
   };
 
+  useEffect(()=>{
+
+  },);
+
   useEffect(()=> {
     let seriesFilteredHist;
     const _txHist = state.txHistory.items;
@@ -84,80 +88,83 @@ const TxHistory = ( { filterTerms, series }:HistoryProps) => {
   }, [ state.txHistory ]);
 
   return (
-    <Box
-      background='background-front'
-      fill='horizontal'
-      round='small'
-      pad='none'
-      border
-      height={{ max:'350px' }}
-      overflow='auto'
-    >
-      <Box 
-        direction='row'
-        gap='xsmall'
-        justify='between'
-        background='background-mid'
-        pad='small'
-        round={{ size:'small', corner:'top' }}
-      >
-        <Box basis='50%'><Text color='text-weak' size='xxsmall'>TRANSACTION</Text></Box>
-        <Box basis='25%' align='center'><Text color='text-weak' size='xxsmall'>AMOUNT</Text></Box>
-        <Box basis='25%' align='center'><Text color='text-weak' size='xxsmall'>DATE</Text></Box>
-        <Box><Text color='text-weak' size='xxsmall'>{' '}</Text></Box>
-      </Box>
-
-      <Box 
-        height={{ min: '100px', max:'350px' }}
+    <Loading condition={state.userLoading} size='large'>
+      <Box
+        background='background-front'
+        fill='horizontal'
+        round='small'
+        pad='none'
+        border
+        height={{ max:'350px' }}
         overflow='auto'
-        gap='xsmall'
       >
-        <Box flex={false}>
-          { txHistory.length > 0 ? txHistory.map((x:any, i:number)=>{
-            const key_ = i;
-            return (            
-              <Box
-                key={key_}
-                pad='small'          
-                gap='xsmall'             
-                hoverIndicator='background-mid'
-                background={itemOpen === key_ ? 'background-mid' : undefined}
-                onClick={itemOpen === key_ ? ()=>setItemOpen(null):()=>setItemOpen(key_)}
-              >         
-                <Box
-                  direction='row'
-                  align='center'
-                  justify='between'
-                >
-                  <Box basis='50%'>
-                    <Text size='xsmall'>
-                      <HistoryItemName item={x} />                       
-                    </Text>
-                  </Box>
-                  <Box basis='25%' align='center'><Text size='xsmall'> {x.amount.toFixed(2)} </Text></Box>
-                  <Box basis='25%' align='center'><Text size='xsmall'> {moment(x.date_).format('DD MMMM YYYY')} </Text></Box>
-                  <Box>
-                    <Text size='xsmall'> 
-                      {itemOpen !== key_ ? <ChevronDown /> : <ChevronUp /> }
-                    </Text>
-                  </Box>
-                </Box>
-                <Collapsible open={itemOpen === key_}>
-                  <HistoryItemInfo item={x} />
-                </Collapsible>           
-              </Box> 
-            );
-          }):
-          <Box align='center' pad='medium'>
-            <Loading condition={state.userLoading} size='large'>
-              <Box pad='xsmall'> 
-                <Text size='xxsmall'> No history yet.</Text>
-              </Box>
-            </Loading>
-          </Box>}
+      
+        <Box 
+          direction='row'
+          gap='xsmall'
+          justify='between'
+          background='background-mid'
+          pad='small'
+          round={{ size:'small', corner:'top' }}
+        >
+          <Box basis='50%'><Text color='text-weak' size='xxsmall'>TRANSACTION</Text></Box>
+          <Box basis='25%' align='center'><Text color='text-weak' size='xxsmall'>AMOUNT</Text></Box>
+          <Box basis='25%' align='center'><Text color='text-weak' size='xxsmall'>DATE</Text></Box>
+          <Box><Text color='text-weak' size='xxsmall'>{' '}</Text></Box>
         </Box>
+        <Box 
+          height={{ min: '100px', max:'350px' }}
+          overflow='auto'
+          gap='xsmall'
+        > 
+          <Box flex={false}>
+            { txHistory.length > 0 ? txHistory.map((x:any, i:number)=>{
+              const key_ = i;
+              return (          
+                <Box
+                  key={key_}
+                  pad='small'          
+                  gap='xsmall'             
+                  hoverIndicator='background-mid'
+                  background={itemOpen === key_ ? 'background-mid' : undefined}
+                  onClick={itemOpen === key_ ? ()=>setItemOpen(null):()=>setItemOpen(key_)}
+                >         
+                  <Box
+                    direction='row'
+                    align='center'
+                    justify='between'
+                  >
+                    <Box basis='50%'>
+                      <Text size='xsmall'>
+                        <HistoryItemName item={x} />                       
+                      </Text>
+                    </Box>
+                    <Box basis='25%' align='center'><Text size='xsmall'> {x.amount.toFixed(2)} </Text></Box>
+                    <Box basis='25%' align='center'><Text size='xsmall'> {moment(x.date_).format('DD MMMM YYYY')} </Text></Box>
+                    <Box>
+                      <Text size='xsmall'> 
+                        {itemOpen !== key_ ? <ChevronDown /> : <ChevronUp /> }
+                      </Text>
+                    </Box>
+                  </Box>
+                  <Collapsible open={itemOpen === key_}>
+                    <HistoryItemInfo item={x} />
+                  </Collapsible>           
+                </Box> 
+              );
+            }):
+            <Box align='center' pad='medium'>
+              <Loading condition={state.userLoading} size='large'>
+                <Box pad='xsmall'> 
+                  <Text size='xxsmall'> No history yet.</Text>
+                </Box>
+              </Loading>
+            </Box>}
+          </Box>    
+        </Box>  
       </Box>
-    </Box>
+    </Loading>
+    
   );
 };
 

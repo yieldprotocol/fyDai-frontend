@@ -184,21 +184,18 @@ const UserProvider = ({ children }: any) => {
    * @dev gets user balances from required tokens,and ETH native.
    */
   const _getTxHistory = async ( forceUpdate:boolean ) => {
-    const _lastBlock = await provider.getBlockNumber();
 
     /* Get transaction history (from cache first or rebuild if an update is forced) */
-    forceUpdate && window.localStorage.removeItem('txHistory') && console.log('Re-building txHistory...');
-    // (hist?.account !== account) && window.localStorage.removeItem('txHistory') && console.log('Re-building txHistory...');
-
-    // forceUpdate && setTxHistory({}) && console.log('Re-building txHistory...');
-    // (txHistory?.account !== account) && window.localStorage.removeItem('txHistory') && console.log('Re-building txHistory...');
+    forceUpdate && console.log('Re-building txHistory...');
+    const _lastBlock = await provider.getBlockNumber();
+    const lastCheckedBlock = (txHistory && forceUpdate)? 0: txHistory?.lastBlock||0;
 
     const collateralHistory = await getEventHistory(
       deployedContracts.Controller,
       'Controller',
       'Posted',
       [ethers.utils.formatBytes32String('ETH-A'), account, null],
-      !txHistory ? 0 : txHistory.lastBlock + 1
+      lastCheckedBlock+1
     )
       .then((res: any) => parseEventList(res))       /* then parse returned values */
       .then((parsedList: any) => {                   /* then add extra info and calculated values */
@@ -221,7 +218,7 @@ const UserProvider = ({ children }: any) => {
       'Controller',
       'Borrowed',
       [ ethers.utils.formatBytes32String('ETH-A'), null, account, null],
-      !txHistory ? 0 : txHistory.lastBlock + 1
+      lastCheckedBlock+1
     )
       .then((res: any) => parseEventList(res))        /* then parse returned values */
       .then((parsedList: any) => {                    /* then add extra info and calculated values */
@@ -247,7 +244,7 @@ const UserProvider = ({ children }: any) => {
         'Pool', 
         'Trade',
         [null, null, account, null, null],
-        !txHistory?0:txHistory.lastBlock+1 
+        lastCheckedBlock+1
       )
         .then((res:any) => parseEventList(res))     /* then parse returned values */
         .then((parsedList: any) => {                /* then add extra info and calculated values */
@@ -287,7 +284,7 @@ const UserProvider = ({ children }: any) => {
         'Pool', 
         'Liquidity',
         [null, null, account, null, null, null],
-        !txHistory?0:txHistory.lastBlock+1
+        lastCheckedBlock+1
       )
         .then((res:any) => parseEventList(res))     /* then parse returned values */
         .then((parsedList: any) => {                /* then add extra info and calculated values */
@@ -321,7 +318,7 @@ const UserProvider = ({ children }: any) => {
         'Pool', 
         'Liquidity',
         [null, account, null, null, null, null],
-        !txHistory?0:txHistory.lastBlock+1
+        lastCheckedBlock+1
       )
         .then((res:any) => parseEventList(res))     /* then parse returned values */
         .then((parsedList: any) => {                /* then add extra info and calculated values */
@@ -350,9 +347,9 @@ const UserProvider = ({ children }: any) => {
     // TODO : get blocknumber at initialisation of fyDaiProtocol instead of using first block(0).
     console.log(
       'txHistory updated from block:',
-          txHistory?.lastBlock + 1 || 0,
-          'to block:',
-          _lastBlock
+      lastCheckedBlock,
+      'to block:',
+      _lastBlock
     );
     
     const updatedHistory = [
@@ -366,12 +363,12 @@ const UserProvider = ({ children }: any) => {
     const _payload = {
       account,
       lastBlock: _lastBlock,
-      items: txHistory ? [...txHistory.items, ...updatedHistory] : [...updatedHistory]
+      items: (!forceUpdate && txHistory) ? [...txHistory.items, ...updatedHistory] : [...updatedHistory]
     };
 
     setTxHistory(_payload);
     dispatch( { type: 'updateTxHistory', payload: _payload });
-    return _payload;    
+    return _payload;
   };
 
   /**
@@ -395,9 +392,6 @@ const UserProvider = ({ children }: any) => {
   const initUser = async () => {
     
     /* Init start */
-    // const hist = JSON.parse( (localStorage.getItem('txHistory') || '{}') );
-    // const newAcc = (hist?.account !== account);
-
     dispatch({ type: 'isLoading', payload: true });
     // TODO: look at splitting these up cleverly, in particular makerData.
 
@@ -417,21 +411,20 @@ const UserProvider = ({ children }: any) => {
 
     // Init everytime it starts or change of user
     !yieldState.yieldLoading && account && initUser();
-
     // If user has changed, rebuild and re-cache the history
-    const hist = JSON.parse( (localStorage.getItem('txHistory') || '{}') );
-    if ( account && (hist?.account !== account) ) {
-      localStorage.removeItem('txHistory');
-      _getTxHistory(true);
-      console.log('History updating due to user change');
-    }
+    !yieldState.yieldLoading && account && !(txHistory?.account === account) && _getTxHistory(true);
+
   }, [ account, yieldState.yieldLoading ]);
 
   const actions = {
     updatePosition: () => _getPosition(),
     updateAuthorizations: () => _getAuthorizations(),
     updateHistory: () => _getTxHistory(false),
-    rebuildHistory: () => _getTxHistory(true),
+    rebuildHistory: async () => {
+      dispatch({ type: 'isLoading', payload: true });
+      await _getTxHistory(true);
+      dispatch({ type: 'isLoading', payload: false });
+    },
     updateMakerData: () => console.log('makerData update fn'),
     updatePreferences: () => console.log('preference update fn'),
     resetPreferences: () => console.log('preferences reset fn'),
