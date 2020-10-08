@@ -188,24 +188,6 @@ const Deposit = ({ openConnectLayer, setActiveView, modalView, depositAmount }:D
               valuePrefix: null,
               valueExtra: null, 
             },
-            
-            {
-              label: 'Did you know?', // 'Post some ETH collateral to start borrowing',
-              labelExtra: null,
-              visible:
-                  !!account &&
-                  parseFloat(ethPosted_) === 0,
-              active: true,
-              loading: false,    
-              value: null,
-              valuePrefix: null,
-              valueExtra: ()=>( 
-                <Box>
-                  <Text size='xxsmall' color='text-weak'>
-                    Collateral posted here can be used to borrow Dai from any one of the Yield series.
-                  </Text>
-                </Box>),
-            },
             /* dummy placeholder */
             // {
             //   label: null,
@@ -219,6 +201,25 @@ const Deposit = ({ openConnectLayer, setActiveView, modalView, depositAmount }:D
             //   valuePrefix: null,
             //   valueExtra:null,
             // },
+            
+            {
+              label: 'Did you know?', // 'Post some ETH collateral to start borrowing',
+              labelExtra: null,
+              visible:
+                  !!account &&
+                  parseFloat(ethPosted_) === 0,
+              active: true,
+              loading: false,    
+              value: null,
+              valuePrefix: null,
+              valueExtra: ()=>( 
+                <Box width={{ max:'200px' }}>
+                  <Text size='xxsmall' color='text-weak'>
+                    Collateral posted can be used to borrow Dai from any one of the Yield series.
+                  </Text>
+                </Box>),
+            },
+
 
             {
               label: 'Current Collateral',
