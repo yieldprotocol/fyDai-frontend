@@ -25,7 +25,6 @@ export const yieldTheme = {
         // light:'#000000',
       },
       'brand-transparent': {
-
         // dark: '#0057921A',
         // light: '#0057921A',
         dark: '#0057921A',

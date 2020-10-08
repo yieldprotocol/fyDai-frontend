@@ -13,6 +13,7 @@ import {
   Layer,
   Menu,
   Collapsible,
+  Stack
 } from 'grommet';
 
 import { 
@@ -120,7 +121,7 @@ const YieldHeader = (props: any) => {
     <Box
       direction={screenSize === 'small' ? 'column' : 'row'}
       fill={screenSize === 'small' ? 'horizontal' : false}
-      gap='medium'
+      gap='large'
       align='center'
     >
       { 
@@ -138,12 +139,11 @@ const YieldHeader = (props: any) => {
             weight='bold'
             // eslint-disable-next-line no-nested-ternary
             color={item.disabled ? 'lightgrey' : activeView === item.link ? 'brand' : 'text-xweak'}
-            size={screenSize === 'small' ? 'medium' : 'xlarge'}
+            size={screenSize === 'small' ? 'medium' : 'xxlarge'}
             style={{ 
               textDecoration: activeView === item.link ? 'none' : 'none', 
               width: screenSize === 'small' ? '100%' : 'auto',           
             }}
-
           >
             {item.text}
           </StyledText>
@@ -154,39 +154,54 @@ const YieldHeader = (props: any) => {
   );
 
   return (
-    <Box
-      background='background-front'
-      direction='row'
-      pad={{ horizontal:'small', vertical:'large' }}
-      justify='between'
-      fill='horizontal'
-      align='center'
-      // width={{ max:'1200px' }}
-    >
-      <Box>
-        <Image src={theme.dark ? logoLight : logoDark} fit="contain" />
-      </Box>
+    <Box fill>
+      <Box
+        direction='row'
+        pad={{ horizontal:'small', top:'large' }}
+        justify='between'
+        fill='horizontal'
+      >
+        <Box alignSelf='start'>
+          <Image src={theme.dark ? logoLight : logoDark} fit="contain" />
+        </Box>
 
-      <Box alignSelf='center'>
-        { screenSize === 'small' ? 
-          <MobileNav /> 
-          : 
-          <Nav />}
-      </Box>
 
-      <Box direction='row' gap='small'>
-        {screenSize === 'small' ? (
-          <MenuButton />
-        ) : (
-          <Box direction="row" align="center" gap="small">
-            <AccountButton {...props} />
-          </Box>
-        )}
-        <FlatButton 
+
+        <Box direction='row' gap='small'>
+          {screenSize === 'small' ? (
+            <MenuButton />
+          ) : (
+            <Box direction="row" align="center" gap="small">
+              <AccountButton {...props} />
+            </Box>
+          )}
+          {/* <FlatButton 
           onClick={()=>console.log('xys')}
           label={<Box pad={{ horizontal:'small' }}><Telescope /></Box>}
-        />
+        /> */}
+        </Box>
       </Box>
+
+      <Box
+        direction='row'
+        justify='center'
+        pad={{ horizontal:'small', top:'large' }}
+        fill='horizontal'
+      >
+        <Box alignSelf='center'>
+          { screenSize === 'small' ? 
+            <MobileNav /> 
+            : 
+            <Nav />}
+        </Box>
+
+
+
+      </Box>
+
+
+
+
     </Box>
   );
 };

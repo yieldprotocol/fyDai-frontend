@@ -1,8 +1,8 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Box, Button, Text} from 'grommet';
+import { Box, Button, Text } from 'grommet';
 
-import {modColor} from '../utils';
+import { modColor } from '../utils';
 
 const StyledButton = styled(Button)`
   border-radius: 25px;

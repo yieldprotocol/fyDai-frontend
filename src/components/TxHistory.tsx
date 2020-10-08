@@ -48,23 +48,26 @@ const TxHistory = ( { filterTerms, series }:HistoryProps) => {
     return (
       <Box 
         direction='row' 
-        justify='between'
-        pad='small'     
+        // justify='between'
+        pad='small' 
+        fill='horizontal'    
       > 
         { (item.event === 'Borrowed') && 
-        <Box>
+        <Box fill>
           <Text size='xxsmall'>Amount owed @ maturity</Text>
           <Text size='xsmall'>{Math.abs(item.fyDai_).toFixed(2)} Dai</Text>
         </Box> }
         
         { (item.event === 'Lent' ) && 
-        <Box>
+        <Box fill>
           <Text size='xxsmall'>Amount redeemable @ maturity</Text>
           <Text size='xsmall'>{Math.abs(item.fyDai_).toFixed(2)} Dai</Text>
         </Box> }
 
-        <Box alignSelf='end'>
-          <EtherscanButton txHash={item.transactionHash} />
+        <Box fill>
+          <Box alignSelf='end'>
+            <EtherscanButton txHash={item.transactionHash} />
+          </Box>
         </Box>
       </Box>   
     );

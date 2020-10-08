@@ -23,32 +23,12 @@ import NotifyLayer from './containers/layers/NotifyLayer';
 // TODO: remove testLayer for prod
 import TestLayer from './containers/layers/TestLayer';
 import Authorization from './components/Authorization';
+import styled from 'styled-components';
 
 // const LendView = React.lazy(() => import('./views/LendView'));
 // const PoolView = React.lazy(() => import('./views/PoolView'));
 // const BorrowView = React.lazy(() => import('./views/BorrowView'));
 // const Dashboard = React.lazy(() => import('./views/Dashboard'));
-
-const ThemedApp = () => {
-  const [darkMode, setDarkMode] = useState(false);
-  const [partyMode, setPartyMode] = useState(false);
-  return (
-    <Suspense fallback={null}>
-      <Grommet
-        theme={deepMerge(base, yieldTheme)}
-        themeMode={darkMode ? 'dark' : 'light'}
-        full
-      >
-        <App 
-          darkMode={darkMode}
-          setDarkMode={setDarkMode}
-          partyMode={partyMode}
-          setPartyMode={setPartyMode}
-        />     
-      </Grommet>
-    </Suspense>
-  );
-};
 
 const App = (props:any) => {
 
@@ -170,6 +150,31 @@ const App = (props:any) => {
           </Nav>
         </Layer>}
     </div>
+  );
+};
+
+const StyledApp = styled(App)`
+    background-color: #333333;
+`;
+
+const ThemedApp = () => {
+  const [darkMode, setDarkMode] = useState(false);
+  const [partyMode, setPartyMode] = useState(false);
+  return (
+    <Suspense fallback={null}>
+      <Grommet
+        theme={deepMerge(base, yieldTheme)}
+        themeMode={darkMode ? 'dark' : 'light'}
+        full
+      >
+        <StyledApp 
+          darkMode={darkMode}
+          setDarkMode={setDarkMode}
+          partyMode={partyMode}
+          setPartyMode={setPartyMode}
+        />     
+      </Grommet>
+    </Suspense>
   );
 };
 
