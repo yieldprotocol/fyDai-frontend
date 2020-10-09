@@ -1,16 +1,13 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { Layer, Box, DropButton, Button, TextInput, Header, Text, Heading, Footer, Collapsible, ThemeContext, Grid } from 'grommet';
+import React, { useContext } from 'react';
+import { Layer, Box, Text, Grid } from 'grommet';
 import {
   FiCheckCircle as CheckCircle,
-  FiX as Close,
   FiInfo as Info,
   FiXCircle as Error,
   FiAlertTriangle as Warn,
 } from 'react-icons/fi';
 
 import { NotifyContext } from '../../contexts/NotifyContext';
-import RaisedButton from '../../components/RaisedButton';
-import FlatButton from '../../components/FlatButton';
 
 function NotifyLayer(target:any, columnsWidth:any) {
 

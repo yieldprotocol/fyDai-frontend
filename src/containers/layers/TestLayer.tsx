@@ -426,7 +426,6 @@ const TestLayer = (props:any) => {
             }
           }
           />
-
           <Button
             alignSelf='end'
             label='reload app' 
@@ -436,7 +435,6 @@ const TestLayer = (props:any) => {
             }
           }
           />
-
         </Footer>
       </Box>
     </Layer>
