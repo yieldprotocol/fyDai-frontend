@@ -100,14 +100,10 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
           justify='around'
           background='#555555'
         >
-          {/* {!buttonOnly && <Text color={series.seriesTextColor}> <Warning /> </Text>}
-          {!buttonOnly && <Text size='xsmall' color={series.seriesTextColor}>A once-off authorization is required to use this series</Text>} */}
           {!buttonOnly && <Text color='#DDDDDD'> <Warning /> </Text>}
           {!buttonOnly && <Text size='xsmall' color='#DDDDDD'>A once-off authorization is required to use this series</Text>}
           <Box>
             <RaisedButton 
-              // background={modColor( series.seriesColor, 40)}
-              // label={<Text size='xsmall' color={series.seriesTextColor}><Unlock /> {screenSize==='small'? '' : 'Unlock Series'}</Text>}
               background='#555555'
               label={<Text size='xsmall' color='#DDDDDD'><Unlock /> {screenSize==='small'? '' : 'Unlock Series'}</Text>}
               onClick={()=>{authProcedure();}}
@@ -121,7 +117,7 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
           onClickOutside={()=>closeAuth()}
         >
           <Box 
-            width={screenSize!=='small'?{ min:'600px', max:'600px' }: undefined}
+            width={screenSize!=='small'?{ min:'620px', max:'620px' }: undefined}
             round
             background='background'
             pad='large'

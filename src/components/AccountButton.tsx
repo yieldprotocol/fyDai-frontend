@@ -108,7 +108,8 @@ const AccountButton = (props: any) => {
           pad="none"
           align='center'
           gap='medium'
-          width={{ min:'600px', max:'600px' }}   
+          // width={{ min:'600px', max:'600px' }} 
+          width={screenSize!=='small'?{ min:'620px', max:'620px' }: undefined}  
         >
           <TxStatus msg='tx pending' tx={pendingTxs[pendingTxs.length-1]} />
           <Box alignSelf='start' pad='medium'> 

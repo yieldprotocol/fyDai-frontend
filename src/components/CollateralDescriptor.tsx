@@ -4,16 +4,7 @@ import { Box, Text, ThemeContext, ResponsiveContext, Image, Collapsible } from '
 
 import { SeriesContext } from '../contexts/SeriesContext';
 
-import logoDark from '../assets/images/logo.svg';
-import logoLight from '../assets/images/logo_light.svg';
-
-import SeriesSelector from './SeriesSelector';
-import AprBadge from './AprBadge';
-import Authorization from './Authorization';
-import Loading from './Loading';
 import RaisedButton from './RaisedButton';
-import { modColor } from '../utils';
-import EthMark from './logos/EthMark';
 
 interface ICollateralDescriptorProps {
   backToBorrow:any;
