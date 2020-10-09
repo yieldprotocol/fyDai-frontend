@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState, useContext, Suspense } from 'react';
 
-import { Grommet, base, Grid, Main, Box, ResponsiveContext, Text, Nav, Layer, Collapsible } from 'grommet';
+import { Grommet, base, Grid, Main, Box, ResponsiveContext, Nav, Layer, Collapsible } from 'grommet';
 import { deepMerge } from 'grommet/utils';
 import { yieldTheme } from './themes';
 
@@ -26,22 +26,13 @@ import Authorization from './components/Authorization';
 import { modColor } from './utils';
 import ErrorBoundary from './components/ErrorBoundry';
 
-// const LendView = React.lazy(() => import('./views/LendView'));
-// const PoolView = React.lazy(() => import('./views/PoolView'));
-// const BorrowView = React.lazy(() => import('./views/BorrowView'));
-// const Dashboard = React.lazy(() => import('./views/Dashboard'));
-
 const App = (props:any) => {
-
   const { state: { seriesLoading, activeSeries } } = useContext(SeriesContext);
-  const { state : { authorizations : { hasDelegatedProxy } } } = useContext(UserContext);
-
+  // const { state : { authorizations : { hasDelegatedProxy } } } = useContext(UserContext);
   const { state: { yieldLoading } } = useContext(YieldContext);
 
   // TODO Switch out for react router
   const [activeView, setActiveView] = useState<string>('BORROW');
-  const [borrowActiveView, setBorrowActiveView] = useState<number>(1);
-
   const [showConnectLayer, setShowConnectLayer] = useState<string|null>(null);
   const [showSeriesLayer, setShowSeriesLayer] = useState<boolean>(false);
 
@@ -50,34 +41,27 @@ const App = (props:any) => {
 
   const leftSideRef = useRef<any>(null);
 
-  const [appReady, setAppReady] = useState<boolean>(false);
-
   const screenSize = useContext(ResponsiveContext);
   const [columnsWidth, setColumnsWidth] = useState<string[]>(['5%', 'auto', '5%']);
 
   useEffect(()=> {
     if (screenSize === 'small') { 
       setColumnsWidth(['0%', 'auto', '0%']);
-    } else {
+    } else { 
       setColumnsWidth(['5%', 'auto', '5%']);
     }
   }, [screenSize]);
-
-
-  useEffect(()=> {
-    !yieldLoading && !seriesLoading && setAppReady(true);
-    // console.log(leftSideRef.current);
-
-  }, [yieldLoading, seriesLoading, hasDelegatedProxy]);
 
   return (
 
     <div 
       className="App" 
       style={
-        activeSeries && 
-        props.moodLighting && 
-        { background: `radial-gradient(at 90% 90%, transparent 70%, ${modColor(activeSeries.seriesColor, 100)})` }
+        ( activeSeries && props.moodLight) ? 
+          { background: `radial-gradient(at 90% 90%, transparent 75%, ${modColor(activeSeries.seriesColor, 50)})`}
+          :
+          undefined
+          // { background: 'radial-gradient(at 90% 90%, transparent 70%, #00000010)', transition: 'all 1s ease-in' }
       }
     >
       <ConnectLayer view={showConnectLayer} closeLayer={() => setShowConnectLayer(null)} />
@@ -131,8 +115,8 @@ const App = (props:any) => {
             setShowTestLayer={setShowTestLayer}
             darkMode={props.darkMode}
             setDarkMode={props.setDarkMode}
-            moodLighting={props.moodLighting}
-            toggleMoodLighting={props.toggleMoodLighting}
+            moodLight={props.moodLight}
+            toggleMoodLight={props.toggleMoodLight}
             openConnectLayer={() => setShowConnectLayer('CONNECT')}
           />}                  
         <Box />      
@@ -165,7 +149,7 @@ const App = (props:any) => {
 
 const ThemedApp = () => {
   const [darkMode, setDarkMode] = useState(false);
-  const [ moodLighting, setMoodLighting] = useState(true);
+  const [ moodLight, setMoodLight] = useState(true);
   return (
     <Suspense fallback={null}>
       <Grommet
@@ -177,8 +161,8 @@ const ThemedApp = () => {
           <App 
             darkMode={darkMode}
             setDarkMode={setDarkMode}
-            moodLighting={moodLighting}
-            toggleMoodLighting={setMoodLighting}
+            moodLight={moodLight}
+            toggleMoodLight={()=>setMoodLight(!moodLight)}
           />
         </ErrorBoundary>
       </Grommet>
