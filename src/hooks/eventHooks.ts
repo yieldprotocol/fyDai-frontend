@@ -28,10 +28,7 @@ const contractMap = new Map<string, any>([
  * @returns { function } getEvents
  */
 export const useEvents = () => {
-  // const { state: { provider } } = useContext(ConnectionContext);
   const { provider } = useSignerAccount();
-  const [ eventListenerList, setEventListenerList ] = useState<boolean>();
-  const [ isLoading, setIsLoading ] = useState<boolean>();
 
   /**
    * Setup an event listener.
@@ -96,6 +93,6 @@ export const useEvents = () => {
     return parsedList;
   };
 
-  return { getEventHistory, addEventListener, parseEventList, isLoading, eventListenerList } as const;
+  return { getEventHistory, addEventListener, parseEventList } as const;
 
 };

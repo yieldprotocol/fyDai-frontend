@@ -46,7 +46,6 @@ const createTypedDelegableData = (message: IDelegableMessage, domain: IDomain) =
 const auths = new Map([
   [1, { id: 1, desc:'Allow the Yield smart contracts to interact on your behalf' }],
   [2, { id: 2, desc:'Allow the Yield smart contracts to interact with Dai on your behalf' }],
-  
   [3, { id: 3, desc:'Allow the Yield smart contracts to interact with this series on your behalf' }],
   [4, { id: 4, desc:'Allow the Yield smart contracts to trade Dai on your behalf' }],
   [5, { id: 5, desc:'Allow the Yield smart contracts to trade fyDai on your behalf' }],
@@ -156,7 +155,6 @@ export const useAuth = () => {
     dispatch({ type: 'requestSigs', payload:[] });
     setAuthActive(false);
   };
-
 
   /**
    * Series/Pool authorizations that are required for each series.

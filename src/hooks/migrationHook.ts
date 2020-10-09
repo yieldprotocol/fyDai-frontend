@@ -61,7 +61,6 @@ export const useMigrations = () => {
     const contract = new ethers.Contract(migrationsAddress, migrationAbi, fallbackProvider );
     await contract.version();
   };
-
   return {
     getAddresses, getYieldVersion
   } as const;

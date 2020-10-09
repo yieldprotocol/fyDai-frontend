@@ -581,12 +581,6 @@ export const useProxy = () => {
     setBuyActive(false);
   };
 
-  // buyDaiWithSignature(address pool, address to, uint128 daiOut, uint128 maxFYDaiIn, bytes memory signature)
-
-  // TODO Add these two ONLY if required
-  const sellFYDai = () => {};
-  const buyFYDai = () => {};
-
   /**
    * SPLITTER SECTION
    *  */
@@ -649,8 +643,6 @@ export const useProxy = () => {
     sellDai, sellActive,
     buyDai, buyActive,
     buyDaiNoSignature,
-    // sellFYDai,
-    // buyFYDai,
 
     /* Splitter fns */
     makerToYield,

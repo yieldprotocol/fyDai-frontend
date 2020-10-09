@@ -27,7 +27,6 @@ export const useController = () => {
   const { signer, fallbackProvider, account } = useSignerAccount();
   const  { dispatch }  = useContext<any>(NotifyContext);
   const { state : { deployedContracts } } = useContext<any>(YieldContext);
-
   const [ postActive, setPostActive ] = useState<boolean>(false);
   const [ withdrawActive, setWithdrawActive ] = useState<boolean>(false);
   const [ borrowActive, setBorrowActive ] = useState<boolean>(false);
@@ -57,6 +56,7 @@ export const useController = () => {
       fallbackProvider
     ));
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.log(e);
     }
 
@@ -64,6 +64,8 @@ export const useController = () => {
 
 
   /**
+   * NB: USE PROXYHOOK FOR ETH-A DEPOSITS
+   * 
    * Posts 'wrapped' collateral (Weth or Chai) - not ETH directly.
    * @param {string} collateral 'ETH-A' || 'CHAI'
    * @param {number} amount amount of collateral to post (in normal human numbers)
@@ -94,6 +96,8 @@ export const useController = () => {
   };
 
   /**
+   * NB: USE PROXYHOOK FOR ETH-A WITHDRAWS
+   * 
    * Withdraws 'wrapped' collateral (Weth or Chai) - not ETH directly.
    * @param {string} controllerAddress address of the Controller (remnant of older protocol)
    * @param {string} collateral 'ETH-A' || 'CHAI'
@@ -125,6 +129,8 @@ export const useController = () => {
   };
 
   /**
+   * NB: USE PROXYHOOK FOR AUTOMMATIC TRADING
+   * 
    * Borrow fyDai with available, posted collateral directly (any type of collateral).
    * @note Direct transaction with no pool trading (doesn't automatically sell fyDai for Dai)
    * 
@@ -161,6 +167,9 @@ export const useController = () => {
   };
 
   /**
+   * 
+   * NB: USE PROXYHOOK FOR REPAYMENTS 
+   * 
    * Repay fyDai debt directly with either Dai or FYDai.
    * @note Direct transaction with no pool trading.
    * 
@@ -313,7 +322,6 @@ export const useController = () => {
     }
     return res;
   };
-
 
   /**
    * @dev Total debt of an user across ALL series, in Dai

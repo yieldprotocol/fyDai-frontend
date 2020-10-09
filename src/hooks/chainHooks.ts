@@ -11,8 +11,6 @@ import Migrations from '../contracts/Migrations.json';
 import Pool from '../contracts/Pool.json';
 import Vat from '../contracts/Vat.json';
 
-// ethers.errors.setLogLevel('error');
-
 const contractMap = new Map<string, any>([
   ['FYDai', FYDai.abi],
   ['Controller', Controller.abi],
@@ -37,7 +35,7 @@ export const useContractAbi = (contractName:string) =>{
  */
 export const useSendTx = () => {
   // const { state: { signer, account } } = useContext(ConnectionContext);
-  const { signer, account } = useSignerAccount();
+  const { signer } = useSignerAccount();
   const [ sendTxActive, setSendTxActive ] = useState<boolean>();
   /**
    * Send a transaction ()
@@ -49,16 +47,20 @@ export const useSendTx = () => {
    */
   const sendTx = async (contractAddr:string, contractName:string, fn:string, data:any[], value:ethers.BigNumber ) => {
     let tx;
+    // eslint-disable-next-line no-console
     console.log(contractAddr, contractMap.get(contractName), signer); 
     setSendTxActive(true);
     const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), signer);
     if (!value.isZero()) {
+      // eslint-disable-next-line no-console
       console.log(`Tx sends ETH: ${value.toString()} `);
       tx = await contract[fn](...data, { value });
     } else {
+      // eslint-disable-next-line no-console
       console.log('Tx has no ETH associated with it (except gas, obs)');
       tx = await contract[fn](...data);
     }
+    // eslint-disable-next-line no-console
     console.log(`${tx.hash} pending`);
     await tx.wait();
     setSendTxActive(false);

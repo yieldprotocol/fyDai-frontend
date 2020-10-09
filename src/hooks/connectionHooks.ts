@@ -66,7 +66,7 @@ const useInactiveListener = (suppress: boolean = false) => {
   const { active, error, activate, account: _account, chainId: _chainId } = useWeb3React();
   const { handleErrorMessage } = useWeb3Errors();
 
-  const [ cachedChainId, setCachedChainId ] = useCachedState('cache_chainId', null);
+  const [ cachedChainId ] = useCachedState('cache_chainId', null);
 
   // eslint-disable-next-line consistent-return
   useEffect((): any => {
@@ -207,11 +207,13 @@ const useWeb3Errors = ()=> {
 
   const handleErrorMessage = (error: Error) => {
     if (error instanceof NoEthereumProviderError) {
+      // eslint-disable-next-line no-console
       console.log(NO_BROWSER_EXT);
       notifyDispatch( { type:'notify', payload:{ message: NO_BROWSER_EXT, type: 'info' } });
       return NO_BROWSER_EXT;
     }
     if (error instanceof UnsupportedChainIdError) {
+      // eslint-disable-next-line no-console
       console.log(UNSUPPORTED_NETWORK);
       notifyDispatch( { type:'notify', payload:{ message: UNSUPPORTED_NETWORK, type: 'error' } });
       return UNSUPPORTED_NETWORK;
@@ -222,6 +224,7 @@ const useWeb3Errors = ()=> {
       notifyDispatch( { type:'notify', payload:{ message: UNAUTHORISED_SITE, type: 'info' } });
       return UNAUTHORISED_SITE;
     }
+    // eslint-disable-next-line no-console
     console.error(error);
     notifyDispatch( { type:'notify', payload:{ message: UNKNOWN_ERROR, type: 'info' } });
     return  UNKNOWN_ERROR;
@@ -248,26 +251,4 @@ export function useSignerAccount() {
     })();
   }, [account, altProvider]);
   return { signer, provider, account, voidSigner, fallbackProvider };
-}
-
-// TODO: get rid of this
-export function useConnectorImage() {
-  const { connector } = useWeb3React();
-  const [ image, setImage ] = useState<any>();
-  useEffect(() => {
-    switch (connector) {
-      case injected:
-        setImage(injectedImage);
-        break;
-      case walletconnect:
-        setImage(walletconnectImage);
-        break;
-      case torus:
-        setImage(torusImage);
-        break;
-      default:
-        setImage(noConnectionImage);
-    }
-  }, [connector]);
-  return image;
 }

@@ -17,7 +17,7 @@ import { YieldContext } from '../contexts/YieldContext';
 export const useMath = () => {
   const { state: { feedData } } = useContext(YieldContext);
   const [ ilks, setIlks ] = useState<any>();
-  
+
   useEffect(()=>{
     feedData.ilks && setIlks(feedData.ilks);
   }, [feedData]);
@@ -61,7 +61,6 @@ export const useMath = () => {
    * @returns {BigNumber} in Ray
    */
   const collRatio = ( _collateralValue:BigNumber, _debtValue:BigNumber ) => {
-
     if (_debtValue.eq(0) ) {
       // handle this case better
       return BigNumber.from(0);
@@ -126,8 +125,6 @@ export const useMath = () => {
     _liquidationRatio:number
   ) => {
     if (_collateralAmount.eq(0)) {
-      // // Do something here to handle 0 collateral
-      // const ratio = createCurrencyRatio(USD, _collateralAmount.type);
       // handle this case better
       return BigNumber.from(0);
     }

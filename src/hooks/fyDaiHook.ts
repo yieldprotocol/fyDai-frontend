@@ -14,12 +14,10 @@ import { cleanValue } from '../utils';
  * @returns { boolean } redeemActive
  */
 export const useFYDai = () => {
-
   const { provider, signer, account } = useSignerAccount();
   const { abi: fyDaiAbi } = FYDai;
   const  { dispatch }  = useContext<any>(NotifyContext);
   const [ redeemActive, setRedeemActive ] = useState<boolean>(false);
-  
   const { handleTx, handleTxBuildError } = useTxHelpers();
 
   /**

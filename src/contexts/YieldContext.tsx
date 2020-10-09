@@ -15,7 +15,6 @@ import { IYieldSeries } from '../types';
 const YieldContext = createContext<any>({});
 
 const fyDaiList = ['20Oct9', '20Oct31', '20Dec31', '21Mar31', '21Jun30', '21Sep30', '21Dec31'];
-// const fyDaiLPList = ['fyDaiLP20Oct5', 'fyDaiLP20Oct6', 'fyDaiLP20Oct9', 'fyDaiLP20Oct31', 'fyDaiLP20Dec31', 'fyDaiLP21Mar31', 'fyDaiLP21Jun30', 'fyDaiLP21Sep30', 'fyDaiLP21Dec31'];
 const seriesColors = ['#ff86c8', '#82d4bb', '#6ab6f1', '#cb90c9', '#aed175', '#f0817f', '#ffbf81', '#95a4db', '#ffdc5c'];
 const contractList = [
   'Controller',
@@ -76,7 +75,7 @@ const initState = {
 
 const YieldProvider = ({ children }: any) => {
   const [state, dispatch] = useReducer(reducer, initState);
-  const { account, provider, fallbackProvider } = useSignerAccount();
+  const { provider, fallbackProvider } = useSignerAccount();
   const { dispatch: notifyDispatch } = useContext(NotifyContext);
 
   /* cache|localStorage declarations */
@@ -87,7 +86,7 @@ const YieldProvider = ({ children }: any) => {
   /* hook declarations */
   const [ callTx ] = useCallTx();
   const { addEventListener } = useEvents();
-  const { getAddresses } = useMigrations();
+  const { getAddresses, getYieldVersion } = useMigrations();
 
   /**
    * @dev internal fn: Get all public Yield addresses from localStorage (or chain if no cache)
@@ -139,7 +138,6 @@ const YieldProvider = ({ children }: any) => {
     } else {
       _deployedSeries.push(...cachedSeries);
     }
-
     return [_deployedSeries, _deployedContracts];
   };
 
@@ -177,7 +175,9 @@ const YieldProvider = ({ children }: any) => {
    */
   const _getYieldData = async (_deployedContracts: any, _deployedSeries: IYieldSeries[]): Promise<any> => {
     const _yieldData: any = {};
-    // _yieldData.ethPosted = await collateralPosted(deployedContracts.Controller, 'ETH-A');
+    _yieldData.version = await getYieldVersion();
+
+    console.log('Version:', _yieldData.version);
     return {
       ..._yieldData,
     };

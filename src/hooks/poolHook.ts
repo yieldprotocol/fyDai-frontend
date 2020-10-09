@@ -273,8 +273,7 @@ export const usePool = () => {
             value = await contract.sellFYDaiPreview(parsedAmount); break;
           default: 
             value = await BigNumber.from('0');
-        } 
-        console.log('PREVIEW: ', value.toString());
+        }
         setCallActive(false);
         return value; 
       }

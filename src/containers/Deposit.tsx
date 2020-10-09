@@ -108,7 +108,7 @@ const Deposit = ({ openConnectLayer, setActiveView, modalView, depositAmount }:D
       const pl = parseFloat(maxDaiAvailable_) + newPower;
       setMaxPower(pl.toFixed(2));
     }
-  }, [ethBalance, maxDaiAvailable_]);
+  }, [ethBalance_, ethPrice_, maxDaiAvailable_]);
 
   /* Handle debounced input value changes */
   useEffect(()=>{
@@ -141,11 +141,10 @@ const Deposit = ({ openConnectLayer, setActiveView, modalView, depositAmount }:D
       !inputValue ||
       parseFloat(inputValue) <= 0    
     ) ? setDepositDisabled(true) : setDepositDisabled(false);
-  }, [inputValue]);
+  }, [inputValue, ethBalance]);
 
   /* Handle input exceptions and warnings */
   useEffect(()=>{ 
-     
     if ( ethBalance && debouncedInput && ( ethers.utils.parseEther(debouncedInput).gt(ethBalance) ) ) {
       setWarningMsg(null);
       setErrorMsg('That amount exceeds your available ETH balance'); 
@@ -159,7 +158,7 @@ const Deposit = ({ openConnectLayer, setActiveView, modalView, depositAmount }:D
       setWarningMsg(null);
       setErrorMsg(null);
     }
-  }, [debouncedInput]);
+  }, [debouncedInput, ethBalance]);
 
   return (
     <Keyboard 
