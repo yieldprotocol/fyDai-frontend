@@ -1,38 +1,21 @@
-import React, { useState, useEffect, useContext } from 'react';
-
-import { useWeb3React } from '@web3-react/core';
-
+import React, { useState, useContext } from 'react';
+import styled from 'styled-components';
 import {
   Text,
   Image,
-  Header,
   Button,
   Box,
   ThemeContext,
   ResponsiveContext,
-  Layer,
-  Menu,
-  Collapsible,
-  Stack
+  Layer
 } from 'grommet';
-
-import { 
-  VscTelescope as Telescope,
-} from 'react-icons/vsc';
-
-import styled from 'styled-components';
+import { VscTelescope as Telescope } from 'react-icons/vsc';
 
 import logoDark from '../assets/images/logo.svg';
 import logoLight from '../assets/images/logo_light.svg';
-import YieldLogo from './logos/YieldLogo';
 
-import { NotifyContext } from '../contexts/NotifyContext';
-import { YieldContext } from '../contexts/YieldContext';
-import TxStatus from  './TxStatus';
-import FlatButton from './FlatButton';
-import Authorization from './Authorization';
 import AccountButton from './AccountButton';
-
+import FlatButton from './FlatButton';
 
 const StyledText = styled(Text)`
   transition: all 0.5s ease-in-out;
@@ -44,21 +27,12 @@ const StyledText = styled(Text)`
   }
 `;
 
-interface LinkProps {
-  link: string;
-  text: string;
-  disabled: boolean;
-}
-
 const YieldHeader = (props: any) => {
-  const { account } = useWeb3React();
   const {
     activeView,
     setActiveView,
   } = props;
 
-  const { state: { pendingTxs, lastCompletedTx } } = useContext(NotifyContext);
-  const { state: { yieldLoading } } = useContext(YieldContext);
   const screenSize = useContext(ResponsiveContext);
 
   // Menu state for mobile later
@@ -165,8 +139,6 @@ const YieldHeader = (props: any) => {
           <Image src={theme.dark ? logoLight : logoDark} fit="contain" />
         </Box>
 
-
-
         <Box direction='row' gap='small'>
           {screenSize === 'small' ? (
             <MenuButton />
@@ -175,10 +147,10 @@ const YieldHeader = (props: any) => {
               <AccountButton {...props} />
             </Box>
           )}
-          {/* <FlatButton 
-          onClick={()=>console.log('xys')}
-          label={<Box pad={{ horizontal:'small' }}><Telescope /></Box>}
-        /> */}
+          <FlatButton 
+            onClick={()=>console.log('xys')}
+            label={<Box pad={{ horizontal:'small' }}><Telescope /></Box>}
+          /> 
         </Box>
       </Box>
 
@@ -194,14 +166,7 @@ const YieldHeader = (props: any) => {
             : 
             <Nav />}
         </Box>
-
-
-
       </Box>
-
-
-
-
     </Box>
   );
 };

@@ -1,9 +1,6 @@
 import React from 'react';
 import { Box, Text } from 'grommet';
-
-import { 
-  FiClock as Clock,
-} from 'react-icons/fi';
+import { FiClock as Clock } from 'react-icons/fi';
 
 const SeriesMatureBox = () => {
   return (

@@ -39,7 +39,6 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
 
   /* filter by isMature, then sort by maturity date  */
   useEffect(()=>{
-
     const sortedActive = new Map([...seriesData.entries()]
       .filter((x:any)=> !(x[1].isMature()) )
       .sort()
@@ -54,7 +53,6 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
     );
     const mergedMap = new Map([...sortedActive, ...sortedMature]);
     setSortedList(mergedMap);
-
   }, [seriesData]);
 
   return (
@@ -89,20 +87,16 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
             <Box basis={screenSize==='small'?'30%':'30%'}>
               <Text size='small' color='text-weak'>APR</Text>
             </Box>
-
             <Box fill='horizontal' direction='row' justify='between' gap='small'>
-
               <Box fill align={screenSize==='small'?'end':undefined}>
-                <Text size='small' color='text-weak'>SERIES NAME</Text>
+                <Text size='small' color='text-weak'>SERIES MATURITY</Text>
               </Box>
-
               <Box fill align={screenSize==='small'?'end':undefined}>
                 <Text size='small' color='text-weak'>
                   { viewMap.get(activeView.toUpperCase())?.head }         
                 </Text>
               </Box>
             </Box>
-
             { screenSize !== 'small' && 
               <Box direction='row' justify='end' basis='25%'>
                 <Text size='small' color='text-weak'> </Text>

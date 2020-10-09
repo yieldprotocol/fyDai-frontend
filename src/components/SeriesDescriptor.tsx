@@ -1,18 +1,14 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Box, Text, ThemeContext, ResponsiveContext, Button, Collapsible } from 'grommet';
+import { Box, Text, ResponsiveContext, Collapsible } from 'grommet';
+import { FiLayers as ChangeSeries } from 'react-icons/fi';
 
-import { 
-  FiLayers as ChangeSeries
-} from 'react-icons/fi';
-import { modColor, invertColor, contrastColor } from '../utils';
-
+import { modColor } from '../utils';
 
 import { SeriesContext } from '../contexts/SeriesContext';
 
 import SeriesSelector from './SeriesSelector';
 import AprBadge from './AprBadge';
 import Authorization from './Authorization';
-import Loading from './Loading';
 import RaisedButton from './RaisedButton';
 
 interface ISeriesDescriptorProps {
@@ -43,17 +39,16 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
           round='small'
           gap='small'
           pad={{ bottom:'small' }}
-
-          // background=${modColor( activeSeries?.seriesColor, 30)}
           background={`linear-gradient(to bottom right, 
           ${modColor( '#add8e6', -40)}, 
           ${modColor( '#add8e6', -20)},
           ${modColor( '#add8e6', 10)},
           ${modColor( '#add8e6', 0)},
-          ${modColor( activeSeries?.seriesColor, 40)}, 
-          ${modColor( activeSeries?.seriesColor, 40)}, 
-          ${modColor( activeSeries?.seriesColor, 40)}, 
-          ${modColor( activeSeries?.seriesColor, 40)}, 
+          ${modColor( activeSeries?.seriesColor, 50)}, 
+          ${modColor( activeSeries?.seriesColor, 50)}, 
+          ${modColor( activeSeries?.seriesColor, 50)}, 
+          ${modColor( activeSeries?.seriesColor, 50)},
+          ${modColor( activeSeries?.seriesColor, 50)}, 
           ${modColor( activeSeries?.seriesColor, 0)}, 
           ${modColor( activeSeries?.seriesColor, 0)})`}
           margin={{ bottom:'-16px' }}
@@ -90,7 +85,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
                 </Box>}
 
                 <RaisedButton
-                  background={modColor( activeSeries?.seriesColor, 40)}
+                  background={modColor( activeSeries?.seriesColor, 50)}
                   label={(screenSize !== 'small' ) ?        
                     <Box align='center' direction='row' gap='small' pad='xsmall'>
                       <Text size='xsmall' color={activeSeries?.seriesTextColor}> <ChangeSeries /> </Text>
@@ -108,7 +103,6 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
             </Box>
 
             <Box
-              // pad={!delegated? { horizontal:'medium' }: { horizontal:'medium', bottom:'medium' }}
               pad={{ horizontal:'medium' }}
             >
               <Collapsible open={seriesState && !seriesState.seriesLoading}>

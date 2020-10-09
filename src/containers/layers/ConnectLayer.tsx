@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-
+import styled, { css } from 'styled-components';
 import {
   Anchor,
   Layer,
@@ -8,23 +8,14 @@ import {
   Box,
   Text,
   ResponsiveContext,
-  Paragraph,
 } from 'grommet';
+import { FiArrowLeft as ArrowLeft} from 'react-icons/fi';
 
-import { 
-  FiArrowLeft as ArrowLeft,
-} from 'react-icons/fi';
-
-import styled, { css } from 'styled-components';
-import {
-  useConnection,
-  useSignerAccount,
-} from '../../hooks';
-
+import { useConnection, useSignerAccount } from '../../hooks';
 import { injected, torus, walletconnect } from '../../connectors';
+
 import metamaskImage from '../../assets/images/providers/metamask.png';
 import torusImage from '../../assets/images/providers/torus.png';
-
 import walletConnectImage from '../../assets/images/providers/walletconnect.png';
 
 import { UserContext } from '../../contexts/UserContext';
@@ -33,9 +24,6 @@ import RaisedButton from '../../components/RaisedButton';
 import FlatButton from '../../components/FlatButton';
 import TxHistory from '../../components/TxHistory';
 import EtherscanButton from '../../components/EtherscanButton';
-import { NotifyContext } from '../../contexts/NotifyContext';
-import { abbreviateHash } from '../../utils';
-
 
 const StyledBox = styled(Box)`
   background: #f8f8f8;
@@ -81,16 +69,14 @@ const StyledBox = styled(Box)`
 const ConnectLayer = ({ view, target, closeLayer }: any) => {
 
   const { state: { position, txHistory } } = useContext(UserContext);
-
   const screenSize = useContext(ResponsiveContext);
-  const { account, provider } = useSignerAccount();
-  const [ layerView, setLayerView] = useState<string>(view);
+  
   const { handleSelectConnector } = useConnection();
 
+  const { account, provider } = useSignerAccount();
+  const [ layerView, setLayerView] = useState<string>(view);
   const [ slippage, setSlippage] = useState<number>(1);
-
   const [ lastTx, setLastTx] = useState<any>(null);
-
   const [ histOpen, setHistOpen] = useState<string>('BORROW');
 
   const connectorList = [
@@ -185,7 +171,7 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                   >
                     <Text size='xsmall'>Last transaction: </Text>
                     <Text size='xxsmall'>{lastTx?.transactionHash} </Text>
-                    <Box >
+                    <Box>
                       <EtherscanButton txHash={lastTx?.transactionHash} /> 
                     </Box>
                   </Box>
@@ -262,11 +248,9 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
 
             { layerView === 'CONNECT' &&      
               <Box pad="medium" gap="small">
-
                 <Box align="center" pad="medium" gap="small">
                   <Text size='xxlarge' color='brand' weight='bold'>Connect a wallet</Text>
-
-                  <Paragraph>Try connecting with:</Paragraph>
+                  <Text>Try connecting with:</Text>
                   {connectorList.map((x) => (
                     <RaisedButton
                       onClick={() => { handleSelectConnector(x.connection); closeLayer();}}

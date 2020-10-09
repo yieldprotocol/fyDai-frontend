@@ -1,31 +1,27 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { useWeb3React } from '@web3-react/core';
-
+import React from 'react';
 import { Anchor, Footer, Text, Box } from 'grommet';
-
 import {
-  FiSun as Sun,
-  FiMoon as Moon,
   FiGithub as Github,
   FiInfo as Info,
   FiFileText as Docs,
   FiCodesandbox as Test,
 } from 'react-icons/fi';
 
+import { CgSleep as Moodlight } from 'react-icons/cg';
+
 // TODO: use theming context properly - no cheating :)
 import { yieldTheme } from '../themes';
-import { useSignerAccount } from '../hooks';
-import FlatButton from './FlatButton';
 
 const YieldFooter = (props: any) => {
   const {
     setShowTestLayer,
     showTestLayer,
-    setDarkMode,
-    darkMode,
-    openConnectLayer,
+    moodLight, 
+    toggleMoodLight,
+    // setDarkMode,
+    // darkMode,
+    // openConnectLayer,
   } = props;
-  const { account } = useSignerAccount();
 
   const IconSize = '1.15rem';
   const IconGap = 'small';
@@ -55,14 +51,6 @@ const YieldFooter = (props: any) => {
           <Info size={IconSize} />
         </Anchor>
       </Box>
-      {/* <Box>
-        {!account && (
-          <FlatButton
-            label={<Text size='small'>Connect wallet</Text>}
-            onClick={() => openConnectLayer()}
-          />
-        )}
-      </Box> */}
       <Box
         direction="row"
         gap={IconGap}
@@ -80,12 +68,12 @@ const YieldFooter = (props: any) => {
         >
           <Test size={IconSize} />
         </Anchor>
-        {/* <Anchor
-          onClick={()=>setDarkMode(!darkMode)}
-          color={yieldTheme.global.colors.brand.light}
+        <Anchor
+          onClick={()=>toggleMoodLight()}
+          color={moodLight? 'grey': 'pink'}
         >
-          {darkMode ? <Sun size={IconSize} /> : <Moon size={IconSize} />}
-        </Anchor> */}
+          <Moodlight />
+        </Anchor>
       </Box>
     </Footer>
   );

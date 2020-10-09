@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import moment from 'moment';
-import { Box, Text, Collapsible, Button } from 'grommet';
+import { Box, Text, Collapsible } from 'grommet';
 
 import {
   FiChevronDown as ChevronDown,
@@ -17,9 +17,8 @@ interface HistoryProps {
   series: IYieldSeries | null;
 }
 
-const TxHistory = ( { filterTerms, series }:HistoryProps) => {
-
-  const { state, actions } = useContext(UserContext);
+const TxHistory = ( { filterTerms, series }: HistoryProps) => {
+  const { state } = useContext(UserContext);
   const [ txHistory, setTxHistory] = useState<any>([]);
   const [ itemOpen, setItemOpen ] = useState<any>(null);
 
@@ -48,7 +47,6 @@ const TxHistory = ( { filterTerms, series }:HistoryProps) => {
     return (
       <Box 
         direction='row' 
-        // justify='between'
         pad='small' 
         fill='horizontal'    
       > 

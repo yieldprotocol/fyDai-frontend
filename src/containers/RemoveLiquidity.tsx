@@ -1,15 +1,11 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { ethers } from 'ethers';
-import { Box, Button, Layer, TextInput, Text, Keyboard, ThemeContext, ResponsiveContext, Collapsible } from 'grommet';
-import { 
-  FiArrowLeft as ArrowLeft,
-} from 'react-icons/fi';
-import YieldMark from '../components/logos/YieldMark';
+import { Box, Button, TextInput, Text, Keyboard, ResponsiveContext, Collapsible } from 'grommet';
+import { FiArrowLeft as ArrowLeft } from 'react-icons/fi';
 
 import { cleanValue } from '../utils';
 
 import { SeriesContext } from '../contexts/SeriesContext';
-import { YieldContext } from '../contexts/YieldContext';
 import { UserContext } from '../contexts/UserContext';
 
 import { useSignerAccount, useProxy, useTxActive, useDebounce, useIsLol } from '../hooks';
@@ -22,6 +18,8 @@ import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
 
+import YieldMark from '../components/logos/YieldMark';
+
 interface IRemoveLiquidityProps {
   close?: any;
 }
@@ -29,11 +27,9 @@ interface IRemoveLiquidityProps {
 const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
 
   const screenSize = useContext(ResponsiveContext);
-
-  const { state: yieldState, actions: yieldActions } = useContext(YieldContext);
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { activeSeries  } = seriesState;
-  const { state: userState, actions: userActions } = useContext(UserContext);
+  const { actions: userActions } = useContext(UserContext);
 
   const { account } = useSignerAccount();
   const { removeLiquidity } = useProxy();

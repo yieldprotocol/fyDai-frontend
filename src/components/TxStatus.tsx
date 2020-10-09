@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import { Box, Text, ResponsiveContext, ThemeContext } from 'grommet';
 
 import { FiCopy as Copy } from 'react-icons/fi';
@@ -23,6 +23,7 @@ const TxStatus= ({ msg, tx }:TxStatusProps) => {
   const screenSize = useContext(ResponsiveContext); 
   const txRef = React.useRef<any>(null);
 
+  // TODO: handle copy
   const handleCopy = () => {
     console.log(txRef.current); 
     // txRef.current?.innerText;

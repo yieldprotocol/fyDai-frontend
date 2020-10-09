@@ -1,11 +1,8 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { ethers } from 'ethers';
-import { Box, Button, Layer, TextInput, Text, Keyboard, ResponsiveContext } from 'grommet';
+import { Box, Layer, TextInput, Text, Keyboard, ResponsiveContext } from 'grommet';
 
-import { 
-  FiArrowLeft as ArrowLeft,
-} from 'react-icons/fi';
-import DaiMark from '../components/logos/DaiMark';
+import { FiArrowLeft as ArrowLeft } from 'react-icons/fi';
 
 import { cleanValue } from '../utils';
 
@@ -20,6 +17,8 @@ import ApprovalPending from '../components/ApprovalPending';
 import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
+
+import DaiMark from '../components/logos/DaiMark';
 
 interface IWithDrawDaiProps {
   close?: any;
@@ -38,14 +37,13 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
   const [ hasDelegated, setHasDelegated ] = useState<boolean>(true);
 
   const { previewPoolTx }  = usePool();
-  const { buyDai, buyDaiNoSignature, buyActive }  = useProxy();
+  const { buyDai }  = useProxy();
   const { account, fallbackProvider } = useSignerAccount();
 
   const [ inputValue, setInputValue ] = useState<any>();
   const debouncedInput = useDebounce(inputValue, 500);
   const [inputRef, setInputRef] = useState<any>(null);
 
-  const [ isGettingMax, setIsGettingMax ] = useState<boolean>(false);
   const [ maxWithdraw, setMaxWithdraw ] = useState<string>();
   
   const [ withdrawDisabled, setWithdrawDisabled ] = useState<boolean>(true);

@@ -16,10 +16,8 @@ import FlatButton from './FlatButton';
 import { UserContext } from '../contexts/UserContext';
 
 const HistoryWrap = ({ children, closeLayer, series } : any) => {
-
   const screenSize = useContext(ResponsiveContext);
   const { actions }= useContext(UserContext);
-
   return (
     <Layer
       onClickOutside={() => closeLayer(true)}

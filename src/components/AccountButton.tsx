@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
-
 import { useWeb3React } from '@web3-react/core';
 
 import {
@@ -16,11 +15,8 @@ import {
   FiArrowLeft as ArrowLeft,
 } from 'react-icons/fi';
 
-
 import { NotifyContext } from '../contexts/NotifyContext';
-import { YieldContext } from '../contexts/YieldContext';
 import { UserContext } from '../contexts/UserContext';
-import { SeriesContext } from '../contexts/SeriesContext';
 
 import FlatButton from './FlatButton';
 import DaiMark from './logos/DaiMark';
@@ -31,6 +27,8 @@ import { abbreviateHash } from '../utils';
 
 
 const AccountButton = (props: any) => {
+  
+  const { openConnectLayer } = props;
 
   const { account } = useWeb3React();
 
@@ -38,25 +36,12 @@ const AccountButton = (props: any) => {
   const completeRef:any = useRef(null);
   const [ over, setOver] = useState<boolean>(false);
 
-  const {
-    openConnectLayer,
-    activeView,
-    setActiveView,
-  } = props;
-
+  const { state: { position } } = useContext(UserContext);
   const { state: { pendingTxs, lastCompletedTx } } = useContext(NotifyContext);
-  const { state: { yieldLoading } } = useContext(YieldContext);
   const screenSize = useContext(ResponsiveContext);
 
-  const { state: { position } } = useContext(UserContext);
-  const { state: { activeSeries } } = useContext(SeriesContext);
-
-  // layer flags
-  // const [pendingLayerOpen, setPendingLayerOpen] = useState(false);
-  // const [completeLayerOpen, setCompleteLayerOpen] = useState(false);
+  // flags
   const [txStatusOpen, setTxStatusOpen] = useState(false);
-
-
   const [txCompleteOpen, setTxCompleteOpen] = useState(false);
 
   useEffect(()=>{

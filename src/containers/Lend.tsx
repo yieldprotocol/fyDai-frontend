@@ -1,15 +1,8 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { ethers } from 'ethers';
-import { Box, Button, Keyboard, TextInput, Text, ResponsiveContext, Collapsible } from 'grommet';
-
-import { 
-  FiArrowRight as ArrowRight,
-} from 'react-icons/fi';
-import { 
-  VscHistory as History,
-} from 'react-icons/vsc';
-
-import DaiMark from '../components/logos/DaiMark';
+import { Box, Keyboard, TextInput, Text, ResponsiveContext, Collapsible } from 'grommet';
+import { FiArrowRight as ArrowRight } from 'react-icons/fi';
+import { VscHistory as History } from 'react-icons/vsc';
 
 import { cleanValue } from '../utils';
 
@@ -37,17 +30,17 @@ import SeriesDescriptor from '../components/SeriesDescriptor';
 import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
-import Loading from '../components/Loading';
 import SeriesMatureBox from '../components/SeriesMatureBox';
 import TxHistory from '../components/TxHistory';
 import HistoryWrap from '../components/HistoryWrap';
 
+import DaiMark from '../components/logos/DaiMark';
+
 interface ILendProps {
   openConnectLayer:any;
-  lendAmount?:any
 }
 
-const Lend = ({ openConnectLayer, lendAmount }:ILendProps) => {
+const Lend = ({ openConnectLayer }:ILendProps) => {
 
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { activeSeries } = seriesState;
@@ -63,7 +56,7 @@ const Lend = ({ openConnectLayer, lendAmount }:ILendProps) => {
   const { account, fallbackProvider } = useSignerAccount();
   const [ txActive ] = useTxActive(['SELL_DAI']);
 
-  const [ hasDelegated, setHasDelegated ] = useState<boolean>(true);
+  const [ hasDelegated ] = useState<boolean>(true);
 
   const [ withdrawDaiOpen, setWithdrawDaiOpen ] = useState<boolean>(false);
   const [ histOpen, setHistOpen ] = useState<boolean>(false);
@@ -233,7 +226,6 @@ const Lend = ({ openConnectLayer, lendAmount }:ILendProps) => {
       >
         <Box flex='grow' gap='small' align='center' fill='horizontal'>
           {/* If the series has NOT matured, show the lending input */}
-          {/* <Loading condition={seriesState.seriesLoading} size='large'> */}
           { !activeSeries?.isMature() && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
             <>
               <Box fill gap='medium'>
@@ -277,11 +269,6 @@ const Lend = ({ openConnectLayer, lendAmount }:ILendProps) => {
                         value: `${fyDaiValue.toFixed(2)} DAI`,
                         valuePrefix: null,
                         valueExtra: null,
-                        //   valueExtra: () => (
-                        //   <Text size='xsmall'>
-                        //     {activeSeries && Moment(activeSeries.maturity_).format('DD MMMM YYYY')}
-                        //   </Text>
-                        // ),
                       },
                       {
                         label: 'Like what you see?',
@@ -326,7 +313,7 @@ const Lend = ({ openConnectLayer, lendAmount }:ILendProps) => {
                           Series Lend History
                         </Text>              
                       </Box>
-                }
+                    }
                   />
                 </Box>}
 
@@ -339,12 +326,10 @@ const Lend = ({ openConnectLayer, lendAmount }:ILendProps) => {
                         <Box><Text size='xsmall' color='text-weak'><Text weight='bold' color={activeSeries.seriesColor}>close</Text> your position in this series</Text></Box>
                         <ArrowRight color='text-weak' />
                       </Box>
-                }
+                    }
                   />
                 </Box>}
               </Box>
-
-
 
             </>}
           
@@ -366,7 +351,5 @@ const Lend = ({ openConnectLayer, lendAmount }:ILendProps) => {
     </Keyboard>
   );
 };
-
-Lend.defaultProps={ lendAmount:null };
 
 export default Lend;

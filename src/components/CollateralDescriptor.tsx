@@ -1,6 +1,5 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { Box, Text, ThemeContext, ResponsiveContext, Image, Collapsible } from 'grommet';
-
+import React, { useState, useContext } from 'react';
+import { Box, Text, Collapsible } from 'grommet';
 
 import { SeriesContext } from '../contexts/SeriesContext';
 
@@ -14,12 +13,8 @@ interface ICollateralDescriptorProps {
 function CollateralDescriptor( props: ICollateralDescriptorProps ) {
 
   const { backToBorrow, children } = props;
-  const theme = useContext<any>(ThemeContext);
-  const screenSize = useContext(ResponsiveContext);
-
   const { state: seriesState } = useContext(SeriesContext);
-  const [ selectorOpen, setSelectorOpen ] = useState<boolean>(false);
-  const [ delegated, setDelegated ] = useState<boolean>(true);
+  const [ delegated ] = useState<boolean>(true);
 
   return (
     <>

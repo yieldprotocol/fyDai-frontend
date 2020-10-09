@@ -9,13 +9,12 @@ import {
 import { useWeb3React, UnsupportedChainIdError } from '@web3-react/core';
 import { NetworkConnector } from '@web3-react/network-connector';
 
-import { injected, trezor, walletlink, torus } from '../connectors';
+import { injected, walletconnect, torus } from '../connectors';
 
 import injectedImage from '../assets/images/providers/metamask.png';
-import trezorImage from '../assets/images/providers/trezor.png';
-import walletlinkImage from '../assets/images/providers/walletlink.png';
 import torusImage from '../assets/images/providers/torus.png';
 import noConnectionImage from '../assets/images/providers/noconnection.png';
+import walletconnectImage from '../assets/images/providers/walletconnect.png';
 
 import { NotifyContext } from '../contexts/NotifyContext';
 
@@ -260,11 +259,8 @@ export function useConnectorImage() {
       case injected:
         setImage(injectedImage);
         break;
-      case trezor:
-        setImage(trezorImage);
-        break;
-      case walletlink:
-        setImage(walletlinkImage);
+      case walletconnect:
+        setImage(walletconnectImage);
         break;
       case torus:
         setImage(torusImage);

@@ -2,10 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import { Box, Layer, Keyboard, TextInput, Text, ResponsiveContext, Collapsible } from 'grommet';
 import ethers from 'ethers';
 
-import { 
-  FiArrowLeft as ArrowLeft,
-} from 'react-icons/fi';
-import EthMark from '../components/logos/EthMark';
+import { FiArrowLeft as ArrowLeft } from 'react-icons/fi';
 
 import { cleanValue } from '../utils';
 
@@ -19,6 +16,8 @@ import InputWrap from '../components/InputWrap';
 import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
+
+import EthMark from '../components/logos/EthMark';
 
 interface IWithDrawProps {
   close?: any;
@@ -40,7 +39,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
     debtValue_,
   } = position;
   
-  const { withdrawEth, withdrawEthActive }  = useProxy();
+  const { withdrawEth } = useProxy();
   const { estCollRatio: estimateRatio } = useMath();
   const [ txActive ] = useTxActive(['WITHDRAW']);
 
@@ -178,11 +177,6 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
                     value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
                     valuePrefix: '~',
                     valueExtra: null,
-                    // valueExtra: () => (
-                    //   <Text color='green' size='medium'> 
-                    //     { inputValue && collateralPercent_ && ( (estRatio-collateralPercent_) !== 0) && `(+ ${(estRatio-collateralPercent_).toFixed(0)}%)` }
-                    //   </Text>
-                    // )
                   },
                 ]}
                 />

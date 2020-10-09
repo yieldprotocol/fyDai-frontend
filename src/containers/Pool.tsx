@@ -1,15 +1,9 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { ethers } from 'ethers';
-import { Box, Button, Keyboard, TextInput, Text, ResponsiveContext, Collapsible, Layer } from 'grommet';
+import { Box, Keyboard, TextInput, Text, ResponsiveContext, Collapsible, Layer } from 'grommet';
 
-import { 
-  FiArrowRight as ArrowRight,
-} from 'react-icons/fi';
-import { 
-  VscHistory as History,
-} from 'react-icons/vsc';
-
-import DaiMark from '../components/logos/DaiMark';
+import { FiArrowRight as ArrowRight } from 'react-icons/fi';
+import { VscHistory as History } from 'react-icons/vsc';
 
 import { cleanValue } from '../utils';
 
@@ -36,14 +30,14 @@ import SeriesDescriptor from '../components/SeriesDescriptor';
 import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
-import Loading from '../components/Loading';
 import SeriesMatureBox from '../components/SeriesMatureBox';
 import TxHistory from '../components/TxHistory';
 import HistoryWrap from '../components/HistoryWrap';
 
+import DaiMark from '../components/logos/DaiMark';
+
 interface IPoolProps {
   openConnectLayer:any;
-  // lendAmount?:any
 }
   
 const Pool = ({ openConnectLayer }:IPoolProps) => {
@@ -51,7 +45,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { activeSeries } = seriesState;
   const { state: userState, actions: userActions } = useContext(UserContext);
-  const { daiBalance_, daiBalance } = userState.position;
+  const { daiBalance } = userState.position;
   const screenSize = useContext(ResponsiveContext);
 
   const { addLiquidity, addLiquidityActive } = useProxy();
@@ -63,7 +57,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
   const { account } = useSignerAccount();
   const [ txActive ] = useTxActive(['ADD_LIQUIDITY', 'REMOVE_LIQUIDITY']);
 
-  const [ hasDelegated, setHasDelegated ] = useState<boolean>(true);
+  const [ hasDelegated ] = useState<boolean>(true);
 
   const [ inputValue, setInputValue ] = useState<any>();
   const debouncedInput = useDebounce(inputValue, 500);
@@ -98,9 +92,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
 
     setCalculating(true);
     const daiReserves = await getBalance(deployedContracts.Dai, 'Dai', activeSeries.poolAddress);
-    console.log(daiReserves);
     const fyDaiReserves = await getBalance(activeSeries.fyDaiAddress, 'FYDai', activeSeries.poolAddress);
-    console.log(fyDaiReserves);
     const tokens_ = ethers.utils.parseEther(debouncedInput).mul(daiReserves).div(fyDaiReserves.add(daiReserves));
     const newBalance = tokens_.add(activeSeries.poolTokens); 
     const percent= ( parseFloat(ethers.utils.formatEther(newBalance)) / parseFloat(ethers.utils.formatEther(activeSeries.totalSupply)) )*100;
@@ -116,7 +108,6 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
   /* Add liquidity disabling logic */
   useEffect(()=>{
     (
-      // ( daiBalance && daiBalance.gt(ethers.constants.Zero) ) ||
       ( inputValue && daiBalance && ethers.utils.parseEther(inputValue).gt(daiBalance) ) ||  
       !account ||
       !hasDelegated ||
@@ -140,7 +131,11 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
     <Keyboard 
       onEsc={() => setInputValue(undefined)}
       onEnter={()=> addLiquidityProcedure()}
-      onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
+      onBackspace={()=> {
+        inputValue && 
+        (document.activeElement !== inputRef) && 
+        setInputValue(debouncedInput.toString().slice(0, -1));
+      }}
       target='document'
     >
       { removeLiquidityOpen && 
@@ -184,17 +179,6 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
               valuePrefix: null,
               valueExtra: null,
             },
-            // {
-            //   label: 'Dai Balance',
-            //   visible:
-            //       (!!account && txActive?.type !== 'ADD_LIQUIDITY' && !activeSeries?.isMature()) || 
-            //       (activeSeries?.isMature() && activeSeries?.poolTokens_>0 ),
-            //   active: true,
-            //   loading: addLiquidityPending,            
-            //   value: daiBalance_?`${daiBalance_} DAI`: '0 DAI',
-            //   valuePrefix: null,
-            //   valueExtra: null,
-            // },
           ]}
         /> 
       </SeriesDescriptor>   
@@ -210,7 +194,6 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
         gap='medium'
       >
         <Box flex='grow' gap='small' align='center' fill='horizontal'>
-          {/* <Loading condition={seriesState.seriesLoading} size='large'> */}
           
           { !(activeSeries?.isMature()) && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
             <>
@@ -282,7 +265,6 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
           { activeSeries?.isMature() &&
             <SeriesMatureBox />}
 
-
           <Box direction='row' fill justify='between'>
             { activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) && 
             <Box alignSelf='start' margin={{ top:'medium' }}>
@@ -314,8 +296,6 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
             </Box>}
           </Box>
 
-
-
           { !txActive && 
             !!account && 
             activeSeries?.isMature() && 
@@ -330,7 +310,5 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
     </Keyboard>
   );
 };
-
-Pool.defaultProps={ lendAmount:null };
 
 export default Pool;

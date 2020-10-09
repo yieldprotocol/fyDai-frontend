@@ -14,12 +14,11 @@ import {
   FiArrowRight as ArrowRight,
   FiArrowLeft as ArrowLeft,
 } from 'react-icons/fi';
-import { FaBullseye } from 'react-icons/fa';
-import EthMark from '../components/logos/EthMark';
 
 import { cleanValue } from '../utils';
 
 import { UserContext } from '../contexts/UserContext';
+import { YieldContext } from '../contexts/YieldContext';
 
 import { 
   useProxy, 
@@ -40,7 +39,8 @@ import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
 import CollateralDescriptor from '../components/CollateralDescriptor';
-import { YieldContext } from '../contexts/YieldContext';
+
+import EthMark from '../components/logos/EthMark';
 
 interface DepositProps {
   /* deposit amount prop is for quick linking into component */
@@ -48,7 +48,6 @@ interface DepositProps {
   openConnectLayer:any;
   modalView?:boolean;
   depositAmount?:string|BigNumber;
-
 }
 
 const Deposit = ({ openConnectLayer, setActiveView, modalView, depositAmount }:DepositProps) => {
@@ -180,25 +179,11 @@ const Deposit = ({ openConnectLayer, setActiveView, modalView, depositAmount }:D
               active: true,
               loading: !ethPosted_ && depositPending && ethPosted_ !== 0, 
               value: maxPower && `${maxPower} DAI`,           
-              // value: (maxPower && (maxPower !== 0))? `maxPower DAI`: '',
               valuePrefix: null,
               valueExtra: null, 
-            },
-            /* dummy placeholder */
-            // {
-            //   label: null,
-            //   labelExtra: null,
-            //   visible:
-            //       !!account &&
-            //       parseFloat(ethPosted_) === 0,
-            //   active: true,
-            //   loading: false,    
-            //   value: null,
-            //   valuePrefix: null,
-            //   valueExtra:null,
-            // },        
+            },       
             {
-              label: 'Did you know?', // 'Post some ETH collateral to start borrowing',
+              label: 'Did you know?',
               labelExtra: null,
               visible:
                   !!account &&
@@ -235,18 +220,6 @@ const Deposit = ({ openConnectLayer, setActiveView, modalView, depositAmount }:D
               valuePrefix: null,
               valueExtra: null, 
             },
-
-            // {
-            //   label: 'Did you know?',
-            //   visible: true,
-            //   active: true,
-            //   loading: false,            
-            //   value:'',
-            //   valuePrefix: null,
-            //   valueExtra: ()=> ( 
-            //     <Text size='xxsmall'>Collateral posted here can be used to borrow Dai from any Yield series.</Text>
-            //   ), 
-            // },
           ]}
         />
       </CollateralDescriptor>
@@ -301,11 +274,11 @@ const Deposit = ({ openConnectLayer, setActiveView, modalView, depositAmount }:D
                   loading: !ethPosted_ && depositPending && ethPosted_ !== 0,           
                   value: (estRatio && estRatio !== 0)? `${estRatio}%`: `${collateralPercent_}%` || '',
                   valuePrefix: null,
-                  valueExtra: () => (
-                    <Text color='green' size='medium'> 
-                      {/* { inputValue && collateralPercent_ && ( (estRatio-collateralPercent_) !== 0) && `(+ ${(estRatio-collateralPercent_).toFixed(0)}%)` } */}
-                    </Text>
-                  )
+                  // valueExtra: () => (
+                  //   <Text color='green' size='medium'> 
+                  //     {/* { inputValue && collateralPercent_ && ( (estRatio-collateralPercent_) !== 0) && `(+ ${(estRatio-collateralPercent_).toFixed(0)}%)` } */}
+                  //   </Text>
+                  // )
                 },
                 {
                   label: '',
@@ -337,7 +310,6 @@ const Deposit = ({ openConnectLayer, setActiveView, modalView, depositAmount }:D
               hasDelegatedPool={true}
             /> }
 
-
           <Box 
             direction='row'
             fill='horizontal'
@@ -361,7 +333,7 @@ const Deposit = ({ openConnectLayer, setActiveView, modalView, depositAmount }:D
                   <Box><Text size='xsmall' color='text-weak'><Text weight='bold'>withdraw</Text> collateral</Text></Box>
                   <ArrowRight color='text-weak' />
                 </Box>
-}
+              }
             />}
           </Box>
        

@@ -1,15 +1,8 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { ethers } from 'ethers';
 import { Keyboard, Box, TextInput, Text, ResponsiveContext, Collapsible, Layer } from 'grommet';
-
-import { 
-  FiArrowRight as ArrowRight,
-} from 'react-icons/fi';
-import { 
-  VscHistory as History,
-} from 'react-icons/vsc';
-
-import DaiMark from '../components/logos/DaiMark';
+import { FiArrowRight as ArrowRight } from 'react-icons/fi';
+import { VscHistory as History } from 'react-icons/vsc';
 
 import { abbreviateHash, cleanValue } from '../utils';
 
@@ -27,6 +20,9 @@ import {
   useIsLol,
 } from '../hooks';
 
+import Repay from './Repay';
+
+import DaiMark from '../components/logos/DaiMark';
 import SeriesDescriptor from '../components/SeriesDescriptor';
 import InputWrap from '../components/InputWrap';
 import ApprovalPending from '../components/ApprovalPending';
@@ -35,7 +31,6 @@ import InfoGrid from '../components/InfoGrid';
 import ActionButton from '../components/ActionButton';
 import RaisedButton from '../components/RaisedButton';
 import FlatButton from '../components/FlatButton';
-import Repay from './Repay';
 import SeriesMatureBox from '../components/SeriesMatureBox';
 import TxHistory from '../components/TxHistory';
 import HistoryWrap from '../components/HistoryWrap';
@@ -66,7 +61,7 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
 
   /* hooks init */
   const { borrow }  = useController();
-  const { previewPoolTx, callActive }  = usePool();
+  const { previewPoolTx }  = usePool();
   const { borrowDai, borrowActive } = useProxy();
   const { yieldAPR, estCollRatio: estimateRatio } = useMath();
   const { account } = useSignerAccount();
@@ -249,13 +244,14 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
                 <Box width={{ min:'300px' }} direction='row' align='center' gap='small'> 
                   <Box align='center'> 
                     {screenSize==='small'? 
+                      // eslint-disable-next-line jsx-a11y/accessible-emoji
                       <Text size='xxlarge'>👆</Text>
                       :
+                      // eslint-disable-next-line jsx-a11y/accessible-emoji
                       <Text size='xxlarge'>👈</Text>}
                   </Box>
                   <Box gap='xsmall'>
                     <Box> 
-                      {/* <Text color='text-weak'> Before borrowing</Text> */}
                       <Text weight='bold' color='text-weak'> Deposit Collateral </Text>
                     </Box>
                     <Text size='xxsmall' color='text-weak'>
@@ -339,8 +335,7 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
           ]}
         />
       </SeriesDescriptor>
-
-      
+   
       { txActive?.type !== 'BORROW' && txActive?.type !== 'BUY' &&  
       <Box
         width={{ max: '600px' }}
@@ -391,11 +386,7 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
                     loading: false,          
                     value: `${fyDaiValue.toFixed(2)} DAI`,
                     valuePrefix: '',
-                    // valueExtra: () => (
-                    //   <Text size='xsmall'>
-                    //     {activeSeries && Moment(activeSeries.maturity_).format('DD MMMM YYYY')}
-                    //   </Text>
-                    // ),
+                    valueExtra: null,
                   },
                   {
                     label: 'Like what you see?',
@@ -510,7 +501,6 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
             <Repay />}
         </Box>
       </Box>}
-
 
       {/* If there is a transaction active, show the applicable view */}
       { borrowActive && !txActive && <ApprovalPending /> } 

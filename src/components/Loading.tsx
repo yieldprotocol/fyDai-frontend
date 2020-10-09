@@ -1,9 +1,5 @@
 import React, { useContext } from 'react';
-
-import { 
-  ThemeContext,
-} from 'grommet';
-
+import { ThemeContext } from 'grommet';
 import { ScaleLoader } from 'react-spinners';
 
 interface ILoadingProps {
@@ -13,7 +9,6 @@ interface ILoadingProps {
 }
 
 function Loading({ condition, size, children }:ILoadingProps) {
-
   const theme:any = useContext(ThemeContext);
   return (
     <>

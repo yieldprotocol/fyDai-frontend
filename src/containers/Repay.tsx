@@ -1,16 +1,14 @@
 import React, { useEffect, useContext, useState } from 'react';
 import { ethers } from 'ethers';
-import { Box, Button, TextInput, Text, ResponsiveContext, Keyboard, Layer, Collapsible } from 'grommet';
+import { Box, TextInput, Text, ResponsiveContext, Keyboard, Collapsible } from 'grommet';
 
 import { 
   FiCheckCircle as Check,
   FiArrowLeft as ArrowLeft,
 } from 'react-icons/fi';
-import DaiMark from '../components/logos/DaiMark';
 
 import { cleanValue } from '../utils';
 
-import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
 
@@ -31,6 +29,8 @@ import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
 
+import DaiMark from '../components/logos/DaiMark';
+
 interface IRepayProps {
   repayAmount?:any
   setActiveView?: any;
@@ -38,16 +38,15 @@ interface IRepayProps {
 }
 
 function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
-  const { state: { deployedContracts } } = useContext(YieldContext);
+
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { activeSeries } = seriesState;
   const { state: userState, actions: userActions } = useContext(UserContext);
-  const { daiBalance_, daiBalance } = userState.position;
+  const { daiBalance } = userState.position;
   const screenSize = useContext(ResponsiveContext);
 
   const [ hasDelegated, setHasDelegated ] = useState<boolean>(true);
 
-  const { previewPoolTx }  = usePool(); 
   const { repayDaiDebt, repayActive } = useProxy();
   const [ txActive ] = useTxActive(['repay']);
   const { account } = useSignerAccount();
@@ -238,7 +237,6 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
                         <Text size='small' color='brand'>You do not have any debt in this series.</Text>         
                       </Box>
                     </Box>
-                    {/* <Button label='borrow Dai from this series' /> */}
                   </Box>             
                 </Box>}            
             </Box>

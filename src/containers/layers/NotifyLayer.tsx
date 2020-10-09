@@ -86,7 +86,6 @@ function NotifyLayer(target:any, columnsWidth:any) {
           </Box>
         </Box>
       </Layer>}
-
     </>
   );
 }

@@ -3,6 +3,7 @@ import { Layer, Box, Text } from 'grommet';
 import {
   FiXCircle as Error,
 } from 'react-icons/fi';
+
 import RaisedButton from './RaisedButton';
 
 interface ErrorBoundaryProps {
@@ -24,7 +25,8 @@ ErrorBoundaryProps
   }
 
   componentDidCatch(error:any, info:any) {
-    // You can also log the error to an error reporting service
+    // TODO: log the error to an error reporting service
+    // eslint-disable-next-line no-console
     console.log(error, info);
   }
 

@@ -1,10 +1,11 @@
 import React, { useContext } from 'react';
 import styled, { css } from 'styled-components';
 import { Box, Text } from 'grommet';
-import Authorization from './Authorization';
 
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
+
+import Authorization from './Authorization';
 
 const color = '#f8f8f8';
 
@@ -111,13 +112,12 @@ function ActionButton({ ...props }:any ) {
           fill='horizontal'
           align='center'
           pad='small'
-          // onClick={()=>{ }}
         >
           <Text 
             size='medium'
             color='background'
           >
-            Dummy box click this if you are a bot.
+            click me.
           </Text>
         </StyledBox>}
     </>

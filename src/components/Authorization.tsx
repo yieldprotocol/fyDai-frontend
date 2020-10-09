@@ -15,7 +15,6 @@ import { UserContext } from '../contexts/UserContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { useAuth, useSignerAccount, useTxActive } from '../hooks';
 import RaisedButton from './RaisedButton';
-import { modColor } from '../utils';
 
 interface IAuthorizationProps {
   series?: IYieldSeries|null;
@@ -29,7 +28,7 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
   const { state: { requestedSigs } } = useContext(NotifyContext);
   const { state: { authorizations }, actions: userActions } = useContext(UserContext);
   const { hasDelegatedProxy } = authorizations;
-  const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
+  const { actions: seriesActions } = useContext(SeriesContext);
 
   // flags 
   const [ authPending, setAuthPending ] = useState<boolean>(false);
@@ -92,8 +91,7 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
         </Box>}
 
       { hasDelegatedProxy && account && series?.hasDelegatedPool === false && !authWrap &&
-        <Box 
-          // round='small'
+        <Box
           direction='row' 
           gap='small'
           pad='medium'

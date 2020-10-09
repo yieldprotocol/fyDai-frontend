@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Box, Text } from 'grommet';
+import { Box } from 'grommet';
 
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
@@ -10,7 +10,6 @@ import InlineAlert from '../components/InlineAlert';
 import ApprovalPending from '../components/ApprovalPending';
 import TxStatus from '../components/TxStatus';
 import ActionButton from '../components/ActionButton';
-import { cleanValue } from '../utils';
 
 interface IRedeemProps {
   close?:any,
@@ -28,8 +27,8 @@ const Redeem  = ({ close }:IRedeemProps)  => {
   const [ redeemDisabled, setRedeemDisabled] = useState<boolean>(true);
   const [ matured, setMatured ] = useState<boolean>(false);
   
-  const [ warningMsg, setWarningMsg] = useState<string|null>(null);
-  const [ errorMsg, setErrorMsg] = useState<string|null>(null);
+  const [ warningMsg ] = useState<string|null>(null);
+  const [ errorMsg ] = useState<string|null>(null);
 
   const redeemProcedure = async () =>{
     if(!redeemDisabled) {
@@ -47,8 +46,6 @@ const Redeem  = ({ close }:IRedeemProps)  => {
   /* Set if the series is mature */ 
   useEffect( () => {
     ( async () => activeSeries && setMatured(await hasBeenMatured(activeSeries.fyDaiAddress)))();
-    ( async () => activeSeries && console.log(await hasBeenMatured(activeSeries.fyDaiAddress)))();
-    activeSeries && console.log(activeSeries.isMature());
   }, [activeSeries]);
 
   /* redeem button disabled logic */ 

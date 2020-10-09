@@ -1,17 +1,11 @@
+/* eslint-disable consistent-return */
 import React, { useContext, useState, useEffect } from 'react';
 import { Box, Text, Collapsible, ResponsiveContext } from 'grommet';
-
-import { 
-  FiLayers as ChangeSeries,
-  FiChevronDown as ChevronDown,
-  FiChevronUp as ChevronUp,
-} from 'react-icons/fi';
 
 import Loading from './Loading';
 
 import { SeriesContext } from '../contexts/SeriesContext';
-import { modColor, invertColor, contrastColor } from '../utils';
-import FlatButton from './FlatButton';
+
 
 type entry = {
   visible: boolean;
@@ -29,26 +23,22 @@ interface IInfoGridProps {
   alt?: boolean;
 }
 
-
-
 function InfoGrid({ entries, alt }:IInfoGridProps) {
 
   const screenSize = useContext(ResponsiveContext);
   const { state:{ activeSeries } } = useContext(SeriesContext);
-
   const [ detailsOpen, setDetailsOpen ] = useState<boolean>();
-
   const [visibleEntries, setVisibleEntries] = useState<any[]>([]);
 
-  const [normalText, setNormalText] = useState<string>(!alt? 'brand': activeSeries?.seriesTextColor);
-  const [xWeakText, setXWeakText] = useState<string>(!alt? 'text-xweak':`${modColor(activeSeries?.seriesColor, 10)}`);
-  const [weakText, setWeakText] = useState<string>(!alt? 'text-weak':`${modColor(activeSeries?.seriesColor, 10)}`);
+  // const [normalText, setNormalText] = useState<string>(!alt? 'brand': activeSeries?.seriesTextColor);
+  // const [xWeakText, setXWeakText] = useState<string>(!alt? 'text-xweak':`${modColor(activeSeries?.seriesColor, 10)}`);
+  // const [weakText, setWeakText] = useState<string>(!alt? 'text-weak':`${modColor(activeSeries?.seriesColor, 10)}`);
 
-  useEffect(()=>{
-    activeSeries && setNormalText( !alt? 'brand': activeSeries?.seriesTextColor);
-    activeSeries && setXWeakText( !alt? 'text-xweak':`${modColor(activeSeries?.seriesColor, 10)}`);
-    activeSeries && setWeakText( !alt? 'text-weak':`${modColor(activeSeries?.seriesColor, 10)}`);
-  }, [activeSeries]);
+  // useEffect(()=>{
+  //   activeSeries && setNormalText( !alt? 'brand': activeSeries?.seriesTextColor);
+  //   activeSeries && setXWeakText( !alt? 'text-xweak':`${modColor(activeSeries?.seriesColor, 10)}`);
+  //   activeSeries && setWeakText( !alt? 'text-weak':`${modColor(activeSeries?.seriesColor, 10)}`);
+  // }, [activeSeries]);
 
   useEffect(()=>{
     setVisibleEntries((entries.filter((x:any)=>x.visible===true)));
@@ -116,7 +106,7 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
       </Box>
 
       <Box
-        margin={ visibleEntries.length <= 3? {bottom:'large'}: undefined}
+        margin={visibleEntries.length <= 3? {bottom:'large'}: undefined}
       >
         <Collapsible open={detailsOpen}>
           <Box 

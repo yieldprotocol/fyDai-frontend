@@ -14,7 +14,7 @@ ${(props:any) => props.background && css`
 `}
 `;
 
-function RaisedBox({ inset=false, children }:any ) {
+function RaisedBox({ children }:any ) {
   const screenSize = useContext(ResponsiveContext);
   return (
     <>
