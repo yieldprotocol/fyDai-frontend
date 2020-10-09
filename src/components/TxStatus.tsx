@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { Box, Text, Drop, ThemeContext } from 'grommet';
+import { Box, Text, ResponsiveContext, ThemeContext } from 'grommet';
 
 import { FiCopy as Copy } from 'react-icons/fi';
 
@@ -19,7 +19,8 @@ const TxStatus= ({ msg, tx }:TxStatusProps) => {
     state: { pendingTxs, lastCompletedTx },
   } = useContext(NotifyContext);
 
-  const theme:any = useContext(ThemeContext); 
+  const theme:any = useContext(ThemeContext);
+  const screenSize = useContext(ResponsiveContext); 
   const txRef = React.useRef<any>(null);
 
   const handleCopy = () => {
@@ -39,6 +40,7 @@ const TxStatus= ({ msg, tx }:TxStatusProps) => {
           pad="large"
           align='center'
           gap='medium'
+          width={screenSize!=='small'?{ min:'600px', max:'600px' }: undefined}
         >
           <Text size='xlarge' color='brand' weight='bold'>Transaction pending...</Text>
           <Text>{msg}</Text>
@@ -63,6 +65,7 @@ const TxStatus= ({ msg, tx }:TxStatusProps) => {
         pad="large"
         align='center'
         gap='medium'
+        width={screenSize!=='small'?{ min:'600px', max:'600px' }: undefined}
       >
         <Text size='xlarge' color='brand' weight='bold'>Transaction Complete. </Text>
         <Text>{lastCompletedTx.status}</Text>

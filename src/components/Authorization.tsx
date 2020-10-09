@@ -118,7 +118,7 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
         >
           <Box 
             width={screenSize!=='small'?{ min:'620px', max:'620px' }: undefined}
-            round
+            round='small'
             background='background'
             pad='large'
             gap='medium'

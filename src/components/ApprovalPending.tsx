@@ -31,10 +31,10 @@ const ApprovalPending = React.forwardRef( (props, ref) => {
         </Box> 
         :
         <Box 
-          width={screenSize!=='small'?{ min:'600px', max:'750px' }: undefined}
+          width={screenSize!=='small'?{ min:'620px', max:'620px' }: undefined}
           pad="medium"
           gap="small"
-          round
+          round='small'
           background='background-front'
         >
           <Text weight='bold'>Transaction approval required</Text>

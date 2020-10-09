@@ -129,7 +129,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
       >
         { !txActive && !withdrawPending && 
           <Box 
-            width={screenSize!=='small'?{ min:'600px', max:'600px' }: undefined}
+            width={screenSize!=='small'?{ min:'620px', max:'620px' }: undefined}
             alignSelf='center'
             fill
             background='background-front'
