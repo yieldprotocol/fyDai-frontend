@@ -97,13 +97,18 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
           pad='medium'
           justify='around'
           background='#555555'
+          align='center'
         >
           {!buttonOnly && <Text color='#DDDDDD'> <Warning /> </Text>}
           {!buttonOnly && <Text size='xsmall' color='#DDDDDD'>A once-off authorization is required to use this series</Text>}
           <Box>
             <RaisedButton 
               background='#555555'
-              label={<Text size='xsmall' color='#DDDDDD'><Unlock /> {screenSize==='small'? '' : 'Unlock Series'}</Text>}
+              label={
+                <Box pad={{ horizontal:'small', vertical:'xsmall' }} align='center'>
+                  <Text size='xsmall' color='#DDDDDD'><Unlock /> {screenSize==='small'? '' : 'Unlock Series'}</Text>
+                </Box>
+              }
               onClick={()=>{authProcedure();}}
             />   
           </Box>
