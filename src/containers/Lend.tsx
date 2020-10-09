@@ -207,6 +207,7 @@ const Lend = ({ openConnectLayer, lendAmount }:ILendProps) => {
             {
               label: 'Dai Balance',
               visible: 
+                  false &&
                   (!!account && !txActive && !activeSeries?.isMature()) || 
                   (activeSeries?.isMature() && activeSeries?.fyDaiBalance_>0),
               active: true,

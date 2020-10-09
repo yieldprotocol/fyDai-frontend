@@ -97,7 +97,6 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
   const calculateNewShare = async () => {
 
     setCalculating(true);
-
     const daiReserves = await getBalance(deployedContracts.Dai, 'Dai', activeSeries.poolAddress);
     console.log(daiReserves);
     const fyDaiReserves = await getBalance(activeSeries.fyDaiAddress, 'FYDai', activeSeries.poolAddress);
@@ -163,6 +162,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
           entries={[
             {
               label: 'Your Pool Tokens',
+              labelExtra: 'owned in this series',
               visible: 
                   (!!account && txActive?.type !== 'ADD_LIQUIDITY' && !activeSeries?.isMature()) || 
                   (activeSeries?.isMature() && activeSeries?.poolTokens_>0 ),
@@ -174,6 +174,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
             },
             {
               label: 'Your Pool share',
+              labelExtra: `of the total ${activeSeries.totalSupply_} tokens in this series`,
               visible: 
                   (!!account && txActive?.type !== 'ADD_LIQUIDITY' && !activeSeries?.isMature()) || 
                   (activeSeries?.isMature() && activeSeries?.poolTokens_>0 ),
