@@ -14,7 +14,7 @@ import { IYieldSeries } from '../types';
 
 const YieldContext = createContext<any>({});
 
-const fyDaiList = ['20Oct5', '20Oct6', '20Oct9', '20Oct31', '20Dec31', '21Mar31', '21Jun30', '21Sep30', '21Dec31'];
+const fyDaiList = ['20Oct9', '20Oct31', '20Dec31', '21Mar31', '21Jun30', '21Sep30', '21Dec31'];
 // const fyDaiLPList = ['fyDaiLP20Oct5', 'fyDaiLP20Oct6', 'fyDaiLP20Oct9', 'fyDaiLP20Oct31', 'fyDaiLP20Dec31', 'fyDaiLP21Mar31', 'fyDaiLP21Jun30', 'fyDaiLP21Sep30', 'fyDaiLP21Dec31'];
 const seriesColors = ['#ff86c8', '#82d4bb', '#6ab6f1', '#cb90c9', '#aed175', '#f0817f', '#ffbf81', '#95a4db', '#ffdc5c'];
 const contractList = [
@@ -125,7 +125,7 @@ const YieldProvider = ({ children }: any) => {
             maturity: maturity.toNumber(),
             poolAddress,
             maturity_: new Date(maturity * 1000),
-            displayName: moment(maturity * 1000).format('MMMM YYYY'),
+            displayName: moment.utc(maturity * 1000).format('MMMM YYYY'),
             seriesColor: seriesColors[i],
             seriesTextColor: '#333333',
             seriesLightColor: utils.modColor(seriesColors[i], 50),
