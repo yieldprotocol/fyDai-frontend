@@ -15,6 +15,7 @@ import {
   FiArrowLeft as ArrowLeft,
 } from 'react-icons/fi';
 
+import styled, { css } from 'styled-components';
 import {
   useConnection,
   useSignerAccount,
@@ -27,21 +28,68 @@ import torusImage from '../../assets/images/providers/torus.png';
 import walletConnectImage from '../../assets/images/providers/walletconnect.png';
 
 import { UserContext } from '../../contexts/UserContext';
-import { YieldContext } from '../../contexts/YieldContext';
 
 import RaisedButton from '../../components/RaisedButton';
 import FlatButton from '../../components/FlatButton';
 import TxHistory from '../../components/TxHistory';
+import EtherscanButton from '../../components/EtherscanButton';
+import { NotifyContext } from '../../contexts/NotifyContext';
+import { abbreviateHash } from '../../utils';
+
+
+const StyledBox = styled(Box)`
+  background: #f8f8f8;
+  border-radius: 25px;
+  border-color: #f8f8f8;
+  transition: all 0.3s ease-in-out;
+  ${(props:any) => !(props.border) && css`
+  box-shadow: 0px 0px 0px #dfdfdf, -0px -0px 0px #ffffff;
+  :active:hover {
+    transform: scale(1);
+    box-shadow: inset 6px 6px 11px #dfdfdf, inset -6px -6px 11px #ffffff;
+    }
+  :hover {
+    transform: scale(1.02);
+    box-shadow:  6px 6px 11px #dfdfdf, -6px -6px 11px #ffffff;
+    }
+  `}
+  ${(props:any) => (props.border) && css`
+  box-shadow:  inset 6px 6px 11px #dfdfdf,  
+    inset -6px -6px 11px #ffffff;
+  :active:hover {
+    box-shadow:  0px 0px 0px #dfdfdf, 
+        -0px -0px 0px #ffffff;
+    }
+  :hover {
+    /* transform: scale(1.01); */
+    }
+  `}
+  ${(props:any) => (props.disabled) && css`
+  box-shadow:  0px 0px 0px #dfdfdf, 
+    -0px -0px 0px #ffffff;
+  :active:hover {
+    box-shadow:  0px 0px 0px #dfdfdf, 
+        -0px -0px 0px #ffffff;
+    }
+  :hover {
+    transform: scale(1);
+    }
+  `}
+`;
+
 
 const ConnectLayer = ({ view, target, closeLayer }: any) => {
 
-  const { state: { position } } = useContext(UserContext);
-  const { state: { deployedSeries } } = useContext(YieldContext);
+  const { state: { position, txHistory } } = useContext(UserContext);
 
   const screenSize = useContext(ResponsiveContext);
   const { account, provider } = useSignerAccount();
   const [ layerView, setLayerView] = useState<string>(view);
   const { handleSelectConnector } = useConnection();
+
+  const [ slippage, setSlippage] = useState<number>(1);
+
+  const [ lastTx, setLastTx] = useState<any>(null);
 
   const [ histOpen, setHistOpen] = useState<string>('BORROW');
 
@@ -54,6 +102,12 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
   useEffect(()=>{
     setLayerView(view);
   }, [view]);
+
+  useEffect(()=>{
+    let newArr; 
+    txHistory && ( newArr = txHistory.items.sort((a:any, b:any) => { return b.date-a.date;}));
+    txHistory && setLastTx(newArr[0]);
+  }, [txHistory]);
 
   return (
     <>
@@ -76,7 +130,7 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
           >
 
             { account && layerView === 'ACCOUNT' &&
-              <>
+              <Box gap='medium'>
                 <Box pad="small" gap="small">
                   <Box direction='row' justify='between'>
                     <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Connected Wallet</Text>   
@@ -94,20 +148,20 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                     gap='small'
                   >
                     {/* <ProfileButton /> */}
-                    {account}
+
                     <Box direction='row' gap='small'>
-                      <Text size='xsmall'>Network:</Text> 
-                      <Text weight="bold"> { provider.network.name } </Text>                   
-                    </Box> 
+                      <Text size='xsmall'>Account:</Text> 
+                      <Text size='xsmall'> {account} </Text>                   
+                    </Box>               
 
                     <Box direction='row' gap='small'>
                       <Text size='xsmall'>ETH balance:</Text>
-                      <Text>{ position.ethBalance_ && position.ethBalance_ || '' }</Text>
+                      <Text size='xsmall'>{ position.ethBalance_ && position.ethBalance_ || '' }</Text>
                     </Box>
 
                     <Box direction='row' gap='small'>
                       <Text size='xsmall'>DAI balance:</Text>
-                      <Text>{ position.daiBalance_ && position.daiBalance_ || '' }</Text>
+                      <Text size='xsmall'>{ position.daiBalance_ && position.daiBalance_ || '' }</Text>
                     </Box>
                     {/* <Button fill='horizontal' label='Connect to another wallet' onClick={()=>setShowConnectLayer(true)} /> */}
                   </Box>
@@ -119,25 +173,31 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                     <Box round>
                       <FlatButton
                         onClick={()=>setLayerView('HISTORY')}
-                        label={<Text size='xsmall'>View history</Text>}
+                        label={<Text size='xsmall'>View full history</Text>}
                       /> 
                     </Box>
-                  </Box>  
+                  </Box> 
+
                   <Box
                     pad={{ vertical:'small' }}
-                    justify="center"
                     gap='small'
+                    align='start'
                   >
-                    <Text size='xsmall'>Last complete transaction: txhashofsomething </Text>
-                    <Text size='xsmall'>Pending transactions: txhashofsomething </Text>    
+                    <Text size='xsmall'>Last transaction: </Text>
+                    <Text size='xxsmall'>{lastTx?.transactionHash} </Text>
+                    <Box >
+                      <EtherscanButton txHash={lastTx?.transactionHash} /> 
+                    </Box>
                   </Box>
+
                 </Box>
 
                 <Box pad="small" gap="small">
                   <Box direction='row' justify='between'>
-                    <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Account Settings</Text> 
+                    <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Settings</Text> 
                     <Box round>
                       <FlatButton
+                        disabled
                         onClick={()=>console.log('STILL TO DO!')}
                         label={<Text size='xsmall'>More settings</Text>}
                       /> 
@@ -145,14 +205,60 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                   </Box>  
                   <Box
                     pad={{ vertical:'small' }}
-                    justify="center"
+                    justify="between"
                     gap='small'
+                    direction='row'
+                    align='center'
                   >
-                    <Text size='xsmall'>Slippage value: 0.05% </Text> 
+                    <Text size='xsmall'>Slippage tolerance:  </Text>
+
+                    <Box gap='small' align='center'>
+                      <StyledBox
+                        pad={{ horizontal: 'large', vertical: 'xsmall' }}
+                        onClick={() => setSlippage(0)}
+                        border={slippage !== 0 ? undefined : 'all'}
+                      >
+                        <Text size="small">
+                          0.1 %
+                        </Text>
+                      </StyledBox>
+                    </Box>
+
+                    <Box gap='small' align='center'>
+                      <StyledBox
+                        pad={{ horizontal: 'large', vertical: 'xsmall' }}
+                        onClick={() => setSlippage(1)}
+                        border={slippage !== 1 ? undefined : 'all'}
+                      >
+                        <Text size="small">
+                          0.5 %
+                        </Text>
+                      </StyledBox>
+                    </Box>
+
+                    <Box gap='small' align='center'>
+                      <StyledBox
+                        pad={{ horizontal: 'large', vertical: 'xsmall' }}
+                        onClick={() => setSlippage(2)}
+                        border={slippage !== 2 ? undefined : 'all'}
+                      >
+                        <Text size="small">
+                          1 %
+                        </Text>
+                      </StyledBox>
+                    </Box>
                   </Box>
                 </Box>
 
-              </> }
+                <Box pad="small" gap="small" border='all' round='xsmall'>
+                  <Box direction='row' justify='between'>
+                    <Text alignSelf='start' size='small' weight='bold'>Diagnostics Info</Text> 
+                  </Box>
+                  <Text size='xxsmall'>App Version:  alpha 0.1 </Text>
+                  <Text size='xxsmall'>Connected Network: { provider.network.name }</Text>
+                  <Text size='xxsmall'>Yield protocol ref contract: {process.env.REACT_APP_MIGRATION_42} </Text>
+                </Box>
+              </Box> }
 
             { layerView === 'CONNECT' &&      
               <Box pad="medium" gap="small">

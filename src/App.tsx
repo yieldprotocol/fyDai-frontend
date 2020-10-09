@@ -77,7 +77,7 @@ const App = (props:any) => {
       style={
         activeSeries && 
         props.moodLighting && 
-        { background: `radial-gradient(at 90% 90%, transparent 70%, ${modColor(activeSeries.seriesColor, 90)})` }
+        { background: `radial-gradient(at 90% 90%, transparent 70%, ${modColor(activeSeries.seriesColor, 100)})` }
       }
     >
       <ConnectLayer view={showConnectLayer} closeLayer={() => setShowConnectLayer(null)} />
