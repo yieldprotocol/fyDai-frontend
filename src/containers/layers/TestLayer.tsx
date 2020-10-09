@@ -51,7 +51,7 @@ const TestLayer = (props:any) => {
   }  = useProxy();
 
   useEffect(()=>{
-    const daiD = utils.dehumanizeNumber(1);
+    const daiD = ethers.BigNumber.from('1');
     const chi  = utils.toRay(1.2);
     setDaiDebt( daiD );
 

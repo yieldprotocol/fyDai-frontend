@@ -48,7 +48,7 @@ ReactDOM.render(
 serviceWorker.register({ 
   // TODO handle the update
   onUpdate: ()=> {
-    console.log('A newer version of the app is available');
+    console.log( 'A newer version of the app is available' );
     // window.location.reload();
   } 
 }); 
