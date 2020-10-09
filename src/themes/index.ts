@@ -113,11 +113,6 @@ export const yieldTheme = {
       background: 'selected-background',
       color: 'selected-text',
     },
-    // control: {
-    //   border: {
-    //     radius: '24px',
-    //   },
-    // },
     borderSize: {
       xsmall: '1px',
       small: '2px',

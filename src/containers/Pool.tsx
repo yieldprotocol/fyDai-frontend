@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useCallback } from 'react';
 import { ethers } from 'ethers';
 import { Box, Keyboard, TextInput, Text, ResponsiveContext, Collapsible, Layer } from 'grommet';
 
@@ -89,7 +89,6 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
   };
 
   const calculateNewShare = async () => {
-
     setCalculating(true);
     const daiReserves = await getBalance(deployedContracts.Dai, 'Dai', activeSeries.poolAddress);
     const fyDaiReserves = await getBalance(activeSeries.fyDaiAddress, 'FYDai', activeSeries.poolAddress);
@@ -101,9 +100,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
   };
 
   /* handle value calculations based on input changes */
-  useEffect(() => {
-    debouncedInput && calculateNewShare();
-  }, [debouncedInput]);
+  useCallback(calculateNewShare, [debouncedInput]);
   
   /* Add liquidity disabling logic */
   useEffect(()=>{
@@ -114,7 +111,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
       !inputValue ||
       parseFloat(inputValue) <= 0
     )? setAddLiquidityDisabled(true): setAddLiquidityDisabled(false);
-  }, [ inputValue, hasDelegated]);
+  }, [ account, daiBalance, inputValue, hasDelegated]);
 
   /* handle warnings input errors */
   useEffect(() => {

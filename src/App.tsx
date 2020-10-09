@@ -5,7 +5,6 @@ import { deepMerge } from 'grommet/utils';
 import { yieldTheme } from './themes';
 
 import { SeriesContext } from './contexts/SeriesContext';
-import { UserContext } from './contexts/UserContext';
 import { YieldContext } from './contexts/YieldContext';
 
 import BorrowView from './views/BorrowView';
@@ -28,7 +27,6 @@ import ErrorBoundary from './components/ErrorBoundry';
 
 const App = (props:any) => {
   const { state: { seriesLoading, activeSeries } } = useContext(SeriesContext);
-  // const { state : { authorizations : { hasDelegatedProxy } } } = useContext(UserContext);
   const { state: { yieldLoading } } = useContext(YieldContext);
 
   // TODO Switch out for react router
@@ -98,7 +96,6 @@ const App = (props:any) => {
             pad={{ vertical: 'large' }}
             align='center'         
           >  
-            {/* <MiniDash activeView={activeView} /> */}
             {activeView === 'BORROW' && <BorrowView openConnectLayer={(v:string) => setShowConnectLayer('CONNECT')} />}
             {activeView === 'LEND' && <LendView openConnectLayer={(v:string) => setShowConnectLayer('CONNECT')} />}
             {activeView === 'POOL' && <PoolView openConnectLayer={(v:string) => setShowConnectLayer('CONNECT')} />}
