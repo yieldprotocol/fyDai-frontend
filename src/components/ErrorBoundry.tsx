@@ -40,7 +40,6 @@ ErrorBoundaryProps
           <Box
             fill
             align="center"
-            direction="row"
             gap="large"
             round='xsmall'
             elevation="medium"
@@ -48,13 +47,13 @@ ErrorBoundaryProps
             background='background'
           >
             <Text color='red'><Error /></Text>
-            <Box align="center" direction="row" gap="xsmall">
-              <Text> An unrecognised error has occured 😰 It\'s our fault, sorry. </Text>
+            <Box align="center" gap="xsmall">
+              <Text weight='bold'> An unrecognised error has occured 😰 </Text>
+              <Text> It's our fault, sorry. </Text>
             </Box>
-
             <RaisedButton 
               onClick={()=>window.location.reload()}
-              label='Please reload the App' 
+              label={<Box pad='small'>Please reload the App</Box>}
             />
           </Box>
         </Layer>

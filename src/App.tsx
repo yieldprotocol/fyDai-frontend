@@ -74,7 +74,11 @@ const App = (props:any) => {
 
     <div 
       className="App" 
-      style={activeSeries && { background: `radial-gradient(at 90% 90%, transparent 70%, ${modColor(activeSeries.seriesColor, 90)})` }}
+      style={
+        activeSeries && 
+        props.moodLighting && 
+        { background: `radial-gradient(at 90% 90%, transparent 70%, ${modColor(activeSeries.seriesColor, 90)})` }
+      }
     >
       <ConnectLayer view={showConnectLayer} closeLayer={() => setShowConnectLayer(null)} />
       { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
@@ -127,6 +131,8 @@ const App = (props:any) => {
             setShowTestLayer={setShowTestLayer}
             darkMode={props.darkMode}
             setDarkMode={props.setDarkMode}
+            moodLighting={props.moodLighting}
+            toggleMoodLighting={props.toggleMoodLighting}
             openConnectLayer={() => setShowConnectLayer('CONNECT')}
           />}                  
         <Box />      
@@ -159,23 +165,23 @@ const App = (props:any) => {
 
 const ThemedApp = () => {
   const [darkMode, setDarkMode] = useState(false);
-  const [partyMode, setPartyMode] = useState(false);
+  const [ moodLighting, setMoodLighting] = useState(true);
   return (
     <Suspense fallback={null}>
-      <ErrorBoundary>
-        <Grommet
-          theme={deepMerge(base, yieldTheme)}
-          themeMode={darkMode ? 'dark' : 'light'}
-          full
-        >
+      <Grommet
+        theme={deepMerge(base, yieldTheme)}
+        themeMode={darkMode ? 'dark' : 'light'}
+        full
+      >
+        <ErrorBoundary>
           <App 
             darkMode={darkMode}
             setDarkMode={setDarkMode}
-            partyMode={partyMode}
-            setPartyMode={setPartyMode}
-          />     
-        </Grommet>
-      </ErrorBoundary>
+            moodLighting={moodLighting}
+            toggleMoodLighting={setMoodLighting}
+          />
+        </ErrorBoundary>
+      </Grommet>
     </Suspense>
   );
 };
