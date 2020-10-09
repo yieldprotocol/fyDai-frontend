@@ -1,5 +1,4 @@
 import { ethers, BigNumber } from 'ethers';
-import { constants } from 'buffer';
 
 /* constants */
 export const BN_RAY = BigNumber.from('1000000000000000000000000000');
@@ -83,14 +82,12 @@ export const cleanValue = (input:string, decimals:number=12) => {
   const re = new RegExp(`(\\d+\\.\\d{${decimals}})(\\d)`);
   const inpu = input.match(re); // inpu = truncated 'input'... get it?
   if (inpu) {
-    console.log('Value truncated: ', inpu[1]);
     return inpu[1];
   }
   return input.valueOf();
 };
 
 /* handle Address/hash shortening */
-
 export const abbreviateHash = (addr:string) => {
   return `${addr?.substring(0, 4)}...${addr?.substring(addr.length - 4)}`; 
 };

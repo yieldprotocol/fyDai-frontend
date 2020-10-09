@@ -52,7 +52,7 @@ function AprBadge({ activeView, series, animate }:IAprBadgeProps) {
         <Box 
           background={series.seriesColor}
           round='xlarge'  
-          pad={{ horizontal:'small', vertical:'none' }} 
+          pad={{ horizontal:'small', vertical:'xsmall' }} 
           align='center'
           justify='center'
           animation={animate ? { type:'zoomIn', duration:1000, size:'xlarge' } : undefined} 

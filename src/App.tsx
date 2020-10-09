@@ -23,7 +23,8 @@ import NotifyLayer from './containers/layers/NotifyLayer';
 // TODO: remove testLayer for prod
 import TestLayer from './containers/layers/TestLayer';
 import Authorization from './components/Authorization';
-import styled from 'styled-components';
+import { modColor } from './utils';
+import ErrorBoundary from './components/ErrorBoundry';
 
 // const LendView = React.lazy(() => import('./views/LendView'));
 // const PoolView = React.lazy(() => import('./views/PoolView'));
@@ -71,7 +72,10 @@ const App = (props:any) => {
 
   return (
 
-    <div className="App">
+    <div 
+      className="App" 
+      style={activeSeries && { background: `radial-gradient(at 90% 90%, transparent 70%, ${modColor(activeSeries.seriesColor, 90)})` }}
+    >
       <ConnectLayer view={showConnectLayer} closeLayer={() => setShowConnectLayer(null)} />
       { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
       { showSeriesLayer  && <SeriesSelector activeView='borrow' close={()=>setShowSeriesLayer(false)} /> }
@@ -153,27 +157,25 @@ const App = (props:any) => {
   );
 };
 
-const StyledApp = styled(App)`
-    background-color: #333333;
-`;
-
 const ThemedApp = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [partyMode, setPartyMode] = useState(false);
   return (
     <Suspense fallback={null}>
-      <Grommet
-        theme={deepMerge(base, yieldTheme)}
-        themeMode={darkMode ? 'dark' : 'light'}
-        full
-      >
-        <StyledApp 
-          darkMode={darkMode}
-          setDarkMode={setDarkMode}
-          partyMode={partyMode}
-          setPartyMode={setPartyMode}
-        />     
-      </Grommet>
+      <ErrorBoundary>
+        <Grommet
+          theme={deepMerge(base, yieldTheme)}
+          themeMode={darkMode ? 'dark' : 'light'}
+          full
+        >
+          <App 
+            darkMode={darkMode}
+            setDarkMode={setDarkMode}
+            partyMode={partyMode}
+            setPartyMode={setPartyMode}
+          />     
+        </Grommet>
+      </ErrorBoundary>
     </Suspense>
   );
 };

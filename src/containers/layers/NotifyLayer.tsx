@@ -81,10 +81,9 @@ function NotifyLayer(target:any, columnsWidth:any) {
           round='xsmall'
           elevation="medium"
           pad={{ vertical: 'large', horizontal: 'large' }}
-          border={{ color:'red' }}
           background='background'
         >
-          { notificationTypeMap(state.type).icon }
+          <Text color='red'><Error /></Text>
           <Box align="center" direction="row" gap="xsmall">
             <Text>{ state.fatalMsg }</Text>
           </Box>

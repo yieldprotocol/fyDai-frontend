@@ -87,12 +87,13 @@ export const useProxy = () => {
   /* Preset the yieldProxy contract to be used with all fns */
   const [ proxyContract, setProxyContract] = useState<any>();
   useEffect(()=>{
-    deployedContracts.YieldProxy && signer &&
+    deployedContracts?.YieldProxy && signer &&
     setProxyContract( new ethers.Contract( 
-      ethers.utils.getAddress(deployedContracts.YieldProxy), 
+      ethers.utils.getAddress(deployedContracts?.YieldProxy), 
       yieldProxyAbi,
       signer
     ));
+
   }, [signer, deployedContracts, yieldProxyAbi ]);
 
   /**

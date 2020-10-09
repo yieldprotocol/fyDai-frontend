@@ -42,19 +42,23 @@ export const useController = () => {
 
   useEffect(()=>{
 
-    deployedContracts.Controller && signer &&
+    try {
+      deployedContracts.Controller && signer &&
     setControllerContract( new ethers.Contract( 
       ethers.utils.getAddress(deployedContracts.Controller), 
       controllerAbi,
       signer
     ));
 
-    deployedContracts.Controller && fallbackProvider &&
+      deployedContracts.Controller && fallbackProvider &&
     setControllerProvider( new ethers.Contract( 
       ethers.utils.getAddress(deployedContracts.Controller), 
       controllerAbi,
       fallbackProvider
     ));
+    } catch (e) {
+      console.log(e);
+    }
 
   }, [signer, fallbackProvider, deployedContracts]);
 

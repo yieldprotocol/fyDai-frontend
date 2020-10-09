@@ -97,68 +97,49 @@ const YieldProvider = ({ children }: any) => {
   ): Promise<any[]> => {
     const _deployedSeries: any[] = [];
     let _deployedContracts: any;
-  
-    try {
 
-      /* Load yield core contract addresses */
-      if ( !cachedContracts || forceUpdate) {
-        const contractAddrs = await getAddresses(contractList);
-        _deployedContracts = Object.fromEntries(contractAddrs);
-        window.localStorage.removeItem('deployedContracts');
-        setCachedContracts(_deployedContracts);
-        console.log('Contract addresses updated:', _deployedContracts);
-      } else {
-        _deployedContracts = cachedContracts;
-      }
-
-      /* Load series specific contract addrs */
-      if (!cachedSeries || (cachedSeries.length !== fyDaiList.length) || forceUpdate) {
-
-        const _list = await getAddresses(fyDaiList.map((x:any)=> `fyDai${x}`));
-        const _poolList = await getAddresses(fyDaiList.map((x:any)=> `fyDaiLP${x}`));
-        // const _list = await getAddresses(fyDaiList);
-        // const _poolList = await getAddresses(fyDaiLPList);
-
-        console.log(_list);
-        console.log(_poolList);
-        
-        const _seriesList = Array.from(_list.values());
-
-        await Promise.all(
-          _seriesList.map(async (x: string, i: number) => {
-
-            const symbol = await callTx(x, 'FYDai', 'symbol', []);
-            const maturity = await callTx(x, 'FYDai', 'maturity', []);
-            const poolAddress = _poolList.get(`${symbol.slice(0, 5)}LP${symbol.slice(5)}`); 
-
-            return {
-              fyDaiAddress: x,
-              symbol,
-              maturity: maturity.toNumber(),
-              poolAddress,
-              maturity_: new Date(maturity * 1000),
-              displayName: moment(maturity * 1000).format('MMMM YYYY'),
-              seriesColor: seriesColors[i],
-              seriesTextColor: '#333333',
-              // seriesTextColor: utils.modColor(seriesColors[i], -120),
-            };
-          })
-        ).then((res: any) => _deployedSeries.push(...res));
-        window.localStorage.removeItem('deployedSeries');
-        setCachedSeries(_deployedSeries);
-        console.log('Series addresses updated');
-      } else {
-        _deployedSeries.push(...cachedSeries);
-      }
-    } catch (e) {     
-      // !loadRetried && _getProtocolAddrs(true);
-      // loadRetried && 
-      notifyDispatch({
-        type: 'fatal',
-        payload: { message: 'Error loading Yield Protocol addresses: Please check you are on a supported network.' },
-      });
-      console.log(e);
+    /* Load yield core contract addresses */
+    if ( !cachedContracts || forceUpdate) {
+      const contractAddrs = await getAddresses(contractList);
+      _deployedContracts = Object.fromEntries(contractAddrs);
+      window.localStorage.removeItem('deployedContracts');
+      setCachedContracts(_deployedContracts);
+      console.log('Contract addresses updated:', _deployedContracts);
+    } else {
+      _deployedContracts = cachedContracts;
     }
+    /* Load series specific contract addrs */
+    if (!cachedSeries || (cachedSeries.length !== fyDaiList.length) || forceUpdate) {
+      const _list = await getAddresses(fyDaiList.map((x:any)=> `fyDai${x}`));
+      const _poolList = await getAddresses(fyDaiList.map((x:any)=> `fyDaiLP${x}`));        
+      const _seriesList = Array.from(_list.values());
+
+      await Promise.all(
+        _seriesList.map(async (x: string, i: number) => {
+          const symbol = await callTx(x, 'FYDai', 'symbol', []);
+          const maturity = await callTx(x, 'FYDai', 'maturity', []);
+          const poolAddress = _poolList.get(`${symbol.slice(0, 5)}LP${symbol.slice(5)}`); 
+          return {
+            fyDaiAddress: x,
+            symbol,
+            maturity: maturity.toNumber(),
+            poolAddress,
+            maturity_: new Date(maturity * 1000),
+            displayName: moment(maturity * 1000).format('MMMM YYYY'),
+            seriesColor: seriesColors[i],
+            seriesTextColor: '#333333',
+            seriesLightColor: utils.modColor(seriesColors[i], 50),
+            seriesDarkColor: utils.modColor(seriesColors[i], -50),
+          };
+        })
+      ).then((res: any) => _deployedSeries.push(...res));
+      window.localStorage.removeItem('deployedSeries');
+      setCachedSeries(_deployedSeries);
+      console.log('Series addresses updated');
+    } else {
+      _deployedSeries.push(...cachedSeries);
+    }
+
     return [_deployedSeries, _deployedContracts];
   };
 
@@ -185,7 +166,7 @@ const YieldProvider = ({ children }: any) => {
         rate_: utils.rayToHuman(_ilks.rate),
       },
       ethPrice,
-      ethPrice_: ethers.utils.formatEther( utils.mulRay(ethers.utils.parseEther('1.5'), (_ilks.spot)).toString()) ,
+      ethPrice_: ethers.utils.formatEther( utils.mulRay(ethers.utils.parseEther('1.5'), (_ilks.spot)).toString()),
     };
     setCachedFeed(_feedData);
     return _feedData;
@@ -222,26 +203,36 @@ const YieldProvider = ({ children }: any) => {
     /* Init start */
     dispatch({ type: 'isLoading', payload: true });
 
+    try {
     /* 1. Fetch PUBLIC Yield protocol ADDRESSES from cache or chain */
-    const [deployedSeries, deployedContracts] = await _getProtocolAddrs(false);
-    dispatch({ type: 'updateDeployedContracts', payload: deployedContracts });
-    dispatch({ type: 'updateDeployedSeries', payload: deployedSeries });
+      const [deployedSeries, deployedContracts] = await _getProtocolAddrs(false);
+      dispatch({ type: 'updateDeployedContracts', payload: deployedContracts });
+      dispatch({ type: 'updateDeployedSeries', payload: deployedSeries });
 
-    /* 2. Fetch feed/stream data (from cache initially if available) and init event listeners */
-    dispatch({
-      type: 'updateFeedData',
-      payload: await _getFeedData(deployedContracts, deployedSeries ),
-    });
+      if (deployedSeries && deployedContracts) {
+        /* 2. Fetch feed/stream data (from cache initially if available) and init event listeners */
+        dispatch({
+          type: 'updateFeedData',
+          payload: await _getFeedData(deployedContracts, deployedSeries ),
+        });
 
-    // 2.1 Add event listeners
-    _addListeners(deployedContracts, deployedSeries);
+        // 2.1 Add event listeners
+        _addListeners(deployedContracts, deployedSeries);
 
-    /* 3. Fetch auxilliary (PUBLIC non-cached, non-user specific) yield and series data */
-    dispatch({
-      type: 'updateYieldData',
-      payload: await _getYieldData(deployedContracts, deployedSeries),
-    });
-
+        /* 3. Fetch auxilliary (PUBLIC non-cached, non-user specific) yield and series data */
+        dispatch({
+          type: 'updateYieldData',
+          payload: await _getYieldData(deployedContracts, deployedSeries),
+        });
+      }
+    } catch (e) {
+      notifyDispatch({
+        type: 'fatal',
+        payload: { message: 'Error Accessing the Yield Protocol.' },
+      });
+      console.log(e);
+      return;
+    }
     /* Init end */
     dispatch({ type: 'isLoading', payload: false });
   };
@@ -251,17 +242,8 @@ const YieldProvider = ({ children }: any) => {
     fallbackProvider && (async () => init())();
   }, [ fallbackProvider ]);
 
-  const actions = {
-    // updateUserData: () =>
-    //   _getUserData(
-    //     state.deployedContracts,
-    //     state.deployedSeries,
-    //     true,
-    //   ).then((res: any) => dispatch({ type: 'updateUserData', payload: res })),
-  };
-
   return (
-    <YieldContext.Provider value={{ state, actions }}>
+    <YieldContext.Provider value={{ state }}>
       {children}
     </YieldContext.Provider>
   );

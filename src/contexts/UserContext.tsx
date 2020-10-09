@@ -394,25 +394,28 @@ const UserProvider = ({ children }: any) => {
     /* Init start */
     dispatch({ type: 'isLoading', payload: true });
     // TODO: look at splitting these up cleverly, in particular makerData.
+    try {
+      await Promise.all([
+        _getPosition(),
+        _getAuthorizations(),
+        _getTxHistory(false),
+        _getPreferences(),
+        _getMakerData(),
+      ]);
+      console.log('User initialised.');
 
-    await Promise.all([
-      _getPosition(),
-      _getAuthorizations(),
-      _getTxHistory(false),
-      _getPreferences(),
-      _getMakerData(),
-    ]);
-    console.log('User initialised.');
+    } catch (e) {
+      console.log(e);
+    }
     /* Init end */
     dispatch({ type: 'isLoading', payload: false });
   };
 
   useEffect(()=>{
-
     // Init everytime it starts or change of user
-    !yieldState.yieldLoading && account && initUser();
+    !yieldState?.yieldLoading && account && initUser();
     // If user has changed, rebuild and re-cache the history
-    !yieldState.yieldLoading && account && !(txHistory?.account === account) && _getTxHistory(true);
+    !yieldState?.yieldLoading && account && !(txHistory?.account === account) && _getTxHistory(true);
 
   }, [ account, yieldState.yieldLoading ]);
 
