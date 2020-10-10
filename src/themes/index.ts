@@ -18,6 +18,7 @@ export const yieldTheme = {
       },
     },
     colors: {
+      active: '#222222',
       brand: {
         dark: '#005792',
         light: '#000000',
@@ -92,7 +93,6 @@ export const yieldTheme = {
       'status-unknown': '#CCCCCC',
       'status-disabled': '#CCCCCC',
     },
-
     'font': {
       'family': '"Sora"',
       'face': "/* latin-ext */\n@font-face {\n  font-family: 'Sora';\n  font-style: normal;\n  font-weight: 400;\n  src: url(https://fonts.gstatic.com/s/sora/v1/xMQOuFFYT72X5wkB_18qmnndmSdSnk-DKQRDA8i1P4xdNw.woff) format('woff');\n  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;\n}\n/* latin */\n@font-face {\n  font-family: 'Sora';\n  font-style: normal;\n  font-weight: 400;\n  src: url(https://fonts.gstatic.com/s/sora/v1/xMQOuFFYT72X5wkB_18qmnndmSdSnk-NKQRDA8i1P4w.woff) format('woff');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;\n}\n\n/* latin-ext */\n@font-face {\n  font-family: 'Sora';\n  font-style: normal;\n  font-weight: 400;\n  src: url(https://fonts.gstatic.com/s/sora/v1/xMQOuFFYT72X5wkB_18qmnndmSdSnk-DKQRDA8i1P4xdNw.woff) format('woff');\n  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;\n}\n/* latin */\n@font-face {\n  font-family: 'Sora';\n  font-style: normal;\n  font-weight: 400;\n  src: url(https://fonts.gstatic.com/s/sora/v1/xMQOuFFYT72X5wkB_18qmnndmSdSnk-NKQRDA8i1P4w.woff) format('woff');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;\n}\n",
@@ -100,7 +100,6 @@ export const yieldTheme = {
       'height': '20px',
       'maxWidth': '300px'
     },
-
     active: {
       background: 'active-background',
       color: 'active-text',
@@ -195,6 +194,12 @@ export const yieldTheme = {
   grommet: {
     // @ts-ignore
     extend: () => css`
+      .App {
+        display: flex;
+        min-height: 100vh;
+        flex-direction: column;
+      }
+      a { color: grey}
       input::-webkit-outer-spin-button,
       input::-webkit-inner-spin-button {
         -webkit-appearance: none;

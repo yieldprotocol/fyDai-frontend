@@ -82,7 +82,10 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
           background='#555555'
           justify='between'
         >
-          {!buttonOnly && <Text>Feel free to look around and play. However, before you make any transactions you will need to sign a few authorizations.</Text> }
+          {!buttonOnly &&
+            <Box> 
+              <Text>Feel free to look around and play. However, before you make any transactions you will need to sign a few authorizations.</Text>
+            </Box>}
           <RaisedButton 
             background='#555555'
             label={<Box pad={{ horizontal:'medium', vertical:'small' }} align='center'><Text size='small' color='#DDDDDD'><Unlock /> Authorize Yield</Text></Box>}

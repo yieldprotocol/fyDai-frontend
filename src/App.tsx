@@ -1,8 +1,10 @@
 import React, { useRef, useEffect, useState, useContext, Suspense } from 'react';
-
+import { HashRouter as Router, Switch, Route, Redirect, useLocation } from 'react-router-dom';
 import { Grommet, base, Grid, Main, Box, ResponsiveContext, Nav, Layer, Collapsible } from 'grommet';
 import { deepMerge } from 'grommet/utils';
 import { yieldTheme } from './themes';
+
+import { modColor } from './utils';
 
 import { SeriesContext } from './contexts/SeriesContext';
 import { YieldContext } from './contexts/YieldContext';
@@ -13,7 +15,9 @@ import PoolView from './views/PoolView';
 
 import YieldHeader from './components/YieldHeader';
 import YieldFooter from './components/YieldFooter';
-import SeriesSelector from './components/SeriesSelector';
+import Authorization from './components/Authorization';
+import ErrorBoundary from './components/ErrorBoundry';
+
 import YieldMark from './components/logos/YieldMark';
 
 import ConnectLayer from './containers/layers/ConnectLayer';
@@ -21,33 +25,33 @@ import NotifyLayer from './containers/layers/NotifyLayer';
 
 // TODO: remove testLayer for prod
 import TestLayer from './containers/layers/TestLayer';
-import Authorization from './components/Authorization';
-import { modColor } from './utils';
-import ErrorBoundary from './components/ErrorBoundry';
+import { useCachedState } from './hooks';
+import YieldNav from './components/YieldNav';
 
 const App = (props:any) => {
   const { state: { seriesLoading, activeSeries } } = useContext(SeriesContext);
   const { state: { yieldLoading } } = useContext(YieldContext);
 
-  // TODO Switch out for react router
-  const [activeView, setActiveView] = useState<string>('BORROW');
-  const [showConnectLayer, setShowConnectLayer] = useState<string|null>(null);
-  const [showSeriesLayer, setShowSeriesLayer] = useState<boolean>(false);
+  const [cachedLastVisit, setCachedLastVisit] = useCachedState('lastVisit', null);
 
+  const location = useLocation();
+  React.useEffect(() => {
+    location && setCachedLastVisit(location.pathname);
+  }, [location]);
+
+  const [showConnectLayer, setShowConnectLayer] = useState<string|null>(null);
+  
   // TODO remove for prod
   const [showTestLayer, setShowTestLayer] = useState<boolean>(false);
 
   const leftSideRef = useRef<any>(null);
 
   const screenSize = useContext(ResponsiveContext);
-  const [columnsWidth, setColumnsWidth] = useState<string[]>(['5%', 'auto', '5%']);
-
+  const [columns, setColumns] = useState<string[]>(['10%', 'auto', '10%']);
   useEffect(()=> {
-    if (screenSize === 'small') { 
-      setColumnsWidth(['0%', 'auto', '0%']);
-    } else { 
-      setColumnsWidth(['5%', 'auto', '5%']);
-    }
+    screenSize === 'small'?
+      setColumns(['0%', 'auto', '0%'])
+      : setColumns(['10%', 'auto', '10%']);
   }, [screenSize]);
 
   return (
@@ -56,55 +60,64 @@ const App = (props:any) => {
       className="App" 
       style={
         ( activeSeries && props.moodLight) ? 
-          { background: `radial-gradient(at 90% 90%, transparent 75%, ${modColor(activeSeries.seriesColor, 50)})`}
+          { background: `radial-gradient(at 90% 90%, transparent 75%, ${modColor(activeSeries.seriesColor, 50)})` }
           :
           undefined
-          // { background: 'radial-gradient(at 90% 90%, transparent 70%, #00000010)', transition: 'all 1s ease-in' }
       }
     >
       <ConnectLayer view={showConnectLayer} closeLayer={() => setShowConnectLayer(null)} />
       { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
-      { showSeriesLayer  && <SeriesSelector activeView='borrow' close={()=>setShowSeriesLayer(false)} /> }
 
-      <Grid fill columns={columnsWidth} justify='center'>
+      <Grid 
+        fill 
+        columns={columns} 
+        justify='center'
+      >
         <Box background={{ color: 'background-front' }} />
         <YieldHeader
           openConnectLayer={(v:string) => setShowConnectLayer(v)}
-          activeView={activeView}
-          setActiveView={setActiveView}
         />
         <Box background={{ color: 'background-front' }} />
       </Grid>
 
       { !yieldLoading &&
         <Collapsible open={!seriesLoading} ref={leftSideRef}>
-          <Grid fill columns={columnsWidth}>
-            <Box background={{ color: '#555555' }} />
-            <Authorization />
-            <Box background={{ color: '#555555' }} />
-          </Grid> 
+          <Authorization />
         </Collapsible>}
 
-      <NotifyLayer target={leftSideRef.current} columnsWidth={columnsWidth} />
+      <NotifyLayer target={leftSideRef.current} columnsWidth={columns} />
+
+      <Box margin={{top:'large'}} align='center'><YieldNav /></Box>
 
       <Main 
         pad={{ bottom:'large' }}
-      >
-        <Grid columns={columnsWidth}>
-          <Box />
-          <Box
-            pad={{ vertical: 'large' }}
-            align='center'         
-          >  
-            {activeView === 'BORROW' && <BorrowView openConnectLayer={(v:string) => setShowConnectLayer('CONNECT')} />}
-            {activeView === 'LEND' && <LendView openConnectLayer={(v:string) => setShowConnectLayer('CONNECT')} />}
-            {activeView === 'POOL' && <PoolView openConnectLayer={(v:string) => setShowConnectLayer('CONNECT')} />}
-          </Box>               
-          <Box />
-        </Grid>
+      >      
+        <Box
+          pad={{ vertical: 'large' }}
+          align='center'
+        >
+          <Switch>
+            <Route exact path="/">
+              <Redirect to={`${cachedLastVisit || '/borrow'}`} />
+            </Route>
+            <Route path="/borrow/:series?/:amnt?">
+              <BorrowView openConnectLayer={() => setShowConnectLayer('CONNECT')} />
+            </Route>
+            <Route path="/lend/:series?/:amnt?">
+              <LendView openConnectLayer={() => setShowConnectLayer('CONNECT')} />
+            </Route>
+            <Route path="/pool/:series?/:amnt?">
+              <PoolView openConnectLayer={() => setShowConnectLayer('CONNECT')} />
+            </Route>
+          </Switch>
+        </Box>               
       </Main>
 
-      <Grid fill columns={columnsWidth} justify='center'>
+      <Grid 
+        fill 
+        columns={columns} 
+        justify='center'
+      >
         <Box />
         {screenSize !== 'small' &&
           <YieldFooter
@@ -116,7 +129,7 @@ const App = (props:any) => {
             toggleMoodLight={props.toggleMoodLight}
             openConnectLayer={() => setShowConnectLayer('CONNECT')}
           />}                  
-        <Box />      
+        <Box />
       </Grid>
 
       {screenSize === 'small' &&    
@@ -148,21 +161,25 @@ const ThemedApp = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [ moodLight, setMoodLight] = useState(true);
   return (
+
     <Suspense fallback={null}>
-      <Grommet
-        theme={deepMerge(base, yieldTheme)}
-        themeMode={darkMode ? 'dark' : 'light'}
-        full
-      >
-        <ErrorBoundary>
-          <App 
-            darkMode={darkMode}
-            setDarkMode={setDarkMode}
-            moodLight={moodLight}
-            toggleMoodLight={()=>setMoodLight(!moodLight)}
-          />
-        </ErrorBoundary>
-      </Grommet>
+      <Router>
+        <Grommet
+          theme={deepMerge(base, yieldTheme)}
+          themeMode={darkMode ? 'dark' : 'light'}
+          full
+        >
+        
+          <ErrorBoundary>
+            <App 
+              darkMode={darkMode}
+              setDarkMode={setDarkMode}
+              moodLight={moodLight}
+              toggleMoodLight={()=>setMoodLight(!moodLight)}
+            />
+          </ErrorBoundary>
+        </Grommet>
+      </Router>
     </Suspense>
   );
 };

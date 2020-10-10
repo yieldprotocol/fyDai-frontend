@@ -1,13 +1,11 @@
 import React, { useState, useContext } from 'react';
-import styled from 'styled-components';
 import {
-  Text,
   Image,
   Button,
   Box,
   ThemeContext,
   ResponsiveContext,
-  Layer
+  Layer,
 } from 'grommet';
 import { VscTelescope as Telescope } from 'react-icons/vsc';
 
@@ -16,48 +14,14 @@ import logoLight from '../assets/images/logo_light.svg';
 
 import AccountButton from './AccountButton';
 import FlatButton from './FlatButton';
-
-const StyledText = styled(Text)`
-  transition: all 0.5s ease-in-out;
-  :active:hover {
-    transform: scale(1.25);
-    }
-  :hover {
-    transform: scale(1.25);
-  }
-`;
+import YieldNav from './YieldNav';
 
 const YieldHeader = (props: any) => {
-  const {
-    activeView,
-    setActiveView,
-  } = props;
 
   const screenSize = useContext(ResponsiveContext);
 
   // Menu state for mobile later
   const [menuOpen, setMenuOpen] = useState(false);
-
-  const [navLinks] = useState([
-    {
-      link: 'BORROW',
-      text: 'Borrow',
-      id: 1,
-      disabled: false,
-    },
-    {
-      link: 'LEND',
-      text: 'Lend',
-      id: 2,
-      disabled: false,
-    },
-    {
-      link: 'POOL',
-      text: 'Pool',
-      id: 3,
-      disabled: false,
-    },
-  ]);
 
   const theme = useContext<any>(ThemeContext);
 
@@ -83,49 +47,12 @@ const YieldHeader = (props: any) => {
         { menuOpen &&
         <Layer full>
           <Box background='background' fill>
-            <Nav />
+            <YieldNav />
           </Box>       
         </Layer>}
       </>
     );
   };
-
-
-  const Nav = () => (
-    <Box
-      direction={screenSize === 'small' ? 'column' : 'row'}
-      fill={screenSize === 'small' ? 'horizontal' : false}
-      gap='large'
-      align='center'
-    >
-      { 
-      navLinks.map((item) => (
-        <Box
-          direction="row-responsive"
-          onClick={() => {
-            !item.disabled && setActiveView(item.link);
-            setMenuOpen(false);
-          }}
-          gap="small"
-          key={item.id}
-        >
-          <StyledText
-            weight='bold'
-            // eslint-disable-next-line no-nested-ternary
-            color={item.disabled ? 'lightgrey' : activeView === item.link ? 'brand' : 'text-xweak'}
-            size={screenSize === 'small' ? 'medium' : 'xxlarge'}
-            style={{ 
-              textDecoration: activeView === item.link ? 'none' : 'none', 
-              width: screenSize === 'small' ? '100%' : 'auto',           
-            }}
-          >
-            {item.text}
-          </StyledText>
-        </Box>
-      ))
-    }    
-    </Box>
-  );
 
   return (
     <Box fill>
@@ -161,10 +88,7 @@ const YieldHeader = (props: any) => {
         fill='horizontal'
       >
         <Box alignSelf='center'>
-          { screenSize === 'small' ? 
-            <MobileNav /> 
-            : 
-            <Nav />}
+          { screenSize === 'small' && <MobileNav /> }
         </Box>
       </Box>
     </Box>
