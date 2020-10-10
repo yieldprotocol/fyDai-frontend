@@ -387,7 +387,7 @@ export const useProxy = () => {
     let minFYDai:BigNumber;
     setRemoveLiquidityActive(true);
     try {
-      if ( !(await hasBeenMatured(series.fyDaiAddress)) ) {
+      if ( !series.isMature() ) {
         console.log('Removing liquidity BEFORE maturity'); 
         /* calculate expected trade values and factor in slippage */
         // const preview = await previewPoolTx('selldai', series, daiUsed);

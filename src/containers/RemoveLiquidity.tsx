@@ -110,7 +110,6 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
     }
   }, [ inputValue ]);
 
-
   return (
     <Keyboard 
       onEsc={() => { inputValue? setInputValue(undefined): close();}}
