@@ -300,37 +300,6 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
                   hasDelegatedPool={activeSeries.hasDelegatedPool}
                 />       
               </Box>
-
-              <Box direction='row' fill justify='between'>
-                { activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) && 
-                <Box alignSelf='start' margin={{ top:'medium' }}>
-                  <FlatButton 
-                    onClick={()=>setHistOpen(true)}
-                    label={
-                      <Box direction='row' gap='small' align='center'>
-                        <Text size='xsmall' color='text-xweak'><History /></Text>                
-                        <Text size='xsmall' color='text-xweak'>
-                          Series Lend History
-                        </Text>              
-                      </Box>
-                    }
-                  />
-                </Box>}
-
-                { activeSeries?.fyDaiBalance_ > 0 &&
-                <Box alignSelf='end' margin={{ top:'medium' }}>
-                  <FlatButton 
-                    onClick={()=>setWithdrawDaiOpen(true)}
-                    label={
-                      <Box direction='row' gap='small' align='center'>
-                        <Box><Text size='xsmall' color='text-weak'><Text weight='bold' color={activeSeries.seriesColor}>close</Text> your position in this series</Text></Box>
-                        <ArrowRight color='text-weak' />
-                      </Box>
-                    }
-                  />
-                </Box>}
-              </Box>
-
             </>}
           
           { activeSeries?.isMature() &&
@@ -341,6 +310,36 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
             activeSeries?.isMature() && 
             activeSeries?.fyDaiBalance?.gt(ethers.constants.Zero) && 
             <Redeem />}
+
+          <Box direction='row' fill justify='between'>
+            { activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) && 
+            <Box alignSelf='start' margin={{ top:'medium' }}>
+              <FlatButton 
+                onClick={()=>setHistOpen(true)}
+                label={
+                  <Box direction='row' gap='small' align='center'>
+                    <Text size='xsmall' color='text-xweak'><History /></Text>                
+                    <Text size='xsmall' color='text-xweak'>
+                      Series Lend History
+                    </Text>              
+                  </Box>
+                    }
+              />
+            </Box>}
+
+            { !activeSeries?.isMature() && activeSeries?.fyDaiBalance_ > 0 &&
+            <Box alignSelf='end' margin={{ top:'medium' }}>
+              <FlatButton 
+                onClick={()=>setWithdrawDaiOpen(true)}
+                label={
+                  <Box direction='row' gap='small' align='center'>
+                    <Box><Text size='xsmall' color='text-weak'><Text weight='bold' color={activeSeries.seriesColor}>close</Text> your position in this series</Text></Box>
+                    <ArrowRight color='text-weak' />
+                  </Box>
+                    }
+              />
+            </Box>}
+          </Box>
 
         </Box>
       </Box>}

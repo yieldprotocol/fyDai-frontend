@@ -455,7 +455,17 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
             />}
           </Box>}
 
+          { activeSeries?.isMature() &&
+            <SeriesMatureBox />}
+            
+          { !txActive && 
+            !!account && 
+            activeSeries?.isMature() && 
+            activeSeries?.ethDebtFYDai.gt(ethers.constants.Zero) && 
+            <Repay />}
+
           <Box direction='row' fill justify='between'>
+
             { activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) && 
             <Box alignSelf='start' margin={{ top:'medium' }}>
               <FlatButton 
@@ -470,7 +480,7 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
                 }
               />
             </Box>}
-
+            
             { !activeSeries?.isMature() &&
             activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) &&
             <Box alignSelf='end' margin={{ top:'medium' }}>
@@ -489,16 +499,6 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
               />
             </Box>}
           </Box>
-
-
-          { activeSeries?.isMature() &&
-            <SeriesMatureBox />}
-            
-          { !txActive && 
-            !!account && 
-            activeSeries?.isMature() && 
-            activeSeries?.ethDebtFYDai.gt(ethers.constants.Zero) && 
-            <Repay />}
         </Box>
       </Box>}
 

@@ -261,6 +261,12 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
 
           { activeSeries?.isMature() &&
             <SeriesMatureBox />}
+            
+          { !txActive && 
+            !!account && 
+            activeSeries?.isMature() && 
+            activeSeries?.poolTokens?.gt(ethers.constants.Zero) && 
+            <RemoveLiquidity />}
 
           <Box direction='row' fill justify='between'>
             { activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) && 
@@ -292,12 +298,6 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
               />
             </Box>}
           </Box>
-
-          { !txActive && 
-            !!account && 
-            activeSeries?.isMature() && 
-            activeSeries?.poolTokens?.gt(ethers.constants.Zero) && 
-            <RemoveLiquidity />}
 
         </Box>
       </Box>}
