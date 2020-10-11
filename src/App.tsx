@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState, useContext, Suspense } from 'react';
 import { Switch, Route, Redirect, useLocation } from 'react-router-dom';
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import { Grommet, base, Grid, Main, Box, ResponsiveContext, Nav, Layer, Collapsible } from 'grommet';
 import { deepMerge } from 'grommet/utils';
 import { yieldTheme } from './themes';
@@ -91,6 +92,7 @@ const App = (props:any) => {
 
       <Box margin={{ top:'large' }} align='center'><YieldNav /></Box>
 
+
       <Main 
         pad={{ bottom:'large' }}
       >      
@@ -99,10 +101,11 @@ const App = (props:any) => {
           align='center'
         >
           <Switch>
+
             <Route path="/borrow/collateral/:amnt?">
               <Deposit openConnectLayer={() => setShowConnectLayer('CONNECT')} />
             </Route>
-
+            
             <Route path="/borrow/:series?/:amnt?">
               <Borrow openConnectLayer={() => setShowConnectLayer('CONNECT')} />
             </Route>
@@ -122,6 +125,8 @@ const App = (props:any) => {
           </Switch>
         </Box>               
       </Main>
+
+      
 
       <Grid 
         fill 
@@ -170,7 +175,7 @@ const App = (props:any) => {
 const WrappedApp = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [ moodLight, setMoodLight] = useState(true);
-
+  
   return (
     <Suspense fallback={null}>
       <Grommet
