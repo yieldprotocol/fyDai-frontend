@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState, useContext, Suspense } from 'react';
 import { Switch, Route, Redirect, useLocation } from 'react-router-dom';
-import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+
 import { Grommet, base, Grid, Main, Box, ResponsiveContext, Nav, Layer, Collapsible } from 'grommet';
 import { deepMerge } from 'grommet/utils';
 import { yieldTheme } from './themes';
@@ -32,7 +32,7 @@ import YieldNav from './components/YieldNav';
 
 
 const App = (props:any) => {
-
+  
   const { state: { seriesLoading, activeSeries } } = useContext(SeriesContext);
   const { state: { yieldLoading } } = useContext(YieldContext);
 
@@ -40,17 +40,16 @@ const App = (props:any) => {
 
   const location = useLocation();
   React.useEffect(() => {
-    activeSeries && 
     location?.pathname !== '/borrow/collateral/' &&
-    setCachedLastVisit(`/${location.pathname.split('/')[1]}/${activeSeries.maturity}` );
+    ['borrow', 'lend', 'pool'].includes(location.pathname.split('/')[1]) &&
+    setCachedLastVisit(`/${location.pathname.split('/')[1]}/${activeSeries?.maturity}` );
   }, [location]);
 
   const [showConnectLayer, setShowConnectLayer] = useState<string|null>(null);
+  const leftSideRef = useRef<any>(null);
   
   // TODO remove for prod
   const [showTestLayer, setShowTestLayer] = useState<boolean>(false);
-
-  const leftSideRef = useRef<any>(null);
 
   const screenSize = useContext(ResponsiveContext);
   const [columns, setColumns] = useState<string[]>(['10%', 'auto', '10%']);
@@ -94,20 +93,18 @@ const App = (props:any) => {
 
       <Box margin={{ top:'large' }} align='center'><YieldNav /></Box>
 
-
       <Main 
         pad={{ bottom:'large' }}
       >      
         <Box
           pad={{ vertical: 'large' }}
           align='center'
-        >
+        > 
           <Switch>
-
             <Route path="/borrow/collateral/:amnt?">
               <Deposit openConnectLayer={() => setShowConnectLayer('CONNECT')} />
             </Route>
-            
+
             <Route path="/borrow/:series?/:amnt?">
               <Borrow openConnectLayer={() => setShowConnectLayer('CONNECT')} />
             </Route>
@@ -115,20 +112,21 @@ const App = (props:any) => {
             <Route path="/lend/:series?/:amnt?">
               <Lend openConnectLayer={() => setShowConnectLayer('CONNECT')} />
             </Route>
-
             <Route path="/pool/:series?/:amnt?">
               <Pool openConnectLayer={() => setShowConnectLayer('CONNECT')} />
             </Route>
-
             <Route exact path="/">
               <Redirect to={`${cachedLastVisit || '/borrow/'}`} />
             </Route>
 
+            <Route path="/*">
+              404
+            </Route>
+
+
           </Switch>
         </Box>               
       </Main>
-
-      
 
       <Grid 
         fill 
