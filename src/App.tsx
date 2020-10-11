@@ -33,14 +33,16 @@ import YieldNav from './components/YieldNav';
 
 const App = (props:any) => {
 
-  const { state: { seriesLoading, activeSeries }, actions: seriesActions } = useContext(SeriesContext);
+  const { state: { seriesLoading, activeSeries } } = useContext(SeriesContext);
   const { state: { yieldLoading } } = useContext(YieldContext);
 
   const [cachedLastVisit, setCachedLastVisit] = useCachedState('lastVisit', null);
 
   const location = useLocation();
   React.useEffect(() => {
-    location && setCachedLastVisit(`/${location.pathname.split('/')[1]}/${location.pathname.split('/')[2]}` );
+    activeSeries && 
+    location?.pathname !== '/borrow/collateral/' &&
+    setCachedLastVisit(`/${location.pathname.split('/')[1]}/${activeSeries.maturity}` );
   }, [location]);
 
   const [showConnectLayer, setShowConnectLayer] = useState<string|null>(null);
@@ -175,7 +177,7 @@ const App = (props:any) => {
 const WrappedApp = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [ moodLight, setMoodLight] = useState(true);
-  
+
   return (
     <Suspense fallback={null}>
       <Grommet
