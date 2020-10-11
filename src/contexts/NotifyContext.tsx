@@ -70,7 +70,7 @@ function notifyReducer(state:INotification, action:IReducerAction) {
   }
 }
 
-const NotifyProvider = ({ children }:any) => {
+const NotifyProvider = ({ updateAvailable, children }:any) => {
   const [state, dispatch] = React.useReducer(notifyReducer, initState);
   useEffect( () => {
     state.open && ( () => {
@@ -83,6 +83,8 @@ const NotifyProvider = ({ children }:any) => {
       }
     })();
   }, [state.open]);
+
+  useEffect(()=> dispatch({ type: 'Notify', payload:{ message: 'An app update is availble', timerMs:0 },  }), [updateAvailable]);
 
   return (
     <NotifyContext.Provider value={{ state, dispatch }}>

@@ -25,7 +25,7 @@ function getFallbackLibrary(provider: any) {
   library.pollingInterval = 12000;
   return library;
 }
-
+let updateAvailable;
 const Web3ReactProviderFallback = createWeb3ReactRoot('fallback');
 
 ReactDOM.render(
@@ -33,7 +33,7 @@ ReactDOM.render(
     <Router>
       <Web3ReactProvider getLibrary={getLibrary}> 
         <Web3ReactProviderFallback getLibrary={getFallbackLibrary}> 
-          <NotifyProvider>
+          <NotifyProvider updateAvialable={updateAvailable}>
             <YieldProvider>
               <UserProvider>
                 <SeriesProvider>
@@ -52,7 +52,7 @@ ReactDOM.render(
 serviceWorker.register({ 
   // TODO handle the update
   onUpdate: ()=> {
+    updateAvailable=true;
     console.log( 'A newer version of the app is available' );
-    // window.location.reload();
   } 
 }); 
