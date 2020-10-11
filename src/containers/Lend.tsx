@@ -35,6 +35,7 @@ import TxHistory from '../components/TxHistory';
 import HistoryWrap from '../components/HistoryWrap';
 
 import DaiMark from '../components/logos/DaiMark';
+import RaisedBox from '../components/RaisedBox';
 
 interface ILendProps {
   openConnectLayer:any;
@@ -145,88 +146,89 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
   }, [ debouncedInput, daiBalance ]);
 
   return (
-    <Keyboard 
-      onEsc={() => setInputValue(undefined)}
-      onEnter={()=> lendProcedure()}
-      onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
-      target='document'
-    >
-      { withdrawDaiOpen && <WithdrawDai close={()=>setWithdrawDaiOpen(false)} /> }
+    <RaisedBox>
+      <Keyboard 
+        onEsc={() => setInputValue(undefined)}
+        onEnter={()=> lendProcedure()}
+        onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
+        target='document'
+      >
+        { withdrawDaiOpen && <WithdrawDai close={()=>setWithdrawDaiOpen(false)} /> }
 
-      { histOpen && 
-      <HistoryWrap closeLayer={()=>setHistOpen(false)}>
-        <TxHistory 
-          filterTerms={['Lent', 'Closed']}
-          series={activeSeries}
-        />
-      </HistoryWrap>}
+        { histOpen && 
+        <HistoryWrap closeLayer={()=>setHistOpen(false)}>
+          <TxHistory 
+            filterTerms={['Lent', 'Closed']}
+            series={activeSeries}
+          />
+        </HistoryWrap>}
 
-      <SeriesDescriptor activeView='lend'>
-        <InfoGrid 
-          alt 
-          entries={[
-            {
-              label: 'Portfolio Value',
-              labelExtra: 'at maturity',
-              visible: 
+        <SeriesDescriptor activeView='lend'>
+          <InfoGrid 
+            alt 
+            entries={[
+              {
+                label: 'Portfolio Value',
+                labelExtra: 'at maturity',
+                visible: 
                   (!!account && !txActive && !activeSeries?.isMature()) || 
                   ( activeSeries?.isMature() && activeSeries?.fyDaiBalance_>0),
-              active: true,
-              loading: lendPending,  
-              value: activeSeries && `${activeSeries?.fyDaiBalance_} DAI` || '-',
-              valuePrefix: null,
-              valueExtra: null,
-            },
-            {
-              label: 'Current Value',
-              labelExtra: 'if closing your position now',
-              visible: !!account && !txActive && !activeSeries?.isMature(),
-              active: true,
-              loading: lendPending || !currentValue,           
-              value: currentValue?`${cleanValue(currentValue, 2)} DAI`: '- Dai',
-              valuePrefix: null,
-              valueExtra: null,
-            },
-            {
-              label: null,
-              labelExtra: null,
-              visible: !!account && !txActive && !activeSeries?.isMature(),
-              active: true,
-              loading: false,           
-              value: null,
-              valuePrefix: null,
-              valueExtra: null,
-            },
-            {
-              label: 'Dai Balance',
-              visible: 
+                active: true,
+                loading: lendPending,  
+                value: activeSeries && `${activeSeries?.fyDaiBalance_} DAI` || '-',
+                valuePrefix: null,
+                valueExtra: null,
+              },
+              {
+                label: 'Current Value',
+                labelExtra: 'if closing your position now',
+                visible: !!account && !txActive && !activeSeries?.isMature(),
+                active: true,
+                loading: lendPending || !currentValue,           
+                value: currentValue?`${cleanValue(currentValue, 2)} DAI`: '- Dai',
+                valuePrefix: null,
+                valueExtra: null,
+              },
+              {
+                label: null,
+                labelExtra: null,
+                visible: !!account && !txActive && !activeSeries?.isMature(),
+                active: true,
+                loading: false,           
+                value: null,
+                valuePrefix: null,
+                valueExtra: null,
+              },
+              {
+                label: 'Dai Balance',
+                visible: 
                   false &&
                   (!!account && !txActive && !activeSeries?.isMature()) || 
                   (activeSeries?.isMature() && activeSeries?.fyDaiBalance_>0),
-              active: true,
-              loading: lendPending,            
-              value: daiBalance_?`${daiBalance_} DAI`: '0 DAI',
-              valuePrefix: null,
-              valueExtra: null,
-            },
-          ]}
-        />
-      </SeriesDescriptor>
+                active: true,
+                loading: lendPending,            
+                value: daiBalance_?`${daiBalance_} DAI`: '0 DAI',
+                valuePrefix: null,
+                valueExtra: null,
+              },
+            ]}
+          />
+        </SeriesDescriptor>
    
-      {/* If there is no applicable transaction active, show the lending page */}
-      { !txActive &&
-      <Box
-        width={{ max:'600px' }}
-        alignSelf='center'
-        fill='horizontal'
-        background='background-front'
-        round='small'
-        pad='large'
-        gap='medium'
-      >
-        <Box flex='grow' gap='small' align='center' fill='horizontal'>
-          {/* If the series has NOT matured, show the lending input */}
-          { !activeSeries?.isMature() && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
+        {/* If there is no applicable transaction active, show the lending page */}
+        { !txActive &&
+        <Box
+          width={{ max:'600px' }}
+          alignSelf='center'
+          fill='horizontal'
+          background='background-front'
+          round='small'
+          pad='large'
+          gap='medium'
+        >
+          <Box flex='grow' gap='small' align='center' fill='horizontal'>
+            {/* If the series has NOT matured, show the lending input */}
+            { !activeSeries?.isMature() && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
             <>
               <Box fill gap='medium'>
                 <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to lend</Text>
@@ -302,52 +304,53 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
               </Box>
             </>}
           
-          { activeSeries?.isMature() &&
+            { activeSeries?.isMature() &&
             <SeriesMatureBox />}
             
-          { !txActive && 
+            { !txActive && 
             !!account && 
             activeSeries?.isMature() && 
             activeSeries?.fyDaiBalance?.gt(ethers.constants.Zero) && 
             <Redeem />}
 
-          <Box direction='row' fill justify='between'>
-            { activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) && 
-            <Box alignSelf='start' margin={{ top:'medium' }}>
-              <FlatButton 
-                onClick={()=>setHistOpen(true)}
-                label={
-                  <Box direction='row' gap='small' align='center'>
+            <Box direction='row' fill justify='between'>
+              { activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) && 
+              <Box alignSelf='start' margin={{ top:'medium' }}>
+                <FlatButton 
+                  onClick={()=>setHistOpen(true)}
+                  label={
+                    <Box direction='row' gap='small' align='center'>
                     <Text size='xsmall' color='text-xweak'><History /></Text>                
                     <Text size='xsmall' color='text-xweak'>
                       Series Lend History
                     </Text>              
                   </Box>
                     }
-              />
-            </Box>}
+                />
+              </Box>}
 
-            { !activeSeries?.isMature() && activeSeries?.fyDaiBalance_ > 0 &&
-            <Box alignSelf='end' margin={{ top:'medium' }}>
-              <FlatButton 
-                onClick={()=>setWithdrawDaiOpen(true)}
-                label={
-                  <Box direction='row' gap='small' align='center'>
+              { !activeSeries?.isMature() && activeSeries?.fyDaiBalance_ > 0 &&
+              <Box alignSelf='end' margin={{ top:'medium' }}>
+                <FlatButton 
+                  onClick={()=>setWithdrawDaiOpen(true)}
+                  label={
+                    <Box direction='row' gap='small' align='center'>
                     <Box><Text size='xsmall' color='text-weak'><Text weight='bold' color={activeSeries.seriesColor}>close</Text> your position in this series</Text></Box>
                     <ArrowRight color='text-weak' />
                   </Box>
                     }
-              />
-            </Box>}
+                />
+              </Box>}
+            </Box>
+
           </Box>
+        </Box>}
 
-        </Box>
-      </Box>}
-
-      {/* If there is a transaction active, show the applicable view */}
-      { sellActive && !txActive && <ApprovalPending /> }
-      { txActive && <TxStatus msg={`You are lending ${inputValue} DAI`} tx={txActive} /> }
-    </Keyboard>
+        {/* If there is a transaction active, show the applicable view */}
+        { sellActive && !txActive && <ApprovalPending /> }
+        { txActive && <TxStatus msg={`You are lending ${inputValue} DAI`} tx={txActive} /> }
+      </Keyboard>
+    </RaisedBox>
   );
 };
 

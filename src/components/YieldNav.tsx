@@ -8,6 +8,8 @@ import {
   ResponsiveContext,
 } from 'grommet';
 
+import { SeriesContext } from '../contexts/SeriesContext';
+
 const StyledLink = styled(NavLink)`
   text-decoration: none;
   -webkit-transition: all 0.5s ease-in-out;
@@ -21,6 +23,7 @@ const StyledLink = styled(NavLink)`
 const YieldNav = (props: any) => {
 
   const screenSize = useContext(ResponsiveContext);
+  const { state: { activeSeries } } = useContext(SeriesContext);
   const theme = useContext<any>(ThemeContext);
 
   return (
@@ -31,21 +34,21 @@ const YieldNav = (props: any) => {
       align='center'
     >
       <StyledLink 
-        to='/borrow' 
+        to={`/borrow/${activeSeries?.maturity}`}
         activeStyle={{ transform: 'scale(1.1)', fontWeight: 'bold', color: `${theme.global.colors.active}` }}
       > 
         <Text weight='bold' size='xxlarge'>Borrow</Text>
       </StyledLink> 
 
       <StyledLink 
-        to='/lend' 
+        to={`/lend/${activeSeries?.maturity}`}
         activeStyle={{ transform: 'scale(1.1)', fontWeight: 'bold', color: `${theme.global.colors.active}` }}
       >
         <Text weight='bold' size='xxlarge'>Lend</Text>
       </StyledLink> 
 
       <StyledLink 
-        to='/pool'
+        to={`/pool/${activeSeries?.maturity}`}
         activeStyle={{ transform: 'scale(1.1)', fontWeight: 'bold', color: `${theme.global.colors.active}` }}
       >
         <Text weight='bold' size='xxlarge'>Pool</Text>

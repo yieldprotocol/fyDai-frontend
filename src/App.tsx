@@ -9,9 +9,10 @@ import { modColor } from './utils';
 import { SeriesContext } from './contexts/SeriesContext';
 import { YieldContext } from './contexts/YieldContext';
 
-import BorrowView from './views/BorrowView';
-import LendView from './views/LendView';
-import PoolView from './views/PoolView';
+import Borrow from './containers/Borrow';
+import Lend from './containers/Lend';
+import Pool from './containers/Pool';
+import Deposit from './containers/Deposit';
 
 import YieldHeader from './components/YieldHeader';
 import YieldFooter from './components/YieldFooter';
@@ -27,6 +28,7 @@ import NotifyLayer from './containers/layers/NotifyLayer';
 import TestLayer from './containers/layers/TestLayer';
 import { useCachedState } from './hooks';
 import YieldNav from './components/YieldNav';
+
 
 const App = (props:any) => {
   const { state: { seriesLoading, activeSeries } } = useContext(SeriesContext);
@@ -97,18 +99,26 @@ const App = (props:any) => {
           align='center'
         >
           <Switch>
+
             <Route exact path="/">
               <Redirect to={`${cachedLastVisit || '/borrow'}`} />
             </Route>
+
+            <Route path="/borrow/collateral/:amnt?">
+              <Deposit openConnectLayer={() => setShowConnectLayer('CONNECT')} />
+            </Route>
             <Route path="/borrow/:series?/:amnt?">
-              <BorrowView openConnectLayer={() => setShowConnectLayer('CONNECT')} />
+              <Borrow openConnectLayer={() => setShowConnectLayer('CONNECT')} />
             </Route>
+
             <Route path="/lend/:series?/:amnt?">
-              <LendView openConnectLayer={() => setShowConnectLayer('CONNECT')} />
+              <Lend openConnectLayer={() => setShowConnectLayer('CONNECT')} />
             </Route>
+
             <Route path="/pool/:series?/:amnt?">
-              <PoolView openConnectLayer={() => setShowConnectLayer('CONNECT')} />
+              <Pool openConnectLayer={() => setShowConnectLayer('CONNECT')} />
             </Route>
+
           </Switch>
         </Box>               
       </Main>

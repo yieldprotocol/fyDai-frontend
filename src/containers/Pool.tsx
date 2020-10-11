@@ -33,8 +33,10 @@ import FlatButton from '../components/FlatButton';
 import SeriesMatureBox from '../components/SeriesMatureBox';
 import TxHistory from '../components/TxHistory';
 import HistoryWrap from '../components/HistoryWrap';
+import RaisedBox from '../components/RaisedBox';
 
 import DaiMark from '../components/logos/DaiMark';
+
 
 interface IPoolProps {
   openConnectLayer:any;
@@ -125,22 +127,23 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
   }, [ debouncedInput, daiBalance ]);
 
   return (
-    <Keyboard 
-      onEsc={() => setInputValue(undefined)}
-      onEnter={()=> addLiquidityProcedure()}
-      onBackspace={()=> {
-        inputValue && 
+    <RaisedBox>
+      <Keyboard 
+        onEsc={() => setInputValue(undefined)}
+        onEnter={()=> addLiquidityProcedure()}
+        onBackspace={()=> {
+          inputValue && 
         (document.activeElement !== inputRef) && 
         setInputValue(debouncedInput.toString().slice(0, -1));
-      }}
-      target='document'
-    >
-      { removeLiquidityOpen && 
+        }}
+        target='document'
+      >
+        { removeLiquidityOpen && 
         <Layer onClickOutside={()=>setRemoveLiquidityOpen(false)}>
           <RemoveLiquidity close={()=>setRemoveLiquidityOpen(false)} /> 
         </Layer>}
 
-      { histOpen && 
+        { histOpen && 
         <HistoryWrap closeLayer={()=>setHistOpen(false)}>
           <TxHistory 
             filterTerms={[ 'Added', 'Removed' ]}
@@ -148,51 +151,51 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
           />
         </HistoryWrap>}
 
-      <SeriesDescriptor activeView='pool'> 
-        <InfoGrid 
-          alt
-          entries={[
-            {
-              label: 'Your Pool Tokens',
-              labelExtra: 'owned in this series',
-              visible: 
+        <SeriesDescriptor activeView='pool'> 
+          <InfoGrid 
+            alt
+            entries={[
+              {
+                label: 'Your Pool Tokens',
+                labelExtra: 'owned in this series',
+                visible: 
                   (!!account && txActive?.type !== 'ADD_LIQUIDITY' && !activeSeries?.isMature()) || 
                   (activeSeries?.isMature() && activeSeries?.poolTokens_>0 ),
-              active: true,
-              loading: addLiquidityPending,     
-              value: activeSeries?.poolTokens_,
-              valuePrefix: null,
-              valueExtra: null, 
-            },
-            {
-              label: 'Your Pool share',
-              labelExtra: `of the total ${activeSeries?.totalSupply_} tokens in this series`,
-              visible: 
+                active: true,
+                loading: addLiquidityPending,     
+                value: activeSeries?.poolTokens_,
+                valuePrefix: null,
+                valueExtra: null, 
+              },
+              {
+                label: 'Your Pool share',
+                labelExtra: `of the total ${activeSeries?.totalSupply_} tokens in this series`,
+                visible: 
                   (!!account && txActive?.type !== 'ADD_LIQUIDITY' && !activeSeries?.isMature()) || 
                   (activeSeries?.isMature() && activeSeries?.poolTokens_>0 ),
-              active: true,
-              loading: addLiquidityPending,           
-              value: activeSeries?` ${activeSeries?.poolPercent}%`: '',
-              valuePrefix: null,
-              valueExtra: null,
-            },
-          ]}
-        /> 
-      </SeriesDescriptor>   
+                active: true,
+                loading: addLiquidityPending,           
+                value: activeSeries?` ${activeSeries?.poolPercent}%`: '',
+                valuePrefix: null,
+                valueExtra: null,
+              },
+            ]}
+          /> 
+        </SeriesDescriptor>   
 
-      { !txActive &&
-      <Box
-        width={{ max:'600px' }}
-        alignSelf='center'
-        fill='horizontal'
-        background='background-front'
-        round='small'
-        pad='large'
-        gap='medium'
-      >
-        <Box flex='grow' gap='small' align='center' fill='horizontal'>
+        { !txActive &&
+        <Box
+          width={{ max:'600px' }}
+          alignSelf='center'
+          fill='horizontal'
+          background='background-front'
+          round='small'
+          pad='large'
+          gap='medium'
+        >
+          <Box flex='grow' gap='small' align='center' fill='horizontal'>
           
-          { !(activeSeries?.isMature()) && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
+            { !(activeSeries?.isMature()) && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
             <>
               <Box fill gap='medium'>
                 <Text alignSelf='start' size='large' color='text' weight='bold'>Add liquidity</Text>
@@ -259,32 +262,32 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
               </Box>
             </>}
 
-          { activeSeries?.isMature() &&
+            { activeSeries?.isMature() &&
             <SeriesMatureBox />}
             
-          { !txActive && 
+            { !txActive && 
             !!account && 
             activeSeries?.isMature() && 
             activeSeries?.poolTokens?.gt(ethers.constants.Zero) && 
             <RemoveLiquidity />}
 
-          <Box direction='row' fill justify='between'>
-            { activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) && 
-            <Box alignSelf='start' margin={{ top:'medium' }}>
-              <FlatButton 
-                onClick={()=>setHistOpen(true)}
-                label={
-                  <Box direction='row' gap='small' align='center'>
+            <Box direction='row' fill justify='between'>
+              { activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) && 
+              <Box alignSelf='start' margin={{ top:'medium' }}>
+                <FlatButton 
+                  onClick={()=>setHistOpen(true)}
+                  label={
+                    <Box direction='row' gap='small' align='center'>
                     <Text size='xsmall' color='text-xweak'><History /></Text>                
                     <Text size='xsmall' color='text-xweak'>
                       Series Pool History
                     </Text>              
                   </Box>
                 }
-              />
-            </Box>}
+                />
+              </Box>}
 
-            { !activeSeries?.isMature() &&
+              { !activeSeries?.isMature() &&
             activeSeries?.poolTokens_>0 &&
             <Box alignSelf='end' margin={{ top:'medium' }}>
               <FlatButton 
@@ -297,14 +300,15 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                 }  
               />
             </Box>}
+            </Box>
+
           </Box>
+        </Box>}
 
-        </Box>
-      </Box>}
-
-      { addLiquidityActive && !txActive && <ApprovalPending /> } 
-      { txActive && <TxStatus msg={`You are adding ${inputValue} DAI liquidity to the pool.`} tx={txActive} /> }
-    </Keyboard>
+        { addLiquidityActive && !txActive && <ApprovalPending /> } 
+        { txActive && <TxStatus msg={`You are adding ${inputValue} DAI liquidity to the pool.`} tx={txActive} /> }
+      </Keyboard>
+    </RaisedBox>
   );
 };
 

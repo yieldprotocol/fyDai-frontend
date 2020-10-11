@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { ethers } from 'ethers';
+import { useParams, useHistory } from 'react-router-dom';
 import { Keyboard, Box, TextInput, Text, ResponsiveContext, Collapsible, Layer } from 'grommet';
 import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 import { VscHistory as History } from 'react-icons/vsc';
@@ -34,6 +35,7 @@ import FlatButton from '../components/FlatButton';
 import SeriesMatureBox from '../components/SeriesMatureBox';
 import TxHistory from '../components/TxHistory';
 import HistoryWrap from '../components/HistoryWrap';
+import RaisedBox from '../components/RaisedBox';
 
 interface IBorrowProps {
   borrowAmount?:number|null;
@@ -42,6 +44,10 @@ interface IBorrowProps {
 }
 
 const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) => {
+
+
+  const { series, amnt } = useParams();
+  const history = useHistory();
 
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { activeSeries } = seriesState; 
@@ -72,9 +78,9 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
   const [ histOpen, setHistOpen ] = useState<boolean>(false);
 
   /* input values */
-  const [ inputValue, setInputValue ] = useState<any|undefined>(borrowAmount || undefined);
+  const [ inputValue, setInputValue ] = useState<any|undefined>(amnt || undefined);
   const debouncedInput = useDebounce(inputValue, 500);
-    
+
   /* internal component state */
   const [ borrowPending, setBorrowPending ] = useState<boolean>(false);
   const [ borrowDisabled, setBorrowDisabled ] = useState<boolean>(true);
@@ -174,263 +180,264 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
   }, [ debouncedInput]);
 
   return (
-    <Keyboard 
-      onEsc={() => setInputValue(undefined)}
-      onEnter={()=> borrowProcedure(inputValue)}
-      onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
-      target='document'   
-    >     
-      { repayOpen && 
+    <RaisedBox>
+      <Keyboard 
+        onEsc={() => setInputValue(undefined)}
+        onEnter={()=> borrowProcedure(inputValue)}
+        onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
+        target='document'
+      >
+        { repayOpen && 
         <Layer 
           onClickOutside={()=>setRepayOpen(false)}
         >
           <Repay close={()=>setRepayOpen(false)} />      
         </Layer>}
 
-      { histOpen && 
-      <HistoryWrap closeLayer={()=>setHistOpen(false)}>
-        <TxHistory 
-          filterTerms={['Borrowed', 'Deposited', 'Withdrew', 'Repaid' ]}
-          series={activeSeries}
-        />
-      </HistoryWrap>}
+        { histOpen && 
+        <HistoryWrap closeLayer={()=>setHistOpen(false)}>
+          <TxHistory 
+            filterTerms={['Borrowed', 'Deposited', 'Withdrew', 'Repaid' ]}
+            series={activeSeries}
+          />
+        </HistoryWrap>}
 
-      <SeriesDescriptor activeView='borrow'>
-        <InfoGrid
-          alt
-          entries={[
-            {
-              label: null,
-              visible: !!account,
-              active: true,
-              loading: false,
-              value:null,
-              valuePrefix: null,
-              valueExtra: ()=>(
-                <>
-                  <Box
-                    width={{ min:'175px' }}
-                    margin={screenSize!=='small'?{ left:'-52px' }: { left:'-25px' }}
-                    background='#555555FA' 
-                    pad='small'
-                    round={{ corner:'right', size:'xsmall' }}
-                    elevation='small'
-                  >
-                    <FlatButton            
-                      onClick={()=>setActiveView(0)}
-                      label={<Text size='xsmall' color='#DDDDDD'> Manage Collateral</Text>}
-                      background='#55555580'
-                    />            
-                  </Box>
-                  <Box
-                    background='#555555FA'
-                    margin={{ left:'-52px' }}
-                    width='2px'
-                    height='2px'
-                  />             
-                </>)
-            },
-            {
-              label: null,
-              labelExtra: null,
-              visible:
-                  !!account &&
-                  parseFloat(ethPosted_) === 0,
-              active: true,
-              loading: false,    
-              value: null,
-              valuePrefix: null,
-              valueExtra: ()=>(
-                <Box width={{ min:'300px' }} direction='row' align='center' gap='small'> 
-                  <Box align='center'> 
-                    {screenSize==='small'? 
-                      // eslint-disable-next-line jsx-a11y/accessible-emoji
-                      <Text size='xxlarge'>👆</Text>
-                      :
-                      // eslint-disable-next-line jsx-a11y/accessible-emoji
-                      <Text size='xxlarge'>👈</Text>}
-                  </Box>
-                  <Box gap='xsmall'>
-                    <Box> 
-                      <Text weight='bold' color='text-weak'> Deposit Collateral </Text>
+        <SeriesDescriptor activeView='borrow'>
+          <InfoGrid
+            alt
+            entries={[
+              {
+                label: null,
+                visible: !!account,
+                active: true,
+                loading: false,
+                value:null,
+                valuePrefix: null,
+                valueExtra: ()=>(
+                  <>
+                    <Box
+                      width={{ min:'175px' }}
+                      margin={screenSize!=='small'?{ left:'-52px' }: { left:'-25px' }}
+                      background='#555555FA' 
+                      pad='small'
+                      round={{ corner:'right', size:'xsmall' }}
+                      elevation='small'
+                    >
+                      <FlatButton            
+                        onClick={()=>history.push('/borrow/collateral/')}
+                        label={<Text size='xsmall' color='#DDDDDD'> Manage Collateral</Text>}
+                        background='#55555580'
+                      />            
                     </Box>
-                    <Text size='xxsmall' color='text-weak'>
-                      Use the 'manage collateral' button to post some ETH
-                    </Text>
-                  </Box>
-                </Box>)
-            },
-
-            /* dummy placeholder */
-            {
-              label: null,
-              labelExtra: null,
-              visible:
+                    <Box
+                      background='#555555FA'
+                      margin={{ left:'-52px' }}
+                      width='2px'
+                      height='2px'
+                    />             
+                  </>)
+              },
+              {
+                label: null,
+                labelExtra: null,
+                visible:
                   !!account &&
                   parseFloat(ethPosted_) === 0,
-              active: true,
-              loading: false,    
-              value: null,
-              valuePrefix: null,
-              valueExtra:null,
-            },
+                active: true,
+                loading: false,    
+                value: null,
+                valuePrefix: null,
+                valueExtra: ()=>(
+                  <Box width={{ min:'300px' }} direction='row' align='center' gap='small'> 
+                    <Box align='center'> 
+                      {screenSize==='small'? 
+                      // eslint-disable-next-line jsx-a11y/accessible-emoji
+                        <Text size='xxlarge'>👆</Text>
+                        :
+                      // eslint-disable-next-line jsx-a11y/accessible-emoji
+                        <Text size='xxlarge'>👈</Text>}
+                    </Box>
+                    <Box gap='xsmall'>
+                      <Box> 
+                        <Text weight='bold' color='text-weak'> Deposit Collateral </Text>
+                      </Box>
+                      <Text size='xxsmall' color='text-weak'>
+                        Use the 'manage collateral' button to post some ETH
+                      </Text>
+                    </Box>
+                  </Box>)
+              },
 
-            {
-              label: 'Dai Debt + Interest',
-              labelExtra: 'owed at maturity',
-              visible:
+              /* dummy placeholder */
+              {
+                label: null,
+                labelExtra: null,
+                visible:
+                  !!account &&
+                  parseFloat(ethPosted_) === 0,
+                active: true,
+                loading: false,    
+                value: null,
+                valuePrefix: null,
+                valueExtra:null,
+              },
+
+              {
+                label: 'Dai Debt + Interest',
+                labelExtra: 'owed at maturity',
+                visible:
                   !!account &&
                   (!activeSeries?.isMature() && !txActive)  || 
                   (activeSeries?.isMature() && activeSeries?.ethDebtDai_ > 0 ),
-              active: true,
-              loading: borrowPending,    
-              value: activeSeries?.ethDebtDai_? `${activeSeries.ethDebtDai_} DAI`: '0 DAI',
-              valuePrefix: null,
-              valueExtra: null, 
-            },
-            {
-              label: 'Borrowing Power',
-              labelExtra: 'based on collateral posted',
-              visible: !txActive && activeSeries && !activeSeries.isMature() && !!account && parseFloat(ethPosted_) > 0,
-              active: maxDaiAvailable_,
-              loading: borrowPending,
-              value: maxDaiAvailable_? `${maxDaiAvailable_} DAI`: '0 DAI',           
-              valuePrefix: null,
-              valueExtra: null,
-            },
+                active: true,
+                loading: borrowPending,    
+                value: activeSeries?.ethDebtDai_? `${activeSeries.ethDebtDai_} DAI`: '0 DAI',
+                valuePrefix: null,
+                valueExtra: null, 
+              },
+              {
+                label: 'Borrowing Power',
+                labelExtra: 'based on collateral posted',
+                visible: !txActive && activeSeries && !activeSeries.isMature() && !!account && parseFloat(ethPosted_) > 0,
+                active: maxDaiAvailable_,
+                loading: borrowPending,
+                value: maxDaiAvailable_? `${maxDaiAvailable_} DAI`: '0 DAI',           
+                valuePrefix: null,
+                valueExtra: null,
+              },
 
-            {
-              label: 'Total Debt',
-              labelExtra: 'across all yield series',
-              visible: !txActive && activeSeries && !activeSeries.isMature() && !!account,
-              active: true,
-              loading: false,        
-              value: ethTotalDebtDai_? `${ethTotalDebtDai_} DAI`: '0 DAI', 
-              valuePrefix: null,
-              valueExtra: null,
-            },
-            {
-              label: 'Collateralization Ratio',
-              labelExtra: 'based on ETH posted',
-              visible: !txActive && activeSeries && !activeSeries.isMature() && !!account && parseFloat(ethPosted_) > 0,
-              active: collateralPercent_ > 0,
-              loading: false,            
-              value: (collateralPercent_ && (collateralPercent_ !== 0))? `${collateralPercent_}%`: '0%',
-              valuePrefix: null,
-              valueExtra: null,  
-            },
-            {
-              label: 'Dai Balance',
-              labelExtra: abbreviateHash('0x6b175474e89094c44da98b954eedeac495271d0f'),
-              visible: 
+              {
+                label: 'Total Debt',
+                labelExtra: 'across all yield series',
+                visible: !txActive && activeSeries && !activeSeries.isMature() && !!account,
+                active: true,
+                loading: false,        
+                value: ethTotalDebtDai_? `${ethTotalDebtDai_} DAI`: '0 DAI', 
+                valuePrefix: null,
+                valueExtra: null,
+              },
+              {
+                label: 'Collateralization Ratio',
+                labelExtra: 'based on ETH posted',
+                visible: !txActive && activeSeries && !activeSeries.isMature() && !!account && parseFloat(ethPosted_) > 0,
+                active: collateralPercent_ > 0,
+                loading: false,            
+                value: (collateralPercent_ && (collateralPercent_ !== 0))? `${collateralPercent_}%`: '0%',
+                valuePrefix: null,
+                valueExtra: null,  
+              },
+              {
+                label: 'Dai Balance',
+                labelExtra: abbreviateHash('0x6b175474e89094c44da98b954eedeac495271d0f'),
+                visible: 
                   (!!account && !txActive && !activeSeries?.isMature()) || 
                   (activeSeries?.isMature() && activeSeries?.fyDaiBalance_>0),
-              active: true,
-              loading: borrowPending,            
-              value: daiBalance_?`${daiBalance_} DAI`: '0 DAI',
-              valuePrefix: null,
-              valueExtra: null,
-            },
+                active: true,
+                loading: borrowPending,            
+                value: daiBalance_?`${daiBalance_} DAI`: '0 DAI',
+                valuePrefix: null,
+                valueExtra: null,
+              },
 
-          ]}
-        />
-      </SeriesDescriptor>
+            ]}
+          />
+        </SeriesDescriptor>
    
-      { txActive?.type !== 'BORROW' && txActive?.type !== 'BUY' &&  
-      <Box
-        width={{ max: '600px' }}
-        alignSelf="center"
-        fill
-        background="background-front"
-        round='small'
-        pad="large"
-        gap='small'
-      >
+        { txActive?.type !== 'BORROW' && txActive?.type !== 'BUY' &&  
+        <Box
+          width={{ max: '600px' }}
+          alignSelf="center"
+          fill
+          background="background-front"
+          round='small'
+          pad="large"
+          gap='small'
+        >
         
-        <Box gap='small' align='center' fill='horizontal'>
+          <Box gap='small' align='center' fill='horizontal'>
 
-          { !activeSeries?.isMature() && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
-          <Box gap='medium' align='center' fill='horizontal'>
-            <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to borrow</Text>
+            { !activeSeries?.isMature() && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
+            <Box gap='medium' align='center' fill='horizontal'>
+              <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to borrow</Text>
 
-            <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={borrowDisabled}>
-              <TextInput
-                ref={(el:any) => {el && !repayOpen && el.focus(); setInputRef(el);}} 
-                type="number"
-                placeholder={screenSize !== 'small' ? 'Enter the amount of Dai to borrow': 'DAI'} 
-                value={inputValue || ''}
-                plain
-                onChange={(event:any) => setInputValue( cleanValue(event.target.value) )}
-                icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <DaiMark />}
-              />
-            </InputWrap>
+              <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={borrowDisabled}>
+                <TextInput
+                  ref={(el:any) => {el && !repayOpen && el.focus(); setInputRef(el);}} 
+                  type="number"
+                  placeholder={screenSize !== 'small' ? 'Enter the amount of Dai to borrow': 'DAI'} 
+                  value={inputValue || ''}
+                  plain
+                  onChange={(event:any) => setInputValue( cleanValue(event.target.value) )}
+                  icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <DaiMark />}
+                />
+              </InputWrap>
 
-            <Box fill>
-              <Collapsible open={!!inputValue&&inputValue>0}>
-                <InfoGrid entries={[
-                  {
-                    label: 'Estimated APR',
-                    labelExtra: `if ${inputValue && cleanValue(inputValue, 2)} Dai are borrowed`,
-                    visible: !!inputValue,
-                    active: !!inputValue&&inputValue>0,
-                    loading: false,    
-                    value: APR?`${APR.toFixed(2)}%`: `${activeSeries? activeSeries.yieldAPR_: ''}%`,
-                    valuePrefix: null,
-                    valueExtra: null, 
-                  },
-                  {
-                    label: 'Dai that will be owed',
-                    labelExtra: 'at maturity',
-                    visible: !!inputValue,
-                    active: !!inputValue&&inputValue>0,
-                    loading: false,          
-                    value: `${fyDaiValue.toFixed(2)} DAI`,
-                    valuePrefix: '',
-                    valueExtra: null,
-                  },
-                  {
-                    label: 'Like what you see?',
-                    // labelExtra: 'the first step is to:',
-                    visible: !account && inputValue>0,
-                    active: inputValue,
-                    loading: false,            
-                    value: '',
-                    valuePrefix: null,
-                    valueExtra: () => (
+              <Box fill>
+                <Collapsible open={!!inputValue&&inputValue>0}>
+                  <InfoGrid entries={[
+                    {
+                      label: 'Estimated APR',
+                      labelExtra: `if ${inputValue && cleanValue(inputValue, 2)} Dai are borrowed`,
+                      visible: !!inputValue,
+                      active: !!inputValue&&inputValue>0,
+                      loading: false,    
+                      value: APR?`${APR.toFixed(2)}%`: `${activeSeries? activeSeries.yieldAPR_: ''}%`,
+                      valuePrefix: null,
+                      valueExtra: null, 
+                    },
+                    {
+                      label: 'Dai that will be owed',
+                      labelExtra: 'at maturity',
+                      visible: !!inputValue,
+                      active: !!inputValue&&inputValue>0,
+                      loading: false,          
+                      value: `${fyDaiValue.toFixed(2)} DAI`,
+                      valuePrefix: '',
+                      valueExtra: null,
+                    },
+                    {
+                      label: 'Like what you see?',
+                      // labelExtra: 'the first step is to:',
+                      visible: !account && inputValue>0,
+                      active: inputValue,
+                      loading: false,            
+                      value: '',
+                      valuePrefix: null,
+                      valueExtra: () => (
                       <Box pad={{ top:'small' }}>
                         <RaisedButton
                           label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Connect a wallet</Text></Box>}
                           onClick={() => openConnectLayer()}
                         /> 
                       </Box>
-                    )
-                  },
-                  {
-                    label: 'Collateralization Ratio',
-                    labelExtra: `after borrowing ${inputValue && cleanValue(inputValue, 2)} Dai`,
-                    visible: !!inputValue && !!account && position.ethPosted_>0,
-                    active: true,
-                    loading: false,        
-                    value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
-                    valuePrefix: '',
-                    valueExtra: () => (
+                      )
+                    },
+                    {
+                      label: 'Collateralization Ratio',
+                      labelExtra: `after borrowing ${inputValue && cleanValue(inputValue, 2)} Dai`,
+                      visible: !!inputValue && !!account && position.ethPosted_>0,
+                      active: true,
+                      loading: false,        
+                      value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
+                      valuePrefix: '',
+                      valueExtra: () => (
                       <Text color='red' size='small'> 
                         {/* { inputValue &&
                         estRatio &&
                         ( (collateralPercent_-estRatio) > 0) &&
                         `(-${(collateralPercent_-estRatio).toFixed(0)}%)` } */}
                       </Text>
-                    )
-                  },
-                  {
-                    label: 'Want to borrow Dai?',
-                    labelExtra: '',
-                    visible: !!inputValue&&inputValue>0 && !!account && position.ethPosted <= 0,
-                    active: !!inputValue,
-                    loading: false,            
-                    value: '',
-                    valuePrefix: null,
-                    valueExtra: () => (
+                      )
+                    },
+                    {
+                      label: 'Want to borrow Dai?',
+                      labelExtra: '',
+                      visible: !!inputValue&&inputValue>0 && !!account && position.ethPosted <= 0,
+                      active: !!inputValue,
+                      loading: false,            
+                      value: '',
+                      valuePrefix: null,
+                      valueExtra: () => (
                       <Box pad={{ top:'small' }}>
                         <RaisedButton
                           color={inputValue? 'brand': 'brand-transparent'}
@@ -438,50 +445,50 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
                           onClick={() => setActiveView(0)}
                         /> 
                       </Box>
-                    )
-                  },
+                      )
+                    },
 
-                ]}
-                />
-              </Collapsible>
-            </Box>
+                  ]}
+                  />
+                </Collapsible>
+              </Box>
 
-            { account &&  
-            <ActionButton
-              onClick={()=>borrowProcedure()}
-              label={`Borrow ${inputValue || ''} DAI`}
-              disabled={borrowDisabled}
-              hasDelegatedPool={activeSeries.hasDelegatedPool}
-            />}
-          </Box>}
+              { account &&  
+              <ActionButton
+                onClick={()=>borrowProcedure()}
+                label={`Borrow ${inputValue || ''} DAI`}
+                disabled={borrowDisabled}
+                hasDelegatedPool={activeSeries.hasDelegatedPool}
+              />}
+            </Box>}
 
-          { activeSeries?.isMature() &&
+            { activeSeries?.isMature() &&
             <SeriesMatureBox />}
             
-          { !txActive && 
+            { !txActive && 
             !!account && 
             activeSeries?.isMature() && 
             activeSeries?.ethDebtFYDai.gt(ethers.constants.Zero) && 
             <Repay />}
 
-          <Box direction='row' fill justify='between'>
+            <Box direction='row' fill justify='between'>
 
-            { activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) && 
-            <Box alignSelf='start' margin={{ top:'medium' }}>
-              <FlatButton 
-                onClick={()=>setHistOpen(true)}
-                label={
-                  <Box direction='row' gap='small' align='center'>
+              { activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) && 
+              <Box alignSelf='start' margin={{ top:'medium' }}>
+                <FlatButton 
+                  onClick={()=>setHistOpen(true)}
+                  label={
+                    <Box direction='row' gap='small' align='center'>
                     <Text size='xsmall' color='text-xweak'><History /></Text>                
                     <Text size='xsmall' color='text-xweak'>
                       Series Borrow History
                     </Text>              
                   </Box>
                 }
-              />
-            </Box>}
+                />
+              </Box>}
             
-            { !activeSeries?.isMature() &&
+              { !activeSeries?.isMature() &&
             activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) &&
             <Box alignSelf='end' margin={{ top:'medium' }}>
               <FlatButton 
@@ -498,15 +505,16 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
                 }
               />
             </Box>}
+            </Box>
           </Box>
-        </Box>
-      </Box>}
+        </Box>}
 
-      {/* If there is a transaction active, show the applicable view */}
-      { borrowActive && !txActive && <ApprovalPending /> } 
-      { txActive && <TxStatus msg={`You are borrowing ${inputValue} DAI`} tx={txActive} /> }
+        {/* If there is a transaction active, show the applicable view */}
+        { borrowActive && !txActive && <ApprovalPending /> } 
+        { txActive && <TxStatus msg={`You are borrowing ${inputValue} DAI`} tx={txActive} /> }
 
-    </Keyboard>
+      </Keyboard>
+    </RaisedBox>
   );
 };
 

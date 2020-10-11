@@ -1,4 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 import ethers, { BigNumber } from 'ethers';
 
 import { 
@@ -39,18 +40,19 @@ import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
 import CollateralDescriptor from '../components/CollateralDescriptor';
+import RaisedBox from '../components/RaisedBox';
 
 import EthMark from '../components/logos/EthMark';
 
 interface DepositProps {
   /* deposit amount prop is for quick linking into component */
-  setActiveView: any;
   openConnectLayer:any;
   modalView?:boolean;
   depositAmount?:string|BigNumber;
 }
 
-const Deposit = ({ openConnectLayer, setActiveView, modalView, depositAmount }:DepositProps) => {
+const Deposit = ({ openConnectLayer, modalView, depositAmount }:DepositProps) => {
+  const history = useHistory();
   const { state: userState, actions: userActions } = useContext(UserContext);
   const {
     ethBalance,
@@ -161,70 +163,71 @@ const Deposit = ({ openConnectLayer, setActiveView, modalView, depositAmount }:D
   }, [debouncedInput, ethBalance]);
 
   return (
-    <Keyboard 
-      onEsc={() => setInputValue(undefined)}
-      onEnter={()=> depositProcedure()}
-      onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.slice(0, -1))}
-      target='document'
-    >
-      <CollateralDescriptor backToBorrow={()=>setActiveView(1)}>
+    <RaisedBox>
+      <Keyboard 
+        onEsc={() => setInputValue(undefined)}
+        onEnter={()=> depositProcedure()}
+        onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.slice(0, -1))}
+        target='document'
+      >
+        <CollateralDescriptor backToBorrow={()=>history.push('/borrow')}>
         
-        <InfoGrid
-          entries={[
-            {
-              label: 'Max Borrowing Power',
-              labelExtra: 'based on your ETH balance',
-              visible: !!account,
-              active: true,
-              loading: !ethPosted_ && depositPending && ethPosted_ !== 0, 
-              value: maxPower && `${maxPower} DAI`,           
-              valuePrefix: null,
-              valueExtra: null, 
-            },       
-            {
-              label: 'Did you know?',
-              labelExtra: null,
-              visible:
+          <InfoGrid
+            entries={[
+              {
+                label: 'Max Borrowing Power',
+                labelExtra: 'based on your ETH balance',
+                visible: !!account,
+                active: true,
+                loading: !ethPosted_ && depositPending && ethPosted_ !== 0, 
+                value: maxPower && `${maxPower} DAI`,           
+                valuePrefix: null,
+                valueExtra: null, 
+              },       
+              {
+                label: 'Did you know?',
+                labelExtra: null,
+                visible:
                   !!account &&
                   parseFloat(ethPosted_) === 0,
-              active: true,
-              loading: false,    
-              value: null,
-              valuePrefix: null,
-              valueExtra: ()=>( 
-                <Box width={{ max:'200px' }}>
-                  <Text size='xxsmall' color='text-weak'>
-                    Collateral posted can be used to borrow Dai from any one of the Yield series.
-                  </Text>
-                </Box>),
-            },
-            {
-              label: 'Current Collateral',
-              labelExtra: 'posted in the Yield Protocol',
-              visible: !!account && parseFloat(ethPosted_) > 0,
-              active: true,
-              loading: depositPending || txActive?.type ==='WITHDRAW',     
-              value: ethPosted_ ? `${ethPosted_} Eth` : '0 Eth',
-              valuePrefix: null,
-              valueExtra: null,
-            },
+                active: true,
+                loading: false,    
+                value: null,
+                valuePrefix: null,
+                valueExtra: ()=>( 
+                  <Box width={{ max:'200px' }}>
+                    <Text size='xxsmall' color='text-weak'>
+                      Collateral posted can be used to borrow Dai from any one of the Yield series.
+                    </Text>
+                  </Box>),
+              },
+              {
+                label: 'Current Collateral',
+                labelExtra: 'posted in the Yield Protocol',
+                visible: !!account && parseFloat(ethPosted_) > 0,
+                active: true,
+                loading: depositPending || txActive?.type ==='WITHDRAW',     
+                value: ethPosted_ ? `${ethPosted_} Eth` : '0 Eth',
+                valuePrefix: null,
+                valueExtra: null,
+              },
 
-            {
-              label: 'Collateralization Ratio',
-              labelExtra: 'based on ETH posted',
-              visible: !!account && collateralPercent_ > 0,
-              active: true,
-              loading: !ethPosted_ && depositPending && ethPosted_ !== 0,            
-              value: (collateralPercent_ && (collateralPercent_ !== 0))? `${collateralPercent_}%`: '',
-              valuePrefix: null,
-              valueExtra: null, 
-            },
-          ]}
-        />
-      </CollateralDescriptor>
+              {
+                label: 'Collateralization Ratio',
+                labelExtra: 'based on ETH posted',
+                visible: !!account && collateralPercent_ > 0,
+                active: true,
+                loading: !ethPosted_ && depositPending && ethPosted_ !== 0,            
+                value: (collateralPercent_ && (collateralPercent_ !== 0))? `${collateralPercent_}%`: '',
+                valuePrefix: null,
+                valueExtra: null, 
+              },
+            ]}
+          />
+        </CollateralDescriptor>
       
-      { withdrawOpen && <WithdrawEth close={()=>setWithdrawOpen(false)} /> }    
-      { (!txActive || txActive?.type === 'WITHDRAW') &&
+        { withdrawOpen && <WithdrawEth close={()=>setWithdrawOpen(false)} /> }    
+        { (!txActive || txActive?.type === 'WITHDRAW') &&
         <Box
           alignSelf="center"
           fill
@@ -316,7 +319,7 @@ const Deposit = ({ openConnectLayer, setActiveView, modalView, depositAmount }:D
             margin={{ top:'medium' }}
           >
             <FlatButton 
-              onClick={()=>setActiveView(1)}
+              onClick={()=>history.push('/borrow')}
               label={
                 <Box direction='row' gap='small' align='center'>
                   <ArrowLeft color='text-weak' />
@@ -337,9 +340,10 @@ const Deposit = ({ openConnectLayer, setActiveView, modalView, depositAmount }:D
           </Box>
        
         </Box>}
-      { postEthActive && !txActive && <ApprovalPending /> } 
-      { txActive && txActive.type !== 'WITHDRAW' && <TxStatus msg={`You are depositing ${inputValue} ETH`} tx={txActive} /> }
-    </Keyboard>
+        { postEthActive && !txActive && <ApprovalPending /> } 
+        { txActive && txActive.type !== 'WITHDRAW' && <TxStatus msg={`You are depositing ${inputValue} ETH`} tx={txActive} /> }
+      </Keyboard>
+    </RaisedBox>
   );
 };
 
