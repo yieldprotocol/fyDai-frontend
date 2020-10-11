@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useMemo, useState, useContext } from 'react';
 import { ethers } from 'ethers';
 import { useParams, useHistory } from 'react-router-dom';
 import { Keyboard, Box, TextInput, Text, ResponsiveContext, Collapsible, Layer } from 'grommet';
@@ -50,7 +50,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
   const { activeSeries } = seriesState;
 
   /* check if the user sent in any requested amount in the url */ 
-  const { amnt }:any = useParams();
+  const params:any = useParams();
 
   const { state: userState, actions: userActions } = useContext(UserContext);
   const { position, authorizations: { hasDelegatedProxy } } = userState;
@@ -79,7 +79,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
   const [ histOpen, setHistOpen ] = useState<boolean>(false);
 
   /* input values */
-  const [ inputValue, setInputValue ] = useState<any|undefined>(amnt || undefined);
+  const [ inputValue, setInputValue ] = useState<any|undefined>(params.amnt || undefined);
   const debouncedInput = useDebounce(inputValue, 500);
 
   /* internal component state */

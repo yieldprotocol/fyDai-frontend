@@ -32,7 +32,7 @@ import YieldNav from './components/YieldNav';
 
 const App = (props:any) => {
 
-  const { state: { seriesLoading, activeSeries } } = useContext(SeriesContext);
+  const { state: { seriesLoading, activeSeries }, actions: seriesActions } = useContext(SeriesContext);
   const { state: { yieldLoading } } = useContext(YieldContext);
 
   const [cachedLastVisit, setCachedLastVisit] = useCachedState('lastVisit', null);
@@ -99,11 +99,6 @@ const App = (props:any) => {
           align='center'
         >
           <Switch>
-            
-            <Route exact path="/">
-              <Redirect to={`${cachedLastVisit || '/borrow'}`} />
-            </Route>
-
             <Route path="/borrow/collateral/:amnt?">
               <Deposit openConnectLayer={() => setShowConnectLayer('CONNECT')} />
             </Route>
@@ -118,6 +113,10 @@ const App = (props:any) => {
 
             <Route path="/pool/:series?/:amnt?">
               <Pool openConnectLayer={() => setShowConnectLayer('CONNECT')} />
+            </Route>
+
+            <Route exact path="/">
+              <Redirect to={`${cachedLastVisit || '/borrow'}`} />
             </Route>
 
           </Switch>

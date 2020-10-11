@@ -1,5 +1,5 @@
 import React, { useEffect, useContext } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import { ethers, BigNumber } from 'ethers';
 
 import * as utils from '../utils';
@@ -53,6 +53,8 @@ const SeriesProvider = ({ children }:any) => {
 
   const [ callTx ] = useCallTx();
   const { yieldAPR: calcAPR, poolPercent: calcPercent }  = useMath();
+
+  const { pathname } = useLocation();
 
   const _prePopulateSeriesData = (seriesArr:IYieldSeries[]) => {
     /* preMap is for faster loading - creates an initial map from the cached data */
@@ -128,9 +130,11 @@ const SeriesProvider = ({ children }:any) => {
 
   /* Update a list of series */
   const updateSeries = async (seriesArr:IYieldSeries[], firstLoad:boolean ) => {
+
+    const seriesFromUrl = parseInt(pathname.split('/')[2], 10);
+
     if(!yieldLoading) {
       dispatch({ type:'isLoading', payload: true });
-
       /* pre-populate info with cached data if available */
       if (firstLoad) {
         const preMap:any = _prePopulateSeriesData(seriesArr);
@@ -138,7 +142,12 @@ const SeriesProvider = ({ children }:any) => {
         const preSelect = preSeries
           .filter((x:IYieldSeries)=>!x.isMature())
           .sort((a:IYieldSeries, b:IYieldSeries)=> a.maturity-b.maturity );
-        dispatch({ type:'setActiveSeries', payload: preMap.get(preSelect[0].maturity) }); 
+        /* check if the value in the url is a valid series date, if so, use it */
+        if (preMap.get(seriesFromUrl)) {
+          dispatch({ type:'setActiveSeries', payload: preMap.get(seriesFromUrl) });
+        } else {
+          dispatch({ type:'setActiveSeries', payload: preMap.get(preSelect[0].maturity) });
+        }
       }
       
       /* Build/re-build series map with data */ 
@@ -154,7 +163,14 @@ const SeriesProvider = ({ children }:any) => {
         const toSelect = unmatureSeries
           .filter((x:IYieldSeries)=>!x.isMature())
           .sort((a:IYieldSeries, b:IYieldSeries)=> a.maturity-b.maturity );
-        dispatch({ type:'setActiveSeries', payload: seriesMap.get(toSelect[0].maturity) }); 
+
+        /* check if the value in the url is a valid series date, if so, use it */
+        if (seriesMap.get(seriesFromUrl)) {
+          dispatch({ type:'setActiveSeries', payload: seriesMap.get(seriesFromUrl) });
+        } else {
+          dispatch({ type:'setActiveSeries', payload: seriesMap.get(toSelect[0].maturity) });
+        }
+        // dispatch({ type:'setActiveSeries', payload: seriesMap.get(toSelect[0].maturity) }); 
       } 
       dispatch({ type:'isLoading', payload: false });
     }
@@ -165,6 +181,7 @@ const SeriesProvider = ({ children }:any) => {
     (provider || fallbackProvider) && !yieldLoading && ( async () => {
       await updateSeries(yieldState.deployedSeries, true);
     })();
+
   }, [ provider, fallbackProvider, chainId, account, yieldLoading ]);
 
   /* Actions for updating the series Context */
