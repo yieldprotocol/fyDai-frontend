@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useContext, Suspense } from 'react';
-import { Switch, Route, Redirect, useLocation, useParams } from 'react-router-dom';
+import { Switch, Route, Redirect, useLocation } from 'react-router-dom';
 import { Grommet, base, Grid, Main, Box, ResponsiveContext, Nav, Layer, Collapsible } from 'grommet';
 import { deepMerge } from 'grommet/utils';
 import { yieldTheme } from './themes';
@@ -39,7 +39,7 @@ const App = (props:any) => {
 
   const location = useLocation();
   React.useEffect(() => {
-    location && setCachedLastVisit(location.pathname);
+    location && setCachedLastVisit(`/${location.pathname.split('/')[1]}/${location.pathname.split('/')[2]}` );
   }, [location]);
 
   const [showConnectLayer, setShowConnectLayer] = useState<string|null>(null);
@@ -116,7 +116,7 @@ const App = (props:any) => {
             </Route>
 
             <Route exact path="/">
-              <Redirect to={`${cachedLastVisit || '/borrow'}`} />
+              <Redirect to={`${cachedLastVisit || '/borrow/'}`} />
             </Route>
 
           </Switch>

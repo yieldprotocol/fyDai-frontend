@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import ethers, { BigNumber } from 'ethers';
 
 import { 
@@ -48,10 +48,9 @@ interface DepositProps {
   /* deposit amount prop is for quick linking into component */
   openConnectLayer:any;
   modalView?:boolean;
-  depositAmount?:string|BigNumber;
 }
 
-const Deposit = ({ openConnectLayer, modalView, depositAmount }:DepositProps) => {
+const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
   const history = useHistory();
   const { state: userState, actions: userActions } = useContext(UserContext);
   const {
@@ -67,6 +66,9 @@ const Deposit = ({ openConnectLayer, modalView, depositAmount }:DepositProps) =>
   const { state: yieldState } = useContext(YieldContext);
   const { ethPrice_ } = yieldState.feedData;
 
+  /* check if the user sent in any requested amount in the url */ 
+  const { amnt }:any = useParams();
+
   const screenSize = useContext(ResponsiveContext);
 
   const { postEth, postEthActive }  = useProxy();
@@ -74,7 +76,7 @@ const Deposit = ({ openConnectLayer, modalView, depositAmount }:DepositProps) =>
   const [ txActive ] = useTxActive(['DEPOSIT', 'WITHDRAW']);
   const { account } = useSignerAccount();
 
-  const [ inputValue, setInputValue ] = useState<any>(depositAmount || undefined);
+  const [ inputValue, setInputValue ] = useState<any>(amnt || undefined);
   const debouncedInput = useDebounce(inputValue, 500);
 
   const [inputRef, setInputRef] = useState<any>(null);

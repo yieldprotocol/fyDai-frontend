@@ -45,12 +45,11 @@ interface IBorrowProps {
 const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
 
   const navHistory = useHistory();
-
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { activeSeries } = seriesState;
 
   /* check if the user sent in any requested amount in the url */ 
-  const params:any = useParams();
+  const { amnt }:any = useParams();
 
   const { state: userState, actions: userActions } = useContext(UserContext);
   const { position, authorizations: { hasDelegatedProxy } } = userState;
@@ -79,7 +78,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
   const [ histOpen, setHistOpen ] = useState<boolean>(false);
 
   /* input values */
-  const [ inputValue, setInputValue ] = useState<any|undefined>(params.amnt || undefined);
+  const [ inputValue, setInputValue ] = useState<any|undefined>(amnt || undefined);
   const debouncedInput = useDebounce(inputValue, 500);
 
   /* internal component state */

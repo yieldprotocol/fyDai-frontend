@@ -36,6 +36,7 @@ import HistoryWrap from '../components/HistoryWrap';
 import RaisedBox from '../components/RaisedBox';
 
 import DaiMark from '../components/logos/DaiMark';
+import { useParams } from 'react-router-dom';
 
 
 interface IPoolProps {
@@ -43,6 +44,10 @@ interface IPoolProps {
 }
   
 const Pool = ({ openConnectLayer }:IPoolProps) => {
+
+  /* check if the user sent in any requested amount in the url */ 
+  const { amnt }:any = useParams();
+
   const { state: { deployedContracts } } = useContext(YieldContext);
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { activeSeries } = seriesState;
@@ -61,7 +66,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
 
   const [ hasDelegated ] = useState<boolean>(true);
 
-  const [ inputValue, setInputValue ] = useState<any>();
+  const [ inputValue, setInputValue ] = useState<any>(amnt || undefined);
   const debouncedInput = useDebounce(inputValue, 500);
   const [inputRef, setInputRef] = useState<any>(null);
 
@@ -278,11 +283,11 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                   onClick={()=>setHistOpen(true)}
                   label={
                     <Box direction='row' gap='small' align='center'>
-                    <Text size='xsmall' color='text-xweak'><History /></Text>                
-                    <Text size='xsmall' color='text-xweak'>
-                      Series Pool History
-                    </Text>              
-                  </Box>
+                      <Text size='xsmall' color='text-xweak'><History /></Text>                
+                      <Text size='xsmall' color='text-xweak'>
+                        Series Pool History
+                      </Text>              
+                    </Box>
                 }
                 />
               </Box>}

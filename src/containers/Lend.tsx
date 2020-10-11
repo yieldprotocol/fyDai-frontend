@@ -36,12 +36,15 @@ import HistoryWrap from '../components/HistoryWrap';
 
 import DaiMark from '../components/logos/DaiMark';
 import RaisedBox from '../components/RaisedBox';
+import { useParams } from 'react-router-dom';
 
 interface ILendProps {
   openConnectLayer:any;
 }
 
 const Lend = ({ openConnectLayer }:ILendProps) => {
+
+  const { amnt }:any = useParams();
   
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { activeSeries } = seriesState;
@@ -62,7 +65,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
   const [ withdrawDaiOpen, setWithdrawDaiOpen ] = useState<boolean>(false);
   const [ histOpen, setHistOpen ] = useState<boolean>(false);
   
-  const [ inputValue, setInputValue ] = useState<any>();
+  const [ inputValue, setInputValue ] = useState<any>(amnt || undefined);
   const debouncedInput = useDebounce(inputValue, 500);
   const [inputRef, setInputRef] = useState<any>(null);
   
