@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
+import { useLocation, useHistory } from 'react-router-dom';
 import { Text, Box, Layer, ResponsiveContext, Button } from 'grommet';
 import { 
   FiArrowLeft as ArrowLeft,
@@ -20,6 +21,9 @@ interface ISeriesSelectorProps {
 const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
 
   const screenSize = useContext(ResponsiveContext);
+  const { pathname } = useLocation();
+  const navHistory = useHistory();
+
   const { state: seriesState, actions: seriesActions } = useContext( SeriesContext );
   const { seriesLoading, activeSeries, seriesData } = seriesState; 
   const { setActiveSeries } = seriesActions;
@@ -34,6 +38,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
 
   const handleSelectSeries = (seriesMaturity: number) => {
     setActiveSeries(seriesMaturity);
+    navHistory.push(`/${pathname.split('/')[1]}/${seriesMaturity}`);
     close();
   };
 

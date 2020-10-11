@@ -42,7 +42,7 @@ interface ILendProps {
 }
 
 const Lend = ({ openConnectLayer }:ILendProps) => {
-
+  
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { activeSeries } = seriesState;
 
@@ -320,11 +320,11 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
                   onClick={()=>setHistOpen(true)}
                   label={
                     <Box direction='row' gap='small' align='center'>
-                    <Text size='xsmall' color='text-xweak'><History /></Text>                
-                    <Text size='xsmall' color='text-xweak'>
-                      Series Lend History
-                    </Text>              
-                  </Box>
+                      <Text size='xsmall' color='text-xweak'><History /></Text>                
+                      <Text size='xsmall' color='text-xweak'>
+                        Series Lend History
+                      </Text>              
+                    </Box>
                     }
                 />
               </Box>}
@@ -335,9 +335,9 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
                   onClick={()=>setWithdrawDaiOpen(true)}
                   label={
                     <Box direction='row' gap='small' align='center'>
-                    <Box><Text size='xsmall' color='text-weak'><Text weight='bold' color={activeSeries.seriesColor}>close</Text> your position in this series</Text></Box>
-                    <ArrowRight color='text-weak' />
-                  </Box>
+                      <Box><Text size='xsmall' color='text-weak'><Text weight='bold' color={activeSeries.seriesColor}>close</Text> your position in this series</Text></Box>
+                      <ArrowRight color='text-weak' />
+                    </Box>
                     }
                 />
               </Box>}

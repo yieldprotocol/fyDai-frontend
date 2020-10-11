@@ -40,17 +40,18 @@ import RaisedBox from '../components/RaisedBox';
 interface IBorrowProps {
   borrowAmount?:number|null;
   openConnectLayer:any;
-  setActiveView?:any; 
 }
 
-const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) => {
+const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
 
-
-  const { series, amnt } = useParams();
-  const history = useHistory();
+  const navHistory = useHistory();
 
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
-  const { activeSeries } = seriesState; 
+  const { activeSeries } = seriesState;
+
+  /* check if the user sent in any requested amount in the url */ 
+  const { amnt }:any = useParams();
+
   const { state: userState, actions: userActions } = useContext(UserContext);
   const { position, authorizations: { hasDelegatedProxy } } = userState;
   const { 
@@ -157,7 +158,6 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
 
   /* Handle input exception logic */
   useEffect(() => {
-
     if ( 
       debouncedInput && 
       maxDaiAvailable && 
@@ -224,7 +224,7 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
                       elevation='small'
                     >
                       <FlatButton            
-                        onClick={()=>history.push('/borrow/collateral/')}
+                        onClick={()=>navHistory.push('/borrow/collateral/')}
                         label={<Text size='xsmall' color='#DDDDDD'> Manage Collateral</Text>}
                         background='#55555580'
                       />            
@@ -352,8 +352,7 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
           round='small'
           pad="large"
           gap='small'
-        >
-        
+        >       
           <Box gap='small' align='center' fill='horizontal'>
 
             { !activeSeries?.isMature() && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
@@ -404,12 +403,12 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
                       value: '',
                       valuePrefix: null,
                       valueExtra: () => (
-                      <Box pad={{ top:'small' }}>
-                        <RaisedButton
-                          label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Connect a wallet</Text></Box>}
-                          onClick={() => openConnectLayer()}
-                        /> 
-                      </Box>
+                        <Box pad={{ top:'small' }}>
+                          <RaisedButton
+                            label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Connect a wallet</Text></Box>}
+                            onClick={() => openConnectLayer()}
+                          /> 
+                        </Box>
                       )
                     },
                     {
@@ -421,12 +420,12 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
                       value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
                       valuePrefix: '',
                       valueExtra: () => (
-                      <Text color='red' size='small'> 
-                        {/* { inputValue &&
+                        <Text color='red' size='small'> 
+                          {/* { inputValue &&
                         estRatio &&
                         ( (collateralPercent_-estRatio) > 0) &&
                         `(-${(collateralPercent_-estRatio).toFixed(0)}%)` } */}
-                      </Text>
+                        </Text>
                       )
                     },
                     {
@@ -438,13 +437,13 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
                       value: '',
                       valuePrefix: null,
                       valueExtra: () => (
-                      <Box pad={{ top:'small' }}>
-                        <RaisedButton
-                          color={inputValue? 'brand': 'brand-transparent'}
-                          label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Deposit collateral</Text></Box>}
-                          onClick={() => setActiveView(0)}
-                        /> 
-                      </Box>
+                        <Box pad={{ top:'small' }}>
+                          <RaisedButton
+                            color={inputValue? 'brand': 'brand-transparent'}
+                            label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Deposit collateral</Text></Box>}
+                            onClick={()=>navHistory.push('/borrow/collateral/')}
+                          /> 
+                        </Box>
                       )
                     },
 
@@ -479,11 +478,11 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
                   onClick={()=>setHistOpen(true)}
                   label={
                     <Box direction='row' gap='small' align='center'>
-                    <Text size='xsmall' color='text-xweak'><History /></Text>                
-                    <Text size='xsmall' color='text-xweak'>
-                      Series Borrow History
-                    </Text>              
-                  </Box>
+                      <Text size='xsmall' color='text-xweak'><History /></Text>                
+                      <Text size='xsmall' color='text-xweak'>
+                        Series Borrow History
+                      </Text>              
+                    </Box>
                 }
                 />
               </Box>}
@@ -518,6 +517,6 @@ const Borrow = ({ openConnectLayer, setActiveView, borrowAmount }:IBorrowProps) 
   );
 };
 
-Borrow.defaultProps = { borrowAmount: null, setActiveView: 1 };
+Borrow.defaultProps = { borrowAmount: null };
 
 export default Borrow;

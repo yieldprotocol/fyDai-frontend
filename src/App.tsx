@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useContext, Suspense } from 'react';
-import { HashRouter as Router, Switch, Route, Redirect, useLocation } from 'react-router-dom';
+import { Switch, Route, Redirect, useLocation, useParams } from 'react-router-dom';
 import { Grommet, base, Grid, Main, Box, ResponsiveContext, Nav, Layer, Collapsible } from 'grommet';
 import { deepMerge } from 'grommet/utils';
 import { yieldTheme } from './themes';
@@ -31,6 +31,7 @@ import YieldNav from './components/YieldNav';
 
 
 const App = (props:any) => {
+
   const { state: { seriesLoading, activeSeries } } = useContext(SeriesContext);
   const { state: { yieldLoading } } = useContext(YieldContext);
 
@@ -57,7 +58,6 @@ const App = (props:any) => {
   }, [screenSize]);
 
   return (
-
     <div 
       className="App" 
       style={
@@ -89,7 +89,7 @@ const App = (props:any) => {
 
       <NotifyLayer target={leftSideRef.current} columnsWidth={columns} />
 
-      <Box margin={{top:'large'}} align='center'><YieldNav /></Box>
+      <Box margin={{ top:'large' }} align='center'><YieldNav /></Box>
 
       <Main 
         pad={{ bottom:'large' }}
@@ -99,7 +99,7 @@ const App = (props:any) => {
           align='center'
         >
           <Switch>
-
+            
             <Route exact path="/">
               <Redirect to={`${cachedLastVisit || '/borrow'}`} />
             </Route>
@@ -107,6 +107,7 @@ const App = (props:any) => {
             <Route path="/borrow/collateral/:amnt?">
               <Deposit openConnectLayer={() => setShowConnectLayer('CONNECT')} />
             </Route>
+
             <Route path="/borrow/:series?/:amnt?">
               <Borrow openConnectLayer={() => setShowConnectLayer('CONNECT')} />
             </Route>
@@ -167,31 +168,28 @@ const App = (props:any) => {
   );
 };
 
-const ThemedApp = () => {
+const WrappedApp = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [ moodLight, setMoodLight] = useState(true);
-  return (
 
+  return (
     <Suspense fallback={null}>
-      <Router>
-        <Grommet
-          theme={deepMerge(base, yieldTheme)}
-          themeMode={darkMode ? 'dark' : 'light'}
-          full
-        >
-        
-          <ErrorBoundary>
-            <App 
-              darkMode={darkMode}
-              setDarkMode={setDarkMode}
-              moodLight={moodLight}
-              toggleMoodLight={()=>setMoodLight(!moodLight)}
-            />
-          </ErrorBoundary>
-        </Grommet>
-      </Router>
+      <Grommet
+        theme={deepMerge(base, yieldTheme)}
+        themeMode={darkMode ? 'dark' : 'light'}
+        full
+      >     
+        <ErrorBoundary>
+          <App 
+            darkMode={darkMode}
+            setDarkMode={setDarkMode}
+            moodLight={moodLight}
+            toggleMoodLight={()=>setMoodLight(!moodLight)}
+          />
+        </ErrorBoundary>
+      </Grommet>
     </Suspense>
   );
 };
 
-export default ThemedApp;
+export default WrappedApp;

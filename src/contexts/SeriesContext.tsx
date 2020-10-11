@@ -1,4 +1,5 @@
 import React, { useEffect, useContext } from 'react';
+import { useParams } from 'react-router-dom';
 import { ethers, BigNumber } from 'ethers';
 
 import * as utils from '../utils';
@@ -120,7 +121,6 @@ const SeriesProvider = ({ children }:any) => {
       );
     }, state.seriesData);
 
-    console.log(_parsedSeriesData);
     /* Update state and return  */
     dispatch( { type:'updateSeries', payload: _parsedSeriesData });
     return _parsedSeriesData;
@@ -143,7 +143,6 @@ const SeriesProvider = ({ children }:any) => {
       
       /* Build/re-build series map with data */ 
       const seriesMap:any = await _getSeriesData(seriesArr); 
-
 
       /* Set the active series */
       if (seriesArr.length===1 ){ 

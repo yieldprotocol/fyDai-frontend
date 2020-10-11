@@ -1,5 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { HashRouter as Router } from 'react-router-dom';
+
 import { ethers } from 'ethers';
 import { Web3ReactProvider, createWeb3ReactRoot } from '@web3-react/core';
 
@@ -28,19 +30,21 @@ const Web3ReactProviderFallback = createWeb3ReactRoot('fallback');
 
 ReactDOM.render(
   <React.StrictMode>
-    <Web3ReactProvider getLibrary={getLibrary}> 
-      <Web3ReactProviderFallback getLibrary={getFallbackLibrary}> 
-        <NotifyProvider>
-          <YieldProvider>
-            <UserProvider>
-              <SeriesProvider>
-                <App />
-              </SeriesProvider>
-            </UserProvider>
-          </YieldProvider>
-        </NotifyProvider>
-      </Web3ReactProviderFallback>
-    </Web3ReactProvider>
+    <Router>
+      <Web3ReactProvider getLibrary={getLibrary}> 
+        <Web3ReactProviderFallback getLibrary={getFallbackLibrary}> 
+          <NotifyProvider>
+            <YieldProvider>
+              <UserProvider>
+                <SeriesProvider>
+                  <App />
+                </SeriesProvider>
+              </UserProvider>
+            </YieldProvider>
+          </NotifyProvider>
+        </Web3ReactProviderFallback>
+      </Web3ReactProvider>
+    </Router>
   </React.StrictMode>,
   document.getElementById('root')
 );
