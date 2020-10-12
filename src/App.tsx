@@ -1,8 +1,10 @@
 import React, { useRef, useEffect, useState, useContext, Suspense } from 'react';
-import { Switch, Route, Redirect, useLocation } from 'react-router-dom';
+import { Switch, Route, Redirect, useLocation, NavLink } from 'react-router-dom';
 
-import { Grommet, base, Grid, Main, Box, ResponsiveContext, Nav, Layer, Collapsible } from 'grommet';
+import { Text, Grommet, base, Grid, Main, Box, ThemeContext, ResponsiveContext, Nav, Layer, Collapsible } from 'grommet';
 import { deepMerge } from 'grommet/utils';
+
+
 import { yieldTheme } from './themes';
 
 import { modColor } from './utils';
@@ -20,7 +22,6 @@ import YieldFooter from './components/YieldFooter';
 import Authorization from './components/Authorization';
 import ErrorBoundary from './components/ErrorBoundry';
 
-import YieldMark from './components/logos/YieldMark';
 
 import ConnectLayer from './containers/layers/ConnectLayer';
 import NotifyLayer from './containers/layers/NotifyLayer';
@@ -51,7 +52,9 @@ const App = (props:any) => {
   // TODO remove for prod
   const [showTestLayer, setShowTestLayer] = useState<boolean>(false);
 
-  const screenSize = useContext(ResponsiveContext);
+  const screenSize = useContext<string>(ResponsiveContext);
+  const theme = useContext<any>(ThemeContext);
+
   const [columns, setColumns] = useState<string[]>(['10%', 'auto', '10%']);
   useEffect(()=> {
     screenSize === 'small'?
@@ -144,37 +147,13 @@ const App = (props:any) => {
           />}                  
         <Box />
       </Grid>
-
-      {screenSize === 'small' &&    
-        <Layer
-          position='bottom'
-          modal={false}
-          responsive={false}
-          full='horizontal'
-        >
-          {/* <MobileButton /> */}
-          <Nav
-            direction="row"
-            background="background-mid"          
-            round={{ corner:'top', size:'small' }}
-            elevation='small'
-            pad="medium"
-            justify='evenly'
-          >
-            <Box><YieldMark /></Box>
-            <Box>Collateral</Box>
-            <Box>Borrow</Box>
-            <Box>Repay</Box>         
-          </Nav>
-        </Layer>}
     </div>
   );
 };
 
 const WrappedApp = () => {
   const [darkMode, setDarkMode] = useState(false);
-  const [ moodLight, setMoodLight] = useState(true);
-
+  const [ moodLight, setMoodLight] = useState(false);
   return (
     <Suspense fallback={null}>
       <Grommet

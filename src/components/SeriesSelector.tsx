@@ -135,7 +135,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
                   <Box fill='horizontal' direction='row' justify='between' gap='small'>
                     <Box fill align={screenSize==='small'?'start':'start'}>
                       <Text size={screenSize} color='brand'>
-                        {x.displayName}
+                        { screenSize === 'small'? x.displayNameMobile : x.displayName }
                       </Text>
                     </Box>
                     <Box fill align={screenSize==='small'?'end':undefined}>
@@ -147,8 +147,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
 
                   { screenSize !== 'small' && 
                   <Box basis='25%' direction='row' justify='end'>
-                    { activeSeries && activeSeries.maturity === x.maturity ? 
-                      
+                    { activeSeries && activeSeries.maturity === x.maturity ?                     
                       <Button 
                         primary
                         color={activeSeries.seriesColor}

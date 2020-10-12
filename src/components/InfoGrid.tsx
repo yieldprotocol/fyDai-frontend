@@ -55,7 +55,8 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
                 round='large'
                 gap='xsmall'
                 width={{ min:'30%' }}
-                // align='center'
+                // direction={screenSize==='small'?'row':undefined}
+                // justify={screenSize==='small'?'between':undefined}
               >
                 <Box>
                   <Text 
@@ -71,18 +72,20 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
                   >
                     { x.labelExtra}
                   </Text>
-                </Box>               
+                </Box>  
+
                 <Loading condition={x.loading} size='small'>
                   <Box direction='row-responsive' gap='xsmall' align='center'>
                     { x.valuePrefix && 
-                        screenSize !== 'small' && 
-                        <Text color={x.active ? activeSeries?.seriesTextColor:'text-xweak'} size='medium' weight='bold'>
-                          {x.valuePrefix}                     
-                        </Text>}
+                      screenSize !== 'small' && 
+                      <Text color={x.active ? activeSeries?.seriesTextColor:'text-xweak'} size='medium' weight='bold'>
+                        {x.valuePrefix}                     
+                      </Text>}
                     <Text color={x.active? activeSeries?.seriesTextColor:'text-xweak'} weight='bold' size='medium'> 
                       { (typeof Value === 'function')? <Value />: Value }
                     </Text>
                   </Box>
+
                   { typeof ValueExtra === 'function' ? 
                     <ValueExtra />  :
                     <Text color={alt? 'text-weak': 'text-weak'} size='xxsmall'> 

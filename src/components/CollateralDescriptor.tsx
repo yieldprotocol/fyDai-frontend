@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { Box, Text, Collapsible } from 'grommet';
+import { Box, Text, Collapsible, ResponsiveContext } from 'grommet';
 
 import { SeriesContext } from '../contexts/SeriesContext';
 
@@ -15,6 +15,8 @@ function CollateralDescriptor( props: ICollateralDescriptorProps ) {
   const { backToBorrow, children } = props;
   const { state: seriesState } = useContext(SeriesContext);
   const [ delegated ] = useState<boolean>(true);
+  
+  const screenSize = useContext(ResponsiveContext);
 
   return (
     <>
@@ -27,6 +29,7 @@ function CollateralDescriptor( props: ICollateralDescriptorProps ) {
         background="linear-gradient(to bottom right, #f0817f, #ff86c8, #82d4bb, #6ab6f1, #cb90c9, #aed175, #add8e6, #add8e6, #add8e6, #add8e6, #add8e6, #add8e6, #ffdc5c, #ffbf81, #95a4db)"
         margin={{ bottom:'-16px' }}
       >
+        {screenSize !=='small' && 
         <Box
           direction='row-responsive'
           fill='horizontal'
@@ -56,7 +59,7 @@ function CollateralDescriptor( props: ICollateralDescriptorProps ) {
           }
             onClick={()=>backToBorrow()}
           />
-        </Box>
+        </Box>}
         
         <Box
           pad={!delegated? { horizontal:'medium' }: { horizontal:'medium', bottom:'medium' }}

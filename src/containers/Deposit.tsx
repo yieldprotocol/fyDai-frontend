@@ -173,7 +173,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
         target='document'
       >
         <CollateralDescriptor backToBorrow={()=>history.push('/borrow')}>
-        
+           
           <InfoGrid
             entries={[
               {

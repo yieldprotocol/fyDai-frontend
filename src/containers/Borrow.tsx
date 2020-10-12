@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState, useContext } from 'react';
 import { ethers } from 'ethers';
-import { useParams, useHistory } from 'react-router-dom';
-import { Keyboard, Box, TextInput, Text, ResponsiveContext, Collapsible, Layer } from 'grommet';
-import { FiArrowRight as ArrowRight } from 'react-icons/fi';
+import { useParams, useHistory, NavLink } from 'react-router-dom';
+import { Keyboard, Box, TextInput, Text, ThemeContext, ResponsiveContext, Collapsible, Layer, Menu, Nav } from 'grommet';
+import { FiArrowRight as ArrowRight, FiMenu as MenuIcon } from 'react-icons/fi';
 import { VscHistory as History } from 'react-icons/vsc';
 
 import { abbreviateHash, cleanValue } from '../utils';
@@ -36,6 +36,7 @@ import SeriesMatureBox from '../components/SeriesMatureBox';
 import TxHistory from '../components/TxHistory';
 import HistoryWrap from '../components/HistoryWrap';
 import RaisedBox from '../components/RaisedBox';
+import YieldMobileNav from '../components/YieldMobileNav';
 
 interface IBorrowProps {
   borrowAmount?:number|null;
@@ -64,6 +65,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
   } = position;
 
   const screenSize = useContext(ResponsiveContext);
+  const theme = useContext<any>(ThemeContext);
 
   /* hooks init */
   const { borrow }  = useController();
@@ -495,7 +497,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
                   <Box direction='row' gap='small' align='center'>
                     <Box>
                       <Text size='xsmall' color='text-weak'>
-                        <Text weight='bold' color={activeSeries.seriesColor}>repay</Text> series debt
+                        <Text weight='bold' color={activeSeries?.seriesColor}>repay</Text> series debt
                       </Text>
                     </Box>
                     <ArrowRight color='text-weak' />
@@ -512,7 +514,33 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
         { txActive && <TxStatus msg={`You are borrowing ${inputValue} DAI`} tx={txActive} /> }
 
       </Keyboard>
+
+      {screenSize === 'small' && 
+        <YieldMobileNav>
+
+          <NavLink 
+            to='/borrow/collateral/'
+            activeStyle={{ transform: 'scale(1.1)', fontWeight: 'bold', color: `${theme?.global.colors.active}` }}
+            style={{ textDecoration: 'none' }}
+          >
+            <Text size='xxsmall' color='text-weak'>Manage Collateral</Text>
+          </NavLink>
+
+          <Box onClick={()=>setRepayOpen(true)}>
+            <Box direction='row' gap='small' align='center'>
+              <Box>
+                <Text size='xxsmall' color='text-weak'>
+                  <Text weight='bold' color={activeSeries?.seriesColor}>repay </Text>
+                  debt
+                </Text>
+              </Box>
+            </Box>
+          </Box>
+
+        </YieldMobileNav>}
+
     </RaisedBox>
+    
   );
 };
 

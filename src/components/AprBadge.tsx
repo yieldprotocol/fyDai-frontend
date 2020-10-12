@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import moment from 'moment';
-import { Box, Text } from 'grommet';
+import { Box, ResponsiveContext, Text } from 'grommet';
 
 import {
   FiClock as Clock,
@@ -17,6 +17,7 @@ interface IAprBadgeProps {
 }
 
 function AprBadge({ activeView, series, animate }:IAprBadgeProps) {
+  const screenSize = useContext(ResponsiveContext);
   const [ seriesApr, setSeriesApr ] = useState<string>(`${series.yieldAPR_} %`);
   const [ seriesMature, setSeriesMature ] = useState<boolean>(series.isMature());
 
@@ -38,13 +39,18 @@ function AprBadge({ activeView, series, animate }:IAprBadgeProps) {
         align='center'
         gap='small'
         background={series.seriesColor}
+        animation={animate ? { type:'zoomIn', duration:1000, size:'xlarge' } : undefined} 
       >
-        <Text size='xsmall' color={series?.seriesTextColor}>
-          <Clock />
-        </Text>
-        <Text size='xsmall' color={series?.seriesTextColor}>  
-          Mature       
-        </Text>
+        { screenSize === 'small' &&  <Box pad={{ horizontal:'small', vertical:'xxsmall' }}><Clock /></Box>}
+        { screenSize !== 'small' && 
+        <>
+          <Text size='xsmall' color={series?.seriesTextColor}>
+            <Clock />
+          </Text>   
+          <Text size='xsmall' color={series?.seriesTextColor}>  
+            Mature       
+          </Text>
+        </>}
       </Box>}
 
       { seriesMature === false && 

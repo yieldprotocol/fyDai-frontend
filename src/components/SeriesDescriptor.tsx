@@ -80,7 +80,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
                 >         
                   <AprBadge activeView={activeView} series={activeSeries} animate />
                   <Text size='large' weight='bold' color={activeSeries?.seriesTextColor}>            
-                    { activeSeries?.displayName }
+                    { screenSize === 'small'? activeSeries?.displayNameMobile : activeSeries?.displayName }
                   </Text>
                 </Box>}
 
@@ -94,8 +94,8 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
                       </Text>
                     </Box>
                     : 
-                    <Box align='center'>
-                      <ChangeSeries />
+                    <Box align='center' direction='row' gap='small' pad='xsmall'>
+                      <ChangeSeries /> Change 
                     </Box>}
                   onClick={()=>setSelectorOpen(true)}
                 />
@@ -108,8 +108,8 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
               <Collapsible open={seriesState && !seriesState.seriesLoading}>
                 { children }
               </Collapsible>
-            </Box> 
-          </Box> 
+            </Box>
+          </Box>
   
           { !seriesState.seriesLoading && !delegated && !activeSeries.isMature() &&
             <Collapsible open={!delegated}>

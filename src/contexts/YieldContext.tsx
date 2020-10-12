@@ -125,6 +125,7 @@ const YieldProvider = ({ children }: any) => {
             poolAddress,
             maturity_: new Date(maturity * 1000),
             displayName: moment.utc(maturity * 1000).format('MMMM YYYY'),
+            displayNameMobile: moment.utc(maturity * 1000).format('MMM YYYY'),
             seriesColor: seriesColors[i],
             seriesTextColor: '#333333',
             seriesLightColor: utils.modColor(seriesColors[i], 50),
