@@ -1,11 +1,9 @@
-import React, { useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import {
   Image,
-  Button,
   Box,
   ThemeContext,
   ResponsiveContext,
-  Layer,
 } from 'grommet';
 import { VscTelescope as Telescope } from 'react-icons/vsc';
 
@@ -14,45 +12,11 @@ import logoLight from '../assets/images/logo_light.svg';
 
 import AccountButton from './AccountButton';
 import FlatButton from './FlatButton';
-import YieldNav from './YieldNav';
 
 const YieldHeader = (props: any) => {
 
   const screenSize = useContext(ResponsiveContext);
-
-  // Menu state for mobile later
-  const [menuOpen, setMenuOpen] = useState(false);
-
   const theme = useContext<any>(ThemeContext);
-
-  function toggleMenu() {
-    setMenuOpen((prevMenu) => !prevMenu);
-  }
-
-  const MenuButton = () => (
-    <Button
-      onClick={toggleMenu}
-      fill="horizontal"
-      style={{
-        textAlign: 'right',
-      }}
-    >
-      Menu
-    </Button>
-  );
-
-  const MobileNav = () => {
-    return (
-      <>
-        { menuOpen &&
-        <Layer full>
-          <Box background='background' fill>
-            <YieldNav />
-          </Box>       
-        </Layer>}
-      </>
-    );
-  };
 
   return (
     <Box fill>
@@ -62,33 +26,19 @@ const YieldHeader = (props: any) => {
         justify='between'
         fill='horizontal'
       >
-        <Box alignSelf='start'>
+        <Box width={screenSize==='small'? '20%':undefined} pad='xxsmall'>
           <Image src={theme.dark ? logoLight : logoDark} fit="contain" />
         </Box>
 
         <Box direction='row' gap='small'>
-          {screenSize === 'small' ? (
-            <MenuButton />
-          ) : (
+          {screenSize !== 'small' &&
             <Box direction="row" align="center" gap="small">
               <AccountButton {...props} />
-            </Box>
-          )}
+            </Box>}
           <FlatButton 
             onClick={()=>console.log('xys')}
             label={<Box pad={{ horizontal:'small' }}><Telescope /></Box>}
           /> 
-        </Box>
-      </Box>
-
-      <Box
-        direction='row'
-        justify='center'
-        pad={{ horizontal:'small', top:'large' }}
-        fill='horizontal'
-      >
-        <Box alignSelf='center'>
-          { screenSize === 'small' && <MobileNav /> }
         </Box>
       </Box>
     </Box>

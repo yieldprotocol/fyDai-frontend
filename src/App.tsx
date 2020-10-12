@@ -63,7 +63,7 @@ const App = (props:any) => {
     <div 
       className="App" 
       style={
-        ( activeSeries && props.moodLight) ? 
+        ( activeSeries && props.moodLight && screenSize!=='small') ? 
           { background: `radial-gradient(at 90% 90%, transparent 75%, ${modColor(activeSeries.seriesColor, 50)})` }
           :
           undefined
@@ -91,7 +91,10 @@ const App = (props:any) => {
 
       <NotifyLayer target={leftSideRef.current} columnsWidth={columns} />
 
-      <Box margin={{ top:'large' }} align='center'><YieldNav /></Box>
+      { screenSize !== 'small' &&
+      <Box margin={{ top:'large' }} align='center'>
+        <YieldNav />
+      </Box>}
 
       <Main 
         pad={{ bottom:'large' }}
@@ -104,11 +107,9 @@ const App = (props:any) => {
             <Route path="/borrow/collateral/:amnt?">
               <Deposit openConnectLayer={() => setShowConnectLayer('CONNECT')} />
             </Route>
-
             <Route path="/borrow/:series?/:amnt?">
               <Borrow openConnectLayer={() => setShowConnectLayer('CONNECT')} />
             </Route>
-
             <Route path="/lend/:series?/:amnt?">
               <Lend openConnectLayer={() => setShowConnectLayer('CONNECT')} />
             </Route>
@@ -118,12 +119,9 @@ const App = (props:any) => {
             <Route exact path="/">
               <Redirect to={`${cachedLastVisit || '/borrow/'}`} />
             </Route>
-
             <Route path="/*">
               404
             </Route>
-
-
           </Switch>
         </Box>               
       </Main>
@@ -154,7 +152,8 @@ const App = (props:any) => {
           responsive={false}
           full='horizontal'
         >
-          <Nav 
+          {/* <MobileButton /> */}
+          <Nav
             direction="row"
             background="background-mid"          
             round={{ corner:'top', size:'small' }}

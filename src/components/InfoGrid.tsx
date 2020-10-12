@@ -30,16 +30,6 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
   const [ detailsOpen, setDetailsOpen ] = useState<boolean>();
   const [visibleEntries, setVisibleEntries] = useState<any[]>([]);
 
-  // const [normalText, setNormalText] = useState<string>(!alt? 'brand': activeSeries?.seriesTextColor);
-  // const [xWeakText, setXWeakText] = useState<string>(!alt? 'text-xweak':`${modColor(activeSeries?.seriesColor, 10)}`);
-  // const [weakText, setWeakText] = useState<string>(!alt? 'text-weak':`${modColor(activeSeries?.seriesColor, 10)}`);
-
-  // useEffect(()=>{
-  //   activeSeries && setNormalText( !alt? 'brand': activeSeries?.seriesTextColor);
-  //   activeSeries && setXWeakText( !alt? 'text-xweak':`${modColor(activeSeries?.seriesColor, 10)}`);
-  //   activeSeries && setWeakText( !alt? 'text-weak':`${modColor(activeSeries?.seriesColor, 10)}`);
-  // }, [activeSeries]);
-
   useEffect(()=>{
     setVisibleEntries((entries.filter((x:any)=>x.visible===true)));
   }, [entries]);

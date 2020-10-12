@@ -207,7 +207,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
             entries={[
               {
                 label: null,
-                visible: !!account,
+                visible: !!account && (screenSize !== 'small'),
                 active: true,
                 loading: false,
                 value:null,
