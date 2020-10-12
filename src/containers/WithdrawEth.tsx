@@ -117,9 +117,6 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
   }, [ estRatio, debouncedInput ]);
 
   return (
-    <Layer 
-      onClickOutside={()=>close()}
-    >
       <Keyboard 
         onEsc={() => { inputValue? setInputValue(undefined): close();}}
         onEnter={()=> withdrawProcedure()}
@@ -235,7 +232,6 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
           </Box>
         </Box>}
       </Keyboard>
-    </Layer>
   );
 };
 

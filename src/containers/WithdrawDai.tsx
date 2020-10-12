@@ -101,14 +101,13 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
   }, [ debouncedInput ]);
 
   return (
-    <Layer onClickOutside={()=>close()}>
-      <Keyboard 
-        onEsc={() => { inputValue? setInputValue(undefined): close();}}
-        onEnter={()=> withdrawProcedure()}
-        onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
-        target='document'
-      >
-        { !txActive && !withdrawDaiPending && 
+    <Keyboard 
+      onEsc={() => { inputValue? setInputValue(undefined): close();}}
+      onEnter={()=> withdrawProcedure()}
+      onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
+      target='document'
+    >
+      { !txActive && !withdrawDaiPending && 
         <Box 
           width={screenSize!=='small'?{ min:'620px', max:'620px' }: undefined}
           alignSelf='center'
@@ -155,38 +154,37 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
           </Box>
         </Box>}
 
-        { withdrawDaiPending && !txActive && <ApprovalPending /> }
+      { withdrawDaiPending && !txActive && <ApprovalPending /> }
 
-        { txActive && 
-          <Box 
-            width={{ max:'600px' }}
-            alignSelf='center'
-            fill
-            background='background-front'
-            round='small'
-            pad='large'
-            gap='medium'
-            justify='between'
-          > 
-            <TxStatus msg={`You are closing ${inputValue} DAI`} tx={txActive} />
+      { txActive && 
+      <Box 
+        width={{ max:'600px' }}
+        alignSelf='center'
+        fill
+        background='background-front'
+        round='small'
+        pad='large'
+        gap='medium'
+        justify='between'
+      > 
+        <TxStatus msg={`You are closing ${inputValue} DAI`} tx={txActive} />
                 
-            <Box alignSelf='start'>
-              <Box
-                round
-                onClick={()=>close()}
-                hoverIndicator='brand-transparent'
-                pad={{ horizontal:'small', vertical:'small' }}
-                justify='center'
-              >
-                <Box direction='row' gap='small' align='center'>
-                  <ArrowLeft color='text-weak' />
-                  <Text size='xsmall' color='text-weak'> { !withdrawDaiPending? 'cancel, and go back.': 'go back'}  </Text>
-                </Box>
-              </Box>
+        <Box alignSelf='start'>
+          <Box
+            round
+            onClick={()=>close()}
+            hoverIndicator='brand-transparent'
+            pad={{ horizontal:'small', vertical:'small' }}
+            justify='center'
+          >
+            <Box direction='row' gap='small' align='center'>
+              <ArrowLeft color='text-weak' />
+              <Text size='xsmall' color='text-weak'> { !withdrawDaiPending? 'cancel, and go back.': 'go back'}  </Text>
             </Box>
-          </Box>}
-      </Keyboard>
-    </Layer>
+          </Box>
+        </Box>
+      </Box>}
+    </Keyboard>
   );
 };
 

@@ -191,6 +191,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
         { repayOpen && 
         <Layer 
           onClickOutside={()=>setRepayOpen(false)}
+          responsive={true}
         >
           <Repay close={()=>setRepayOpen(false)} />      
         </Layer>}
@@ -225,7 +226,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
                       elevation='small'
                     >
                       <FlatButton            
-                        onClick={()=>navHistory.push('/borrow/collateral/')}
+                        onClick={()=>navHistory.push('/post/')}
                         label={<Text size='xsmall' color='#DDDDDD'> Manage Collateral</Text>}
                         background='#55555580'
                       />            
@@ -442,7 +443,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
                           <RaisedButton
                             color={inputValue? 'brand': 'brand-transparent'}
                             label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Deposit collateral</Text></Box>}
-                            onClick={()=>navHistory.push('/borrow/collateral/')}
+                            onClick={()=>navHistory.push('/post/')}
                           /> 
                         </Box>
                       )
@@ -472,8 +473,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
             <Repay />}
 
             <Box direction='row' fill justify='between'>
-
-              { activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) && 
+              { activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) && screenSize !== 'small' &&
               <Box alignSelf='start' margin={{ top:'medium' }}>
                 <FlatButton 
                   onClick={()=>setHistOpen(true)}
@@ -489,23 +489,25 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
               </Box>}
             
               { !activeSeries?.isMature() &&
-            activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) &&
-            <Box alignSelf='end' margin={{ top:'medium' }}>
-              <FlatButton 
-                onClick={()=>setRepayOpen(true)}
-                label={
-                  <Box direction='row' gap='small' align='center'>
-                    <Box>
-                      <Text size='xsmall' color='text-weak'>
-                        <Text weight='bold' color={activeSeries?.seriesColor}>repay</Text> series debt
-                      </Text>
-                    </Box>
-                    <ArrowRight color='text-weak' />
-                  </Box>
+                activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) &&
+                screenSize !== 'small' &&
+                <Box alignSelf='end' margin={{ top:'medium' }}>
+                  <FlatButton 
+                    onClick={()=>setRepayOpen(true)}
+                    label={
+                      <Box direction='row' gap='small' align='center'>
+                        <Box>
+                          <Text size='xsmall' color='text-weak'>
+                            <Text weight='bold' color={activeSeries?.seriesColor}>repay</Text> series debt
+                          </Text>
+                        </Box>
+                        <ArrowRight color='text-weak' />
+                      </Box>
                 }
-              />
-            </Box>}
+                  />
+                </Box>}
             </Box>
+
           </Box>
         </Box>}
 
@@ -517,26 +519,31 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
 
       {screenSize === 'small' && 
         <YieldMobileNav>
-
           <NavLink 
-            to='/borrow/collateral/'
+            to='/post/'
             activeStyle={{ transform: 'scale(1.1)', fontWeight: 'bold', color: `${theme?.global.colors.active}` }}
             style={{ textDecoration: 'none' }}
           >
-            <Text size='xxsmall' color='text-weak'>Manage Collateral</Text>
+            <Box>
+              <Text size='xxsmall' color='text-weak'>Manage Collateral</Text>
+            </Box>
           </NavLink>
 
-          <Box onClick={()=>setRepayOpen(true)}>
-            <Box direction='row' gap='small' align='center'>
-              <Box>
+          {!activeSeries?.isMature() &&
+            activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) &&
+            <NavLink 
+              to={`/repay/${activeSeries?.maturity}`}
+              activeStyle={{ transform: 'scale(1.1)', fontWeight: 'bold', color: `${theme?.global.colors.active}` }}
+              style={{ textDecoration: 'none' }}
+            >
+              <Box direction='row' gap='small' align='center'>
                 <Text size='xxsmall' color='text-weak'>
                   <Text weight='bold' color={activeSeries?.seriesColor}>repay </Text>
                   debt
                 </Text>
+                <ArrowRight color='text-weak' />
               </Box>
-            </Box>
-          </Box>
-
+            </NavLink>}
         </YieldMobileNav>}
 
     </RaisedBox>

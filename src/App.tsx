@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState, useContext, Suspense } from 'react';
 import { Switch, Route, Redirect, useLocation, NavLink } from 'react-router-dom';
 
-import { Text, Grommet, base, Grid, Main, Box, ThemeContext, ResponsiveContext, Nav, Layer, Collapsible } from 'grommet';
+import { Text, Grommet, base, Grid, Main, Box, ThemeContext, ResponsiveContext, Nav, Sidebar, Collapsible, Layer } from 'grommet';
 import { deepMerge } from 'grommet/utils';
 
 
@@ -30,6 +30,10 @@ import NotifyLayer from './containers/layers/NotifyLayer';
 import TestLayer from './containers/layers/TestLayer';
 import { useCachedState } from './hooks';
 import YieldNav from './components/YieldNav';
+import WithdrawDai from './containers/WithdrawDai';
+import WithdrawEth from './containers/WithdrawEth';
+import Repay from './containers/Repay';
+import RemoveLiquidity from './containers/RemoveLiquidity';
 
 
 const App = (props:any) => {
@@ -41,25 +45,30 @@ const App = (props:any) => {
 
   const location = useLocation();
   React.useEffect(() => {
-    location?.pathname !== '/borrow/collateral/' &&
+    /* remember/cache the following last visited routes: */
     ['borrow', 'lend', 'pool'].includes(location.pathname.split('/')[1]) &&
+    /* but, ignore these other routes */
+    !['withdraw', 'repay', 'removeLiquidity', 'close'].includes(location.pathname.split('/')[1]) &&
     setCachedLastVisit(`/${location.pathname.split('/')[1]}/${activeSeries?.maturity}` );
   }, [location]);
 
-  const [showConnectLayer, setShowConnectLayer] = useState<string|null>(null);
+  
   const leftSideRef = useRef<any>(null);
   
+
+  const [showConnectLayer, setShowConnectLayer] = useState<string|null>(null);
   // TODO remove for prod
   const [showTestLayer, setShowTestLayer] = useState<boolean>(false);
+  const [showSidebar, setShowSidebar] = useState<boolean>(true);
 
   const screenSize = useContext<string>(ResponsiveContext);
   const theme = useContext<any>(ThemeContext);
 
-  const [columns, setColumns] = useState<string[]>(['10%', 'auto', '10%']);
+  const [columns, setColumns] = useState<string[]>(['7%', 'auto', '7%']);
   useEffect(()=> {
     screenSize === 'small'?
       setColumns(['0%', 'auto', '0%'])
-      : setColumns(['10%', 'auto', '10%']);
+      : setColumns(['7%', 'auto', '7%']);
   }, [screenSize]);
 
   return (
@@ -75,12 +84,12 @@ const App = (props:any) => {
       <ConnectLayer view={showConnectLayer} closeLayer={() => setShowConnectLayer(null)} />
       { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
 
-      <Grid 
-        fill 
+      <Grid
         columns={columns} 
         justify='center'
+        onClick={()=>setShowSidebar(!showSidebar)}
       >
-        <Box background={{ color: 'background-front' }} />
+        <Box background={{ color: 'background-front' }}/>
         <YieldHeader
           openConnectLayer={(v:string) => setShowConnectLayer(v)}
         />
@@ -107,21 +116,41 @@ const App = (props:any) => {
           align='center'
         > 
           <Switch>
-            <Route path="/borrow/collateral/:amnt?">
+            <Route path="/post/:amnt?">
               <Deposit openConnectLayer={() => setShowConnectLayer('CONNECT')} />
             </Route>
+            <Route path="/withdraw/:amnt?">
+              <WithdrawEth />
+            </Route>
+
             <Route path="/borrow/:series?/:amnt?">
               <Borrow openConnectLayer={() => setShowConnectLayer('CONNECT')} />
             </Route>
+  
+            <Route path="/repay/:series/:amnt?">
+              <Repay />
+            </Route>
+
             <Route path="/lend/:series?/:amnt?">
               <Lend openConnectLayer={() => setShowConnectLayer('CONNECT')} />
             </Route>
+
+            <Route path="/close/:series/:amnt?">
+              <WithdrawDai />
+            </Route>
+
             <Route path="/pool/:series?/:amnt?">
               <Pool openConnectLayer={() => setShowConnectLayer('CONNECT')} />
             </Route>
+
+            <Route path="/removeLiquidity/:series/:amnt?">
+              <RemoveLiquidity />
+            </Route>
+            
             <Route exact path="/">
               <Redirect to={`${cachedLastVisit || '/borrow/'}`} />
             </Route>
+            
             <Route path="/*">
               404
             </Route>

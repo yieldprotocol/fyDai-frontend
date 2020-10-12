@@ -29,10 +29,10 @@ const YieldNav = (props: any) => {
   return (
     <>
       <Box
-        direction={screenSize === 'small' ? 'column' : 'row'}
-        fill={screenSize === 'small' ? 'horizontal' : false}
-        gap='large'
+        direction='row'
+        gap={screenSize === 'small'? 'medium':'large'}
         align='center'
+        justify='evenly'
       >
         <StyledLink 
           to={`/borrow/${activeSeries?.maturity}`}
@@ -41,21 +41,33 @@ const YieldNav = (props: any) => {
             return (location.pathname.includes('borrow'));
           }}
         > 
-          <Text weight='bold' size='xxlarge'>Borrow</Text>
+          <Text 
+            weight='bold' 
+            size={screenSize === 'small'? 'small':'xxlarge'}
+          >Borrow
+          </Text>
         </StyledLink> 
 
         <StyledLink 
           to={`/lend/${activeSeries?.maturity}`}
           activeStyle={{ transform: 'scale(1.1)', fontWeight: 'bold', color: `${theme.global.colors.active}` }}
         >
-          <Text weight='bold' size='xxlarge'>Lend</Text>
+          <Text 
+            weight='bold' 
+            size={screenSize === 'small'? 'small':'xxlarge'} 
+          > Lend
+          </Text>
         </StyledLink> 
 
         <StyledLink 
           to={`/pool/${activeSeries?.maturity}`}
           activeStyle={{ transform: 'scale(1.1)', fontWeight: 'bold', color: `${theme.global.colors.active}` }}
         >
-          <Text weight='bold' size='xxlarge'>Pool</Text>
+          <Text 
+            weight='bold' 
+            size={screenSize === 'small'? 'small':'xxlarge'} 
+          >Pool
+          </Text>
         </StyledLink> 
       </Box>
     </>

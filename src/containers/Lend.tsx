@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { ethers } from 'ethers';
-import { Box, Keyboard, TextInput, Text, ResponsiveContext, Collapsible } from 'grommet';
+import { Box, Keyboard, TextInput, Text, ResponsiveContext, Collapsible, Layer } from 'grommet';
 import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 import { VscHistory as History } from 'react-icons/vsc';
 
+import { useParams } from 'react-router-dom';
 import { cleanValue } from '../utils';
 
 import { SeriesContext } from '../contexts/SeriesContext';
@@ -36,7 +37,7 @@ import HistoryWrap from '../components/HistoryWrap';
 
 import DaiMark from '../components/logos/DaiMark';
 import RaisedBox from '../components/RaisedBox';
-import { useParams } from 'react-router-dom';
+import YieldMobileNav from '../components/YieldMobileNav';
 
 interface ILendProps {
   openConnectLayer:any;
@@ -156,7 +157,10 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
         onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
         target='document'
       >
-        { withdrawDaiOpen && <WithdrawDai close={()=>setWithdrawDaiOpen(false)} /> }
+        { withdrawDaiOpen && 
+        <Layer onClickOutside={()=>setWithdrawDaiOpen(false)}>
+          <WithdrawDai close={()=>setWithdrawDaiOpen(false)} />   
+        </Layer>}
 
         { histOpen && 
         <HistoryWrap closeLayer={()=>setHistOpen(false)}>
@@ -318,32 +322,35 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
 
             <Box direction='row' fill justify='between'>
               { activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) && 
-              <Box alignSelf='start' margin={{ top:'medium' }}>
-                <FlatButton 
-                  onClick={()=>setHistOpen(true)}
-                  label={
-                    <Box direction='row' gap='small' align='center'>
-                      <Text size='xsmall' color='text-xweak'><History /></Text>                
-                      <Text size='xsmall' color='text-xweak'>
-                        Series Lend History
-                      </Text>              
-                    </Box>
+                screenSize !== 'small' &&
+                <Box alignSelf='start' margin={{ top:'medium' }}>
+                  <FlatButton 
+                    onClick={()=>setHistOpen(true)}
+                    label={
+                      <Box direction='row' gap='small' align='center'>
+                        <Text size='xsmall' color='text-xweak'><History /></Text>                
+                        <Text size='xsmall' color='text-xweak'>
+                          Series Lend History
+                        </Text>              
+                      </Box>
                     }
-                />
-              </Box>}
+                  />
+                </Box>}
 
-              { !activeSeries?.isMature() && activeSeries?.fyDaiBalance_ > 0 &&
-              <Box alignSelf='end' margin={{ top:'medium' }}>
-                <FlatButton 
-                  onClick={()=>setWithdrawDaiOpen(true)}
-                  label={
-                    <Box direction='row' gap='small' align='center'>
-                      <Box><Text size='xsmall' color='text-weak'><Text weight='bold' color={activeSeries.seriesColor}>close</Text> your position in this series</Text></Box>
-                      <ArrowRight color='text-weak' />
-                    </Box>
+              { !activeSeries?.isMature() && 
+                activeSeries?.fyDaiBalance_ > 0 &&
+                screenSize !== 'small' &&
+                <Box alignSelf='end' margin={{ top:'medium' }}>
+                  <FlatButton 
+                    onClick={()=>setWithdrawDaiOpen(true)}
+                    label={
+                      <Box direction='row' gap='small' align='center'>
+                        <Box><Text size='xsmall' color='text-weak'><Text weight='bold' color={activeSeries?.seriesColor}>close</Text> your position in this series</Text></Box>
+                        <ArrowRight color='text-weak' />
+                      </Box>
                     }
-                />
-              </Box>}
+                  />
+                </Box>}
             </Box>
 
           </Box>
@@ -353,6 +360,24 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
         { sellActive && !txActive && <ApprovalPending /> }
         { txActive && <TxStatus msg={`You are lending ${inputValue} DAI`} tx={txActive} /> }
       </Keyboard>
+
+      {screenSize === 'small' &&
+       !activeSeries?.isMature() && 
+       activeSeries?.fyDaiBalance_ > 0 &&
+       <YieldMobileNav>
+         <Box onClick={()=>setWithdrawDaiOpen(true)}>
+           <Box direction='row' gap='small' align='center'>
+             <Box>
+               <Text size='xxsmall' color='text-weak'>
+                 <Text weight='bold' size='xsmall' color={activeSeries?.seriesColor}>close </Text> 
+                 your position
+               </Text>
+             </Box>
+             <ArrowRight color='text-weak' />
+           </Box>
+         </Box>
+       </YieldMobileNav>}
+        
     </RaisedBox>
   );
 };

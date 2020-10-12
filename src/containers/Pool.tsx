@@ -5,6 +5,7 @@ import { Box, Keyboard, TextInput, Text, ResponsiveContext, Collapsible, Layer }
 import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 import { VscHistory as History } from 'react-icons/vsc';
 
+import { useParams } from 'react-router-dom';
 import { cleanValue } from '../utils';
 
 import { YieldContext } from '../contexts/YieldContext';
@@ -36,7 +37,7 @@ import HistoryWrap from '../components/HistoryWrap';
 import RaisedBox from '../components/RaisedBox';
 
 import DaiMark from '../components/logos/DaiMark';
-import { useParams } from 'react-router-dom';
+import YieldMobileNav from '../components/YieldMobileNav';
 
 
 interface IPoolProps {
@@ -278,33 +279,35 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
 
             <Box direction='row' fill justify='between'>
               { activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) && 
-              <Box alignSelf='start' margin={{ top:'medium' }}>
-                <FlatButton 
-                  onClick={()=>setHistOpen(true)}
-                  label={
-                    <Box direction='row' gap='small' align='center'>
-                      <Text size='xsmall' color='text-xweak'><History /></Text>                
-                      <Text size='xsmall' color='text-xweak'>
-                        Series Pool History
-                      </Text>              
-                    </Box>
+                screenSize !== 'small' &&
+                <Box alignSelf='start' margin={{ top:'medium' }}>
+                  <FlatButton 
+                    onClick={()=>setHistOpen(true)}
+                    label={
+                      <Box direction='row' gap='small' align='center'>
+                        <Text size='xsmall' color='text-xweak'><History /></Text>                
+                        <Text size='xsmall' color='text-xweak'>
+                          Series Pool History
+                        </Text>              
+                      </Box>
                 }
-                />
-              </Box>}
+                  />
+                </Box>}
 
               { !activeSeries?.isMature() &&
-            activeSeries?.poolTokens_>0 &&
-            <Box alignSelf='end' margin={{ top:'medium' }}>
-              <FlatButton 
-                onClick={()=>setRemoveLiquidityOpen(true)}
-                label={
-                  <Box direction='row' gap='small' align='center'>
-                    <Text size='xsmall' color='text-weak'><Text weight='bold' color={activeSeries.seriesColor}>Remove Liquidity</Text> from this series</Text>
-                    <ArrowRight color='text-weak' />
-                  </Box>
-                }  
-              />
-            </Box>}
+                activeSeries?.poolTokens_>0 &&
+                screenSize !== 'small' && 
+                <Box alignSelf='end' margin={{ top:'medium' }}>
+                  <FlatButton 
+                    onClick={()=>setRemoveLiquidityOpen(true)}
+                    label={
+                      <Box direction='row' gap='small' align='center'>
+                        <Text size='xsmall' color='text-weak'><Text weight='bold' color={activeSeries?.seriesColor}>Remove Liquidity</Text> from this series</Text>
+                        <ArrowRight color='text-weak' />
+                      </Box>
+                }
+                  />
+                </Box>}
             </Box>
 
           </Box>
@@ -313,6 +316,23 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
         { addLiquidityActive && !txActive && <ApprovalPending /> } 
         { txActive && <TxStatus msg={`You are adding ${inputValue} DAI liquidity to the pool.`} tx={txActive} /> }
       </Keyboard>
+
+      {screenSize === 'small' && 
+       !activeSeries?.isMature() &&
+       activeSeries?.poolTokens_>0 &&
+       <YieldMobileNav>
+         <Box onClick={()=>setRemoveLiquidityOpen(true)}>
+           <Box direction='row' gap='small' align='center'>
+             <Box>
+               <Text size='xxsmall' color='text-weak'>
+                 <Text weight='bold' size='xsmall' color={activeSeries?.seriesColor}>Remove Liquidity</Text> 
+               </Text>
+             </Box>
+             <ArrowRight color='text-weak' />
+           </Box>
+         </Box>
+       </YieldMobileNav>}
+
     </RaisedBox>
   );
 };

@@ -1,22 +1,21 @@
 import React, { useContext } from 'react';
-import { NavLink, useLocation, useHistory } from 'react-router-dom';
+import { useLocation, useHistory } from 'react-router-dom';
 import {
   Text,
   Image,
   Box,
   ThemeContext,
   ResponsiveContext,
-  Layer,
-  Nav,
 } from 'grommet';
 import { VscTelescope as Telescope } from 'react-icons/vsc';
-import { FiArrowLeft as ArrowLeft, FiMenu as MenuIcon } from 'react-icons/fi';
+import { FiArrowLeft as ArrowLeft } from 'react-icons/fi';
 
 import logoDark from '../assets/images/logo.svg';
 import logoLight from '../assets/images/logo_light.svg';
 
 import AccountButton from './AccountButton';
 import FlatButton from './FlatButton';
+import YieldNav from './YieldNav';
 
 const YieldHeader = (props: any) => {
   const screenSize = useContext(ResponsiveContext);
@@ -37,21 +36,43 @@ const YieldHeader = (props: any) => {
           <Image src={theme.dark ? logoLight : logoDark} fit="contain" />
         </Box>}
 
-        { screenSize==='small' && location.pathname.split('/')[2]!=='collateral' && 
+        { screenSize==='small' && 
+        ['borrow', 'lend', 'pool'].includes(location.pathname.split('/')[1]) && 
         <Box direction='row' gap='medium' align='center'>
-
-          <Box width={screenSize==='small'? '30%':undefined}>
+          {/* <Box width={screenSize==='small'? '30%':undefined}>
             <Image src={theme.dark ? logoLight : logoDark} fit="contain" />
-          </Box>   
-          {/* <Box onClick={()=>history.push('/borrow/')}> <MenuIcon /> </Box> */}
-          <Text weight='bold' size='medium' style={{ textTransform:'capitalize' }}> {location.pathname.split('/')[1]} </Text>
+          </Box>    */}
+          {/* <Text weight='bold' size='medium' style={{ textTransform:'capitalize' }}> {location.pathname.split('/')[1]} </Text> */}
+          <YieldNav />
         </Box>}
 
-        { screenSize==='small' && location.pathname.split('/')[2]==='collateral' && 
+        { screenSize==='small' && 
+        ['post', 'withdraw'].includes(location.pathname.split('/')[1])&&
         <Box direction='row' gap='medium' align='center'>
-          <Box onClick={()=>history.push('/borrow/')}> <ArrowLeft /> </Box>
-          <Text weight='bold' size='medium'> Manage Collateral</Text>
+          <Box onClick={()=>history.push('/borrow/')}><ArrowLeft /></Box>
+          <Text weight='bold' size='medium' style={{ textTransform:'capitalize' }}> {location.pathname.split('/')[1]} Collateral</Text>
         </Box>}
+        
+        { screenSize==='small' && 
+        location.pathname.split('/')[1]==='repay' &&
+        <Box direction='row' gap='medium' align='center'>
+          <Box onClick={()=>history.push('/borrow/')}><ArrowLeft /></Box>
+          <Text weight='bold' size='medium'>Repay Dai</Text>
+        </Box>}
+        { screenSize==='small' && 
+        location.pathname.split('/')[1]==='close' &&
+        <Box direction='row' gap='medium' align='center'>
+          <Box onClick={()=>history.push('/borrow/')}><ArrowLeft /></Box>
+          <Text weight='bold' size='medium'>Close Position</Text>
+        </Box>}
+
+        { screenSize==='small' && 
+        location.pathname.split('/')[1]==='remove' &&
+        <Box direction='row' gap='medium' align='center'>
+          <Box onClick={()=>history.push('/borrow/')}><ArrowLeft /></Box>
+          <Text weight='bold' size='medium'> Remove Liquidity</Text>
+        </Box>}
+
 
         <Box direction='row' gap='small'>
           {screenSize !== 'small' &&
@@ -64,47 +85,6 @@ const YieldHeader = (props: any) => {
           /> 
         </Box>
       </Box>
-      {/*
-      {screenSize === 'small' &&  
-        
-      <Layer
-        position='left'
-        modal={false}
-        responsive={false}
-        full='vertical'
-      >
-        <Nav
-          background="background-mid"          
-          round={{ corner:'top', size:'small' }}
-          elevation='small'
-          pad="medium"
-          justify='evenly'
-        >
-          <NavLink 
-            to='/borrow/'
-            activeStyle={{ transform: 'scale(1.1)', fontWeight: 'bold', color: `${theme?.global.colors.active}` }}
-            style={{ textDecoration: 'none' }}
-          >
-            <Text size='xsmall'>Borrow</Text>
-          </NavLink>
-
-          <NavLink 
-            to='/lend/'
-            activeStyle={{ transform: 'scale(1.1)', fontWeight: 'bold', color: `${theme?.global.colors.active}` }}
-            style={{ textDecoration: 'none' }}
-          >
-            <Text size='xsmall'>Lend</Text>
-          </NavLink>
-
-          <NavLink 
-            to='/pool/'
-            activeStyle={{ transform: 'scale(1.1)', fontWeight: 'bold', color: `${theme?.global.colors.active}` }}
-            style={{ textDecoration: 'none' }}
-          >
-            <Text size='xsmall'>Pool</Text>
-          </NavLink>
-        </Nav>
-      </Layer>} */}
     </>
   );
 };

@@ -86,8 +86,8 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
   };
 
   useEffect(()=>{
-    daiBalance && activeSeries?.ethDebtDai && daiBalance.gt(activeSeries?.ethDebtDai) && setMaxRepay(activeSeries.ethDebtDai);
-    daiBalance && activeSeries?.ethDebtDai && daiBalance.lt(activeSeries.ethDebtDai) && setMaxRepay(daiBalance);
+    activeSeries?.ethDebtDai && daiBalance?.gt(activeSeries?.ethDebtDai) && setMaxRepay(activeSeries.ethDebtDai);
+    activeSeries?.ethDebtDai && daiBalance?.lt(activeSeries.ethDebtDai) && setMaxRepay(daiBalance);
   }, [daiBalance, activeSeries]);
 
   /* Repay disabling logic */
@@ -124,10 +124,9 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
       onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
       target='document'
     >
-
       { !txActive &&
         <Box
-          width={{ min: '600px', max: '600px' }}
+          width={screenSize!=='small'?{ min:'620px', max:'620px' }: undefined}
           alignSelf="center"
           fill
           background="background-front"
@@ -137,7 +136,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
           <Box flex='grow' justify='between'>
             <Box gap='medium' align='center' fill='horizontal'>
 
-              { (activeSeries?.ethDebtFYDai.gt(ethers.constants.Zero)) ?
+              { (activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero)) ?
              
                 <Box gap='medium' align='center' fill='horizontal'>
                   <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to Repay</Text>
@@ -167,7 +166,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
                             visible: false,
                             active: true,
                             loading: repayPending,    
-                            value: activeSeries?.ethDebtFYDai_? `${activeSeries.ethDebtFYDai_} DAI`: '0 DAI',
+                            value: activeSeries?.ethDebtFYDai_? `${activeSeries?.ethDebtFYDai_} DAI`: '0 DAI',
                             valuePrefix: null,
                             valueExtra: null, 
                           }, 
@@ -176,7 +175,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
                             visible: true,
                             active: true,
                             loading: false,    
-                            value:  activeSeries?.ethDebtDai_? `${cleanValue(activeSeries.ethDebtDai_, 2)} DAI`: '0 DAI',
+                            value:  activeSeries?.ethDebtDai_? `${cleanValue(activeSeries?.ethDebtDai_, 2)} DAI`: '0 DAI',
                             valuePrefix: null,
                             valueExtra: null,
                           },
@@ -186,8 +185,8 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
                             active: !!inputValue&&inputValue>0,
                             loading: false,
                             value: activeSeries?.ethDebtDai_ ? 
-                              ( activeSeries.ethDebtDai_ - parseFloat(debouncedInput)>0 ? 
-                                activeSeries.ethDebtDai_ - parseFloat(debouncedInput) 
+                              ( activeSeries?.ethDebtDai_ - parseFloat(debouncedInput)>0 ? 
+                                activeSeries?.ethDebtDai_ - parseFloat(debouncedInput) 
                                 : 0
                               ).toFixed(2) : '- DAI',
 

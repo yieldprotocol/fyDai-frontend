@@ -134,8 +134,8 @@ export const yieldTheme = {
           hair: '1px',
           xxsmall: '2px',
           xsmall: '3px',
-          small: '5px',
-          medium: '10px',
+          small: '10px',
+          medium: '15px',
           large: '20px',
           xlarge: '40px',
         },
@@ -524,6 +524,9 @@ export const yieldTheme = {
     overlay: {
       background: '#000000A6', // 60%
     },
+    animation: {
+      
+    }, 
   },
 
   table: {

@@ -61,7 +61,8 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
               fill='horizontal'
               gap='small'
               align='center'
-              pad={{vertical:'small'}}
+              pad={{ vertical:'small' }}
+              style={{position:'sticky', top:0}}
             >
               <Box 
                 round='xsmall'

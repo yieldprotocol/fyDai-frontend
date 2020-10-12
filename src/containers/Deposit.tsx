@@ -8,7 +8,8 @@ import {
   TextInput, 
   Text,
   ResponsiveContext, 
-  Collapsible
+  Collapsible,
+  Layer
 } from 'grommet';
 
 import {
@@ -228,7 +229,11 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
           />
         </CollateralDescriptor>
       
-        { withdrawOpen && <WithdrawEth close={()=>setWithdrawOpen(false)} /> }    
+        { withdrawOpen && 
+          <Layer onClickOutside={()=>setWithdrawOpen(false)}>
+            <WithdrawEth close={()=>setWithdrawOpen(false)} /> 
+          </Layer>}
+        
         { (!txActive || txActive?.type === 'WITHDRAW') &&
         <Box
           alignSelf="center"
