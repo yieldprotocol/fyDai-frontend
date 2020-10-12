@@ -27,33 +27,38 @@ const YieldNav = (props: any) => {
   const theme = useContext<any>(ThemeContext);
 
   return (
-    <Box
-      direction={screenSize === 'small' ? 'column' : 'row'}
-      fill={screenSize === 'small' ? 'horizontal' : false}
-      gap='large'
-      align='center'
-    >
-      <StyledLink 
-        to={`/borrow/${activeSeries?.maturity}`}
-        activeStyle={{ transform: 'scale(1.1)', fontWeight: 'bold', color: `${theme.global.colors.active}` }}
-      > 
-        <Text weight='bold' size='xxlarge'>Borrow</Text>
-      </StyledLink> 
-
-      <StyledLink 
-        to={`/lend/${activeSeries?.maturity}`}
-        activeStyle={{ transform: 'scale(1.1)', fontWeight: 'bold', color: `${theme.global.colors.active}` }}
+    <>
+      <Box
+        direction={screenSize === 'small' ? 'column' : 'row'}
+        fill={screenSize === 'small' ? 'horizontal' : false}
+        gap='large'
+        align='center'
       >
-        <Text weight='bold' size='xxlarge'>Lend</Text>
-      </StyledLink> 
+        <StyledLink 
+          to={`/borrow/${activeSeries?.maturity}`}
+          activeStyle={{ transform: 'scale(1.1)', fontWeight: 'bold', color: `${theme.global.colors.active}` }}
+          isActive={(match, location:any) => {
+            return (location.pathname.includes('borrow'));
+          }}
+        > 
+          <Text weight='bold' size='xxlarge'>Borrow</Text>
+        </StyledLink> 
 
-      <StyledLink 
-        to={`/pool/${activeSeries?.maturity}`}
-        activeStyle={{ transform: 'scale(1.1)', fontWeight: 'bold', color: `${theme.global.colors.active}` }}
-      >
-        <Text weight='bold' size='xxlarge'>Pool</Text>
-      </StyledLink> 
-    </Box>
+        <StyledLink 
+          to={`/lend/${activeSeries?.maturity}`}
+          activeStyle={{ transform: 'scale(1.1)', fontWeight: 'bold', color: `${theme.global.colors.active}` }}
+        >
+          <Text weight='bold' size='xxlarge'>Lend</Text>
+        </StyledLink> 
+
+        <StyledLink 
+          to={`/pool/${activeSeries?.maturity}`}
+          activeStyle={{ transform: 'scale(1.1)', fontWeight: 'bold', color: `${theme.global.colors.active}` }}
+        >
+          <Text weight='bold' size='xxlarge'>Pool</Text>
+        </StyledLink> 
+      </Box>
+    </>
   );
 };
 
