@@ -1,24 +1,27 @@
-html {
-    height: 100vh;
-    scroll-behavior: smooth;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
+@import-normalize;
+
+.App {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+  }
+
 body {
-    -webkit-overflow-scrolling: touch;
-    -webkit-font-smoothing: auto;
-    text-rendering: optimizeLegibility;
-    letter-spacing: -0.5px;
+    margin: 0;
+    padding: 0;
 }
-a,
-a:hover,
-a:active,
-a:visited {
-    transition: all 0.15s ease-in-out;
+
+.Transition-enter {
+  opacity: 0.01;
 }
-::-webkit-scrollbar { display:none; }
-@media screen and (prefers-reduced-motion: reduce) {
-	html {
-		scroll-behavior: auto;
-	}
+.Transition-enter.Transition-enter-active {
+  opacity: 1;
+  transition: opacity 500ms ease-in;
+}
+.Transition-leave {
+  opacity: 1;
+}
+.Transition-leave.transition-leave-active {
+  opacity: 0.01;
+  transition: opacity 300ms ease-in;
 }

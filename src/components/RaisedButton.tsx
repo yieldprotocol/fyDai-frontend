@@ -1,8 +1,8 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Box, Button, Text} from 'grommet';
+import { Box, Button, Text } from 'grommet';
 
-import {modColor} from '../utils';
+import { modColor } from '../utils';
 
 const StyledButton = styled(Button)`
   border-radius: 25px;
@@ -22,7 +22,6 @@ const StyledButton = styled(Button)`
 
 ${(props:any) => props.background && css`
      background: ${ props.background };
-
      box-shadow:  6px 6px 11px ${modColor(props.background, -20)}, -6px -6px 11px ${modColor(props.background, 10)};
       :active:hover {
     box-shadow:  0px 0px 0px ${modColor(props.background, -20)}, -0px -0px 0px ${modColor(props.background, 10)};
@@ -31,9 +30,7 @@ ${(props:any) => props.background && css`
     transform: scale(1.02);
     box-shadow:  8px 8px 11px ${modColor(props.background, -20)}, -8px -8px 11px ${modColor(props.background, 10)};
 }
-
 `}
-
 `;
 
 function RaisedButton({ selected=true, ...props }:any ) {
