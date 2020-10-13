@@ -99,7 +99,7 @@ function ActionButton({ ...props }:any ) {
 
       {/* Handles the 'No proxy' case */}
       { !hasDelegatedProxy && 
-        !props.disabled &&       
+        !props.disabled &&   
         <Authorization 
           authWrap
         >
@@ -140,60 +140,62 @@ function ActionButton({ ...props }:any ) {
                   <Text size='xxsmall'>Cancel</Text>
                 </Box>
                 <Box width={{ max:'75%' }} direction='row' align='center' gap='small'>  
-                  <Text size='xsmall'> Please authorize Yield before going any further</Text>
+                  <Text size='xsmall' textAlign='center'> Please authorize Yield before going any further</Text>
                 </Box>     
               </Box>
             </Layer>}
         </Authorization>}
 
       {/* Handles the 'No Series auth' case */}
-      { hasDelegatedProxy && !props.hasDelegatedPool && !props.disabled &&
-      <Authorization 
-        authWrap
-        series={activeSeries}
-      >
-        { !mobile? 
-          <StyledBox 
-            {...props} 
-            fill='horizontal'
-            align='center'
-            pad='small'
-            onClick={()=>{ }}
-          >
-            <Text 
-              size='medium'
-              color={activeSeries?.seriesTextColor}
-            >
-              Please unlock this series first
-            </Text>
-          </StyledBox>
-          :
-          <Layer
-            position='bottom'
-            modal={false}
-            responsive={false}
-            full='horizontal'
-          >
-            <Box
-              background='background'
-              direction="row"  
-              elevation='medium'
-              pad="medium"
-              justify='between'
+      { hasDelegatedProxy && 
+        !props.hasDelegatedPool &&
+        !props.disabled &&
+        <Authorization 
+          authWrap
+          series={activeSeries}
+        >
+          { !mobile? 
+            <StyledBox 
+              {...props} 
+              fill='horizontal'
               align='center'
-            >          
+              pad='small'
+              onClick={()=>{ }}
+            >
+              <Text 
+                size='medium'
+                color={activeSeries?.seriesTextColor}
+              >
+                Please unlock this series first
+              </Text>
+            </StyledBox>
+            :
+            <Layer
+              position='bottom'
+              modal={false}
+              responsive={false}
+              full='horizontal'
+            >
               <Box
-                onClick={(e:any)=>{e.stopPropagation(); props.clearInput();}}
-              > 
-                <Text size='xxsmall'>Cancel</Text>
+                background='background'
+                direction="row"  
+                elevation='medium'
+                pad="medium"
+                justify='between'
+                align='center'
+              >          
+                <Box
+                  onClick={(e:any)=>{e.stopPropagation(); props.clearInput();}}
+                > 
+                  <Text size='xxsmall'>Cancel</Text>
+                </Box>
+                <Box direction='row' align='center' gap='small'>  
+                  <Text size='xsmall'>Please unlock this series first</Text>
+                  <ArrowRight color={activeSeries?.seriesColor} />
+                </Box>     
               </Box>
-              <Box direction='row' align='center' gap='small'>  
-                <Text size='xsmall'>Please unlock this series first</Text>
-                <ArrowRight color={activeSeries?.seriesColor} />
-              </Box>     
-            </Box>
-          </Layer>}
-      </Authorization>}
+            </Layer>}
+        </Authorization>}
 
       { !mobile && props.disabled && 
         <StyledBox 

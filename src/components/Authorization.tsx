@@ -68,7 +68,7 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
 
   return (
     <>
-      { account && authWrap && 
+      { account && authWrap && !authActive && 
         <Box fill='horizontal' onClick={()=>{authProcedure();}}> 
           {children} 
         </Box>}
@@ -122,11 +122,14 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
 
       { authActive && layerOpen &&
         <Layer 
-          onClickOutside={()=>closeAuth()}
+          // onClickOutside={()=>closeAuth()}
+          modal={mobile?true: undefined}
+          responsive={mobile?false: undefined}
+          full={mobile?true: undefined}
         >
           <Box 
             width={!mobile?{ min:'620px', max:'620px' }: undefined}
-            round='small'
+            round={mobile?undefined:'small'}
             background='background'
             pad='large'
             gap='medium'
