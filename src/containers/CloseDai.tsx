@@ -19,6 +19,8 @@ import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
 
 import DaiMark from '../components/logos/DaiMark';
+import { NavLink } from 'react-router-dom';
+import YieldMobileNav from '../components/YieldMobileNav';
 
 interface ICloseDaiProps {
   close?: any;
@@ -142,6 +144,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
             clearInput={()=>setInputValue(undefined)}
           />
           
+          {!mobile &&
           <Box alignSelf='start' margin={{ top:'medium' }}>
             <FlatButton 
               onClick={()=>close()}
@@ -152,7 +155,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
                 </Box>
                 }
             />
-          </Box>
+          </Box>}
         </Box>}
 
       { CloseDaiPending && !txActive && <ApprovalPending /> }
@@ -185,6 +188,20 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
           </Box>
         </Box>
       </Box>}
+
+      {mobile && 
+        <YieldMobileNav noMenu={true}>
+          <NavLink 
+            to={`/lend/${activeSeries?.maturity}`}
+            style={{ textDecoration: 'none' }}
+          >
+            <Box direction='row' gap='small'>
+              <Text size='xxsmall' color='text-weak'><ArrowLeft /></Text>
+              <Text size='xxsmall' color='text-weak'>back to lend</Text>
+            </Box>
+          </NavLink>
+        </YieldMobileNav>}
+        
     </Keyboard>
   );
 };

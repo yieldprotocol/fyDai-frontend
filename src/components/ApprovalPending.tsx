@@ -16,13 +16,15 @@ const ApprovalPending = React.forwardRef( (props, ref) => {
   return (
     <Layer
       modal={true}
+      responsive={mobile?false: undefined}
+      full={mobile?true: undefined}
     >
       {  sigsRequested ? 
         <Box 
           width={!mobile?{ min:'620px', max:'620px' }: undefined}
           pad="medium"
           gap="small"
-          round
+          round={mobile?undefined:'small'}
           background='background-front'
         >
           <Text weight='bold'>A Signature is required</Text>

@@ -7,7 +7,7 @@ import { SeriesContext } from '../contexts/SeriesContext';
 import logoDark from '../assets/images/logo.svg';
 import logoLight from '../assets/images/logo_light.svg';
 
-const YieldMobileNav = ({ children }:any) =>  {
+const YieldMobileNav = ({ noMenu=false, children }:any) =>  {
 
   const [showSidebar, setShowSidebar] = useState<boolean>(false);
   const theme = useContext<any>(ThemeContext);
@@ -31,9 +31,10 @@ const YieldMobileNav = ({ children }:any) =>  {
           justify='between'
           align='center'
         >
+          {!noMenu &&
           <Box onClick={()=>setShowSidebar(!showSidebar)}>
             <MenuIcon />
-          </Box>   
+          </Box>}  
           {children}
         </Nav>
       </Layer>

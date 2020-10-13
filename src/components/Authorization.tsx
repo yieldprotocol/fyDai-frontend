@@ -123,7 +123,8 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
       { authActive && layerOpen &&
         <Layer 
           // onClickOutside={()=>closeAuth()}
-          modal={mobile?true: undefined}
+          // modal={mobile?true: undefined}
+          modal={true}
           responsive={mobile?false: undefined}
           full={mobile?true: undefined}
         >

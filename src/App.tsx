@@ -102,7 +102,7 @@ const App = (props:any) => {
           <Authorization />
         </Collapsible>}
 
-      <NotifyLayer target={leftSideRef.current} columnsWidth={columns} />
+      <NotifyLayer target={!mobile?leftSideRef.current:undefined} columnsWidth={columns} />
 
       { !mobile &&
       <Box margin='large' align='center'>

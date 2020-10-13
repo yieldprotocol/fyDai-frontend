@@ -19,6 +19,8 @@ import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
 
 import YieldMark from '../components/logos/YieldMark';
+import { NavLink } from 'react-router-dom';
+import YieldMobileNav from '../components/YieldMobileNav';
 
 interface IRemoveLiquidityProps {
   close?: any;
@@ -239,6 +241,20 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
           </Box>
         </Box>
       </Box>}
+
+      {mobile && 
+        <YieldMobileNav noMenu={true}>
+          <NavLink 
+            to={`/pool/${activeSeries?.maturity}`}
+            style={{ textDecoration: 'none' }}
+          >
+            <Box direction='row' gap='small'>
+              <Text size='xxsmall' color='text-weak'><ArrowLeft /></Text>
+              <Text size='xxsmall' color='text-weak'>back to add Liquidity</Text>
+            </Box>
+          </NavLink>
+        </YieldMobileNav>}
+        
     </Keyboard>
   );
 };

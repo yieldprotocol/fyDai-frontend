@@ -30,6 +30,8 @@ import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
 
 import DaiMark from '../components/logos/DaiMark';
+import { NavLink } from 'react-router-dom';
+import YieldMobileNav from '../components/YieldMobileNav';
 
 interface IRepayProps {
   repayAmount?:any
@@ -206,7 +208,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
                     clearInput={()=>setInputValue(undefined)}
                   />
 
-                  {!activeSeries?.isMature() &&
+                  {!activeSeries?.isMature() && !mobile &&
                   <Box alignSelf='start' margin={{ top:'medium' }}> 
                     <FlatButton 
                       onClick={()=>close()}
@@ -244,6 +246,20 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
         </Box>}
       { repayActive && !txActive && <ApprovalPending /> }
       { txActive && <TxStatus msg={`You are repaying ${inputValue} DAI`} tx={txActive} /> }
+
+      {mobile && 
+        <YieldMobileNav noMenu={true}>
+          <NavLink 
+            to={`/borrow/${activeSeries?.maturity}`}
+            style={{ textDecoration: 'none' }}
+          >
+            <Box direction='row' gap='small'>
+              <Text size='xxsmall' color='text-weak'><ArrowLeft /></Text>
+              <Text size='xxsmall' color='text-weak'>back to borrow</Text>
+            </Box>
+          </NavLink>
+        </YieldMobileNav>}
+        
     </Keyboard>
   );
 }

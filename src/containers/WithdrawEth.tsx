@@ -18,6 +18,8 @@ import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
 
 import EthMark from '../components/logos/EthMark';
+import { NavLink } from 'react-router-dom';
+import YieldMobileNav from '../components/YieldMobileNav';
 
 interface IWithDrawProps {
   close?: any;
@@ -232,6 +234,20 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
             </Box>
           </Box>
         </Box>}
+
+      {mobile && 
+        <YieldMobileNav noMenu={true}>
+          <NavLink 
+            to="/post"
+            style={{ textDecoration: 'none' }}
+          >
+            <Box direction='row' gap='small'>
+              <Text size='xxsmall' color='text-weak'><ArrowLeft /></Text>
+              <Text size='xxsmall' color='text-weak'>back</Text>
+            </Box>
+          </NavLink>
+        </YieldMobileNav>}
+
     </Keyboard>
   );
 };

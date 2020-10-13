@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { NavLink, useHistory, useParams } from 'react-router-dom';
 import ethers, { BigNumber } from 'ethers';
 
 import { 
@@ -44,6 +44,7 @@ import CollateralDescriptor from '../components/CollateralDescriptor';
 import RaisedBox from '../components/RaisedBox';
 
 import EthMark from '../components/logos/EthMark';
+import YieldMobileNav from '../components/YieldMobileNav';
 
 interface DepositProps {
   /* deposit amount prop is for quick linking into component */
@@ -320,6 +321,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
               clearInput={()=>setInputValue(undefined)}
             /> }
 
+          {!mobile &&
           <Box 
             direction='row'
             fill='horizontal'
@@ -340,21 +342,46 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
               onClick={()=>setWithdrawOpen(true)}
               label={
                 <Box direction='row' gap='small' align='center'>
-                  <Box><Text size='xsmall' color='text-weak'><Text weight='bold'>withdraw</Text> collateral</Text></Box>
+                  <Box><Text size='xsmall' color='text-weak'><Text weight='bold'>Withdraw</Text> collateral</Text></Box>
                   <ArrowRight color='text-weak' />
                 </Box>
               }
             />}
-          </Box>
+          </Box>}
        
         </Box>}
         { postEthActive && !txActive && <ApprovalPending /> } 
         { txActive && txActive.type !== 'WITHDRAW' && <TxStatus msg={`You are depositing ${inputValue} ETH`} tx={txActive} /> }
       </Keyboard>
+
+      {mobile && 
+        <YieldMobileNav noMenu={true}>
+          <NavLink 
+            to='/borrow/'
+            style={{ textDecoration: 'none' }}
+          >
+            <Box direction='row' gap='small'>
+              <Text size='xxsmall' color='text-weak'><ArrowLeft /></Text>
+              <Text size='xxsmall' color='text-weak'>back</Text>
+            </Box>
+          </NavLink>
+
+          {ethPosted_ > 0 &&
+            <NavLink 
+              to='/withdraw/'
+              style={{ textDecoration: 'none' }}
+            >
+              <Box direction='row' gap='small' >
+                <Text size='xxsmall' color='text-weak'> <Text weight='bold' size='xsmall'>Withdraw </Text> collateral</Text>
+                <Text color='text-weak'><ArrowRight /></Text>
+              </Box>
+            </NavLink>}
+        </YieldMobileNav>}
+
     </RaisedBox>
   );
 };
 
-Deposit.defaultProps = { depositAmount: null, modalView: false };
+Deposit.defaultProps = { modalView: false };
 
 export default Deposit;
