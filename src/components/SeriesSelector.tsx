@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { useLocation, useHistory } from 'react-router-dom';
+import { useLocation, useHistory, NavLink } from 'react-router-dom';
 import { Text, Box, Layer, ResponsiveContext, Button } from 'grommet';
 import { 
   FiArrowLeft as ArrowLeft,
@@ -12,6 +12,7 @@ import AprBadge from './AprBadge';
 import Loading from './Loading';
 import FlatButton from './FlatButton';
 import RaisedButton from './RaisedButton';
+import YieldMobileNav from './YieldMobileNav';
 
 interface ISeriesSelectorProps {
   activeView:string;
@@ -76,10 +77,14 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
         gap='medium'
         width={!mobile?{ min:'620px', max:'620px' }: undefined}
       >
-        <Box gap='medium'>
-          <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Choose a series</Text>
-          <Text alignSelf='start' size='medium' color='text-weak'>Select a series from the list below</Text>
+        <Box gap='small'>
+          <Box direction='row' gap='medium' align='center'>
+            <Box onClick={() => close()}><ArrowLeft /></Box>
+            <Text weight='bold' size={mobile?'small':'medium'} style={{ textTransform: 'capitalize' }}> Choose a Series</Text>
+          </Box>
+          <Text alignSelf='start' size={mobile?'xxsmall':'small'} color='text-weak'>Select a series from the list below</Text>
         </Box>
+
         <Box 
           gap='none'
         >
@@ -95,17 +100,17 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
             </Box>
             <Box fill='horizontal' direction='row' justify='between' gap='small'>
               <Box fill align={mobile?'end':undefined}>
-                <Text size='small' color='text-weak'>SERIES MATURITY</Text>
+                <Text size={mobile? 'xsmall':'small'} color='text-weak'>{mobile? 'SERIES' : 'SERIES MATURITY'}</Text>
               </Box>
               <Box fill align={mobile?'end':undefined}>
-                <Text size='small' color='text-weak'>
+                <Text size={mobile? 'xsmall':'small'} color='text-weak'>
                   { viewMap.get(activeView.toUpperCase())?.head }         
                 </Text>
               </Box>
             </Box>
             { !mobile && 
               <Box direction='row' justify='end' basis='25%'>
-                <Text size='small' color='text-weak'> </Text>
+                <Text size={mobile? 'xsmall':'small'} color='text-weak'> </Text>
               </Box>}
           </Box>
 
@@ -167,7 +172,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
             })}
           </Loading>        
         </Box>
-
+        {!mobile &&
         <Box alignSelf='start' margin={{ top:'medium' }}>
           <FlatButton 
             onClick={()=>close()}
@@ -178,8 +183,16 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
               </Box>
             }
           />
-        </Box>
+        </Box>}
       </Box>
+
+      {mobile && 
+        <YieldMobileNav noMenu={true}>
+          <Box direction='row' gap='small' onClick={()=>close()}>
+            <Text size='xxsmall' color='text-weak'><ArrowLeft /></Text>
+            <Text size='xxsmall' color='text-weak'> go back </Text>
+          </Box>
+        </YieldMobileNav>}
     </Layer>
   );
 };
