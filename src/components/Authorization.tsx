@@ -24,7 +24,7 @@ interface IAuthorizationProps {
 }
 
 const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorizationProps) => { 
-  const screenSize = useContext(ResponsiveContext);
+  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   const { state: { requestedSigs } } = useContext(NotifyContext);
   const { state: { authorizations }, actions: userActions } = useContext(UserContext);
   const { hasDelegatedProxy } = authorizations;
@@ -109,7 +109,7 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
               background='#555555'
               label={
                 <Box pad={{ horizontal:'small', vertical:'xsmall' }} align='center'>
-                  <Text size='xsmall' color='#DDDDDD'><Unlock /> {screenSize==='small'? '' : 'Unlock Series'}</Text>
+                  <Text size='xsmall' color='#DDDDDD'><Unlock /> {mobile? '' : 'Unlock Series'}</Text>
                 </Box>
               }
               onClick={()=>{authProcedure();}}
@@ -123,7 +123,7 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
           onClickOutside={()=>closeAuth()}
         >
           <Box 
-            width={screenSize!=='small'?{ min:'620px', max:'620px' }: undefined}
+            width={!mobile?{ min:'620px', max:'620px' }: undefined}
             round='small'
             background='background'
             pad='large'

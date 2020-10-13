@@ -30,7 +30,7 @@ import NotifyLayer from './containers/layers/NotifyLayer';
 import TestLayer from './containers/layers/TestLayer';
 import { useCachedState } from './hooks';
 import YieldNav from './components/YieldNav';
-import WithdrawDai from './containers/WithdrawDai';
+import CloseDai from './containers/CloseDai';
 import WithdrawEth from './containers/WithdrawEth';
 import Repay from './containers/Repay';
 import RemoveLiquidity from './containers/RemoveLiquidity';
@@ -61,21 +61,22 @@ const App = (props:any) => {
   const [showTestLayer, setShowTestLayer] = useState<boolean>(false);
   const [showSidebar, setShowSidebar] = useState<boolean>(true);
 
-  const screenSize = useContext<string>(ResponsiveContext);
+  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
+
   const theme = useContext<any>(ThemeContext);
 
   const [columns, setColumns] = useState<string[]>(['7%', 'auto', '7%']);
   useEffect(()=> {
-    screenSize === 'small'?
+    mobile?
       setColumns(['0%', 'auto', '0%'])
       : setColumns(['7%', 'auto', '7%']);
-  }, [screenSize]);
+  }, [mobile]);
 
   return (
     <div 
       className="App" 
       style={
-        ( activeSeries && props.moodLight && screenSize!=='small') ? 
+        ( activeSeries && props.moodLight && !mobile) ? 
           { background: `radial-gradient(at 90% 90%, transparent 75%, ${modColor(activeSeries.seriesColor, 50)})` }
           :
           undefined
@@ -103,7 +104,7 @@ const App = (props:any) => {
 
       <NotifyLayer target={leftSideRef.current} columnsWidth={columns} />
 
-      { screenSize !== 'small' &&
+      { !mobile &&
       <Box margin={{ top:'large' }} align='center'>
         <YieldNav />
       </Box>}
@@ -136,7 +137,7 @@ const App = (props:any) => {
             </Route>
 
             <Route path="/close/:series/:amnt?">
-              <WithdrawDai />
+              <CloseDai />
             </Route>
 
             <Route path="/pool/:series?/:amnt?">
@@ -164,7 +165,7 @@ const App = (props:any) => {
         justify='center'
       >
         <Box />
-        {screenSize !== 'small' &&
+        {!mobile &&
           <YieldFooter
             showTestLayer={showTestLayer}
             setShowTestLayer={setShowTestLayer}

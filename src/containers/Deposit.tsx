@@ -70,7 +70,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
   /* check if the user sent in any requested amount in the url */ 
   const { amnt }:any = useParams();
 
-  const screenSize = useContext(ResponsiveContext);
+  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
   const { postEth, postEthActive }  = useProxy();
   const { estCollRatio: estimateRatio, collValue } = useMath();
@@ -247,9 +247,9 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
 
           <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={depositDisabled}>
             <TextInput
-              ref={(el:any) => {el && !withdrawOpen && el.focus(); setInputRef(el);}} 
+              ref={(el:any) => {el && !withdrawOpen && !mobile && el.focus(); setInputRef(el);}} 
               type='number'
-              placeholder={(screenSize !== 'small' && !modalView) ? 'Enter the ETH amount to deposit': 'ETH'}
+              placeholder={(!mobile && !modalView) ? 'Enter the ETH amount to deposit': 'ETH'}
               value={inputValue || ''}
               disabled={postEthActive}
               plain
@@ -257,7 +257,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
               icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <EthMark />}
             />
             <RaisedButton
-              label={(screenSize !== 'small' && !modalView) ? 'Deposit Maximum': 'Max'}
+              label={(!mobile && !modalView) ? 'Deposit Maximum': 'Max'}
               onClick={()=>account && setInputValue(ethers.utils.formatEther(ethBalance))}
             />
           </InputWrap>

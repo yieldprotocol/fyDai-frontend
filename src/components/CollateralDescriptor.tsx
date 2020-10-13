@@ -16,7 +16,7 @@ function CollateralDescriptor( props: ICollateralDescriptorProps ) {
   const { state: seriesState } = useContext(SeriesContext);
   const [ delegated ] = useState<boolean>(true);
   
-  const screenSize = useContext(ResponsiveContext);
+  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
   return (
     <>
@@ -29,7 +29,7 @@ function CollateralDescriptor( props: ICollateralDescriptorProps ) {
         background="linear-gradient(to bottom right, #f0817f, #ff86c8, #82d4bb, #6ab6f1, #cb90c9, #aed175, #add8e6, #add8e6, #add8e6, #add8e6, #add8e6, #add8e6, #ffdc5c, #ffbf81, #95a4db)"
         margin={{ bottom:'-16px' }}
       >
-        {screenSize !=='small' && 
+        {!mobile && 
         <Box
           direction='row-responsive'
           fill='horizontal'

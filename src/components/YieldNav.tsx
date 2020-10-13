@@ -22,7 +22,7 @@ const StyledLink = styled(NavLink)`
 
 const YieldNav = (props: any) => {
 
-  const screenSize = useContext(ResponsiveContext);
+  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   const { state: { activeSeries } } = useContext(SeriesContext);
   const theme = useContext<any>(ThemeContext);
 
@@ -30,7 +30,7 @@ const YieldNav = (props: any) => {
     <>
       <Box
         direction='row'
-        gap={screenSize === 'small'? 'medium':'large'}
+        gap={mobile? 'medium':'large'}
         align='center'
         justify='evenly'
       >
@@ -43,7 +43,7 @@ const YieldNav = (props: any) => {
         > 
           <Text 
             weight='bold' 
-            size={screenSize === 'small'? 'small':'xxlarge'}
+            size={mobile? 'small':'xxlarge'}
           >Borrow
           </Text>
         </StyledLink> 
@@ -54,7 +54,7 @@ const YieldNav = (props: any) => {
         >
           <Text 
             weight='bold' 
-            size={screenSize === 'small'? 'small':'xxlarge'} 
+            size={mobile? 'small':'xxlarge'} 
           > Lend
           </Text>
         </StyledLink> 
@@ -65,7 +65,7 @@ const YieldNav = (props: any) => {
         >
           <Text 
             weight='bold' 
-            size={screenSize === 'small'? 'small':'xxlarge'} 
+            size={mobile? 'small':'xxlarge'} 
           >Pool
           </Text>
         </StyledLink> 

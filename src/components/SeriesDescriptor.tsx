@@ -19,7 +19,7 @@ interface ISeriesDescriptorProps {
 function SeriesDescriptor( props: ISeriesDescriptorProps ) {
 
   const { activeView, children } = props;
-  const screenSize = useContext(ResponsiveContext);
+  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   const { state: seriesState } = useContext(SeriesContext);
   const { activeSeries } = seriesState; 
   const [ selectorOpen, setSelectorOpen ] = useState<boolean>(false);
@@ -54,7 +54,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
           margin={{ bottom:'-16px' }}
         >
           <Box
-            pad='small'  
+            pad='small'   
           >
             <Box
               direction='row-responsive'
@@ -62,7 +62,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
               gap='small'
               align='center'
               pad={{ vertical:'small' }}
-              style={{position:'sticky', top:0}}
+              style={{ position:'sticky', top:0 }}
             >
               <Box 
                 round='xsmall'
@@ -81,13 +81,13 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
                 >         
                   <AprBadge activeView={activeView} series={activeSeries} animate />
                   <Text size='large' weight='bold' color={activeSeries?.seriesTextColor}>            
-                    { screenSize === 'small'? activeSeries?.displayNameMobile : activeSeries?.displayName }
+                    { mobile? activeSeries?.displayNameMobile : activeSeries?.displayName }
                   </Text>
                 </Box>}
 
                 <RaisedButton
                   background={modColor( activeSeries?.seriesColor, 50)}
-                  label={(screenSize !== 'small' ) ?        
+                  label={(!mobile ) ?        
                     <Box align='center' direction='row' gap='small' pad='xsmall'>
                       <Text size='xsmall' color={activeSeries?.seriesTextColor}> <ChangeSeries /> </Text>
                       <Text size='xsmall' color={activeSeries?.seriesTextColor}>

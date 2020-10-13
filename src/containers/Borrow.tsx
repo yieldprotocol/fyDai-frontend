@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState, useContext } from 'react';
 import { ethers } from 'ethers';
 import { useParams, useHistory, NavLink } from 'react-router-dom';
 import { Keyboard, Box, TextInput, Text, ThemeContext, ResponsiveContext, Collapsible, Layer, Menu, Nav } from 'grommet';
-import { FiArrowRight as ArrowRight, FiMenu as MenuIcon } from 'react-icons/fi';
+import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 import { VscHistory as History } from 'react-icons/vsc';
 
 import { abbreviateHash, cleanValue } from '../utils';
@@ -64,7 +64,8 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
     daiBalance_,
   } = position;
 
-  const screenSize = useContext(ResponsiveContext);
+  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
+
   const theme = useContext<any>(ThemeContext);
 
   /* hooks init */
@@ -210,7 +211,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
             entries={[
               {
                 label: null,
-                visible: !!account && (screenSize !== 'small'),
+                visible: !!account && !mobile,
                 active: true,
                 loading: false,
                 value:null,
@@ -219,7 +220,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
                   <>
                     <Box
                       width={{ min:'175px' }}
-                      margin={screenSize!=='small'?{ left:'-52px' }: { left:'-25px' }}
+                      margin={!mobile?{ left:'-52px' }: { left:'-25px' }}
                       background='#555555FA' 
                       pad='small'
                       round={{ corner:'right', size:'xsmall' }}
@@ -252,7 +253,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
                 valueExtra: ()=>(
                   <Box width={{ min:'300px' }} direction='row' align='center' gap='small'> 
                     <Box align='center'> 
-                      {screenSize==='small'? 
+                      {mobile ? 
                       // eslint-disable-next-line jsx-a11y/accessible-emoji
                         <Text size='xxlarge'>👆</Text>
                         :
@@ -363,9 +364,9 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
 
               <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={borrowDisabled}>
                 <TextInput
-                  ref={(el:any) => {el && !repayOpen && el.focus(); setInputRef(el);}} 
+                  ref={(el:any) => {el && !repayOpen && !mobile && el.focus(); setInputRef(el);}} 
                   type="number"
-                  placeholder={screenSize !== 'small' ? 'Enter the amount of Dai to borrow': 'DAI'} 
+                  placeholder={!mobile ? 'Enter the amount of Dai to borrow': 'DAI'} 
                   value={inputValue || ''}
                   plain
                   onChange={(event:any) => setInputValue( cleanValue(event.target.value) )}
@@ -473,7 +474,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
             <Repay />}
 
             <Box direction='row' fill justify='between'>
-              { activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) && screenSize !== 'small' &&
+              { activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) && !mobile &&
               <Box alignSelf='start' margin={{ top:'medium' }}>
                 <FlatButton 
                   onClick={()=>setHistOpen(true)}
@@ -490,7 +491,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
             
               { !activeSeries?.isMature() &&
                 activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) &&
-                screenSize !== 'small' &&
+                !mobile &&
                 <Box alignSelf='end' margin={{ top:'medium' }}>
                   <FlatButton 
                     onClick={()=>setRepayOpen(true)}
@@ -517,7 +518,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
 
       </Keyboard>
 
-      {screenSize === 'small' && 
+      {mobile && 
         <YieldMobileNav>
           <NavLink 
             to='/post/'
@@ -533,15 +534,11 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
             activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) &&
             <NavLink 
               to={`/repay/${activeSeries?.maturity}`}
-              activeStyle={{ transform: 'scale(1.1)', fontWeight: 'bold', color: `${theme?.global.colors.active}` }}
               style={{ textDecoration: 'none' }}
             >
               <Box direction='row' gap='small' align='center'>
-                <Text size='xxsmall' color='text-weak'>
-                  <Text weight='bold' color={activeSeries?.seriesColor}>repay </Text>
-                  debt
-                </Text>
-                <ArrowRight color='text-weak' />
+                <Text size='xxsmall' color='text-weak'> <Text weight='bold' size='xsmall' color={activeSeries?.seriesColor}>repay </Text> debt </Text>
+                <ArrowRight color={activeSeries?.seriesColor} />
               </Box>
             </NavLink>}
         </YieldMobileNav>}

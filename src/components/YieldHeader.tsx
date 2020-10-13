@@ -18,7 +18,7 @@ import FlatButton from './FlatButton';
 import YieldNav from './YieldNav';
 
 const YieldHeader = (props: any) => {
-  const screenSize = useContext(ResponsiveContext);
+  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   const theme = useContext<any>(ThemeContext);
   const location = useLocation();
   const history = useHistory();
@@ -27,46 +27,46 @@ const YieldHeader = (props: any) => {
     <>
       <Box
         direction='row'
-        pad={screenSize==='small'? { horizontal:'medium', top:'medium' }: { horizontal:'small', top:'large' }}
+        pad={mobile? { horizontal:'medium', top:'medium' }: { horizontal:'small', top:'large' }}
         justify='between'
         fill
       >
-        {screenSize !=='small' &&
-        <Box width={screenSize==='small'? '20%':undefined}>
+        {!mobile &&
+        <Box width={mobile? '20%':undefined}>
           <Image src={theme.dark ? logoLight : logoDark} fit="contain" />
         </Box>}
 
-        { screenSize==='small' && 
+        { mobile && 
         ['borrow', 'lend', 'pool'].includes(location.pathname.split('/')[1]) && 
         <Box direction='row' gap='medium' align='center'>
-          {/* <Box width={screenSize==='small'? '30%':undefined}>
+          {/* <Box width={mobile? '30%':undefined}>
             <Image src={theme.dark ? logoLight : logoDark} fit="contain" />
           </Box>    */}
           {/* <Text weight='bold' size='medium' style={{ textTransform:'capitalize' }}> {location.pathname.split('/')[1]} </Text> */}
           <YieldNav />
         </Box>}
 
-        { screenSize==='small' && 
+        { mobile && 
         ['post', 'withdraw'].includes(location.pathname.split('/')[1])&&
         <Box direction='row' gap='medium' align='center'>
           <Box onClick={()=>history.push('/borrow/')}><ArrowLeft /></Box>
           <Text weight='bold' size='medium' style={{ textTransform:'capitalize' }}> {location.pathname.split('/')[1]} Collateral</Text>
         </Box>}
         
-        { screenSize==='small' && 
+        { mobile && 
         location.pathname.split('/')[1]==='repay' &&
         <Box direction='row' gap='medium' align='center'>
           <Box onClick={()=>history.push('/borrow/')}><ArrowLeft /></Box>
           <Text weight='bold' size='medium'>Repay Dai</Text>
         </Box>}
-        { screenSize==='small' && 
+        { mobile && 
         location.pathname.split('/')[1]==='close' &&
         <Box direction='row' gap='medium' align='center'>
           <Box onClick={()=>history.push('/borrow/')}><ArrowLeft /></Box>
           <Text weight='bold' size='medium'>Close Position</Text>
         </Box>}
 
-        { screenSize==='small' && 
+        { mobile && 
         location.pathname.split('/')[1]==='remove' &&
         <Box direction='row' gap='medium' align='center'>
           <Box onClick={()=>history.push('/borrow/')}><ArrowLeft /></Box>
@@ -75,7 +75,7 @@ const YieldHeader = (props: any) => {
 
 
         <Box direction='row' gap='small'>
-          {screenSize !== 'small' &&
+          {!mobile &&
           <Box direction="row" align="center" gap="small">
             <AccountButton {...props} />
           </Box>}

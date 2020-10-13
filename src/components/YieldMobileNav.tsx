@@ -45,6 +45,7 @@ const YieldMobileNav = ({ children }:any) =>  {
         responsive={false}
         modal={true}
         full='vertical'
+        onClickOutside={()=>setShowSidebar(false)}
       >
         <Box
           width={{ min:'60vw' }}
@@ -73,7 +74,6 @@ const YieldMobileNav = ({ children }:any) =>  {
                 return (location.pathname.includes('borrow'));
               }}
               style={{ textDecoration:'none' }}
-              
             > 
               <Text weight='bold' size='medium' color='text-weak'>Borrow</Text>
             </NavLink>
@@ -89,8 +89,7 @@ const YieldMobileNav = ({ children }:any) =>  {
               onClick={()=>setShowSidebar(false)}
               to={`/pool/${activeSeries?.maturity}`}
               activeStyle={{ fontWeight: 'bold', color: `${theme.global.colors.active}` }}
-              style={{ textDecoration:'none' }}
-      
+              style={{ textDecoration:'none' }}   
             >
               <Text weight='bold' size='medium' color='text-weak'>Pool</Text>
             </NavLink> 

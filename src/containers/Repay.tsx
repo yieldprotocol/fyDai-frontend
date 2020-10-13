@@ -43,7 +43,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
   const { activeSeries } = seriesState;
   const { state: userState, actions: userActions } = useContext(UserContext);
   const { daiBalance } = userState.position;
-  const screenSize = useContext(ResponsiveContext);
+  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
   const [ hasDelegated, setHasDelegated ] = useState<boolean>(true);
 
@@ -126,7 +126,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
     >
       { !txActive &&
         <Box
-          width={screenSize!=='small'?{ min:'620px', max:'620px' }: undefined}
+          width={!mobile?{ min:'620px', max:'620px' }: undefined}
           alignSelf="center"
           fill
           background="background-front"
@@ -143,16 +143,16 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
 
                   <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={repayDisabled}>
                     <TextInput
-                      ref={(el:any) => {el && el.focus(); setInputRef(el);}} 
+                      ref={(el:any) => {el && !mobile && el.focus(); setInputRef(el);}} 
                       type="number"
-                      placeholder={screenSize !== 'small' ? 'Enter the amount of Dai to Repay': 'DAI'}
+                      placeholder={!mobile ? 'Enter the amount of Dai to Repay': 'DAI'}
                       value={inputValue || ''}
                       plain
                       onChange={(event:any) => setInputValue(( cleanValue(event.target.value, 6) ))}
                       icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <DaiMark />}
                     />
                     <RaisedButton 
-                      label={screenSize !== 'small' ? 'Repay Maximum': 'Maximum'}
+                      label={!mobile ? 'Repay Maximum': 'Maximum'}
                       onClick={()=>setInputValue( cleanValue(ethers.utils.formatEther(maxRepay), 6) )}
                     />
                   </InputWrap>

@@ -17,7 +17,7 @@ interface IAprBadgeProps {
 }
 
 function AprBadge({ activeView, series, animate }:IAprBadgeProps) {
-  const screenSize = useContext(ResponsiveContext);
+  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   const [ seriesApr, setSeriesApr ] = useState<string>(`${series.yieldAPR_} %`);
   const [ seriesMature, setSeriesMature ] = useState<boolean>(series.isMature());
 
@@ -41,8 +41,8 @@ function AprBadge({ activeView, series, animate }:IAprBadgeProps) {
         background={series.seriesColor}
         animation={animate ? { type:'zoomIn', duration:1000, size:'xlarge' } : undefined} 
       >
-        { screenSize === 'small' &&  <Box pad={{ horizontal:'small', vertical:'xxsmall' }}><Clock /></Box>}
-        { screenSize !== 'small' && 
+        { mobile &&  <Box pad={{ horizontal:'small', vertical:'xxsmall' }}><Clock /></Box>}
+        { !mobile && 
         <>
           <Text size='xsmall' color={series?.seriesTextColor}>
             <Clock />

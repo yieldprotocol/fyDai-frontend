@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import styled, { css } from 'styled-components';
-import { Box, Text } from 'grommet';
+import { Text, Box, Layer, ResponsiveContext } from 'grommet';
+import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
@@ -41,6 +42,7 @@ const StyledBox = styled(Box)`
 
 function ActionButton({ ...props }:any ) {
 
+  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   const { state: seriesState } = useContext(SeriesContext);
   const { activeSeries } = seriesState;
   
@@ -49,7 +51,7 @@ function ActionButton({ ...props }:any ) {
 
   return (
     <>
-      { hasDelegatedProxy && props.hasDelegatedPool && !props.disabled &&
+      { !mobile && hasDelegatedProxy && props.hasDelegatedPool && !props.disabled &&
       <StyledBox 
         {...props} 
         fill='horizontal'
@@ -65,7 +67,7 @@ function ActionButton({ ...props }:any ) {
         </Text>
       </StyledBox>}
 
-      { !hasDelegatedProxy && !props.disabled &&    
+      { !mobile && !hasDelegatedProxy && !props.disabled &&    
         <Authorization 
           authWrap
         >
@@ -85,7 +87,7 @@ function ActionButton({ ...props }:any ) {
           </StyledBox>
         </Authorization>}
 
-      { hasDelegatedProxy && !props.hasDelegatedPool && !props.disabled &&
+      { !mobile && hasDelegatedProxy && !props.hasDelegatedPool && !props.disabled &&
         <Authorization 
           authWrap
           series={activeSeries}
@@ -106,7 +108,7 @@ function ActionButton({ ...props }:any ) {
           </StyledBox>
         </Authorization>}
 
-      { props.disabled && 
+      { !mobile && props.disabled && 
         <StyledBox 
           {...props} 
           fill='horizontal'
@@ -120,6 +122,35 @@ function ActionButton({ ...props }:any ) {
             click me.
           </Text>
         </StyledBox>}
+
+      { mobile && !props.disabled &&
+      <Layer
+        position='bottom'
+        modal={false}
+        responsive={false}
+        full='horizontal'
+      >
+        <Box
+          background='background'
+          direction="row"  
+          elevation='medium'
+          pad="medium"
+          justify='between'
+          align='center'
+        >
+          
+          <Box
+            onClick={()=>console.log('clearing input')}
+          > 
+            <Text size='xxsmall'>Cancel</Text>
+          </Box>
+
+          <Box {...props} direction='row' align='center' gap='small'>  
+            <Text weight='bold'> {props.label} </Text>
+            <ArrowRight color={activeSeries?.seriesColor} />
+          </Box>     
+        </Box>
+      </Layer>}
     </>
   );
 }

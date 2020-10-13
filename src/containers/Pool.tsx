@@ -5,7 +5,7 @@ import { Box, Keyboard, TextInput, Text, ResponsiveContext, Collapsible, Layer }
 import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 import { VscHistory as History } from 'react-icons/vsc';
 
-import { useParams } from 'react-router-dom';
+import { NavLink, useParams } from 'react-router-dom';
 import { cleanValue } from '../utils';
 
 import { YieldContext } from '../contexts/YieldContext';
@@ -54,7 +54,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
   const { activeSeries } = seriesState;
   const { state: userState, actions: userActions } = useContext(UserContext);
   const { daiBalance } = userState.position;
-  const screenSize = useContext(ResponsiveContext);
+  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
   const { addLiquidity, addLiquidityActive } = useProxy();
   const { getBalance } = useToken();
@@ -207,9 +207,9 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                 <Text alignSelf='start' size='large' color='text' weight='bold'>Add liquidity</Text>
                 <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={addLiquidityDisabled}>
                   <TextInput
-                    ref={(el:any) => {el && !removeLiquidityOpen && el.focus(); setInputRef(el);}} 
+                    ref={(el:any) => {el && !removeLiquidityOpen && !mobile && el.focus(); setInputRef(el);}} 
                     type="number"
-                    placeholder={screenSize !== 'small' ? 'Enter the amount of Dai Liquidity to add': 'DAI'}
+                    placeholder={!mobile ? 'Enter the amount of Dai Liquidity to add': 'DAI'}
                     value={inputValue || ''}
                     plain
                     onChange={(event:any) => setInputValue( cleanValue(event.target.value, 6) )}
@@ -218,7 +218,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                   
                   {account &&
                   <RaisedButton 
-                    label={screenSize !== 'small' ? 'Add Maximum': 'Maximum'}
+                    label={!mobile ? 'Add Maximum': 'Maximum'}
                     onClick={()=>setInputValue(cleanValue(ethers.utils.formatEther(daiBalance), 6))}
                   />}
                 </InputWrap>
@@ -279,7 +279,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
 
             <Box direction='row' fill justify='between'>
               { activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) && 
-                screenSize !== 'small' &&
+                !mobile &&
                 <Box alignSelf='start' margin={{ top:'medium' }}>
                   <FlatButton 
                     onClick={()=>setHistOpen(true)}
@@ -296,7 +296,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
 
               { !activeSeries?.isMature() &&
                 activeSeries?.poolTokens_>0 &&
-                screenSize !== 'small' && 
+                !mobile && 
                 <Box alignSelf='end' margin={{ top:'medium' }}>
                   <FlatButton 
                     onClick={()=>setRemoveLiquidityOpen(true)}
@@ -317,20 +317,19 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
         { txActive && <TxStatus msg={`You are adding ${inputValue} DAI liquidity to the pool.`} tx={txActive} /> }
       </Keyboard>
 
-      {screenSize === 'small' && 
+      {mobile && 
        !activeSeries?.isMature() &&
        activeSeries?.poolTokens_>0 &&
        <YieldMobileNav>
-         <Box onClick={()=>setRemoveLiquidityOpen(true)}>
+         <NavLink 
+           to={`/removeLiquidity/${activeSeries?.maturity}`}
+           style={{ textDecoration: 'none' }}
+         >
            <Box direction='row' gap='small' align='center'>
-             <Box>
-               <Text size='xxsmall' color='text-weak'>
-                 <Text weight='bold' size='xsmall' color={activeSeries?.seriesColor}>Remove Liquidity</Text> 
-               </Text>
-             </Box>
-             <ArrowRight color='text-weak' />
+             <Text weight='bold' size='xsmall' color={activeSeries?.seriesColor}>Remove Liquidity</Text>
+             <ArrowRight color={activeSeries?.seriesColor} />
            </Box>
-         </Box>
+         </NavLink>
        </YieldMobileNav>}
 
     </RaisedBox>

@@ -15,10 +15,10 @@ ${(props:any) => props.background && css`
 `;
 
 function RaisedBox({ children }:any ) {
-  const screenSize = useContext(ResponsiveContext);
+  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   return (
     <>
-      { screenSize !=='small' ?
+      { !mobile ?
         <StyledBox 
           width={{ max:'600px' }}
           alignSelf='center'
