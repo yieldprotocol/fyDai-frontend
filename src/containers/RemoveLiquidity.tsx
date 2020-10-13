@@ -19,6 +19,8 @@ import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
 
 import YieldMark from '../components/logos/YieldMark';
+import { NavLink } from 'react-router-dom';
+import YieldMobileNav from '../components/YieldMobileNav';
 
 interface IRemoveLiquidityProps {
   close?: any;
@@ -26,7 +28,8 @@ interface IRemoveLiquidityProps {
 
 const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
 
-  const screenSize = useContext(ResponsiveContext);
+  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
+
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { activeSeries  } = seriesState;
   const { actions: userActions } = useContext(UserContext);
@@ -72,11 +75,13 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
   };
 
   const calculateNewShare = async () => {
-    setCalculating(true);
-    const newBalance = activeSeries.poolTokens.sub(ethers.utils.parseEther(debouncedInput));
-    const percent= ( parseFloat(ethers.utils.formatEther(newBalance)) / parseFloat(ethers.utils.formatEther(activeSeries.totalSupply)) )*100;
-    setNewShare(percent.toFixed(4));
-    setCalculating(false);
+    if (activeSeries) {
+      setCalculating(true);
+      const newBalance = activeSeries.poolTokens.sub(ethers.utils.parseEther(debouncedInput));
+      const percent= ( parseFloat(ethers.utils.formatEther(newBalance)) / parseFloat(ethers.utils.formatEther(activeSeries.totalSupply)) )*100;
+      setNewShare(percent.toFixed(4));
+      setCalculating(false);
+    }
   };
 
   /* handle value calculations based on input changes */
@@ -86,7 +91,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
 
   /* handle warnings input errors */
   useEffect(() => {
-    if ( debouncedInput && (activeSeries.poolTokens.sub(ethers.utils.parseEther(debouncedInput)).lt(ethers.constants.Zero)) ) {
+    if ( debouncedInput && (activeSeries?.poolTokens?.sub(ethers.utils.parseEther(debouncedInput)).lt(ethers.constants.Zero)) ) {
       setWarningMsg(null);
       setErrorMsg('That amount exceeds the amount of tokens you have'); 
     } else {
@@ -119,7 +124,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
     >
       {!txActive && !removeLiquidityPending && 
       <Box 
-        width={screenSize!=='small'?{ min:'600px', max:'600px' }: undefined}
+        width={!mobile?{ min:'600px', max:'600px' }: undefined}
         alignSelf='center'
         fill
         background='background-front'
@@ -130,7 +135,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
         <Text alignSelf='start' size='large' color='text' weight='bold'>Remove Liquidity Tokens</Text>
         <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={removeLiquidityDisabled}>
           <TextInput
-            ref={(el:any) => {el && el.focus(); setInputRef(el);}} 
+            ref={(el:any) => {el && !mobile && el.focus(); setInputRef(el);}} 
             type="number"
             placeholder='Tokens to remove'
             value={inputValue || ''}
@@ -189,10 +194,11 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
           onClick={()=> removeLiquidityProcedure(inputValue)}
           label={`Remove ${inputValue || ''} tokens`}
           disabled={removeLiquidityDisabled}
-          hasDelegatedPool={activeSeries.hasDelegatedPool}
+          hasDelegatedPool={activeSeries?.hasDelegatedPool}
+          clearInput={()=>setInputValue(undefined)}
         />
 
-        {!activeSeries?.isMature() &&
+        {!activeSeries?.isMature() && !mobile && 
         <Box alignSelf='start' margin={{ top:'medium' }}>
           <FlatButton 
             onClick={()=>close()}
@@ -235,6 +241,20 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
           </Box>
         </Box>
       </Box>}
+
+      {mobile && 
+        <YieldMobileNav noMenu={true}>
+          <NavLink 
+            to={`/pool/${activeSeries?.maturity}`}
+            style={{ textDecoration: 'none' }}
+          >
+            <Box direction='row' gap='small'>
+              <Text size='xxsmall' color='text-weak'><ArrowLeft /></Text>
+              <Text size='xxsmall' color='text-weak'>back to add Liquidity</Text>
+            </Box>
+          </NavLink>
+        </YieldMobileNav>}
+        
     </Keyboard>
   );
 };

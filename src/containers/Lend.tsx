@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { ethers } from 'ethers';
-import { Box, Keyboard, TextInput, Text, ResponsiveContext, Collapsible } from 'grommet';
+import { Box, Keyboard, TextInput, Text, ResponsiveContext, Collapsible, Layer } from 'grommet';
 import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 import { VscHistory as History } from 'react-icons/vsc';
 
+import { NavLink, useParams } from 'react-router-dom';
 import { cleanValue } from '../utils';
 
 import { SeriesContext } from '../contexts/SeriesContext';
@@ -19,7 +20,7 @@ import {
   useIsLol,
 } from '../hooks';
 
-import WithdrawDai from './WithdrawDai';
+import CloseDai from './CloseDai';
 import Redeem from './Redeem';
 
 import InputWrap from '../components/InputWrap';
@@ -36,7 +37,7 @@ import HistoryWrap from '../components/HistoryWrap';
 
 import DaiMark from '../components/logos/DaiMark';
 import RaisedBox from '../components/RaisedBox';
-import { useParams } from 'react-router-dom';
+import YieldMobileNav from '../components/YieldMobileNav';
 
 interface ILendProps {
   openConnectLayer:any;
@@ -52,7 +53,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
   const { state: userState, actions: userActions } = useContext(UserContext);
   const { daiBalance, daiBalance_ } = userState.position;
 
-  const screenSize = useContext(ResponsiveContext);
+  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
   const { previewPoolTx } = usePool();
   const { sellDai, sellActive } = useProxy();
@@ -62,7 +63,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
 
   const [ hasDelegated ] = useState<boolean>(true);
 
-  const [ withdrawDaiOpen, setWithdrawDaiOpen ] = useState<boolean>(false);
+  const [ CloseDaiOpen, setCloseDaiOpen ] = useState<boolean>(false);
   const [ histOpen, setHistOpen ] = useState<boolean>(false);
   
   const [ inputValue, setInputValue ] = useState<any>(amnt || undefined);
@@ -156,7 +157,10 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
         onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
         target='document'
       >
-        { withdrawDaiOpen && <WithdrawDai close={()=>setWithdrawDaiOpen(false)} /> }
+        { CloseDaiOpen && 
+        <Layer onClickOutside={()=>setCloseDaiOpen(false)}>
+          <CloseDai close={()=>setCloseDaiOpen(false)} />   
+        </Layer>}
 
         { histOpen && 
         <HistoryWrap closeLayer={()=>setHistOpen(false)}>
@@ -237,9 +241,9 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
                 <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to lend</Text>
                 <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={lendDisabled}>
                   <TextInput
-                    ref={(el:any) => {el && !withdrawDaiOpen && el.focus(); setInputRef(el);}}
+                    ref={(el:any) => {el && !CloseDaiOpen && !mobile && el.focus(); setInputRef(el);}}
                     type="number"
-                    placeholder={screenSize !== 'small' ? 'Enter the amount of Dai to lend': 'DAI'}
+                    placeholder={!mobile ? 'Enter the amount of Dai to lend': 'DAI'}
                     value={inputValue || ''}
                     plain
                     onChange={(event:any) => setInputValue( cleanValue(event.target.value, 6) )}
@@ -247,7 +251,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
                   />
                   {account &&
                   <RaisedButton 
-                    label={screenSize !== 'small' ? 'Lend Maximum': 'Maximum'}
+                    label={!mobile ? 'Lend Maximum': 'Maximum'}
                     onClick={()=>setInputValue( cleanValue(ethers.utils.formatEther(daiBalance), 6) )}
                   />}
                 </InputWrap>
@@ -303,6 +307,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
                   label={`Lend ${inputValue || ''} DAI`}
                   disabled={lendDisabled}
                   hasDelegatedPool={activeSeries.hasDelegatedPool}
+                  clearInput={()=>setInputValue(undefined)}
                 />       
               </Box>
             </>}
@@ -318,32 +323,35 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
 
             <Box direction='row' fill justify='between'>
               { activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) && 
-              <Box alignSelf='start' margin={{ top:'medium' }}>
-                <FlatButton 
-                  onClick={()=>setHistOpen(true)}
-                  label={
-                    <Box direction='row' gap='small' align='center'>
-                      <Text size='xsmall' color='text-xweak'><History /></Text>                
-                      <Text size='xsmall' color='text-xweak'>
-                        Series Lend History
-                      </Text>              
-                    </Box>
+                !mobile &&
+                <Box alignSelf='start' margin={{ top:'medium' }}>
+                  <FlatButton 
+                    onClick={()=>setHistOpen(true)}
+                    label={
+                      <Box direction='row' gap='small' align='center'>
+                        <Text size='xsmall' color='text-xweak'><History /></Text>                
+                        <Text size='xsmall' color='text-xweak'>
+                          Series Lend History
+                        </Text>              
+                      </Box>
                     }
-                />
-              </Box>}
+                  />
+                </Box>}
 
-              { !activeSeries?.isMature() && activeSeries?.fyDaiBalance_ > 0 &&
-              <Box alignSelf='end' margin={{ top:'medium' }}>
-                <FlatButton 
-                  onClick={()=>setWithdrawDaiOpen(true)}
-                  label={
-                    <Box direction='row' gap='small' align='center'>
-                      <Box><Text size='xsmall' color='text-weak'><Text weight='bold' color={activeSeries.seriesColor}>close</Text> your position in this series</Text></Box>
-                      <ArrowRight color='text-weak' />
-                    </Box>
+              { !activeSeries?.isMature() && 
+                activeSeries?.fyDaiBalance_ > 0 &&
+                !mobile &&
+                <Box alignSelf='end' margin={{ top:'medium' }}>
+                  <FlatButton 
+                    onClick={()=>setCloseDaiOpen(true)}
+                    label={
+                      <Box direction='row' gap='small' align='center'>
+                        <Box><Text size='xsmall' color='text-weak'><Text weight='bold' color={activeSeries?.seriesColor}>close</Text> your position in this series</Text></Box>
+                        <ArrowRight color='text-weak' />
+                      </Box>
                     }
-                />
-              </Box>}
+                  />
+                </Box>}
             </Box>
 
           </Box>
@@ -353,6 +361,22 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
         { sellActive && !txActive && <ApprovalPending /> }
         { txActive && <TxStatus msg={`You are lending ${inputValue} DAI`} tx={txActive} /> }
       </Keyboard>
+
+      {mobile &&
+      <YieldMobileNav>
+        {!activeSeries?.isMature() && 
+          activeSeries?.fyDaiBalance_ > 0 &&
+          <NavLink 
+            to={`/close/${activeSeries?.maturity}`}
+            style={{ textDecoration: 'none' }}
+          >
+            <Box direction='row' gap='small' align='center'>
+              <Text size='xxsmall' color='text-weak'><Text weight='bold' size='xsmall' color={activeSeries?.seriesColor}>close </Text> your position</Text>
+              <ArrowRight color={activeSeries?.seriesColor} />
+            </Box>
+          </NavLink>}
+      </YieldMobileNav>}
+        
     </RaisedBox>
   );
 };

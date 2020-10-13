@@ -1,8 +1,8 @@
 import React from 'react';
 import { Anchor, Footer, Text, Box } from 'grommet';
+import { FaDiscord as Discord } from 'react-icons/fa';
 import {
   FiGithub as Github,
-  FiInfo as Info,
   FiFileText as Docs,
   FiCodesandbox as Test,
 } from 'react-icons/fi';
@@ -41,14 +41,14 @@ const YieldFooter = (props: any) => {
           top: '2px',
         }}
       >
-        <Anchor color="grey">
+        <Anchor color="grey" href='https://github.com/yieldprotocol'>
           <Github size={IconSize} />
         </Anchor>
-        <Anchor color="grey">
+        <Anchor color="grey" href='http://docs.yield.is'>
           <Docs size={IconSize} />
         </Anchor>
-        <Anchor color="grey">
-          <Info size={IconSize} />
+        <Anchor color="grey" href='https://discord.gg/JAFfDj5'>
+          <Discord size={IconSize} />
         </Anchor>
       </Box>
       <Box

@@ -16,7 +16,7 @@ import FlatButton from './FlatButton';
 import { UserContext } from '../contexts/UserContext';
 
 const HistoryWrap = ({ children, closeLayer, series } : any) => {
-  const screenSize = useContext(ResponsiveContext);
+  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   const { actions }= useContext(UserContext);
   return (
     <Layer
@@ -25,7 +25,7 @@ const HistoryWrap = ({ children, closeLayer, series } : any) => {
       onEsc={() => closeLayer(true)}
     >
       <Box
-        width={screenSize!=='small'?{ min:'620px', max:'620px' }: undefined}
+        width={!mobile?{ min:'620px', max:'620px' }: undefined}
         background="background-front"
         direction="column"
         fill="vertical"

@@ -18,6 +18,8 @@ import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
 
 import EthMark from '../components/logos/EthMark';
+import { NavLink } from 'react-router-dom';
+import YieldMobileNav from '../components/YieldMobileNav';
 
 interface IWithDrawProps {
   close?: any;
@@ -25,7 +27,7 @@ interface IWithDrawProps {
 
 const WithdrawEth = ({ close }:IWithDrawProps) => {
 
-  const screenSize = useContext(ResponsiveContext);
+  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
   const { state: { position, authorizations }, actions: userActions } = useContext(UserContext);
   const { hasDelegatedProxy } = authorizations;
@@ -117,96 +119,94 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
   }, [ estRatio, debouncedInput ]);
 
   return (
-    <Layer 
-      onClickOutside={()=>close()}
+    <Keyboard 
+      onEsc={() => { inputValue? setInputValue(undefined): close();}}
+      onEnter={()=> withdrawProcedure()}
+      onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
+      target='document'
     >
-      <Keyboard 
-        onEsc={() => { inputValue? setInputValue(undefined): close();}}
-        onEnter={()=> withdrawProcedure()}
-        onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
-        target='document'
-      >
-        { !txActive && !withdrawPending && 
-          <Box 
-            width={screenSize!=='small'?{ min:'620px', max:'620px' }: undefined}
-            alignSelf='center'
-            fill
-            background='background-front'
-            round='small'
-            pad='large'
-            gap='medium'
-            justify='between'
-          >        
-            <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to withdraw</Text>
+      { !txActive && !withdrawPending && 
+      <Box 
+        width={!mobile?{ min:'620px', max:'620px' }: undefined}
+        alignSelf='center'
+        fill
+        background='background-front'
+        round='small'
+        pad='large'
+        gap='medium'
+        justify='between'
+      >        
+        <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to withdraw</Text>
 
-            <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={withdrawDisabled}>
-              <TextInput
-                ref={(el:any) => {el && el.focus(); setInputRef(el);}} 
-                type="number"
-                placeholder='ETH'
-                disabled={!hasDelegatedProxy}
-                value={inputValue || ''}
-                plain
-                onChange={(event:any) => setInputValue(cleanValue(event.target.value))}
-                icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <EthMark />}
-              />
-              <RaisedButton 
-                label='Withdraw maximum'
-                disabled={!hasDelegatedProxy}
-                onClick={()=>maxWithdraw && setInputValue(cleanValue(maxWithdraw))}
-              />
-            </InputWrap>
+        <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={withdrawDisabled}>
+          <TextInput
+            ref={(el:any) => {el && !mobile && el.focus(); setInputRef(el);}} 
+            type="number"
+            placeholder='ETH'
+            disabled={!hasDelegatedProxy}
+            value={inputValue || ''}
+            plain
+            onChange={(event:any) => setInputValue(cleanValue(event.target.value))}
+            icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <EthMark />}
+          />
+          <RaisedButton 
+            label='Withdraw maximum'
+            disabled={!hasDelegatedProxy}
+            onClick={()=>maxWithdraw && setInputValue(cleanValue(maxWithdraw))}
+          />
+        </InputWrap>
 
-            <Box fill>
-              <Collapsible open={!!inputValue&&inputValue>0}>
-                <InfoGrid entries={[
-                  {
-                    label: 'Max withdraw',
-                    visible: true,
-                    active: hasDelegatedProxy,
-                    loading: false, 
-                    value: maxWithdraw? `${parseFloat(maxWithdraw).toFixed(4)} Eth` : '-',
-                    valuePrefix: null,
-                    valueExtra: null, 
-                  },
-                  {
-                    label: 'Ratio after Withdraw',
-                    visible: collateralPercent_ > 0,
-                    active: !!inputValue,
-                    loading: false,           
-                    value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
-                    valuePrefix: '~',
-                    valueExtra: null,
-                  },
-                ]}
-                />
-              </Collapsible>
-            </Box>
+        <Box fill>
+          <Collapsible open={!!inputValue&&inputValue>0}>
+            <InfoGrid entries={[
+              {
+                label: 'Max withdraw',
+                visible: true,
+                active: hasDelegatedProxy,
+                loading: false, 
+                value: maxWithdraw? `${parseFloat(maxWithdraw).toFixed(4)} Eth` : '-',
+                valuePrefix: null,
+                valueExtra: null, 
+              },
+              {
+                label: 'Ratio after Withdraw',
+                visible: collateralPercent_ > 0,
+                active: !!inputValue,
+                loading: false,           
+                value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
+                valuePrefix: '~',
+                valueExtra: null,
+              },
+            ]}
+            />
+          </Collapsible>
+        </Box>
 
-            <ActionButton
-              onClick={()=> withdrawProcedure()}
-              label={`Withdraw ${inputValue || ''} Eth`}
-              disabled={withdrawDisabled}
-              hasDelegatedPool={true}
-            />  
+        <ActionButton
+          onClick={()=> withdrawProcedure()}
+          label={`Withdraw ${inputValue || ''} Eth`}
+          disabled={withdrawDisabled}
+          hasDelegatedPool={true}
+          clearInput={()=>setInputValue(undefined)}
+        />  
           
-            <Box alignSelf='start' margin={{ top:'medium' }}>
-              <FlatButton 
-                onClick={()=>close()}
-                label={
-                  <Box direction='row' gap='medium' align='center'>
-                    <ArrowLeft color='text-weak' />
-                    <Text size='small' color='text-weak'> { !withdrawPending? 'cancel, and go back.': 'go back'}</Text>
-                  </Box>
+        <Box alignSelf='start' margin={{ top:'medium' }}>
+          <FlatButton 
+            onClick={()=>close()}
+            label={
+              <Box direction='row' gap='medium' align='center'>
+                <ArrowLeft color='text-weak' />
+                <Text size='small' color='text-weak'> { !withdrawPending? 'cancel, and go back.': 'go back'}</Text>
+              </Box>
                 }
-              />
-            </Box>
+          />
+        </Box>
             
-          </Box>}
+      </Box>}
 
-        { withdrawPending && !txActive && <ApprovalPending /> }
+      { withdrawPending && !txActive && <ApprovalPending /> }
           
-        { txActive && 
+      { txActive && 
         <Box 
           width={{ max:'600px' }}
           alignSelf='center'
@@ -234,8 +234,21 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
             </Box>
           </Box>
         </Box>}
-      </Keyboard>
-    </Layer>
+
+      {mobile && 
+        <YieldMobileNav noMenu={true}>
+          <NavLink 
+            to="/post"
+            style={{ textDecoration: 'none' }}
+          >
+            <Box direction='row' gap='small'>
+              <Text size='xxsmall' color='text-weak'><ArrowLeft /></Text>
+              <Text size='xxsmall' color='text-weak'>back</Text>
+            </Box>
+          </NavLink>
+        </YieldMobileNav>}
+
+    </Keyboard>
   );
 };
 

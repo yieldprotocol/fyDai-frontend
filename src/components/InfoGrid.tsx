@@ -25,7 +25,7 @@ interface IInfoGridProps {
 
 function InfoGrid({ entries, alt }:IInfoGridProps) {
 
-  const screenSize = useContext(ResponsiveContext);
+  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   const { state:{ activeSeries } } = useContext(SeriesContext);
   const [ detailsOpen, setDetailsOpen ] = useState<boolean>();
   const [visibleEntries, setVisibleEntries] = useState<any[]>([]);
@@ -55,7 +55,8 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
                 round='large'
                 gap='xsmall'
                 width={{ min:'30%' }}
-                // align='center'
+                // direction={mobile?'row':undefined}
+                // justify={mobile?'between':undefined}
               >
                 <Box>
                   <Text 
@@ -71,18 +72,20 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
                   >
                     { x.labelExtra}
                   </Text>
-                </Box>               
+                </Box>  
+
                 <Loading condition={x.loading} size='small'>
                   <Box direction='row-responsive' gap='xsmall' align='center'>
                     { x.valuePrefix && 
-                        screenSize !== 'small' && 
-                        <Text color={x.active ? activeSeries?.seriesTextColor:'text-xweak'} size='medium' weight='bold'>
-                          {x.valuePrefix}                     
-                        </Text>}
+                      !mobile && 
+                      <Text color={x.active ? activeSeries?.seriesTextColor:'text-xweak'} size='medium' weight='bold'>
+                        {x.valuePrefix}                     
+                      </Text>}
                     <Text color={x.active? activeSeries?.seriesTextColor:'text-xweak'} weight='bold' size='medium'> 
                       { (typeof Value === 'function')? <Value />: Value }
                     </Text>
                   </Box>
+
                   { typeof ValueExtra === 'function' ? 
                     <ValueExtra />  :
                     <Text color={alt? 'text-weak': 'text-weak'} size='xxsmall'> 
@@ -138,7 +141,7 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
                     <Loading condition={x.loading} size='small'>
                       <Box direction='row-responsive' gap='xsmall' align='center'>
                         { x.valuePrefix && 
-                        screenSize !== 'small' && 
+                        !mobile && 
                         <Text color={x.active ? activeSeries?.seriesTextColor:'text-xweak'} size='medium' weight='bold'>
                           {x.valuePrefix}                     
                         </Text>}

@@ -24,7 +24,7 @@ interface IAuthorizationProps {
 }
 
 const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorizationProps) => { 
-  const screenSize = useContext(ResponsiveContext);
+  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   const { state: { requestedSigs } } = useContext(NotifyContext);
   const { state: { authorizations }, actions: userActions } = useContext(UserContext);
   const { hasDelegatedProxy } = authorizations;
@@ -68,7 +68,7 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
 
   return (
     <>
-      { account && authWrap && 
+      { account && authWrap && !authActive && 
         <Box fill='horizontal' onClick={()=>{authProcedure();}}> 
           {children} 
         </Box>}
@@ -76,55 +76,61 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
       { !hasDelegatedProxy && account && !authWrap && !series && 
         <Box 
           fill='horizontal'
-          pad='medium'
+          pad={mobile?{ horizontal:'medium', top:'medium', bottom:'large' }:'medium'}
           direction='row-responsive'
           gap='medium'
           background='#555555'
           justify='between'
+          margin={mobile?{ bottom:'-10px' }:undefined}
         >
           {!buttonOnly &&
             <Box> 
-              <Text>Feel free to look around and play. However, before you make any transactions you will need to sign a few authorizations.</Text>
+              <Text size={mobile?'xsmall': undefined}>Feel free to look around and play. However, before you make any transactions you will need to sign a few authorizations.</Text>
             </Box>}
           <RaisedButton 
             background='#555555'
-            label={<Box pad={{ horizontal:'medium', vertical:'small' }} align='center'><Text size='small' color='#DDDDDD'><Unlock /> Authorize Yield</Text></Box>}
+            label={<Box pad={{ horizontal:'small', vertical:'xsmall' }} align='center'><Text size='small' color='#DDDDDD'><Unlock /> Authorize Yield</Text></Box>}
             onClick={()=>{authProcedure();}}
           />
         </Box>}
 
       { hasDelegatedProxy && account && series?.hasDelegatedPool === false && !authWrap &&
         <Box
-          direction='row' 
+          direction='row-responsive' 
           gap='small'
           pad='medium'
           justify='around'
           background='#555555'
           align='center'
-        >
-          {!buttonOnly && <Text color='#DDDDDD'> <Warning /> </Text>}
-          {!buttonOnly && <Text size='xsmall' color='#DDDDDD'>A once-off authorization is required to use this series</Text>}
+        >  
+          <Box direction='row' gap='small'>
+            {!buttonOnly && <Text color='#DDDDDD'> <Warning /> </Text>}
+            {!buttonOnly && <Text size='xsmall' color='#DDDDDD'>A once-off authorization is required to use this series </Text>}
+          </Box>
           <Box>
             <RaisedButton 
               background='#555555'
               label={
                 <Box pad={{ horizontal:'small', vertical:'xsmall' }} align='center'>
-                  <Text size='xsmall' color='#DDDDDD'><Unlock /> {screenSize==='small'? '' : 'Unlock Series'}</Text>
+                  <Text size='xsmall' color='#DDDDDD'><Unlock /> Unlock Series </Text>
                 </Box>
               }
               onClick={()=>{authProcedure();}}
             />   
-          </Box>
-             
+          </Box>           
         </Box>}
 
       { authActive && layerOpen &&
         <Layer 
-          onClickOutside={()=>closeAuth()}
+          // onClickOutside={()=>closeAuth()}
+          // modal={mobile?true: undefined}
+          modal={true}
+          responsive={mobile?false: undefined}
+          full={mobile?true: undefined}
         >
           <Box 
-            width={screenSize!=='small'?{ min:'620px', max:'620px' }: undefined}
-            round='small'
+            width={!mobile?{ min:'620px', max:'620px' }: undefined}
+            round={mobile?undefined:'small'}
             background='background'
             pad='large'
             gap='medium'

@@ -5,6 +5,7 @@ import { Box, Keyboard, TextInput, Text, ResponsiveContext, Collapsible, Layer }
 import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 import { VscHistory as History } from 'react-icons/vsc';
 
+import { NavLink, useParams } from 'react-router-dom';
 import { cleanValue } from '../utils';
 
 import { YieldContext } from '../contexts/YieldContext';
@@ -36,7 +37,7 @@ import HistoryWrap from '../components/HistoryWrap';
 import RaisedBox from '../components/RaisedBox';
 
 import DaiMark from '../components/logos/DaiMark';
-import { useParams } from 'react-router-dom';
+import YieldMobileNav from '../components/YieldMobileNav';
 
 
 interface IPoolProps {
@@ -53,7 +54,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
   const { activeSeries } = seriesState;
   const { state: userState, actions: userActions } = useContext(UserContext);
   const { daiBalance } = userState.position;
-  const screenSize = useContext(ResponsiveContext);
+  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
   const { addLiquidity, addLiquidityActive } = useProxy();
   const { getBalance } = useToken();
@@ -206,9 +207,9 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                 <Text alignSelf='start' size='large' color='text' weight='bold'>Add liquidity</Text>
                 <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={addLiquidityDisabled}>
                   <TextInput
-                    ref={(el:any) => {el && !removeLiquidityOpen && el.focus(); setInputRef(el);}} 
+                    ref={(el:any) => {el && !removeLiquidityOpen && !mobile && el.focus(); setInputRef(el);}} 
                     type="number"
-                    placeholder={screenSize !== 'small' ? 'Enter the amount of Dai Liquidity to add': 'DAI'}
+                    placeholder={!mobile ? 'Enter the amount of Dai Liquidity to add': 'DAI'}
                     value={inputValue || ''}
                     plain
                     onChange={(event:any) => setInputValue( cleanValue(event.target.value, 6) )}
@@ -217,7 +218,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                   
                   {account &&
                   <RaisedButton 
-                    label={screenSize !== 'small' ? 'Add Maximum': 'Maximum'}
+                    label={!mobile ? 'Add Maximum': 'Maximum'}
                     onClick={()=>setInputValue(cleanValue(ethers.utils.formatEther(daiBalance), 6))}
                   />}
                 </InputWrap>
@@ -263,6 +264,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                   label={`Supply ${inputValue || ''} DAI`}
                   disabled={addLiquidityDisabled}
                   hasDelegatedPool={activeSeries.hasDelegatedPool}
+                  clearInput={()=>setInputValue(undefined)}
                 />
               </Box>
             </>}
@@ -278,33 +280,35 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
 
             <Box direction='row' fill justify='between'>
               { activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) && 
-              <Box alignSelf='start' margin={{ top:'medium' }}>
-                <FlatButton 
-                  onClick={()=>setHistOpen(true)}
-                  label={
-                    <Box direction='row' gap='small' align='center'>
-                      <Text size='xsmall' color='text-xweak'><History /></Text>                
-                      <Text size='xsmall' color='text-xweak'>
-                        Series Pool History
-                      </Text>              
-                    </Box>
+                !mobile &&
+                <Box alignSelf='start' margin={{ top:'medium' }}>
+                  <FlatButton 
+                    onClick={()=>setHistOpen(true)}
+                    label={
+                      <Box direction='row' gap='small' align='center'>
+                        <Text size='xsmall' color='text-xweak'><History /></Text>                
+                        <Text size='xsmall' color='text-xweak'>
+                          Series Pool History
+                        </Text>              
+                      </Box>
                 }
-                />
-              </Box>}
+                  />
+                </Box>}
 
               { !activeSeries?.isMature() &&
-            activeSeries?.poolTokens_>0 &&
-            <Box alignSelf='end' margin={{ top:'medium' }}>
-              <FlatButton 
-                onClick={()=>setRemoveLiquidityOpen(true)}
-                label={
-                  <Box direction='row' gap='small' align='center'>
-                    <Text size='xsmall' color='text-weak'><Text weight='bold' color={activeSeries.seriesColor}>Remove Liquidity</Text> from this series</Text>
-                    <ArrowRight color='text-weak' />
-                  </Box>
-                }  
-              />
-            </Box>}
+                activeSeries?.poolTokens_>0 &&
+                !mobile && 
+                <Box alignSelf='end' margin={{ top:'medium' }}>
+                  <FlatButton 
+                    onClick={()=>setRemoveLiquidityOpen(true)}
+                    label={
+                      <Box direction='row' gap='small' align='center'>
+                        <Text size='xsmall' color='text-weak'><Text weight='bold' color={activeSeries?.seriesColor}>Remove Liquidity</Text> from this series</Text>
+                        <ArrowRight color='text-weak' />
+                      </Box>
+                }
+                  />
+                </Box>}
             </Box>
 
           </Box>
@@ -313,6 +317,22 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
         { addLiquidityActive && !txActive && <ApprovalPending /> } 
         { txActive && <TxStatus msg={`You are adding ${inputValue} DAI liquidity to the pool.`} tx={txActive} /> }
       </Keyboard>
+
+      { mobile && 
+      <YieldMobileNav>
+        { !activeSeries?.isMature() &&
+       activeSeries?.poolTokens_>0 &&
+         <NavLink 
+           to={`/removeLiquidity/${activeSeries?.maturity}`}
+           style={{ textDecoration: 'none' }}
+         >
+           <Box direction='row' gap='small' align='center'>
+             <Text weight='bold' size='xsmall' color={activeSeries?.seriesColor}>Remove Liquidity</Text>
+             <ArrowRight color={activeSeries?.seriesColor} />
+           </Box>
+         </NavLink>}
+      </YieldMobileNav>}
+
     </RaisedBox>
   );
 };

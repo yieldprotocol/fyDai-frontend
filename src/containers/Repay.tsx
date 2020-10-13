@@ -30,6 +30,8 @@ import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
 
 import DaiMark from '../components/logos/DaiMark';
+import { NavLink } from 'react-router-dom';
+import YieldMobileNav from '../components/YieldMobileNav';
 
 interface IRepayProps {
   repayAmount?:any
@@ -43,7 +45,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
   const { activeSeries } = seriesState;
   const { state: userState, actions: userActions } = useContext(UserContext);
   const { daiBalance } = userState.position;
-  const screenSize = useContext(ResponsiveContext);
+  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
   const [ hasDelegated, setHasDelegated ] = useState<boolean>(true);
 
@@ -86,8 +88,8 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
   };
 
   useEffect(()=>{
-    daiBalance && activeSeries?.ethDebtDai && daiBalance.gt(activeSeries?.ethDebtDai) && setMaxRepay(activeSeries.ethDebtDai);
-    daiBalance && activeSeries?.ethDebtDai && daiBalance.lt(activeSeries.ethDebtDai) && setMaxRepay(daiBalance);
+    activeSeries?.ethDebtDai && daiBalance?.gt(activeSeries?.ethDebtDai) && setMaxRepay(activeSeries.ethDebtDai);
+    activeSeries?.ethDebtDai && daiBalance?.lt(activeSeries.ethDebtDai) && setMaxRepay(daiBalance);
   }, [daiBalance, activeSeries]);
 
   /* Repay disabling logic */
@@ -124,10 +126,9 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
       onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
       target='document'
     >
-
       { !txActive &&
         <Box
-          width={{ min: '600px', max: '600px' }}
+          width={!mobile?{ min:'620px', max:'620px' }: undefined}
           alignSelf="center"
           fill
           background="background-front"
@@ -137,23 +138,23 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
           <Box flex='grow' justify='between'>
             <Box gap='medium' align='center' fill='horizontal'>
 
-              { (activeSeries?.ethDebtFYDai.gt(ethers.constants.Zero)) ?
+              { (activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero)) ?
              
                 <Box gap='medium' align='center' fill='horizontal'>
                   <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to Repay</Text>
 
                   <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={repayDisabled}>
                     <TextInput
-                      ref={(el:any) => {el && el.focus(); setInputRef(el);}} 
+                      ref={(el:any) => {el && !mobile && el.focus(); setInputRef(el);}} 
                       type="number"
-                      placeholder={screenSize !== 'small' ? 'Enter the amount of Dai to Repay': 'DAI'}
+                      placeholder={!mobile ? 'Enter the amount of Dai to Repay': 'DAI'}
                       value={inputValue || ''}
                       plain
                       onChange={(event:any) => setInputValue(( cleanValue(event.target.value, 6) ))}
                       icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <DaiMark />}
                     />
                     <RaisedButton 
-                      label={screenSize !== 'small' ? 'Repay Maximum': 'Maximum'}
+                      label={!mobile ? 'Repay Maximum': 'Maximum'}
                       onClick={()=>setInputValue( cleanValue(ethers.utils.formatEther(maxRepay), 6) )}
                     />
                   </InputWrap>
@@ -167,7 +168,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
                             visible: false,
                             active: true,
                             loading: repayPending,    
-                            value: activeSeries?.ethDebtFYDai_? `${activeSeries.ethDebtFYDai_} DAI`: '0 DAI',
+                            value: activeSeries?.ethDebtFYDai_? `${activeSeries?.ethDebtFYDai_} DAI`: '0 DAI',
                             valuePrefix: null,
                             valueExtra: null, 
                           }, 
@@ -176,7 +177,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
                             visible: true,
                             active: true,
                             loading: false,    
-                            value:  activeSeries?.ethDebtDai_? `${cleanValue(activeSeries.ethDebtDai_, 2)} DAI`: '0 DAI',
+                            value:  activeSeries?.ethDebtDai_? `${cleanValue(activeSeries?.ethDebtDai_, 2)} DAI`: '0 DAI',
                             valuePrefix: null,
                             valueExtra: null,
                           },
@@ -186,8 +187,8 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
                             active: !!inputValue&&inputValue>0,
                             loading: false,
                             value: activeSeries?.ethDebtDai_ ? 
-                              ( activeSeries.ethDebtDai_ - parseFloat(debouncedInput)>0 ? 
-                                activeSeries.ethDebtDai_ - parseFloat(debouncedInput) 
+                              ( activeSeries?.ethDebtDai_ - parseFloat(debouncedInput)>0 ? 
+                                activeSeries?.ethDebtDai_ - parseFloat(debouncedInput) 
                                 : 0
                               ).toFixed(2) : '- DAI',
 
@@ -204,9 +205,10 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
                     label={`Repay ${inputValue || ''} DAI`}
                     disabled={repayDisabled}
                     hasDelegatedPool={true}
+                    clearInput={()=>setInputValue(undefined)}
                   />
 
-                  {!activeSeries?.isMature() &&
+                  {!activeSeries?.isMature() && !mobile &&
                   <Box alignSelf='start' margin={{ top:'medium' }}> 
                     <FlatButton 
                       onClick={()=>close()}
@@ -244,6 +246,20 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
         </Box>}
       { repayActive && !txActive && <ApprovalPending /> }
       { txActive && <TxStatus msg={`You are repaying ${inputValue} DAI`} tx={txActive} /> }
+
+      {mobile && 
+        <YieldMobileNav noMenu={true}>
+          <NavLink 
+            to={`/borrow/${activeSeries?.maturity}`}
+            style={{ textDecoration: 'none' }}
+          >
+            <Box direction='row' gap='small'>
+              <Text size='xxsmall' color='text-weak'><ArrowLeft /></Text>
+              <Text size='xxsmall' color='text-weak'>back to borrow</Text>
+            </Box>
+          </NavLink>
+        </YieldMobileNav>}
+        
     </Keyboard>
   );
 }

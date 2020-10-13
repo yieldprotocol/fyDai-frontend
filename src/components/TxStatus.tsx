@@ -20,7 +20,7 @@ const TxStatus= ({ msg, tx }:TxStatusProps) => {
   } = useContext(NotifyContext);
 
   const theme:any = useContext(ThemeContext);
-  const screenSize = useContext(ResponsiveContext); 
+  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' ); 
   const txRef = React.useRef<any>(null);
 
   // TODO: handle copy
@@ -41,7 +41,7 @@ const TxStatus= ({ msg, tx }:TxStatusProps) => {
           pad="large"
           align='center'
           gap='medium'
-          width={screenSize!=='small'?{ min:'600px', max:'600px' }: undefined}
+          width={!mobile?{ min:'600px', max:'600px' }: undefined}
         >
           <Text size='xlarge' color='brand' weight='bold'>Transaction pending...</Text>
           <Text>{msg}</Text>
@@ -66,7 +66,7 @@ const TxStatus= ({ msg, tx }:TxStatusProps) => {
         pad="large"
         align='center'
         gap='medium'
-        width={screenSize!=='small'?{ min:'600px', max:'600px' }: undefined}
+        width={!mobile?{ min:'600px', max:'600px' }: undefined}
       >
         <Text size='xlarge' color='brand' weight='bold'>Transaction Complete. </Text>
         <Text>{lastCompletedTx.status}</Text>

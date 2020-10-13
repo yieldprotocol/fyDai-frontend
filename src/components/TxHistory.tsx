@@ -84,7 +84,7 @@ const TxHistory = ( { filterTerms, series }: HistoryProps) => {
     } else {
       seriesFilteredHist = filteredHist;
     }
-    const sortedList = seriesFilteredHist.sort( (a:any, b:any) => a.date - b.date ); 
+    const sortedList = seriesFilteredHist.sort( (a:any, b:any) => b.date - a.date ); 
     setTxHistory(sortedList);
   }, [ state.txHistory ]);
 

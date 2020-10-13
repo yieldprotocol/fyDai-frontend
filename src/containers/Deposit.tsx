@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { NavLink, useHistory, useParams } from 'react-router-dom';
 import ethers, { BigNumber } from 'ethers';
 
 import { 
@@ -8,7 +8,8 @@ import {
   TextInput, 
   Text,
   ResponsiveContext, 
-  Collapsible
+  Collapsible,
+  Layer
 } from 'grommet';
 
 import {
@@ -43,6 +44,7 @@ import CollateralDescriptor from '../components/CollateralDescriptor';
 import RaisedBox from '../components/RaisedBox';
 
 import EthMark from '../components/logos/EthMark';
+import YieldMobileNav from '../components/YieldMobileNav';
 
 interface DepositProps {
   /* deposit amount prop is for quick linking into component */
@@ -69,7 +71,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
   /* check if the user sent in any requested amount in the url */ 
   const { amnt }:any = useParams();
 
-  const screenSize = useContext(ResponsiveContext);
+  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
   const { postEth, postEthActive }  = useProxy();
   const { estCollRatio: estimateRatio, collValue } = useMath();
@@ -173,7 +175,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
         target='document'
       >
         <CollateralDescriptor backToBorrow={()=>history.push('/borrow')}>
-        
+           
           <InfoGrid
             entries={[
               {
@@ -228,7 +230,11 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
           />
         </CollateralDescriptor>
       
-        { withdrawOpen && <WithdrawEth close={()=>setWithdrawOpen(false)} /> }    
+        { withdrawOpen && 
+          <Layer onClickOutside={()=>setWithdrawOpen(false)}>
+            <WithdrawEth close={()=>setWithdrawOpen(false)} /> 
+          </Layer>}
+        
         { (!txActive || txActive?.type === 'WITHDRAW') &&
         <Box
           alignSelf="center"
@@ -242,9 +248,9 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
 
           <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={depositDisabled}>
             <TextInput
-              ref={(el:any) => {el && !withdrawOpen && el.focus(); setInputRef(el);}} 
+              ref={(el:any) => {el && !withdrawOpen && !mobile && el.focus(); setInputRef(el);}} 
               type='number'
-              placeholder={(screenSize !== 'small' && !modalView) ? 'Enter the ETH amount to deposit': 'ETH'}
+              placeholder={(!mobile && !modalView) ? 'Enter the ETH amount to deposit': 'ETH'}
               value={inputValue || ''}
               disabled={postEthActive}
               plain
@@ -252,7 +258,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
               icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <EthMark />}
             />
             <RaisedButton
-              label={(screenSize !== 'small' && !modalView) ? 'Deposit Maximum': 'Max'}
+              label={(!mobile && !modalView) ? 'Deposit Maximum': 'Max'}
               onClick={()=>account && setInputValue(ethers.utils.formatEther(ethBalance))}
             />
           </InputWrap>
@@ -312,8 +318,10 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
               label={`Deposit ${inputValue || ''} Eth`}
               disabled={depositDisabled}
               hasDelegatedPool={true}
+              clearInput={()=>setInputValue(undefined)}
             /> }
 
+          {!mobile &&
           <Box 
             direction='row'
             fill='horizontal'
@@ -334,21 +342,46 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
               onClick={()=>setWithdrawOpen(true)}
               label={
                 <Box direction='row' gap='small' align='center'>
-                  <Box><Text size='xsmall' color='text-weak'><Text weight='bold'>withdraw</Text> collateral</Text></Box>
+                  <Box><Text size='xsmall' color='text-weak'><Text weight='bold'>Withdraw</Text> collateral</Text></Box>
                   <ArrowRight color='text-weak' />
                 </Box>
               }
             />}
-          </Box>
+          </Box>}
        
         </Box>}
         { postEthActive && !txActive && <ApprovalPending /> } 
         { txActive && txActive.type !== 'WITHDRAW' && <TxStatus msg={`You are depositing ${inputValue} ETH`} tx={txActive} /> }
       </Keyboard>
+
+      {mobile && 
+        <YieldMobileNav noMenu={true}>
+          <NavLink 
+            to='/borrow/'
+            style={{ textDecoration: 'none' }}
+          >
+            <Box direction='row' gap='small'>
+              <Text size='xxsmall' color='text-weak'><ArrowLeft /></Text>
+              <Text size='xxsmall' color='text-weak'>back</Text>
+            </Box>
+          </NavLink>
+
+          {ethPosted_ > 0 &&
+            <NavLink 
+              to='/withdraw/'
+              style={{ textDecoration: 'none' }}
+            >
+              <Box direction='row' gap='small' >
+                <Text size='xxsmall' color='text-weak'> <Text weight='bold' size='xsmall'>Withdraw </Text> collateral</Text>
+                <Text color='text-weak'><ArrowRight /></Text>
+              </Box>
+            </NavLink>}
+        </YieldMobileNav>}
+
     </RaisedBox>
   );
 };
 
-Deposit.defaultProps = { depositAmount: null, modalView: false };
+Deposit.defaultProps = { modalView: false };
 
 export default Deposit;

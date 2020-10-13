@@ -11,6 +11,12 @@ body {
     padding: 0;
 }
 
+Box.sticky {
+  position: -webkit-sticky; /* Safari */
+  position: sticky;
+  top: 0;
+}
+
 .Transition-enter {
   opacity: 0.01;
 }

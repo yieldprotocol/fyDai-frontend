@@ -69,7 +69,7 @@ const StyledBox = styled(Box)`
 const ConnectLayer = ({ view, target, closeLayer }: any) => {
 
   const { state: { position, txHistory } } = useContext(UserContext);
-  const screenSize = useContext(ResponsiveContext);
+  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   
   const { handleSelectConnector } = useConnection();
 
@@ -105,7 +105,7 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
           target={target || undefined}
         >
           <Box
-            width={screenSize!=='small'?{ min:'620px', max:'620px' }: undefined}
+            width={!mobile?{ min:'620px', max:'620px' }: undefined}
             background="background-front"
             direction="column"
             fill="vertical"

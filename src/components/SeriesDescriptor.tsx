@@ -19,7 +19,7 @@ interface ISeriesDescriptorProps {
 function SeriesDescriptor( props: ISeriesDescriptorProps ) {
 
   const { activeView, children } = props;
-  const screenSize = useContext(ResponsiveContext);
+  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   const { state: seriesState } = useContext(SeriesContext);
   const { activeSeries } = seriesState; 
   const [ selectorOpen, setSelectorOpen ] = useState<boolean>(false);
@@ -54,14 +54,15 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
           margin={{ bottom:'-16px' }}
         >
           <Box
-            pad='small'  
+            pad='small'   
           >
             <Box
               direction='row-responsive'
               fill='horizontal'
               gap='small'
               align='center'
-              pad={{vertical:'small'}}
+              pad={{ vertical:'small' }}
+              style={{ position:'sticky', top:0 }}
             >
               <Box 
                 round='xsmall'
@@ -80,13 +81,13 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
                 >         
                   <AprBadge activeView={activeView} series={activeSeries} animate />
                   <Text size='large' weight='bold' color={activeSeries?.seriesTextColor}>            
-                    { activeSeries?.displayName }
+                    { mobile? activeSeries?.displayNameMobile : activeSeries?.displayName }
                   </Text>
                 </Box>}
 
                 <RaisedButton
                   background={modColor( activeSeries?.seriesColor, 50)}
-                  label={(screenSize !== 'small' ) ?        
+                  label={(!mobile ) ?        
                     <Box align='center' direction='row' gap='small' pad='xsmall'>
                       <Text size='xsmall' color={activeSeries?.seriesTextColor}> <ChangeSeries /> </Text>
                       <Text size='xsmall' color={activeSeries?.seriesTextColor}>
@@ -94,8 +95,8 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
                       </Text>
                     </Box>
                     : 
-                    <Box align='center'>
-                      <ChangeSeries />
+                    <Box align='center' direction='row' gap='small' pad='xsmall'>
+                      <ChangeSeries /> Change 
                     </Box>}
                   onClick={()=>setSelectorOpen(true)}
                 />
@@ -108,8 +109,8 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
               <Collapsible open={seriesState && !seriesState.seriesLoading}>
                 { children }
               </Collapsible>
-            </Box> 
-          </Box> 
+            </Box>
+          </Box>
   
           { !seriesState.seriesLoading && !delegated && !activeSeries.isMature() &&
             <Collapsible open={!delegated}>

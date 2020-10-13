@@ -19,14 +19,16 @@ import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
 
 import DaiMark from '../components/logos/DaiMark';
+import { NavLink } from 'react-router-dom';
+import YieldMobileNav from '../components/YieldMobileNav';
 
-interface IWithDrawDaiProps {
+interface ICloseDaiProps {
   close?: any;
 }
 
-const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
+const CloseDai = ({ close }:ICloseDaiProps) => {
 
-  const screenSize = useContext(ResponsiveContext);
+  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { activeSeries  } = seriesState;
 
@@ -47,7 +49,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
   const [ maxWithdraw, setMaxWithdraw ] = useState<string>();
   
   const [ withdrawDisabled, setWithdrawDisabled ] = useState<boolean>(true);
-  const [ withdrawDaiPending, setWithdrawDaiPending] = useState<boolean>(false);
+  const [ CloseDaiPending, setCloseDaiPending] = useState<boolean>(false);
 
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
@@ -55,7 +57,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
 
   const withdrawProcedure = async () => {
     if ( !withdrawDisabled ) {
-      setWithdrawDaiPending(true);
+      setCloseDaiPending(true);
       await buyDai(
         activeSeries,
         inputValue,
@@ -64,7 +66,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
       userActions.updateHistory();
       userActions.updatePosition();
       seriesActions.updateActiveSeries();
-      setWithdrawDaiPending(false);
+      setCloseDaiPending(false);
       close();
     }
   };
@@ -101,16 +103,15 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
   }, [ debouncedInput ]);
 
   return (
-    <Layer onClickOutside={()=>close()}>
-      <Keyboard 
-        onEsc={() => { inputValue? setInputValue(undefined): close();}}
-        onEnter={()=> withdrawProcedure()}
-        onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
-        target='document'
-      >
-        { !txActive && !withdrawDaiPending && 
+    <Keyboard 
+      onEsc={() => { inputValue? setInputValue(undefined): close();}}
+      onEnter={()=> withdrawProcedure()}
+      onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
+      target='document'
+    >
+      { !txActive && !CloseDaiPending && 
         <Box 
-          width={screenSize!=='small'?{ min:'620px', max:'620px' }: undefined}
+          width={!mobile?{ min:'620px', max:'620px' }: undefined}
           alignSelf='center'
           fill
           background='background-front'
@@ -121,7 +122,7 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
           <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to close</Text>
           <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={withdrawDisabled}>
             <TextInput
-              ref={(el:any) => {el && el.focus(); setInputRef(el);}} 
+              ref={(el:any) => {el && !mobile && el.focus(); setInputRef(el);}} 
               type="number"
               placeholder='DAI'
               value={inputValue || ''}
@@ -140,8 +141,10 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
             label={`Reclaim ${inputValue || ''} Dai`}
             disabled={withdrawDisabled}
             hasDelegatedPool={activeSeries.hasDelegatedPool}
+            clearInput={()=>setInputValue(undefined)}
           />
           
+          {!mobile &&
           <Box alignSelf='start' margin={{ top:'medium' }}>
             <FlatButton 
               onClick={()=>close()}
@@ -152,44 +155,57 @@ const WithdrawDai = ({ close }:IWithDrawDaiProps) => {
                 </Box>
                 }
             />
-          </Box>
+          </Box>}
         </Box>}
 
-        { withdrawDaiPending && !txActive && <ApprovalPending /> }
+      { CloseDaiPending && !txActive && <ApprovalPending /> }
 
-        { txActive && 
-          <Box 
-            width={{ max:'600px' }}
-            alignSelf='center'
-            fill
-            background='background-front'
-            round='small'
-            pad='large'
-            gap='medium'
-            justify='between'
-          > 
-            <TxStatus msg={`You are closing ${inputValue} DAI`} tx={txActive} />
+      { txActive && 
+      <Box 
+        width={{ max:'600px' }}
+        alignSelf='center'
+        fill
+        background='background-front'
+        round='small'
+        pad='large'
+        gap='medium'
+        justify='between'
+      > 
+        <TxStatus msg={`You are closing ${inputValue} DAI`} tx={txActive} />
                 
-            <Box alignSelf='start'>
-              <Box
-                round
-                onClick={()=>close()}
-                hoverIndicator='brand-transparent'
-                pad={{ horizontal:'small', vertical:'small' }}
-                justify='center'
-              >
-                <Box direction='row' gap='small' align='center'>
-                  <ArrowLeft color='text-weak' />
-                  <Text size='xsmall' color='text-weak'> { !withdrawDaiPending? 'cancel, and go back.': 'go back'}  </Text>
-                </Box>
-              </Box>
+        <Box alignSelf='start'>
+          <Box
+            round
+            onClick={()=>close()}
+            hoverIndicator='brand-transparent'
+            pad={{ horizontal:'small', vertical:'small' }}
+            justify='center'
+          >
+            <Box direction='row' gap='small' align='center'>
+              <ArrowLeft color='text-weak' />
+              <Text size='xsmall' color='text-weak'> { !CloseDaiPending? 'cancel, and go back.': 'go back'}  </Text>
             </Box>
-          </Box>}
-      </Keyboard>
-    </Layer>
+          </Box>
+        </Box>
+      </Box>}
+
+      {mobile && 
+        <YieldMobileNav noMenu={true}>
+          <NavLink 
+            to={`/lend/${activeSeries?.maturity}`}
+            style={{ textDecoration: 'none' }}
+          >
+            <Box direction='row' gap='small'>
+              <Text size='xxsmall' color='text-weak'><ArrowLeft /></Text>
+              <Text size='xxsmall' color='text-weak'>back to lend</Text>
+            </Box>
+          </NavLink>
+        </YieldMobileNav>}
+        
+    </Keyboard>
   );
 };
 
-WithdrawDai.defaultProps={ close:null };
+CloseDai.defaultProps={ close:null };
 
-export default WithdrawDai;
+export default CloseDai;

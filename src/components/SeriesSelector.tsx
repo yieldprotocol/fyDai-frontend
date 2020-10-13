@@ -20,7 +20,7 @@ interface ISeriesSelectorProps {
 
 const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
 
-  const screenSize = useContext(ResponsiveContext);
+  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   const { pathname } = useLocation();
   const navHistory = useHistory();
 
@@ -65,7 +65,8 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
       onClickOutside={()=>close()}
       onEsc={()=>close()}
       responsive={true}
-      animation='slide'  
+      animation='slide' 
+      style={{ zIndex:1000 }}
     >
       <Box
         round='small'
@@ -73,7 +74,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
         background='background-front'
         pad={{ horizontal: 'medium', vertical:'large' }}
         gap='medium'
-        width={screenSize!=='small'?{ min:'620px', max:'620px' }: undefined}
+        width={!mobile?{ min:'620px', max:'620px' }: undefined}
       >
         <Box gap='medium'>
           <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Choose a series</Text>
@@ -89,20 +90,20 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
             justify='between'
             gap='small'
           >
-            <Box basis={screenSize==='small'?'30%':'30%'}>
+            <Box basis={mobile?'30%':'30%'}>
               <Text size='small' color='text-weak'>APR</Text>
             </Box>
             <Box fill='horizontal' direction='row' justify='between' gap='small'>
-              <Box fill align={screenSize==='small'?'end':undefined}>
+              <Box fill align={mobile?'end':undefined}>
                 <Text size='small' color='text-weak'>SERIES MATURITY</Text>
               </Box>
-              <Box fill align={screenSize==='small'?'end':undefined}>
+              <Box fill align={mobile?'end':undefined}>
                 <Text size='small' color='text-weak'>
                   { viewMap.get(activeView.toUpperCase())?.head }         
                 </Text>
               </Box>
             </Box>
-            { screenSize !== 'small' && 
+            { !mobile && 
               <Box direction='row' justify='end' basis='25%'>
                 <Text size='small' color='text-weak'> </Text>
               </Box>}
@@ -126,29 +127,28 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
                   pad='medium'
                   gap='small'
                 >
-                  <Box basis={screenSize==='small'?'30%':'30%'} align='center'>
+                  <Box basis={mobile?'30%':'30%'} align='center'>
                     <Box direction='row'>
                       <AprBadge activeView={activeView} series={x} />
                     </Box>
                   </Box>
 
                   <Box fill='horizontal' direction='row' justify='between' gap='small'>
-                    <Box fill align={screenSize==='small'?'start':'start'}>
-                      <Text size={screenSize} color='brand'>
-                        {x.displayName}
+                    <Box fill align={mobile?'start':'start'}>
+                      <Text size='xsmall' color='brand'>
+                        { mobile? x.displayNameMobile : x.displayName }
                       </Text>
                     </Box>
-                    <Box fill align={screenSize==='small'?'end':undefined}>
-                      <Text size={screenSize} color='brand'>
+                    <Box fill align={mobile?'end':undefined}>
+                      <Text size='xsmall' color='brand'>
                         {x[field]}
                       </Text>
                     </Box>                 
                   </Box>
 
-                  { screenSize !== 'small' && 
+                  { !mobile && 
                   <Box basis='25%' direction='row' justify='end'>
-                    { activeSeries && activeSeries.maturity === x.maturity ? 
-                      
+                    { activeSeries && activeSeries.maturity === x.maturity ?                     
                       <Button 
                         primary
                         color={activeSeries.seriesColor}

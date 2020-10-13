@@ -38,7 +38,7 @@ const AccountButton = (props: any) => {
 
   const { state: { position } } = useContext(UserContext);
   const { state: { pendingTxs, lastCompletedTx } } = useContext(NotifyContext);
-  const screenSize = useContext(ResponsiveContext);
+  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
   // flags
   const [txStatusOpen, setTxStatusOpen] = useState(false);
@@ -94,7 +94,7 @@ const AccountButton = (props: any) => {
           align='center'
           gap='medium'
           // width={{ min:'600px', max:'600px' }} 
-          width={screenSize!=='small'?{ min:'620px', max:'620px' }: undefined}  
+          width={!mobile?{ min:'620px', max:'620px' }: undefined}  
         >
           <TxStatus msg='tx pending' tx={pendingTxs[pendingTxs.length-1]} />
           <Box alignSelf='start' pad='medium'> 
