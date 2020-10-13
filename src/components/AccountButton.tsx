@@ -29,9 +29,8 @@ import { abbreviateHash } from '../utils';
 const AccountButton = (props: any) => {
   
   const { openConnectLayer } = props;
-
   const { account } = useWeb3React();
-
+  
   const pendingRef:any = useRef(null);
   const completeRef:any = useRef(null);
   const [ over, setOver] = useState<boolean>(false);
@@ -80,8 +79,7 @@ const AccountButton = (props: any) => {
       align='center'
       background={account?'#f0f0f0':undefined}
     > 
-
-      { txStatusOpen && 
+      {txStatusOpen && 
       <Layer 
         onClickOutside={()=>setTxStatusOpen(false)}
         onEsc={()=>setTxStatusOpen(false)}
@@ -111,11 +109,11 @@ const AccountButton = (props: any) => {
         </Box>
       </Layer>}
 
-      { pendingTxs.length===0 && !txCompleteOpen && account &&
+      { !mobile && pendingTxs.length===0 && !txCompleteOpen && account &&
       <Box pad={{ left:'small', right:'large' }} direction='row' gap='small' align='center'>
         <DaiMark />
         <Loading condition={!position.daiBalance} size='xsmall'>
-          <Text size='xsmall' weight='bold' >{position?.daiBalance_} DAI </Text>
+          <Text size='xsmall' weight='bold'>{position?.daiBalance_} DAI </Text>
         </Loading>
       </Box>}
         
@@ -133,7 +131,7 @@ const AccountButton = (props: any) => {
         { pendingRef.current && over && <DropBox />}
       </Box>}
 
-      { txCompleteOpen &&
+      {txCompleteOpen &&
       <>    
         <Box
           ref={completeRef}
@@ -157,8 +155,8 @@ const AccountButton = (props: any) => {
       </>}
 
       { account ?
-        <FlatButton
-          selected
+        <>{!mobile && <FlatButton
+          selected 
           background='#f0f0f0'
           onClick={()=>openConnectLayer('ACCOUNT')}
           label={
@@ -169,7 +167,8 @@ const AccountButton = (props: any) => {
               <Gear />
             </Box>
             }
-        /> 
+        />}
+        </> 
         : 
         <FlatButton 
           onClick={() => {
@@ -177,9 +176,9 @@ const AccountButton = (props: any) => {
           }}
           label={<Text size='small'>Connect a wallet</Text>}
         />}
+
     </Box>
   );
-    
 };
 
 export default AccountButton;

@@ -55,6 +55,7 @@ const YieldHeader = (props: any) => {
           <Box onClick={()=>history.push('/borrow/')}><ArrowLeft /></Box>
           <Text weight='bold' size='medium'>Repay Dai</Text>
         </Box>}
+        
         { mobile && 
         location.pathname.split('/')[1]==='close' &&
         <Box direction='row' gap='medium' align='center'>
@@ -70,10 +71,10 @@ const YieldHeader = (props: any) => {
         </Box>}
 
         <Box direction='row' gap='small'>
-          {!mobile &&
+
           <Box direction="row" align="center" gap="small">
             <AccountButton {...props} />
-          </Box>}
+          </Box>
 
           <FlatButton 
             disabled

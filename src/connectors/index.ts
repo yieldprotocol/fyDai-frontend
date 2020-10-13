@@ -16,12 +16,13 @@ const RPC_URLS: { [chainId: number]: string } = {
 export const injected = new InjectedConnector({ supportedChainIds: [5, 42, 31337] });
 
 export const walletconnect = new WalletConnectConnector({
-  rpc: { 1: RPC_URLS[1]  },
+  rpc: { 42: RPC_URLS[42]  },
   bridge: 'https://bridge.walletconnect.org',
   qrcode: true,
   pollingInterval: POLLING_INTERVAL
 });
-export const torus = new TorusConnector({ chainId: 1 });
+
+export const torus = new TorusConnector({ chainId: 42 });
 
 // export const walletlink = new WalletLinkConnector({
 //   url: RPC_URLS[1],
