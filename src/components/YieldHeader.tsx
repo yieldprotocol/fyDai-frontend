@@ -39,10 +39,6 @@ const YieldHeader = (props: any) => {
         { mobile && 
         ['borrow', 'lend', 'pool'].includes(location.pathname.split('/')[1]) && 
         <Box direction='row' gap='medium' align='center'>
-          {/* <Box width={mobile? '30%':undefined}>
-            <Image src={theme.dark ? logoLight : logoDark} fit="contain" />
-          </Box>    */}
-          {/* <Text weight='bold' size='medium' style={{ textTransform:'capitalize' }}> {location.pathname.split('/')[1]} </Text> */}
           <YieldNav />
         </Box>}
 
@@ -62,24 +58,25 @@ const YieldHeader = (props: any) => {
         { mobile && 
         location.pathname.split('/')[1]==='close' &&
         <Box direction='row' gap='medium' align='center'>
-          <Box onClick={()=>history.push('/borrow/')}><ArrowLeft /></Box>
+          <Box onClick={()=>history.push('/lend/')}><ArrowLeft /></Box>
           <Text weight='bold' size='medium'>Close Position</Text>
         </Box>}
 
         { mobile && 
-        location.pathname.split('/')[1]==='remove' &&
+        location.pathname.split('/')[1]==='removeLiquidity' &&
         <Box direction='row' gap='medium' align='center'>
-          <Box onClick={()=>history.push('/borrow/')}><ArrowLeft /></Box>
-          <Text weight='bold' size='medium'> Remove Liquidity</Text>
+          <Box onClick={()=>history.push('/pool/')}><ArrowLeft /></Box>
+          <Text weight='bold' size='medium'>Remove Liquidity</Text>
         </Box>}
-
 
         <Box direction='row' gap='small'>
           {!mobile &&
           <Box direction="row" align="center" gap="small">
             <AccountButton {...props} />
           </Box>}
+
           <FlatButton 
+            disabled
             onClick={()=>console.log('xys')}
             label={<Box pad={{ horizontal:'small' }}><Telescope /></Box>}
           /> 

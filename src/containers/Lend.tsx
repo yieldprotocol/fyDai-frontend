@@ -363,19 +363,19 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
       </Keyboard>
 
       {mobile &&
-       !activeSeries?.isMature() && 
-       activeSeries?.fyDaiBalance_ > 0 &&
-       <YieldMobileNav>
-         <NavLink 
-           to={`/close/${activeSeries?.maturity}`}
-           style={{ textDecoration: 'none' }}
-         >
-           <Box direction='row' gap='small' align='center'>
-             <Text size='xxsmall' color='text-weak'><Text weight='bold' size='xsmall' color={activeSeries?.seriesColor}>close </Text> your position</Text>
-             <ArrowRight color={activeSeries?.seriesColor} />
-           </Box>
-         </NavLink>
-       </YieldMobileNav>}
+      <YieldMobileNav>
+        {!activeSeries?.isMature() && 
+          activeSeries?.fyDaiBalance_ > 0 &&
+          <NavLink 
+            to={`/close/${activeSeries?.maturity}`}
+            style={{ textDecoration: 'none' }}
+          >
+            <Box direction='row' gap='small' align='center'>
+              <Text size='xxsmall' color='text-weak'><Text weight='bold' size='xsmall' color={activeSeries?.seriesColor}>close </Text> your position</Text>
+              <ArrowRight color={activeSeries?.seriesColor} />
+            </Box>
+          </NavLink>}
+      </YieldMobileNav>}
         
     </RaisedBox>
   );

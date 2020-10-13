@@ -524,9 +524,6 @@ export const yieldTheme = {
     overlay: {
       background: '#000000A6', // 60%
     },
-    animation: {
-      
-    }, 
   },
 
   table: {

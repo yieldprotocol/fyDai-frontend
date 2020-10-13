@@ -318,10 +318,10 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
         { txActive && <TxStatus msg={`You are adding ${inputValue} DAI liquidity to the pool.`} tx={txActive} /> }
       </Keyboard>
 
-      {mobile && 
-       !activeSeries?.isMature() &&
+      { mobile && 
+      <YieldMobileNav>
+        { !activeSeries?.isMature() &&
        activeSeries?.poolTokens_>0 &&
-       <YieldMobileNav>
          <NavLink 
            to={`/removeLiquidity/${activeSeries?.maturity}`}
            style={{ textDecoration: 'none' }}
@@ -330,8 +330,8 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
              <Text weight='bold' size='xsmall' color={activeSeries?.seriesColor}>Remove Liquidity</Text>
              <ArrowRight color={activeSeries?.seriesColor} />
            </Box>
-         </NavLink>
-       </YieldMobileNav>}
+         </NavLink>}
+      </YieldMobileNav>}
 
     </RaisedBox>
   );

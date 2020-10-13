@@ -65,7 +65,8 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
       onClickOutside={()=>close()}
       onEsc={()=>close()}
       responsive={true}
-      animation='slide'  
+      animation='slide' 
+      style={{ zIndex:1000 }}
     >
       <Box
         round='small'

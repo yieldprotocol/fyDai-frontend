@@ -95,27 +95,28 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
 
       { hasDelegatedProxy && account && series?.hasDelegatedPool === false && !authWrap &&
         <Box
-          direction='row' 
+          direction='row-responsive' 
           gap='small'
           pad='medium'
           justify='around'
           background='#555555'
           align='center'
-        >
-          {!buttonOnly && <Text color='#DDDDDD'> <Warning /> </Text>}
-          {!buttonOnly && <Text size='xsmall' color='#DDDDDD'>A once-off authorization is required to use this series</Text>}
+        >  
+          <Box direction='row' gap='small'>
+            {!buttonOnly && <Text color='#DDDDDD'> <Warning /> </Text>}
+            {!buttonOnly && <Text size='xsmall' color='#DDDDDD'>A once-off authorization is required to use this series </Text>}
+          </Box>
           <Box>
             <RaisedButton 
               background='#555555'
               label={
                 <Box pad={{ horizontal:'small', vertical:'xsmall' }} align='center'>
-                  <Text size='xsmall' color='#DDDDDD'><Unlock /> {mobile? '' : 'Unlock Series'}</Text>
+                  <Text size='xsmall' color='#DDDDDD'><Unlock /> Unlock Series </Text>
                 </Box>
               }
               onClick={()=>{authProcedure();}}
             />   
-          </Box>
-             
+          </Box>           
         </Box>}
 
       { authActive && layerOpen &&
