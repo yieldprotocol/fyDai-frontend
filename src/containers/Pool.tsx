@@ -264,6 +264,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                   label={`Supply ${inputValue || ''} DAI`}
                   disabled={addLiquidityDisabled}
                   hasDelegatedPool={activeSeries.hasDelegatedPool}
+                  clearInput={()=>setInputValue(undefined)}
                 />
               </Box>
             </>}

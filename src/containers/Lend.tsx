@@ -307,6 +307,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
                   label={`Lend ${inputValue || ''} DAI`}
                   disabled={lendDisabled}
                   hasDelegatedPool={activeSeries.hasDelegatedPool}
+                  clearInput={()=>setInputValue(undefined)}
                 />       
               </Box>
             </>}

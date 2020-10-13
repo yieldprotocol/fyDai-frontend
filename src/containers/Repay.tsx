@@ -203,6 +203,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
                     label={`Repay ${inputValue || ''} DAI`}
                     disabled={repayDisabled}
                     hasDelegatedPool={true}
+                    clearInput={()=>setInputValue(undefined)}
                   />
 
                   {!activeSeries?.isMature() &&

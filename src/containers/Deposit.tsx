@@ -317,6 +317,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
               label={`Deposit ${inputValue || ''} Eth`}
               disabled={depositDisabled}
               hasDelegatedPool={true}
+              clearInput={()=>setInputValue(undefined)}
             /> }
 
           <Box 

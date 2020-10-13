@@ -461,6 +461,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
                 label={`Borrow ${inputValue || ''} DAI`}
                 disabled={borrowDisabled}
                 hasDelegatedPool={activeSeries.hasDelegatedPool}
+                clearInput={()=>setInputValue(undefined)}
               />}
             </Box>}
 

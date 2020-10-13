@@ -140,7 +140,7 @@ function ActionButton({ ...props }:any ) {
         >
           
           <Box
-            onClick={()=>console.log('clearing input')}
+            onClick={()=>props.clearInput()}
           > 
             <Text size='xxsmall'>Cancel</Text>
           </Box>

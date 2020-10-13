@@ -193,6 +193,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
           label={`Remove ${inputValue || ''} tokens`}
           disabled={removeLiquidityDisabled}
           hasDelegatedPool={activeSeries?.hasDelegatedPool}
+          clearInput={()=>setInputValue(undefined)}
         />
 
         {!activeSeries?.isMature() && !mobile && 

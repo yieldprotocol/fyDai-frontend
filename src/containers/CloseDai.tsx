@@ -139,6 +139,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
             label={`Reclaim ${inputValue || ''} Dai`}
             disabled={withdrawDisabled}
             hasDelegatedPool={activeSeries.hasDelegatedPool}
+            clearInput={()=>setInputValue(undefined)}
           />
           
           <Box alignSelf='start' margin={{ top:'medium' }}>

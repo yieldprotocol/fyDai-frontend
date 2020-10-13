@@ -185,6 +185,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
           label={`Withdraw ${inputValue || ''} Eth`}
           disabled={withdrawDisabled}
           hasDelegatedPool={true}
+          clearInput={()=>setInputValue(undefined)}
         />  
           
         <Box alignSelf='start' margin={{ top:'medium' }}>
