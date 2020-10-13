@@ -27,7 +27,7 @@ const YieldHeader = (props: any) => {
     <>
       <Box
         direction='row'
-        pad={mobile? { horizontal:'medium', top:'medium' }: { horizontal:'small', top:'large' }}
+        pad={mobile?{ horizontal:'small', vertical:'large' }:{ horizontal:'small', vertical:'large' }}
         justify='between'
         fill
       >

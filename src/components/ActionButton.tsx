@@ -132,13 +132,14 @@ function ActionButton({ ...props }:any ) {
                 pad="medium"
                 justify='between'
                 align='center'
+                fill
               >    
-                <Box
+                <Box 
                   onClick={(e:any)=>{e.stopPropagation(); props.clearInput();}}
                 >
                   <Text size='xxsmall'>Cancel</Text>
                 </Box>
-                <Box direction='row' align='center' gap='small'>  
+                <Box width={{ max:'75%' }} direction='row' align='center' gap='small'>  
                   <Text size='xsmall'> Please authorize Yield before going any further</Text>
                 </Box>     
               </Box>

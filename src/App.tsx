@@ -90,7 +90,7 @@ const App = (props:any) => {
         justify='center'
         onClick={()=>setShowSidebar(!showSidebar)}
       >
-        <Box background={{ color: 'background-front' }}/>
+        <Box background={{ color: 'background-front' }} />
         <YieldHeader
           openConnectLayer={(v:string) => setShowConnectLayer(v)}
         />
@@ -105,58 +105,54 @@ const App = (props:any) => {
       <NotifyLayer target={leftSideRef.current} columnsWidth={columns} />
 
       { !mobile &&
-      <Box margin={{ top:'large' }} align='center'>
+      <Box margin='large' align='center'>
         <YieldNav />
       </Box>}
 
       <Main 
         pad={{ bottom:'large' }}
+        align='center'
       >      
-        <Box
-          pad={{ vertical: 'large' }}
-          align='center'
-        > 
-          <Switch>
-            <Route path="/post/:amnt?">
-              <Deposit openConnectLayer={() => setShowConnectLayer('CONNECT')} />
-            </Route>
-            <Route path="/withdraw/:amnt?">
-              <WithdrawEth />
-            </Route>
+        <Switch>
+          <Route path="/post/:amnt?">
+            <Deposit openConnectLayer={() => setShowConnectLayer('CONNECT')} />
+          </Route>
+          <Route path="/withdraw/:amnt?">
+            <WithdrawEth />
+          </Route>
 
-            <Route path="/borrow/:series?/:amnt?">
-              <Borrow openConnectLayer={() => setShowConnectLayer('CONNECT')} />
-            </Route>
+          <Route path="/borrow/:series?/:amnt?">
+            <Borrow openConnectLayer={() => setShowConnectLayer('CONNECT')} />
+          </Route>
   
-            <Route path="/repay/:series/:amnt?">
-              <Repay />
-            </Route>
+          <Route path="/repay/:series/:amnt?">
+            <Repay />
+          </Route>
 
-            <Route path="/lend/:series?/:amnt?">
-              <Lend openConnectLayer={() => setShowConnectLayer('CONNECT')} />
-            </Route>
+          <Route path="/lend/:series?/:amnt?">
+            <Lend openConnectLayer={() => setShowConnectLayer('CONNECT')} />
+          </Route>
 
-            <Route path="/close/:series/:amnt?">
-              <CloseDai />
-            </Route>
+          <Route path="/close/:series/:amnt?">
+            <CloseDai />
+          </Route>
 
-            <Route path="/pool/:series?/:amnt?">
-              <Pool openConnectLayer={() => setShowConnectLayer('CONNECT')} />
-            </Route>
+          <Route path="/pool/:series?/:amnt?">
+            <Pool openConnectLayer={() => setShowConnectLayer('CONNECT')} />
+          </Route>
 
-            <Route path="/removeLiquidity/:series/:amnt?">
-              <RemoveLiquidity />
-            </Route>
+          <Route path="/removeLiquidity/:series/:amnt?">
+            <RemoveLiquidity />
+          </Route>
             
-            <Route exact path="/">
-              <Redirect to={`${cachedLastVisit || '/borrow/'}`} />
-            </Route>
+          <Route exact path="/">
+            <Redirect to={`${cachedLastVisit || '/borrow/'}`} />
+          </Route>
             
-            <Route path="/*">
-              404
-            </Route>
-          </Switch>
-        </Box>               
+          <Route path="/*">
+            404
+          </Route>
+        </Switch>              
       </Main>
 
       <Grid 

@@ -244,6 +244,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
                 label: null,
                 labelExtra: null,
                 visible:
+                  !mobile &&
                   !!account &&
                   parseFloat(ethPosted_) === 0,
                 active: true,
@@ -253,12 +254,9 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
                 valueExtra: ()=>(
                   <Box width={{ min:'300px' }} direction='row' align='center' gap='small'> 
                     <Box align='center'> 
-                      {mobile ? 
+                      {!mobile &&
                       // eslint-disable-next-line jsx-a11y/accessible-emoji
-                        <Text size='xxlarge'>👆</Text>
-                        :
-                      // eslint-disable-next-line jsx-a11y/accessible-emoji
-                        <Text size='xxlarge'>👈</Text>}
+                      <Text size='xxlarge'>👈</Text>}
                     </Box>
                     <Box gap='xsmall'>
                       <Box> 
