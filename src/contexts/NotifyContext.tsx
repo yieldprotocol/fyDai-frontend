@@ -3,18 +3,22 @@ import { INotification, IReducerAction } from '../types';
 
 const NotifyContext = React.createContext<any>({});
 const initState = {
-  open: false,
-  position: 'right',
+  notifyOpen: false,
   message: '',
   type: 'info',
   timerMs: 8000,
   callbackAction: null,
   callbackCancel: null,
+  
   fatalOpen: false,
   fatalMsg: '',
+
   pendingTxs: [],
   lastCompletedTx: null,
   requestedSigs: [],
+
+  updateAvailable: false,
+  updateAccept: ()=>console.log('No update available'),
 };
 
 function notifyReducer(state:INotification, action:IReducerAction) {
@@ -22,11 +26,10 @@ function notifyReducer(state:INotification, action:IReducerAction) {
     case 'notify':
       return { 
         ...state,
-        open: true,
+        notifyOpen: true,
         message: action.payload.message,
         type: action.payload.type || initState.type,
         timerMs: action.payload.showFor || initState.timerMs,
-        position: action.payload.position || initState.position,
         callbackAction: action.payload.callbackAction || null,
         callbackCancel: action.payload.callbackCancel || null,
       };
@@ -61,6 +64,15 @@ function notifyReducer(state:INotification, action:IReducerAction) {
           }  return x;  
         })
       };
+
+    case 'updateAvailable':
+      return {
+        ...state,
+        updateAvailable: action.payload.updateAvailable,
+        updateAccept: action.payload.updateAccept || ( ()=>console.log('No update available') ),
+      };
+
+    /* internal - maybe find a better way to do these two */ 
     case '_closeNotify':
       return { ...state, open: false, timerMs: initState.timerMs };
     case '_openNotify':
@@ -70,9 +82,8 @@ function notifyReducer(state:INotification, action:IReducerAction) {
   }
 }
 
-const NotifyProvider = ({ updateAvailable, children }:any) => {
-  const [state, dispatch] = React.useReducer(notifyReducer, initState);
-
+const NotifyProvider = ({ children }:any) => {
+  const [state, dispatch] = React.useReducer(notifyReducer, initState); 
   useEffect( () => {
     state.open && ( () => {
       if (state.timerMs === 0) {
@@ -88,7 +99,7 @@ const NotifyProvider = ({ updateAvailable, children }:any) => {
   return (
     <NotifyContext.Provider value={{ state, dispatch }}>
       {children}
-    </NotifyContext.Provider>
+    </NotifyContext.Provider> 
   );
 };
 

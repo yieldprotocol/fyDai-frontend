@@ -1,9 +1,11 @@
-import React, { useRef, useEffect, useState, useContext, Suspense } from 'react';
-import { Switch, Route, Redirect, useLocation, NavLink } from 'react-router-dom';
 
-import { Text, Grommet, base, Grid, Main, Box, ThemeContext, ResponsiveContext, Nav, Sidebar, Collapsible, Layer } from 'grommet';
+import React, { useRef, useEffect, useState, useContext, Suspense } from 'react';
+import { Switch, Route, Redirect, useLocation } from 'react-router-dom';
+
+import { Grommet, base, Grid, Main, Box, ResponsiveContext, Collapsible } from 'grommet';
 import { deepMerge } from 'grommet/utils';
 
+import * as serviceWorker from './serviceWorker';
 
 import { yieldTheme } from './themes';
 
@@ -11,6 +13,7 @@ import { modColor } from './utils';
 
 import { SeriesContext } from './contexts/SeriesContext';
 import { YieldContext } from './contexts/YieldContext';
+import { NotifyContext } from './contexts/NotifyContext';
 
 import Borrow from './containers/Borrow';
 import Lend from './containers/Lend';
@@ -35,12 +38,11 @@ import WithdrawEth from './containers/WithdrawEth';
 import Repay from './containers/Repay';
 import RemoveLiquidity from './containers/RemoveLiquidity';
 
-
 const App = (props:any) => {
   
   const { state: { seriesLoading, activeSeries } } = useContext(SeriesContext);
   const { state: { yieldLoading } } = useContext(YieldContext);
-
+  const { dispatch } = useContext(NotifyContext);
   const [cachedLastVisit, setCachedLastVisit] = useCachedState('lastVisit', null);
 
   const location = useLocation();
@@ -52,10 +54,7 @@ const App = (props:any) => {
     setCachedLastVisit(`/${location.pathname.split('/')[1]}/${activeSeries?.maturity}` );
   }, [location]);
 
-  
   const leftSideRef = useRef<any>(null);
-  
-
   const [showConnectLayer, setShowConnectLayer] = useState<string|null>(null);
   // TODO remove for prod
   const [showTestLayer, setShowTestLayer] = useState<boolean>(false);
@@ -63,14 +62,36 @@ const App = (props:any) => {
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
-  const theme = useContext<any>(ThemeContext);
-
   const [columns, setColumns] = useState<string[]>(['7%', 'auto', '7%']);
   useEffect(()=> {
     mobile?
       setColumns(['0%', 'auto', '0%'])
       : setColumns(['7%', 'auto', '7%']);
   }, [mobile]);
+
+
+  /* handle app updates */
+  useEffect(()=>{
+    serviceWorker.register({ 
+      onUpdate: (registration:any)=> {
+        // eslint-disable-next-line no-console
+        console.log( 'A new version of the app is available' );
+
+        dispatch({ 
+          type: 'updateAvailable',
+          payload: { 
+            updateAvailable:true,
+            updateAccept: ()=> { 
+              registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+              localStorage.clear();
+              window.location.reload();
+            },    
+          },
+        });
+      } 
+    });
+
+  }, []);
 
   return (
     <div 
