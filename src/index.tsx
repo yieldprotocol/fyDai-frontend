@@ -33,7 +33,7 @@ ReactDOM.render(
     <Router>
       <Web3ReactProvider getLibrary={getLibrary}> 
         <Web3ReactProviderFallback getLibrary={getFallbackLibrary}> 
-          <NotifyProvider updateAvialable={updateAvailable}>
+          <NotifyProvider updateAvailable={updateAvailable}>
             <YieldProvider>
               <UserProvider>
                 <SeriesProvider>

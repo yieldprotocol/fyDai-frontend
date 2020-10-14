@@ -72,7 +72,6 @@ function notifyReducer(state:INotification, action:IReducerAction) {
 
 const NotifyProvider = ({ updateAvailable, children }:any) => {
   const [state, dispatch] = React.useReducer(notifyReducer, initState);
-  console.log(updateAvailable);
 
   useEffect( () => {
     state.open && ( () => {
@@ -85,8 +84,6 @@ const NotifyProvider = ({ updateAvailable, children }:any) => {
       }
     })();
   }, [state.open]);
-
-  useEffect(()=> console.log('in NOTIFY - there is and update'));
 
   return (
     <NotifyContext.Provider value={{ state, dispatch }}>
