@@ -211,6 +211,28 @@ export const useController = () => {
   };
 
   /**
+   * @dev Delegate a 3rd party to act on behalf of the user in the controller
+   * @param {string} delegatedAddress address of the contract/entity getting delegated. 
+   */
+  const addControllerDelegate = async (
+    delegatedAddress:string,
+  ) => {
+    let tx:any;
+    /* Processing and sanitizing input */
+    const delegatedAddr = ethers.utils.getAddress(delegatedAddress);
+    /* Contract interaction */
+    try {
+      tx = await controllerContract.addDelegate(delegatedAddr);
+    } catch (e) {
+      handleTxBuildError(e);
+      return;
+    }
+    /* Transaction reporting & tracking */
+    dispatch({ type: 'txPending', payload:{ tx, message: 'Pending once-off controller delegation ...', type: 'AUTH' } } );
+    await handleTx(tx);
+  };
+
+  /**
    * @dev Checks to see if an account (user) has delegated a contract/3rd Party for the controller.
    * @param {string} delegateAddress address of the delegate to be checked (yieldProxy contract getting approved). 
    * @returns {Promise<boolean>} promise > approved or not
@@ -351,6 +373,7 @@ export const useController = () => {
     borrow, borrowActive,
     repay, repayActive,
 
+    addControllerDelegate,
     checkControllerDelegate,
     collateralPosted,
     collateralLocked,
