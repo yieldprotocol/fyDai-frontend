@@ -12,10 +12,9 @@ import {
 import { FiArrowLeft as ArrowLeft} from 'react-icons/fi';
 
 import { useConnection, useSignerAccount } from '../../hooks';
-import { injected, torus, walletconnect } from '../../connectors';
+import { injected, walletconnect } from '../../connectors';
 
 import metamaskImage from '../../assets/images/providers/metamask.png';
-import torusImage from '../../assets/images/providers/torus.png';
 import walletConnectImage from '../../assets/images/providers/walletconnect.png';
 
 import { UserContext } from '../../contexts/UserContext';
@@ -82,7 +81,6 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
   const connectorList = [
     { name: 'Metamask', image: metamaskImage, connection: injected },
     { name: 'Wallet Connect', image: walletConnectImage, connection: walletconnect },
-    { name: 'Torus', image: torusImage, connection: torus },
   ];
 
   useEffect(()=>{

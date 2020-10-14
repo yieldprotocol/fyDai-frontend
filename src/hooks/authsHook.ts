@@ -93,17 +93,32 @@ export const useAuth = () => {
     setAuthActive(false);
   };
 
+
+  const fallbackYieldAuth = async () => {
+
+
+
+
+
+  }; 
+
+
+  const fallbackPoolAuth = async () => {
+
+
+
+
+  };
+
   /**
    *  Once off Yield Controller and Dai authorizations
    */
   const yieldAuth = async ( ) => {
     let controllerSig:any;
     let daiPermitSig:any;
-
     const overrides = { 
       gasLimit: BigNumber.from('1000000')
     };
-
     setAuthActive(true);
     dispatch({ type: 'requestSigs', payload:[ auths.get(1), auths.get(2) ] });
     try {     
@@ -122,7 +137,6 @@ export const useAuth = () => {
         chainId: (await provider.getNetwork()).chainId,
         verifyingContract: controllerAddr,
       };
-
       controllerSig = await sendForSig(
         provider.provider, 
         'eth_signTypedData_v4', 

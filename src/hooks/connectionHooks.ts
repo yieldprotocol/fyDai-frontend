@@ -9,12 +9,7 @@ import {
 import { useWeb3React, UnsupportedChainIdError } from '@web3-react/core';
 import { NetworkConnector } from '@web3-react/network-connector';
 
-import { injected, walletconnect, torus } from '../connectors';
-
-import injectedImage from '../assets/images/providers/metamask.png';
-import torusImage from '../assets/images/providers/torus.png';
-import noConnectionImage from '../assets/images/providers/noconnection.png';
-import walletconnectImage from '../assets/images/providers/walletconnect.png';
+import { injected, walletconnect } from '../connectors';
 
 import { NotifyContext } from '../contexts/NotifyContext';
 
@@ -153,7 +148,7 @@ const useFallbackConnect = (triedEager: boolean = false) => {
 
 /* useConnection ig the GAteway into the web3 connections */
 export function useConnection() {
-  const { dispatch: notifyDispatch } = useContext(NotifyContext);
+
   const [ cachedChainId, setCachedChainId ] = useCachedState('cache_chainId', null);
   const { 
     connector,
@@ -184,7 +179,7 @@ export function useConnection() {
       localStorage.clear();
       // eslint-disable-next-line no-restricted-globals
       location.reload();
-    };
+    }
   }, [ chainId ]);
 
   /* handle changing connector */

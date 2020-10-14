@@ -1,6 +1,5 @@
 import { InjectedConnector } from '@web3-react/injected-connector';
 import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
-import { TorusConnector } from '@web3-react/torus-connector';
 
 const POLLING_INTERVAL = 12000;
 
@@ -21,8 +20,6 @@ export const walletconnect = new WalletConnectConnector({
   qrcode: true,
   pollingInterval: POLLING_INTERVAL
 });
-
-export const torus = new TorusConnector({ chainId: 42 });
 
 // export const walletlink = new WalletLinkConnector({
 //   url: RPC_URLS[1],
