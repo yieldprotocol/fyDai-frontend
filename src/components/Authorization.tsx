@@ -36,13 +36,13 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
   const [ allSigned, setAllSigned ] = useState<boolean>(false);
   
   const { account } = useSignerAccount();
-  const { yieldAuth, poolAuth, authActive } = useAuth();
+  const { yieldAuth, poolAuth, authActive, fallbackAuthActive } = useAuth();
   const [ txActive ] = useTxActive(['AUTH']);
 
   const authProcedure = async () => {
     setAuthPending(true);
     !series && await yieldAuth();
-    series && await poolAuth(series.fyDaiAddress, series.poolAddress);
+    series && await poolAuth(series);
     await Promise.all([
       userActions.updateAuthorizations(),
       seriesActions.updateActiveSeries()
@@ -186,7 +186,28 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
             </Box>}
 
           </Box>
-        </Layer>} 
+        </Layer>}
+
+      { fallbackAuthActive && 
+      <Layer
+        modal={true}
+        responsive={mobile?false: undefined}
+        full={mobile?true: undefined}
+      >
+        <Box 
+          width={!mobile?{ min:'620px', max:'620px' }: undefined}
+          round={mobile?undefined:'small'}
+          background='background'
+          pad='large'
+          gap='medium'
+        >
+          <Text>It seems there was a problem signing the authorizations.</Text>
+          <Text>(Some wallets dont provide this functionality yet :| )</Text>
+          <Text>You can try with individual approval transactions </Text>
+          <Text> or simply reject them all and try again. </Text>
+          <Box> If you would like to always approve individually, </Box>
+        </Box>
+      </Layer>}
     </>);
 };
 

@@ -9,6 +9,8 @@ export interface IYieldSeries {
   fyDaiAddress: string;
   liquidityProxyAddress: string;
   hasDelegatedPool: boolean;
+  hasDaiAuth: boolean;
+  hasFyDaiAuth: boolean;
   isMature: any; // function typeScript this out
   fyDaiBalance_: number;
   fyDaiBalance: BigNumber;
@@ -67,7 +69,7 @@ export interface INotification {
   callbackCancel?: any;
   showFor?: number;
   position?: string;
-  open?: boolean,
+  notifyOpen?: boolean,
   timerMs?: number,
   fatalOpen?: boolean,
   fatalMsg?: string,

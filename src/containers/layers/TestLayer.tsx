@@ -275,7 +275,7 @@ const TestLayer = (props:any) => {
             label='poolAuth' 
             primary
             onClick={async ()=> {
-              await poolAuth(deployedSeries[0].fyDaiAddress, deployedSeries[0].poolAddress);
+              await poolAuth(deployedSeries[0]);
             }}
           />
         </Box>

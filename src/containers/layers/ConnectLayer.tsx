@@ -8,8 +8,9 @@ import {
   Box,
   Text,
   ResponsiveContext,
+  CheckBox,
 } from 'grommet';
-import { FiArrowLeft as ArrowLeft} from 'react-icons/fi';
+import { FiArrowLeft as ArrowLeft } from 'react-icons/fi';
 
 import { useConnection, useSignerAccount } from '../../hooks';
 import { injected, walletconnect } from '../../connectors';
@@ -23,6 +24,7 @@ import RaisedButton from '../../components/RaisedButton';
 import FlatButton from '../../components/FlatButton';
 import TxHistory from '../../components/TxHistory';
 import EtherscanButton from '../../components/EtherscanButton';
+import { FaAcquisitionsIncorporated } from 'react-icons/fa';
 
 const StyledBox = styled(Box)`
   background: #f8f8f8;
@@ -64,19 +66,23 @@ const StyledBox = styled(Box)`
   `}
 `;
 
+const slippageList = [0.001, 0.005, 0.01];
 
 const ConnectLayer = ({ view, target, closeLayer }: any) => {
 
-  const { state: { position, txHistory } } = useContext(UserContext);
+  const { state: { position, txHistory, preferences }, actions: { updatePreferences } } = useContext(UserContext);
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   
   const { handleSelectConnector } = useConnection();
 
   const { account, provider } = useSignerAccount();
   const [ layerView, setLayerView] = useState<string>(view);
-  const [ slippage, setSlippage] = useState<number>(1);
+
   const [ lastTx, setLastTx] = useState<any>(null);
   const [ histOpen, setHistOpen] = useState<string>('BORROW');
+
+  const [ slippage, setSlippage] = useState<number>(0);
+  const [ permitStrategy, setPermitStrategy] = useState<boolean>(!preferences.useTxApprovals);
 
   const connectorList = [
     { name: 'Metamask', image: metamaskImage, connection: injected },
@@ -86,6 +92,23 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
   useEffect(()=>{
     setLayerView(view);
   }, [view]);
+  
+  useEffect(()=>{
+    preferences.slippage && setSlippage(slippageList.indexOf(preferences.slippage));
+  }, [preferences.slippage]);
+
+  // useEffect(()=>{
+  //   console.log(slippage, slippageList[slippage]);
+  //   slippage && updatePreferences({ slippage: slippageList[slippage] });
+  // }, [slippage]);
+
+  useEffect(()=>{
+    setPermitStrategy(!preferences.useTxApprovals);
+  }, [preferences.useTxApprovals]);
+
+  // useEffect(()=>{
+  //   updatePreferences({ useTxApprovals: permitStrategy });
+  // }, [permitStrategy]);
 
   useEffect(()=>{
     let newArr; 
@@ -112,7 +135,6 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
               padding: '2rem',
             }}
           >
-
             { account && layerView === 'ACCOUNT' &&
               <Box gap='medium'>
                 <Box pad="small" gap="small">
@@ -187,6 +209,8 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                       /> 
                     </Box>
                   </Box>  
+
+
                   <Box
                     pad={{ vertical:'small' }}
                     justify="between"
@@ -196,11 +220,16 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                   >
                     <Text size='xsmall'>Slippage tolerance:  </Text>
 
+                    { slippageList.map( (x:any, i:number) => {
+
+
+                    })}
+
                     <Box gap='small' align='center'>
                       <StyledBox
                         pad={{ horizontal: 'large', vertical: 'xsmall' }}
-                        onClick={() => setSlippage(0)}
-                        border={slippage !== 0 ? undefined : 'all'}
+                        onClick={() => updatePreferences({ slippage: slippageList[0] })}
+                        border={slippageList.indexOf(preferences.slippage)!== 0 ? undefined : 'all'}
                       >
                         <Text size="small">
                           0.1 %
@@ -211,7 +240,7 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                     <Box gap='small' align='center'>
                       <StyledBox
                         pad={{ horizontal: 'large', vertical: 'xsmall' }}
-                        onClick={() => setSlippage(1)}
+                        onClick={() => updatePreferences({ slippage: slippageList[1] })}
                         border={slippage !== 1 ? undefined : 'all'}
                       >
                         <Text size="small">
@@ -223,7 +252,7 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                     <Box gap='small' align='center'>
                       <StyledBox
                         pad={{ horizontal: 'large', vertical: 'xsmall' }}
-                        onClick={() => setSlippage(2)}
+                        onClick={() => updatePreferences({ slippage: slippageList[2] })}
                         border={slippage !== 2 ? undefined : 'all'}
                       >
                         <Text size="small">
@@ -232,6 +261,41 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                       </StyledBox>
                     </Box>
                   </Box>
+
+                  <Box
+                    pad={{ vertical:'small' }}
+                    justify="between"
+                    gap='small'
+                    direction='row'
+                    align='center'
+                  >
+                    <Text size='xsmall'>Authorisation strategy: </Text>
+
+                    <Box gap='small' align='center'>
+                      <StyledBox
+                        pad={{ horizontal: 'large', vertical: 'xsmall' }}
+                        onClick={() => updatePreferences({ useTxApprovals: false })}
+                        border={permitStrategy ? 'all' : undefined}
+                      >
+                        <Text size="xxsmall">
+                          Sign permits
+                        </Text>
+                      </StyledBox>
+                    </Box>
+
+                    <Box gap='small' align='center'>
+                      <StyledBox
+                        pad={{ horizontal: 'large', vertical: 'xsmall' }}
+                        onClick={() => updatePreferences({ useTxApprovals: true })}
+                        border={!permitStrategy?'all': undefined}
+                      >
+                        <Text size="xxsmall">
+                          Approval transactions
+                        </Text>
+                      </StyledBox>
+                    </Box>
+                  </Box>
+
                 </Box>
 
                 <Box pad="small" gap="small" border='all' round='xsmall'>

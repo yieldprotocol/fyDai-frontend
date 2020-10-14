@@ -23,9 +23,8 @@ const contractMap = new Map<string, any>([
  */
 export function useToken() {
   // const { state: { provider, account } } = useContext(ConnectionContext);
-  const { signer, provider, account, voidSigner, fallbackProvider } = useSignerAccount();
+  const { signer, provider, account, fallbackProvider } = useSignerAccount();
   const  { dispatch }  = useContext<any>(NotifyContext);
-  const [ approveActive, setApproveActive ] = useState<boolean>(false);
   const { handleTx, handleTxBuildError } = useTxHelpers();
 
   /**
@@ -96,7 +95,6 @@ export function useToken() {
     const tokenAddr = ethers.utils.getAddress(tokenAddress);
 
     /* Contract interaction */
-    setApproveActive(true);
     const contract = new ethers.Contract(
       tokenAddr,
       Dai.abi,
@@ -106,14 +104,12 @@ export function useToken() {
       tx = await contract.approve(delegateAddr, parsedAmount);
     } catch (e) {
       handleTxBuildError(e);
-      setApproveActive(false);
       return;
     }
     /* Transaction reporting & tracking */
-    dispatch({ type: 'txPending', payload:{ tx, message: `Token approval of ${amount} pending...`, type: 'AUTH' } } );
+    dispatch({ type: 'txPending', payload:{ tx, message: 'Token authorization pending...', type: 'AUTH' } } );
     await handleTx(tx);
-    setApproveActive(false);
   };
 
-  return { approveToken, approveActive, getTokenAllowance, getBalance } as const;
+  return { approveToken, getTokenAllowance, getBalance } as const;
 }

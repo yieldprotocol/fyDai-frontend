@@ -8,14 +8,20 @@ import YieldProxy from '../contracts/YieldProxy.json';
 
 import {
   IDelegableMessage,
-  IDomain
+  IDomain,
+  IYieldSeries
 } from '../types';
 
 import { NotifyContext } from '../contexts/NotifyContext';
 import { YieldContext } from '../contexts/YieldContext';
+import { UserContext } from '../contexts/UserContext';
 
 import { useSignerAccount } from './connectionHooks';
 import { useTxHelpers } from './appHooks';
+
+import { useController } from './controllerHook';
+import { usePool } from './poolHook';
+import { useToken } from './tokenHook';
 
 
 const MAX_INT = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
@@ -55,6 +61,7 @@ export const useAuth = () => {
   const { account, provider, signer } = useSignerAccount();
   const { state: { deployedContracts } } = useContext(YieldContext);
   const { dispatch } = useContext(NotifyContext);
+  const { state: { preferences } } = useContext(UserContext);
   
   const controllerAddr = ethers.utils.getAddress(deployedContracts.Controller);
   const controllerContract = new ethers.Contract( controllerAddr, Controller.abi, provider);
@@ -65,8 +72,13 @@ export const useAuth = () => {
   const fromAddr = account && ethers.utils.getAddress(account);
 
   const [authActive, setAuthActive] = useState<boolean>(false);
+  const [fallbackAuthActive, setFallbackAuthActive] = useState<boolean>(false);
 
   const { handleTx, handleTxBuildError } = useTxHelpers();
+
+  const { addControllerDelegate } = useController();
+  const { approveToken } = useToken();
+  const { addPoolDelegate } = usePool();
 
   const sendForSig = (_provider: any, method: string, params?: any[]) => new Promise<any>((resolve, reject) => {
     const payload = {
@@ -93,21 +105,33 @@ export const useAuth = () => {
     setAuthActive(false);
   };
 
-
   const fallbackYieldAuth = async () => {
+    try {
+      await Promise.all([
+        approveToken(daiAddr, proxyAddr, MAX_INT),
+        addControllerDelegate(proxyAddr)
+      ]);
+      setFallbackAuthActive(false);
+    } catch (e) {
+      // handleTxBuildError(e);
+      console.log(e);
+      setFallbackAuthActive(false);     
+    }
+  };
 
-
-
-
-
-  }; 
-
-
-  const fallbackPoolAuth = async () => {
-
-
-
-
+  const fallbackPoolAuth = async ( series:IYieldSeries ) => {
+    try {
+      await Promise.all([
+        approveToken(daiAddr, series.poolAddress, MAX_INT),
+        approveToken(series.fyDaiAddress, proxyAddr, MAX_INT),
+        addPoolDelegate(series.poolAddress, proxyAddr),
+      ]);
+      setFallbackAuthActive(false);
+    } catch (e) {
+      // handleTxBuildError(e);
+      console.log(e);
+      setFallbackAuthActive(false);      
+    }
   };
 
   /**
@@ -151,6 +175,14 @@ export const useAuth = () => {
       dispatch({ type: 'signed', payload: auths.get(2) });
 
     } catch (e) {
+      /* If there is a problem with the signing, use the approve txs as a fallback */
+      if ( e.code !== 4001 ) {
+        handleSignError(e);
+        setFallbackAuthActive(true);
+        console.log('Fallback to approval transactions');
+        await fallbackYieldAuth();
+        return;
+      }
       handleSignError(e);
       return;
     }
@@ -173,18 +205,19 @@ export const useAuth = () => {
   /**
    * Series/Pool authorizations that are required for each series.
    * 
-   * @param fyDaiAddress series fyDai address to be authorised
-   * @param poolAddress series pool address to be authorised
+   * @param series {IYieldSeries} series to be authorised
    * 
    */
   const poolAuth = async (
-    fyDaiAddress:string,
-    poolAddress:string
+    series: IYieldSeries,
   ) => {
     /* Sanitise input */
-    const poolContract = new ethers.Contract( poolAddress, Pool.abi, provider);
-    const fyDaiAddr = ethers.utils.getAddress(fyDaiAddress);
-    const poolAddr = ethers.utils.getAddress(poolAddress);
+    const poolContract = new ethers.Contract( series.poolAddress, Pool.abi, provider);
+    const fyDaiAddr = ethers.utils.getAddress(series.fyDaiAddress);
+    const poolAddr = ethers.utils.getAddress(series.poolAddress);
+
+    const fallback = preferences?.useTxApprovals;
+
     let poolSig;
     let daiSig;
     let fyDaiSig;
@@ -192,69 +225,85 @@ export const useAuth = () => {
     const overrides = { 
       gasLimit: BigNumber.from('1000000')
     };
-
     setAuthActive(true);
     dispatch({ type: 'requestSigs', payload:[ auths.get(3), auths.get(4), auths.get(5) ] });
-    
-    try {
-    /* YieldProxy | Pool delegation */
-      const poolNonce = await poolContract.signatureCount(fromAddr);
-      const msg: IDelegableMessage = {
-      // @ts-ignore
-        user: fromAddr,
-        delegate: proxyAddr,
-        nonce: poolNonce.toHexString(),
-        deadline: MAX_INT,
-      };
-      const domain: IDomain = {
-        name: 'Yield',
-        version: '1',
-        chainId: (await provider.getNetwork()).chainId,
-        verifyingContract: poolAddr,
-      };
-      poolSig = await sendForSig(
-        provider.provider, 
-        'eth_signTypedData_v4', 
-        [fromAddr, createTypedDelegableData(msg, domain)],
-      );
-      dispatch({ type: 'signed', payload: auths.get(3) });
+  
+    /* if ser account preferences don't specify using fallback,  */
+    if (!fallback) {
+      try {
+        /* YieldProxy | Pool delegation */
+        const poolNonce = await poolContract.signatureCount(fromAddr);
+        const msg: IDelegableMessage = {
+          // @ts-ignore
+          user: fromAddr,
+          delegate: proxyAddr,
+          nonce: poolNonce.toHexString(),
+          deadline: MAX_INT,
+        };
+        const domain: IDomain = {
+          name: 'Yield',
+          version: '1',
+          chainId: (await provider.getNetwork()).chainId,
+          verifyingContract: poolAddr,
+        };
+        poolSig = await sendForSig(
+          provider.provider, 
+          'eth_signTypedData_v4', 
+          [fromAddr, createTypedDelegableData(msg, domain)],
+        );
+        dispatch({ type: 'signed', payload: auths.get(3) });
 
-      /* Dai permit pool */
-      // @ts-ignore
-      const dResult = await signDaiPermit(provider.provider, daiAddr, fromAddr, poolAddr);
-      daiSig = ethers.utils.joinSignature(dResult);
-      dispatch({ type: 'signed', payload: auths.get(4) });
+        /* Dai permit pool */
+        // @ts-ignore
+        const dResult = await signDaiPermit(provider.provider, daiAddr, fromAddr, poolAddr);
+        daiSig = ethers.utils.joinSignature(dResult);
+        dispatch({ type: 'signed', payload: auths.get(4) });
 
-      /* fyDai permit proxy */
-      // @ts-ignore
-      const yResult = await signERC2612Permit(provider.provider, fyDaiAddr, fromAddr, proxyAddr, MAX_INT);
-      fyDaiSig = ethers.utils.joinSignature(yResult);
-      dispatch({ type: 'signed', payload: auths.get(5) });
+        /* fyDai permit proxy */
+        // @ts-ignore
+        const yResult = await signERC2612Permit(provider.provider, fyDaiAddr, fromAddr, proxyAddr, MAX_INT);
+        fyDaiSig = ethers.utils.joinSignature(yResult);
+        dispatch({ type: 'signed', payload: auths.get(5) });
 
-    } catch (e) {
-      handleSignError(e);
-      return;
-    }
+      } catch (e) {
+      /* If there is a problem with the signing, use the approve txs as a fallback */
+        if ( e.code === 4001 ) {
+          handleSignError(e);
+          console.log('Fallback to approval transactions');
+          setFallbackAuthActive(true);
+          await fallbackPoolAuth(series);
+          return;
+        }
+        handleSignError(e);
+        return;
+      }
 
-    /* Broadcast signatures */
-    let tx:any;
-    try {
-      tx = await proxyContract.authorizePool(poolAddr, fromAddr, daiSig, fyDaiSig, poolSig, overrides);
-    } catch (e) {
-      handleTxBuildError(e);
+      /* Broadcast signatures */
+      let tx:any;
+      try {
+        tx = await proxyContract.authorizePool(poolAddr, fromAddr, daiSig, fyDaiSig, poolSig, overrides);
+      } catch (e) {
+        handleTxBuildError(e);
+        setAuthActive(false);
+        return;
+      }
+      dispatch({ type: 'txPending', payload: { tx, message: 'Authorization pending...', type:'AUTH' } });
+      await handleTx(tx);
+      dispatch({ type: 'requestSigs', payload:[] });
       setAuthActive(false);
-      return;
+
+    } else {
+      console.log('Fallback to approval transactions');
+      setFallbackAuthActive(true);
+      await fallbackPoolAuth(series);
     }
-    dispatch({ type: 'txPending', payload: { tx, message: 'Authorization pending...', type:'AUTH' } });
-    await handleTx(tx);
-    dispatch({ type: 'requestSigs', payload:[] });
-    setAuthActive(false);
   };
 
   return {
     yieldAuth,
     poolAuth,
-    authActive
+    authActive, 
+    fallbackAuthActive,
   };
 
 };

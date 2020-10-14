@@ -74,9 +74,9 @@ function notifyReducer(state:INotification, action:IReducerAction) {
 
     /* internal - maybe find a better way to do these two */ 
     case '_closeNotify':
-      return { ...state, open: false, timerMs: initState.timerMs };
+      return { ...state, notifyOpen: false, timerMs: initState.timerMs };
     case '_openNotify':
-      return { ...state, open: true };
+      return { ...state, notifyOpen: true };
     default:
       return state;
   }
@@ -85,7 +85,7 @@ function notifyReducer(state:INotification, action:IReducerAction) {
 const NotifyProvider = ({ children }:any) => {
   const [state, dispatch] = React.useReducer(notifyReducer, initState); 
   useEffect( () => {
-    state.open && ( () => {
+    state.notifyOpen && ( () => {
       if (state.timerMs === 0) {
         dispatch({ type: '_openNotify' });
       } else {
@@ -94,7 +94,7 @@ const NotifyProvider = ({ children }:any) => {
         }, 3000);
       }
     })();
-  }, [state.open]);
+  }, [state.notifyOpen]);
 
   return (
     <NotifyContext.Provider value={{ state, dispatch }}>

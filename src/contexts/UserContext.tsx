@@ -62,7 +62,8 @@ const initState = {
   },
   authorizations:{},
   preferences:{
-    slippage: 0.005 // default === 0.5%
+    slippage: 0.005, // default === 0.5%
+    useTxApprovals: false,
   },
   makerData:{},
 };
@@ -76,11 +77,11 @@ const UserProvider = ({ children }: any) => {
 
   /* cache | localStorage declarations */
   const [txHistory, setTxHistory] = useCachedState('txHistory', null);
-  const [preferences, setPreferences] = useCachedState('userPreferences', null );
+  const [cachedPreferences, setCachedPreferences] = useCachedState('userPreferences', null );
   
   /* hook declarations */
   const { getEventHistory, parseEventList } = useEvents();
-  const { getBalance } = useToken();
+  const { getBalance, getTokenAllowance } = useToken();
   const { 
     collateralPosted, 
     collateralLocked,
@@ -129,9 +130,6 @@ const UserProvider = ({ children }: any) => {
     const collateralPercent = collPercent(collateralRatio); 
     const maxDaiAvailable = daiAvailable( collateralValue, ethTotalDebtDai, 2);
 
-    // const collateralPrice = collPrice();
-    // const minSafeCollateral = minSafeColl( ethTotalDebtDai, 1.5, collateralPrice);
-
     const values = {
       ethBalance, 
       daiBalance, 
@@ -144,10 +142,7 @@ const UserProvider = ({ children }: any) => {
       collateralRatio,
       collateralPercent,
       maxDaiAvailable,
-      // collateralPrice,
-      // minSafeCollateral,
     };
-
     /* parse to human usable */
     const parsedValues = {  
       ethBalance_ : cleanValue(ethers.utils.formatEther(ethBalance), 6),
@@ -161,11 +156,8 @@ const UserProvider = ({ children }: any) => {
       collateralRatio_ : parseFloat(collateralRatio.toString()),
       collateralPercent_ : parseFloat(collateralPercent.toString()),
       maxDaiAvailable_ : cleanValue(ethers.utils.formatEther(maxDaiAvailable), 2),
-      // collateralPrice_ : utils.humanize(collateralPrice),
-      // minSafeCollateral_ : utils.humanize(minSafeCollateral),
     };
     console.log('User updated:');
-    console.log({ ...values, ...parsedValues } );
     dispatch( { type: 'updatePosition', payload: { ...values, ...parsedValues } } );
     return { ...values, ...parsedValues };
   };
@@ -176,6 +168,7 @@ const UserProvider = ({ children }: any) => {
   const _getAuthorizations = async () => {
     const _auths:any={};
     _auths.hasDelegatedProxy = await checkControllerDelegate(deployedContracts.YieldProxy);
+    _auths.hasAuthorisedProxy = (await getTokenAllowance(deployedContracts.Dai, deployedContracts.YieldProxy, 'Dai') >0);
     dispatch( { type: 'updateAuthorizations', payload: _auths });
     return _auths;
   };
@@ -372,25 +365,15 @@ const UserProvider = ({ children }: any) => {
   };
 
   /**
-   * @dev Gets user Maker data if available.
-   */
-  const _getMakerData = async () => {
-    // const urn = await callTx(deployedContracts.Vat, 'Vat', 'urns', [ utils.ETH, account ]);
-    // dispatch( { type: 'updateMakerData', payload: urn });
-    return {};
-  };
-
-  /**
    * @dev Gets preferences from cache.
    */
-  const _getPreferences = async () => {
-    console.log('Dont forget to add in the preferences' );
-    // dispatch( { type: 'updatePreferences', payload: { slippage:0.005 } });
-    return {};
+  const _updatePreferences = async (newPrefs:any) => {
+    setCachedPreferences({ ...state.preferences, ...cachedPreferences, ...newPrefs });
+    dispatch( { type: 'updatePreferences', payload: { ...state.preferences, ...cachedPreferences } });
+    return { ...state.preferences, ...cachedPreferences };
   };
 
   const initUser = async () => {
-    
     /* Init start */
     dispatch({ type: 'isLoading', payload: true });
     // TODO: look at splitting these up cleverly, in particular makerData.
@@ -399,11 +382,9 @@ const UserProvider = ({ children }: any) => {
         _getPosition(),
         _getAuthorizations(),
         _getTxHistory(false),
-        _getPreferences(),
-        _getMakerData(),
+        _updatePreferences(null),
       ]);
       console.log('User initialised.');
-
     } catch (e) {
       console.log(e);
     }
@@ -423,14 +404,14 @@ const UserProvider = ({ children }: any) => {
     updatePosition: () => _getPosition(),
     updateAuthorizations: () => _getAuthorizations(),
     updateHistory: () => _getTxHistory(false),
+
     rebuildHistory: async () => {
       dispatch({ type: 'isLoading', payload: true });
       await _getTxHistory(true);
       dispatch({ type: 'isLoading', payload: false });
     },
-    updateMakerData: () => console.log('makerData update fn'),
-    updatePreferences: () => console.log('preference update fn'),
-    resetPreferences: () => console.log('preferences reset fn'),
+    updatePreferences: (x:any) => _updatePreferences(x),
+    resetPreferences: () => localStorage.removeItem('userPreferences'),
   };
 
   return (

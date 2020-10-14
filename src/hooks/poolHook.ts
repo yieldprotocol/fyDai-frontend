@@ -197,7 +197,7 @@ export const usePool = () => {
       return;
     }
     /* Transaction reporting & tracking */
-    dispatch({ type: 'txPending', payload:{ tx, message: 'Pending once-off delegation ...', type:'DELEGATION' } } );
+    dispatch({ type: 'txPending', payload:{ tx, message: 'Pending once-off Pool delegation ...', type:'AUTH' } } );
     await handleTx(tx);
   };
 
