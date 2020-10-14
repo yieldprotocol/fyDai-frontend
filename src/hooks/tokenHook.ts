@@ -82,35 +82,35 @@ export function useToken() {
    * 
    * @param {string} tokenAddress address of the token to approve.
    * @param {string} poolAddress address of the market.
-   * @param {number} amount to approve (in human understandable numbers)
+   * @param {string} amount to approve (in human understandable numbers)
    */
   const approveToken = async (
     tokenAddress:string,
-    poolAddress:string,
-    amount:number
+    delegateAddress:string,
+    amount:string
   ) => {
     let tx:any;
     /* Processing and sanitizing input */
-    const parsedAmount = ethers.utils.parseEther(amount.toString());
-    const marketAddr = ethers.utils.getAddress(poolAddress);
+    const parsedAmount = amount;
+    const delegateAddr = ethers.utils.getAddress(delegateAddress);
     const tokenAddr = ethers.utils.getAddress(tokenAddress);
 
     /* Contract interaction */
     setApproveActive(true);
     const contract = new ethers.Contract(
       tokenAddr,
-      FYDai.abi,
+      Dai.abi,
       signer
     );
     try {
-      tx = await contract.approve(marketAddr, parsedAmount);
+      tx = await contract.approve(delegateAddr, parsedAmount);
     } catch (e) {
       handleTxBuildError(e);
       setApproveActive(false);
       return;
     }
     /* Transaction reporting & tracking */
-    dispatch({ type: 'txPending', payload:{ tx, message: `Token approval of ${amount} pending...` } } );
+    dispatch({ type: 'txPending', payload:{ tx, message: `Token approval of ${amount} pending...`, type: 'AUTH' } } );
     await handleTx(tx);
     setApproveActive(false);
   };
