@@ -63,7 +63,7 @@ const initState = {
   authorizations:{},
   preferences:{
     slippage: 0.005, // default === 0.5%
-    useTxApprovals: false,
+    useTxApproval: false,
   },
   makerData:{},
 };
@@ -368,9 +368,10 @@ const UserProvider = ({ children }: any) => {
    * @dev Gets preferences from cache.
    */
   const _updatePreferences = async (newPrefs:any) => {
-    setCachedPreferences({ ...state.preferences, ...cachedPreferences, ...newPrefs });
-    dispatch( { type: 'updatePreferences', payload: { ...state.preferences, ...cachedPreferences } });
-    return { ...state.preferences, ...cachedPreferences };
+    const allPrefs = { ...state.preferences, ...cachedPreferences, ...newPrefs };
+    dispatch( { type: 'updatePreferences', payload: allPrefs });
+    setCachedPreferences(allPrefs);
+    return { allPrefs };
   };
 
   const initUser = async () => {

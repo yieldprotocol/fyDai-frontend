@@ -216,7 +216,7 @@ export const useAuth = () => {
     const fyDaiAddr = ethers.utils.getAddress(series.fyDaiAddress);
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
 
-    const fallback = preferences?.useTxApprovals;
+    const fallback = preferences?.useTxApproval;
 
     let poolSig;
     let daiSig;
