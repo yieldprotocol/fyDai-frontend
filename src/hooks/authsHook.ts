@@ -140,66 +140,78 @@ export const useAuth = () => {
   const yieldAuth = async ( ) => {
     let controllerSig:any;
     let daiPermitSig:any;
+
+    const fallback = preferences?.useTxApproval;
+
     const overrides = { 
       gasLimit: BigNumber.from('1000000')
     };
+
     setAuthActive(true);
     dispatch({ type: 'requestSigs', payload:[ auths.get(1), auths.get(2) ] });
-    try {     
+
+    if (!fallback) { 
+      try {
       /* yieldProxy | Controller delegation */ 
-      const controllerNonce = await controllerContract.signatureCount(fromAddr);
-      const msg: IDelegableMessage = {
+        const controllerNonce = await controllerContract.signatureCount(fromAddr);
+        const msg: IDelegableMessage = {
         // @ts-ignore
-        user: fromAddr,
-        delegate: proxyAddr,
-        nonce: controllerNonce.toHexString(),
-        deadline: MAX_INT,
-      };
-      const domain: IDomain = {
-        name: 'Yield',
-        version: '1',
-        chainId: (await provider.getNetwork()).chainId,
-        verifyingContract: controllerAddr,
-      };
-      controllerSig = await sendForSig(
-        provider.provider, 
-        'eth_signTypedData_v4', 
-        [fromAddr, createTypedDelegableData(msg, domain)],
-      );
-      dispatch({ type: 'signed', payload: auths.get(1) });
+          user: fromAddr,
+          delegate: proxyAddr,
+          nonce: controllerNonce.toHexString(),
+          deadline: MAX_INT,
+        };
+        const domain: IDomain = {
+          name: 'Yield',
+          version: '1',
+          chainId: (await provider.getNetwork()).chainId,
+          verifyingContract: controllerAddr,
+        };
+        controllerSig = await sendForSig(
+          provider.provider, 
+          'eth_signTypedData_v4', 
+          [fromAddr, createTypedDelegableData(msg, domain)],
+        );
+        dispatch({ type: 'signed', payload: auths.get(1) });
 
-      /* Dai permit yieldProxy */
-      // @ts-ignore
-      const result = await signDaiPermit(provider.provider, daiAddr, fromAddr, proxyAddr);
-      daiPermitSig = ethers.utils.joinSignature(result);
-      dispatch({ type: 'signed', payload: auths.get(2) });
-
-    } catch (e) {
+        /* Dai permit yieldProxy */
+        // @ts-ignore
+        const result = await signDaiPermit(provider.provider, daiAddr, fromAddr, proxyAddr);
+        daiPermitSig = ethers.utils.joinSignature(result);
+        dispatch({ type: 'signed', payload: auths.get(2) });
+      } catch (e) {
       /* If there is a problem with the signing, use the approve txs as a fallback */
-      if ( e.code !== 4001 ) {
+        if ( e.code === 4001 ) {
+          handleSignError(e);
+          setFallbackAuthActive(true);
+          console.log('Fallback to approval transactions');
+          await fallbackYieldAuth();
+          return;
+        }
         handleSignError(e);
-        setFallbackAuthActive(true);
-        console.log('Fallback to approval transactions');
-        await fallbackYieldAuth();
         return;
       }
-      handleSignError(e);
-      return;
-    }
 
-    /* Broadcast signatures */
-    let tx:any;
-    try {
-      tx = await proxyContract.onboard(fromAddr, daiPermitSig, controllerSig, overrides);
-    } catch (e) {
-      handleTxBuildError(e);
+      /* Broadcast signatures */
+      let tx:any;
+      try {
+        tx = await proxyContract.onboard(fromAddr, daiPermitSig, controllerSig, overrides);
+      } catch (e) {
+        handleTxBuildError(e);
+        setAuthActive(false);
+        return;
+      }
+      dispatch({ type: 'txPending', payload: { tx, message: 'Authorization pending...', type:'AUTH' } });
+      await handleTx(tx);
+      dispatch({ type: 'requestSigs', payload:[] });
       setAuthActive(false);
-      return;
+
+    } else {
+      console.log('Fallback to approval transactions');
+      setFallbackAuthActive(true);
+      await fallbackYieldAuth();
+      dispatch({ type: 'requestSigs', payload:[] });
     }
-    dispatch({ type: 'txPending', payload: { tx, message: 'Authorization pending...', type:'AUTH' } });
-    await handleTx(tx);
-    dispatch({ type: 'requestSigs', payload:[] });
-    setAuthActive(false);
   };
 
   /**
@@ -296,6 +308,7 @@ export const useAuth = () => {
       console.log('Fallback to approval transactions');
       setFallbackAuthActive(true);
       await fallbackPoolAuth(series);
+      dispatch({ type: 'requestSigs', payload:[] });
     }
   };
 

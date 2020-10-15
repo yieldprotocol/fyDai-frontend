@@ -9,24 +9,27 @@ import {
   FiAlertTriangle as Warning,
 } from 'react-icons/fi';
 
+
+
 import { IYieldSeries } from '../types';
 import { NotifyContext } from '../contexts/NotifyContext';
 import { UserContext } from '../contexts/UserContext';
 import { SeriesContext } from '../contexts/SeriesContext';
+
+
 import { useAuth, useSignerAccount, useTxActive } from '../hooks';
 import RaisedButton from './RaisedButton';
 
 interface IAuthorizationProps {
   series?: IYieldSeries|null;
   authWrap?: boolean;
-  buttonOnly?: boolean;
   children?:any;
 }
 
-const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorizationProps) => { 
+const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => { 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   const { state: { requestedSigs } } = useContext(NotifyContext);
-  const { state: { authorizations }, actions: userActions } = useContext(UserContext);
+  const { state: { authorizations, preferences }, actions: userActions } = useContext(UserContext);
   const { hasDelegatedProxy } = authorizations;
   const { actions: seriesActions } = useContext(SeriesContext);
 
@@ -68,12 +71,17 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
 
   return (
     <>
-      { account && authWrap && !authActive && 
+      { authWrap && 
+        !authActive &&
+        account &&
         <Box fill='horizontal' onClick={()=>{authProcedure();}}> 
           {children} 
         </Box>}
 
-      { !hasDelegatedProxy && account && !authWrap && !series && 
+      { !hasDelegatedProxy &&
+        !series && 
+        account && 
+        !authWrap &&
         <Box 
           fill='horizontal'
           pad={mobile?{ horizontal:'medium', top:'medium', bottom:'large' }:'medium'}
@@ -83,10 +91,9 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
           justify='between'
           margin={mobile?{ bottom:'-10px' }:undefined}
         >
-          {!buttonOnly &&
-            <Box> 
-              <Text size={mobile?'xsmall': undefined}>Feel free to look around and play. However, before you make any transactions you will need to sign a few authorizations.</Text>
-            </Box>}
+          <Box> 
+            <Text size={mobile?'xsmall': undefined}>Feel free to look around and play. However, before you make any transactions you will need to sign a few authorizations.</Text>
+          </Box>
           <RaisedButton 
             background='#555555'
             label={<Box pad={{ horizontal:'small', vertical:'xsmall' }} align='center'><Text size='small' color='#DDDDDD'><Unlock /> Authorize Yield</Text></Box>}
@@ -94,7 +101,12 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
           />
         </Box>}
 
-      { hasDelegatedProxy && account && series?.hasDelegatedPool === false && !authWrap &&
+      { hasDelegatedProxy && 
+        /* check if there is a series argument , if so, check if any of the auths are outstanding */
+        series &&  ( !series.hasDelegatedPool || !series.hasDaiAuth || !series.hasFyDaiAuth ) &&
+        account && 
+        !authWrap &&
+
         <Box
           direction='row-responsive' 
           gap='small'
@@ -104,8 +116,8 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
           align='center'
         >  
           <Box direction='row' gap='small'>
-            {!buttonOnly && <Text color='#DDDDDD'> <Warning /> </Text>}
-            {!buttonOnly && <Text size='xsmall' color='#DDDDDD'>A once-off authorization is required to use this series </Text>}
+            <Text color='#DDDDDD'> <Warning /> </Text>
+            <Text size='xsmall' color='#DDDDDD'>A once-off authorization is required to use this series </Text>
           </Box>
           <Box>
             <RaisedButton 
@@ -120,10 +132,11 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
           </Box>           
         </Box>}
 
-      { authActive && layerOpen &&
-        <Layer 
-          // onClickOutside={()=>closeAuth()}
-          // modal={mobile?true: undefined}
+      { authActive && 
+        !preferences?.useTxApproval &&
+        layerOpen &&
+
+        <Layer
           modal={true}
           responsive={mobile?false: undefined}
           full={mobile?true: undefined}
@@ -166,50 +179,85 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
                 </Box>
               );
             })}
-            { !txActive && allSigned && <Text size='xsmall' weight='bold'>Finally, confirm sending the signatures to Yield in a transaction...</Text>}
+
+            { !txActive && 
+              allSigned && 
+              <Text size='xsmall' weight='bold'>
+                Finally, confirm sending the signatures to Yield in a transaction...
+              </Text>}
             { txActive && <Text size='xsmall' weight='bold'> Submitting your signed authorizations ... transaction pending.</Text> }
             
-            { authPending && txActive &&
-            <Box alignSelf='start'>
-              <Box
-                round
-                onClick={()=>closeAuth()}
-                hoverIndicator='brand-transparent'
-                pad={{ horizontal:'small', vertical:'small' }}
-                justify='center'
-              >
-                <Box direction='row' gap='small' align='center'>
-                  <ArrowLeft color='text-weak' />
-                  <Text size='xsmall' color='text-weak'>close, and go back to the app</Text>
+            { authPending && 
+              txActive &&
+              <Box alignSelf='start'>
+                <Box
+                  round
+                  onClick={()=>closeAuth()}
+                  hoverIndicator='brand-transparent'
+                  pad={{ horizontal:'small', vertical:'small' }}
+                  justify='center'
+                >
+                  <Box direction='row' gap='small' align='center'>
+                    <ArrowLeft color='text-weak' />
+                    <Text size='xsmall' color='text-weak'>close, and go back to the app</Text>
+                  </Box>
                 </Box>
-              </Box>
-            </Box>}
-
+              </Box>}
           </Box>
         </Layer>}
 
       { fallbackAuthActive && 
-      <Layer
-        modal={true}
-        responsive={mobile?false: undefined}
-        full={mobile?true: undefined}
-      >
-        <Box 
-          width={!mobile?{ min:'620px', max:'620px' }: undefined}
-          round={mobile?undefined:'small'}
-          background='background'
-          pad='large'
-          gap='medium'
-        >
-          <Text>It seems there was a problem signing the authorizations.</Text>
-          <Text>(Some wallets dont provide this functionality yet :| )</Text>
-          <Text>You can try with individual approval transactions </Text>
-          <Text> or simply reject them all and try again. </Text>
-          <Box> If you would like to always approve individually, </Box>
-        </Box>
-      </Layer>}
+       layerOpen &&
+       <Layer
+         modal={true}
+         responsive={mobile?false: undefined}
+         full={mobile?true: undefined}
+       >
+         {!preferences?.useTxApproval &&
+         <Box 
+           width={!mobile?{ min:'620px', max:'620px' }: undefined}
+           round={mobile?undefined:'small'}
+           background='background'
+           pad='large'
+           gap='medium'
+         >
+           <Text>It seems there was a problem signing the authorizations.</Text>
+           <Text>(Some wallets dont provide this functionality yet :| )</Text>
+           <Text>You can try with individual approval transactions </Text>
+           <Text> or simply reject them all and try again. </Text>
+           <Box> If you would like to always approve individually, </Box>        
+         </Box>}
+
+         { preferences?.useTxApproval &&
+         <Box 
+           width={!mobile?{ min:'620px', max:'620px' }: undefined}
+           round={mobile?undefined:'small'}
+           background='background'
+           pad='large'
+           gap='medium'
+         >
+           <Text> Please Approve the following authorization transactions with your wallet or provider </Text>
+         </Box>}
+
+         { txActive &&
+         <Box alignSelf='start'>
+           <Box
+             round
+             onClick={()=>closeAuth()}
+             hoverIndicator='brand-transparent'
+             pad={{ horizontal:'small', vertical:'small' }}
+             justify='center'
+           >
+             <Box direction='row' gap='small' align='center'>
+               <ArrowLeft color='text-weak' />
+               <Text size='xsmall' color='text-weak'>close, and go back to the app</Text>
+             </Box>
+           </Box>
+         </Box>}
+       </Layer>}
+       
     </>);
 };
 
-Authorization.defaultProps={ series:null, buttonOnly:false, authWrap:false, children:null };
+Authorization.defaultProps={ series:null, authWrap:false, children:null };
 export default Authorization;
