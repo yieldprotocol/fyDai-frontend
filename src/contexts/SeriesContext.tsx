@@ -49,7 +49,7 @@ const SeriesProvider = ({ children }:any) => {
 
   const { previewPoolTx, checkPoolDelegate, checkPoolState } = usePool();
   const { debtDai } = useController();
-  const { getBalance } = useToken();
+  const { getBalance, getTokenAllowance } = useToken();
 
   const [ callTx ] = useCallTx();
   const { yieldAPR: calcAPR, poolPercent: calcPercent }  = useMath();
@@ -80,9 +80,11 @@ const SeriesProvider = ({ children }:any) => {
         ]);
 
         /* with user */
-        const [ poolTokens, hasDelegatedPool, ethDebtDai, ethDebtFYDai, fyDaiBalance] =  account && await Promise.all([
+        const [ poolTokens, hasDelegatedPool, hasDaiAuth, hasFyDaiAuth, ethDebtDai, ethDebtFYDai, fyDaiBalance] =  account && await Promise.all([
           getBalance(_x.poolAddress, 'Pool', account),
           checkPoolDelegate(_x.poolAddress, deployedContracts.YieldProxy),
+          getTokenAllowance(deployedContracts.Dai, _x.poolAddress, 'Dai'),
+          getTokenAllowance(_x.fyDaiAddress, deployedContracts.YieldProxy, 'FYDai'),
           debtDai('ETH-A', _x.maturity ),
           callTx(deployedContracts.Controller, 'Controller', 'debtFYDai', [utils.ETH, _x.maturity, account]),
           getBalance(_x.fyDaiAddress, 'FYDai', account),
@@ -94,6 +96,9 @@ const SeriesProvider = ({ children }:any) => {
           totalSupply,
           poolTokens: poolTokens || BigNumber.from('0'),
           hasDelegatedPool: hasDelegatedPool || false, // TODO check this
+          hasDaiAuth: (hasDaiAuth && hasDaiAuth>0) || false, 
+          hasFyDaiAuth: (hasFyDaiAuth && hasFyDaiAuth>0) || false,
+          authComplete: ( !!hasDaiAuth && !!hasFyDaiAuth && !!hasDelegatedPool),
           ethDebtDai: ethDebtDai || BigNumber.from('0'),
           ethDebtFYDai : ethDebtFYDai || BigNumber.from('0'),
           fyDaiBalance : fyDaiBalance || BigNumber.from('0'),
@@ -122,6 +127,8 @@ const SeriesProvider = ({ children }:any) => {
         }
       );
     }, state.seriesData);
+
+    console.log(_parsedSeriesData);
 
     /* Update state and return  */
     dispatch( { type:'updateSeries', payload: _parsedSeriesData });

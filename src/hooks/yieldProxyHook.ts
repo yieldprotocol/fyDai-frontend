@@ -53,7 +53,6 @@ export const useProxy = () => {
   const { previewPoolTx } = usePool();
   const { splitDaiLiquidity } = useMath();
   const { getBalance } = useToken();
-  const { hasBeenMatured } = useFYDai();
   const { handleTx, handleTxBuildError } = useTxHelpers();
   
   /* Activity flags */

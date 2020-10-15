@@ -3,18 +3,22 @@ import { INotification, IReducerAction } from '../types';
 
 const NotifyContext = React.createContext<any>({});
 const initState = {
-  open: false,
-  position: 'right',
+  notifyOpen: false,
   message: '',
   type: 'info',
   timerMs: 8000,
   callbackAction: null,
   callbackCancel: null,
+  
   fatalOpen: false,
   fatalMsg: '',
+
   pendingTxs: [],
   lastCompletedTx: null,
   requestedSigs: [],
+
+  updateAvailable: false,
+  updateAccept: ()=>console.log('No update available'),
 };
 
 function notifyReducer(state:INotification, action:IReducerAction) {
@@ -22,11 +26,10 @@ function notifyReducer(state:INotification, action:IReducerAction) {
     case 'notify':
       return { 
         ...state,
-        open: true,
+        notifyOpen: true,
         message: action.payload.message,
         type: action.payload.type || initState.type,
         timerMs: action.payload.showFor || initState.timerMs,
-        position: action.payload.position || initState.position,
         callbackAction: action.payload.callbackAction || null,
         callbackCancel: action.payload.callbackCancel || null,
       };
@@ -37,6 +40,7 @@ function notifyReducer(state:INotification, action:IReducerAction) {
         fatalMsg: action.payload.message,
       };
     case 'txPending':
+      // console.log(state.pendingTxs);
       return {
         ...state,
         pendingTxs: [ ...state.pendingTxs, action.payload],
@@ -45,7 +49,7 @@ function notifyReducer(state:INotification, action:IReducerAction) {
       return {
         ...state,
         pendingTxs: state.pendingTxs.filter( (x:any) => x.tx.hash !== ( action.payload.transactionHash || action.payload.hash)  ),
-        lastCompletedTx: action.payload,
+        lastCompletedTx: { ...action.payload, transactionHash: action.payload.transactionHash || action.payload.hash },
       };
     case 'requestSigs':
       return {
@@ -61,21 +65,27 @@ function notifyReducer(state:INotification, action:IReducerAction) {
           }  return x;  
         })
       };
+    case 'updateAvailable':
+      return {
+        ...state,
+        updateAvailable: action.payload.updateAvailable,
+        updateAccept: action.payload.updateAccept || ( ()=>console.log('No update available') ),
+      };
+
+    /* internal - maybe find a better way to do these two */ 
     case '_closeNotify':
-      return { ...state, open: false, timerMs: initState.timerMs };
+      return { ...state, notifyOpen: false, timerMs: initState.timerMs };
     case '_openNotify':
-      return { ...state, open: true };
+      return { ...state, notifyOpen: true };
     default:
       return state;
   }
 }
 
-const NotifyProvider = ({ updateAvailable, children }:any) => {
-  const [state, dispatch] = React.useReducer(notifyReducer, initState);
-  console.log(updateAvailable);
-
+const NotifyProvider = ({ children }:any) => {
+  const [state, dispatch] = React.useReducer(notifyReducer, initState); 
   useEffect( () => {
-    state.open && ( () => {
+    state.notifyOpen && ( () => {
       if (state.timerMs === 0) {
         dispatch({ type: '_openNotify' });
       } else {
@@ -84,14 +94,12 @@ const NotifyProvider = ({ updateAvailable, children }:any) => {
         }, 3000);
       }
     })();
-  }, [state.open]);
-
-  useEffect(()=> console.log('in NOTIFY - there is and update'));
+  }, [state.notifyOpen]);
 
   return (
     <NotifyContext.Provider value={{ state, dispatch }}>
       {children}
-    </NotifyContext.Provider>
+    </NotifyContext.Provider> 
   );
 };
 

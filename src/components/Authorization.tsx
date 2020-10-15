@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Box, Layer, Text, ResponsiveContext } from 'grommet';
+import { Box, Layer, Text, ResponsiveContext, CheckBox } from 'grommet';
 
 import { 
   FiCheckCircle as Check,
@@ -9,40 +9,51 @@ import {
   FiAlertTriangle as Warning,
 } from 'react-icons/fi';
 
+
+
 import { IYieldSeries } from '../types';
 import { NotifyContext } from '../contexts/NotifyContext';
 import { UserContext } from '../contexts/UserContext';
 import { SeriesContext } from '../contexts/SeriesContext';
+
+
 import { useAuth, useSignerAccount, useTxActive } from '../hooks';
 import RaisedButton from './RaisedButton';
+import FlatButton from './FlatButton';
+import EtherscanButton from './EtherscanButton';
+import { abbreviateHash } from '../utils';
 
 interface IAuthorizationProps {
-  series?: IYieldSeries|null;
+  series?: IYieldSeries | null;
   authWrap?: boolean;
-  buttonOnly?: boolean;
   children?:any;
 }
 
-const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorizationProps) => { 
+const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => { 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
-  const { state: { requestedSigs } } = useContext(NotifyContext);
-  const { state: { authorizations }, actions: userActions } = useContext(UserContext);
+  const { state: { requestedSigs, pendingTxs } } = useContext(NotifyContext);
+  const { state: { authorizations, preferences }, actions: userActions } = useContext(UserContext);
   const { hasDelegatedProxy } = authorizations;
-  const { actions: seriesActions } = useContext(SeriesContext);
+  const { state: { activeSeries }, actions: seriesActions } = useContext(SeriesContext);
 
   // flags 
   const [ authPending, setAuthPending ] = useState<boolean>(false);
-  const [ layerOpen, setLayerOpen ] = useState<boolean>(true);
   const [ allSigned, setAllSigned ] = useState<boolean>(false);
-  
+  const [ seriesAuthDone, setSeriesAuthDone ] = useState<boolean|undefined>();
+
+  const [ layerOpen, setLayerOpen ] = useState<boolean>(true);
+  const [ fallbackLayerOpen, setFallbackLayerOpen ] = useState<boolean>(true);
+
+  const [checkBoxStatic, setChecboxStatic] = useState<any>(preferences.useTxApproval);
+
   const { account } = useSignerAccount();
-  const { yieldAuth, poolAuth, authActive } = useAuth();
+  const { yieldAuth, poolAuth, authActive, fallbackAuthActive } = useAuth();
   const [ txActive ] = useTxActive(['AUTH']);
 
   const authProcedure = async () => {
     setAuthPending(true);
     !series && await yieldAuth();
-    series && await poolAuth(series.fyDaiAddress, series.poolAddress);
+    series && await poolAuth(series);
     await Promise.all([
       userActions.updateAuthorizations(),
       seriesActions.updateActiveSeries()
@@ -52,12 +63,18 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
 
   const closeAuth = () => {
     setLayerOpen(false);
+    setFallbackLayerOpen(false);
   };
 
-  /* manage layer open /closed by watching authActive */
+  /* manage layer visibility by watching authActive & fallbackActive */
   useEffect(()=>{
     authActive && setLayerOpen(true);
-  }, [authActive]);
+    fallbackAuthActive && setFallbackLayerOpen(true);
+  }, [authActive, fallbackAuthActive]);
+
+  // useEffect(()=>{
+  //   activeSeries && setSeriesAuthDone(activeSeries.authComplete);
+  // }, [activeSeries]);
 
   useEffect(()=>{
     const _allSigned = requestedSigs.reduce((acc:boolean, nextItem:any)=> {
@@ -68,12 +85,17 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
 
   return (
     <>
-      { account && authWrap && !authActive && 
+      { authWrap && 
+        !authActive &&
+        account &&
         <Box fill='horizontal' onClick={()=>{authProcedure();}}> 
           {children} 
         </Box>}
 
-      { !hasDelegatedProxy && account && !authWrap && !series && 
+      { !hasDelegatedProxy &&
+        !series && 
+        account && 
+        !authWrap &&
         <Box 
           fill='horizontal'
           pad={mobile?{ horizontal:'medium', top:'medium', bottom:'large' }:'medium'}
@@ -83,10 +105,9 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
           justify='between'
           margin={mobile?{ bottom:'-10px' }:undefined}
         >
-          {!buttonOnly &&
-            <Box> 
-              <Text size={mobile?'xsmall': undefined}>Feel free to look around and play. However, before you make any transactions you will need to sign a few authorizations.</Text>
-            </Box>}
+          <Box> 
+            <Text size={mobile?'xsmall': undefined}>Feel free to look around and play. However, before you make any transactions you will need to sign a few authorizations.</Text>
+          </Box>
           <RaisedButton 
             background='#555555'
             label={<Box pad={{ horizontal:'small', vertical:'xsmall' }} align='center'><Text size='small' color='#DDDDDD'><Unlock /> Authorize Yield</Text></Box>}
@@ -94,7 +115,10 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
           />
         </Box>}
 
-      { hasDelegatedProxy && account && series?.hasDelegatedPool === false && !authWrap &&
+      { hasDelegatedProxy &&
+        account &&
+        !authWrap &&
+        series &&
         <Box
           direction='row-responsive' 
           gap='small'
@@ -102,10 +126,10 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
           justify='around'
           background='#555555'
           align='center'
-        >  
+        >
           <Box direction='row' gap='small'>
-            {!buttonOnly && <Text color='#DDDDDD'> <Warning /> </Text>}
-            {!buttonOnly && <Text size='xsmall' color='#DDDDDD'>A once-off authorization is required to use this series </Text>}
+            <Text color='#DDDDDD'> <Warning /> </Text>
+            <Text size='xsmall' color='#DDDDDD'>A once-off authorization is required to use this series </Text>
           </Box>
           <Box>
             <RaisedButton 
@@ -120,10 +144,10 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
           </Box>           
         </Box>}
 
-      { authActive && layerOpen &&
-        <Layer 
-          // onClickOutside={()=>closeAuth()}
-          // modal={mobile?true: undefined}
+      { authActive && 
+        !preferences?.useTxApproval &&
+        layerOpen &&
+        <Layer
           modal={true}
           responsive={mobile?false: undefined}
           full={mobile?true: undefined}
@@ -166,29 +190,115 @@ const Authorization = ({ series, buttonOnly, authWrap, children }:IAuthorization
                 </Box>
               );
             })}
-            { !txActive && allSigned && <Text size='xsmall' weight='bold'>Finally, confirm sending the signatures to Yield in a transaction...</Text>}
+
+            { !txActive && 
+              allSigned && 
+              <Text size='xsmall' weight='bold'>
+                Finally, confirm sending the signatures to Yield in a transaction...
+              </Text>}
             { txActive && <Text size='xsmall' weight='bold'> Submitting your signed authorizations ... transaction pending.</Text> }
             
-            { authPending && txActive &&
-            <Box alignSelf='start'>
-              <Box
-                round
-                onClick={()=>closeAuth()}
-                hoverIndicator='brand-transparent'
-                pad={{ horizontal:'small', vertical:'small' }}
-                justify='center'
-              >
-                <Box direction='row' gap='small' align='center'>
-                  <ArrowLeft color='text-weak' />
-                  <Text size='xsmall' color='text-weak'>close, and go back to the app</Text>
+            { authPending && 
+              txActive &&
+              <Box alignSelf='start'>
+                <FlatButton 
+                  onClick={()=>closeAuth()}
+                  label={
+                    <Box direction='row' gap='medium' align='center'>
+                      <ArrowLeft color='text-weak' />
+                      <Text size='small' color='text-weak'>close, and go back to the app</Text>
+                    </Box>
+                  }
+                />
+              </Box>}
+          </Box>
+        </Layer>}
+
+      { fallbackAuthActive && 
+        fallbackLayerOpen &&
+        <Layer
+          modal={true}
+          responsive={mobile?false: undefined}
+          full={mobile?true: undefined}
+        >
+          {!preferences?.useTxApproval && 
+          <Box 
+            width={!mobile?{ min:'620px', max:'620px' }: undefined}
+            round={mobile?undefined:'small'}
+            background='background'
+            pad='large'
+            gap='medium'
+          >
+            <Box>
+              <Text weight='bold' size='large'>It seems there was a problem signing the authorizations.</Text>
+              {!mobile && <Text size='xsmall'>( Its not your fault, some wallets dont provide signing functionality just yet :| )</Text>}
+            </Box>
+
+            <Box>
+              {/* <Text size='small' weight='bold'> Option 1:</Text> */}
+              <Text size='small'>You can continue by approving the set of authorization transactions individually with your wallet or provider.</Text>
+            </Box>
+
+            <Box>
+              {/* <Text size='small' weight='bold'> Option 2:</Text> */}
+              <Text size='small'> Or, if you know your wallet does support signing permits, simply reject all the approvals and try again.</Text>
+            </Box>
+
+            <Box>
+              <CheckBox 
+                checked={checkBoxStatic}
+                label={<Text size='xsmall'>In future, always use individual transactions for authorizations</Text>}
+                onChange={(e:any) => userActions.updatePreferences({ useTxApproval: true })}
+              />
+              <Box margin={{ left:'large' }}>
+                <Text size='xxsmall'>(You can always change back to using permit-style authorization in the settings)</Text>
+              </Box>
+            </Box>
+          </Box>}
+
+          {preferences?.useTxApproval &&
+          <Box 
+            width={!mobile?{ min:'620px', max:'620px' }: undefined}
+            round={mobile?undefined:'small'}
+            background='background'
+            pad='large'
+            gap='medium'
+          >
+            <Text weight='bold'> Please approve the following set of authorization transactions with your wallet or provider </Text>
+            { txActive && 
+            <Box gap='medium'>
+              <Box gap='medium'>
+                <Text size='xsmall' weight='bold'> 
+                  Authorization transactions pending: 
+                </Text>
+                <Box gap='small' fill='horizontal'>
+                  { pendingTxs.map((x:any, i:number)=> (
+                    <Box key={i} direction='row' fill='horizontal' justify='between'>
+                      <Box> { abbreviateHash(x.tx.hash) }</Box>
+                      <EtherscanButton txHash={x.tx.hash} />
+                    </Box>
+                  )   
+                  )}
                 </Box>
+              </Box> 
+              <Box alignSelf='start'>
+                <FlatButton 
+                  onClick={()=>closeAuth()}
+                  label={
+                    <Box direction='row' gap='medium' align='center'>
+                      <ArrowLeft color='text-weak' />
+                      <Text size='small' color='text-weak'>close, and go back to the app</Text>
+                    </Box>
+                  }
+                />
               </Box>
             </Box>}
+          </Box>}
 
-          </Box>
-        </Layer>} 
+        </Layer>}
+
     </>);
 };
 
-Authorization.defaultProps={ series:null, buttonOnly:false, authWrap:false, children:null };
+Authorization.defaultProps={ series:null, authWrap:false, children:null };
 export default Authorization;
