@@ -147,10 +147,9 @@ export const useAuth = () => {
       gasLimit: BigNumber.from('1000000')
     };
 
-    setAuthActive(true);
-    dispatch({ type: 'requestSigs', payload:[ auths.get(1), auths.get(2) ] });
-
     if (!fallback) { 
+      setAuthActive(true);
+      dispatch({ type: 'requestSigs', payload:[ auths.get(1), auths.get(2) ] });
       try {
       /* yieldProxy | Controller delegation */ 
         const controllerNonce = await controllerContract.signatureCount(fromAddr);
@@ -207,10 +206,9 @@ export const useAuth = () => {
       setAuthActive(false);
 
     } else {
-      console.log('Fallback to approval transactions');
+      handleSignError('Fallback to approval transactions');
       setFallbackAuthActive(true);
       await fallbackYieldAuth();
-      dispatch({ type: 'requestSigs', payload:[] });
     }
   };
 
@@ -237,11 +235,14 @@ export const useAuth = () => {
     const overrides = { 
       gasLimit: BigNumber.from('1000000')
     };
-    setAuthActive(true);
-    dispatch({ type: 'requestSigs', payload:[ auths.get(3), auths.get(4), auths.get(5) ] });
+
   
-    /* if ser account preferences don't specify using fallback,  */
+    /* if user account preferences don't specify using fallback,  */
     if (!fallback) {
+
+      setAuthActive(true);
+      dispatch({ type: 'requestSigs', payload:[ auths.get(3), auths.get(4), auths.get(5) ] });
+
       try {
         /* YieldProxy | Pool delegation */
         const poolNonce = await poolContract.signatureCount(fromAddr);
@@ -305,10 +306,9 @@ export const useAuth = () => {
       setAuthActive(false);
 
     } else {
-      console.log('Fallback to approval transactions');
+      handleSignError('Fallback to approval transactions');
       setFallbackAuthActive(true);
       await fallbackPoolAuth(series);
-      dispatch({ type: 'requestSigs', payload:[] });
     }
   };
 

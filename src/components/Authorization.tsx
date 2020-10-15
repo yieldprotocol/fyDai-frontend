@@ -35,9 +35,11 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
 
   // flags 
   const [ authPending, setAuthPending ] = useState<boolean>(false);
-  const [ layerOpen, setLayerOpen ] = useState<boolean>(true);
   const [ allSigned, setAllSigned ] = useState<boolean>(false);
-  
+
+  const [ layerOpen, setLayerOpen ] = useState<boolean>(true);
+  const [ fallbackLayerOpen, setFallbackLayerOpen ] = useState<boolean>(true);
+
   const { account } = useSignerAccount();
   const { yieldAuth, poolAuth, authActive, fallbackAuthActive } = useAuth();
   const [ txActive ] = useTxActive(['AUTH']);
@@ -57,10 +59,13 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
     setLayerOpen(false);
   };
 
-  /* manage layer open /closed by watching authActive */
+  /* manage layer visibility by watching authActive & fallbackActive */
   useEffect(()=>{
     authActive && setLayerOpen(true);
-  }, [authActive]);
+    fallbackAuthActive && setFallbackLayerOpen(true);
+
+
+  }, [authActive, fallbackAuthActive]);
 
   useEffect(()=>{
     const _allSigned = requestedSigs.reduce((acc:boolean, nextItem:any)=> {
@@ -207,55 +212,56 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
         </Layer>}
 
       { fallbackAuthActive && 
-       layerOpen &&
-       <Layer
-         modal={true}
-         responsive={mobile?false: undefined}
-         full={mobile?true: undefined}
-       >
-         {!preferences?.useTxApproval &&
-         <Box 
-           width={!mobile?{ min:'620px', max:'620px' }: undefined}
-           round={mobile?undefined:'small'}
-           background='background'
-           pad='large'
-           gap='medium'
-         >
-           <Text>It seems there was a problem signing the authorizations.</Text>
-           <Text>(Some wallets dont provide this functionality yet :| )</Text>
-           <Text>You can try with individual approval transactions </Text>
-           <Text> or simply reject them all and try again. </Text>
-           <Box> If you would like to always approve individually, </Box>        
-         </Box>}
+        fallbackLayerOpen &&
+    
+        <Layer
+          modal={true}
+          responsive={mobile?false: undefined}
+          full={mobile?true: undefined}
+        >
+          {!preferences?.useTxApproval &&
+          <Box 
+            width={!mobile?{ min:'620px', max:'620px' }: undefined}
+            round={mobile?undefined:'small'}
+            background='background'
+            pad='large'
+            gap='small'
+          >
+            <Text weight='bold'>It seems there was a problem signing the authorizations.</Text>
+            <Text size='small'>(Some wallets dont provide this functionality yet :| )</Text>
+            <Text>You can try with individual approval transactions </Text>
+            <Text> or simply reject them all and try again. </Text>
+            <Box> If you would like to always approve individually, </Box>        
+          </Box>}
 
-         { preferences?.useTxApproval &&
-         <Box 
-           width={!mobile?{ min:'620px', max:'620px' }: undefined}
-           round={mobile?undefined:'small'}
-           background='background'
-           pad='large'
-           gap='medium'
-         >
-           <Text> Please Approve the following authorization transactions with your wallet or provider </Text>
-         </Box>}
+          { preferences?.useTxApproval &&
+          <Box 
+            width={!mobile?{ min:'620px', max:'620px' }: undefined}
+            round={mobile?undefined:'small'}
+            background='background'
+            pad='large'
+            gap='medium'
+          >
+            <Text> Please Approve the following authorization transactions with your wallet or provider </Text>
+          </Box>}
 
-         { txActive &&
-         <Box alignSelf='start'>
-           <Box
-             round
-             onClick={()=>closeAuth()}
-             hoverIndicator='brand-transparent'
-             pad={{ horizontal:'small', vertical:'small' }}
-             justify='center'
-           >
-             <Box direction='row' gap='small' align='center'>
-               <ArrowLeft color='text-weak' />
-               <Text size='xsmall' color='text-weak'>close, and go back to the app</Text>
-             </Box>
-           </Box>
-         </Box>}
-       </Layer>}
-       
+          { txActive &&
+          <Box alignSelf='start'>
+            <Box
+              round
+              onClick={()=>closeAuth()}
+              hoverIndicator='brand-transparent'
+              pad={{ horizontal:'small', vertical:'small' }}
+              justify='center'
+            >
+              <Box direction='row' gap='small' align='center'>
+                <ArrowLeft color='text-weak' />
+                <Text size='xsmall' color='text-weak'>close, and go back to the app</Text>
+              </Box>
+            </Box>
+          </Box>}
+        </Layer>}
+
     </>);
 };
 
