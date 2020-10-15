@@ -239,7 +239,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
             <>
               <Box fill gap='medium'>
                 <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to lend</Text>
-                <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={lendDisabled}>
+                <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
                   <TextInput
                     ref={(el:any) => {el && !CloseDaiOpen && !mobile && el.focus(); setInputRef(el);}}
                     type="number"

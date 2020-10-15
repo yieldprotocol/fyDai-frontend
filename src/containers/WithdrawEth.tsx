@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Box, Layer, Keyboard, TextInput, Text, ResponsiveContext, Collapsible } from 'grommet';
+import { NavLink } from 'react-router-dom';
+import { Box, Keyboard, TextInput, Text, ResponsiveContext, Collapsible } from 'grommet';
 import ethers from 'ethers';
 
 import { FiArrowLeft as ArrowLeft } from 'react-icons/fi';
@@ -18,7 +19,6 @@ import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
 
 import EthMark from '../components/logos/EthMark';
-import { NavLink } from 'react-router-dom';
 import YieldMobileNav from '../components/YieldMobileNav';
 
 interface IWithDrawProps {
@@ -138,7 +138,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
       >        
         <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to withdraw</Text>
 
-        <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={withdrawDisabled}>
+        <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
           <TextInput
             ref={(el:any) => {el && !mobile && el.focus(); setInputRef(el);}} 
             type="number"

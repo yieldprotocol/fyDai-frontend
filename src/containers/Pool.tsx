@@ -210,7 +210,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
             <>
               <Box fill gap='medium'>
                 <Text alignSelf='start' size='large' color='text' weight='bold'>Add liquidity</Text>
-                <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={addLiquidityDisabled}>
+                <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
                   <TextInput
                     ref={(el:any) => {el && !removeLiquidityOpen && !mobile && el.focus(); setInputRef(el);}} 
                     type="number"

@@ -360,7 +360,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
             <Box gap='medium' align='center' fill='horizontal'>
               <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to borrow</Text>
 
-              <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={borrowDisabled}>
+              <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} >
                 <TextInput
                   ref={(el:any) => {el && !repayOpen && !mobile && el.focus(); setInputRef(el);}} 
                   type="number"

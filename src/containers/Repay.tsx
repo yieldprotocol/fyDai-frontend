@@ -143,7 +143,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
                 <Box gap='medium' align='center' fill='horizontal'>
                   <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to Repay</Text>
 
-                  <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={repayDisabled}>
+                  <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
                     <TextInput
                       ref={(el:any) => {el && !mobile && el.focus(); setInputRef(el);}} 
                       type="number"

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import styled, { css } from 'styled-components';
 import { Box, Collapsible } from 'grommet';
 
@@ -7,7 +7,6 @@ import InlineAlert from './InlineAlert';
 interface IInputProps {
   warningMsg: string|null;
   errorMsg: string|null;
-  disabled?: boolean,
   children:any;
 }
 
@@ -22,23 +21,7 @@ box-shadow: inset 6px 6px 11px #e9e9e9,
   `}
 `;
 
-function InputWrap( { warningMsg, errorMsg, disabled, children }: IInputProps) {
-
-  // const [ corners, setCorners ] = useState<any>('small');
-  // const [ border, setBorder ] = useState<any>('all');
-  // const [ animation, setAnimation ] = useState<any>(null);
-  // useEffect(()=>{
-
-  //   if (errorMsg || warningMsg) {
-  //     setCorners({ corner:'top', size:'small' });
-  //     setAnimation([{ type:'jiggle', duration:100, size:'xsmall' }, { type:'none', delay:1000 }] );
-  //     errorMsg && setBorder([{ color: 'red', side:'top' }, { side:'bottom' }, { color: 'red', side:'vertical' }]);
-  //     warningMsg && setBorder([{ color: 'orange', side:'top' }, { side:'bottom' }, { color: 'orange', side:'vertical' }]);
-  //   } else { 
-  //     setCorners('small');
-  //     setBorder('all');
-  //   }
-  // }, [errorMsg, warningMsg]);
+function InputWrap( { warningMsg, errorMsg, children }: IInputProps) {
 
   return (
     <InsetBox
@@ -65,7 +48,5 @@ function InputWrap( { warningMsg, errorMsg, disabled, children }: IInputProps) {
     </InsetBox>
   );
 }
-
-InputWrap.defaultProps = { disabled:false };
 
 export default InputWrap;

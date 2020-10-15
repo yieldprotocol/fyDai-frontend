@@ -1,6 +1,8 @@
 import React, { useState, useContext, useEffect } from 'react';
+import { NavLink } from 'react-router-dom';
+
 import { ethers } from 'ethers';
-import { Box, Layer, TextInput, Text, Keyboard, ResponsiveContext } from 'grommet';
+import { Box, TextInput, Text, Keyboard, ResponsiveContext } from 'grommet';
 
 import { FiArrowLeft as ArrowLeft } from 'react-icons/fi';
 
@@ -19,7 +21,6 @@ import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
 
 import DaiMark from '../components/logos/DaiMark';
-import { NavLink } from 'react-router-dom';
 import YieldMobileNav from '../components/YieldMobileNav';
 
 interface ICloseDaiProps {
@@ -120,7 +121,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
           gap='medium'
         >
           <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to close</Text>
-          <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={withdrawDisabled}>
+          <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
             <TextInput
               ref={(el:any) => {el && !mobile && el.focus(); setInputRef(el);}} 
               type="number"

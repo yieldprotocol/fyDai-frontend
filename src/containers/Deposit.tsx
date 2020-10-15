@@ -246,7 +246,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
         >
           <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to deposit</Text>
 
-          <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} disabled={depositDisabled}>
+          <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
             <TextInput
               ref={(el:any) => {el && !withdrawOpen && !mobile && el.focus(); setInputRef(el);}} 
               type='number'

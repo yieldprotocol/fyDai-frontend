@@ -6,7 +6,6 @@ import Loading from './Loading';
 
 import { SeriesContext } from '../contexts/SeriesContext';
 
-
 type entry = {
   visible: boolean;
   active: boolean;
@@ -55,8 +54,6 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
                 round='large'
                 gap='xsmall'
                 width={{ min:'30%' }}
-                // direction={mobile?'row':undefined}
-                // justify={mobile?'between':undefined}
               >
                 <Box>
                   <Text 
@@ -94,12 +91,13 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
                 </Loading>
               </Box>
             );
-          }
+          } 
+          return [];
         })}
       </Box>
 
       <Box
-        margin={visibleEntries.length <= 3? {bottom:'large'}: undefined}
+        margin={visibleEntries.length <= 3? { bottom:'large' }: undefined}
       >
         <Collapsible open={detailsOpen}>
           <Box 
@@ -157,7 +155,8 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
                     </Loading>
                   </Box>
                 );
-              }
+              } 
+              return [];
             })}
           </Box>
         </Collapsible>
