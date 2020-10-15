@@ -23,6 +23,8 @@ import FlatButton from '../../components/FlatButton';
 import TxHistory from '../../components/TxHistory';
 import EtherscanButton from '../../components/EtherscanButton';
 import YieldSettings from '../../components/YieldSettings';
+import ExperimentWrap from '../../components/ExperimentWrap';
+
 
 const ConnectLayer = ({ view, target, closeLayer }: any) => {
 
@@ -38,8 +40,8 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
   const [ histOpen, setHistOpen] = useState<string>('BORROW');
 
   const connectorList = [
-    { name: 'Metamask', image: metamaskImage, connection: injected },
-    { name: 'Wallet Connect', image: walletConnectImage, connection: walletconnect },
+    { name: 'Metamask', image: metamaskImage, connection: injected, trial: false },
+    { name: 'Wallet Connect', image: walletConnectImage, connection: walletconnect, trial: true },
   ];
 
   useEffect(()=>{
@@ -152,32 +154,38 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                 <Box align="center" pad="medium" gap="small">
                   <Text size='xxlarge' color='brand' weight='bold'>Connect a wallet</Text>
                   <Text>Try connecting with:</Text>
-                  {connectorList.map((x) => (
-                    <RaisedButton
-                      onClick={() => { handleSelectConnector(x.connection); closeLayer();}}
-                      label={x.name}
-                      fill="horizontal"
-                      icon={
-                        <Box
-                          height="1rem"
-                          width="1rem"
-                          style={{
-                            position: 'absolute',
-                            left: '1rem',
-                          }}
-                        >
-                          <Image src={x.image} fit="contain" />
-                        </Box>
+                  {connectorList.map((x:any, i:number) => {          
+                    const ConnectButton = ()=> (
+                      <RaisedButton
+                        onClick={() => { handleSelectConnector(x.connection); closeLayer();}}
+                        label={x.name}
+                        fill="horizontal"
+                        icon={
+                          <Box
+                            height="1rem"
+                            width="1rem"
+                            style={{
+                              position: 'absolute',
+                              left: '1rem',
+                            }}
+                          >
+                            <Image src={x.image} fit="contain" />
+                          </Box>
+                        }
+                        style={{
+                          marginBottom: '1rem',
+                          fontWeight: 500,
+                          position: 'relative',
+                          padding: '0.5rem',
+                        }}
+                        key={x.name}
+                      />);                 
+                    if (x.trial) {
+                      return <ExperimentWrap><ConnectButton /></ExperimentWrap>;
+                    // eslint-disable-next-line react/jsx-key
+                    } return <ConnectButton />;
                   }
-                      style={{
-                        marginBottom: '1rem',
-                        fontWeight: 500,
-                        position: 'relative',
-                        padding: '0.5rem',
-                      }}
-                      key={x.name}
-                    />
-                  ))}
+                  )}
                   <Box gap="xsmall" direction="row">
                     <Anchor href="#" label="Help!" size="xsmall" color="brand" />
                     <Text size="xsmall"> I'm not sure what this means.</Text>

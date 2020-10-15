@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Box, Layer, Text, ResponsiveContext } from 'grommet';
+import { Box, Layer, Text, ResponsiveContext, CheckBox } from 'grommet';
 
 import { 
   FiCheckCircle as Check,
@@ -39,6 +39,8 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
 
   const [ layerOpen, setLayerOpen ] = useState<boolean>(true);
   const [ fallbackLayerOpen, setFallbackLayerOpen ] = useState<boolean>(true);
+
+  const [checkBoxStatic, setChecboxStatic] = useState<any>(preferences.useTxApproval);
 
   const { account } = useSignerAccount();
   const { yieldAuth, poolAuth, authActive, fallbackAuthActive } = useAuth();
@@ -213,28 +215,13 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
 
       { fallbackAuthActive && 
         fallbackLayerOpen &&
-    
         <Layer
           modal={true}
           responsive={mobile?false: undefined}
           full={mobile?true: undefined}
         >
-          {!preferences?.useTxApproval &&
-          <Box 
-            width={!mobile?{ min:'620px', max:'620px' }: undefined}
-            round={mobile?undefined:'small'}
-            background='background'
-            pad='large'
-            gap='small'
-          >
-            <Text weight='bold'>It seems there was a problem signing the authorizations.</Text>
-            <Text size='small'>(Some wallets dont provide this functionality yet :| )</Text>
-            <Text>You can try with individual approval transactions </Text>
-            <Text> or simply reject them all and try again. </Text>
-            <Box> If you would like to always approve individually, </Box>        
-          </Box>}
 
-          { preferences?.useTxApproval &&
+          {!preferences?.useTxApproval && 
           <Box 
             width={!mobile?{ min:'620px', max:'620px' }: undefined}
             round={mobile?undefined:'small'}
@@ -242,7 +229,43 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
             pad='large'
             gap='medium'
           >
-            <Text> Please Approve the following authorization transactions with your wallet or provider </Text>
+            <Box>
+              <Text weight='bold' size='large'>It seems there was a problem signing the authorizations.</Text>
+              {!mobile && <Text size='xsmall'>( Its not your fault, some wallets dont provide signing functionality just yet :| )</Text>}
+            </Box>
+
+            <Box>
+              {/* <Text size='small' weight='bold'> Option 1:</Text> */}
+              <Text size='small'>You can continue by approving the set of authorization transactions individually with your wallet or provider.</Text>
+            </Box>
+
+            <Box>
+              {/* <Text size='small' weight='bold'> Option 2:</Text> */}
+              <Text size='small'> Or, if you know your wallet does support signing permits, simply reject all the approvals and try again.</Text>
+            </Box>
+
+            <Box>
+              <CheckBox 
+                checked={checkBoxStatic}
+                label={<Text size='xsmall'>In future, always use individual transactions for authorizations</Text>}
+                onChange={(e:any) => userActions.updatePreferences({ useTxApproval: true })}
+              />
+              <Box margin={{ left:'large' }}>
+                <Text size='xxsmall'>(You can always change back to using permit-style authorization in the settings)</Text>
+              </Box>
+            </Box>
+          </Box>}
+
+          {preferences?.useTxApproval &&
+          <Box 
+            width={!mobile?{ min:'620px', max:'620px' }: undefined}
+            round={mobile?undefined:'small'}
+            background='background'
+            pad='large'
+            gap='medium'
+          >
+            <Text> Please approve the following set of authorization transactions with your wallet or provider </Text>
+
           </Box>}
 
           { txActive &&
