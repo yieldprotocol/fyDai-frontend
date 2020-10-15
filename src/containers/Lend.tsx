@@ -183,7 +183,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
                   ( activeSeries?.isMature() && activeSeries?.fyDaiBalance_>0),
                 active: true,
                 loading: lendPending,  
-                value: activeSeries && `${activeSeries?.fyDaiBalance_} DAI` || '-',
+                value: activeSeries? `${activeSeries?.fyDaiBalance_} DAI` : '-',
                 valuePrefix: null,
                 valueExtra: null,
               },
@@ -209,10 +209,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
               },
               {
                 label: 'Dai Balance',
-                visible: 
-                  false &&
-                  (!!account && !txActive && !activeSeries?.isMature()) || 
-                  (activeSeries?.isMature() && activeSeries?.fyDaiBalance_>0),
+                visible: false,
                 active: true,
                 loading: lendPending,            
                 value: daiBalance_?`${daiBalance_} DAI`: '0 DAI',

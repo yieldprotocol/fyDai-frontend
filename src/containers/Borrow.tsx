@@ -179,7 +179,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
       setWarningMsg(null);
       setErrorMsg(null);
     }
-  }, [ debouncedInput]);
+  }, [ debouncedInput ]);
 
   return (
     <RaisedBox>
