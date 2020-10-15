@@ -1,8 +1,7 @@
-import { useState, useContext } from 'react';
+import { useContext } from 'react';
 import { ethers }  from 'ethers';
 
 import { NotifyContext } from '../contexts/NotifyContext';
-
 import { useSignerAccount } from './connectionHooks';
 
 import FYDai from '../contracts/FYDai.json';
@@ -36,7 +35,11 @@ export function useToken() {
    * 
    * @returns {BigNumber} ETH in Wei or token balance.
    */
-  const getBalance = async (tokenAddr:string|null=null, contractName:string|null=null, queryAddress:string|null=null) => {  
+  const getBalance = async (
+    tokenAddr:string|null=null, 
+    contractName:string|null=null, 
+    queryAddress:string|null=null
+  ) => {  
     if (fallbackProvider) {
       const addrToCheck = queryAddress || account;
       if (tokenAddr && contractName) {
@@ -70,6 +73,7 @@ export function useToken() {
     try {
       res = await contract.allowance(fromAddr, operatorAddr);
     }  catch (e) {
+      // eslint-disable-next-line no-console
       console.log(e);
       res = ethers.BigNumber.from('0');
     }

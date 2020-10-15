@@ -64,6 +64,7 @@ export const useSendTx = () => {
     console.log(`${tx.hash} pending`);
     await tx.wait();
     setSendTxActive(false);
+    // eslint-disable-next-line no-console
     console.log(`${tx.hash} send tx complete`);
   };
   return [ sendTx, sendTxActive ] as const;
@@ -188,6 +189,7 @@ export const useTimeTravel = () => {
     // eslint-disable-next-line no-console
     console.log(await res.json());
     setBlock(provider.blockNumber);
+    // eslint-disable-next-line no-console
     console.log('new block:', provider.blockNumber);
   };
 

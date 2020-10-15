@@ -3,7 +3,6 @@ import { ethers, BigNumber }  from 'ethers';
 import * as utils from '../utils';
 
 import { YieldContext } from '../contexts/YieldContext';
-import { divRay } from '../utils';
 
 /**
  * Hook for Yield maths functions
@@ -29,7 +28,6 @@ export const useMath = () => {
    */
   const collPrice = (): BigNumber => {
     // TODO: Update this to use ETH-A Oracle - not ilks.spot for market price USD
-    console.log('ETH price:', ethers.utils.formatEther(utils.mulRay(ethers.utils.parseEther('1.5'), (ilks.spot)).toString()));
     return utils.mulRay(utils.toRay(1.5), (ilks.spot));
   };
 

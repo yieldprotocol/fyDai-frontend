@@ -9,7 +9,7 @@ import {
 import { useWeb3React, UnsupportedChainIdError } from '@web3-react/core';
 import { NetworkConnector } from '@web3-react/network-connector';
 
-import { injected, walletconnect } from '../connectors';
+import { injected } from '../connectors';
 
 import { NotifyContext } from '../contexts/NotifyContext';
 
@@ -58,7 +58,7 @@ const useEagerConnect = () => {
 };
 
 const useInactiveListener = (suppress: boolean = false) => {
-  const { active, error, activate, account: _account, chainId: _chainId } = useWeb3React();
+  const { active, error, activate, chainId: _chainId } = useWeb3React();
   const { handleErrorMessage } = useWeb3Errors();
 
   const [ cachedChainId ] = useCachedState('cache_chainId', null);

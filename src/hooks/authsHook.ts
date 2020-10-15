@@ -113,7 +113,7 @@ export const useAuth = () => {
       ]);
       setFallbackAuthActive(false);
     } catch (e) {
-      // handleTxBuildError(e);
+      // eslint-disable-next-line no-console
       console.log(e);
       setFallbackAuthActive(false);     
     }
@@ -128,7 +128,7 @@ export const useAuth = () => {
       ]);
       setFallbackAuthActive(false);
     } catch (e) {
-      // handleTxBuildError(e);
+      // eslint-disable-next-line no-console
       console.log(e);
       setFallbackAuthActive(false);      
     }
@@ -183,6 +183,7 @@ export const useAuth = () => {
         if ( e.code === 4001 ) {
           handleSignError(e);
           setFallbackAuthActive(true);
+          // eslint-disable-next-line no-console
           console.log('Fallback to approval transactions');
           await fallbackYieldAuth();
           return;
@@ -236,7 +237,6 @@ export const useAuth = () => {
       gasLimit: BigNumber.from('1000000')
     };
 
-  
     /* if user account preferences don't specify using fallback,  */
     if (!fallback) {
 
@@ -282,6 +282,7 @@ export const useAuth = () => {
       /* If there is a problem with the signing, use the approve txs as a fallback */
         if ( e.code === 4001 ) {
           handleSignError(e);
+          // eslint-disable-next-line no-console
           console.log('Fallback to approval transactions');
           setFallbackAuthActive(true);
           await fallbackPoolAuth(series);

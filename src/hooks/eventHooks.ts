@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { ethers }  from 'ethers';
 
 import { useSignerAccount } from './connectionHooks';
@@ -81,6 +80,7 @@ export const useEvents = () => {
             return y.toString();
           } if (ethers.utils.isAddress(y)) {
             return ethers.utils.getAddress(y);
+          // eslint-disable-next-line no-constant-condition
           } if (typeof y) {
             return y;
           }

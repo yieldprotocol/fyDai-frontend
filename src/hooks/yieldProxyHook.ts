@@ -15,9 +15,7 @@ import { useSignerAccount } from './connectionHooks';
 import { usePool } from './poolHook';
 import { useMath } from './mathHooks';
 import { useToken } from './tokenHook';
-import { useFYDai } from './fyDaiHook';
 import { useTxHelpers } from './appHooks';
-
 
 /**
  * Hook for interacting with the Yield Proxy Contract.
@@ -106,7 +104,8 @@ export const useProxy = () => {
 
     /* Processing and/or sanitizing input */
     const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(utils.cleanValue(amount));
-    const toAddr = account && ethers.utils.getAddress(account); /* 'to' in this case represents the vault to be depositied into within controller */  
+    /* 'to' in this case represents the vault to be depositied into within controller */
+    const toAddr = account && ethers.utils.getAddress(account);   
     
     /* Contract interaction */
     let tx:any;
@@ -244,6 +243,7 @@ export const useProxy = () => {
       if ( series.isMature() ) {  
         try {     
           /* Repay using a signature authorizing treasury */
+          // eslint-disable-next-line no-console
           console.log('Repaying Before maturity - Signature required');
           dispatch({ type: 'requestSigs', payload:[ auths.get(1) ] });
           const result = await signDaiPermit( 
@@ -272,6 +272,7 @@ export const useProxy = () => {
         );
 
       } else if ( !series.isMature() ) {
+        // eslint-disable-next-line no-console
         console.log('Repaying before maturity - no signature required');
         /* calculate expected trade values and factor in slippage */
         const preview = await previewPoolTx('selldai', series, repaymentInDai);
@@ -292,6 +293,7 @@ export const useProxy = () => {
           overrides
         );
       } else {
+        // eslint-disable-next-line no-console
         console.log('Series has passed its maturity date, but has not yet been matured');
       }     
       
@@ -496,7 +498,7 @@ export const useProxy = () => {
         // maxFYDaiIn = ethers.utils.parseEther('1000000');
         throw(preview);
       }
-      tx = await proxyContract.buyDai(poolAddr, toAddr, parsedDaiOut, maxFYDaiIn);
+      tx = await proxyContract.buyDai(poolAddr, toAddr, parsedDaiOut, maxFYDaiIn, overrides);
     } catch (e) {
       handleTxBuildError(e);  
       setBuyActive(false);
@@ -596,7 +598,6 @@ export const useProxy = () => {
     // makerToYield(address pool, address user, uint256 wethAmount, uint256 daiAmount)
   };
 
-  
   // @dev Transfer debt and collateral from Yield to MakerDAO
   // Needs vat.hope(splitter.address, { from: user });
   // Needs controller.addDelegate(splitter.address, { from: user });

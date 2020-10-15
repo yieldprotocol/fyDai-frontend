@@ -1,6 +1,5 @@
 import { useEffect, useState, useContext } from 'react';
 import { NotifyContext } from '../contexts/NotifyContext';
-import { IYieldSeries } from '../types';
 
 /* Simple Hook for checking if a transaction family/families are in process */
 export const useTxActive = (typeList:string[]) => {
