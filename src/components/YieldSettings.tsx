@@ -1,10 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import styled, { css } from 'styled-components';
-import {
-  Box,
-  Text,
-  ResponsiveContext,
-} from 'grommet';
+import { Box, Text } from 'grommet';
 
 import { UserContext } from '../contexts/UserContext';
 import FlatButton from './FlatButton';
@@ -53,14 +49,8 @@ const slippageList = [0.001, 0.005, 0.01];
 
 const YieldSettings = () => {
 
-  const { state: { position, txHistory, preferences }, actions: { updatePreferences } } = useContext(UserContext);
-  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
-  const [ slippage, setSlippage] = useState<number>(0);
+  const { state: { preferences }, actions: { updatePreferences } } = useContext(UserContext);
   const [ useTxApproval, setUseTxApproval] = useState<boolean>(!preferences.useTxApproval);
-  
-  useEffect(()=>{
-    preferences.slippage && setSlippage(slippageList.indexOf(preferences.slippage));
-  }, [preferences.slippage]);
 
   useEffect(()=>{
     setUseTxApproval(!preferences.useTxApproval);
@@ -74,6 +64,7 @@ const YieldSettings = () => {
           <Box round>
             <FlatButton
               disabled
+              // eslint-disable-next-line no-console
               onClick={()=>console.log('STILL TO DO!')}
               label={<Text size='xsmall'>More settings</Text>}
             /> 
@@ -89,47 +80,20 @@ const YieldSettings = () => {
         >
           <Text size='xsmall'>Slippage tolerance:  </Text>
 
-          { slippageList.map( (x:any, i:number) => {
-
-
-          })}
-
-          <Box gap='small' align='center'>
-            <StyledBox
-              pad={{ horizontal: 'large', vertical: 'xsmall' }}
-              onClick={() => updatePreferences({ slippage: slippageList[0] })}
-              border={slippageList.indexOf(preferences.slippage)!== 0 ? undefined : 'all'}
-            >
-              <Text size="small">
-                0.1 %
-              </Text>
-            </StyledBox>
-          </Box>
-
-          <Box gap='small' align='center'>
-            <StyledBox
-              pad={{ horizontal: 'large', vertical: 'xsmall' }}
-              onClick={() => updatePreferences({ slippage: slippageList[1] })}
-              border={slippage !== 1 ? undefined : 'all'}
-            >
-              <Text size="small">
-                0.5 %
-              </Text>
-            </StyledBox>
-          </Box>
-
-          <Box gap='small' align='center'>
-            <StyledBox
-              pad={{ horizontal: 'large', vertical: 'xsmall' }}
-              onClick={() => updatePreferences({ slippage: slippageList[2] })}
-              border={slippage !== 2 ? undefined : 'all'}
-            >
-              <Text size="small">
-                1 %
-              </Text>
-            </StyledBox>
-          </Box>
-        </Box>
+          { slippageList.map( (x:any, i:number) => (
+            <Box gap='small' align='center' key={x}>
+              <StyledBox
+                pad={{ horizontal: 'large', vertical: 'xsmall' }}
+                onClick={() => updatePreferences({ slippage: slippageList[i] })}
+                border={slippageList.indexOf(preferences.slippage)!== i ? undefined : 'all'}
+              >
+                <Text size="small">
+                  {x*100} %
+                </Text>
+              </StyledBox>
+            </Box>)
+          )}   
+        </Box> 
 
         <Box
           pad={{ vertical:'small' }}

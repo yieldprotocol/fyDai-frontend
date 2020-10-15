@@ -1,9 +1,8 @@
 import React, { useContext } from 'react';
 import { Box, Text, ResponsiveContext, ThemeContext } from 'grommet';
-
 import { FiCopy as Copy } from 'react-icons/fi';
-
 import { ScaleLoader } from 'react-spinners';
+
 import { NotifyContext } from '../contexts/NotifyContext';
 import EtherscanButton from './EtherscanButton';
 import { abbreviateHash } from '../utils';
@@ -25,8 +24,6 @@ const TxStatus= ({ msg, tx }:TxStatusProps) => {
 
   // TODO: handle copy
   const handleCopy = () => {
-    console.log(txRef.current); 
-    // txRef.current?.innerText;
     document.execCommand('copy');
   };
 

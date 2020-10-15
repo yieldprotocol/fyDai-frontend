@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext, useCallback } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { ethers } from 'ethers';
 import { Box, Keyboard, TextInput, Text, ResponsiveContext, Collapsible, Layer } from 'grommet';
 
@@ -102,7 +102,12 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
     setCalculating(true);
     const daiReserves = await getBalance(deployedContracts.Dai, 'Dai', activeSeries.poolAddress);
     const fyDaiReserves = await getBalance(activeSeries.fyDaiAddress, 'FYDai', activeSeries.poolAddress);
-    const newTokens = calcTokensMinted(daiReserves, fyDaiReserves, activeSeries.totalSupply, ethers.utils.parseEther(debouncedInput));
+    const newTokens = calcTokensMinted(
+      daiReserves, 
+      fyDaiReserves, 
+      activeSeries.totalSupply, 
+      ethers.utils.parseEther(debouncedInput)
+    );
     const newBalance = newTokens.add(activeSeries.poolTokens);
     const newTotalSupply = activeSeries.totalSupply.add(newTokens);
     const percent = poolPercent(newTotalSupply, newBalance); 

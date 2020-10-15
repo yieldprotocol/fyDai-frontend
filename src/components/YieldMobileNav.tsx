@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Image, Box, Text, Layer, Nav, ThemeContext } from 'grommet';
-import { FiArrowRight as ArrowRight, FiMenu as MenuIcon } from 'react-icons/fi';
+import { FiMenu as MenuIcon } from 'react-icons/fi';
 
 import { SeriesContext } from '../contexts/SeriesContext';
 import logoDark from '../assets/images/logo.svg';
@@ -9,11 +9,10 @@ import logoLight from '../assets/images/logo_light.svg';
 
 const YieldMobileNav = ({ noMenu=false, children }:any) =>  {
 
-  const [showSidebar, setShowSidebar] = useState<boolean>(false);
   const theme = useContext<any>(ThemeContext);
-
   const { state: { activeSeries } } = useContext(SeriesContext);
-
+  
+  const [showSidebar, setShowSidebar] = useState<boolean>(false);
 
   return (
     <Box>

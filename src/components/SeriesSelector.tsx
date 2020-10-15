@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { useLocation, useHistory, NavLink } from 'react-router-dom';
+import { useLocation, useHistory } from 'react-router-dom';
 import { Text, Box, Layer, ResponsiveContext, Button } from 'grommet';
 import { 
   FiArrowLeft as ArrowLeft,

@@ -1,9 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import {
-  Box,
-  Text,
-  ResponsiveContext,
-} from 'grommet';
+import {Box, Text } from 'grommet';
 import { UserContext } from '../contexts/UserContext';
 import { NotifyContext } from '../contexts/NotifyContext';
 import FlatButton from './FlatButton';
@@ -13,7 +9,6 @@ const TxRecent = ({ setView }: any) => {
 
   const { state: { lastCompletedTx, pendingTxs } } = useContext(NotifyContext);
   const { state: { txHistory } } = useContext(UserContext);
-  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
   const [ lastTx, setLastTx] = useState<any>(null);
   

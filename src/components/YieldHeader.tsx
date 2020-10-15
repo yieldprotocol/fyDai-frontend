@@ -7,14 +7,13 @@ import {
   ThemeContext,
   ResponsiveContext,
 } from 'grommet';
-import { VscTelescope as Telescope } from 'react-icons/vsc';
+// import { VscTelescope as Telescope } from 'react-icons/vsc';
 import { FiArrowLeft as ArrowLeft } from 'react-icons/fi';
 
 import logoDark from '../assets/images/logo.svg';
 import logoLight from '../assets/images/logo_light.svg';
 
 import AccountButton from './AccountButton';
-import FlatButton from './FlatButton';
 import YieldNav from './YieldNav';
 
 const YieldHeader = (props: any) => {
