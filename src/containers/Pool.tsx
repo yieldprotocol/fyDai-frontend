@@ -283,8 +283,9 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
             activeSeries?.poolTokens?.gt(ethers.constants.Zero) && 
             <RemoveLiquidity />}
 
+            
             <Box direction='row' fill justify='between'>
-              { activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) && 
+              { activeSeries?.poolTokens?.gt(ethers.constants.Zero) && 
                 !mobile &&
                 <Box alignSelf='start' margin={{ top:'medium' }}>
                   <FlatButton 
