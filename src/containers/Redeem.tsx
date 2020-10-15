@@ -23,7 +23,6 @@ const Redeem  = ({ close }:IRedeemProps)  => {
   const { hasBeenMatured, redeem, redeemActive } = useFYDai();
   const [ txActive ] = useTxActive(['redeem']);
 
-  const [ redeemPending, setRedeemPending] = useState<boolean>(false);
   const [ redeemDisabled, setRedeemDisabled] = useState<boolean>(true);
   const [ matured, setMatured ] = useState<boolean>(false);
   
@@ -32,14 +31,12 @@ const Redeem  = ({ close }:IRedeemProps)  => {
 
   const redeemProcedure = async () =>{
     if(!redeemDisabled) {
-      setRedeemPending(true);
       await redeem(activeSeries.fyDaiAddress, activeSeries.fyDaiBalance.toString());
       userActions.updateHistory();
       await Promise.all([
         userActions.updatePosition(),
         seriesActions.updateActiveSeries()
       ]);
-      setRedeemPending(false);
     }
   };
 

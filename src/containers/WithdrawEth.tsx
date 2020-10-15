@@ -50,7 +50,6 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
   const [inputRef, setInputRef] = useState<any>(null);
 
   const [ estRatio, setEstRatio ] = useState<any>();
-  const [ estDecrease, setEstDecrease ] = useState<any>();
   const [ maxWithdraw, setMaxWithdraw ] = useState<string>();
 
   const [ withdrawDisabled, setWithdrawDisabled ] = useState<boolean>(true);
@@ -85,10 +84,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
       const newRatio = estimateRatio((ethPosted.sub( parsedInput )), debtValue); 
       // const newRatio = estimateRatio((ethPosted_ - parseFloat(inputValue)).toString(), debtValue_);
       if (newRatio) {
-        console.log('new ratio', newRatio);
         setEstRatio(parseFloat(newRatio.toString()).toFixed(2));
-        const newDecrease = collateralPercent_ - parseFloat(newRatio.toString());
-        setEstDecrease(newDecrease.toFixed(2));
       }
     }
   }, [ debouncedInput ]);
@@ -122,7 +118,11 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
     <Keyboard 
       onEsc={() => { inputValue? setInputValue(undefined): close();}}
       onEnter={()=> withdrawProcedure()}
-      onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
+      onBackspace={()=> {
+        inputValue && 
+        (document.activeElement !== inputRef) && 
+        setInputValue(debouncedInput.toString().slice(0, -1));
+      }}
       target='document'
     >
       { !txActive && !withdrawPending && 

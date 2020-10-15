@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { ethers } from 'ethers';
 import { useParams, useHistory, NavLink } from 'react-router-dom';
-import { Keyboard, Box, TextInput, Text, ThemeContext, ResponsiveContext, Collapsible, Layer, Menu, Nav } from 'grommet';
+import { Keyboard, Box, TextInput, Text, ThemeContext, ResponsiveContext, Collapsible, Layer } from 'grommet';
 import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 import { VscHistory as History } from 'react-icons/vsc';
 
@@ -186,7 +186,11 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
       <Keyboard 
         onEsc={() => setInputValue(undefined)}
         onEnter={()=> borrowProcedure(inputValue)}
-        onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
+        onBackspace={()=> {
+          inputValue && 
+          (document.activeElement !== inputRef) && 
+          setInputValue(debouncedInput.toString().slice(0, -1));
+        }}
         target='document'
       >
         { repayOpen && 
@@ -299,7 +303,12 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
               {
                 label: 'Borrowing Power',
                 labelExtra: 'based on collateral posted',
-                visible: !txActive && activeSeries && !activeSeries.isMature() && !!account && parseFloat(ethPosted_) > 0,
+                visible: 
+                  !txActive && 
+                  activeSeries && 
+                  !activeSeries.isMature() && 
+                  !!account && 
+                  parseFloat(ethPosted_) > 0,
                 active: maxDaiAvailable_,
                 loading: borrowPending,
                 value: maxDaiAvailable_? `${maxDaiAvailable_} DAI`: '0 DAI',           
@@ -320,7 +329,12 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
               {
                 label: 'Collateralization Ratio',
                 labelExtra: 'based on ETH posted',
-                visible: !txActive && activeSeries && !activeSeries.isMature() && !!account && parseFloat(ethPosted_) > 0,
+                visible: 
+                  !txActive && 
+                  activeSeries && 
+                  !activeSeries.isMature() && 
+                  !!account && 
+                  parseFloat(ethPosted_) > 0,
                 active: collateralPercent_ > 0,
                 loading: false,            
                 value: (collateralPercent_ && (collateralPercent_ !== 0))? `${collateralPercent_}%`: '0%',
@@ -360,7 +374,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
             <Box gap='medium' align='center' fill='horizontal'>
               <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to borrow</Text>
 
-              <InputWrap errorMsg={errorMsg} warningMsg={warningMsg} >
+              <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
                 <TextInput
                   ref={(el:any) => {el && !repayOpen && !mobile && el.focus(); setInputRef(el);}} 
                   type="number"
@@ -397,7 +411,6 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
                     },
                     {
                       label: 'Like what you see?',
-                      // labelExtra: 'the first step is to:',
                       visible: !account && inputValue>0,
                       active: inputValue,
                       loading: false,            

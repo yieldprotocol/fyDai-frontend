@@ -1,4 +1,5 @@
 import React, { useEffect, useContext, useState } from 'react';
+import { NavLink } from 'react-router-dom';
 import { ethers } from 'ethers';
 import { Box, TextInput, Text, ResponsiveContext, Keyboard, Collapsible } from 'grommet';
 
@@ -13,7 +14,6 @@ import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
 
 import {
-  usePool,
   useProxy,
   useTxActive,
   useSignerAccount,
@@ -30,7 +30,6 @@ import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
 
 import DaiMark from '../components/logos/DaiMark';
-import { NavLink } from 'react-router-dom';
 import YieldMobileNav from '../components/YieldMobileNav';
 
 interface IRepayProps {
@@ -46,8 +45,6 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
   const { state: userState, actions: userActions } = useContext(UserContext);
   const { daiBalance } = userState.position;
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
-
-  const [ hasDelegated, setHasDelegated ] = useState<boolean>(true);
 
   const { repayDaiDebt, repayActive } = useProxy();
   const [ txActive ] = useTxActive(['repay']);
@@ -97,11 +94,10 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
     (
       (daiBalance && daiBalance.eq(ethers.constants.Zero)) ||
       !account ||
-      !hasDelegated ||
       !inputValue ||
       parseFloat(inputValue) <= 0
     )? setRepayDisabled(true): setRepayDisabled(false);
-  }, [ inputValue, hasDelegated ]);
+  }, [ inputValue ]);
 
   /* Handle input warnings and errors */ 
   useEffect(() => {
@@ -123,7 +119,11 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
     <Keyboard 
       onEsc={() => setInputValue(undefined)}
       onEnter={()=> repayProcedure(inputValue)}
-      onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
+      onBackspace={()=> {
+        inputValue && 
+        (document.activeElement !== inputRef) && 
+        setInputValue(debouncedInput.toString().slice(0, -1));
+      }}
       target='document'
     >
       { !txActive &&
@@ -264,6 +264,6 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
   );
 }
 
-Repay.defaultProps = { repayAmount:null, setActiveView: 2, close:()=>console.log('Send in a close function') };
+Repay.defaultProps = { repayAmount:null, setActiveView: 2, close:()=>null };
 
 export default Repay;

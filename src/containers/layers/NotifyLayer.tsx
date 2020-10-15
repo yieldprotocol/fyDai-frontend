@@ -55,11 +55,6 @@ function NotifyLayer(target:any, columnsWidth:any) {
               <Box align="center" direction="row" gap="small" pad='small'>
                 <Text size='small' color={notificationTypeMap(state.type).textColor}>{ state.message }</Text>
               </Box>
-              {/* <RaisedButton
-                background={notificationTypeMap(state.type).color}
-                onClick={()=>dispatch({ type:'closeNotify' })}
-                label={<Text size='small' color={notificationTypeMap(state.type).textColor}>Close</Text>}
-              /> */}
             </Box>
             <Box background={notificationTypeMap(state.type).color} />
           </Grid> 
@@ -108,7 +103,7 @@ function NotifyLayer(target:any, columnsWidth:any) {
             pad={{ vertical:'small', horizontal:'small' }}
             background={notificationTypeMap('null').color}
             round='small'
-            margin={mobile?{ bottom:'50px', horizontal:'xsmall'}: { bottom:'xlarge', right:'large' }}
+            margin={mobile?{ bottom:'50px', horizontal:'xsmall' }: { bottom:'xlarge', right:'large' }}
             align='center'
           >
             <Box direction='row' align='center'>
@@ -142,7 +137,6 @@ function NotifyLayer(target:any, columnsWidth:any) {
         onEsc={()=>dispatch({ type:'closeNotify' })}
         responsive={false}
         plain
-        // target={target.target}
         full='vertical'
       >
         <Box

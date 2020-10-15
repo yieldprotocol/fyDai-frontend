@@ -156,7 +156,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
       >
         { removeLiquidityOpen && 
         <Layer onClickOutside={()=>setRemoveLiquidityOpen(false)}>
-          <RemoveLiquidity close={()=>setRemoveLiquidityOpen(false)} /> 
+          <RemoveLiquidity close={()=>setRemoveLiquidityOpen(false)} openConnectLayer={openConnectLayer} /> 
         </Layer>}
 
         { histOpen && 

@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { NavLink, useHistory, useParams } from 'react-router-dom';
-import ethers, { BigNumber } from 'ethers';
+import ethers from 'ethers';
 
 import { 
   Box,
@@ -171,7 +171,11 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
       <Keyboard 
         onEsc={() => setInputValue(undefined)}
         onEnter={()=> depositProcedure()}
-        onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.slice(0, -1))}
+        onBackspace={()=> { 
+          inputValue && 
+          (document.activeElement !== inputRef) && 
+          setInputValue(debouncedInput.slice(0, -1));
+        }}
         target='document'
       >
         <CollateralDescriptor backToBorrow={()=>history.push('/borrow')}>
@@ -371,7 +375,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
               to='/withdraw/'
               style={{ textDecoration: 'none' }}
             >
-              <Box direction='row' gap='small' >
+              <Box direction='row' gap='small'>
                 <Text size='xxsmall' color='text-weak'> <Text weight='bold' size='xsmall'>Withdraw </Text> collateral</Text>
                 <Text color='text-weak'><ArrowRight /></Text>
               </Box>

@@ -1,4 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
+import { NavLink } from 'react-router-dom';
 import { ethers } from 'ethers';
 import { Box, Button, TextInput, Text, Keyboard, ResponsiveContext, Collapsible } from 'grommet';
 import { FiArrowLeft as ArrowLeft } from 'react-icons/fi';
@@ -19,14 +20,15 @@ import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
 
 import YieldMark from '../components/logos/YieldMark';
-import { NavLink } from 'react-router-dom';
+
 import YieldMobileNav from '../components/YieldMobileNav';
 
 interface IRemoveLiquidityProps {
+  openConnectLayer?:any
   close?: any;
 }
 
-const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
+const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
@@ -78,7 +80,9 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
     if (activeSeries) {
       setCalculating(true);
       const newBalance = activeSeries.poolTokens.sub(ethers.utils.parseEther(debouncedInput));
-      const percent= ( parseFloat(ethers.utils.formatEther(newBalance)) / parseFloat(ethers.utils.formatEther(activeSeries.totalSupply)) )*100;
+      const percent= (
+        parseFloat(ethers.utils.formatEther(newBalance))/
+        parseFloat(ethers.utils.formatEther(activeSeries.totalSupply)))*100;
       setNewShare(percent.toFixed(4));
       setCalculating(false);
     }
@@ -91,7 +95,9 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
 
   /* handle warnings input errors */
   useEffect(() => {
-    if ( debouncedInput && (activeSeries?.poolTokens?.sub(ethers.utils.parseEther(debouncedInput)).lt(ethers.constants.Zero)) ) {
+    if ( debouncedInput && 
+        (activeSeries?.poolTokens?.sub(ethers.utils.parseEther(debouncedInput)).lt(ethers.constants.Zero))
+    ) {
       setWarningMsg(null);
       setErrorMsg('That amount exceeds the amount of tokens you have'); 
     } else {
@@ -119,7 +125,11 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
     <Keyboard 
       onEsc={() => { inputValue? setInputValue(undefined): close();}}
       onEnter={()=> removeLiquidityProcedure(inputValue)}
-      onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
+      onBackspace={()=> {
+        inputValue && 
+        (document.activeElement !== inputRef) && 
+        setInputValue(debouncedInput.toString().slice(0, -1));
+      }}
       target='document'
     >
       {!txActive && !removeLiquidityPending && 
@@ -180,7 +190,7 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
                   <Button
                     color='brand-transparent'
                     label={<Text size='xsmall' color='brand'>Connect a wallet</Text>}
-                    onClick={()=>console.log('still to implement')}
+                    onClick={() => openConnectLayer()}
                     hoverIndicator='brand-transparent'
                   /> 
                 )
@@ -259,6 +269,6 @@ const RemoveLiquidity = ({ close }:IRemoveLiquidityProps) => {
   );
 };
 
-RemoveLiquidity.defaultProps={ close:null };
+RemoveLiquidity.defaultProps={ close:null, openConnectLayer:()=>null };
 
 export default RemoveLiquidity;

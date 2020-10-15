@@ -137,10 +137,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
 
   /* handle exceptions, errors and warnings */
   useEffect(() => {
-    if ( false ) {
-      setWarningMsg(null);
-      setErrorMsg('There is not enough liquidity to support a transaction of that size just yet.'); 
-    } else if ( daiBalance && debouncedInput && ethers.utils.parseEther(debouncedInput).gt(daiBalance)  ) {
+    if ( daiBalance && debouncedInput && ethers.utils.parseEther(debouncedInput).gt(daiBalance)  ) {
       setWarningMsg(null);
       setErrorMsg('That amount exceeds the amount of Dai you have'); 
     } else {
@@ -154,7 +151,11 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
       <Keyboard 
         onEsc={() => setInputValue(undefined)}
         onEnter={()=> lendProcedure()}
-        onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
+        onBackspace={()=> {
+          inputValue && 
+          (document.activeElement !== inputRef) && 
+          setInputValue(debouncedInput.toString().slice(0, -1));
+        }}
         target='document'
       >
         { CloseDaiOpen && 

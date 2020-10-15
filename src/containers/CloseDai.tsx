@@ -37,8 +37,6 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
 
   const { actions: userActions } = useContext(UserContext);
 
-  const [ hasDelegated, setHasDelegated ] = useState<boolean>(true);
-
   const { previewPoolTx }  = usePool();
   const { buyDai }  = useProxy();
   const { account, fallbackProvider } = useSignerAccount();
@@ -85,12 +83,10 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
   useEffect(()=>{
     (
       !account ||
-      !hasDelegated ||
       !inputValue || 
       parseFloat(inputValue) <= 0
     ) ? setWithdrawDisabled(true): setWithdrawDisabled(false);
-  }, [ inputValue, hasDelegated ]);
-
+  }, [ inputValue ]);
 
   /* show warnings and errors with collateralization ratio levels and inputs */
   useEffect(()=>{
@@ -107,7 +103,11 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
     <Keyboard 
       onEsc={() => { inputValue? setInputValue(undefined): close();}}
       onEnter={()=> withdrawProcedure()}
-      onBackspace={()=> inputValue && (document.activeElement !== inputRef) && setInputValue(debouncedInput.toString().slice(0, -1))}
+      onBackspace={()=> {
+        inputValue && 
+        (document.activeElement !== inputRef) && 
+        setInputValue(debouncedInput.toString().slice(0, -1));
+      }}
       target='document'
     >
       { !txActive && !CloseDaiPending && 
