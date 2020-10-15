@@ -18,7 +18,7 @@ export interface IYieldSeries {
   totalSupply_?: number;
   poolTokens?:  BigNumber;
   poolTokens_?: number;
-  poolState?: any; // TODO type this
+  poolState?: any;
   symbol?: string;
   id?: string;
   currentValue?: any;
@@ -33,10 +33,8 @@ export interface IYieldSeries {
 }
 
 export interface IConnection {
-  // TODO get provider types
   provider: any;     /* a wallet connected provider */
   altProvider: any;  /* a provider with no connected wallet */
-  // TODO get signer types
   signer: any;       /* derived from provider if EIP1192 */
   voidSigner: any;
   chainId: number|null;   /* official chain number or development number */
@@ -44,7 +42,7 @@ export interface IConnection {
   account: string|null;   /* user ethereum address */
 }
 
-export interface IUser {
+export interface IYieldUser {
   appPrefs: any;
   account?: string;
   ethBalance?: BigNumber;

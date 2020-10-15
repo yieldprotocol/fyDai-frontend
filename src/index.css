@@ -1,5 +1,3 @@
-@import-normalize;
-
 .App {
     display: flex;
     min-height: 100vh;
@@ -9,25 +7,4 @@
 body {
     margin: 0;
     padding: 0;
-}
-
-Box.sticky {
-  position: -webkit-sticky; /* Safari */
-  position: sticky;
-  top: 0;
-}
-
-.Transition-enter {
-  opacity: 0.01;
-}
-.Transition-enter.Transition-enter-active {
-  opacity: 1;
-  transition: opacity 500ms ease-in;
-}
-.Transition-leave {
-  opacity: 1;
-}
-.Transition-leave.transition-leave-active {
-  opacity: 0.01;
-  transition: opacity 300ms ease-in;
 }

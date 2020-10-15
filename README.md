@@ -2,15 +2,15 @@
 Front end for fyDai 
 
 
-### Start a new locally served ganache instance to test the frontend UI:  
+### Start a new locally served blockchain instance to test the frontend UI:  
 
-1. Clone the fyDai repositiory: https://github.com/yieldprotocol/fyDai.git  (working commit: 23eccef40926110c1729bb42b5b2ce6d6ef68bf5):  
+1. Clone the fyDai repositiory: https://github.com/yieldprotocol/fyDai.git  (working commit: 4ee6d9756b027e9d378b2b35ad56ddc9fec2c163):  
 `git clone https://github.com/yieldprotocol/fyDai.git`  
-`git reset --hard 23eccef40926110c1729bb42b5b2ce6d6ef68bf5`    
+`git reset --hard 4ee6d9756b027e9d378b2b35ad56ddc9fec2c163`    
 ( if you want to revert to the latest fyDai, simply: `git pull` )
 
 2. Prepare necessary files ( in fyDai root folder ):
- - `.secret` should contain a wallet mnemonic. You will reuse this mnemonic in the next step when starting ganache.
+ - `.secret` should contain a wallet mnemonic. You will reuse this mnemonic in the next step if starting ganache.
  - `.infuraKey` should contain an infuraKey. This is used only for public network deploys but is currently expected to run the frontend. 
 
 

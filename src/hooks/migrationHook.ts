@@ -59,8 +59,17 @@ export const useMigrations = () => {
   const getYieldVersion = async (
   ) => {
     const contract = new ethers.Contract(migrationsAddress, migrationAbi, fallbackProvider );
-    await contract.version();
+    let res;
+    try {
+      res = await contract.version();
+    }  catch (e) {
+      // eslint-disable-next-line no-console
+      console.log(e);
+      res = false;
+    }
+    return res;
   };
+
   return {
     getAddresses, getYieldVersion
   } as const;

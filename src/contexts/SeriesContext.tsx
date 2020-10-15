@@ -1,13 +1,11 @@
 import React, { useEffect, useContext } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { ethers, BigNumber } from 'ethers';
 
 import * as utils from '../utils';
-
-import { YieldContext } from './YieldContext';
-
-import { useCallTx, useMath, usePool, useSignerAccount, useWeb3React, useController, useToken } from '../hooks';
 import { IYieldSeries } from '../types';
+import { YieldContext } from './YieldContext';
+import { useCallTx, useMath, usePool, useSignerAccount, useWeb3React, useController, useToken } from '../hooks';
 
 const SeriesContext = React.createContext<any>({});
 
@@ -52,7 +50,7 @@ const SeriesProvider = ({ children }:any) => {
   const { getBalance, getTokenAllowance } = useToken();
 
   const [ callTx ] = useCallTx();
-  const { calcAPR: calcAPR, poolPercent: calcPercent }  = useMath();
+  const { calcAPR, poolPercent: calcPercent }  = useMath();
 
   const { pathname } = useLocation();
 
@@ -66,9 +64,8 @@ const SeriesProvider = ({ children }:any) => {
     return preMap;
   };
 
-  /* Get the data for a particular series, or set of series */
+  /* PRIVATE Get the data for a particular series, OR set of series  */
   const _getSeriesData = async (seriesArr:IYieldSeries[]) => {
-
     /* concurrently get all the series data */
     const _seriesData = await Promise.all(
       seriesArr.map( async (x:IYieldSeries, i:number) => {
@@ -78,7 +75,6 @@ const SeriesProvider = ({ children }:any) => {
           await previewPoolTx('sellFYDai', _x, 1),
           await callTx(_x.poolAddress, 'Pool', 'totalSupply', []),
         ]);
-
         /* with user */
         const [ poolTokens, hasDelegatedPool, hasDaiAuth, hasFyDaiAuth, ethDebtDai, ethDebtFYDai, fyDaiBalance] =  account && await Promise.all([
           getBalance(_x.poolAddress, 'Pool', account),
@@ -95,7 +91,7 @@ const SeriesProvider = ({ children }:any) => {
           sellFYDaiRate: !(sellFYDaiRate instanceof Error)? sellFYDaiRate : BigNumber.from('0'),
           totalSupply,
           poolTokens: poolTokens || BigNumber.from('0'),
-          hasDelegatedPool: hasDelegatedPool || false, // TODO check this
+          hasDelegatedPool: hasDelegatedPool || false,
           hasDaiAuth: (hasDaiAuth && hasDaiAuth>0) || false, 
           hasFyDaiAuth: (hasFyDaiAuth && hasFyDaiAuth>0) || false,
           authComplete: ( !!hasDaiAuth && !!hasFyDaiAuth && !!hasDelegatedPool),
@@ -128,21 +124,20 @@ const SeriesProvider = ({ children }:any) => {
       );
     }, state.seriesData);
 
-    console.log(_parsedSeriesData);
-
     /* Update state and return  */
     dispatch( { type:'updateSeries', payload: _parsedSeriesData });
     return _parsedSeriesData;
   };
 
-  /* Update a list of series */
+  /* PUBLIC EXPOSED (via actions) Update series from a list of series */
   const updateSeries = async (seriesArr:IYieldSeries[], firstLoad:boolean ) => {
 
     const seriesFromUrl = parseInt(pathname.split('/')[2], 10);
 
     if(!yieldLoading) {
       dispatch({ type:'isLoading', payload: true });
-      /* pre-populate info with cached data if available */
+
+      /* Pre-populate info with cached data if available */
       if (firstLoad) {
         const preMap:any = _prePopulateSeriesData(seriesArr);
         const preSeries: IYieldSeries[] = Array.from(preMap.values());
@@ -157,7 +152,7 @@ const SeriesProvider = ({ children }:any) => {
         }
       }
       
-      /* Build/re-build series map with data */ 
+      /* Build/Re-build series map with data */ 
       const seriesMap:any = await _getSeriesData(seriesArr); 
 
       /* Set the active series */
@@ -177,7 +172,6 @@ const SeriesProvider = ({ children }:any) => {
         } else {
           dispatch({ type:'setActiveSeries', payload: seriesMap.get(toSelect[0].maturity) });
         }
-        // dispatch({ type:'setActiveSeries', payload: seriesMap.get(toSelect[0].maturity) }); 
       } 
       dispatch({ type:'isLoading', payload: false });
     }
@@ -188,7 +182,6 @@ const SeriesProvider = ({ children }:any) => {
     (provider || fallbackProvider) && !yieldLoading && ( async () => {
       await updateSeries(yieldState.deployedSeries, true);
     })();
-
   }, [ provider, fallbackProvider, chainId, account, yieldLoading ]);
 
   /* Actions for updating the series Context */

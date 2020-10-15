@@ -1,13 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { HashRouter as Router } from 'react-router-dom';
-
 import { ethers } from 'ethers';
 import { Web3ReactProvider, createWeb3ReactRoot } from '@web3-react/core';
 
 import './index.css';
-import App from './App';
 
+import App from './App';
 import { NotifyProvider }  from './contexts/NotifyContext';
 import { YieldProvider }  from './contexts/YieldContext';
 import { UserProvider }  from './contexts/UserContext';

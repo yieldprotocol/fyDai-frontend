@@ -19,10 +19,8 @@ const seriesColors = ['#ff86c8', '#82d4bb', '#6ab6f1', '#cb90c9', '#aed175', '#f
 const contractList = [
   'Controller',
   'Treasury',
-  'Chai',
   'Dai',
   'Vat',
-  'Weth',
   'YieldProxy',
 ];
 
@@ -103,7 +101,8 @@ const YieldProvider = ({ children }: any) => {
       _deployedContracts = Object.fromEntries(contractAddrs);
       window.localStorage.removeItem('deployedContracts');
       setCachedContracts(_deployedContracts);
-      console.log('Contract addresses updated:', _deployedContracts);
+      // eslint-disable-next-line no-console
+      console.log('Yield contract addresses updated:', _deployedContracts);
     } else {
       _deployedContracts = cachedContracts;
     }
@@ -135,7 +134,8 @@ const YieldProvider = ({ children }: any) => {
       ).then((res: any) => _deployedSeries.push(...res));
       window.localStorage.removeItem('deployedSeries');
       setCachedSeries(_deployedSeries);
-      console.log('Series addresses updated');
+      // eslint-disable-next-line no-console
+      console.log('Series contract addresses updated', _deployedSeries);
     } else {
       _deployedSeries.push(...cachedSeries);
     }
@@ -177,15 +177,14 @@ const YieldProvider = ({ children }: any) => {
   const _getYieldData = async (_deployedContracts: any, _deployedSeries: IYieldSeries[]): Promise<any> => {
     const _yieldData: any = {};
     _yieldData.version = await getYieldVersion();
-
-    console.log('Version:', _yieldData.version);
+    // eslint-disable-next-line no-console
+    console.log('Contract Version:', _yieldData.version);
     return {
       ..._yieldData,
     };
   };
 
   const _addListeners = async (_deployedContracts: any, _deployedSeries: IYieldSeries[] ) => {
-    // Add Maker rate/spot changes
     provider &&
       addEventListener(
         _deployedContracts.Vat,
@@ -216,10 +215,8 @@ const YieldProvider = ({ children }: any) => {
           type: 'updateFeedData',
           payload: await _getFeedData(deployedContracts, deployedSeries ),
         });
-
         // 2.1 Add event listeners
         _addListeners(deployedContracts, deployedSeries);
-
         /* 3. Fetch auxilliary (PUBLIC non-cached, non-user specific) yield and series data */
         dispatch({
           type: 'updateYieldData',
@@ -228,9 +225,10 @@ const YieldProvider = ({ children }: any) => {
       }
     } catch (e) {
       notifyDispatch({
-        type: 'fatal',
-        payload: { message: 'Error Accessing the Yield Protocol.' },
+        type: 'notify',
+        payload: { message: 'Error Accessing the Yield Protocol. Please check your network connection.' },
       });
+      // eslint-disable-next-line no-console
       console.log(e);
       return;
     }

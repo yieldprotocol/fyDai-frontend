@@ -1,5 +1,4 @@
 import React, { useContext } from 'react';
-
 import {
   Layer,
   Footer,
@@ -7,7 +6,6 @@ import {
   Text,
   ResponsiveContext,
 } from 'grommet';
-
 import { 
   FiArrowLeft as ArrowLeft,
 } from 'react-icons/fi';
@@ -51,7 +49,7 @@ const HistoryWrap = ({ children, closeLayer, series } : any) => {
                   }
           />
           <FlatButton
-            label={<Text size='xsmall' color='text-weak'>Rebuild history</Text>}
+            label={<Text size='xsmall' color='text-weak'>Refresh</Text>}
             onClick={()=>actions.rebuildHistory()}
           />
         </Footer>

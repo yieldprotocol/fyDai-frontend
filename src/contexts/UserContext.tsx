@@ -38,11 +38,6 @@ function reducer(state: any, action: any) {
         ...state,
         txHistory: action.payload,
       };
-    case 'updateMakerData':
-      return {
-        ...state,
-        makerData: action.payload,
-      };
     case 'isLoading':
       return {
         ...state,
@@ -128,7 +123,7 @@ const UserProvider = ({ children }: any) => {
     const collateralValue = collValue(ethPosted);
     const collateralRatio = collRatio(collateralValue, ethTotalDebtDai);
     const collateralPercent = collPercent(collateralRatio); 
-    const maxDaiAvailable = daiAvailable( collateralValue, ethTotalDebtDai, 2);
+    const maxDaiAvailable = daiAvailable( collateralValue, ethTotalDebtDai, 2); // 2===200%
 
     const values = {
       ethBalance, 
@@ -157,8 +152,10 @@ const UserProvider = ({ children }: any) => {
       collateralPercent_ : parseFloat(collateralPercent.toString()),
       maxDaiAvailable_ : cleanValue(ethers.utils.formatEther(maxDaiAvailable), 2),
     };
-    console.log('User updated:');
+    
     dispatch( { type: 'updatePosition', payload: { ...values, ...parsedValues } } );
+    // eslint-disable-next-line no-console
+    console.log('User updated:', { ...values, ...parsedValues } );
     return { ...values, ...parsedValues };
   };
 
@@ -168,21 +165,23 @@ const UserProvider = ({ children }: any) => {
   const _getAuthorizations = async () => {
     const _auths:any={};
     _auths.hasDelegatedProxy = await checkControllerDelegate(deployedContracts.YieldProxy);
-    _auths.hasAuthorisedProxy = (await getTokenAllowance(deployedContracts.Dai, deployedContracts.YieldProxy, 'Dai') >0);
+    _auths.hasAuthorisedProxy = (await getTokenAllowance(deployedContracts.Dai, deployedContracts.YieldProxy, 'Dai') > 0);
     dispatch( { type: 'updateAuthorizations', payload: _auths });
     return _auths;
   };
 
   /**
-   * @dev gets user balances from required tokens,and ETH native.
+   * @dev gets user transaction history.
    */
   const _getTxHistory = async ( forceUpdate:boolean ) => {
 
     /* Get transaction history (from cache first or rebuild if an update is forced) */
-    forceUpdate && console.log('Re-building txHistory...');
+    // eslint-disable-next-line no-console
+    forceUpdate && console.log('Re-building transaction History...');
     const _lastBlock = await provider.getBlockNumber();
-    const lastCheckedBlock = (txHistory && forceUpdate)? 0: txHistory?.lastBlock||0;
+    const lastCheckedBlock = (txHistory && forceUpdate)? 0: txHistory?.lastBlock || 0;
 
+    /* get the collateral transaction history */ 
     const collateralHistory = await getEventHistory(
       deployedContracts.Controller,
       'Controller',
@@ -206,6 +205,7 @@ const UserProvider = ({ children }: any) => {
         });     
       });
     
+    /* get the repayment hisotry from the controller */
     const repayHistory = await getEventHistory(
       deployedContracts.Controller,
       'Controller',
@@ -229,7 +229,7 @@ const UserProvider = ({ children }: any) => {
         });     
       });
 
-    // Trade(uint256 maturity, address indexed from, address indexed to, int256 daiTokens, int256 fyDaiTokens);
+    /* get the trades history from the pool */
     const tradeHistory = await deployedSeries.reduce( async ( accP: any, cur:any) => {
       const acc = await accP; 
       const _seriesHist = await getEventHistory(
@@ -269,7 +269,7 @@ const UserProvider = ({ children }: any) => {
       return [...acc, ..._seriesHist];
     }, Promise.resolve([]) );
 
-    // Liquidity(uint256 maturity, address indexed from, address indexed to, int256 daiTokens, int256 fyDaiTokens, int256 poolTokens);
+    /* get the add liquidity histrory */ 
     const addLiquidityHistory = await deployedSeries.reduce( async ( accP: any, cur:any) => {
       const acc = await accP; 
       const _seriesHist = await getEventHistory(
@@ -303,7 +303,7 @@ const UserProvider = ({ children }: any) => {
       return [...acc, ..._seriesHist];
     }, Promise.resolve([]) );
 
-    // Liquidity(uint256 maturity, address indexed from, address indexed to, int256 daiTokens, int256 fyDaiTokens, int256 poolTokens);
+    /* get the remove liquidity histrory  - I know!! i will combine the two. but filterign is problmeatic */ 
     const removeLiquidityHistory = await deployedSeries.reduce( async ( accP: any, cur:any) => {
       const acc = await accP; 
       const _seriesHist = await getEventHistory(
@@ -336,15 +336,7 @@ const UserProvider = ({ children }: any) => {
         });
       return [...acc, ..._seriesHist];
     }, Promise.resolve([]) );
-    
-    // TODO : get blocknumber at initialisation of fyDaiProtocol instead of using first block(0).
-    console.log(
-      'txHistory updated from block:',
-      lastCheckedBlock,
-      'to block:',
-      _lastBlock
-    );
-    
+     
     const updatedHistory = [
       ...collateralHistory,
       ...repayHistory,
@@ -361,11 +353,20 @@ const UserProvider = ({ children }: any) => {
 
     setTxHistory(_payload);
     dispatch( { type: 'updateTxHistory', payload: _payload });
+
+    // eslint-disable-next-line no-console
+    console.log(
+      'Transaction history updated from block:',
+      lastCheckedBlock,
+      'to block:',
+      _lastBlock
+    );
+
     return _payload;
   };
 
   /**
-   * @dev Gets preferences from cache.
+   * @dev Gets/updates preferences from cache.
    */
   const _updatePreferences = async (newPrefs:any) => {
     const allPrefs = { ...state.preferences, ...cachedPreferences, ...newPrefs };
@@ -374,10 +375,11 @@ const UserProvider = ({ children }: any) => {
     return { allPrefs };
   };
 
+
+  /* initiate the user */
   const initUser = async () => {
     /* Init start */
     dispatch({ type: 'isLoading', payload: true });
-    // TODO: look at splitting these up cleverly, in particular makerData.
     try {
       await Promise.all([
         _getPosition(),
@@ -387,6 +389,7 @@ const UserProvider = ({ children }: any) => {
       ]);
       console.log('User initialised.');
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.log(e);
     }
     /* Init end */
@@ -401,6 +404,7 @@ const UserProvider = ({ children }: any) => {
 
   }, [ account, yieldState.yieldLoading ]);
 
+  /* Exposed actions */
   const actions = {
     updatePosition: () => _getPosition(),
     updateAuthorizations: () => _getAuthorizations(),
@@ -411,6 +415,7 @@ const UserProvider = ({ children }: any) => {
       await _getTxHistory(true);
       dispatch({ type: 'isLoading', payload: false });
     },
+
     updatePreferences: (x:any) => _updatePreferences(x),
     resetPreferences: () => localStorage.removeItem('userPreferences'),
   };

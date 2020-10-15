@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect, useState, useContext, Suspense } from 'react';
 import { Switch, Route, Redirect, useLocation } from 'react-router-dom';
 import { Grommet, base, Grid, Main, Box, ResponsiveContext, Collapsible } from 'grommet';
@@ -22,7 +21,6 @@ import Borrow from './containers/Borrow';
 import Lend from './containers/Lend';
 import Pool from './containers/Pool';
 import Deposit from './containers/Deposit';
-
 import CloseDai from './containers/CloseDai';
 import WithdrawEth from './containers/WithdrawEth';
 import Repay from './containers/Repay';
@@ -34,27 +32,23 @@ import Authorization from './components/Authorization';
 import ErrorBoundary from './components/ErrorBoundry';
 import YieldNav from './components/YieldNav';
 
-// TODO: remove testLayer for prod
-import TestLayer from './containers/layers/TestLayer';
-
 const App = (props:any) => {
-  
   const { state: { seriesLoading, activeSeries } } = useContext(SeriesContext);
   const { state: { yieldLoading } } = useContext(YieldContext);
   const { dispatch } = useContext(NotifyContext);
-  const [cachedLastVisit, setCachedLastVisit] = useCachedState('lastVisit', null);
+  const [ cachedLastVisit, setCachedLastVisit ] = useCachedState('lastVisit', null);
 
-  /* route caching */
+  /* App route caching */
   const location = useLocation();
   React.useEffect(() => {
-    /* remember/cache the following last visited routes: */
+    /* Remember the following last visited routes: */
     ['borrow', 'lend', 'pool'].includes(location.pathname.split('/')[1]) &&
     /* but, ignore these other routes */
     !['withdraw', 'repay', 'removeLiquidity', 'close'].includes(location.pathname.split('/')[1]) &&
     setCachedLastVisit(`/${location.pathname.split('/')[1]}/${activeSeries?.maturity}` );
   }, [location]);
 
-  /* Serivce worker registraion and handle app updates and user confirmations */
+  /* Serivce Worker registraion and handle app updates and user confirmations */
   useEffect(()=>{
     serviceWorker.register({ 
       onUpdate: (registration:any)=> {
@@ -66,6 +60,7 @@ const App = (props:any) => {
             updateAvailable:true,
             updateAccept: ()=> { 
               registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+              /* Clear the cache completely on update - in future, save user preferences */
               localStorage.clear();
               window.location.reload();
             },    
@@ -75,14 +70,11 @@ const App = (props:any) => {
     });
   }, []);
 
-  const leftSideRef = useRef<any>(null);
-  const [showConnectLayer, setShowConnectLayer] = useState<string|null>(null);
-  // TODO remove for prod
-  const [showTestLayer, setShowTestLayer] = useState<boolean>(false);
-  const [showSidebar, setShowSidebar] = useState<boolean>(true);
-
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
+  const leftSideRef = useRef<any>(null);
+  const [showConnectLayer, setShowConnectLayer] = useState<string|null>(null);
+  const [showSidebar, setShowSidebar] = useState<boolean>(true);
   const [columns, setColumns] = useState<string[]>(['7%', 'auto', '7%']);
   useEffect(()=> {
     mobile?
@@ -101,7 +93,6 @@ const App = (props:any) => {
       }
     >
       <ConnectLayer view={showConnectLayer} closeLayer={() => setShowConnectLayer(null)} />
-      { showTestLayer  && <TestLayer closeLayer={()=>setShowTestLayer(false)} /> }
 
       <Grid
         columns={columns} 
@@ -115,14 +106,14 @@ const App = (props:any) => {
         <Box background={{ color: 'background-front' }} />
       </Grid>
 
-      { !yieldLoading &&
+      {!yieldLoading &&
         <Collapsible open={!seriesLoading} ref={leftSideRef}>
           <Authorization />
         </Collapsible>}
 
       <NotifyLayer target={!mobile?leftSideRef.current:undefined} columnsWidth={columns} />
 
-      { !mobile &&
+      {!mobile && 
       <Box margin='large' align='center'>
         <YieldNav />
       </Box>}
@@ -153,8 +144,6 @@ const App = (props:any) => {
         <Box />
         {!mobile &&
           <YieldFooter
-            showTestLayer={showTestLayer}
-            setShowTestLayer={setShowTestLayer}
             darkMode={props.darkMode}
             setDarkMode={props.setDarkMode}
             moodLight={props.moodLight}
@@ -176,7 +165,7 @@ const WrappedApp = () => {
         theme={deepMerge(base, yieldTheme)}
         themeMode={darkMode ? 'dark' : 'light'}
         full
-      >     
+      >
         <ErrorBoundary>
           <App 
             darkMode={darkMode}

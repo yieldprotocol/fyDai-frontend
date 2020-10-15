@@ -18,6 +18,7 @@ const initState = {
   requestedSigs: [],
 
   updateAvailable: false,
+  // eslint-disable-next-line no-console
   updateAccept: ()=>console.log('No update available'),
 };
 
@@ -48,7 +49,7 @@ function notifyReducer(state:INotification, action:IReducerAction) {
     case 'txComplete':
       return {
         ...state,
-        pendingTxs: state.pendingTxs.filter( (x:any) => x.tx.hash !== ( action.payload.transactionHash || action.payload.hash)  ),
+        pendingTxs: state.pendingTxs.filter((x:any) => x.tx.hash !== ( action.payload.transactionHash || action.payload.hash)),
         lastCompletedTx: { ...action.payload, transactionHash: action.payload.transactionHash || action.payload.hash },
       };
     case 'requestSigs':
@@ -69,6 +70,7 @@ function notifyReducer(state:INotification, action:IReducerAction) {
       return {
         ...state,
         updateAvailable: action.payload.updateAvailable,
+        // eslint-disable-next-line no-console
         updateAccept: action.payload.updateAccept || ( ()=>console.log('No update available') ),
       };
 
