@@ -25,7 +25,7 @@ export const useTxHelpers = () => {
     /* silence user rejection errors */
     if ( error.code === 4001 ) {
       dispatch({ 
-        type: 'notify', 
+        type: 'notify',
         payload: { message: 'Transaction rejected by user.' } 
       });    
     } else {
@@ -48,7 +48,7 @@ export const useTxHelpers = () => {
     txComplete(receipt);
   };
   
-  const handleTx = async (tx:any, msg?:string, series?: IYieldSeries) => {
+  const handleTx = async (tx:any ) => {
     await tx.wait()
       .then((receipt:any) => {
         txComplete(receipt);
@@ -58,6 +58,7 @@ export const useTxHelpers = () => {
   };
   return { handleTx, txComplete, handleTxBuildError };
 };
+
 
 /* Simple Hook for caching & retrieved data */
 export const useCachedState = (key:string, initialValue:any) => {

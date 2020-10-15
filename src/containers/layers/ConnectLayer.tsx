@@ -9,34 +9,27 @@ import {
   ResponsiveContext,
 } from 'grommet';
 import { FiArrowLeft as ArrowLeft } from 'react-icons/fi';
-
 import { useConnection, useSignerAccount } from '../../hooks';
 import { injected, walletconnect } from '../../connectors';
-
 import metamaskImage from '../../assets/images/providers/metamask.png';
 import walletConnectImage from '../../assets/images/providers/walletconnect.png';
-
 import { UserContext } from '../../contexts/UserContext';
-
 import RaisedButton from '../../components/RaisedButton';
 import FlatButton from '../../components/FlatButton';
 import TxHistory from '../../components/TxHistory';
-import EtherscanButton from '../../components/EtherscanButton';
 import YieldSettings from '../../components/YieldSettings';
 import ExperimentWrap from '../../components/ExperimentWrap';
-
+import TxRecent from '../../components/TxRecent';
 
 const ConnectLayer = ({ view, target, closeLayer }: any) => {
 
-  const { state: { position, txHistory } } = useContext(UserContext);
+  const { state: { position } } = useContext(UserContext);
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   
   const { handleSelectConnector } = useConnection();
 
   const { account, provider } = useSignerAccount();
   const [ layerView, setLayerView] = useState<string>(view);
-
-  const [ lastTx, setLastTx] = useState<any>(null);
   const [ histOpen, setHistOpen] = useState<string>('BORROW');
 
   const connectorList = [
@@ -47,12 +40,6 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
   useEffect(()=>{
     setLayerView(view);
   }, [view]);
-  
-  useEffect(()=>{
-    let newArr; 
-    txHistory && ( newArr = txHistory.items.sort((a:any, b:any) => { return b.date-a.date;}));
-    txHistory && setLastTx(newArr[0]);
-  }, [txHistory]);
 
   return (
     <>
@@ -85,14 +72,12 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                       /> 
                     </Box>
                   </Box>
-                   
+
                   <Box
                     pad={{ vertical:'small' }}
                     justify="center"
                     gap='small'
                   >
-                    {/* <ProfileButton /> */}
-
                     <Box direction='row' gap='small'>
                       <Text size='xsmall'>Account:</Text> 
                       <Text size='xsmall'> {account} </Text>                   
@@ -107,35 +92,10 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                       <Text size='xsmall'>DAI balance:</Text>
                       <Text size='xsmall'>{ position.daiBalance_ && position.daiBalance_ || '' }</Text>
                     </Box>
-                    {/* <Button fill='horizontal' label='Connect to another wallet' onClick={()=>setShowConnectLayer(true)} /> */}
                   </Box>
                 </Box>
 
-                <Box pad="small" gap="small">
-                  <Box direction='row' justify='between'>
-                    <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Transactions</Text>   
-                    <Box round>
-                      <FlatButton
-                        onClick={()=>setLayerView('HISTORY')}
-                        label={<Text size='xsmall'>View full history</Text>}
-                      /> 
-                    </Box>
-                  </Box> 
-
-                  <Box
-                    pad={{ vertical:'small' }}
-                    gap='small'
-                    align='start'
-                  >
-                    <Text size='xsmall'>Last transaction: </Text>
-                    <Text size='xxsmall'>{lastTx?.transactionHash} </Text>
-                    <Box>
-                      <EtherscanButton txHash={lastTx?.transactionHash} /> 
-                    </Box>
-                  </Box>
-
-                </Box>
-
+                <TxRecent setView={()=>setLayerView('HISTORY')} />
                 <YieldSettings />
 
                 <Box pad="small" gap="small" border='all' round='xsmall'>
@@ -187,14 +147,14 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                   }
                   )}
                   <Box gap="xsmall" direction="row">
-                    <Anchor href="#" label="Help!" size="xsmall" color="brand" />
+                    <Anchor href='https://ethereum.org/en/learn/' label="Help!" size="xsmall" color="brand" target="_blank" />
                     <Text size="xsmall"> I'm not sure what this means.</Text>
                   </Box>
                 </Box>
               </Box>}
 
             { account && layerView === 'HISTORY' &&      
-              <Box pad="medium" gap="small"> 
+              <Box pad="medium" gap="large"> 
                 <Box direction='row' justify='evenly'>
                   <FlatButton 
                     onClick={()=> setHistOpen('BORROW')}

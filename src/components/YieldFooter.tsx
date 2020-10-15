@@ -41,13 +41,13 @@ const YieldFooter = (props: any) => {
           top: '2px',
         }}
       >
-        <Anchor color="grey" href='https://github.com/yieldprotocol'>
+        <Anchor color="grey" href='https://github.com/yieldprotocol' target="_blank">
           <Github size={IconSize} />
         </Anchor>
-        <Anchor color="grey" href='http://docs.yield.is'>
+        <Anchor color="grey" href='http://docs.yield.is' target="_blank">
           <Docs size={IconSize} />
         </Anchor>
-        <Anchor color="grey" href='https://discord.gg/JAFfDj5'>
+        <Anchor color="grey" href='https://discord.gg/JAFfDj5' target="_blank">
           <Discord size={IconSize} />
         </Anchor>
       </Box>

@@ -40,6 +40,7 @@ function notifyReducer(state:INotification, action:IReducerAction) {
         fatalMsg: action.payload.message,
       };
     case 'txPending':
+      // console.log(state.pendingTxs);
       return {
         ...state,
         pendingTxs: [ ...state.pendingTxs, action.payload],
@@ -48,7 +49,7 @@ function notifyReducer(state:INotification, action:IReducerAction) {
       return {
         ...state,
         pendingTxs: state.pendingTxs.filter( (x:any) => x.tx.hash !== ( action.payload.transactionHash || action.payload.hash)  ),
-        lastCompletedTx: action.payload,
+        lastCompletedTx: { ...action.payload, transactionHash: action.payload.transactionHash || action.payload.hash },
       };
     case 'requestSigs':
       return {
@@ -64,7 +65,6 @@ function notifyReducer(state:INotification, action:IReducerAction) {
           }  return x;  
         })
       };
-
     case 'updateAvailable':
       return {
         ...state,

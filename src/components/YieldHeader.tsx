@@ -71,16 +71,14 @@ const YieldHeader = (props: any) => {
         </Box>}
 
         <Box direction='row' gap='small'>
-
           <Box direction="row" align="center" gap="small">
             <AccountButton {...props} />
           </Box>
-
-          <FlatButton 
+          {/* <FlatButton 
             disabled
             onClick={()=>console.log('xys')}
             label={<Box pad={{ horizontal:'small' }}><Telescope /></Box>}
-          /> 
+          />  */}
         </Box>
       </Box>
     </>

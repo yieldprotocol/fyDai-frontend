@@ -94,7 +94,7 @@ const AccountButton = (props: any) => {
           // width={{ min:'600px', max:'600px' }} 
           width={!mobile?{ min:'620px', max:'620px' }: undefined}  
         >
-          <TxStatus msg='tx pending' tx={pendingTxs[pendingTxs.length-1]} />
+          <TxStatus msg='Please be patient.' tx={pendingTxs[pendingTxs.length-1]} />
           <Box alignSelf='start' pad='medium'> 
             <FlatButton 
               onClick={()=>setTxStatusOpen(false)}

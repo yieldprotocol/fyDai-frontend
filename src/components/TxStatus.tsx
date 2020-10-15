@@ -68,8 +68,8 @@ const TxStatus= ({ msg, tx }:TxStatusProps) => {
         gap='medium'
         width={!mobile?{ min:'600px', max:'600px' }: undefined}
       >
-        <Text size='xlarge' color='brand' weight='bold'>Transaction Complete. </Text>
-        <Text>{lastCompletedTx.status}</Text>
+        <Text size='xlarge' color='brand' weight='bold'>Transaction complete. </Text>
+        <Text>{(lastCompletedTx.status === 1)? 'Transaction succeeded': 'Transaction failed'}</Text>
         <Box direction='row' gap='xsmall'>
           <Text size='xsmall' ref={txRef}> { abbreviateHash(lastCompletedTx.transactionHash) } </Text>
           <Box

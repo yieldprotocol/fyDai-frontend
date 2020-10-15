@@ -26,7 +26,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
   const [ delegated, setDelegated ] = useState<boolean>(true);
 
   useEffect(()=>{
-    activeSeries && setDelegated(activeSeries.hasDelegatedPool);
+    activeSeries && setDelegated(activeSeries.authComplete);
   }, [ activeSeries ]);
 
   return (

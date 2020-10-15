@@ -19,23 +19,27 @@ import { SeriesContext } from '../contexts/SeriesContext';
 
 import { useAuth, useSignerAccount, useTxActive } from '../hooks';
 import RaisedButton from './RaisedButton';
+import FlatButton from './FlatButton';
+import EtherscanButton from './EtherscanButton';
+import { abbreviateHash } from '../utils';
 
 interface IAuthorizationProps {
-  series?: IYieldSeries|null;
+  series?: IYieldSeries | null;
   authWrap?: boolean;
   children?:any;
 }
 
 const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => { 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
-  const { state: { requestedSigs } } = useContext(NotifyContext);
+  const { state: { requestedSigs, pendingTxs } } = useContext(NotifyContext);
   const { state: { authorizations, preferences }, actions: userActions } = useContext(UserContext);
   const { hasDelegatedProxy } = authorizations;
-  const { actions: seriesActions } = useContext(SeriesContext);
+  const { state: { activeSeries }, actions: seriesActions } = useContext(SeriesContext);
 
   // flags 
   const [ authPending, setAuthPending ] = useState<boolean>(false);
   const [ allSigned, setAllSigned ] = useState<boolean>(false);
+  const [ seriesAuthDone, setSeriesAuthDone ] = useState<boolean|undefined>();
 
   const [ layerOpen, setLayerOpen ] = useState<boolean>(true);
   const [ fallbackLayerOpen, setFallbackLayerOpen ] = useState<boolean>(true);
@@ -59,15 +63,18 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
 
   const closeAuth = () => {
     setLayerOpen(false);
+    setFallbackLayerOpen(false);
   };
 
   /* manage layer visibility by watching authActive & fallbackActive */
   useEffect(()=>{
     authActive && setLayerOpen(true);
     fallbackAuthActive && setFallbackLayerOpen(true);
-
-
   }, [authActive, fallbackAuthActive]);
+
+  // useEffect(()=>{
+  //   activeSeries && setSeriesAuthDone(activeSeries.authComplete);
+  // }, [activeSeries]);
 
   useEffect(()=>{
     const _allSigned = requestedSigs.reduce((acc:boolean, nextItem:any)=> {
@@ -108,12 +115,10 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
           />
         </Box>}
 
-      { hasDelegatedProxy && 
-        /* check if there is a series argument , if so, check if any of the auths are outstanding */
-        series &&  ( !series.hasDelegatedPool || !series.hasDaiAuth || !series.hasFyDaiAuth ) &&
-        account && 
+      { hasDelegatedProxy &&
+        account &&
         !authWrap &&
-
+        series &&
         <Box
           direction='row-responsive' 
           gap='small'
@@ -121,7 +126,7 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
           justify='around'
           background='#555555'
           align='center'
-        >  
+        >
           <Box direction='row' gap='small'>
             <Text color='#DDDDDD'> <Warning /> </Text>
             <Text size='xsmall' color='#DDDDDD'>A once-off authorization is required to use this series </Text>
@@ -142,7 +147,6 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
       { authActive && 
         !preferences?.useTxApproval &&
         layerOpen &&
-
         <Layer
           modal={true}
           responsive={mobile?false: undefined}
@@ -197,18 +201,15 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
             { authPending && 
               txActive &&
               <Box alignSelf='start'>
-                <Box
-                  round
+                <FlatButton 
                   onClick={()=>closeAuth()}
-                  hoverIndicator='brand-transparent'
-                  pad={{ horizontal:'small', vertical:'small' }}
-                  justify='center'
-                >
-                  <Box direction='row' gap='small' align='center'>
-                    <ArrowLeft color='text-weak' />
-                    <Text size='xsmall' color='text-weak'>close, and go back to the app</Text>
-                  </Box>
-                </Box>
+                  label={
+                    <Box direction='row' gap='medium' align='center'>
+                      <ArrowLeft color='text-weak' />
+                      <Text size='small' color='text-weak'>close, and go back to the app</Text>
+                    </Box>
+                  }
+                />
               </Box>}
           </Box>
         </Layer>}
@@ -220,7 +221,6 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
           responsive={mobile?false: undefined}
           full={mobile?true: undefined}
         >
-
           {!preferences?.useTxApproval && 
           <Box 
             width={!mobile?{ min:'620px', max:'620px' }: undefined}
@@ -264,25 +264,37 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
             pad='large'
             gap='medium'
           >
-            <Text> Please approve the following set of authorization transactions with your wallet or provider </Text>
-
-          </Box>}
-
-          { txActive &&
-          <Box alignSelf='start'>
-            <Box
-              round
-              onClick={()=>closeAuth()}
-              hoverIndicator='brand-transparent'
-              pad={{ horizontal:'small', vertical:'small' }}
-              justify='center'
-            >
-              <Box direction='row' gap='small' align='center'>
-                <ArrowLeft color='text-weak' />
-                <Text size='xsmall' color='text-weak'>close, and go back to the app</Text>
+            <Text weight='bold'> Please approve the following set of authorization transactions with your wallet or provider </Text>
+            { txActive && 
+            <Box gap='medium'>
+              <Box gap='medium'>
+                <Text size='xsmall' weight='bold'> 
+                  Authorization transactions pending: 
+                </Text>
+                <Box gap='small' fill='horizontal'>
+                  { pendingTxs.map((x:any, i:number)=> (
+                    <Box key={i} direction='row' fill='horizontal' justify='between'>
+                      <Box> { abbreviateHash(x.tx.hash) }</Box>
+                      <EtherscanButton txHash={x.tx.hash} />
+                    </Box>
+                  )   
+                  )}
+                </Box>
+              </Box> 
+              <Box alignSelf='start'>
+                <FlatButton 
+                  onClick={()=>closeAuth()}
+                  label={
+                    <Box direction='row' gap='medium' align='center'>
+                      <ArrowLeft color='text-weak' />
+                      <Text size='small' color='text-weak'>close, and go back to the app</Text>
+                    </Box>
+                  }
+                />
               </Box>
-            </Box>
+            </Box>}
           </Box>}
+
         </Layer>}
 
     </>);

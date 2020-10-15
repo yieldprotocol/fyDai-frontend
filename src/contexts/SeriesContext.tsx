@@ -98,6 +98,7 @@ const SeriesProvider = ({ children }:any) => {
           hasDelegatedPool: hasDelegatedPool || false, // TODO check this
           hasDaiAuth: (hasDaiAuth && hasDaiAuth>0) || false, 
           hasFyDaiAuth: (hasFyDaiAuth && hasFyDaiAuth>0) || false,
+          authComplete: ( !!hasDaiAuth && !!hasFyDaiAuth && !!hasDelegatedPool),
           ethDebtDai: ethDebtDai || BigNumber.from('0'),
           ethDebtFYDai : ethDebtFYDai || BigNumber.from('0'),
           fyDaiBalance : fyDaiBalance || BigNumber.from('0'),
