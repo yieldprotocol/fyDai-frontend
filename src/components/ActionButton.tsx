@@ -51,8 +51,7 @@ function ActionButton({ ...props }:any ) {
 
   return (
     <>
-
-      {/* Handles the 'ALL cLaer to transact' case for mobile and other */}
+      {/* Handles the 'ALL clear to transact' case for mobile and other */}
       { hasDelegatedProxy && props.hasDelegatedPool && !props.disabled &&
        ( !mobile ? 
          <StyledBox 
@@ -97,12 +96,10 @@ function ActionButton({ ...props }:any ) {
          </Layer>
        )}
 
-      {/* Handles the 'No proxy' case */}
+      {/* Handles the 'No proxy authorised' case */}
       { !hasDelegatedProxy && 
         !props.disabled &&   
-        <Authorization 
-          authWrap
-        >
+        <Authorization authWrap>
           { !mobile ?
             <StyledBox 
               {...props} 

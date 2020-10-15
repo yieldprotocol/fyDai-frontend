@@ -29,8 +29,8 @@ const ApprovalPending = React.forwardRef( (props, ref) => {
         >
           <Text weight='bold'>A Signature is required</Text>
           <Text> {requestedSigs.length>0 && requestedSigs[0].desc}</Text>
-          <Text>Please check your wallet/provider to sign the permission</Text>          
-        </Box> 
+          <Text>Please check your wallet or provider to sign the permission</Text>          
+        </Box>
         :
         <Box 
           width={!mobile?{ min:'620px', max:'620px' }: undefined}
@@ -40,7 +40,7 @@ const ApprovalPending = React.forwardRef( (props, ref) => {
           background='background-front'
         >
           <Text weight='bold'>Transaction approval required</Text>
-          <Text>Please check your wallet/provider to approve the transaction</Text>            
+          <Text>Please check your wallet or provider to approve the transaction</Text>            
         </Box>}
     </Layer>
 

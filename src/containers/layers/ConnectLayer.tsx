@@ -141,9 +141,9 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                         key={x.name}
                       />);                 
                     if (x.trial) {
-                      return <ExperimentWrap><ConnectButton /></ExperimentWrap>;
+                      return <ExperimentWrap key={x.name}><ConnectButton /></ExperimentWrap>;
                     // eslint-disable-next-line react/jsx-key
-                    } return <ConnectButton />;
+                    } return <ConnectButton key={x.name} />;
                   }
                   )}
                   <Box gap="xsmall" direction="row">

@@ -33,7 +33,7 @@ const AccountButton = (props: any) => {
   
   const pendingRef:any = useRef(null);
   const completeRef:any = useRef(null);
-  const [ over, setOver] = useState<boolean>(false);
+  const [ over ] = useState<boolean>(false);
 
   const { state: { position } } = useContext(UserContext);
   const { state: { pendingTxs, lastCompletedTx } } = useContext(NotifyContext);
@@ -91,7 +91,6 @@ const AccountButton = (props: any) => {
           pad="none"
           align='center'
           gap='medium'
-          // width={{ min:'600px', max:'600px' }} 
           width={!mobile?{ min:'620px', max:'620px' }: undefined}  
         >
           <TxStatus msg='Please be patient.' tx={pendingTxs[pendingTxs.length-1]} />

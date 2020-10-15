@@ -9,13 +9,10 @@ import {
   FiAlertTriangle as Warning,
 } from 'react-icons/fi';
 
-
-
 import { IYieldSeries } from '../types';
 import { NotifyContext } from '../contexts/NotifyContext';
 import { UserContext } from '../contexts/UserContext';
 import { SeriesContext } from '../contexts/SeriesContext';
-
 
 import { useAuth, useSignerAccount, useTxActive } from '../hooks';
 import RaisedButton from './RaisedButton';
@@ -34,17 +31,14 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
   const { state: { requestedSigs, pendingTxs } } = useContext(NotifyContext);
   const { state: { authorizations, preferences }, actions: userActions } = useContext(UserContext);
   const { hasDelegatedProxy } = authorizations;
-  const { state: { activeSeries }, actions: seriesActions } = useContext(SeriesContext);
+  const { actions: seriesActions } = useContext(SeriesContext);
 
   // flags 
   const [ authPending, setAuthPending ] = useState<boolean>(false);
   const [ allSigned, setAllSigned ] = useState<boolean>(false);
-  const [ seriesAuthDone, setSeriesAuthDone ] = useState<boolean|undefined>();
 
   const [ layerOpen, setLayerOpen ] = useState<boolean>(true);
   const [ fallbackLayerOpen, setFallbackLayerOpen ] = useState<boolean>(true);
-
-  const [checkBoxStatic, setChecboxStatic] = useState<any>(preferences.useTxApproval);
 
   const { account } = useSignerAccount();
   const { yieldAuth, poolAuth, authActive, fallbackAuthActive } = useAuth();
@@ -71,10 +65,6 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
     authActive && setLayerOpen(true);
     fallbackAuthActive && setFallbackLayerOpen(true);
   }, [authActive, fallbackAuthActive]);
-
-  // useEffect(()=>{
-  //   activeSeries && setSeriesAuthDone(activeSeries.authComplete);
-  // }, [activeSeries]);
 
   useEffect(()=>{
     const _allSigned = requestedSigs.reduce((acc:boolean, nextItem:any)=> {
@@ -246,7 +236,7 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
 
             <Box>
               <CheckBox 
-                checked={checkBoxStatic}
+                checked={preferences?.useTxApproval}
                 label={<Text size='xsmall'>In future, always use individual transactions for authorizations</Text>}
                 onChange={(e:any) => userActions.updatePreferences({ useTxApproval: true })}
               />
@@ -273,11 +263,10 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
                 </Text>
                 <Box gap='small' fill='horizontal'>
                   { pendingTxs.map((x:any, i:number)=> (
-                    <Box key={i} direction='row' fill='horizontal' justify='between'>
+                    <Box key={x.tx.hash} direction='row' fill='horizontal' justify='between'>
                       <Box> { abbreviateHash(x.tx.hash) }</Box>
                       <EtherscanButton txHash={x.tx.hash} />
-                    </Box>
-                  )   
+                    </Box>)
                   )}
                 </Box>
               </Box> 

@@ -8,7 +8,6 @@ import RaisedButton from './RaisedButton';
 
 interface ErrorBoundaryProps {
   hasError: boolean;
-  error: string;
 }
 export default class ErrorBoundary extends React.Component<
 {},
@@ -16,7 +15,7 @@ ErrorBoundaryProps
 > {
   constructor(props:any) {
     super(props);
-    this.state = { hasError: false, error:'' };
+    this.state = { hasError: false };
   }
 
   static getDerivedStateFromError(error:any) {
@@ -50,7 +49,7 @@ ErrorBoundaryProps
           >
             <Text color='red'><Error /></Text>
             <Box align="center" gap="xsmall">
-              <Text weight='bold'> An unrecognised error has occured 😰 </Text>
+              <Text weight='bold'> An unrecognised error has occured <span role='img' aria-label='coldsweat'>😰</span> </Text>
               <Text> It's our fault, sorry. </Text>
             </Box>
             <RaisedButton 

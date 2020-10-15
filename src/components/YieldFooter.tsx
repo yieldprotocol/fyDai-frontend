@@ -4,23 +4,13 @@ import { FaDiscord as Discord } from 'react-icons/fa';
 import {
   FiGithub as Github,
   FiFileText as Docs,
-  FiCodesandbox as Test,
 } from 'react-icons/fi';
-
 import { CgSleep as Moodlight } from 'react-icons/cg';
-
-// TODO: use theming context properly - no cheating :)
-import { yieldTheme } from '../themes';
 
 const YieldFooter = (props: any) => {
   const {
-    setShowTestLayer,
-    showTestLayer,
     moodLight, 
     toggleMoodLight,
-    // setDarkMode,
-    // darkMode,
-    // openConnectLayer,
   } = props;
 
   const IconSize = '1.15rem';
@@ -62,12 +52,6 @@ const YieldFooter = (props: any) => {
         <Text size='xxsmall' color='text-weak'>
           This software is in ALPHA v0.2
         </Text>
-        {/* <Anchor
-          onClick={() => setShowTestLayer(!showTestLayer)}
-          color={showTestLayer ? yieldTheme.global.colors.brand.light : 'grey'}
-        >
-          <Test size={IconSize} />
-        </Anchor> */}
         <Anchor
           onClick={()=>toggleMoodLight()}
           color={moodLight? 'pink':'grey'}
