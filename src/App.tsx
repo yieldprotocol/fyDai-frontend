@@ -158,7 +158,7 @@ const App = (props:any) => {
 
 const WrappedApp = () => {
   const [darkMode, setDarkMode] = useState(false);
-  const [ moodLight, setMoodLight] = useState(false);
+  const [ moodLight, setMoodLight] = useState(true);
   return (
     <Suspense fallback={null}>
       <Grommet

@@ -59,15 +59,15 @@ const YieldFooter = (props: any) => {
           top: '2px',
         }}
       >
-        <Text size='xsmall' color='text-weak'>
-          This software is in ALPHA v0.1
+        <Text size='xxsmall' color='text-weak'>
+          This software is in ALPHA v0.2
         </Text>
-        <Anchor
+        {/* <Anchor
           onClick={() => setShowTestLayer(!showTestLayer)}
           color={showTestLayer ? yieldTheme.global.colors.brand.light : 'grey'}
         >
           <Test size={IconSize} />
-        </Anchor>
+        </Anchor> */}
         <Anchor
           onClick={()=>toggleMoodLight()}
           color={moodLight? 'pink':'grey'}
