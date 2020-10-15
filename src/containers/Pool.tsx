@@ -18,7 +18,8 @@ import {
   useProxy,
   useToken,
   useDebounce,
-  useIsLol
+  useIsLol,
+  useMath
 } from '../hooks';
 
 import RemoveLiquidity from './RemoveLiquidity';
@@ -58,8 +59,9 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
 
   const { addLiquidity, addLiquidityActive } = useProxy();
   const { getBalance } = useToken();
+  const { poolPercent, calcTokensMinted } = useMath();
 
-  const [newShare, setNewShare] = useState<string>(activeSeries?.poolPercent);
+  const [newShare, setNewShare] = useState<string>();
   const [calculating, setCalculating] = useState<boolean>(false);
 
   const { account } = useSignerAccount();
@@ -100,15 +102,18 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
     setCalculating(true);
     const daiReserves = await getBalance(deployedContracts.Dai, 'Dai', activeSeries.poolAddress);
     const fyDaiReserves = await getBalance(activeSeries.fyDaiAddress, 'FYDai', activeSeries.poolAddress);
-    const tokens_ = ethers.utils.parseEther(debouncedInput).mul(daiReserves).div(fyDaiReserves.add(daiReserves));
-    const newBalance = tokens_.add(activeSeries.poolTokens); 
-    const percent= ( parseFloat(ethers.utils.formatEther(newBalance)) / parseFloat(ethers.utils.formatEther(activeSeries.totalSupply)) )*100;
-    setNewShare(percent.toFixed(5)) ;
+    const newTokens = calcTokensMinted(daiReserves, fyDaiReserves, activeSeries.totalSupply, ethers.utils.parseEther(debouncedInput));
+    const newBalance = newTokens.add(activeSeries.poolTokens);
+    const newTotalSupply = activeSeries.totalSupply.add(newTokens);
+    const percent = poolPercent(newTotalSupply, newBalance); 
+    setNewShare(percent.toFixed(4));
     setCalculating(false);
   };
 
   /* handle value calculations based on input changes */
-  useCallback(calculateNewShare, [debouncedInput]);
+  useEffect(()=>{
+    activeSeries && debouncedInput && calculateNewShare();
+  }, [debouncedInput]);
   
   /* Add liquidity disabling logic */
   useEffect(()=>{
@@ -177,8 +182,8 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                 label: 'Your Pool share',
                 labelExtra: `of the total ${activeSeries?.totalSupply_} tokens in this series`,
                 visible: 
-                  (!!account && txActive?.type !== 'ADD_LIQUIDITY' && !activeSeries?.isMature()) || 
-                  (activeSeries?.isMature() && activeSeries?.poolTokens_>0 ),
+                    (!!account && txActive?.type !== 'ADD_LIQUIDITY' && !activeSeries?.isMature()) || 
+                    (activeSeries?.isMature() && activeSeries?.poolTokens_>0 ),
                 active: true,
                 loading: addLiquidityPending,           
                 value: activeSeries?` ${activeSeries?.poolPercent}%`: '',
@@ -229,8 +234,8 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                     <InfoGrid entries={[
                       {
                         label: 'Share of the Pool after adding liquidity',
-                        visible: true,
-                        active: inputValue,
+                        visible: inputValue>0,
+                        active: debouncedInput,
                         loading: calculating,           
                         value: newShare? `${newShare}%`: '',
                         valuePrefix: null,
@@ -239,7 +244,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                       {
                         label: 'Like what you see?',
                         visible: !account && inputValue>0,
-                        active: inputValue,
+                        active: true,
                         loading: false,            
                         value: '',
                         valuePrefix: null,

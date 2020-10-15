@@ -7,7 +7,6 @@ import { Web3ReactProvider, createWeb3ReactRoot } from '@web3-react/core';
 
 import './index.css';
 import App from './App';
-import * as serviceWorker from './serviceWorker';
 
 import { NotifyProvider }  from './contexts/NotifyContext';
 import { YieldProvider }  from './contexts/YieldContext';

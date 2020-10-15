@@ -3,6 +3,7 @@ import { ethers, BigNumber }  from 'ethers';
 import * as utils from '../utils';
 
 import { YieldContext } from '../contexts/YieldContext';
+import { divRay } from '../utils';
 
 /**
  * Hook for Yield maths functions
@@ -162,10 +163,31 @@ export const useMath = () => {
     _balance: BigNumber,
   )=> {
     if (!_supply.isZero()) {
-      return  ( parseFloat(ethers.utils.formatEther(_balance)) / parseFloat(ethers.utils.formatEther(_supply)))*100;
-    }
+      return parseFloat(ethers.utils.formatEther(_balance))/parseFloat( ethers.utils.formatEther(_supply))*100;
+    } 
     return 0;
   };
+
+  /**
+   * Calculate amount of LP Tokens that will be minted  
+   *
+   * @param { BigNumber } daiReservess // dai balance of pool
+   * @param { BigNumber } fyDaiReserves// yDai series balance of Pool
+   * @param { BigNumber } totalSupply // total LP tokens
+   * @param { BigNumber } daiInput // dai input value by user
+   * 
+   * @returns { BigNumber } number of tokens minted
+   */
+  const calcTokensMinted =(
+    daiReserves: BigNumber,
+    fyDaiReserves: BigNumber,
+    totalSupply: BigNumber,
+    daiInput: BigNumber,
+  )=> {
+    const daiOffered = (daiInput.mul(daiReserves)).div(fyDaiReserves.add(daiReserves) );
+    return (totalSupply).mul(daiOffered).div(daiReserves);
+  };
+
 
   /**
    * Split a certain amount of Dai liquidity into its fyDai and Dai componetnts
@@ -196,7 +218,7 @@ export const useMath = () => {
    * 
    * @returns { number } human readable number.
    */
-  const yieldAPR =(
+  const calcAPR =(
     _rate: BigNumber,
     _amount: BigNumber,
     _maturity:number,
@@ -220,7 +242,8 @@ export const useMath = () => {
   };
 
   return {
-    yieldAPR,
+    calcAPR,
+    calcTokensMinted,
     poolPercent,
     splitDaiLiquidity,
     liquidationPrice,

@@ -52,7 +52,7 @@ const SeriesProvider = ({ children }:any) => {
   const { getBalance, getTokenAllowance } = useToken();
 
   const [ callTx ] = useCallTx();
-  const { yieldAPR: calcAPR, poolPercent: calcPercent }  = useMath();
+  const { calcAPR: calcAPR, poolPercent: calcPercent }  = useMath();
 
   const { pathname } = useLocation();
 
@@ -109,7 +109,7 @@ const SeriesProvider = ({ children }:any) => {
     /* Parse the data */
     const _parsedSeriesData = _seriesData.reduce((acc: Map<string, any>, x:any) => {
       const yieldAPR = calcAPR(x.sellFYDaiRate, ethers.utils.parseEther('1'), x.maturity);
-      const poolPercent = calcPercent(x.totalSupply, x.poolTokens).toFixed(4);
+      const poolPercent = calcPercent(x.totalSupply, x.poolTokens);
       const poolState = checkPoolState(x);
       return acc.set(
         x.maturity,
@@ -123,7 +123,7 @@ const SeriesProvider = ({ children }:any) => {
           yieldAPR_: yieldAPR.toFixed(2),
           yieldAPR,
           poolState,
-          poolPercent,        
+          poolPercent: poolPercent.toFixed(4),  
         }
       );
     }, state.seriesData);

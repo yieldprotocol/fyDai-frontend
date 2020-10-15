@@ -94,7 +94,7 @@ const UserProvider = ({ children }: any) => {
     collValue,
     collRatio,
     collPercent,
-    yieldAPR,
+    calcAPR,
     daiAvailable,
   } = useMath();
 
@@ -260,7 +260,7 @@ const UserProvider = ({ children }: any) => {
               amount: Math.abs( parseFloat(ethers.utils.formatEther( x.args_[3] )) ),
               dai: x.args[3].abs(),
               fyDai: x.args[4].abs(),
-              APR: yieldAPR( x.args[3].abs(),  x.args[4].abs(), parseInt(x.args_[0], 10), x.date), 
+              APR: calcAPR( x.args[3].abs(),  x.args[4].abs(), parseInt(x.args_[0], 10), x.date), 
               dai_: ethers.utils.formatEther( x.args_[3] ),
               fyDai_: ethers.utils.formatEther( x.args_[4] ),
             };

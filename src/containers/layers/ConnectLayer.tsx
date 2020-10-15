@@ -85,12 +85,12 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
 
                     <Box direction='row' gap='small'>
                       <Text size='xsmall'>ETH balance:</Text>
-                      <Text size='xsmall'>{ position.ethBalance_ && position.ethBalance_ || '' }</Text>
+                      <Text size='xsmall'>{ position?.ethBalance_ || '' }</Text>
                     </Box>
 
                     <Box direction='row' gap='small'>
                       <Text size='xsmall'>DAI balance:</Text>
-                      <Text size='xsmall'>{ position.daiBalance_ && position.daiBalance_ || '' }</Text>
+                      <Text size='xsmall'>{ position?.daiBalance_ || '' }</Text>
                     </Box>
                   </Box>
                 </Box>

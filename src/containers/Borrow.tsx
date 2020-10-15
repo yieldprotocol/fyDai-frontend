@@ -72,7 +72,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
   const { borrow }  = useController();
   const { previewPoolTx }  = usePool();
   const { borrowDai, borrowActive } = useProxy();
-  const { yieldAPR, estCollRatio: estimateRatio } = useMath();
+  const { calcAPR, estCollRatio: estimateRatio } = useMath();
   const { account } = useSignerAccount();
 
   const [ txActive ] = useTxActive(['BORROW', 'BUY' ]);
@@ -134,7 +134,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
       const preview = await previewPoolTx('buyDai', activeSeries, debouncedInput);
       if (!(preview instanceof Error)) {
         setFYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
-        setAPR( yieldAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries.maturity ) );      
+        setAPR( calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries.maturity ) );      
       } else {
         /* if the market doesnt have liquidity just estimate from rate */
         const rate = await previewPoolTx('buyDai', activeSeries, 1);
