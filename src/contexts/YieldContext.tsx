@@ -11,10 +11,11 @@ import { useSignerAccount } from '../hooks/connectionHooks';
 import { useMigrations } from '../hooks/migrationHook';
 
 import { IYieldSeries } from '../types';
+import { cleanValue } from '../utils';
 
 const YieldContext = createContext<any>({});
 
-const fyDaiList = ['20Oct9', '20Oct31', '20Dec31', '21Mar31', '21Jun30', '21Sep30', '21Dec31'];
+const fyDaiList = ['20Oct', '20Dec', '21Mar', '21Jun', '21Sep', '21Dec'];
 const seriesColors = ['#ff86c8', '#82d4bb', '#6ab6f1', '#cb90c9', '#aed175', '#f0817f', '#ffbf81', '#95a4db', '#ffdc5c'];
 const contractList = [
   'Controller',
@@ -165,9 +166,10 @@ const YieldProvider = ({ children }: any) => {
         rate_: utils.rayToHuman(_ilks.rate),
       },
       ethPrice,
-      ethPrice_: ethers.utils.formatEther( utils.mulRay(ethers.utils.parseEther('1.5'), (_ilks.spot)).toString()),
+      ethPrice_: cleanValue( ethers.utils.formatEther( utils.mulRay(ethers.utils.parseEther('1.5'), (_ilks.spot)).toString()), 4),
     };
     setCachedFeed(_feedData);
+    console.log(_feedData.ethPrice_);
     return _feedData;
   };
 
@@ -182,20 +184,6 @@ const YieldProvider = ({ children }: any) => {
     return {
       ..._yieldData,
     };
-  };
-
-  const _addListeners = async (_deployedContracts: any, _deployedSeries: IYieldSeries[] ) => {
-    provider &&
-      addEventListener(
-        _deployedContracts.Vat,
-        'Vat',
-        'LogNote',
-        [],
-        (x: any) => {
-          console.log('MAKER listener', x);
-          // dispatch({ type:'updateFeedData', payload: {...feedData, x.ilks })
-        }
-      );
   };
 
   const init = async () => {
@@ -215,8 +203,6 @@ const YieldProvider = ({ children }: any) => {
           type: 'updateFeedData',
           payload: await _getFeedData(deployedContracts, deployedSeries ),
         });
-        // 2.1 Add event listeners
-        _addListeners(deployedContracts, deployedSeries);
         /* 3. Fetch auxilliary (PUBLIC non-cached, non-user specific) yield and series data */
         dispatch({
           type: 'updateYieldData',
@@ -240,6 +226,14 @@ const YieldProvider = ({ children }: any) => {
   useEffect(() => {
     fallbackProvider && (async () => init())();
   }, [ fallbackProvider ]);
+
+  useEffect(()=>{
+    const timer = setTimeout(
+      () => _getFeedData(state.deployedContracts, state.deployedSeries),
+      5000 //300000
+    );
+    return () => clearTimeout(timer);
+  });
 
   return (
     <YieldContext.Provider value={{ state }}>

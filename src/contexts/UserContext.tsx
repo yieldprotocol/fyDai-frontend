@@ -52,7 +52,7 @@ const initState = {
   userLoading: true,
   position: {},
   txHistory: {
-    lastBlock: 0, 
+    lastBlock: 11066942, 
     items:[],
   },
   authorizations:{},
@@ -180,7 +180,7 @@ const UserProvider = ({ children }: any) => {
     // eslint-disable-next-line no-console
     forceUpdate && console.log('Re-building transaction History...');
     const _lastBlock = await provider.getBlockNumber();
-    const lastCheckedBlock = (txHistory && forceUpdate)? 0: txHistory?.lastBlock || 0;
+    const lastCheckedBlock = (txHistory && forceUpdate)? 11066942: txHistory?.lastBlock || 11066942;
 
     /* get the collateral transaction history */ 
     const collateralHistory = await getEventHistory(
