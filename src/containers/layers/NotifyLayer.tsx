@@ -1,5 +1,5 @@
-import React, { useContext, useState, useEffect } from 'react';
-import { Layer, Box, Text, Grid, ResponsiveContext, Paragraph, CheckBox } from 'grommet';
+import React, { useContext } from 'react';
+import { Layer, Box, Text, ResponsiveContext } from 'grommet';
 import {
   FiCheckCircle as CheckCircle,
   FiInfo as Info,
@@ -11,7 +11,7 @@ import { NotifyContext } from '../../contexts/NotifyContext';
 import RaisedButton from '../../components/RaisedButton';
 import YieldDisclaimer from '../../components/YieldDisclaimer';
 
-function NotifyLayer(target:any, columnsWidth:any) {
+function NotifyLayer(target:any) {
 
   const  { state, dispatch }  = useContext<any>(NotifyContext);
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
@@ -40,25 +40,21 @@ function NotifyLayer(target:any, columnsWidth:any) {
         <Box 
           width='1/2' 
         >
-          <Grid columns={columnsWidth}>
-            <Box />
-            <Box
-              direction="row"
-              justify="center"
-              elevation="large"
-              gap='medium'
-              pad={{ vertical:'small', horizontal:'medium' }}
-              background={notificationTypeMap(state.type).color}
-              round={{ corner:'left', size:'small' }}
-              align='center'
-            >
-              { notificationTypeMap(state.type).icon }
-              <Box align="center" direction="row" gap="small" pad='small'>
-                <Text size='small' color={notificationTypeMap(state.type).textColor}>{ state.message }</Text>
-              </Box>
+          <Box
+            direction="row"
+            justify="center"
+            elevation="large"
+            gap='medium'
+            pad={{ vertical:'small', horizontal:'medium' }}
+            background={notificationTypeMap(state.type).color}
+            round={{ corner:'left', size:'small' }}
+            align='center'
+          >
+            { notificationTypeMap(state.type).icon }
+            <Box align="center" direction="row" gap="small" pad='small'>
+              <Text size='small' color={notificationTypeMap(state.type).textColor}>{ state.message }</Text>
             </Box>
-            <Box background={notificationTypeMap(state.type).color} />
-          </Grid> 
+          </Box>
         </Box>
       </Layer>}
 

@@ -172,7 +172,7 @@ export const useProxy = () => {
     const collatType = ethers.utils.formatBytes32String(collateralType);
 
     const overrides = { 
-      gasLimit: BigNumber.from('500000')
+      gasLimit: BigNumber.from('300000')
     };
 
     setBorrowActive(true);
@@ -232,7 +232,7 @@ export const useProxy = () => {
     const parsedMaturity = series.maturity.toString();
 
     const overrides = {
-      gasLimit: BigNumber.from('1000000')
+      gasLimit: BigNumber.from('250000')
     };
 
     setRepayActive(true);
@@ -327,7 +327,7 @@ export const useProxy = () => {
     const parsedDaiUsed = BigNumber.isBigNumber(daiUsed)? daiUsed : ethers.utils.parseEther(daiUsed.toString());
 
     const overrides = { 
-      gasLimit: BigNumber.from('1000000'),
+      gasLimit: BigNumber.from('600000'),
       value: ethers.utils.parseEther('0')
     };
 
@@ -379,7 +379,7 @@ export const useProxy = () => {
     const parsedTokens = BigNumber.isBigNumber(tokens)? tokens : ethers.utils.parseEther(tokens.toString());
 
     const overrides = { 
-      gasLimit: BigNumber.from('1000000')
+      gasLimit: BigNumber.from('600000')
     };
 
     /* Contract interaction */
@@ -398,11 +398,10 @@ export const useProxy = () => {
         //   // testing with slippage etc. 
         //   // minDai = ethers.utils.parseEther('0');
         //   throw(preview);
-        // }
-
-        // TODO dont use this testing with slippage etc. 
+        // } 
         minDai = ethers.utils.parseEther('0');
         minFYDai = ethers.utils.parseEther('0');
+
         tx = await proxyContract.removeLiquidityEarlyDaiPool(poolAddr, parsedTokens, minDai, minFYDai, overrides );
 
       } else {
@@ -440,7 +439,7 @@ export const useProxy = () => {
     const toAddr = account && ethers.utils.getAddress(account);
 
     const overrides = { 
-      gasLimit: BigNumber.from('1000000')
+      gasLimit: BigNumber.from('250000')
     };
 
     /* Contract interaction */
@@ -482,7 +481,7 @@ export const useProxy = () => {
     const toAddr = account && ethers.utils.getAddress(account);
 
     const overrides = { 
-      gasLimit: BigNumber.from('1000000')
+      gasLimit: BigNumber.from('250000')
     };
 
     /* Contract interaction */
@@ -526,7 +525,7 @@ export const useProxy = () => {
     const fromAddr = account && ethers.utils.getAddress(account);
 
     const overrides = { 
-      gasLimit: BigNumber.from('1000000')
+      gasLimit: BigNumber.from('250000')
     };
 
     /* Contract interaction */

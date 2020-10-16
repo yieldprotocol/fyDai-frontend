@@ -88,7 +88,7 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
         !authWrap &&
         <Box 
           fill='horizontal'
-          pad={mobile?{ horizontal:'medium', top:'medium', bottom:'large' }:'medium'}
+          pad={mobile?{ horizontal:'medium', top:'medium', bottom:'large' }:{ horizontal:'xlarge', vertical:'medium' }}
           direction='row-responsive'
           gap='medium'
           background='#555555'

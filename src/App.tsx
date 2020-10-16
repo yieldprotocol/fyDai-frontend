@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState, useContext, Suspense } from 'react';
 import { Switch, Route, Redirect, useLocation } from 'react-router-dom';
-import { Grommet, base, Grid, Main, Box, ResponsiveContext, Collapsible } from 'grommet';
+import { Grommet, base, Main, Box, ResponsiveContext, Collapsible, Header, Footer } from 'grommet';
 import { deepMerge } from 'grommet/utils';
 
 import * as serviceWorker from './serviceWorker';
@@ -71,19 +71,11 @@ const App = (props:any) => {
   }, []);
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
-
   const leftSideRef = useRef<any>(null);
   const [showConnectLayer, setShowConnectLayer] = useState<string|null>(null);
-  const [showSidebar, setShowSidebar] = useState<boolean>(true);
-  const [columns, setColumns] = useState<string[]>(['7%', 'auto', '7%']);
-  useEffect(()=> {
-    mobile?
-      setColumns(['0%', 'auto', '0%'])
-      : setColumns(['7%', 'auto', '7%']);
-  }, [mobile]);
 
   return (
-    <div 
+    <div
       className="App" 
       style={
         ( activeSeries && props.moodLight && !mobile) ? 
@@ -92,35 +84,30 @@ const App = (props:any) => {
           undefined
       }
     >
-      <ConnectLayer view={showConnectLayer} closeLayer={() => setShowConnectLayer(null)} />
-
-      <Grid
-        columns={columns} 
-        justify='center'
-        onClick={()=>setShowSidebar(!showSidebar)}
-      >
-        <Box background={{ color: 'background-front' }} />
+      <Header margin={mobile? undefined: { horizontal:'xlarge' }}>
         <YieldHeader
           openConnectLayer={(v:string) => setShowConnectLayer(v)}
         />
-        <Box background={{ color: 'background-front' }} />
-      </Grid>
+      </Header>
+
+      <ConnectLayer view={showConnectLayer} closeLayer={() => setShowConnectLayer(null)} />
 
       {!yieldLoading &&
         <Collapsible open={!seriesLoading} ref={leftSideRef}>
           <Authorization />
         </Collapsible>}
 
-      <NotifyLayer target={!mobile?leftSideRef.current:undefined} columnsWidth={columns} />
+      <NotifyLayer target={!mobile?leftSideRef.current:undefined} />
 
       {!mobile && 
-      <Box margin='large' align='center'>
-        <YieldNav />
-      </Box>}
+        <Box margin='large' align='center'>
+          <YieldNav />
+        </Box>}
 
       <Main 
         pad={{ bottom:'large' }}
         align='center'
+        flex
       >      
         <Switch>
           <Route path="/post/:amnt?"> <Deposit openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route>
@@ -136,22 +123,16 @@ const App = (props:any) => {
         </Switch>              
       </Main>
 
-      <Grid 
-        fill 
-        columns={columns} 
-        justify='center'
-      >
-        <Box />
+      <Footer margin={mobile? undefined: { horizontal:'xlarge' }}>
         {!mobile &&
-          <YieldFooter
-            darkMode={props.darkMode}
-            setDarkMode={props.setDarkMode}
-            moodLight={props.moodLight}
-            toggleMoodLight={props.toggleMoodLight}
-            openConnectLayer={() => setShowConnectLayer('CONNECT')}
-          />}                  
-        <Box />
-      </Grid>
+        <YieldFooter
+          darkMode={props.darkMode}
+          setDarkMode={props.setDarkMode}
+          moodLight={props.moodLight}
+          toggleMoodLight={props.toggleMoodLight}
+          openConnectLayer={() => setShowConnectLayer('CONNECT')}
+        />}                  
+      </Footer>
     </div>
   );
 };

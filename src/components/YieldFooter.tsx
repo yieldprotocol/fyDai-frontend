@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Anchor, Footer, Text, Box } from 'grommet';
 import { FaDiscord as Discord } from 'react-icons/fa';
 import {
@@ -6,12 +6,15 @@ import {
   FiFileText as Docs,
 } from 'react-icons/fi';
 import { CgSleep as Moodlight } from 'react-icons/cg';
+import YieldDisclaimer from './YieldDisclaimer';
 
 const YieldFooter = (props: any) => {
   const {
     moodLight, 
     toggleMoodLight,
   } = props;
+
+  const [ showDisclaimer, setShowDisclaimer] = useState<boolean>(false);
 
   const IconSize = '1.15rem';
   const IconGap = 'small';
@@ -49,9 +52,12 @@ const YieldFooter = (props: any) => {
           top: '2px',
         }}
       >
-        <Text size='xxsmall' color='text-weak'>
-          This software is in ALPHA v0.2
-        </Text>
+        <Box onClick={()=> setShowDisclaimer(true)}>
+          <Text size='xxsmall' color='text-weak'>
+            This software is in BETA v0.2
+          </Text>
+          {/* {showDisclaimer && <YieldDisclaimer forceShow={true} />} */}
+        </Box>
         <Anchor
           onClick={()=>toggleMoodLight()}
           color={moodLight? 'pink':'grey'}
