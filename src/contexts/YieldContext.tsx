@@ -169,7 +169,8 @@ const YieldProvider = ({ children }: any) => {
       ethPrice_: cleanValue( ethers.utils.formatEther( utils.mulRay(ethers.utils.parseEther('1.5'), (_ilks.spot)).toString()), 4),
     };
     setCachedFeed(_feedData);
-    console.log(_feedData.ethPrice_);
+    // eslint-disable-next-line no-console
+    console.log('Eth Price check:', _feedData.ethPrice_);
     return _feedData;
   };
 
@@ -230,7 +231,7 @@ const YieldProvider = ({ children }: any) => {
   useEffect(()=>{
     const timer = setTimeout(
       () => _getFeedData(state.deployedContracts, state.deployedSeries),
-      5000 //300000
+      300000
     );
     return () => clearTimeout(timer);
   });
