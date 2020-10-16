@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useContext } from 'react';
-import {Box, Text } from 'grommet';
+import { Box, Text } from 'grommet';
 import { UserContext } from '../contexts/UserContext';
 import { NotifyContext } from '../contexts/NotifyContext';
 import FlatButton from './FlatButton';
 import EtherscanButton from './EtherscanButton';
+import Loading from './Loading';
 
 const TxRecent = ({ setView }: any) => {
 
@@ -52,7 +53,7 @@ const TxRecent = ({ setView }: any) => {
         <Text size='xsmall'>Last transaction this session: </Text>
         <Text size='xxsmall'>{lastCompletedTx.transactionHash} </Text>
         <Box>
-          <EtherscanButton txHash={lastCompletedTx.transactionHash} /> 
+          <EtherscanButton txHash={lastCompletedTx?.transactionHash} /> 
         </Box>
       </Box>}
 
@@ -63,9 +64,11 @@ const TxRecent = ({ setView }: any) => {
         align='start'
       >
         <Text size='xsmall'>Last transaction this session: </Text>
-        <Text size='xxsmall'>{lastCompletedTx.transactionHash} </Text>
+        <Loading condition={lastCompletedTx?.transactionHash} size='small'>
+          <Text size='xxsmall'>{lastCompletedTx?.transactionHash} </Text>
+        </Loading>
         <Box>
-          <EtherscanButton txHash={lastCompletedTx.transactionHash} /> 
+          <EtherscanButton txHash={lastCompletedTx?.transactionHash} /> 
         </Box>
       </Box>}
 

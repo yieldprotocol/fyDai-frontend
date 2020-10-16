@@ -482,7 +482,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
             { !txActive && 
             !!account && 
             activeSeries?.isMature() && 
-            activeSeries?.ethDebtFYDai.gt(ethers.constants.Zero) && 
+            activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) && 
             <Repay />}
 
             <Box direction='row' fill justify='between'>

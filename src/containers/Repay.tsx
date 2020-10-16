@@ -101,19 +101,14 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
 
   /* Handle input warnings and errors */ 
   useEffect(() => {
-    if ( debouncedInput  && daiBalance && ( ethers.utils.parseEther(debouncedInput).gt(daiBalance) ) ) {
+    if ( debouncedInput && daiBalance && ( ethers.utils.parseEther(debouncedInput).gt(daiBalance) ) ) {
       setWarningMsg(null);
       setErrorMsg('That amount exceeds the amount of Dai in your wallet'); 
     } else {
       setWarningMsg(null);
       setErrorMsg(null);
     }
-  }, [ debouncedInput ]);
-
-  useEffect(() => {
-    ( async ()=>{
-    })();
-  }, [ activeSeries ]);
+  }, [ debouncedInput, daiBalance ]);
 
   return (
     <Keyboard 
@@ -248,6 +243,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
       { txActive && <TxStatus msg={`You are repaying ${inputValue} DAI`} tx={txActive} /> }
 
       {mobile && 
+      !activeSeries?.isMature() && 
         <YieldMobileNav noMenu={true}>
           <NavLink 
             to={`/borrow/${activeSeries?.maturity}`}

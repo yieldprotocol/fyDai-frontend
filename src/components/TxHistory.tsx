@@ -71,11 +71,8 @@ const TxHistory = ( { filterTerms, series }: HistoryProps) => {
     );
   };
 
-  useEffect(()=>{
-
-  },);
-
   useEffect(()=> {
+
     let seriesFilteredHist;
     const _txHist = state.txHistory.items;
     const filteredHist = _txHist.filter((x:any) => filterTerms.includes(x.event));
@@ -85,8 +82,10 @@ const TxHistory = ( { filterTerms, series }: HistoryProps) => {
       seriesFilteredHist = filteredHist;
     }
     const sortedList = seriesFilteredHist.sort( (a:any, b:any) => b.date - a.date ); 
+    
     setTxHistory(sortedList);
-  }, [ state.txHistory ]);
+
+  }, [ state.txHistory, series, filterTerms ]);
 
   return (
     <Loading condition={state.userLoading} size='large'>

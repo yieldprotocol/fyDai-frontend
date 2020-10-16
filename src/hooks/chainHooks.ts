@@ -37,6 +37,7 @@ export const useSendTx = () => {
   // const { state: { signer, account } } = useContext(ConnectionContext);
   const { signer } = useSignerAccount();
   const [ sendTxActive, setSendTxActive ] = useState<boolean>();
+  
   /**
    * Send a transaction ()
    * @param {string} contractAddress address of the contract to send to.
@@ -114,7 +115,7 @@ export const useTimeTravel = () => {
       const { timestamp: ts } = await provider.getBlock(await provider.blockNumber);
       setTimestamp(ts);
     })();
-  }, [block]);
+  }, [block, provider]);
 
   const takeSnapshot = async () => {
     const res = await fetch('http://localhost:8545', {

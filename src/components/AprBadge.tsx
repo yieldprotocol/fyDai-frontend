@@ -41,16 +41,18 @@ function AprBadge({ activeView, series, animate }:IAprBadgeProps) {
         background={series.seriesColor}
         animation={animate ? { type:'zoomIn', duration:1000, size:'xlarge' } : undefined} 
       >
-        { mobile &&  <Box pad={{ horizontal:'small', vertical:'xxsmall' }}> <Text size='xxsmall' color={series?.seriesTextColor}><Clock /></Text></Box>}
-        { !mobile && 
-        <>
-          <Text size='xsmall' color={series?.seriesTextColor}>
-            <Clock />
-          </Text>   
-          <Text size='xsmall' color={series?.seriesTextColor}>  
-            Mature       
-          </Text>
-        </>}
+        <Box fill>
+          { mobile &&  <Box pad={{ horizontal:'small', vertical:'xxsmall' }}> <Text size='xxsmall' color={series?.seriesTextColor}><Clock /></Text></Box>}
+          { !mobile && 
+          <>
+            <Text size='xsmall' color={series?.seriesTextColor}>
+              <Clock />
+            </Text>   
+            <Text size='xsmall' color={series?.seriesTextColor}>  
+              Mature       
+            </Text>
+          </>}
+        </Box>
       </Box>}
 
       { seriesMature === false && 
@@ -63,11 +65,11 @@ function AprBadge({ activeView, series, animate }:IAprBadgeProps) {
           justify='center'
           animation={animate ? { type:'zoomIn', duration:1000, size:'xlarge' } : undefined} 
         >
-          <Loading condition={!seriesApr} size='xsmall'>
-            <Box fill>
+          <Box fill>
+            <Loading condition={!seriesApr} size='xsmall'>
               <Text size={mobile?'xxsmall':'xsmall'} color={series?.seriesTextColor}> { seriesApr } </Text> 
-            </Box> 
-          </Loading>
+            </Loading>
+          </Box>
         </Box>}
 
       { seriesMature === false &&
