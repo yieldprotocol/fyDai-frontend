@@ -86,7 +86,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
 
   useEffect(()=>{
     activeSeries?.ethDebtDai && daiBalance?.gt(activeSeries?.ethDebtDai) && setMaxRepay(activeSeries.ethDebtDai);
-    activeSeries?.ethDebtDai && daiBalance?.lt(activeSeries.ethDebtDai) && setMaxRepay(daiBalance);
+    activeSeries?.ethDebtDai && daiBalance?.lt(activeSeries?.ethDebtDai) && setMaxRepay(daiBalance);
   }, [daiBalance, activeSeries]);
 
   /* Repay disabling logic */
