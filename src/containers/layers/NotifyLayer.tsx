@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import { Layer, Box, Text, Grid, ResponsiveContext } from 'grommet';
+import React, { useContext, useState, useEffect } from 'react';
+import { Layer, Box, Text, Grid, ResponsiveContext, Paragraph, CheckBox } from 'grommet';
 import {
   FiCheckCircle as CheckCircle,
   FiInfo as Info,
@@ -9,6 +9,7 @@ import {
 
 import { NotifyContext } from '../../contexts/NotifyContext';
 import RaisedButton from '../../components/RaisedButton';
+import YieldDisclaimer from '../../components/YieldDisclaimer';
 
 function NotifyLayer(target:any, columnsWidth:any) {
 
@@ -130,31 +131,8 @@ function NotifyLayer(target:any, columnsWidth:any) {
         </Box>      
       </Layer>}
 
-      {state.slowNetwork && 
-      <Layer
-        position={state.position}
-        modal={false}
-        onEsc={()=>dispatch({ type:'closeNotify' })}
-        responsive={false}
-        plain
-        full='vertical'
-      >
-        <Box
-          fill
-          align="center"
-          direction="row"
-          gap="large"
-          round='xsmall'
-          elevation="medium"
-          pad={{ vertical: 'large', horizontal: 'large' }}
-          background='background'
-        >
-          <Text color='red'><Error /></Text>
-          <Box align="center" direction="row" gap="xsmall">
-            <Text>Slow network detected</Text>
-          </Box>
-        </Box>
-      </Layer>}
+      <YieldDisclaimer />
+
     </>
   );
 }
