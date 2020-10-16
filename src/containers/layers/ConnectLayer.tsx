@@ -102,11 +102,10 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                   <Box direction='row' justify='between'>
                     <Text alignSelf='start' size='small' weight='bold'>Diagnostics Info</Text> 
                   </Box>
-                  <Text size='xxsmall'>App Version:  alpha 0.1 </Text>
+                  <Text size='xxsmall'>App Version:  Alpha 0.2</Text>
                   <Text size='xxsmall'>Connected Network: { provider.network.name }</Text>
-                  <Text size='xxsmall'>Yield protocol ref contract: {process.env.REACT_APP_MIGRATION_42} </Text>
+                  <Text size='xxsmall'>Yield protocol ref contract: {process.env.REACT_APP_MIGRATION_1} </Text>
                 </Box>
-
               </Box> }
 
             { layerView === 'CONNECT' &&      
