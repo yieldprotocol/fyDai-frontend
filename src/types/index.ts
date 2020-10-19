@@ -11,6 +11,7 @@ export interface IYieldSeries {
   hasDelegatedPool: boolean;
   hasDaiAuth: boolean;
   hasFyDaiAuth: boolean;
+  authComplete:boolean;
   isMature: any; // function typeScript this out
   fyDaiBalance_: number;
   fyDaiBalance: BigNumber;

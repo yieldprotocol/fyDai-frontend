@@ -15,8 +15,8 @@ import { cleanValue } from '../utils';
 
 const YieldContext = createContext<any>({});
 
-// const fyDaiList = ['20Oct', '20Dec', '21Mar', '21Jun', '21Sep', '21Dec'];
-const fyDaiList = ['20Oct9', '20Oct31', '20Dec31', '21Mar31', '21Jun30', '21Sep30', '21Dec31'];
+const fyDaiList = ['20Oct', '20Dec', '21Mar', '21Jun', '21Sep', '21Dec'];
+// const fyDaiList = ['20Oct9', '20Oct31', '20Dec31', '21Mar31', '21Jun30', '21Sep30', '21Dec31'];
 const seriesColors = ['#ff86c8', '#82d4bb', '#6ab6f1', '#cb90c9', '#aed175', '#f0817f', '#ffbf81', '#95a4db', '#ffdc5c'];
 const contractList = [
   'Controller',
