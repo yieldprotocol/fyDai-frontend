@@ -30,7 +30,7 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   const { state: { requestedSigs, pendingTxs } } = useContext(NotifyContext);
   const { state: { authorizations, preferences }, actions: userActions } = useContext(UserContext);
-  const { hasDelegatedProxy } = authorizations;
+  const { hasDelegatedProxy, hasAuthorisedProxy } = authorizations;
   const { actions: seriesActions } = useContext(SeriesContext);
 
   // flags 
@@ -54,6 +54,8 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
     ]);
     // setAuthPending(false);
   };
+
+  console.log(hasDelegatedProxy, hasAuthorisedProxy);
 
   const closeAuth = () => {
     setLayerOpen(false);
@@ -82,7 +84,7 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
           {children} 
         </Box>}
 
-      { !hasDelegatedProxy &&
+      { ( !hasDelegatedProxy || !hasAuthorisedProxy) &&
         !series && 
         account && 
         !authWrap &&
@@ -104,6 +106,8 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
             onClick={()=>{authProcedure();}}
           />
         </Box>}
+
+        
 
       { hasDelegatedProxy &&
         account &&
