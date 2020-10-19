@@ -385,11 +385,9 @@ export const useProxy = () => {
         // eslint-disable-next-line no-console
         console.log('Removing liquidity BEFORE maturity');
         /* calculate expected trade values  */      
-        const preview = await previewPoolTx('buydai', series, ethers.utils.parseEther('1'));
-        
+        const preview = await previewPoolTx('buydai', series, ethers.utils.parseEther('1'));   
         if ( !(preview instanceof Error) ) {
           minFYDai = utils.divRay( preview.mul(BigNumber.from('1000000000')), utils.toRay(1.1));
-          minFYDai = ethers.utils.parseEther('0');
         } else {
           throw(preview);
         }
