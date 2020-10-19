@@ -95,7 +95,7 @@ const YieldProvider = ({ children }: any) => {
 
     /* Load yield core contract addresses */
     if ( !cachedContracts || forceUpdate) {
-      const _deployedContracts = getAddresses(contractList);
+      _deployedContracts = getAddresses(contractList);
       window.localStorage.removeItem('deployedContracts');
       setCachedContracts(_deployedContracts);
       // eslint-disable-next-line no-console
@@ -104,7 +104,7 @@ const YieldProvider = ({ children }: any) => {
       _deployedContracts = cachedContracts;
     }
     /* Load series specific contract addrs */
-    const fyDaiList = getFyDaiNames()
+    const fyDaiList = getFyDaiNames();
     if (!cachedSeries || (cachedSeries.length !== fyDaiList.length) || forceUpdate) {
       const _list = getAddresses(fyDaiList);
       const _poolList = getAddresses(fyDaiList.map((x:any)=> `fyDaiLP${x.slice(5)}`));        

@@ -244,7 +244,7 @@ export const useProxy = () => {
         try {     
           /* Repay using a signature authorizing treasury */
           // eslint-disable-next-line no-console
-          console.log('Repaying Before maturity - Signature required');
+          console.log('Repaying after maturity - Signature required');
           dispatch({ type: 'requestSigs', payload:[ auths.get(1) ] });
           const result = await signDaiPermit( 
             provider.provider, 

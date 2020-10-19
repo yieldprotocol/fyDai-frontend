@@ -26,7 +26,7 @@
         "Version" : "4ee6d9756b027e9d378b2b35ad56ddc9fec2c163",
         "Weth" : "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
         "WethJoin" : "0x2F0b23f53734252Bda2277357e97e1517d6B042A",
-        "YieldProxy" : "0x706060B2AB63c6bF37B40a702A78DfB6502b9C2b"
+        "YieldProxy" : "0x5Cd6B40763f0D79Cd2198425C42Efc7ae5B18bc7"
     },
     "42": {
         "Chai" : "0xA16e38AF14EBE62Da49Db3605258c1931C4bC76C",

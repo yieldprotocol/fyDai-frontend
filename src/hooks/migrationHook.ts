@@ -14,6 +14,8 @@ const migrationAddrs = new Map([
   [31337, process.env.REACT_APP_MIGRATION_31337 ],
 ]);
 
+const addresses = require('./addresses.json');
+
 /**
  * Hook for interacting with the yield 'YDAI' Contract
  * @returns { function } redeem
@@ -42,18 +44,21 @@ export const useMigrations = () => {
   ): { [name: string]: string; } => {
     // eslint-disable-next-line no-console
     console.log('Loading addrs for contracts', contractNameList);
-    const addresses = require("./addresses.json")[chainId!]
-    const res = Object.keys(addresses).reduce((filtered: any, key) => {
-        if (contractNameList.indexOf(key) !== -1) filtered[key] = addresses[key];
-        return filtered;
+    const addrs = addresses[chainId!];
+    const res = Object.keys(addrs).reduce((filtered: any, key) => {
+      if (contractNameList.indexOf(key) !== -1) {
+        // eslint-disable-next-line no-param-reassign
+        filtered[key] = addresses[key];
+      }
+      return filtered;
     }, {});
     return res;
   };
 
   const getFyDaiNames = (): string[] => {
-    const addresses = require("./addresses.json")[chainId!]
-    return Object.keys(addresses).filter((x) => x.startsWith('fyDai') && x.indexOf('LP') === -1)
-  }
+    // const addresses = require('./addresses.json')[chainId!];
+    return Object.keys(addresses).filter((x) => x.startsWith('fyDai') && x.indexOf('LP') === -1);
+  };
 
   /**
    * Fetches Yield protocol contract version from 
