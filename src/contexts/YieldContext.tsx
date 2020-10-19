@@ -1,4 +1,6 @@
 import React, { useReducer, useEffect, useContext, createContext } from 'react';
+import { useWeb3React } from '@web3-react/core';
+
 import { ethers } from 'ethers';
 import moment from 'moment';
 import * as utils from '../utils';
@@ -22,10 +24,8 @@ const YieldContext = createContext<any>({});
  */
 const getAddresses = (
     contractNameList: string[],
-    chainId: string,
+    chainId: number,
 ): { [name: string]: string; } => {
-    // eslint-disable-next-line no-console
-    console.log('Loading addrs for contracts', contractNameList);
     const addrs = (Addresses as any)[chainId];
     const res = Object.keys(addrs).reduce((filtered: any, key) => {
         if (contractNameList.indexOf(key) !== -1) {
@@ -37,7 +37,7 @@ const getAddresses = (
     return res;
 };
 
-const getFyDaiNames = (chainId: string): string[] => {
+const getFyDaiNames = (chainId: number): string[] => {
     const addrs = (Addresses as any)[chainId]
     return Object.keys(addrs).filter((x) => x.startsWith('fyDai') && x.indexOf('LP') === -1);
 };
@@ -102,6 +102,7 @@ const YieldProvider = ({ children }: any) => {
   const [state, dispatch] = useReducer(reducer, initState);
   const { fallbackProvider } = useSignerAccount();
   const { dispatch: notifyDispatch } = useContext(NotifyContext);
+  let { chainId } = useWeb3React();
 
   /* cache|localStorage declarations */
   const [cachedContracts, setCachedContracts] = useCachedState('deployedContracts', null );
@@ -120,11 +121,13 @@ const YieldProvider = ({ children }: any) => {
   ): Promise<any[]> => {
     const _deployedSeries: any[] = [];
     let _deployedContracts: any;
-    const chainId = (await fallbackProvider.getNetwork()).chainId as string;
+    if (chainId === undefined) {
+        chainId = (await fallbackProvider.getNetwork()).chainId
+    }
 
     /* Load yield core contract addresses */
     if ( !cachedContracts || forceUpdate) {
-      _deployedContracts = getAddresses(contractList, chainId);
+      _deployedContracts = getAddresses(contractList, chainId!);
       window.localStorage.removeItem('deployedContracts');
       setCachedContracts(_deployedContracts);
       // eslint-disable-next-line no-console
@@ -133,10 +136,10 @@ const YieldProvider = ({ children }: any) => {
       _deployedContracts = cachedContracts;
     }
     /* Load series specific contract addrs */
-    const fyDaiList = getFyDaiNames(chainId);
+    const fyDaiList = getFyDaiNames(chainId!);
     if (!cachedSeries || (cachedSeries.length !== fyDaiList.length) || forceUpdate) {
-      const _list = getAddresses(fyDaiList, chainId);
-      const _poolList = getAddresses(fyDaiList.map((x:any)=> `fyDaiLP${x.slice(5)}`), chainId);        
+      const _list = getAddresses(fyDaiList, chainId!);
+      const _poolList = getAddresses(fyDaiList.map((x:any)=> `fyDaiLP${x.slice(5)}`), chainId!);
       const _seriesList = Array.from(Object.values(_list));
 
       await Promise.all(
