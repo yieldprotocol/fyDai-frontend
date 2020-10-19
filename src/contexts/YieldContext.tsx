@@ -3,6 +3,7 @@ import { ethers } from 'ethers';
 import moment from 'moment';
 import * as utils from '../utils';
 import { NotifyContext } from './NotifyContext';
+import Addresses from './YieldAddresses.json'
 
 import { useCachedState, } from '../hooks/appHooks';
 import { useCallTx } from '../hooks/chainHooks';
@@ -13,6 +14,33 @@ import { IYieldSeries } from '../types';
 import { cleanValue } from '../utils';
 
 const YieldContext = createContext<any>({});
+
+/**
+ * Gets the addresses from the provided contract names
+ * @param {string[]} contractNameList list of contract names registered in the migrations contract.
+ * @returns {Promise<Map>} keyed with contract names
+ */
+const getAddresses = (
+    contractNameList: string[],
+    chainId: string,
+): { [name: string]: string; } => {
+    // eslint-disable-next-line no-console
+    console.log('Loading addrs for contracts', contractNameList);
+    const addrs = (Addresses as any)[chainId];
+    const res = Object.keys(addrs).reduce((filtered: any, key) => {
+        if (contractNameList.indexOf(key) !== -1) {
+            // eslint-disable-next-line no-param-reassign
+            filtered[key] = addrs[key];
+        }
+        return filtered;
+    }, {});
+    return res;
+};
+
+const getFyDaiNames = (chainId: string): string[] => {
+    const addrs = (Addresses as any)[chainId]
+    return Object.keys(addrs).filter((x) => x.startsWith('fyDai') && x.indexOf('LP') === -1);
+};
 
 const seriesColors = ['#ff86c8', '#82d4bb', '#6ab6f1', '#cb90c9', '#aed175', '#f0817f', '#ffbf81', '#95a4db', '#ffdc5c'];
 const contractList = [
@@ -82,7 +110,7 @@ const YieldProvider = ({ children }: any) => {
 
   /* hook declarations */
   const [ callTx ] = useCallTx();
-  const { getAddresses, getYieldVersion, getFyDaiNames } = useMigrations();
+  const { getYieldVersion } = useMigrations();
 
   /**
    * @dev internal fn: Get all public Yield addresses from localStorage (or chain if no cache)
@@ -92,10 +120,11 @@ const YieldProvider = ({ children }: any) => {
   ): Promise<any[]> => {
     const _deployedSeries: any[] = [];
     let _deployedContracts: any;
+    const chainId = (await fallbackProvider.getNetwork()).chainId as string;
 
     /* Load yield core contract addresses */
     if ( !cachedContracts || forceUpdate) {
-      _deployedContracts = getAddresses(contractList);
+      _deployedContracts = getAddresses(contractList, chainId);
       window.localStorage.removeItem('deployedContracts');
       setCachedContracts(_deployedContracts);
       // eslint-disable-next-line no-console
@@ -104,10 +133,10 @@ const YieldProvider = ({ children }: any) => {
       _deployedContracts = cachedContracts;
     }
     /* Load series specific contract addrs */
-    const fyDaiList = getFyDaiNames();
+    const fyDaiList = getFyDaiNames(chainId);
     if (!cachedSeries || (cachedSeries.length !== fyDaiList.length) || forceUpdate) {
-      const _list = getAddresses(fyDaiList);
-      const _poolList = getAddresses(fyDaiList.map((x:any)=> `fyDaiLP${x.slice(5)}`));        
+      const _list = getAddresses(fyDaiList, chainId);
+      const _poolList = getAddresses(fyDaiList.map((x:any)=> `fyDaiLP${x.slice(5)}`), chainId);        
       const _seriesList = Array.from(Object.values(_list));
 
       await Promise.all(
