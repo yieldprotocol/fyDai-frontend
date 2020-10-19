@@ -98,8 +98,7 @@ const YieldProvider = ({ children }: any) => {
 
     /* Load yield core contract addresses */
     if ( !cachedContracts || forceUpdate) {
-      const contractAddrs = await getAddresses(contractList);
-      _deployedContracts = Object.fromEntries(contractAddrs);
+      const _deployedContracts = await getAddresses(contractList);
       window.localStorage.removeItem('deployedContracts');
       setCachedContracts(_deployedContracts);
       // eslint-disable-next-line no-console
@@ -111,13 +110,13 @@ const YieldProvider = ({ children }: any) => {
     if (!cachedSeries || (cachedSeries.length !== fyDaiList.length) || forceUpdate) {
       const _list = await getAddresses(fyDaiList.map((x:any)=> `fyDai${x}`));
       const _poolList = await getAddresses(fyDaiList.map((x:any)=> `fyDaiLP${x}`));        
-      const _seriesList = Array.from(_list.values());
+      const _seriesList = Array.from(Object.values(_list));
 
       await Promise.all(
-        _seriesList.map(async (x: string, i: number) => {
+        _seriesList.map(async (x: any, i: number) => {
           const symbol = await callTx(x, 'FYDai', 'symbol', []);
           const maturity = await callTx(x, 'FYDai', 'maturity', []);
-          const poolAddress = _poolList.get(`${symbol.slice(0, 5)}LP${symbol.slice(5)}`); 
+          const poolAddress = _poolList[`${symbol.slice(0, 5)}LP${symbol.slice(5)}`]; 
           return {
             fyDaiAddress: x,
             symbol,

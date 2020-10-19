@@ -38,17 +38,15 @@ export const useMigrations = () => {
    * @returns {Promise<Map>} keyed with contract names
    */
   const getAddresses = async (
-    contractNameList:string[],
-  ) => {
+    contractNameList: string[],
+  ): Promise<{ [name: string]: string; }> => {
     // eslint-disable-next-line no-console
-    console.log('Migration contract called:', migrationsAddress);
-    const contract = new ethers.Contract(migrationsAddress, migrationAbi, fallbackProvider );
-    const res = new Map<string, string>();
-    await Promise.all(
-      contractNameList.map(async (x: string) => {
-        res.set( x, await contract.contracts(ethers.utils.formatBytes32String(x)));
-      })
-    );
+    console.log('Loading addrs for contracts', contractNameList);
+    const addresses = require("./addresses.json")[chainId!]
+    const res = Object.keys(addresses).reduce((filtered: any, key) => {
+        if (contractNameList.indexOf(key) !== -1) filtered[key] = addresses[key];
+        return filtered;
+    }, {});
     return res;
   };
 
