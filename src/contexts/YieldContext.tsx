@@ -1,12 +1,14 @@
 import React, { useReducer, useEffect, useContext, createContext } from 'react';
+import { useWeb3React } from '@web3-react/core';
+
 import { ethers } from 'ethers';
 import moment from 'moment';
 import * as utils from '../utils';
 import { NotifyContext } from './NotifyContext';
+import Addresses from './YieldAddresses.json'
 
 import { useCachedState, } from '../hooks/appHooks';
 import { useCallTx } from '../hooks/chainHooks';
-import { useEvents } from '../hooks/eventHooks';
 import { useSignerAccount } from '../hooks/connectionHooks';
 import { useMigrations } from '../hooks/migrationHook';
 
@@ -15,7 +17,31 @@ import { cleanValue } from '../utils';
 
 const YieldContext = createContext<any>({});
 
-const fyDaiList = ['20Oct', '20Dec', '21Mar', '21Jun', '21Sep', '21Dec'];
+/**
+ * Gets the addresses from the provided contract names
+ * @param {string[]} contractNameList list of contract names registered in the migrations contract.
+ * @returns {Promise<Map>} keyed with contract names
+ */
+const getAddresses = (
+    contractNameList: string[],
+    chainId: number,
+): { [name: string]: string; } => {
+    const addrs = (Addresses as any)[chainId];
+    const res = Object.keys(addrs).reduce((filtered: any, key) => {
+        if (contractNameList.indexOf(key) !== -1) {
+            // eslint-disable-next-line no-param-reassign
+            filtered[key] = addrs[key];
+        }
+        return filtered;
+    }, {});
+    return res;
+};
+
+const getFyDaiNames = (chainId: number): string[] => {
+    const addrs = (Addresses as any)[chainId]
+    return Object.keys(addrs).filter((x) => x.startsWith('fyDai') && x.indexOf('LP') === -1);
+};
+
 const seriesColors = ['#ff86c8', '#82d4bb', '#6ab6f1', '#cb90c9', '#aed175', '#f0817f', '#ffbf81', '#95a4db', '#ffdc5c'];
 const contractList = [
   'Controller',
@@ -74,8 +100,9 @@ const initState = {
 
 const YieldProvider = ({ children }: any) => {
   const [state, dispatch] = useReducer(reducer, initState);
-  const { provider, fallbackProvider } = useSignerAccount();
+  const { fallbackProvider } = useSignerAccount();
   const { dispatch: notifyDispatch } = useContext(NotifyContext);
+  let { chainId } = useWeb3React();
 
   /* cache|localStorage declarations */
   const [cachedContracts, setCachedContracts] = useCachedState('deployedContracts', null );
@@ -84,8 +111,7 @@ const YieldProvider = ({ children }: any) => {
 
   /* hook declarations */
   const [ callTx ] = useCallTx();
-  const { addEventListener } = useEvents();
-  const { getAddresses, getYieldVersion } = useMigrations();
+  const { getYieldVersion } = useMigrations();
 
   /**
    * @dev internal fn: Get all public Yield addresses from localStorage (or chain if no cache)
@@ -95,11 +121,13 @@ const YieldProvider = ({ children }: any) => {
   ): Promise<any[]> => {
     const _deployedSeries: any[] = [];
     let _deployedContracts: any;
+    if (chainId === undefined) {
+        chainId = (await fallbackProvider.getNetwork()).chainId
+    }
 
     /* Load yield core contract addresses */
     if ( !cachedContracts || forceUpdate) {
-      const contractAddrs = await getAddresses(contractList);
-      _deployedContracts = Object.fromEntries(contractAddrs);
+      _deployedContracts = getAddresses(contractList, chainId!);
       window.localStorage.removeItem('deployedContracts');
       setCachedContracts(_deployedContracts);
       // eslint-disable-next-line no-console
@@ -108,16 +136,17 @@ const YieldProvider = ({ children }: any) => {
       _deployedContracts = cachedContracts;
     }
     /* Load series specific contract addrs */
+    const fyDaiList = getFyDaiNames(chainId!);
     if (!cachedSeries || (cachedSeries.length !== fyDaiList.length) || forceUpdate) {
-      const _list = await getAddresses(fyDaiList.map((x:any)=> `fyDai${x}`));
-      const _poolList = await getAddresses(fyDaiList.map((x:any)=> `fyDaiLP${x}`));        
-      const _seriesList = Array.from(_list.values());
+      const _list = getAddresses(fyDaiList, chainId!);
+      const _poolList = getAddresses(fyDaiList.map((x:any)=> `fyDaiLP${x.slice(5)}`), chainId!);
+      const _seriesList = Array.from(Object.values(_list));
 
       await Promise.all(
-        _seriesList.map(async (x: string, i: number) => {
+        _seriesList.map(async (x: any, i: number) => {
           const symbol = await callTx(x, 'FYDai', 'symbol', []);
           const maturity = await callTx(x, 'FYDai', 'maturity', []);
-          const poolAddress = _poolList.get(`${symbol.slice(0, 5)}LP${symbol.slice(5)}`); 
+          const poolAddress = _poolList[`${symbol.slice(0, 5)}LP${symbol.slice(5)}`]; 
           return {
             fyDaiAddress: x,
             symbol,

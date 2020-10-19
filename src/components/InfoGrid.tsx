@@ -12,7 +12,7 @@ type entry = {
   loading: boolean;
   label: any;
   value: any;
-  labelExtra?: string|null;
+  labelExtra?: any|null;
   valuePrefix?: string|null;
   valueExtra?: any|null;
 };
@@ -46,6 +46,8 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
           const ValueExtra = x.valueExtra;
           const Value = x.value;
           const Label = x.label;
+          const LabelExtra = x.labelExtra;
+
           if (i < 3) {
             return (             
               <Box
@@ -67,7 +69,7 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
                     color={alt? 'text-xweak': 'text-xweak'} 
                     size='xxsmall'
                   >
-                    { x.labelExtra}
+                    { (typeof LabelExtra === 'function')? <LabelExtra />: LabelExtra }
                   </Text>
                 </Box>  
 

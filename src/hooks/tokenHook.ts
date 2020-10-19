@@ -73,8 +73,6 @@ export function useToken() {
     try {
       res = await contract.allowance(fromAddr, operatorAddr);
     }  catch (e) {
-      // eslint-disable-next-line no-console
-      console.log(e);
       res = ethers.BigNumber.from('0');
     }
     return parseFloat(ethers.utils.formatEther(res));

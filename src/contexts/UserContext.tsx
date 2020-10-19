@@ -168,6 +168,8 @@ const UserProvider = ({ children }: any) => {
     _auths.hasDelegatedProxy = await checkControllerDelegate(deployedContracts.YieldProxy);
     _auths.hasAuthorisedProxy = (await getTokenAllowance(deployedContracts.Dai, deployedContracts.YieldProxy, 'Dai') > 0);
     dispatch( { type: 'updateAuthorizations', payload: _auths });
+
+    console.log(_auths);
     return _auths;
   };
 
