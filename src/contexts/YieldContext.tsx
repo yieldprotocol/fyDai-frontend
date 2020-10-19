@@ -98,7 +98,7 @@ const YieldProvider = ({ children }: any) => {
 
     /* Load yield core contract addresses */
     if ( !cachedContracts || forceUpdate) {
-      const _deployedContracts = await getAddresses(contractList);
+      const _deployedContracts = getAddresses(contractList);
       window.localStorage.removeItem('deployedContracts');
       setCachedContracts(_deployedContracts);
       // eslint-disable-next-line no-console
@@ -108,8 +108,8 @@ const YieldProvider = ({ children }: any) => {
     }
     /* Load series specific contract addrs */
     if (!cachedSeries || (cachedSeries.length !== fyDaiList.length) || forceUpdate) {
-      const _list = await getAddresses(fyDaiList.map((x:any)=> `fyDai${x}`));
-      const _poolList = await getAddresses(fyDaiList.map((x:any)=> `fyDaiLP${x}`));        
+      const _list = getAddresses(fyDaiList.map((x:any)=> `fyDai${x}`));
+      const _poolList = getAddresses(fyDaiList.map((x:any)=> `fyDaiLP${x}`));        
       const _seriesList = Array.from(Object.values(_list));
 
       await Promise.all(

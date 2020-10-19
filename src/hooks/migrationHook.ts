@@ -37,9 +37,9 @@ export const useMigrations = () => {
    * @param {string[]} contractNameList list of contract names registered in the migrations contract.
    * @returns {Promise<Map>} keyed with contract names
    */
-  const getAddresses = async (
+  const getAddresses = (
     contractNameList: string[],
-  ): Promise<{ [name: string]: string; }> => {
+  ): { [name: string]: string; } => {
     // eslint-disable-next-line no-console
     console.log('Loading addrs for contracts', contractNameList);
     const addresses = require("./addresses.json")[chainId!]
