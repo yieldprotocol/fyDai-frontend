@@ -50,6 +50,11 @@ export const useMigrations = () => {
     return res;
   };
 
+  const getFyDaiNames = (): string[] => {
+    const addresses = require("./addresses.json")[chainId!]
+    return Object.keys(addresses).filter((x) => x.startsWith('fyDai') && x.indexOf('LP') === -1)
+  }
+
   /**
    * Fetches Yield protocol contract version from 
    * @returns {string} yield protocol version
@@ -69,6 +74,6 @@ export const useMigrations = () => {
   };
 
   return {
-    getAddresses, getYieldVersion
+    getAddresses, getYieldVersion, getFyDaiNames,
   } as const;
 };

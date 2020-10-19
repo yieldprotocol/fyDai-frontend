@@ -6,7 +6,6 @@ import { NotifyContext } from './NotifyContext';
 
 import { useCachedState, } from '../hooks/appHooks';
 import { useCallTx } from '../hooks/chainHooks';
-import { useEvents } from '../hooks/eventHooks';
 import { useSignerAccount } from '../hooks/connectionHooks';
 import { useMigrations } from '../hooks/migrationHook';
 
@@ -15,7 +14,6 @@ import { cleanValue } from '../utils';
 
 const YieldContext = createContext<any>({});
 
-const fyDaiList = ['20Oct', '20Dec', '21Mar', '21Jun', '21Sep', '21Dec'];
 const seriesColors = ['#ff86c8', '#82d4bb', '#6ab6f1', '#cb90c9', '#aed175', '#f0817f', '#ffbf81', '#95a4db', '#ffdc5c'];
 const contractList = [
   'Controller',
@@ -74,7 +72,7 @@ const initState = {
 
 const YieldProvider = ({ children }: any) => {
   const [state, dispatch] = useReducer(reducer, initState);
-  const { provider, fallbackProvider } = useSignerAccount();
+  const { fallbackProvider } = useSignerAccount();
   const { dispatch: notifyDispatch } = useContext(NotifyContext);
 
   /* cache|localStorage declarations */
@@ -84,8 +82,7 @@ const YieldProvider = ({ children }: any) => {
 
   /* hook declarations */
   const [ callTx ] = useCallTx();
-  const { addEventListener } = useEvents();
-  const { getAddresses, getYieldVersion } = useMigrations();
+  const { getAddresses, getYieldVersion, getFyDaiNames } = useMigrations();
 
   /**
    * @dev internal fn: Get all public Yield addresses from localStorage (or chain if no cache)
@@ -107,9 +104,10 @@ const YieldProvider = ({ children }: any) => {
       _deployedContracts = cachedContracts;
     }
     /* Load series specific contract addrs */
+    const fyDaiList = getFyDaiNames()
     if (!cachedSeries || (cachedSeries.length !== fyDaiList.length) || forceUpdate) {
-      const _list = getAddresses(fyDaiList.map((x:any)=> `fyDai${x}`));
-      const _poolList = getAddresses(fyDaiList.map((x:any)=> `fyDaiLP${x}`));        
+      const _list = getAddresses(fyDaiList);
+      const _poolList = getAddresses(fyDaiList.map((x:any)=> `fyDaiLP${x.slice(5)}`));        
       const _seriesList = Array.from(Object.values(_list));
 
       await Promise.all(
