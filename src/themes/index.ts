@@ -194,11 +194,6 @@ export const yieldTheme = {
   grommet: {
     // @ts-ignore
     extend: () => css`
-      .App {
-        display: flex;
-        min-height: 100vh;
-        flex-direction: column;
-      }
       a { color: grey}
       input::-webkit-outer-spin-button,
       input::-webkit-inner-spin-button {
@@ -208,7 +203,7 @@ export const yieldTheme = {
       input[type='number'] {
         -moz-appearance: textfield;
       }
-      overflow: auto;
+      overflow:auto;
       -ms-overflow-style: none;
       scrollbar-width: none;
       ::-webkit-scrollbar {

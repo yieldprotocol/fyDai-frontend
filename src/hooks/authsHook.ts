@@ -61,7 +61,8 @@ export const useAuth = () => {
   const { account, provider, signer } = useSignerAccount();
   const { state: { deployedContracts } } = useContext(YieldContext);
   const { dispatch } = useContext(NotifyContext);
-  const { state: { preferences } } = useContext(UserContext);
+  const { state: { preferences, authorizations } } = useContext(UserContext);
+  const { hasDelegatedProxy, hasAuthorisedProxy } = authorizations;
   
   const controllerAddr = ethers.utils.getAddress(deployedContracts.Controller);
   const controllerContract = new ethers.Contract( controllerAddr, Controller.abi, provider);
@@ -108,8 +109,8 @@ export const useAuth = () => {
   const fallbackYieldAuth = async () => {
     try {
       await Promise.all([
-        approveToken(daiAddr, proxyAddr, MAX_INT),
-        addControllerDelegate(proxyAddr)
+        !hasAuthorisedProxy? approveToken(daiAddr, proxyAddr, MAX_INT): null,
+        !hasDelegatedProxy? addControllerDelegate(proxyAddr): null, 
       ]);
       setFallbackAuthActive(false);
     } catch (e) {
@@ -121,10 +122,11 @@ export const useAuth = () => {
 
   const fallbackPoolAuth = async ( series:IYieldSeries ) => {
     try {
+      console.log(series.hasDaiAuth,series.hasFyDaiAuth,series.hasDelegatedPool )
       await Promise.all([
-        approveToken(daiAddr, series.poolAddress, MAX_INT),
-        approveToken(series.fyDaiAddress, proxyAddr, MAX_INT),
-        addPoolDelegate(series.poolAddress, proxyAddr),
+        !series.hasDaiAuth? approveToken(daiAddr, series.poolAddress, MAX_INT):null,
+        !series.hasFyDaiAuth? approveToken(series.fyDaiAddress, proxyAddr, MAX_INT):null,
+        !series.hasDelegatedPool? addPoolDelegate(series.poolAddress, proxyAddr):null,
       ]);
       setFallbackAuthActive(false);
     } catch (e) {
@@ -142,12 +144,12 @@ export const useAuth = () => {
     let daiPermitSig:any;
 
     const fallback = preferences?.useTxApproval;
-
     const overrides = { 
       gasLimit: BigNumber.from('1000000')
     };
 
-    if (!fallback) { 
+    /* use permit if user has selected to do so , or if previous auth failed on some of the txs */
+    if (!fallback && (!hasAuthorisedProxy && !hasDelegatedProxy)) { 
       setAuthActive(true);
       dispatch({ type: 'requestSigs', payload:[ auths.get(1), auths.get(2) ] });
       try {
@@ -179,8 +181,8 @@ export const useAuth = () => {
         daiPermitSig = ethers.utils.joinSignature(result);
         dispatch({ type: 'signed', payload: auths.get(2) });
       } catch (e) {
-      /* If there is a problem with the signing, use the approve txs as a fallback */
-        if ( e.code === 4001 ) {
+      /* If there is a problem with the signing, use the approve txs as a fallback, but ignore if error code 4001 (user reject) */
+        if ( e.code !== 4001 ) {
           handleSignError(e);
           setFallbackAuthActive(true);
           // eslint-disable-next-line no-console
@@ -237,8 +239,8 @@ export const useAuth = () => {
       gasLimit: BigNumber.from('1000000')
     };
 
-    /* if user account preferences don't specify using fallback,  */
-    if (!fallback) {
+    /* if user account preferences don't specify using fallback, OR, a previous auth failed on SOME txs */
+    if (!fallback && (!series.hasDaiAuth && !series.hasFyDaiAuth && !series.hasDelegatedPool) ) {
 
       setAuthActive(true);
       dispatch({ type: 'requestSigs', payload:[ auths.get(3), auths.get(4), auths.get(5) ] });
@@ -279,8 +281,8 @@ export const useAuth = () => {
         dispatch({ type: 'signed', payload: auths.get(5) });
 
       } catch (e) {
-      /* If there is a problem with the signing, use the approve txs as a fallback */
-        if ( e.code === 4001 ) {
+      /* If there is a problem with the signing, use the approve txs as a fallback , but ignore if error code 4001 (user reject) */
+        if ( e.code !== 4001 ) {
           handleSignError(e);
           // eslint-disable-next-line no-console
           console.log('Fallback to approval transactions');

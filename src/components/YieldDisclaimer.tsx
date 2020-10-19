@@ -5,7 +5,7 @@ import { UserContext } from '../contexts/UserContext';
 
 import FlatButton from './FlatButton';
 
-const YieldDisclaimer = ({ forceShow=false }:any) =>  {
+const YieldDisclaimer = ({ forceShow=false, closeCallback }:any) =>  {
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   const  { state: { userLoading, preferences }, actions: { updatePreferences } }  = useContext<any>(UserContext);
@@ -23,7 +23,9 @@ const YieldDisclaimer = ({ forceShow=false }:any) =>  {
         (showDisclaimer || forceShow) &&
         <Layer
           modal={true}
-          onEsc={()=>setShowDisclaimer(false)}
+          onEsc={()=>{ 
+            setShowDisclaimer(false);     
+          }}
           responsive={false}
           full={mobile?true:undefined}
         >

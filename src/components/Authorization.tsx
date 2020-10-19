@@ -30,7 +30,7 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   const { state: { requestedSigs, pendingTxs } } = useContext(NotifyContext);
   const { state: { authorizations, preferences }, actions: userActions } = useContext(UserContext);
-  const { hasDelegatedProxy } = authorizations;
+  const { hasDelegatedProxy, hasAuthorisedProxy } = authorizations;
   const { actions: seriesActions } = useContext(SeriesContext);
 
   // flags 
@@ -82,22 +82,28 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
           {children} 
         </Box>}
 
-      { !hasDelegatedProxy &&
+      { ( !hasDelegatedProxy || !hasAuthorisedProxy) &&
         !series && 
         account && 
         !authWrap &&
         <Box 
           fill='horizontal'
-          pad={mobile?{ horizontal:'medium', top:'medium', bottom:'large' }:'medium'}
+          pad={mobile?{ horizontal:'medium', top:'medium', bottom:'large' }:{ horizontal:'xlarge', vertical:'medium' }}
           direction='row-responsive'
           gap='medium'
           background='#555555'
           justify='between'
           margin={mobile?{ bottom:'-10px' }:undefined}
         >
+          { (!hasDelegatedProxy && !hasAuthorisedProxy) &&
           <Box> 
             <Text size={mobile?'xsmall': undefined}>Feel free to look around and play. However, before you make any transactions you will need to sign a few authorizations.</Text>
-          </Box>
+          </Box>}
+          { !(!hasDelegatedProxy && !hasAuthorisedProxy) &&
+          <Box>
+            <Text size={mobile?'xsmall': undefined}>There may have been a problem with the previous authorization attempt.</Text>
+            <Text size={mobile?'xsmall': undefined}>An authorisation is still required.</Text>
+          </Box>}
           <RaisedButton 
             background='#555555'
             label={<Box pad={{ horizontal:'small', vertical:'xsmall' }} align='center'><Text size='small' color='#DDDDDD'><Unlock /> Authorize Yield</Text></Box>}
@@ -117,10 +123,22 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
           background='#555555'
           align='center'
         >
+
+          { (!series.hasDaiAuth && !series.hasFyDaiAuth && !series.hasDelegatedPool) && 
           <Box direction='row' gap='small'>
             <Text color='#DDDDDD'> <Warning /> </Text>
             <Text size='xsmall' color='#DDDDDD'>A once-off authorization is required to use this series </Text>
-          </Box>
+          </Box> }
+
+          { !(!series.hasDaiAuth && !series.hasFyDaiAuth && !series.hasDelegatedPool) && 
+          <Box direction='row' gap='small'>
+            <Text color='#DDDDDD'> <Warning /> </Text>
+            <Box>
+              <Text size='xsmall' color='#DDDDDD'>There was a problem with the previous unlock attempt.</Text>
+              <Text size='xsmall' color='#DDDDDD'>A few authorisations are still outstanding.</Text>
+            </Box>
+          </Box> }
+
           <Box>
             <RaisedButton 
               background='#555555'
@@ -211,7 +229,7 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
           responsive={mobile?false: undefined}
           full={mobile?true: undefined}
         >
-          {!preferences?.useTxApproval && 
+          {!preferences?.useTxApproval && !txActive &&
           <Box 
             width={!mobile?{ min:'620px', max:'620px' }: undefined}
             round={mobile?undefined:'small'}
@@ -230,11 +248,6 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
             </Box>
 
             <Box>
-              {/* <Text size='small' weight='bold'> Option 2:</Text> */}
-              <Text size='small'> Or, if you know your wallet does support signing permits, simply reject all the approvals and try again.</Text>
-            </Box>
-
-            <Box>
               <CheckBox 
                 checked={preferences?.useTxApproval}
                 label={<Text size='xsmall'>In future, always use individual transactions for authorizations</Text>}
@@ -244,7 +257,35 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
                 <Text size='xxsmall'>(You can always change back to using permit-style authorization in the settings)</Text>
               </Box>
             </Box>
+
           </Box>}
+
+          {!preferences?.useTxApproval && txActive &&
+          <Box 
+            width={!mobile?{ min:'620px', max:'620px' }: undefined}
+            round={mobile?undefined:'small'}
+            background='background'
+            pad='large'
+            gap='medium'
+          >
+            { txActive && <Text size='xsmall' weight='bold'> Submitting your Authorizations ... Transaction pending.</Text> }
+            
+            { authPending && 
+              txActive &&
+              <Box alignSelf='start'>
+                <FlatButton 
+                  onClick={()=>closeAuth()}
+                  label={
+                    <Box direction='row' gap='medium' align='center'>
+                      <ArrowLeft color='text-weak' />
+                      <Text size='small' color='text-weak'>close, and go back to the app</Text>
+                    </Box>
+                  }
+                />
+              </Box>}
+
+          </Box>}
+
 
           {preferences?.useTxApproval &&
           <Box 
@@ -255,7 +296,7 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
             gap='medium'
           >
             <Text weight='bold'> Please approve the following set of authorization transactions with your wallet or provider </Text>
-            { txActive && 
+            { txActive &&  
             <Box gap='medium'>
               <Box gap='medium'>
                 <Text size='xsmall' weight='bold'> 

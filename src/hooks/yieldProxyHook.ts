@@ -232,7 +232,7 @@ export const useProxy = () => {
     const parsedMaturity = series.maturity.toString();
 
     const overrides = {
-      gasLimit: BigNumber.from('1000000')
+      gasLimit: BigNumber.from('500000')
     };
 
     setRepayActive(true);
@@ -341,14 +341,7 @@ export const useProxy = () => {
     let maxFYDai:BigNumber;
     setAddLiquidityActive(true);
     try {
-      /* Calculate expected trade values and factor in slippage */
-      const preview = await previewPoolTx('sellDai', series, fyDaiSplit);
-      if ( !(preview instanceof Error) ) {
-        maxFYDai = valueWithSlippage(preview);
-      } else {
-        // maxFYDai = ethers.utils.parseEther('1000000');
-        throw(preview);
-      }
+      maxFYDai = utils.mulRay(fyDaiSplit, utils.toRay(1.1));
       tx = await proxyContract.addLiquidity(poolAddr, parsedDaiUsed, maxFYDai, overrides);
     } catch (e) {
       handleTxBuildError(e);
@@ -372,7 +365,7 @@ export const useProxy = () => {
     // removeLiquidityEarly(address from, uint256 poolTokens, uint256 DaiLimit)
     // removeLiquidityMature(address from, uint256 poolTokens)
     series: IYieldSeries,  
-    tokens:number|BigNumber,
+    tokens: number|BigNumber,
   ) => {
     /* Processing and sanitizing input */
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
@@ -384,26 +377,22 @@ export const useProxy = () => {
 
     /* Contract interaction */
     let tx:any;
-    let minDai:BigNumber;
+    // let minDai:BigNumber;
     let minFYDai:BigNumber;
     setRemoveLiquidityActive(true);
     try {
       if ( !series.isMature() ) {
-        console.log('Removing liquidity BEFORE maturity'); 
-        /* calculate expected trade values and factor in slippage */
-        // const preview = await previewPoolTx('selldai', series, daiUsed);
-        // if ( !(preview instanceof Error) ) {
-        //   minDai = valueWithSlippage(preview, true);
-        // } else {
-        //   // testing with slippage etc. 
-        //   // minDai = ethers.utils.parseEther('0');
-        //   throw(preview);
-        // }
+        // eslint-disable-next-line no-console
+        console.log('Removing liquidity BEFORE maturity');
+        /* calculate expected trade values  */      
+        const preview = await previewPoolTx('buydai', series, ethers.utils.parseEther('1'));   
+        if ( !(preview instanceof Error) ) {
+          minFYDai = utils.divRay( preview.mul(BigNumber.from('1000000000')), utils.toRay(1.1));
+        } else {
+          throw(preview);
+        }
 
-        // TODO dont use this testing with slippage etc. 
-        minDai = ethers.utils.parseEther('0');
-        minFYDai = ethers.utils.parseEther('0');
-        tx = await proxyContract.removeLiquidityEarlyDaiPool(poolAddr, parsedTokens, minDai, minFYDai, overrides );
+        tx = await proxyContract.removeLiquidityEarlyDaiFixed(poolAddr, parsedTokens, minFYDai, overrides );
 
       } else {
         console.log('removing liquidity AFTER maturity');
@@ -440,7 +429,7 @@ export const useProxy = () => {
     const toAddr = account && ethers.utils.getAddress(account);
 
     const overrides = { 
-      gasLimit: BigNumber.from('1000000')
+      gasLimit: BigNumber.from('500000')
     };
 
     /* Contract interaction */
@@ -482,7 +471,7 @@ export const useProxy = () => {
     const toAddr = account && ethers.utils.getAddress(account);
 
     const overrides = { 
-      gasLimit: BigNumber.from('1000000')
+      gasLimit: BigNumber.from('250000')
     };
 
     /* Contract interaction */
@@ -526,7 +515,7 @@ export const useProxy = () => {
     const fromAddr = account && ethers.utils.getAddress(account);
 
     const overrides = { 
-      gasLimit: BigNumber.from('1000000')
+      gasLimit: BigNumber.from('500000')
     };
 
     /* Contract interaction */

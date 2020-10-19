@@ -146,10 +146,10 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                     } return <ConnectButton key={x.name} />;
                   }
                   )}
-                  <Box gap="xsmall" direction="row">
+                  {/* <Box gap="xsmall" direction="row">
                     <Anchor href='https://ethereum.org/en/learn/' label="Help!" size="xsmall" color="brand" target="_blank" />
                     <Text size="xsmall"> I'm not sure what this means.</Text>
-                  </Box>
+                  </Box> */}
                 </Box>
               </Box>}
 

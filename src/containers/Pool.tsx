@@ -185,7 +185,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
               },
               {
                 label: 'Your Pool share',
-                labelExtra: `of the total ${activeSeries?.totalSupply_} tokens in this series`,
+                labelExtra: ()=>(<Text size='xxsmall'> of the total <Text size='xxsmall' color='text'>{activeSeries?.totalSupply_}</Text> tokens </Text>),
                 visible: 
                     (!!account && txActive?.type !== 'ADD_LIQUIDITY' && !activeSeries?.isMature()) || 
                     (activeSeries?.isMature() && activeSeries?.poolTokens_>0 ),
@@ -199,7 +199,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
           /> 
         </SeriesDescriptor>   
 
-        { !txActive &&
+        { (!txActive || txActive.type === 'REMOVE_LIQUIDITY') &&
         <Box
           width={{ max:'600px' }}
           alignSelf='center'
@@ -326,7 +326,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
         </Box>}
 
         { addLiquidityActive && !txActive && <ApprovalPending /> } 
-        { txActive && <TxStatus msg={`You are adding ${inputValue} DAI liquidity to the pool.`} tx={txActive} /> }
+        { txActive && txActive.type !== 'REMOVE_LIQUIDITY' && <TxStatus msg={`You are adding ${inputValue} DAI liquidity to the pool.`} tx={txActive} /> }
       </Keyboard>
 
       { mobile && 
