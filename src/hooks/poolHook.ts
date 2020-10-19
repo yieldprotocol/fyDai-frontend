@@ -224,8 +224,6 @@ export const usePool = () => {
     try {
       res = await contract.delegated(fromAddr, delegateAddr);
     }  catch (e) {
-      // eslint-disable-next-line no-console
-      console.log(e);
       res = false;
     }
     return res;
