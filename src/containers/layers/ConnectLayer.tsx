@@ -23,6 +23,7 @@ import FlatButton from '../../components/FlatButton';
 import TxHistory from '../../components/TxHistory';
 import YieldSettings from '../../components/YieldSettings';
 import ExperimentWrap from '../../components/ExperimentWrap';
+import HashWrap from '../../components/HashWrap';
 import TxRecent from '../../components/TxRecent';
 
 const ConnectLayer = ({ view, target, closeLayer }: any) => {
@@ -85,7 +86,7 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                   >
                     <Box direction='row' gap='small'>
                       <Text size='xsmall'>Account:</Text> 
-                      <Text size='xsmall'> {account} </Text>                   
+                      <Text size='xsmall'> <HashWrap hash={account}>{account}</HashWrap> </Text>                   
                     </Box>               
 
                     <Box direction='row' gap='small'>

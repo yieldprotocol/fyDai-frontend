@@ -11,6 +11,7 @@ import { UserContext } from '../contexts/UserContext';
 import EtherscanButton from './EtherscanButton';
 import { IYieldSeries } from '../types';
 import Loading from './Loading';
+import HashWrap from './HashWrap';
 
 interface HistoryProps {
   filterTerms: string[];
@@ -63,9 +64,11 @@ const TxHistory = ( { filterTerms, series }: HistoryProps) => {
         </Box> }
 
         <Box fill>
-          <Box alignSelf='end'>
+          <Box alignSelf='end' direction='row' gap='small'>
             <EtherscanButton txHash={item.transactionHash} />
+            <HashWrap hash={item.transactionHash} /> 
           </Box>
+          
         </Box>
       </Box>   
     );

@@ -102,7 +102,6 @@ export const invertColor = (hex:any) => {
   return `#${  padZero(r)  }${padZero(g)  }${padZero(b)}`;
 };
 
-
 /**
  * number formatting if reqd.
  * */
@@ -124,4 +123,13 @@ export const nFormatter = (num:number, digits:number) => {
     }
   }
   return (num / si[i].value).toFixed(digits).replace(rx, '$1') + si[i].symbol;
-}
+};
+
+export const copyToClipboard=(str:string)=> {
+  const el = document.createElement('textarea');
+  el.value = str;
+  document.body.appendChild(el);
+  el.select();
+  document.execCommand('copy');
+  document.body.removeChild(el);
+};

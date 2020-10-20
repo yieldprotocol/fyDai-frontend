@@ -24,6 +24,7 @@ import Loading from './Loading';
 import EtherscanButton from './EtherscanButton';
 import TxStatus from './TxStatus';
 import { abbreviateHash } from '../utils';
+import HashWrap from './HashWrap';
 
 
 const AccountButton = (props: any) => {
@@ -65,9 +66,9 @@ const AccountButton = (props: any) => {
           pad='small'
           background='#f0f0f0'
         >
-          { abbreviateHash(lastCompletedTx.transactionHash) }
-          {lastCompletedTx.status}
-          <EtherscanButton txHash={lastCompletedTx.transactionHash} />
+          <HashWrap hash={lastCompletedTx?.transactionHash}>{ abbreviateHash(lastCompletedTx?.transactionHash) }</HashWrap>
+          {lastCompletedTx?.status}
+          <EtherscanButton txHash={lastCompletedTx?.transactionHash} />
         </Box>}
       </Drop>);
   };

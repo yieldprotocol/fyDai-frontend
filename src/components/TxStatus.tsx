@@ -6,6 +6,7 @@ import { ScaleLoader } from 'react-spinners';
 import { NotifyContext } from '../contexts/NotifyContext';
 import EtherscanButton from './EtherscanButton';
 import { abbreviateHash } from '../utils';
+import HashWrap from './HashWrap';
 
 interface TxStatusProps {
   msg:string;
@@ -44,12 +45,7 @@ const TxStatus= ({ msg, tx }:TxStatusProps) => {
           <Text>{msg}</Text>
           <ScaleLoader color={theme?.global?.colors?.brand.dark || 'grey'} height='25px' />
           <Box direction='row' gap='xsmall'>
-            <Text size='xsmall' ref={txRef}> { abbreviateHash(tx.tx.hash) } </Text>
-            <Box
-              onClick={()=>handleCopy()}
-            >
-              <Copy /> 
-            </Box>    
+            <HashWrap hash={tx.tx.hash}> <Text size='xsmall' ref={txRef}> { abbreviateHash(tx.tx.hash) } </Text></HashWrap>  
           </Box>
           <EtherscanButton txHash={tx.tx.hash} />
         </Box>}
@@ -68,7 +64,7 @@ const TxStatus= ({ msg, tx }:TxStatusProps) => {
         <Text size='xlarge' color='brand' weight='bold'>Transaction complete. </Text>
         <Text>{(lastCompletedTx.status === 1)? 'Transaction succeeded': 'Transaction failed'}</Text>
         <Box direction='row' gap='xsmall'>
-          <Text size='xsmall' ref={txRef}> { abbreviateHash(lastCompletedTx.transactionHash) } </Text>
+          <Text size='xsmall' ref={txRef}> <HashWrap hash={lastCompletedTx?.transactionHash}>{ abbreviateHash(lastCompletedTx?.transactionHash) }</HashWrap> </Text>
           <Box
             onClick={()=>handleCopy()}
           >
