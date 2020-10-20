@@ -13,7 +13,7 @@ import {
   FiRefreshCcw as Refresh,
 
 } from 'react-icons/fi';
-import { useConnection, useSignerAccount } from '../../hooks';
+import { useConnection, useSignerAccount, useWeb3React } from '../../hooks';
 import { injected, walletconnect } from '../../connectors';
 import metamaskImage from '../../assets/images/providers/metamask.png';
 import walletConnectImage from '../../assets/images/providers/walletconnect.png';
@@ -32,7 +32,8 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
   
   const { handleSelectConnector } = useConnection();
 
-  const { account, provider } = useSignerAccount();
+  const { account, provider, chainId } = useSignerAccount();
+  const web3React = useWeb3React();
   const [ layerView, setLayerView] = useState<string>(view);
   const [ histOpen, setHistOpen] = useState<string>('BORROW');
 
@@ -68,7 +69,7 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
               <Box gap='medium'>
                 <Box pad="small" gap="small">
                   <Box direction='row' justify='between'>
-                    <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Connected Wallet</Text>   
+                    <Text alignSelf='start' size='large' color='brand' weight='bold'>Connected Wallet</Text>   
                     <Box round>
                       <FlatButton
                         onClick={()=>setLayerView('CONNECT')}
@@ -97,6 +98,12 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                       <Text size='xsmall'>{ position?.daiBalance_ || '' }</Text>
                     </Box>
                   </Box>
+                  <Box direction='row'>
+                    <RaisedButton 
+                      label={<Box pad='xsmall'><Text size='xsmall'>Disconnect wallet</Text></Box>}
+                      onClick={()=>web3React.deactivate()}
+                    />
+                  </Box>
                 </Box>
 
                 <TxRecent setView={()=>setLayerView('HISTORY')} />
@@ -107,8 +114,8 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                     <Text alignSelf='start' size='small' weight='bold'>Diagnostics Info</Text> 
                   </Box>
                   <Text size='xxsmall'>App Version: Alpha 0.2</Text>
-                  <Text size='xxsmall'>Connected Network: { provider.network.name }</Text>
-                  <Text size='xxsmall'>Yield protocol ref contract: {process.env.REACT_APP_MIGRATION_1} </Text>
+                  <Text size='xxsmall'>Connected Network: { provider?.network?.name }</Text>
+                  <Text size='xxsmall'>Yield protocol ref contract: {process.env[`REACT_APP_MIGRATION_${chainId}`]} </Text>
                   
                 </Box>
               </Box> }
@@ -187,6 +194,11 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                   {histOpen === 'POOL' && <TxHistory filterTerms={['Added', 'Removed' ]} series={null} />}
                 </Box>
               </Box> }
+
+            { !account && layerView === 'ACCOUNT' &&
+            <Box pad='medium' align='center'>  
+              <Text weight='bold'>Your wallet has been disconnected.</Text>
+            </Box>}
 
             <Footer direction="row-responsive" justify='between' pad="medium" margin={{ top:'medium' }}>
               <FlatButton 

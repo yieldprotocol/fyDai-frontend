@@ -60,7 +60,7 @@ const YieldSettings = () => {
     <>
       <Box pad="small" gap="small">
         <Box direction='row' justify='between'>
-          <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Settings</Text> 
+          <Text alignSelf='start' size='large' color='brand' weight='bold'>Settings</Text> 
           <Box round>
             <FlatButton
               disabled

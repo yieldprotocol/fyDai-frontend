@@ -22,7 +22,7 @@ const TxRecent = ({ setView }: any) => {
   return (
     <Box pad="small" gap="small">
       <Box direction='row' justify='between'>
-        <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Transactions</Text>   
+        <Text alignSelf='start' size='large' color='brand' weight='bold'>Transactions</Text>   
         <Box round>
           <FlatButton
             onClick={()=>setView()}
