@@ -144,7 +144,7 @@ export const useAuth = () => {
 
     const fallback = preferences?.useTxApproval;
     const overrides = { 
-      gasLimit: BigNumber.from('1000000')
+      gasLimit: BigNumber.from('200000')
     };
 
     /* use permit if user has selected to do so , or if previous auth failed on some of the txs */
@@ -235,7 +235,7 @@ export const useAuth = () => {
     let fyDaiSig;
 
     const overrides = { 
-      gasLimit: BigNumber.from('1000000')
+      gasLimit: BigNumber.from('250000')
     };
 
     /* if user account preferences don't specify using fallback, OR, a previous auth failed on SOME txs */
