@@ -22,6 +22,14 @@ const urls = {
   31337: process.env.REACT_APP_RPC_URL_31337 as string, 
 };
 
+const clearAllButPrefs = () => {
+  localStorage.removeItem('deployedContracts');
+  localStorage.removeItem('lastFeed');
+  localStorage.removeItem('deployedSeries');
+  localStorage.removeItem('cache_chainId');
+  localStorage.removeItem('txHistory'); 
+};
+
 const useEagerConnect = () => {
   const { activate, active, chainId } = useWeb3React();
   const { activate: activateFallback } = useWeb3React('fallback');
@@ -44,7 +52,7 @@ const useEagerConnect = () => {
   useEffect(() => {
     if (!tried && active) {
       setTried(true);
-      ( cachedChainId !== chainId ) && localStorage.clear();
+      ( cachedChainId !== chainId ) && clearAllButPrefs();
       // eslint-disable-next-line no-console
       console.log('Web3 connected (eagerly ). Now, connecting fallback provider with same chainId');
       activateFallback( new NetworkConnector({ urls, defaultChainId: chainId }), (e) => handleErrorMessage(e));
@@ -92,6 +100,7 @@ const useInactiveListener = (suppress: boolean = false) => {
         console.log("Handling 'network!Changed' event with payload", networkId);
         // activate(injected);
         if ((cachedChainId !== networkId) && active){
+
           console.log('NETWORK change actions');
           // localStorage.clear();
           // // eslint-disable-next-line no-restricted-globals
@@ -136,7 +145,7 @@ const useFallbackConnect = (triedEager: boolean = false) => {
 
   useEffect(()=>{
     if ( triedEager && !active && !fallbackActive ) {        
-      ( cachedChainId !== defaultChainId ) && localStorage.clear();
+      ( cachedChainId !== defaultChainId ) && clearAllButPrefs();
       activateFallback( new NetworkConnector({ urls, defaultChainId }), (e) => handleErrorMessage(e));
       setCachedChainId(defaultChainId);
     }
@@ -173,7 +182,7 @@ export function useConnection() {
   clear EVERYTHING from cache and reset the app - it will be different info */
   useEffect(()=>{
     if (chainId && cachedChainId && (cachedChainId !== chainId) ) { 
-      localStorage.clear();
+      clearAllButPrefs();
       // eslint-disable-next-line no-restricted-globals
       location.reload();
     }

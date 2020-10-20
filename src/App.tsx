@@ -60,8 +60,12 @@ const App = (props:any) => {
             updateAvailable:true,
             updateAccept: ()=> { 
               registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-              /* Clear the cache completely on update - in future, save user preferences */
-              localStorage.clear();
+              /* Clear the cache (except user Preferences) on update - in future, save user preferences */
+              localStorage.removeItem('deployedContracts');
+              localStorage.removeItem('lastFeed');
+              localStorage.removeItem('deployedSeries');
+              localStorage.removeItem('cache_chainId');
+              localStorage.removeItem('txHistory');
               window.location.reload();
             },    
           },
