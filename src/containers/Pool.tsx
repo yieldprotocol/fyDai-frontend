@@ -6,7 +6,7 @@ import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 import { VscHistory as History } from 'react-icons/vsc';
 
 import { NavLink, useParams } from 'react-router-dom';
-import { cleanValue } from '../utils';
+import { cleanValue, nFormatter } from '../utils';
 
 import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
@@ -192,6 +192,16 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                 active: true,
                 loading: addLiquidityPending,           
                 value: activeSeries?` ${activeSeries?.poolPercent}%`: '',
+                valuePrefix: null,
+                valueExtra: null,
+              },
+              {
+                label: 'Total Liquidity',
+                labelExtra: ' staked in this series',
+                visible: (txActive?.type !== 'ADD_LIQUIDITY' && !activeSeries?.isMature()),
+                active: true,
+                loading: addLiquidityPending,           
+                value: activeSeries?` ${nFormatter(activeSeries?.totalSupply_, 2)} tokens`: '',
                 valuePrefix: null,
                 valueExtra: null,
               },

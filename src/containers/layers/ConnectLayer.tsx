@@ -100,7 +100,7 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                   </Box>
                   <Box direction='row'>
                     <RaisedButton 
-                      label={<Box pad='xsmall'><Text size='xsmall'>Disconnect wallet</Text></Box>}
+                      label={<Box pad='xsmall'><Text size='xxsmall'>Disconnect wallet</Text></Box>}
                       onClick={()=>web3React.deactivate()}
                     />
                   </Box>
@@ -118,7 +118,7 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                   <Text size='xxsmall'>Yield protocol ref contract: {process.env[`REACT_APP_MIGRATION_${chainId}`]} </Text> 
                   <Box direction='row'>
                     <RaisedButton 
-                      label={<Box pad='xsmall'><Text size='xsmall'>Reset all settings</Text></Box>}
+                      label={<Box pad='xsmall'><Text size='xxsmall'>Reset Settings</Text></Box>}
                     // eslint-disable-next-line no-restricted-globals
                       onClick={()=>{localStorage.clear(); location.reload();}}
                     />  
