@@ -58,7 +58,7 @@ const auths = new Map([
 ]);
 
 export const useAuth = () => {
-  const { account, provider, signer } = useSignerAccount();
+  const { account, provider, signer, chainId } = useSignerAccount();
   const { state: { deployedContracts } } = useContext(YieldContext);
   const { dispatch } = useContext(NotifyContext);
   const { state: { preferences, authorizations } } = useContext(UserContext);
@@ -122,7 +122,6 @@ export const useAuth = () => {
 
   const fallbackPoolAuth = async ( series:IYieldSeries ) => {
     try {
-      console.log(series.hasDaiAuth,series.hasFyDaiAuth,series.hasDelegatedPool )
       await Promise.all([
         !series.hasDaiAuth? approveToken(daiAddr, series.poolAddress, MAX_INT):null,
         !series.hasFyDaiAuth? approveToken(series.fyDaiAddress, proxyAddr, MAX_INT):null,
@@ -165,7 +164,7 @@ export const useAuth = () => {
         const domain: IDomain = {
           name: 'Yield',
           version: '1',
-          chainId: (await provider.getNetwork()).chainId,
+          chainId: chainId || 1,
           verifyingContract: controllerAddr,
         };
         controllerSig = await sendForSig(
@@ -258,7 +257,7 @@ export const useAuth = () => {
         const domain: IDomain = {
           name: 'Yield',
           version: '1',
-          chainId: (await provider.getNetwork()).chainId,
+          chainId: chainId || 1,
           verifyingContract: poolAddr,
         };
         poolSig = await sendForSig(

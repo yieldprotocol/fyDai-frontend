@@ -225,7 +225,7 @@ const useWeb3Errors = ()=> {
 };
 
 export function useSignerAccount() {
-  const { library: provider, account } = useWeb3React();
+  const { library: provider, account, chainId } = useWeb3React();
   const { library: altProvider } = useWeb3React('fallback');
   const [ signer, setSigner ] = useState<any>();
   const [ voidSigner, setVoidSigner ] = useState<any>();
@@ -242,5 +242,5 @@ export function useSignerAccount() {
       setFallbackProvider( altProvider );
     })();
   }, [account, altProvider]);
-  return { signer, provider, account, voidSigner, fallbackProvider };
+  return { signer, provider, account, voidSigner, fallbackProvider, chainId };
 }

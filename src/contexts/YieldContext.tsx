@@ -5,7 +5,7 @@ import { ethers } from 'ethers';
 import moment from 'moment';
 import * as utils from '../utils';
 import { NotifyContext } from './NotifyContext';
-import Addresses from './YieldAddresses.json'
+import Addresses from './YieldAddresses.json';
 
 import { useCachedState, } from '../hooks/appHooks';
 import { useCallTx } from '../hooks/chainHooks';
@@ -23,23 +23,23 @@ const YieldContext = createContext<any>({});
  * @returns {Promise<Map>} keyed with contract names
  */
 const getAddresses = (
-    contractNameList: string[],
-    chainId: number,
+  contractNameList: string[],
+  chainId: number,
 ): { [name: string]: string; } => {
-    const addrs = (Addresses as any)[chainId];
-    const res = Object.keys(addrs).reduce((filtered: any, key) => {
-        if (contractNameList.indexOf(key) !== -1) {
-            // eslint-disable-next-line no-param-reassign
-            filtered[key] = addrs[key];
-        }
-        return filtered;
-    }, {});
-    return res;
+  const addrs = (Addresses as any)[chainId];
+  const res = Object.keys(addrs).reduce((filtered: any, key) => {
+    if (contractNameList.indexOf(key) !== -1) {
+      // eslint-disable-next-line no-param-reassign
+      filtered[key] = addrs[key];
+    }
+    return filtered;
+  }, {});
+  return res;
 };
 
 const getFyDaiNames = (chainId: number): string[] => {
-    const addrs = (Addresses as any)[chainId]
-    return Object.keys(addrs).filter((x) => x.startsWith('fyDai') && x.indexOf('LP') === -1);
+  const addrs = (Addresses as any)[chainId];
+  return Object.keys(addrs).filter((x) => x.startsWith('fyDai') && x.indexOf('LP') === -1);
 };
 
 const seriesColors = ['#ff86c8', '#82d4bb', '#6ab6f1', '#cb90c9', '#aed175', '#f0817f', '#ffbf81', '#95a4db', '#ffdc5c'];
@@ -121,8 +121,10 @@ const YieldProvider = ({ children }: any) => {
   ): Promise<any[]> => {
     const _deployedSeries: any[] = [];
     let _deployedContracts: any;
+
     if (chainId === undefined) {
-        chainId = (await fallbackProvider.getNetwork()).chainId
+      console.log('chainId call');
+      chainId = (await fallbackProvider.getNetwork()).chainId;
     }
 
     /* Load yield core contract addresses */
