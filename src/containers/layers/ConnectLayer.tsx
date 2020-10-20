@@ -8,7 +8,11 @@ import {
   Text,
   ResponsiveContext,
 } from 'grommet';
-import { FiArrowLeft as ArrowLeft } from 'react-icons/fi';
+import { 
+  FiArrowLeft as ArrowLeft,
+  FiRefreshCcw as Refresh,
+
+} from 'react-icons/fi';
 import { useConnection, useSignerAccount } from '../../hooks';
 import { injected, walletconnect } from '../../connectors';
 import metamaskImage from '../../assets/images/providers/metamask.png';
@@ -23,7 +27,7 @@ import TxRecent from '../../components/TxRecent';
 
 const ConnectLayer = ({ view, target, closeLayer }: any) => {
 
-  const { state: { position } } = useContext(UserContext);
+  const { state: { position }, actions } = useContext(UserContext);
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   
   const { handleSelectConnector } = useConnection();
@@ -171,7 +175,12 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                     label='Pool History'
                     selected={histOpen==='POOL'}
                   />
+                  <FlatButton
+                    label={<Text textAlign='center' size='xsmall' color='text-weak'> <Refresh /></Text>}
+                    onClick={()=>actions.rebuildHistory()}
+                  />
                 </Box>
+
                 <Box>
                   {histOpen === 'BORROW' && <TxHistory filterTerms={['Borrowed', 'Repaid', 'Deposited', 'Withdrew']} series={null} />}
                   {histOpen === 'LEND' && <TxHistory filterTerms={['Closed', 'Lent' ]} series={null} />}
