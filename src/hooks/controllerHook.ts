@@ -1,13 +1,13 @@
 import { useEffect, useState, useContext } from 'react';
 import { ethers, BigNumber }  from 'ethers';
 
-import { NotifyContext } from '../contexts/NotifyContext';
+import { TxContext } from '../contexts/TxContext';
 import { YieldContext } from '../contexts/YieldContext';
 
 import Controller from '../contracts/Controller.json';
 
 import { useSignerAccount } from './connectionHooks';
-import { useTxHelpers } from './appHooks';
+import { useTxHelpers } from './txHooks';
 
 /**
  * Hook for interacting with the yield 'CRONTROLLER' Contract
@@ -25,7 +25,7 @@ import { useTxHelpers } from './appHooks';
 export const useController = () => {
   const { abi: controllerAbi } = Controller;
   const { signer, fallbackProvider, account } = useSignerAccount();
-  const  { dispatch }  = useContext<any>(NotifyContext);
+  const  { dispatch }  = useContext<any>(TxContext);
   const { state : { deployedContracts } } = useContext<any>(YieldContext);
   const [ postActive, setPostActive ] = useState<boolean>(false);
   const [ withdrawActive, setWithdrawActive ] = useState<boolean>(false);

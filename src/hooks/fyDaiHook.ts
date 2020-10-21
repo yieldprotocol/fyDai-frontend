@@ -3,9 +3,9 @@ import { ethers, BigNumber }  from 'ethers';
 
 import FYDai from '../contracts/FYDai.json';
 
-import { NotifyContext } from '../contexts/NotifyContext';
+import { TxContext } from '../contexts/TxContext';
 import { useSignerAccount } from './connectionHooks';
-import { useTxHelpers } from './appHooks';
+import { useTxHelpers } from './txHooks';
 import { cleanValue } from '../utils';
 
 /**
@@ -16,7 +16,7 @@ import { cleanValue } from '../utils';
 export const useFYDai = () => {
   const { provider, signer, account } = useSignerAccount();
   const { abi: fyDaiAbi } = FYDai;
-  const  { dispatch }  = useContext<any>(NotifyContext);
+  const  { dispatch }  = useContext<any>(TxContext);
   const [ redeemActive, setRedeemActive ] = useState<boolean>(false);
   const { handleTx, handleTxBuildError } = useTxHelpers();
 

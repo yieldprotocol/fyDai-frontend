@@ -3,7 +3,7 @@ import { useWeb3React } from '@web3-react/core';
 import { useSignerAccount, useConnection } from './connectionHooks';
 
 /* General app hooks */
-import { useCachedState, useDebounce, useTxActive, useIsLol } from './appHooks';
+import { useCachedState, useDebounce, useIsLol } from './appHooks';
 import { useEvents } from './eventHooks';
 
 /* Utility hooks */
@@ -13,6 +13,7 @@ import { useAuth } from './authsHook';
 /* Generic blockchain transactional hooks */
 import { useCallTx, useSendTx, useTimeTravel } from './chainHooks'; 
 import { useToken } from './tokenHook';
+import { useTxActive, useTxHelpers } from './txHooks';
 
 /* Contract hooks */
 import { useMigrations } from './migrationHook';
@@ -22,8 +23,9 @@ import { usePool } from './poolHook';
 import { useFYDai } from './fyDaiHook';
 
 export {
-  usePool,
+
   useTxActive,
+  useTxHelpers,
   useCachedState,
   useDebounce,
   useSendTx,
@@ -35,6 +37,7 @@ export {
   useController,
   useFYDai,
   useMigrations,
+  usePool,
 
   useEvents,
   useMath,

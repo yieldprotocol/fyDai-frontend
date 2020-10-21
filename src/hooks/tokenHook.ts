@@ -1,13 +1,13 @@
 import { useContext } from 'react';
 import { ethers }  from 'ethers';
 
-import { NotifyContext } from '../contexts/NotifyContext';
+import { TxContext } from '../contexts/TxContext';
 import { useSignerAccount } from './connectionHooks';
 
 import FYDai from '../contracts/FYDai.json';
 import Dai from '../contracts/Dai.json';
 import Pool from '../contracts/Pool.json';
-import { useTxHelpers } from './appHooks';
+import { useTxHelpers } from './txHooks';
 
 const contractMap = new Map<string, any>([
   ['FYDai', FYDai.abi],
@@ -23,7 +23,7 @@ const contractMap = new Map<string, any>([
 export function useToken() {
   // const { state: { provider, account } } = useContext(ConnectionContext);
   const { signer, provider, account, fallbackProvider } = useSignerAccount();
-  const  { dispatch }  = useContext<any>(NotifyContext);
+  const  { dispatch }  = useContext<any>(TxContext);
   const { handleTx, handleTxBuildError } = useTxHelpers();
 
   /**

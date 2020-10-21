@@ -7,7 +7,7 @@ import { IYieldSeries } from '../types';
 
 import YieldProxy from '../contracts/YieldProxy.json';
 
-import { NotifyContext } from '../contexts/NotifyContext';
+import { TxContext } from '../contexts/TxContext';
 import { YieldContext } from '../contexts/YieldContext';
 import { UserContext } from '../contexts/UserContext';
 
@@ -15,7 +15,7 @@ import { useSignerAccount } from './connectionHooks';
 import { usePool } from './poolHook';
 import { useMath } from './mathHooks';
 import { useToken } from './tokenHook';
-import { useTxHelpers } from './appHooks';
+import { useTxHelpers } from './txHooks';
 
 /**
  * Hook for interacting with the Yield Proxy Contract.
@@ -42,7 +42,7 @@ import { useTxHelpers } from './appHooks';
 export const useProxy = () => {
 
   /* contexts */
-  const  { dispatch }  = useContext<any>(NotifyContext);
+  const  { dispatch }  = useContext<any>(TxContext);
   const  { state: { deployedContracts } }  = useContext<any>(YieldContext);
   const  { state: { preferences: { slippage } } }  = useContext<any>(UserContext);
 

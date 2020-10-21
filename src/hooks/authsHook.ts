@@ -12,12 +12,12 @@ import {
   IYieldSeries
 } from '../types';
 
-import { NotifyContext } from '../contexts/NotifyContext';
+import { TxContext } from '../contexts/TxContext';
 import { YieldContext } from '../contexts/YieldContext';
 import { UserContext } from '../contexts/UserContext';
 
 import { useSignerAccount } from './connectionHooks';
-import { useTxHelpers } from './appHooks';
+import { useTxHelpers } from './txHooks';
 
 import { useController } from './controllerHook';
 import { usePool } from './poolHook';
@@ -60,7 +60,7 @@ const auths = new Map([
 export const useAuth = () => {
   const { account, provider, signer, chainId } = useSignerAccount();
   const { state: { deployedContracts } } = useContext(YieldContext);
-  const { dispatch } = useContext(NotifyContext);
+  const { dispatch } = useContext(TxContext);
   const { state: { preferences, authorizations } } = useContext(UserContext);
   const { hasDelegatedProxy, hasAuthorisedProxy } = authorizations;
   

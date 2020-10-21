@@ -1,12 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Box, Text, Layer, ResponsiveContext } from 'grommet';
 
-import { NotifyContext } from '../contexts/NotifyContext';
+import { TxContext } from '../contexts/TxContext';
  
 const ApprovalPending = React.forwardRef( (props, ref) => {
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
-  const { state: { requestedSigs } }  = useContext(NotifyContext);
+  const { state: { requestedSigs } }  = useContext(TxContext);
   const [ sigsRequested, setSigsRequested ] = useState(false);
 
   useEffect(() =>{

@@ -10,7 +10,7 @@ import {
 } from 'react-icons/fi';
 
 import { IYieldSeries } from '../types';
-import { NotifyContext } from '../contexts/NotifyContext';
+import { TxContext } from '../contexts/TxContext';
 import { UserContext } from '../contexts/UserContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 
@@ -28,7 +28,7 @@ interface IAuthorizationProps {
 
 const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => { 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
-  const { state: { requestedSigs, pendingTxs } } = useContext(NotifyContext);
+  const { state: { requestedSigs, pendingTxs } } = useContext(TxContext);
   const { state: { authorizations, preferences }, actions: userActions } = useContext(UserContext);
   const { hasDelegatedProxy, hasAuthorisedProxy } = authorizations;
   const { actions: seriesActions } = useContext(SeriesContext);

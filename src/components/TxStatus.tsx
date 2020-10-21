@@ -3,7 +3,7 @@ import { Box, Text, ResponsiveContext, ThemeContext } from 'grommet';
 import { FiCopy as Copy } from 'react-icons/fi';
 import { ScaleLoader } from 'react-spinners';
 
-import { NotifyContext } from '../contexts/NotifyContext';
+import { TxContext } from '../contexts/TxContext';
 import EtherscanButton from './EtherscanButton';
 import { abbreviateHash } from '../utils';
 import HashWrap from './HashWrap';
@@ -17,7 +17,7 @@ const TxStatus= ({ msg, tx }:TxStatusProps) => {
 
   const {
     state: { pendingTxs, lastCompletedTx },
-  } = useContext(NotifyContext);
+  } = useContext(TxContext);
 
   const theme:any = useContext(ThemeContext);
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' ); 

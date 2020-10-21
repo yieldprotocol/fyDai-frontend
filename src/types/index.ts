@@ -77,6 +77,12 @@ export interface INotification {
   requestedSigs?: any,
 }
 
+export interface ITx {
+  pendingTxs?: any,
+  lastCompletedTx?: any,
+  requestedSigs?: any,
+}
+
 export interface IDelegableMessage {
   user: string;
   delegate: string;
