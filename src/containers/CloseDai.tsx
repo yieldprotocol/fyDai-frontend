@@ -33,12 +33,12 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { activeSeries  } = seriesState;
 
-  const [ txActive ] = useTxActive(['BUY_DAI']);
+  const [ txActive ] = useTxActive(['BUY_DAI', 'AUTH']);
 
   const { actions: userActions } = useContext(UserContext);
 
   const { previewPoolTx }  = usePool();
-  const { buyDai }  = useProxy();
+  const { buyDai, buyApprovalActive }  = useProxy();
   const { account, fallbackProvider } = useSignerAccount();
 
   const [ inputValue, setInputValue ] = useState<any>();
@@ -111,7 +111,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
       target='document'
     >
       { !txActive && !CloseDaiPending && 
-        <Box 
+        <Box
           width={!mobile?{ min:'620px', max:'620px' }: undefined}
           alignSelf='center'
           fill
@@ -159,9 +159,34 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
           </Box>}
         </Box>}
 
-      { CloseDaiPending && !txActive && <ApprovalPending /> }
+      { CloseDaiPending && !txActive && !buyApprovalActive && <ApprovalPending /> }
 
-      { txActive && 
+      { CloseDaiPending && !txActive && buyApprovalActive &&
+      <Box
+        width={!mobile?{ min:'620px', max:'620px' }: undefined}
+        round={mobile?undefined:'small'}
+        background='background'
+        pad='large'
+        gap='medium'
+      >
+        <Text weight='bold'> An authorization transaction is required before closing your position. Please check your wallet or provider.</Text>
+      </Box>}
+
+      { txActive?.type === 'AUTH' &&
+      <Box 
+        width={{ max:'600px' }}
+        alignSelf='center'
+        fill
+        background='background-front'
+        round='small'
+        pad='large'
+        gap='medium'
+        justify='between'
+      > 
+        <TxStatus msg='Approval transaction pending...' tx={txActive} />
+      </Box>}
+
+      { txActive?.type === 'BUY_DAI' &&
       <Box 
         width={{ max:'600px' }}
         alignSelf='center'
