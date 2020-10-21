@@ -19,7 +19,7 @@ const EtherscanButton = ({ txHash }: any) => {
   return (
     <RaisedButton 
       onClick={(e:any)=>{ e.stopPropagation(); window.open( `https://${network}etherscan.io/tx/${txHash}`, '_blank');}}
-      label={<Box pad='xsmall'><Text size='xsmall'> View on Etherscan </Text></Box>}
+      label={<Box pad='xsmall'><Text size='xxsmall'> View on Etherscan </Text></Box>}
     />
   );
 };
