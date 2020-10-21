@@ -1,5 +1,8 @@
 import React, { useEffect, useReducer } from 'react';
+import { useTxHelpers } from '../hooks/txHooks';
+import { useCachedState } from '../hooks/appHooks';
 import { IReducerAction, ITx } from '../types';
+import { useSignerAccount } from '../hooks/connectionHooks';
 
 const TxContext = React.createContext<any>({});
 
@@ -44,11 +47,18 @@ function txReducer(state:ITx, action:IReducerAction) {
 
 const TxProvider = ({ children }:any) => {
 
-  const [state, dispatch] = useReducer(txReducer, initState); 
+  const [ pendingCache ] = useCachedState('txPending', []);
+  const [ state, dispatch ] = useReducer(txReducer, initState );
+
+  const { handleCachedTx } = useTxHelpers();
+  const { fallbackProvider } = useSignerAccount();
 
   useEffect( () => {
-    // here is where to bring in cached info
-  }, []);
+    /* bring in cached serialized transactions if any */
+    fallbackProvider && pendingCache.map((x:any) => {
+      handleCachedTx(x);
+    });
+  }, [ fallbackProvider ]);
 
   return (
     <TxContext.Provider value={{ state, dispatch }}>
