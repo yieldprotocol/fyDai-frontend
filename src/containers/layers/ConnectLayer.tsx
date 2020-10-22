@@ -58,16 +58,21 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
         >
           <Box
             width={!mobile?{ min:'620px', max:'620px' }: undefined}
+            height={!mobile?{ max:'750px' }: undefined}
             background="background-front"
-            direction="column"
+            // direction="column"
             fill="vertical"
             style={{
               borderRadius: '0.5rem',
               padding: '2rem',
             }}
           >
-            { account && layerView === 'ACCOUNT' &&
-              <Box gap='medium'>
+            <Box
+              flex
+              overflow='auto'      
+            > 
+              { account && layerView === 'ACCOUNT' &&
+              <Box gap='medium' flex={false}>
                 <Box pad="small" gap="small">
                   <Box direction='row' justify='between'>
                     <Text alignSelf='start' size='large' color='brand' weight='bold'>Connected Wallet</Text>   
@@ -127,7 +132,7 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                 </Box>
               </Box> }
 
-            { layerView === 'CONNECT' &&      
+              { layerView === 'CONNECT' &&      
               <Box pad="medium" gap="small">
                 <Box align="center" pad="medium" gap="small">
                   <Text size='xxlarge' color='brand' weight='bold'>Connect a wallet</Text>
@@ -171,7 +176,7 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                 </Box>
               </Box>}
 
-            { account && layerView === 'HISTORY' &&      
+              { account && layerView === 'HISTORY' &&      
               <Box pad="medium" gap="large"> 
                 <Box direction='row' justify='evenly'>
                   <FlatButton 
@@ -202,11 +207,12 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                 </Box>
               </Box> }
 
-            { !account && layerView === 'ACCOUNT' &&
-            <Box pad='medium' align='center'>  
-              <Text weight='bold'>Your wallet has been disconnected.</Text>
-            </Box>}
-
+              { !account && layerView === 'ACCOUNT' &&
+              <Box pad='medium' align='center'>  
+                <Text weight='bold'>Your wallet has been disconnected.</Text>
+              </Box>}
+            </Box>
+            
             <Footer direction="row-responsive" justify='between' pad="medium" margin={{ top:'medium' }}>
               <FlatButton 
                 onClick={() => {
@@ -223,11 +229,12 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                   </Box>
                   }
               />
-              {layerView !== 'ACCOUNT' &&  <FlatButton
-                label={<Text size='xsmall' color='text-weak'>Close</Text>}
+              <FlatButton
+                label={<Text size='xsmall' color='text-weak'> {layerView !== 'ACCOUNT'? 'Close' : 'Done'}</Text>}
                 onClick={()=>closeLayer()}
-              />}
+              />
             </Footer>
+
           </Box>
         </Layer>
       )}
