@@ -33,12 +33,12 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { activeSeries  } = seriesState;
 
-  const [ txActive ] = useTxActive(['BUY_DAI']);
+  const [ txActive ] = useTxActive(['BUY_DAI', 'AUTH']);
 
   const { actions: userActions } = useContext(UserContext);
 
   const { previewPoolTx }  = usePool();
-  const { buyDai }  = useProxy();
+  const { buyDai, buyApprovalActive }  = useProxy();
   const { account, fallbackProvider } = useSignerAccount();
 
   const [ inputValue, setInputValue ] = useState<any>();
@@ -110,16 +110,18 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
       }}
       target='document'
     >
-      { !txActive && !CloseDaiPending && 
-        <Box 
-          width={!mobile?{ min:'620px', max:'620px' }: undefined}
-          alignSelf='center'
-          fill
-          background='background-front'
-          round='small'
-          pad='large'
-          gap='medium'
-        >
+
+      <Box    
+        width={!mobile?{ min:'620px', max:'620px' }: undefined}
+        alignSelf='center'
+        fill
+        background='background-front'
+        round='small'
+        pad='large'
+        gap='medium'
+      >
+        { !txActive && !CloseDaiPending && 
+        <>
           <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to close</Text>
           <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
             <TextInput
@@ -157,52 +159,53 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
                 }
             />
           </Box>}
-        </Box>}
+        </>}
 
-      { CloseDaiPending && !txActive && <ApprovalPending /> }
+        { CloseDaiPending && 
+          !txActive && 
+          buyApprovalActive && 
+          <Text weight='bold'> An authorization transaction is required before closing your position. Please check your wallet or provider.</Text>}
 
-      { txActive && 
-      <Box 
-        width={{ max:'600px' }}
-        alignSelf='center'
-        fill
-        background='background-front'
-        round='small'
-        pad='large'
-        gap='medium'
-        justify='between'
-      > 
-        <TxStatus msg={`You are closing ${inputValue} DAI`} tx={txActive} />
-                
-        <Box alignSelf='start'>
-          <Box
-            round
-            onClick={()=>close()}
-            hoverIndicator='brand-transparent'
-            pad={{ horizontal:'small', vertical:'small' }}
-            justify='center'
-          >
-            <Box direction='row' gap='small' align='center'>
-              <ArrowLeft color='text-weak' />
-              <Text size='xsmall' color='text-weak'> { !CloseDaiPending? 'cancel, and go back.': 'go back'}  </Text>
+        { CloseDaiPending && 
+          !txActive && 
+          !buyApprovalActive && 
+          <ApprovalPending />}
+
+        { txActive?.type === 'AUTH' && 
+          <TxStatus msg='Approval transaction pending...' tx={txActive} />}
+
+        { txActive?.type === 'BUY_DAI' &&
+        <>
+          <TxStatus msg={`You are closing ${inputValue} DAI`} tx={txActive} />
+          <Box alignSelf='start'>
+            <Box
+              round
+              onClick={() => close()}
+              hoverIndicator='brand-transparent'
+              pad={{ horizontal: 'small', vertical: 'small' }}
+              justify='center'
+            >
+              <Box direction='row' gap='small' align='center'>
+                <ArrowLeft color='text-weak' />
+                <Text size='xsmall' color='text-weak'> {!CloseDaiPending ? 'cancel, and go back.' : 'go back'}  </Text>
+              </Box>
             </Box>
           </Box>
-        </Box>
-      </Box>}
+        </>}
 
-      {mobile && 
-        <YieldMobileNav noMenu={true}>
-          <NavLink 
-            to={`/lend/${activeSeries?.maturity}`}
-            style={{ textDecoration: 'none' }}
-          >
-            <Box direction='row' gap='small'>
-              <Text size='xxsmall' color='text-weak'><ArrowLeft /></Text>
-              <Text size='xxsmall' color='text-weak'>back to lend</Text>
-            </Box>
-          </NavLink>
-        </YieldMobileNav>}
-        
+        {mobile && 
+          <YieldMobileNav noMenu={true}>
+            <NavLink 
+              to={`/lend/${activeSeries?.maturity}`}
+              style={{ textDecoration: 'none' }}
+            >
+              <Box direction='row' gap='small'>
+                <Text size='xxsmall' color='text-weak'><ArrowLeft /></Text>
+                <Text size='xxsmall' color='text-weak'>back to lend</Text>
+              </Box>
+            </NavLink>
+          </YieldMobileNav>}
+      </Box>
     </Keyboard>
   );
 };

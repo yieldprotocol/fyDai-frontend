@@ -15,7 +15,7 @@ import {
   FiArrowLeft as ArrowLeft,
 } from 'react-icons/fi';
 
-import { NotifyContext } from '../contexts/NotifyContext';
+import { TxContext } from '../contexts/TxContext';
 import { UserContext } from '../contexts/UserContext';
 
 import FlatButton from './FlatButton';
@@ -37,7 +37,7 @@ const AccountButton = (props: any) => {
   const [ over ] = useState<boolean>(false);
 
   const { state: { position } } = useContext(UserContext);
-  const { state: { pendingTxs, lastCompletedTx } } = useContext(NotifyContext);
+  const { state: { pendingTxs, lastCompletedTx } } = useContext(TxContext);
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
   // flags

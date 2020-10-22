@@ -1,12 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Box, Text, Layer, ResponsiveContext } from 'grommet';
 
-import { NotifyContext } from '../contexts/NotifyContext';
+import { TxContext } from '../contexts/TxContext';
  
 const ApprovalPending = React.forwardRef( (props, ref) => {
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
-  const { state: { requestedSigs } }  = useContext(NotifyContext);
+  const { state: { requestedSigs } }  = useContext(TxContext);
   const [ sigsRequested, setSigsRequested ] = useState(false);
 
   useEffect(() =>{
@@ -32,18 +32,17 @@ const ApprovalPending = React.forwardRef( (props, ref) => {
           <Text>Please check your wallet or provider to sign the permission</Text>          
         </Box>
         :
-        <Box 
+        <Box
           width={!mobile?{ min:'620px', max:'620px' }: undefined}
           pad="medium"
           gap="small"
           round='small'
           background='background-front'
         >
-          <Text weight='bold'>Transaction approval required</Text>
+          <Text weight='bold'>Confirmation required</Text>
           <Text>Please check your wallet or provider to approve the transaction</Text>            
         </Box>}
     </Layer>
-
   );
 });
 
