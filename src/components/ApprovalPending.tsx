@@ -32,18 +32,17 @@ const ApprovalPending = React.forwardRef( (props, ref) => {
           <Text>Please check your wallet or provider to sign the permission</Text>          
         </Box>
         :
-        <Box 
+        <Box
           width={!mobile?{ min:'620px', max:'620px' }: undefined}
           pad="medium"
           gap="small"
           round='small'
           background='background-front'
         >
-          <Text weight='bold'>Transaction approval required</Text>
+          <Text weight='bold'>Confirmation required</Text>
           <Text>Please check your wallet or provider to approve the transaction</Text>            
         </Box>}
     </Layer>
-
   );
 });
 

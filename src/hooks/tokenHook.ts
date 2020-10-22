@@ -106,7 +106,7 @@ export function useToken() {
       tx = await contract.approve(delegateAddr, parsedAmount);
     } catch (e) {
       handleTxBuildError(e);
-      return;
+      return e;
     }
     /* Transaction reporting & tracking */
     dispatch({ type: 'txPending', payload:{ tx, message: 'Token authorization pending...', type: 'AUTH' } } );
