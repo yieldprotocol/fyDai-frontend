@@ -15,7 +15,7 @@ const initState = {
 function txReducer(state:ITx, action:IReducerAction) {
   switch (action.type) {
     case 'txPending':
-      // console.log(state.pendingTxs);
+      console.log(state.pendingTxs);
       return {
         ...state,
         pendingTxs: [ ...state.pendingTxs, action.payload],

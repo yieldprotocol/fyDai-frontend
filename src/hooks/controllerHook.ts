@@ -9,6 +9,7 @@ import Controller from '../contracts/Controller.json';
 import { useSignerAccount } from './connectionHooks';
 import { useTxHelpers } from './txHooks';
 
+
 /**
  * Hook for interacting with the yield 'CRONTROLLER' Contract
  * @returns { function } post
@@ -26,6 +27,7 @@ export const useController = () => {
   const { abi: controllerAbi } = Controller;
   const { signer, fallbackProvider, account } = useSignerAccount();
   const  { dispatch }  = useContext<any>(TxContext);
+  
   const { state : { deployedContracts } } = useContext<any>(YieldContext);
   const [ postActive, setPostActive ] = useState<boolean>(false);
   const [ withdrawActive, setWithdrawActive ] = useState<boolean>(false);
@@ -228,7 +230,7 @@ export const useController = () => {
       return;
     }
     /* Transaction reporting & tracking */
-    dispatch({ type: 'txPending', payload:{ tx, message: 'Pending once-off controller delegation ...', type: 'AUTH' } } );
+    dispatch({ type: 'txPending', payload:{ tx, message: 'Pending once-off controller delegation ...', type: 'AUTH', series: null } } );
     await handleTx(tx);
   };
 

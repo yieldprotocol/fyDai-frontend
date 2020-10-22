@@ -124,7 +124,7 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                   <Text size='xxsmall'>Yield protocol ref contract: {process.env[`REACT_APP_MIGRATION_${chainId}`]} </Text> 
                   <Box direction='row'>
                     <RaisedButton 
-                      label={<Box pad='xsmall'><Text size='xxsmall'>Reset Settings</Text></Box>}
+                      label={<Box pad='xsmall'><Text size='xxsmall'>Factory Reset</Text></Box>}
                     // eslint-disable-next-line no-restricted-globals
                       onClick={()=>{localStorage.clear(); location.reload();}}
                     />  

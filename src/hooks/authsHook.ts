@@ -109,7 +109,7 @@ export const useAuth = () => {
   const fallbackYieldAuth = async () => {
     try {
       await Promise.all([
-        !hasAuthorisedProxy? approveToken(daiAddr, proxyAddr, MAX_INT): null,
+        !hasAuthorisedProxy? approveToken(daiAddr, proxyAddr, MAX_INT, null): null,
         !hasDelegatedProxy? addControllerDelegate(proxyAddr): null, 
       ]);
       setFallbackAuthActive(false);
@@ -123,9 +123,9 @@ export const useAuth = () => {
   const fallbackPoolAuth = async ( series:IYieldSeries ) => {
     try {
       await Promise.all([
-        !series.hasDaiAuth? approveToken(daiAddr, series.poolAddress, MAX_INT):null,
-        !series.hasFyDaiAuth? approveToken(series.fyDaiAddress, proxyAddr, MAX_INT):null,
-        !series.hasDelegatedPool? addPoolDelegate(series.poolAddress, proxyAddr):null,
+        !series.hasDaiAuth? approveToken(daiAddr, series.poolAddress, MAX_INT, series):null,
+        !series.hasFyDaiAuth? approveToken(series.fyDaiAddress, proxyAddr, MAX_INT, series):null,
+        !series.hasDelegatedPool? addPoolDelegate(series, proxyAddr):null,
       ]);
       setFallbackAuthActive(false);
     } catch (e) {
@@ -202,7 +202,7 @@ export const useAuth = () => {
         setAuthActive(false);
         return;
       }
-      dispatch({ type: 'txPending', payload: { tx, message: 'Authorization pending...', type:'AUTH' } });
+      dispatch({ type: 'txPending', payload: { tx, message: 'Authorization pending...', type:'AUTH', series:null } });
       await handleTx(tx);
       dispatch({ type: 'requestSigs', payload:[] });
       setAuthActive(false);
@@ -302,7 +302,7 @@ export const useAuth = () => {
         setAuthActive(false);
         return;
       }
-      dispatch({ type: 'txPending', payload: { tx, message: 'Authorization pending...', type:'AUTH' } });
+      dispatch({ type: 'txPending', payload: { tx, message: 'Authorization pending...', type:'AUTH', series:series.maturity } });
       await handleTx(tx);
       dispatch({ type: 'requestSigs', payload:[] });
       setAuthActive(false);

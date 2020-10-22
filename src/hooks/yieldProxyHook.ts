@@ -477,7 +477,7 @@ export const useProxy = () => {
       if (!series.hasCloseAuth) {
         setBuyApprovalActive(true);
         /* handle signing */
-        await approveToken(series?.fyDaiAddress, series?.poolAddress, MAX_INT).then(async (x:any) => {
+        await approveToken(series?.fyDaiAddress, series?.poolAddress, MAX_INT, series).then(async (x:any) => {
           if ( x === undefined ) {
             setBuyApprovalActive(false);
             await buyDaiNoSignature(series, daiOut);

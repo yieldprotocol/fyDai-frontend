@@ -105,11 +105,15 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
             <Text size={mobile?'xsmall': undefined}>There may have been a problem with the previous authorization attempt.</Text>
             <Text size={mobile?'xsmall': undefined}>An authorisation is still required.</Text>
           </Box>}
-          <RaisedButton 
-            background='#555555'
-            label={<Box pad={{ horizontal:'small', vertical:'xsmall' }} align='center'><Text size='small' color='#DDDDDD'><Unlock /> Authorize Yield</Text></Box>}
-            onClick={()=>{authProcedure();}}
-          />
+
+          { !pendingTxs.some((x:any) => (x.type === 'AUTH') && (x.series === null) )?
+            <RaisedButton 
+              background='#555555'
+              label={<Box pad={{ horizontal:'small', vertical:'xsmall' }} align='center'><Text size='small' color='#DDDDDD'><Unlock /> Authorize Yield</Text></Box>}
+              onClick={()=>{authProcedure();}}
+            />
+            :
+            <Box pad={{ horizontal:'small', vertical:'xsmall' }} align='center'><Text size='small' color='#DDDDDD'><Unlock />Pending...</Text></Box>}
         </Box>}
 
       { hasDelegatedProxy &&
@@ -139,16 +143,21 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
             </Box>
           </Box> }
 
-          <Box>
-            <RaisedButton 
-              background='#555555'
-              label={
-                <Box pad={{ horizontal:'small', vertical:'xsmall' }} align='center'>
-                  <Text size='xsmall' color='#DDDDDD'><Unlock /> Unlock Series </Text>
-                </Box>
+          <Box>        
+            { !pendingTxs.some((x:any) => (x.type === 'AUTH') && (series.maturity === x.series) )?
+              <RaisedButton 
+                background='#555555'
+                label={
+                  <Box pad={{ horizontal:'small', vertical:'xsmall' }} align='center'>
+                    <Text size='xsmall' color='#DDDDDD'><Unlock /> Unlock Series </Text>
+                  </Box>
               }
-              onClick={()=>{authProcedure();}}
-            />   
+                onClick={()=>{authProcedure();}}
+              />
+              :
+              <Box pad={{ horizontal:'small', vertical:'xsmall' }} align='center'>
+                <Text size='xsmall' color='#DDDDDD'><Unlock /> Pending...</Text>
+              </Box>}
           </Box>           
         </Box>}
 

@@ -177,12 +177,12 @@ export const usePool = () => {
    * @param {string} delegatedAddress address of the contract/entity getting delegated. 
    */
   const addPoolDelegate = async (
-    poolAddress:string,
+    series:IYieldSeries,
     delegatedAddress:string,
   ) => {
     let tx:any;
     /* Processing and sanitizing input */
-    const marketAddr = ethers.utils.getAddress(poolAddress);
+    const marketAddr = ethers.utils.getAddress(series.poolAddress);
     const delegatedAddr = ethers.utils.getAddress(delegatedAddress);
     /* Contract interaction */
     const contract = new ethers.Contract(
@@ -197,7 +197,7 @@ export const usePool = () => {
       return;
     }
     /* Transaction reporting & tracking */
-    dispatch({ type: 'txPending', payload:{ tx, message: 'Pending once-off Pool delegation ...', type:'AUTH' } } );
+    dispatch({ type: 'txPending', payload:{ tx, message: 'Pending once-off Pool delegation ...', type:'AUTH', series: series.maturity } } );
     await handleTx(tx);
   };
 
