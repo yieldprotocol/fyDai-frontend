@@ -19,6 +19,7 @@ import RaisedButton from './RaisedButton';
 import FlatButton from './FlatButton';
 import EtherscanButton from './EtherscanButton';
 import { abbreviateHash } from '../utils';
+import TxStatus from './TxStatus';
 
 interface IAuthorizationProps {
   series?: IYieldSeries | null;
@@ -123,7 +124,6 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
           background='#555555'
           align='center'
         >
-
           { (!series.hasDaiAuth && !series.hasFyDaiAuth && !series.hasDelegatedPool) && 
           <Box direction='row' gap='small'>
             <Text color='#DDDDDD'> <Warning /> </Text>
@@ -204,7 +204,8 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
               <Text size='xsmall' weight='bold'>
                 Finally, confirm sending the signatures to Yield in a transaction...
               </Text>}
-            { txActive && <Text size='xsmall' weight='bold'> Submitting your signed authorizations ... transaction pending.</Text> }
+            {/* { txActive && <Text size='xsmall' weight='bold'> Submitting your signed authorizations ... transaction pending.</Text> } */}
+            { txActive && <TxStatus msg='Submitting your Authorizations.' tx={txActive} /> }
             
             { authPending && 
               txActive &&
@@ -241,12 +242,9 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
               <Text weight='bold' size='large'>It seems there was a problem signing the authorizations.</Text>
               {!mobile && <Text size='xsmall'>( Its not your fault, some wallets dont provide signing functionality just yet :| )</Text>}
             </Box>
-
             <Box>
-              {/* <Text size='small' weight='bold'> Option 1:</Text> */}
               <Text size='small'>You can continue by approving the set of authorization transactions individually with your wallet or provider.</Text>
             </Box>
-
             <Box>
               <CheckBox 
                 checked={preferences?.useTxApproval}
@@ -257,7 +255,6 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
                 <Text size='xxsmall'>(You can always change back to using permit-style authorization in the settings)</Text>
               </Box>
             </Box>
-
           </Box>}
 
           {!preferences?.useTxApproval && txActive &&
@@ -268,8 +265,7 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
             pad='large'
             gap='medium'
           >
-            { txActive && <Text size='xsmall' weight='bold'> Submitting your Authorizations ... Transaction pending.</Text> }
-            
+            { txActive && <TxStatus msg='Submitting your Authorizations.' tx={txActive} /> }
             { authPending && 
               txActive &&
               <Box alignSelf='start'>
@@ -283,7 +279,6 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
                   }
                 />
               </Box>}
-
           </Box>}
 
 
@@ -310,7 +305,7 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
                     </Box>)
                   )}
                 </Box>
-              </Box> 
+              </Box>
               <Box alignSelf='start'>
                 <FlatButton 
                   onClick={()=>closeAuth()}
@@ -324,7 +319,6 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
               </Box>
             </Box>}
           </Box>}
-
         </Layer>}
 
     </>);

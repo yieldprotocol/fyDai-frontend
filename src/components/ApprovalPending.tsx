@@ -5,7 +5,6 @@ import { NotifyContext } from '../contexts/NotifyContext';
  
 const ApprovalPending = React.forwardRef( (props, ref) => {
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
-
   const { state: { requestedSigs } }  = useContext(NotifyContext);
   const [ sigsRequested, setSigsRequested ] = useState(false);
 
@@ -43,7 +42,6 @@ const ApprovalPending = React.forwardRef( (props, ref) => {
           <Text>Please check your wallet or provider to approve the transaction</Text>            
         </Box>}
     </Layer>
-
   );
 });
 
