@@ -12,12 +12,12 @@ import {
   IYieldSeries
 } from '../types';
 
-import { NotifyContext } from '../contexts/NotifyContext';
+import { TxContext } from '../contexts/TxContext';
 import { YieldContext } from '../contexts/YieldContext';
 import { UserContext } from '../contexts/UserContext';
 
 import { useSignerAccount } from './connectionHooks';
-import { useTxHelpers } from './appHooks';
+import { useTxHelpers } from './txHooks';
 
 import { useController } from './controllerHook';
 import { usePool } from './poolHook';
@@ -58,9 +58,9 @@ const auths = new Map([
 ]);
 
 export const useAuth = () => {
-  const { account, provider, signer } = useSignerAccount();
+  const { account, provider, signer, chainId } = useSignerAccount();
   const { state: { deployedContracts } } = useContext(YieldContext);
-  const { dispatch } = useContext(NotifyContext);
+  const { dispatch } = useContext(TxContext);
   const { state: { preferences, authorizations } } = useContext(UserContext);
   const { hasDelegatedProxy, hasAuthorisedProxy } = authorizations;
   
@@ -109,7 +109,7 @@ export const useAuth = () => {
   const fallbackYieldAuth = async () => {
     try {
       await Promise.all([
-        !hasAuthorisedProxy? approveToken(daiAddr, proxyAddr, MAX_INT): null,
+        !hasAuthorisedProxy? approveToken(daiAddr, proxyAddr, MAX_INT, null): null,
         !hasDelegatedProxy? addControllerDelegate(proxyAddr): null, 
       ]);
       setFallbackAuthActive(false);
@@ -122,11 +122,10 @@ export const useAuth = () => {
 
   const fallbackPoolAuth = async ( series:IYieldSeries ) => {
     try {
-      console.log(series.hasDaiAuth,series.hasFyDaiAuth,series.hasDelegatedPool )
       await Promise.all([
-        !series.hasDaiAuth? approveToken(daiAddr, series.poolAddress, MAX_INT):null,
-        !series.hasFyDaiAuth? approveToken(series.fyDaiAddress, proxyAddr, MAX_INT):null,
-        !series.hasDelegatedPool? addPoolDelegate(series.poolAddress, proxyAddr):null,
+        !series.hasDaiAuth? approveToken(daiAddr, series.poolAddress, MAX_INT, series):null,
+        !series.hasFyDaiAuth? approveToken(series.fyDaiAddress, proxyAddr, MAX_INT, series):null,
+        !series.hasDelegatedPool? addPoolDelegate(series, proxyAddr):null,
       ]);
       setFallbackAuthActive(false);
     } catch (e) {
@@ -145,7 +144,7 @@ export const useAuth = () => {
 
     const fallback = preferences?.useTxApproval;
     const overrides = { 
-      gasLimit: BigNumber.from('1000000')
+      gasLimit: BigNumber.from('200000')
     };
 
     /* use permit if user has selected to do so , or if previous auth failed on some of the txs */
@@ -165,7 +164,7 @@ export const useAuth = () => {
         const domain: IDomain = {
           name: 'Yield',
           version: '1',
-          chainId: (await provider.getNetwork()).chainId,
+          chainId: chainId || 1,
           verifyingContract: controllerAddr,
         };
         controllerSig = await sendForSig(
@@ -203,7 +202,7 @@ export const useAuth = () => {
         setAuthActive(false);
         return;
       }
-      dispatch({ type: 'txPending', payload: { tx, message: 'Authorization pending...', type:'AUTH' } });
+      dispatch({ type: 'txPending', payload: { tx, message: 'Authorization pending...', type:'AUTH', series:null } });
       await handleTx(tx);
       dispatch({ type: 'requestSigs', payload:[] });
       setAuthActive(false);
@@ -236,7 +235,7 @@ export const useAuth = () => {
     let fyDaiSig;
 
     const overrides = { 
-      gasLimit: BigNumber.from('1000000')
+      gasLimit: BigNumber.from('250000')
     };
 
     /* if user account preferences don't specify using fallback, OR, a previous auth failed on SOME txs */
@@ -258,7 +257,7 @@ export const useAuth = () => {
         const domain: IDomain = {
           name: 'Yield',
           version: '1',
-          chainId: (await provider.getNetwork()).chainId,
+          chainId: chainId || 1,
           verifyingContract: poolAddr,
         };
         poolSig = await sendForSig(
@@ -303,7 +302,7 @@ export const useAuth = () => {
         setAuthActive(false);
         return;
       }
-      dispatch({ type: 'txPending', payload: { tx, message: 'Authorization pending...', type:'AUTH' } });
+      dispatch({ type: 'txPending', payload: { tx, message: 'Authorization pending...', type:'AUTH', series:series.maturity } });
       await handleTx(tx);
       dispatch({ type: 'requestSigs', payload:[] });
       setAuthActive(false);

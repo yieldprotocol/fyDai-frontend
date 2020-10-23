@@ -8,8 +8,12 @@ import {
   Text,
   ResponsiveContext,
 } from 'grommet';
-import { FiArrowLeft as ArrowLeft } from 'react-icons/fi';
-import { useConnection, useSignerAccount } from '../../hooks';
+import { 
+  FiArrowLeft as ArrowLeft,
+  FiRefreshCcw as Refresh,
+
+} from 'react-icons/fi';
+import { useConnection, useSignerAccount, useWeb3React } from '../../hooks';
 import { injected, walletconnect } from '../../connectors';
 import metamaskImage from '../../assets/images/providers/metamask.png';
 import walletConnectImage from '../../assets/images/providers/walletconnect.png';
@@ -19,16 +23,18 @@ import FlatButton from '../../components/FlatButton';
 import TxHistory from '../../components/TxHistory';
 import YieldSettings from '../../components/YieldSettings';
 import ExperimentWrap from '../../components/ExperimentWrap';
+import HashWrap from '../../components/HashWrap';
 import TxRecent from '../../components/TxRecent';
 
 const ConnectLayer = ({ view, target, closeLayer }: any) => {
 
-  const { state: { position } } = useContext(UserContext);
+  const { state: { position }, actions } = useContext(UserContext);
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   
   const { handleSelectConnector } = useConnection();
 
-  const { account, provider } = useSignerAccount();
+  const { account, provider, chainId } = useSignerAccount();
+  const web3React = useWeb3React();
   const [ layerView, setLayerView] = useState<string>(view);
   const [ histOpen, setHistOpen] = useState<string>('BORROW');
 
@@ -52,19 +58,24 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
         >
           <Box
             width={!mobile?{ min:'620px', max:'620px' }: undefined}
+            height={!mobile?{ max:'750px' }: undefined}
             background="background-front"
-            direction="column"
+            // direction="column"
             fill="vertical"
             style={{
               borderRadius: '0.5rem',
               padding: '2rem',
             }}
           >
-            { account && layerView === 'ACCOUNT' &&
-              <Box gap='medium'>
+            <Box
+              flex
+              overflow='auto'      
+            > 
+              { account && layerView === 'ACCOUNT' &&
+              <Box gap='medium' flex={false}>
                 <Box pad="small" gap="small">
                   <Box direction='row' justify='between'>
-                    <Text alignSelf='start' size='xlarge' color='brand' weight='bold'>Connected Wallet</Text>   
+                    <Text alignSelf='start' size='large' color='brand' weight='bold'>Connected Wallet</Text>   
                     <Box round>
                       <FlatButton
                         onClick={()=>setLayerView('CONNECT')}
@@ -80,7 +91,7 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                   >
                     <Box direction='row' gap='small'>
                       <Text size='xsmall'>Account:</Text> 
-                      <Text size='xsmall'> {account} </Text>                   
+                      <Text size='xsmall'> <HashWrap hash={account}>{account}</HashWrap> </Text>                   
                     </Box>               
 
                     <Box direction='row' gap='small'>
@@ -93,6 +104,12 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                       <Text size='xsmall'>{ position?.daiBalance_ || '' }</Text>
                     </Box>
                   </Box>
+                  <Box direction='row'>
+                    <RaisedButton 
+                      label={<Box pad='xsmall'><Text size='xxsmall'>Disconnect wallet</Text></Box>}
+                      onClick={()=>web3React.deactivate()}
+                    />
+                  </Box>
                 </Box>
 
                 <TxRecent setView={()=>setLayerView('HISTORY')} />
@@ -102,14 +119,20 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                   <Box direction='row' justify='between'>
                     <Text alignSelf='start' size='small' weight='bold'>Diagnostics Info</Text> 
                   </Box>
-                  <Text size='xxsmall'>App Version: Alpha 0.2</Text>
-                  <Text size='xxsmall'>Connected Network: { provider.network.name }</Text>
-                  <Text size='xxsmall'>Yield protocol ref contract: {process.env.REACT_APP_MIGRATION_1} </Text>
-                  
+                  <Text size='xxsmall'>App Version: Beta 0.2.1</Text>
+                  <Text size='xxsmall'>Connected Network: { provider?.network?.name }</Text>
+                  <Text size='xxsmall'>Yield protocol ref contract: {process.env[`REACT_APP_MIGRATION_${chainId}`]} </Text> 
+                  <Box direction='row'>
+                    <RaisedButton 
+                      label={<Box pad='xsmall'><Text size='xxsmall'>Factory Reset</Text></Box>}
+                    // eslint-disable-next-line no-restricted-globals
+                      onClick={()=>{localStorage.clear(); location.reload();}}
+                    />  
+                  </Box>         
                 </Box>
               </Box> }
 
-            { layerView === 'CONNECT' &&      
+              { layerView === 'CONNECT' &&      
               <Box pad="medium" gap="small">
                 <Box align="center" pad="medium" gap="small">
                   <Text size='xxlarge' color='brand' weight='bold'>Connect a wallet</Text>
@@ -153,7 +176,7 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                 </Box>
               </Box>}
 
-            { account && layerView === 'HISTORY' &&      
+              { account && layerView === 'HISTORY' &&      
               <Box pad="medium" gap="large"> 
                 <Box direction='row' justify='evenly'>
                   <FlatButton 
@@ -171,7 +194,12 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                     label='Pool History'
                     selected={histOpen==='POOL'}
                   />
+                  <FlatButton
+                    label={<Text textAlign='center' size='xsmall' color='text-weak'> <Refresh /></Text>}
+                    onClick={()=>actions.rebuildHistory()}
+                  />
                 </Box>
+
                 <Box>
                   {histOpen === 'BORROW' && <TxHistory filterTerms={['Borrowed', 'Repaid', 'Deposited', 'Withdrew']} series={null} />}
                   {histOpen === 'LEND' && <TxHistory filterTerms={['Closed', 'Lent' ]} series={null} />}
@@ -179,6 +207,12 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                 </Box>
               </Box> }
 
+              { !account && layerView === 'ACCOUNT' &&
+              <Box pad='medium' align='center'>  
+                <Text weight='bold'>Your wallet has been disconnected.</Text>
+              </Box>}
+            </Box>
+            
             <Footer direction="row-responsive" justify='between' pad="medium" margin={{ top:'medium' }}>
               <FlatButton 
                 onClick={() => {
@@ -195,11 +229,12 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                   </Box>
                   }
               />
-              {layerView !== 'ACCOUNT' &&  <FlatButton
-                label={<Text size='xsmall' color='text-weak'>Close</Text>}
+              <FlatButton
+                label={<Text size='xsmall' color='text-weak'> {layerView !== 'ACCOUNT'? 'Close' : 'Done'}</Text>}
                 onClick={()=>closeLayer()}
-              />}
+              />
             </Footer>
+
           </Box>
         </Layer>
       )}

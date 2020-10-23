@@ -1,13 +1,14 @@
 import { useContext } from 'react';
 import { ethers }  from 'ethers';
 
-import { NotifyContext } from '../contexts/NotifyContext';
+import { TxContext } from '../contexts/TxContext';
 import { useSignerAccount } from './connectionHooks';
 
 import FYDai from '../contracts/FYDai.json';
 import Dai from '../contracts/Dai.json';
 import Pool from '../contracts/Pool.json';
-import { useTxHelpers } from './appHooks';
+import { useTxHelpers } from './txHooks';
+import { IYieldSeries } from '../types';
 
 const contractMap = new Map<string, any>([
   ['FYDai', FYDai.abi],
@@ -23,7 +24,7 @@ const contractMap = new Map<string, any>([
 export function useToken() {
   // const { state: { provider, account } } = useContext(ConnectionContext);
   const { signer, provider, account, fallbackProvider } = useSignerAccount();
-  const  { dispatch }  = useContext<any>(NotifyContext);
+  const  { dispatch }  = useContext<any>(TxContext);
   const { handleTx, handleTxBuildError } = useTxHelpers();
 
   /**
@@ -57,13 +58,12 @@ export function useToken() {
    * @param {string} tokenAddr address of the Token
    * @param {string} operatorAddr address of the operator whose allowance you are checking
    * @param {string} tokenName name of the token (probably ERC20 in most cases)
-   * @prarm 
    * @returns whatever token value
    */
   const getTokenAllowance = async (
     tokenAddress:string,
     operatorAddress:string,
-    tokenName: string
+    tokenName: string,
   ) => {
     const fromAddr = account && ethers.utils.getAddress(account);
     const tokenAddr = ethers.utils.getAddress(tokenAddress);
@@ -84,11 +84,14 @@ export function useToken() {
    * @param {string} tokenAddress address of the token to approve.
    * @param {string} poolAddress address of the market.
    * @param {string} amount to approve (in human understandable numbers)
+   * 
+   * @param {string} series IYieldSereis in question or null
    */
   const approveToken = async (
     tokenAddress:string,
     delegateAddress:string,
-    amount:string
+    amount:string,
+    series:IYieldSeries|null,
   ) => {
     let tx:any;
     /* Processing and sanitizing input */
@@ -106,10 +109,10 @@ export function useToken() {
       tx = await contract.approve(delegateAddr, parsedAmount);
     } catch (e) {
       handleTxBuildError(e);
-      return;
+      return e;
     }
     /* Transaction reporting & tracking */
-    dispatch({ type: 'txPending', payload:{ tx, message: 'Token authorization pending...', type: 'AUTH' } } );
+    dispatch({ type: 'txPending', payload:{ tx, message: 'Token authorization pending...', type: 'AUTH', series: series?.maturity||null } } );
     await handleTx(tx);
   };
 

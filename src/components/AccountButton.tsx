@@ -15,7 +15,7 @@ import {
   FiArrowLeft as ArrowLeft,
 } from 'react-icons/fi';
 
-import { NotifyContext } from '../contexts/NotifyContext';
+import { TxContext } from '../contexts/TxContext';
 import { UserContext } from '../contexts/UserContext';
 
 import FlatButton from './FlatButton';
@@ -24,6 +24,7 @@ import Loading from './Loading';
 import EtherscanButton from './EtherscanButton';
 import TxStatus from './TxStatus';
 import { abbreviateHash } from '../utils';
+import HashWrap from './HashWrap';
 
 
 const AccountButton = (props: any) => {
@@ -36,7 +37,7 @@ const AccountButton = (props: any) => {
   const [ over ] = useState<boolean>(false);
 
   const { state: { position } } = useContext(UserContext);
-  const { state: { pendingTxs, lastCompletedTx } } = useContext(NotifyContext);
+  const { state: { pendingTxs, lastCompletedTx } } = useContext(TxContext);
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
   // flags
@@ -65,9 +66,9 @@ const AccountButton = (props: any) => {
           pad='small'
           background='#f0f0f0'
         >
-          { abbreviateHash(lastCompletedTx.transactionHash) }
-          {lastCompletedTx.status}
-          <EtherscanButton txHash={lastCompletedTx.transactionHash} />
+          <HashWrap hash={lastCompletedTx?.transactionHash}>{ abbreviateHash(lastCompletedTx?.transactionHash) }</HashWrap>
+          {lastCompletedTx?.status}
+          <EtherscanButton txHash={lastCompletedTx?.transactionHash} />
         </Box>}
       </Drop>);
   };

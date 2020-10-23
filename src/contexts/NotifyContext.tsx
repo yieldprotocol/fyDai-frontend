@@ -13,10 +13,6 @@ const initState = {
   fatalOpen: false,
   fatalMsg: '',
 
-  pendingTxs: [],
-  lastCompletedTx: null,
-  requestedSigs: [],
-
   updateAvailable: false,
   // eslint-disable-next-line no-console
   updateAccept: ()=>console.log('No update available'),
@@ -40,32 +36,7 @@ function notifyReducer(state:INotification, action:IReducerAction) {
         fatalOpen: true,
         fatalMsg: action.payload.message,
       };
-    case 'txPending':
-      // console.log(state.pendingTxs);
-      return {
-        ...state,
-        pendingTxs: [ ...state.pendingTxs, action.payload],
-      };
-    case 'txComplete':
-      return {
-        ...state,
-        pendingTxs: state.pendingTxs.filter((x:any) => x.tx.hash !== ( action.payload.transactionHash || action.payload.hash)),
-        lastCompletedTx: { ...action.payload, transactionHash: action.payload.transactionHash || action.payload.hash },
-      };
-    case 'requestSigs':
-      return {
-        ...state,
-        requestedSigs: action.payload.map((x:any)=> { return { ...x, signed: false };} ),
-      };
-    case 'signed':
-      return {
-        ...state,
-        requestedSigs: state.requestedSigs.map( (x:any) => {           
-          if ( x.id === action.payload.id) {
-            return { ...x, signed:true };
-          }  return x;  
-        })
-      };
+      
     case 'updateAvailable':
       return {
         ...state,

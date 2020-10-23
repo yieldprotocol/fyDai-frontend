@@ -11,6 +11,7 @@ export interface IYieldSeries {
   hasDelegatedPool: boolean;
   hasDaiAuth: boolean;
   hasFyDaiAuth: boolean;
+  hasCloseAuth:boolean;
   authComplete:boolean;
   isMature: any; // function typeScript this out
   fyDaiBalance_: number;
@@ -72,6 +73,12 @@ export interface INotification {
   timerMs?: number,
   fatalOpen?: boolean,
   fatalMsg?: string,
+  pendingTxs?: any,
+  lastCompletedTx?: any,
+  requestedSigs?: any,
+}
+
+export interface ITx {
   pendingTxs?: any,
   lastCompletedTx?: any,
   requestedSigs?: any,

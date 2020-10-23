@@ -7,7 +7,7 @@ import { IYieldSeries } from '../types';
 
 import YieldProxy from '../contracts/YieldProxy.json';
 
-import { NotifyContext } from '../contexts/NotifyContext';
+import { TxContext } from '../contexts/TxContext';
 import { YieldContext } from '../contexts/YieldContext';
 import { UserContext } from '../contexts/UserContext';
 
@@ -15,7 +15,9 @@ import { useSignerAccount } from './connectionHooks';
 import { usePool } from './poolHook';
 import { useMath } from './mathHooks';
 import { useToken } from './tokenHook';
-import { useTxHelpers } from './appHooks';
+import { useTxHelpers } from './txHooks';
+
+const MAX_INT = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
 
 /**
  * Hook for interacting with the Yield Proxy Contract.
@@ -42,15 +44,15 @@ import { useTxHelpers } from './appHooks';
 export const useProxy = () => {
 
   /* contexts */
-  const  { dispatch }  = useContext<any>(NotifyContext);
+  const  { dispatch }  = useContext<any>(TxContext);
   const  { state: { deployedContracts } }  = useContext<any>(YieldContext);
-  const  { state: { preferences: { slippage } } }  = useContext<any>(UserContext);
+  const  { state: { preferences: { slippage, useTxApproval } } }  = useContext<any>(UserContext);
 
   /* hooks */ 
   const { signer, provider, account } = useSignerAccount();
   const { previewPoolTx } = usePool();
   const { splitDaiLiquidity } = useMath();
-  const { getBalance } = useToken();
+  const { getBalance, approveToken } = useToken();
   const { handleTx, handleTxBuildError } = useTxHelpers();
   
   /* Activity flags */
@@ -61,6 +63,7 @@ export const useProxy = () => {
   const [ removeLiquidityActive, setRemoveLiquidityActive ] = useState<boolean>(false);
   const [ addLiquidityActive, setAddLiquidityActive ] = useState<boolean>(false);
   const [ buyActive, setBuyActive ] = useState<boolean>(false);
+  const [ buyApprovalActive, setBuyApprovalActive ] = useState<boolean>(false);
   const [ sellActive, setSellActive ] = useState<boolean>(false);
 
   const { abi: yieldProxyAbi } = YieldProxy;
@@ -172,7 +175,7 @@ export const useProxy = () => {
     const collatType = ethers.utils.formatBytes32String(collateralType);
 
     const overrides = { 
-      gasLimit: BigNumber.from('500000')
+      gasLimit: BigNumber.from('300000')
     };
 
     setBorrowActive(true);
@@ -232,7 +235,7 @@ export const useProxy = () => {
     const parsedMaturity = series.maturity.toString();
 
     const overrides = {
-      gasLimit: BigNumber.from('500000')
+      gasLimit: BigNumber.from('250000')
     };
 
     setRepayActive(true);
@@ -268,7 +271,7 @@ export const useProxy = () => {
           toAddr,
           dai,
           daiPermitSig,
-          overrides
+          { gasLimit: BigNumber.from('400000') }
         );
 
       } else if ( !series.isMature() ) {
@@ -327,7 +330,7 @@ export const useProxy = () => {
     const parsedDaiUsed = BigNumber.isBigNumber(daiUsed)? daiUsed : ethers.utils.parseEther(daiUsed.toString());
 
     const overrides = { 
-      gasLimit: BigNumber.from('1000000'),
+      gasLimit: BigNumber.from('600000'),
       value: ethers.utils.parseEther('0')
     };
 
@@ -372,7 +375,7 @@ export const useProxy = () => {
     const parsedTokens = BigNumber.isBigNumber(tokens)? tokens : ethers.utils.parseEther(tokens.toString());
 
     const overrides = { 
-      gasLimit: BigNumber.from('1000000')
+      gasLimit: BigNumber.from('500000')
     };
 
     /* Contract interaction */
@@ -396,7 +399,7 @@ export const useProxy = () => {
 
       } else {
         console.log('removing liquidity AFTER maturity');
-        tx = await proxyContract.removeLiquidityMature(poolAddr, parsedTokens, overrides );
+        tx = await proxyContract.removeLiquidityMature(poolAddr, parsedTokens, { gasLimit: BigNumber.from('500000') } );
       }
     } catch (e) {
       handleTxBuildError(e);
@@ -429,7 +432,7 @@ export const useProxy = () => {
     const toAddr = account && ethers.utils.getAddress(account);
 
     const overrides = { 
-      gasLimit: BigNumber.from('500000')
+      gasLimit: BigNumber.from('200000')
     };
 
     /* Contract interaction */
@@ -456,12 +459,47 @@ export const useProxy = () => {
     setSellActive(false);
   };
 
+
+
   /**
-   * @dev LEGACY Buy Dai with fyDai - USE BUY DAI WITH SIGNATURE
+   * @dev Buy Dai with fyDai
    * @param {IYieldSeries} series yield series to act on.
    * @param daiOut Amount of dai being bought
    * */ 
-  const buyDaiNoSignature= async ( 
+  const buyDai = async (
+    series: IYieldSeries, 
+    daiOut:number,
+    forceTxApproval:boolean=false,
+  ) => {
+    /* if the user preferes to use tx approvals, or the series has previously been approved */
+    if ( useTxApproval || series.hasCloseAuth || forceTxApproval ) {
+      /* authorised the series if it hasnt already been authorized  (eg. in the case to approval transaction users) */
+      if (!series.hasCloseAuth) {
+        setBuyApprovalActive(true);
+        /* handle signing */
+        await approveToken(series?.fyDaiAddress, series?.poolAddress, MAX_INT, series).then(async (x:any) => {
+          if ( x === undefined ) {
+            setBuyApprovalActive(false);
+            await buyDaiNoSignature(series, daiOut);
+          } else {
+            // eslint-disable-next-line no-console
+            console.log(x);
+            setBuyApprovalActive(false);
+          }   
+        }); 
+      } else { await buyDaiNoSignature(series, daiOut); }
+    } else {
+      /* if the user uses permits as auth and hasn't authed for pre-maturity closes */
+      await buyDaiWithSignature(series, daiOut);
+    }
+  };
+
+  /**
+   * @dev for use as the when user has already authorised buying the series OR, no signing abilities (eg. ledger)
+   * @param {IYieldSeries} series yield series to act on.
+   * @param daiOut Amount of dai being bought
+   * */ 
+  const buyDaiNoSignature = async ( 
     series: IYieldSeries, 
     daiOut:number,
   ) => {
@@ -471,12 +509,13 @@ export const useProxy = () => {
     const toAddr = account && ethers.utils.getAddress(account);
 
     const overrides = { 
-      gasLimit: BigNumber.from('250000')
+      gasLimit: BigNumber.from('200000')
     };
 
     /* Contract interaction */
     let tx:any;
     let maxFYDaiIn:BigNumber;
+
     setBuyActive(true);
     try {
       /* calculate expected trade values and factor in slippage */
@@ -488,8 +527,9 @@ export const useProxy = () => {
         throw(preview);
       }
       tx = await proxyContract.buyDai(poolAddr, toAddr, parsedDaiOut, maxFYDaiIn, overrides);
+
     } catch (e) {
-      handleTxBuildError(e);  
+      handleTxBuildError(e);
       setBuyActive(false);
       return;
     }
@@ -499,11 +539,11 @@ export const useProxy = () => {
   };
 
   /**
-   * @dev Buy Dai with fyDai
+   * @dev for when a user hasnt authrorised the series, and prefers signing using permits
    * @param {IYieldSeries} series yield series to act on.
    * @param daiOut Amount of dai being bought
    * */ 
-  const buyDai = async ( 
+  const buyDaiWithSignature = async ( 
     series: IYieldSeries, 
     daiOut:number,
   ) => {
@@ -515,13 +555,14 @@ export const useProxy = () => {
     const fromAddr = account && ethers.utils.getAddress(account);
 
     const overrides = { 
-      gasLimit: BigNumber.from('500000')
+      gasLimit: BigNumber.from('250000')
     };
 
     /* Contract interaction */
     let tx:any;
     let maxFYDaiIn:BigNumber;
     let fyDaiPermitSig:any;
+    
     setBuyActive(true);
     try { 
       /* calculate expected trade values and factor in slippage */
@@ -529,10 +570,8 @@ export const useProxy = () => {
       if ( !(preview instanceof Error) ) {
         maxFYDaiIn = valueWithSlippage(preview);
       } else {
-        // maxFYDaiIn = ethers.utils.parseEther('1000000');
         throw(preview);
       }
-
       /* Get the user signature authorizing fyDai to interact with Dai */
       try {
         dispatch({ type: 'requestSigs', payload:[ auths.get(2) ] });
@@ -547,9 +586,18 @@ export const useProxy = () => {
         dispatch({ type: 'signed', payload: auths.get(2) });
         dispatch({ type: 'requestSigs', payload: [] });
       } catch (e) { 
-        handleTxBuildError(e);
-        dispatch({ type: 'requestSigs', payload: [] });
-        setRepayActive(false);
+        /* If there is a problem with the signing, try to use an approval tx as the fallback flow, but ignore if error code 4001 (user reject) */
+        if ( e.code !== 4001 ) {
+          console.log(e);
+          dispatch({ type: 'requestSigs', payload:[] });
+          setBuyActive(false);
+          // eslint-disable-next-line no-console
+          console.log('Fallback to approval transaction');
+          await buyDai(series, daiOut, true);
+          return;
+        }
+        dispatch({ type: 'requestSigs', payload:[] });
+        setBuyActive(false);
         return;
       }
 
@@ -630,8 +678,7 @@ export const useProxy = () => {
 
     /* limitPool fns */
     sellDai, sellActive,
-    buyDai, buyActive,
-    buyDaiNoSignature,
+    buyDai, buyActive, buyApprovalActive,
 
     /* Splitter fns */
     makerToYield,

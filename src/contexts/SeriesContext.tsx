@@ -76,11 +76,12 @@ const SeriesProvider = ({ children }:any) => {
           await callTx(_x.poolAddress, 'Pool', 'totalSupply', []),
         ]);
         /* with user */
-        const [ poolTokens, hasDelegatedPool, hasDaiAuth, hasFyDaiAuth, ethDebtDai, ethDebtFYDai, fyDaiBalance] =  account && await Promise.all([
+        const [ poolTokens, hasDelegatedPool, hasDaiAuth, hasFyDaiAuth, hasCloseAuth, ethDebtDai, ethDebtFYDai, fyDaiBalance] =  account && await Promise.all([
           getBalance(_x.poolAddress, 'Pool', account),
           checkPoolDelegate(_x.poolAddress, deployedContracts.YieldProxy),
           getTokenAllowance(deployedContracts.Dai, _x.poolAddress, 'Dai'),
           getTokenAllowance(_x.fyDaiAddress, deployedContracts.YieldProxy, 'FYDai'),
+          getTokenAllowance(_x.fyDaiAddress, _x.poolAddress, 'FYDai'),
           debtDai('ETH-A', _x.maturity ),
           callTx(deployedContracts.Controller, 'Controller', 'debtFYDai', [utils.ETH, _x.maturity, account]),
           getBalance(_x.fyDaiAddress, 'FYDai', account),
@@ -94,6 +95,7 @@ const SeriesProvider = ({ children }:any) => {
           hasDelegatedPool: hasDelegatedPool || false,
           hasDaiAuth: (hasDaiAuth && hasDaiAuth>0) || false, 
           hasFyDaiAuth: (hasFyDaiAuth && hasFyDaiAuth>0) || false,
+          hasCloseAuth: (hasCloseAuth && hasCloseAuth>0) || false,
           authComplete: ( !!hasDaiAuth && !!hasFyDaiAuth && !!hasDelegatedPool),
           ethDebtDai: ethDebtDai || BigNumber.from('0'),
           ethDebtFYDai : ethDebtFYDai || BigNumber.from('0'),

@@ -3,10 +3,10 @@ import { ethers, BigNumber }  from 'ethers';
 
 import Pool from '../contracts/Pool.json';
 
-import { NotifyContext } from '../contexts/NotifyContext';
+import { TxContext } from '../contexts/TxContext';
 import { useSignerAccount } from './connectionHooks';
 import { IYieldSeries } from '../types';
-import { useTxHelpers } from './appHooks';
+import { useTxHelpers } from './txHooks';
 
 /**
  * Hook for interacting with the yield 'Pool' Contract
@@ -14,7 +14,7 @@ import { useTxHelpers } from './appHooks';
 export const usePool = () => {
   const { fallbackProvider, provider, signer, account } = useSignerAccount();
   const { abi: poolAbi } = Pool;
-  const  { dispatch }  = useContext<any>(NotifyContext);
+  const  { dispatch }  = useContext<any>(TxContext);
   const [ sellActive, setSellActive ] = useState<boolean>(false);
   const [ buyActive, setBuyActive ] = useState<boolean>(false);
   const [ callActive, setCallActive ] = useState<boolean>(false);
@@ -177,12 +177,12 @@ export const usePool = () => {
    * @param {string} delegatedAddress address of the contract/entity getting delegated. 
    */
   const addPoolDelegate = async (
-    poolAddress:string,
+    series:IYieldSeries,
     delegatedAddress:string,
   ) => {
     let tx:any;
     /* Processing and sanitizing input */
-    const marketAddr = ethers.utils.getAddress(poolAddress);
+    const marketAddr = ethers.utils.getAddress(series.poolAddress);
     const delegatedAddr = ethers.utils.getAddress(delegatedAddress);
     /* Contract interaction */
     const contract = new ethers.Contract(
@@ -197,7 +197,7 @@ export const usePool = () => {
       return;
     }
     /* Transaction reporting & tracking */
-    dispatch({ type: 'txPending', payload:{ tx, message: 'Pending once-off Pool delegation ...', type:'AUTH' } } );
+    dispatch({ type: 'txPending', payload:{ tx, message: 'Pending once-off Pool delegation ...', type:'AUTH', series: series.maturity } } );
     await handleTx(tx);
   };
 
