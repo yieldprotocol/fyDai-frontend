@@ -1,8 +1,8 @@
 import React, { useEffect, useReducer } from 'react';
-import { useTxHelpers } from '../hooks/txHooks';
 import { useCachedState } from '../hooks/appHooks';
-import { IReducerAction, ITx } from '../types';
+import { IReducerAction, ITxState, ITx } from '../types';
 import { useSignerAccount } from '../hooks/connectionHooks';
+import { useTxHelpers } from '../hooks/txHooks';
 
 const TxContext = React.createContext<any>({});
 
@@ -12,10 +12,9 @@ const initState = {
   requestedSigs: [],
 };
 
-function txReducer(state:ITx, action:IReducerAction) {
+function txReducer(state:ITxState, action:IReducerAction) {
   switch (action.type) {
     case 'txPending':
-      console.log(state.pendingTxs);
       return {
         ...state,
         pendingTxs: [ ...state.pendingTxs, action.payload],
@@ -23,7 +22,7 @@ function txReducer(state:ITx, action:IReducerAction) {
     case 'txComplete':
       return {
         ...state,
-        pendingTxs: state.pendingTxs.filter((x:any) => x.tx.hash !== ( action.payload.transactionHash || action.payload.hash)),
+        pendingTxs: state.pendingTxs?.filter((x:any) => x.tx.hash !== ( action.payload.transactionHash || action.payload.hash)),
         lastCompletedTx: { ...action.payload, transactionHash: action.payload.transactionHash || action.payload.hash },
       };
     case 'requestSigs':
@@ -50,15 +49,14 @@ const TxProvider = ({ children }:any) => {
   const [ pendingCache ] = useCachedState('txPending', []);
   const [ state, dispatch ] = useReducer(txReducer, initState );
 
-  const { handleCachedTx } = useTxHelpers();
-  const { fallbackProvider } = useSignerAccount();
-
-  useEffect( () => {
-    /* bring in cached serialized transactions if any */
-    fallbackProvider && pendingCache.map((x:any) => {
-      handleCachedTx(x);
-    });
-  }, [ fallbackProvider ]);
+  React.useEffect(() => {
+    // /* bring in cached transactions if any */
+    // fallbackProvider && pendingCache.map((x:any) => { 
+    //   dispatch({ type:'txPending', payload:x });
+    //   // handleCachedTx(x);
+    //   // console.log state.pendingTxs);
+    // });
+  }, []);
 
   return (
     <TxContext.Provider value={{ state, dispatch }}>

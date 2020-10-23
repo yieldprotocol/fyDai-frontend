@@ -27,7 +27,8 @@ const clearAllButPrefs = () => {
   localStorage.removeItem('lastFeed');
   localStorage.removeItem('deployedSeries');
   localStorage.removeItem('cache_chainId');
-  localStorage.removeItem('txHistory'); 
+  localStorage.removeItem('txHistory');
+  localStorage.removeItem('txPending');
 };
 
 const useEagerConnect = () => {
@@ -113,13 +114,12 @@ const useInactiveListener = (suppress: boolean = false) => {
         console.log("Handling 'chain!Changed' event with payload", chainId);
         // activate(injected);
         if ((cachedChainId !== chainId) && active){
-          console.log('CHAIN cahnge actions');
+          console.log('CHAIN change actions');
           // localStorage.clear();
           // // eslint-disable-next-line no-restricted-globals
           // location.reload();
         }
       };
-
       ethereum.on('connect', handleConnect);
       ethereum.on('chainChanged', handleChainChanged);
       ethereum.on('accountsChanged', handleAccountsChanged);
@@ -165,6 +165,7 @@ export function useConnection() {
 
   /* Try web3 initiate automatically irrespective of state */
   const [activatingConnector, setActivatingConnector] = useState<any>();
+  
   useEffect(() => {
     if (activatingConnector && activatingConnector === connector) {
       setActivatingConnector(undefined);
@@ -182,6 +183,7 @@ export function useConnection() {
   clear EVERYTHING from cache and reset the app - it will be different info */
   useEffect(()=>{
     if (chainId && cachedChainId && (cachedChainId !== chainId) ) { 
+
       clearAllButPrefs();
       // eslint-disable-next-line no-restricted-globals
       location.reload();
@@ -239,6 +241,7 @@ export function useSignerAccount() {
   const [ signer, setSigner ] = useState<any>();
   const [ voidSigner, setVoidSigner ] = useState<any>();
   const [ fallbackProvider, setFallbackProvider ] = useState<any>();
+  
   useEffect(()=>{
     provider && (async () => {
       setSigner( await provider.getSigner() );
@@ -251,5 +254,6 @@ export function useSignerAccount() {
       setFallbackProvider( altProvider );
     })();
   }, [account, altProvider]);
+  
   return { signer, provider, account, voidSigner, fallbackProvider, chainId };
 }

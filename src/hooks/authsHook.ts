@@ -75,7 +75,7 @@ export const useAuth = () => {
   const [authActive, setAuthActive] = useState<boolean>(false);
   const [fallbackAuthActive, setFallbackAuthActive] = useState<boolean>(false);
 
-  const { handleTx, handleTxBuildError } = useTxHelpers();
+  const { handleTx, handleTxRejectError } = useTxHelpers();
 
   const { addControllerDelegate } = useController();
   const { approveToken } = useToken();
@@ -198,12 +198,11 @@ export const useAuth = () => {
       try {
         tx = await proxyContract.onboard(fromAddr, daiPermitSig, controllerSig, overrides);
       } catch (e) {
-        handleTxBuildError(e);
+        handleTxRejectError(e);
         setAuthActive(false);
         return;
       }
-      dispatch({ type: 'txPending', payload: { tx, message: 'Authorization pending...', type:'AUTH', series:null } });
-      await handleTx(tx);
+      await handleTx({ tx, msg: 'Authorization pending...', type:'AUTH', series: null } );
       dispatch({ type: 'requestSigs', payload:[] });
       setAuthActive(false);
 
@@ -240,10 +239,8 @@ export const useAuth = () => {
 
     /* if user account preferences don't specify using fallback, OR, a previous auth failed on SOME txs */
     if (!fallback && (!series.hasDaiAuth && !series.hasFyDaiAuth && !series.hasDelegatedPool) ) {
-
       setAuthActive(true);
       dispatch({ type: 'requestSigs', payload:[ auths.get(3), auths.get(4), auths.get(5) ] });
-
       try {
         /* YieldProxy | Pool delegation */
         const poolNonce = await poolContract.signatureCount(fromAddr);
@@ -298,12 +295,11 @@ export const useAuth = () => {
       try {
         tx = await proxyContract.authorizePool(poolAddr, fromAddr, daiSig, fyDaiSig, poolSig, overrides);
       } catch (e) {
-        handleTxBuildError(e);
+        handleTxRejectError(e);
         setAuthActive(false);
         return;
       }
-      dispatch({ type: 'txPending', payload: { tx, message: 'Authorization pending...', type:'AUTH', series:series.maturity } });
-      await handleTx(tx);
+      await handleTx({ tx, msg: 'Authorization pending...', type:'AUTH', series });
       dispatch({ type: 'requestSigs', payload:[] });
       setAuthActive(false);
 
