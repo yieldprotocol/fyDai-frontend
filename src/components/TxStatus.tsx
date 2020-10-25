@@ -65,11 +65,6 @@ const TxStatus= ({ msg, tx }:TxStatusProps) => {
         <Text>{(lastCompletedTx.status === 1)? 'Transaction succeeded': 'Transaction failed'}</Text>
         <Box direction='row' gap='xsmall'>
           <Text size='xsmall' ref={txRef}> <HashWrap hash={lastCompletedTx?.transactionHash}>{ abbreviateHash(lastCompletedTx?.transactionHash) }</HashWrap> </Text>
-          <Box
-            onClick={()=>handleCopy()}
-          >
-            <Copy /> 
-          </Box>
         </Box>
         <EtherscanButton txHash={lastCompletedTx.transactionHash} />
       </Box>}
