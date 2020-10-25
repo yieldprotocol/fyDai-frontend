@@ -19,7 +19,7 @@ function getLibrary(provider: any) {
   return library;
 }
 function getFallbackLibrary(provider: any) {
-  const library = new ethers.providers.JsonRpcProvider(provider);
+  const library = new ethers.providers.InfuraProvider(provider.chainId, '646dc0f33d2449878b28e0afa25267f6');
   // const library = ethers.getDefaultProvider('ropsten');
   library.pollingInterval = 12000;
   return library;
