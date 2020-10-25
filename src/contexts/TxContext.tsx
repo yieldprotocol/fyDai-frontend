@@ -1,8 +1,8 @@
-import React, { useEffect, useReducer } from 'react';
+import React, { useContext, useEffect, useReducer } from 'react';
 import { useCachedState } from '../hooks/appHooks';
 import { IReducerAction, ITxState, ITx } from '../types';
-import { useSignerAccount } from '../hooks/connectionHooks';
-import { useTxHelpers } from '../hooks/txHooks';
+// import { useTxHelpers } from '../hooks/txHooks';
+// import { SeriesContext } from './SeriesContext';
 
 const TxContext = React.createContext<any>({});
 
@@ -48,15 +48,17 @@ const TxProvider = ({ children }:any) => {
 
   const [ pendingCache ] = useCachedState('txPending', []);
   const [ state, dispatch ] = useReducer(txReducer, initState );
+  // const { state: { seriesLoading } } = useContext(SeriesContext);
+  // const { handleCachedTx } = useTxHelpers();
 
-  React.useEffect(() => {
-    // /* bring in cached transactions if any */
-    // fallbackProvider && pendingCache.map((x:any) => { 
-    //   dispatch({ type:'txPending', payload:x });
-    //   // handleCachedTx(x);
-    //   // console.log state.pendingTxs);
-    // });
-  }, []);
+  // React.useEffect(() => {
+  //   // /* bring in cached transactions if any */
+  //   !seriesLoading && pendingCache.map((x:any) => { 
+  //     dispatch({ type:'txPending', payload:x });
+  //     handleCachedTx(x);
+  //     // console.log state.pendingTxs);
+  //   });
+  // }, [seriesLoading]);
 
   return (
     <TxContext.Provider value={{ state, dispatch }}>

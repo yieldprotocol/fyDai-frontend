@@ -70,8 +70,6 @@ export const useTxHelpers = () => {
   };
 
   const handleCachedTx = async (tx:ITx) => {
-    dispatch({ type: 'txPending', payload: tx });
-    // console.log(tx.tx.hash);
     await fallbackProvider.waitForTransaction(tx.tx.hash, 3)
       .then((receipt:any) => {
         console.log(receipt);
@@ -80,6 +78,15 @@ export const useTxHelpers = () => {
         handleTxError('Error: Transaction failed. Please see console', tx.tx, error);
       });
   };
+
+  // useEffect(() => {
+  //   // /* bring in cached transactions if any */
+  //   !seriesLoading && pendingCache.map((x:any) => { 
+  //     dispatch({ type:'txPending', payload:x });
+  //     handleCachedTx(x);
+  //     // console.log state.pendingTxs);
+  //   });
+  // }, [seriesLoading]);
 
   return { handleTx, handleCachedTx, txComplete, handleTxRejectError };
 };
