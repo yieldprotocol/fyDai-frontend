@@ -375,7 +375,7 @@ export const useProxy = () => {
     const parsedTokens = BigNumber.isBigNumber(tokens)? tokens : ethers.utils.parseEther(tokens.toString());
 
     const overrides = { 
-      gasLimit: BigNumber.from('500000')
+      gasLimit: BigNumber.from('600000')
     };
 
     /* Contract interaction */
