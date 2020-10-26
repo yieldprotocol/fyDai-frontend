@@ -185,7 +185,8 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
               },
               {
                 label: 'Your Pool share',
-                labelExtra: ()=>(<Text size='xxsmall'> of the total <Text size='xxsmall' color='text'>{nFormatter(activeSeries?.totalSupply_, 0)}</Text> tokens </Text>),
+                // labelExtra: ()=>(<Text size='xxsmall'> of the total <Text size='xxsmall' color='text'>{nFormatter(activeSeries?.totalSupply_, 0)}</Text> tokens </Text>),
+                labelExtra: ()=>(<Text size='xxsmall'> of the total tokens </Text>),
                 visible: 
                     (!!account && txActive?.type !== 'ADD_LIQUIDITY' && !activeSeries?.isMature()) || 
                     (activeSeries?.isMature() && activeSeries?.poolTokens_>0 ),
