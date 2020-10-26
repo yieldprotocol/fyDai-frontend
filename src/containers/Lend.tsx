@@ -320,7 +320,11 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
             <Redeem />}
 
             <Box direction='row' fill justify='between'>
-              { activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) && 
+              { 
+                // activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) && 
+                // !mobile &&
+                !activeSeries?.isMature() && 
+                activeSeries?.fyDaiBalance_ > 0 &&
                 !mobile &&
                 <Box alignSelf='start' margin={{ top:'medium' }}>
                   <FlatButton 
