@@ -61,7 +61,7 @@ export const useTxHelpers = () => {
   const handleTx = async ( tx:ITx ) => {
     dispatch({ type: 'txPending', payload: tx  });
     setPendingCache([...state.pendingTxs, tx ]);
-    await tx.tx.wait([2])
+    await tx.tx.wait()
       .then((receipt:any) => {
         txComplete(receipt);
       }, ( error:any ) => {
@@ -69,14 +69,5 @@ export const useTxHelpers = () => {
       });
   };
 
-  const handleCachedTx = async (tx:ITx) => {
-    await fallbackProvider.waitForTransaction(tx.tx.hash, 3)
-      .then((receipt:any) => {
-        txComplete(receipt);
-      }, ( error:any ) => {
-        handleTxError('Error: Transaction failed. Please see console', tx.tx, error);
-      });
-  };
-
-  return { handleTx, handleCachedTx, handleTxError, txComplete, handleTxRejectError };
+  return { handleTx, handleTxError, txComplete, handleTxRejectError };
 };

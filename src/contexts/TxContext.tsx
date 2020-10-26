@@ -62,7 +62,7 @@ const TxProvider = ({ children }:any) => {
       if (!seriesLoading && library && !hasReadCache) {
         await Promise.all( pendingCache.map(async (x:any) => {
           dispatch({ type:'txPending', payload: x });
-          await library.waitForTransaction(x.tx.hash, 3)
+          await library.waitForTransaction(x.tx.hash, 1)
             .then((receipt:any) => {
               dispatch({ type: 'txComplete', payload: receipt } );
             });
