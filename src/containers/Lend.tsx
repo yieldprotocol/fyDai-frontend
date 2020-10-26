@@ -357,7 +357,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
 
         {/* If there is a transaction active, show the applicable view */}
         { sellActive && !txActive && <ApprovalPending /> }
-        { txActive && <TxStatus msg={`You are lending ${inputValue} DAI`} tx={txActive} /> }
+        { txActive && <TxStatus tx={txActive} /> }
       </Keyboard>
 
       {mobile &&

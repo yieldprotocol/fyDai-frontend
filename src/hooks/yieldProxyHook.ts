@@ -369,7 +369,7 @@ export const useProxy = () => {
     const parsedTokens = BigNumber.isBigNumber(tokens)? tokens : ethers.utils.parseEther(tokens.toString());
 
     const overrides = { 
-      gasLimit: BigNumber.from('500000')
+      gasLimit: BigNumber.from('600000')
     };
 
     /* Contract interaction */
@@ -437,11 +437,12 @@ export const useProxy = () => {
       const preview = await previewPoolTx('selldai', series, daiIn);
       if ( !(preview instanceof Error) ) {
         minFYDaiOut = valueWithSlippage(preview, true);
+        tx = await proxyContract.sellDai(poolAddr, toAddr, parsedDaiIn, minFYDaiOut, overrides);
       } else {
         // minFYDaiOut = ethers.utils.parseEther('0');
         throw(preview);
       }
-      tx = await proxyContract.sellDai(poolAddr, toAddr, parsedDaiIn, minFYDaiOut, overrides);
+      // tx = await proxyContract.sellDai(poolAddr, toAddr, parsedDaiIn, minFYDaiOut, overrides);
     } catch (e) {
       handleTxRejectError(e);
       setSellActive(false);

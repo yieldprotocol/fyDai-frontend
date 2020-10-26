@@ -336,7 +336,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
         </Box>}
 
         { addLiquidityActive && !txActive && <ApprovalPending /> } 
-        { txActive && txActive.type !== 'REMOVE_LIQUIDITY' && <TxStatus msg={`You are adding ${inputValue} DAI liquidity to the pool.`} tx={txActive} /> }
+        { txActive && txActive.type !== 'REMOVE_LIQUIDITY' && <TxStatus tx={txActive} /> }
       </Keyboard>
 
       { mobile && 

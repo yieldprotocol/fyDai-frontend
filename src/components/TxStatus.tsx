@@ -7,13 +7,13 @@ import { TxContext } from '../contexts/TxContext';
 import EtherscanButton from './EtherscanButton';
 import { abbreviateHash } from '../utils';
 import HashWrap from './HashWrap';
+import { ITx } from '../types';
 
 interface TxStatusProps {
-  msg:string;
-  tx: any;
+  tx: ITx;
 }
 
-const TxStatus= ({ msg, tx }:TxStatusProps) => {
+const TxStatus= ({ tx }:TxStatusProps) => {
 
   const {
     state: { pendingTxs, lastCompletedTx },
@@ -42,7 +42,7 @@ const TxStatus= ({ msg, tx }:TxStatusProps) => {
           width={!mobile?{ min:'600px', max:'600px' }: undefined}
         >
           <Text size='xlarge' color='brand' weight='bold'>Transaction pending...</Text>
-          <Text>{msg}</Text>
+          <Text>{tx.msg}</Text>
           <ScaleLoader color={theme?.global?.colors?.brand.dark || 'grey'} height='25px' />
           <Box direction='row' gap='xsmall'>
             <HashWrap hash={tx.tx.hash}> <Text size='xsmall' ref={txRef}> { abbreviateHash(tx.tx.hash) } </Text></HashWrap>  

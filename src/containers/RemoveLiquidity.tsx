@@ -234,7 +234,7 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
         gap='medium'
         justify='between'
       > 
-        <TxStatus msg={`You are removing ${inputValue} liquidity tokens`} tx={txActive} />
+        <TxStatus tx={txActive} />
                 
         <Box alignSelf='start'>
           <Box

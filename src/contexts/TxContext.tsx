@@ -1,8 +1,11 @@
-import React, { useContext, useEffect, useReducer } from 'react';
+import React, { useState, useContext, useEffect, useReducer } from 'react';
+import { useWeb3React } from '@web3-react/core';
+
 import { useCachedState } from '../hooks/appHooks';
 import { IReducerAction, ITxState, ITx } from '../types';
-// import { useTxHelpers } from '../hooks/txHooks';
-// import { SeriesContext } from './SeriesContext';
+
+import { SeriesContext } from './SeriesContext';
+// import { useSignerAccount } from '../hooks';
 
 const TxContext = React.createContext<any>({});
 
@@ -45,20 +48,35 @@ function txReducer(state:ITxState, action:IReducerAction) {
 }
 
 const TxProvider = ({ children }:any) => {
-
-  const [ pendingCache ] = useCachedState('txPending', []);
   const [ state, dispatch ] = useReducer(txReducer, initState );
-  // const { state: { seriesLoading } } = useContext(SeriesContext);
-  // const { handleCachedTx } = useTxHelpers();
 
-  // React.useEffect(() => {
-  //   // /* bring in cached transactions if any */
-  //   !seriesLoading && pendingCache.map((x:any) => { 
-  //     dispatch({ type:'txPending', payload:x });
-  //     handleCachedTx(x);
-  //     // console.log state.pendingTxs);
-  //   });
-  // }, [seriesLoading]);
+  const { state: { seriesLoading } } = useContext(SeriesContext);
+  const [ pendingCache, setPendingCache ] = useCachedState('txPending', []);
+  const { library } = useWeb3React('fallback');
+  const [ hasReadCache, setHasReadCache] = useState<boolean>(false);
+  
+
+  useEffect(() => {
+    /* handle registering and monitoring the cached transactions if any */
+    ( async () => {
+      if (!seriesLoading && library && !hasReadCache) {
+        await Promise.all( pendingCache.map(async (x:any) => {
+          dispatch({ type:'txPending', payload: x });
+          await library.waitForTransaction(x.tx.hash, 3)
+            .then((receipt:any) => {
+              dispatch({ type: 'txComplete', payload: receipt } );
+            });
+          console.log(x.tx.hash);
+          setPendingCache( pendingCache.filter((t:any) => t.tx.hash !== x.tx.hash));
+        })
+        );
+        console.log('cache txs processed');
+        setPendingCache(state.pendingTxs);
+        setHasReadCache(true);
+      }
+    })();
+
+  }, [library, seriesLoading]);
 
   return (
     <TxContext.Provider value={{ state, dispatch }}>

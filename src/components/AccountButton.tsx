@@ -94,9 +94,9 @@ const AccountButton = (props: any) => {
           gap='medium'
           width={!mobile?{ min:'620px', max:'620px' }: undefined}  
         >
-          <TxStatus msg='Please be patient.' tx={pendingTxs[pendingTxs.length-1]} />
+          <TxStatus tx={pendingTxs[pendingTxs.length-1]} />
           <Box alignSelf='start' pad='medium'> 
-            <FlatButton 
+            <FlatButton
               onClick={()=>setTxStatusOpen(false)}
               label={
                 <Box direction='row' gap='medium' align='center'>

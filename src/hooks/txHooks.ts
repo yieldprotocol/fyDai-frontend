@@ -21,14 +21,14 @@ export const useTxActive = (typeList:string[]) => {
 
 export const useTxHelpers = () => { 
   const  { dispatch: notify }  = useContext<any>(NotifyContext);
-  const  { dispatch  }  = useContext<any>(TxContext);
+  const  { state, dispatch  }  = useContext<any>(TxContext);
   const [ pendingCache, setPendingCache ] = useCachedState('txPending', []);
   const { fallbackProvider } = useSignerAccount();
 
   /* Notification Helpers */
-  const txComplete = (receipt:any) => {
-    setPendingCache( pendingCache.filter((x:any) => x.tx.hash !== ( receipt.transactionHash || receipt.hash)));
+  const txComplete = (receipt:any) => {  
     dispatch({ type: 'txComplete', payload: receipt } );
+    setPendingCache( state.pendingTxs.filter((x:any) => x.tx.hash !== ( receipt.transactionHash || receipt.hash)));
   };
 
   const handleTxRejectError = (error:any) => {
@@ -60,7 +60,7 @@ export const useTxHelpers = () => {
   
   const handleTx = async ( tx:ITx ) => {
     dispatch({ type: 'txPending', payload: tx  });
-    setPendingCache([...pendingCache, tx ]);
+    setPendingCache([...state.pendingTxs, tx ]);
     await tx.tx.wait([2])
       .then((receipt:any) => {
         txComplete(receipt);
@@ -72,21 +72,11 @@ export const useTxHelpers = () => {
   const handleCachedTx = async (tx:ITx) => {
     await fallbackProvider.waitForTransaction(tx.tx.hash, 3)
       .then((receipt:any) => {
-        console.log(receipt);
         txComplete(receipt);
       }, ( error:any ) => {
         handleTxError('Error: Transaction failed. Please see console', tx.tx, error);
       });
   };
 
-  // useEffect(() => {
-  //   // /* bring in cached transactions if any */
-  //   !seriesLoading && pendingCache.map((x:any) => { 
-  //     dispatch({ type:'txPending', payload:x });
-  //     handleCachedTx(x);
-  //     // console.log state.pendingTxs);
-  //   });
-  // }, [seriesLoading]);
-
-  return { handleTx, handleCachedTx, txComplete, handleTxRejectError };
+  return { handleTx, handleCachedTx, handleTxError, txComplete, handleTxRejectError };
 };
