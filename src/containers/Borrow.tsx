@@ -526,7 +526,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
 
         {/* If there is a transaction active, show the applicable view */}
         { borrowActive && !txActive && <ApprovalPending /> } 
-        { txActive && <TxStatus msg={`You are borrowing ${inputValue} DAI`} tx={txActive} /> }
+        { txActive && <TxStatus tx={txActive} /> }
 
       </Keyboard>
 

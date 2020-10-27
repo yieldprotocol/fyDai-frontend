@@ -3,10 +3,10 @@ import { ethers, BigNumber }  from 'ethers';
 
 import FYDai from '../contracts/FYDai.json';
 
-import { TxContext } from '../contexts/TxContext';
 import { useSignerAccount } from './connectionHooks';
 import { useTxHelpers } from './txHooks';
 import { cleanValue } from '../utils';
+import { IYieldSeries } from '../types';
 
 /**
  * Hook for interacting with the yield 'eDAI' Contract
@@ -16,24 +16,24 @@ import { cleanValue } from '../utils';
 export const useFYDai = () => {
   const { provider, signer, account } = useSignerAccount();
   const { abi: fyDaiAbi } = FYDai;
-  const  { dispatch }  = useContext<any>(TxContext);
   const [ redeemActive, setRedeemActive ] = useState<boolean>(false);
-  const { handleTx, handleTxBuildError } = useTxHelpers();
+  const { handleTx, handleTxRejectError } = useTxHelpers();
 
   /**
    * @dev Redeems fyDai for dai after maturity
-   * @param {string} fyDaiAddress address of the fyDai series to redeem from.
+   * @param {IYieldSeries} series to redeem from.
    * @param {BigNumber} amount in exact fyDai available to burn precision
    */
+  // TODO accept series rather than 
   const redeem = async (
-    fyDaiAddress:string,
+    series: IYieldSeries,
     amount: string|BigNumber
   ) => {
     let tx:any;
     const parsedAmount = BigNumber.isBigNumber(amount)? amount : (cleanValue(amount));
     const fromAddr = account && ethers.utils.getAddress(account);
     const toAddr = fromAddr;
-    const fyDaiAddr = ethers.utils.getAddress(fyDaiAddress);
+    const fyDaiAddr = ethers.utils.getAddress(series.fyDaiAddress);
 
     const overrides = {
       gasLimit: BigNumber.from('500000')
@@ -44,12 +44,11 @@ export const useFYDai = () => {
     try {
       tx = await contract.redeem(fromAddr, toAddr, parsedAmount, overrides);
     } catch (e) {
-      handleTxBuildError(e);
+      handleTxRejectError(e);
       setRedeemActive(false);
       return;
     }
-    dispatch({ type: 'txPending', payload:{ tx, message: `Redeeming ${amount} pending...`, type:'REDEEM' } } );
-    await handleTx(tx);
+    await handleTx({ tx, msg: `Redeeming ${amount} pending...`, type:'REDEEM', series });
     setRedeemActive(false);
   };
 

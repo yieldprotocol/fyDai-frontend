@@ -355,7 +355,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
        
         </Box>}
         { postEthActive && !txActive && <ApprovalPending /> } 
-        { txActive && txActive.type !== 'WITHDRAW' && <TxStatus msg={`You are depositing ${inputValue} ETH`} tx={txActive} /> }
+        { txActive && txActive.type !== 'WITHDRAW' && <TxStatus tx={txActive} /> }
       </Keyboard>
 
       {mobile && 

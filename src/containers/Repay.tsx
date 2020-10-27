@@ -240,7 +240,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
           </Box>
         </Box>}
       { repayActive && !txActive && <ApprovalPending /> }
-      { txActive && <TxStatus msg={`You are repaying ${inputValue} DAI`} tx={txActive} /> }
+      { txActive && <TxStatus tx={txActive} /> }
 
       {mobile && 
       !activeSeries?.isMature() && 

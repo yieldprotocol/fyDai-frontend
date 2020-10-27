@@ -31,7 +31,7 @@ const Redeem  = ({ close }:IRedeemProps)  => {
 
   const redeemProcedure = async () =>{
     if(!redeemDisabled) {
-      await redeem(activeSeries.fyDaiAddress, activeSeries.fyDaiBalance.toString());
+      await redeem(activeSeries, activeSeries.fyDaiBalance.toString());
       userActions.updateHistory();
       await Promise.all([
         userActions.updatePosition(),
@@ -66,7 +66,7 @@ const Redeem  = ({ close }:IRedeemProps)  => {
         />
       </>}
       { redeemActive && !txActive && <ApprovalPending /> } 
-      { txActive && <TxStatus msg={`You are redeeming ${activeSeries?.fyDaiBalance_} DAI`} tx={txActive} /> }
+      { txActive && <TxStatus tx={txActive} /> }
     </Box>
   );
 };

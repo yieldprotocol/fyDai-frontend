@@ -6,7 +6,7 @@ import {
   Box,
   ResponsiveContext,
   Layer,
-  Drop
+  Collapsible
 } from 'grommet';
 
 import { 
@@ -21,10 +21,9 @@ import { UserContext } from '../contexts/UserContext';
 import FlatButton from './FlatButton';
 import DaiMark from './logos/DaiMark';
 import Loading from './Loading';
-import EtherscanButton from './EtherscanButton';
 import TxStatus from './TxStatus';
 import { abbreviateHash } from '../utils';
-import HashWrap from './HashWrap';
+import EthMark from './logos/EthMark';
 
 
 const AccountButton = (props: any) => {
@@ -34,7 +33,6 @@ const AccountButton = (props: any) => {
   
   const pendingRef:any = useRef(null);
   const completeRef:any = useRef(null);
-  const [ over ] = useState<boolean>(false);
 
   const { state: { position } } = useContext(UserContext);
   const { state: { pendingTxs, lastCompletedTx } } = useContext(TxContext);
@@ -43,6 +41,7 @@ const AccountButton = (props: any) => {
   // flags
   const [txStatusOpen, setTxStatusOpen] = useState(false);
   const [txCompleteOpen, setTxCompleteOpen] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState<boolean>(false);
 
   useEffect(()=>{
     lastCompletedTx?.transactionHash && pendingTxs.length===0 && setTxCompleteOpen(true);
@@ -53,25 +52,6 @@ const AccountButton = (props: any) => {
     })();
 
   }, [pendingTxs, lastCompletedTx ]);
-
-  const DropBox = () => {
-    return ( 
-      <Drop
-        target={completeRef.current}
-        align={{ top: 'bottom' }}
-        plain
-      >
-        {lastCompletedTx &&
-        <Box
-          pad='small'
-          background='#f0f0f0'
-        >
-          <HashWrap hash={lastCompletedTx?.transactionHash}>{ abbreviateHash(lastCompletedTx?.transactionHash) }</HashWrap>
-          {lastCompletedTx?.status}
-          <EtherscanButton txHash={lastCompletedTx?.transactionHash} />
-        </Box>}
-      </Drop>);
-  };
   
   return (
     <Box
@@ -94,9 +74,9 @@ const AccountButton = (props: any) => {
           gap='medium'
           width={!mobile?{ min:'620px', max:'620px' }: undefined}  
         >
-          <TxStatus msg='Please be patient.' tx={pendingTxs[pendingTxs.length-1]} />
+          <TxStatus tx={pendingTxs[pendingTxs.length-1]} />
           <Box alignSelf='start' pad='medium'> 
-            <FlatButton 
+            <FlatButton
               onClick={()=>setTxStatusOpen(false)}
               label={
                 <Box direction='row' gap='medium' align='center'>
@@ -110,12 +90,36 @@ const AccountButton = (props: any) => {
       </Layer>}
 
       { !mobile && pendingTxs.length===0 && !txCompleteOpen && account &&
-      <Box pad={{ left:'small', right:'large' }} direction='row' gap='small' align='center'>
-        <DaiMark />
-        <Loading condition={!position.daiBalance} size='xsmall'>
-          <Text size='xsmall' weight='bold'>{position?.daiBalance_} DAI </Text>
-        </Loading>
+      <Box 
+        pad={{ left:'small', right:'large' }} 
+        direction='row' 
+        gap='medium' 
+        align='center'
+        onMouseOver={() => setDetailsOpen(true)}
+        onMouseLeave={() => setDetailsOpen(false)}
+        onFocus={() => setDetailsOpen(true)}
+        onBlur={() => setDetailsOpen(false)}
+      >
+
+        
+        <Collapsible open={detailsOpen} direction='horizontal'>
+          { detailsOpen && 
+          <Box overflow='scroll' gap='xsmall' direction='row' animation='slideLeft'>    
+            <EthMark /> 
+            <Text size='xsmall' weight='bold'>{position?.ethBalance_}</Text>
+            <Text size='xsmall' weight='bold'>ETH</Text>
+          </Box>}
+        </Collapsible>
+        
+        <Box gap='xsmall' direction='row'>
+          <DaiMark />
+          <Loading condition={!position.daiBalance} size='xsmall'>
+            <Text size='xsmall' weight='bold'>{position?.daiBalance_} DAI </Text>
+          </Loading>
+        </Box>
+
       </Box>}
+
         
       {pendingTxs.length>0 &&  
       <Box
@@ -127,12 +131,11 @@ const AccountButton = (props: any) => {
         animation='slideLeft'
         onClick={()=>setTxStatusOpen(true)}
       >
-        <Text size='small'> Transaction pending ... </Text>   
-        { pendingRef.current && over && <DropBox />}
+        <Text size='xsmall'> Transaction pending ... </Text>   
       </Box>}
 
       {txCompleteOpen &&
-      <>    
+      <>
         <Box
           ref={completeRef}
           direction='row'
@@ -143,15 +146,13 @@ const AccountButton = (props: any) => {
           onClick={()=>setTxStatusOpen(true)}
         >
           {lastCompletedTx?.status === 1 &&
-          <Text color='green' textAlign='center' size='small'>              
-            <Check /> Transaction Complete
-          </Text>}
+          <Box direction='row' gap='xsmall'> 
+            <Text color='green' textAlign='center' size='xsmall'><Check /></Text>
+            <Text color='green' textAlign='center' size='xsmall'>Transaction Complete</Text>
+          </Box>}
           {lastCompletedTx?.status !== 1 &&
-          <Text color='red' textAlign='center' size='small'>              
-            Transaction failed
-          </Text>}
+          <Text color='red' textAlign='center' size='xsmall'>  Transaction failed  </Text>}
         </Box> 
-        { completeRef.current && over && <DropBox />}               
       </>}
 
       { account ?

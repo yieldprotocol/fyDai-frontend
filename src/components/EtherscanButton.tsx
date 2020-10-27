@@ -2,6 +2,8 @@ import { Box, Text } from 'grommet';
 import React, { useState, useEffect } from 'react';
 import RaisedButton from './RaisedButton';
 
+import FlatButton from './FlatButton';
+
 import { useWeb3React } from '../hooks';
 
 const networkMap = new Map([
@@ -17,9 +19,9 @@ const EtherscanButton = ({ txHash }: any) => {
   }, [chainId]);
 
   return (
-    <RaisedButton 
+    <FlatButton 
       onClick={(e:any)=>{ e.stopPropagation(); window.open( `https://${network}etherscan.io/tx/${txHash}`, '_blank');}}
-      label={<Box pad='xsmall'><Text size='xxsmall'> View on Etherscan </Text></Box>}
+      label={<Box pad={{ horizontal:'xxsmall', vertical:'none' }}><Text size='xxsmall'> View on Etherscan </Text></Box>}
     />
   );
 };
