@@ -51,8 +51,8 @@ export const cleanValue = (input:string, decimals:number=12) => {
 };
 
 /* handle Address/hash shortening */
-export const abbreviateHash = (addr:string) => {
-  return `${addr?.substring(0, 4)}...${addr?.substring(addr.length - 4)}`; 
+export const abbreviateHash = (addr:string, buffer:number=4) => {
+  return `${addr?.substring(0, buffer)}...${addr?.substring(addr.length - buffer)}`; 
 };
 
 /**

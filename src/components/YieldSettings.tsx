@@ -87,7 +87,7 @@ const YieldSettings = () => {
                 onClick={() => updatePreferences({ slippage: slippageList[i] })}
                 border={slippageList.indexOf(preferences.slippage)!== i ? undefined : 'all'}
               >
-                <Text size="small">
+                <Text size="xxsmall">
                   {x*100} %
                 </Text>
               </StyledBox>

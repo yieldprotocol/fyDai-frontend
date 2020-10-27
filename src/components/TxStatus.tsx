@@ -23,11 +23,6 @@ const TxStatus= ({ tx }:TxStatusProps) => {
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' ); 
   const txRef = React.useRef<any>(null);
 
-  // TODO: handle copy
-  const handleCopy = () => {
-    document.execCommand('copy');
-  };
-
   return (
     <>
       { pendingTxs && pendingTxs.length > 0 &&
