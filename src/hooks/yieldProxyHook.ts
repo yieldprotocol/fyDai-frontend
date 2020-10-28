@@ -10,12 +10,15 @@ import YieldProxy from '../contracts/YieldProxy.json';
 import { TxContext } from '../contexts/TxContext';
 import { YieldContext } from '../contexts/YieldContext';
 import { UserContext } from '../contexts/UserContext';
+import { SeriesContext } from '../contexts/SeriesContext';
 
 import { useSignerAccount } from './connectionHooks';
 import { usePool } from './poolHook';
 import { useMath } from './mathHooks';
 import { useToken } from './tokenHook';
 import { useTxHelpers } from './txHooks';
+
+import { useTempProxy } from './tempProxyHook';
 
 const MAX_INT = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
 
@@ -46,6 +49,7 @@ export const useProxy = () => {
   /* contexts */
   const  { dispatch }  = useContext<any>(TxContext);
   const  { state: { deployedContracts } }  = useContext<any>(YieldContext);
+  const  { state: { seriesData } }  = useContext<any>(SeriesContext);
   const  { state: { preferences: { slippage, useTxApproval } } }  = useContext<any>(UserContext);
 
   /* hooks */ 
@@ -54,6 +58,8 @@ export const useProxy = () => {
   const { splitDaiLiquidity } = useMath();
   const { getBalance, approveToken } = useToken();
   const { handleTx, handleTxRejectError } = useTxHelpers();
+
+  const { removeLiquidityWithSignature } = useTempProxy();
   
   /* Activity flags */
   const [ postEthActive, setPostEthActive ] = useState<boolean>(false);
@@ -93,7 +99,6 @@ export const useProxy = () => {
       yieldProxyAbi,
       signer
     ));
-
   }, [signer, deployedContracts, yieldProxyAbi ]);
 
   /**
@@ -124,6 +129,7 @@ export const useProxy = () => {
     setPostEthActive(false);
   };
 
+
   /**
    * @dev Withdraw ETH collateral via YieldProxy
    * @param {string|BigNumber} amount amount of ETH to withdraw (in normal human numbers or in Wei as a BigNumber)
@@ -149,6 +155,7 @@ export const useProxy = () => {
     await handleTx({ tx, msg: `Withdrawing ${amount} ETH `, type:'WITHDRAW', series: null });
     setWithdrawEthActive(false);
   };
+
 
   /**
    * @dev Borrow fyDai from Controller and sell it immediately for Dai, for a maximum fyDai debt.
@@ -229,7 +236,6 @@ export const useProxy = () => {
     const fromAddr = account && ethers.utils.getAddress(account);
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const parsedMaturity = series.maturity.toString();
-
     const overrides = {
       gasLimit: BigNumber.from('250000')
     };
@@ -294,8 +300,7 @@ export const useProxy = () => {
       } else {
         // eslint-disable-next-line no-console
         console.log('Series has passed its maturity date, but has not yet been matured');
-      }     
-      
+      }      
     } catch (e) {
       handleTxRejectError(e);
       setRepayActive(false);
@@ -305,10 +310,11 @@ export const useProxy = () => {
     setRepayActive(false);
   };
 
+
   /**
    * LIQUIDITY SECTION
    */
-  
+
   /**
    * @dev Add liquidity to a pool 
    * 
@@ -350,6 +356,22 @@ export const useProxy = () => {
     setAddLiquidityActive(false);
   };
 
+  const removeLiquidity = async (
+    series: IYieldSeries,  
+    tokens: number|BigNumber,
+  ) => {
+    setRemoveLiquidityActive(true);
+    /* if the user has pool tokens in more than one series, then direct them to the temp proxy */
+    if ( Array.from(seriesData).filter(([ key, value ]: any) => value.poolTokens > 0 ).length > 1  ) {
+      /* temporary proxy patched for removing liquidity if user has liquidity in more than one series */
+      await removeLiquidityWithSignature(series, tokens);
+    } else {
+      /* else remove liquidity with no signature */
+      await removeLiquidityNoSignature(series, tokens);
+    }
+    setRemoveLiquidityActive(false);
+  };
+
   /**
    * @dev removes liquidity from a pool
    * 
@@ -358,9 +380,7 @@ export const useProxy = () => {
    * 
    * @note if BigNumber is used make sure it is in WEI
    */
-  const removeLiquidity = async (
-    // removeLiquidityEarly(address from, uint256 poolTokens, uint256 DaiLimit)
-    // removeLiquidityMature(address from, uint256 poolTokens)
+  const removeLiquidityNoSignature = async (
     series: IYieldSeries,  
     tokens: number|BigNumber,
   ) => {
@@ -374,9 +394,8 @@ export const useProxy = () => {
 
     /* Contract interaction */
     let tx:any;
-    // let minDai:BigNumber;
     let minFYDai:BigNumber;
-    setRemoveLiquidityActive(true);
+
     try {
       if ( !series.isMature() ) {
         // eslint-disable-next-line no-console
@@ -388,11 +407,9 @@ export const useProxy = () => {
         } else {
           throw(preview);
         }
-
         tx = await proxyContract.removeLiquidityEarlyDaiFixed(poolAddr, parsedTokens, minFYDai, overrides );
-
       } else {
-        console.log('removing liquidity AFTER maturity');
+        console.log('Removing liquidity AFTER maturity');
         tx = await proxyContract.removeLiquidityMature(poolAddr, parsedTokens, { gasLimit: BigNumber.from('500000') } );
       }
     } catch (e) {
@@ -401,7 +418,7 @@ export const useProxy = () => {
       return;
     }
     await handleTx({ tx, msg: `Removing ${tokens} DAI liquidity from ${series.displayNameMobile}`, type:'REMOVE_LIQUIDITY', series });
-    setRemoveLiquidityActive(false);
+
   };
 
 
@@ -451,8 +468,6 @@ export const useProxy = () => {
     await handleTx({ tx, msg: `Lending ${daiIn} DAI to ${series.displayNameMobile} `, type:'SELL_DAI', series });
     setSellActive(false);
   };
-
-
 
   /**
    * @dev This selects which type of buy to use depending on maturity and authorisations.

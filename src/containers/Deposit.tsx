@@ -321,7 +321,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
               onClick={()=>depositProcedure()}
               label={`Deposit ${inputValue || ''} Eth`}
               disabled={depositDisabled}
-              hasDelegatedPool={true}
+              hasPoolDelegatedProxy={true}
               clearInput={()=>setInputValue(undefined)}
             /> }
 

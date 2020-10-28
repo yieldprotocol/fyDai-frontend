@@ -128,13 +128,13 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
           background='#555555'
           align='center'
         >
-          { (!series.hasDaiAuth && !series.hasFyDaiAuth && !series.hasDelegatedPool) && 
+          { (!series.hasDaiAuth && !series.hasFyDaiAuth && !series.hasPoolDelegatedProxy) && 
           <Box direction='row' gap='small'>
             <Text color='#DDDDDD'> <Warning /> </Text>
             <Text size='xsmall' color='#DDDDDD'>A once-off authorization is required to use this series </Text>
           </Box> }
 
-          { !(!series.hasDaiAuth && !series.hasFyDaiAuth && !series.hasDelegatedPool) && 
+          { !(!series.hasDaiAuth && !series.hasFyDaiAuth && !series.hasPoolDelegatedProxy) && 
           <Box direction='row' gap='small'>
             <Text color='#DDDDDD'> <Warning /> </Text>
             <Box>

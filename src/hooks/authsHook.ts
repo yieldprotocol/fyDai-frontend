@@ -76,7 +76,6 @@ export const useAuth = () => {
   const [fallbackAuthActive, setFallbackAuthActive] = useState<boolean>(false);
 
   const { handleTx, handleTxRejectError } = useTxHelpers();
-
   const { addControllerDelegate } = useController();
   const { approveToken } = useToken();
   const { addPoolDelegate } = usePool();
@@ -99,40 +98,33 @@ export const useAuth = () => {
     _provider.sendAsync( payload, callback );
   });
 
+  const delegationSignature = async (delegationContract:any, delegateAddr:string ) => {
+    const _nonce = await delegationContract.signatureCount(fromAddr) ;
+    const msg: IDelegableMessage = {
+      // @ts-ignore
+      user: fromAddr,
+      delegate: delegateAddr,
+      nonce: _nonce.toHexString(),
+      deadline: MAX_INT,
+    };
+    const domain: IDomain = {
+      name: 'Yield',
+      version: '1',
+      chainId: chainId || 1,
+      verifyingContract: delegationContract.address,
+    };
+    return sendForSig(
+      provider.provider, 
+      'eth_signTypedData_v4', 
+      [fromAddr, createTypedDelegableData(msg, domain)],
+    );
+  };
+
   const handleSignError = (e:any) =>{
     // eslint-disable-next-line no-console
     console.log(e);
     dispatch({ type: 'requestSigs', payload:[] });
     setAuthActive(false);
-  };
-
-  const fallbackYieldAuth = async () => {
-    try {
-      await Promise.all([
-        !hasAuthorisedProxy? approveToken(daiAddr, proxyAddr, MAX_INT, null): null,
-        !hasDelegatedProxy? addControllerDelegate(proxyAddr): null, 
-      ]);
-      setFallbackAuthActive(false);
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.log(e);
-      setFallbackAuthActive(false);     
-    }
-  };
-
-  const fallbackPoolAuth = async ( series:IYieldSeries ) => {
-    try {
-      await Promise.all([
-        !series.hasDaiAuth? approveToken(daiAddr, series.poolAddress, MAX_INT, series):null,
-        !series.hasFyDaiAuth? approveToken(series.fyDaiAddress, proxyAddr, MAX_INT, series):null,
-        !series.hasDelegatedPool? addPoolDelegate(series, proxyAddr):null,
-      ]);
-      setFallbackAuthActive(false);
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.log(e);
-      setFallbackAuthActive(false);      
-    }
   };
 
   /**
@@ -153,25 +145,7 @@ export const useAuth = () => {
       dispatch({ type: 'requestSigs', payload:[ auths.get(1), auths.get(2) ] });
       try {
       /* yieldProxy | Controller delegation */ 
-        const controllerNonce = await controllerContract.signatureCount(fromAddr);
-        const msg: IDelegableMessage = {
-        // @ts-ignore
-          user: fromAddr,
-          delegate: proxyAddr,
-          nonce: controllerNonce.toHexString(),
-          deadline: MAX_INT,
-        };
-        const domain: IDomain = {
-          name: 'Yield',
-          version: '1',
-          chainId: chainId || 1,
-          verifyingContract: controllerAddr,
-        };
-        controllerSig = await sendForSig(
-          provider.provider, 
-          'eth_signTypedData_v4', 
-          [fromAddr, createTypedDelegableData(msg, domain)],
-        );
+        controllerSig = await delegationSignature( controllerContract, proxyAddr); 
         dispatch({ type: 'signed', payload: auths.get(1) });
 
         /* Dai permit yieldProxy */
@@ -213,6 +187,20 @@ export const useAuth = () => {
     }
   };
 
+  const fallbackYieldAuth = async () => {
+    try {
+      await Promise.all([
+        !hasAuthorisedProxy? approveToken(daiAddr, proxyAddr, MAX_INT, null): null,
+        !hasDelegatedProxy? addControllerDelegate(proxyAddr): null, 
+      ]);
+      setFallbackAuthActive(false);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log(e);
+      setFallbackAuthActive(false);     
+    }
+  };
+
   /**
    * Series/Pool authorizations that are required for each series.
    * 
@@ -238,30 +226,13 @@ export const useAuth = () => {
     };
 
     /* if user account preferences don't specify using fallback, OR, a previous auth failed on SOME txs */
-    if (!fallback && (!series.hasDaiAuth && !series.hasFyDaiAuth && !series.hasDelegatedPool) ) {
+    if (!fallback && (!series.hasDaiAuth && !series.hasFyDaiAuth && !series.hasPoolDelegatedProxy) ) {
       setAuthActive(true);
       dispatch({ type: 'requestSigs', payload:[ auths.get(3), auths.get(4), auths.get(5) ] });
       try {
+
         /* YieldProxy | Pool delegation */
-        const poolNonce = await poolContract.signatureCount(fromAddr);
-        const msg: IDelegableMessage = {
-          // @ts-ignore
-          user: fromAddr,
-          delegate: proxyAddr,
-          nonce: poolNonce.toHexString(),
-          deadline: MAX_INT,
-        };
-        const domain: IDomain = {
-          name: 'Yield',
-          version: '1',
-          chainId: chainId || 1,
-          verifyingContract: poolAddr,
-        };
-        poolSig = await sendForSig(
-          provider.provider, 
-          'eth_signTypedData_v4', 
-          [fromAddr, createTypedDelegableData(msg, domain)],
-        );
+        poolSig = await delegationSignature( poolContract, proxyAddr);
         dispatch({ type: 'signed', payload: auths.get(3) });
 
         /* Dai permit pool */
@@ -310,9 +281,25 @@ export const useAuth = () => {
     }
   };
 
+  const fallbackPoolAuth = async ( series:IYieldSeries ) => {
+    try {
+      await Promise.all([
+        !series.hasDaiAuth? approveToken(daiAddr, series.poolAddress, MAX_INT, series):null,
+        !series.hasFyDaiAuth? approveToken(series.fyDaiAddress, proxyAddr, MAX_INT, series):null,
+        !series.hasPoolDelegatedProxy? addPoolDelegate(series, proxyAddr):null,
+      ]);
+      setFallbackAuthActive(false);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log(e);
+      setFallbackAuthActive(false);      
+    }
+  };
+
   return {
     yieldAuth,
     poolAuth,
+    delegationSignature,
     authActive, 
     fallbackAuthActive,
   };

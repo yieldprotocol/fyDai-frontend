@@ -204,7 +204,7 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
           onClick={()=> removeLiquidityProcedure(inputValue)}
           label={`Remove ${inputValue || ''} tokens`}
           disabled={removeLiquidityDisabled}
-          hasDelegatedPool={activeSeries?.hasDelegatedPool}
+          hasPoolDelegatedProxy={activeSeries?.hasPoolDelegatedProxy}
           clearInput={()=>setInputValue(undefined)}
         />
 

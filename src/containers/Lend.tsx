@@ -304,7 +304,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
                   onClick={()=>lendProcedure()}
                   label={`Lend ${inputValue || ''} DAI`}
                   disabled={lendDisabled}
-                  hasDelegatedPool={activeSeries.hasDelegatedPool}
+                  hasPoolDelegatedProxy={activeSeries.hasPoolDelegatedProxy}
                   clearInput={()=>setInputValue(undefined)}
                 />       
               </Box>

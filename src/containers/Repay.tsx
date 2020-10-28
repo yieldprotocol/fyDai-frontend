@@ -199,7 +199,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
                     onClick={()=>repayProcedure(inputValue)}
                     label={`Repay ${inputValue || ''} DAI`}
                     disabled={repayDisabled}
-                    hasDelegatedPool={true}
+                    hasPoolDelegatedProxy={true}
                     clearInput={()=>setInputValue(undefined)}
                   />
 

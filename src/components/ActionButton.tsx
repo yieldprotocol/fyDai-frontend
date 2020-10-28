@@ -52,7 +52,7 @@ function ActionButton({ ...props }:any ) {
   return (
     <>
       {/* Handles the 'ALL clear to transact' case for mobile and other */}
-      { hasDelegatedProxy && props.hasDelegatedPool && !props.disabled &&
+      { hasDelegatedProxy && props.hasPoolDelegatedProxy && !props.disabled &&
        ( !mobile ? 
          <StyledBox 
            {...props} 
@@ -145,7 +145,7 @@ function ActionButton({ ...props }:any ) {
 
       {/* Handles the 'No Series auth' case */}
       { hasDelegatedProxy && 
-        !props.hasDelegatedPool &&
+        !props.hasPoolDelegatedProxy &&
         !props.disabled &&
         <Authorization 
           authWrap

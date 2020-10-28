@@ -62,7 +62,7 @@ const Redeem  = ({ close }:IRedeemProps)  => {
           onClick={()=>redeemProcedure()} 
           label={`Redeem ${activeSeries?.fyDaiBalance_ || ''} Dai`}
           disabled={redeemDisabled}
-          hasDelegatedPool={true}
+          hasPoolDelegatedProxy={true}
         />
       </>}
       { redeemActive && !txActive && <ApprovalPending /> } 
