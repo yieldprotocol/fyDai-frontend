@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from 'react';
-import { ethers, BigNumber, Contract }  from 'ethers';
+import { ethers, BigNumber }  from 'ethers';
 import * as utils from '../utils';
 
 import { IDelegableMessage, IDomain, IYieldSeries } from '../types';
@@ -168,10 +168,10 @@ export const useTempProxy = () => {
       /* Deal wth the signtures */ 
       try {
 
-        console.log(authorizations.hasDelegatedAltProxy, series.hasPoolDelegatedAltProxy );
-
         /* AltProxy | Controller delegation if required */ 
         const controllerContract = new ethers.Contract( deployedContracts.Controller, Controller.abi, provider);
+
+        console.log(controllerContract.address);
         controllerSig = !authorizations.hasDelegatedAltProxy? await delegationSignature( controllerContract, deployedContracts.PoolProxy) : '0x';
         dispatch({ type: 'signed', payload: auths.get(1) });
 
@@ -186,7 +186,7 @@ export const useTempProxy = () => {
           handleSignError(e);
           // eslint-disable-next-line no-console
           console.log('Fallback to approval transactions');
-          await fallbackRemoveLiquididty(series, tokens);
+          await fallbackRemoveLiquidity(series, tokens);
           return;
         }
         handleSignError(e);
@@ -211,6 +211,7 @@ export const useTempProxy = () => {
           } else {
             throw(preview);
           }
+
           tx = await tempProxyContract.removeLiquidityEarlyDaiFixedWithSignature(
             poolAddr, 
             parsedTokens, 
@@ -234,16 +235,17 @@ export const useTempProxy = () => {
         return;
       }
       await handleTx({ tx, msg: `Removing ${tokens} DAI liquidity from ${series.displayNameMobile}`, type:'REMOVE_LIQUIDITY', series });
+
     } else {
       handleSignError('Fallback to approval transactions');
-      await fallbackRemoveLiquididty(series, tokens);
+      await fallbackRemoveLiquidity(series, tokens);
     }
   };
 
 
   /* or, if the user is using the fallback approval transactions  */ 
 
-  const fallbackRemoveLiquididty = async (
+  const fallbackRemoveLiquidity = async (
     series: IYieldSeries,  
     tokens: number|BigNumber,
   ) => {
@@ -260,7 +262,7 @@ export const useTempProxy = () => {
       await Promise.all([
         !authorizations.delegatedAltProxy ? addControllerDelegate(deployedContracts.PoolProxy): null,
         !series.hasPoolDelegatedAltProxy ? addPoolDelegate(series, deployedContracts.PoolProxy): null, 
-      ]).then((s)=>console.log(s));
+      ]);
 
       let tx:any;
       // let minDai:BigNumber;
@@ -288,8 +290,7 @@ export const useTempProxy = () => {
       } else {
 
         // eslint-disable-next-line no-console
-        console.log('Removing liquidity AFTER maturity "with signature" FALLBACK to approval txs');
-        
+        console.log('Removing liquidity AFTER maturity "with signature" FALLBACK to approval txs');      
         tx = await tempProxyContract.removeLiquidityMatureWithSignature(
           poolAddr, 
           parsedTokens, 
