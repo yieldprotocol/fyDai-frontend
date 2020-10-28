@@ -18,6 +18,7 @@ import { useTxHelpers } from './txHooks';
 import { useController } from './controllerHook';
 
 const MAX_INT = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+
 const EIP712Domain = [
   { name: 'name', type: 'string' },
   { name: 'version', type: 'string' },
@@ -165,13 +166,11 @@ export const useTempProxy = () => {
 
       dispatch({ type: 'requestSigs', payload:[ auths.get(1), auths.get(2) ] });
 
-      /* Deal wth the signtures */ 
+      /* Deal wth the signtures in a try..catch */ 
       try {
 
         /* AltProxy | Controller delegation if required */ 
         const controllerContract = new ethers.Contract( deployedContracts.Controller, Controller.abi, provider);
-
-        console.log(controllerContract.address);
         controllerSig = !authorizations.hasDelegatedAltProxy? await delegationSignature( controllerContract, deployedContracts.PoolProxy) : '0x';
         dispatch({ type: 'signed', payload: auths.get(1) });
 
@@ -223,6 +222,7 @@ export const useTempProxy = () => {
         } else {
           // eslint-disable-next-line no-console
           console.log('Removing liquidity AFTER maturity with signature ');
+
           tx = await tempProxyContract.removeLiquidityMatureWithSignature(
             poolAddr, 
             parsedTokens,
@@ -252,34 +252,31 @@ export const useTempProxy = () => {
 
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const parsedTokens = BigNumber.isBigNumber(tokens)? tokens : ethers.utils.parseEther(tokens.toString());
-
     const overrides = { 
       gasLimit: BigNumber.from('600000')
     };
 
     try {
-
       await Promise.all([
-        !authorizations.delegatedAltProxy ? addControllerDelegate(deployedContracts.PoolProxy): null,
+        !authorizations.hasDelegatedAltProxy ? addControllerDelegate(deployedContracts.PoolProxy): null,
         !series.hasPoolDelegatedAltProxy ? addPoolDelegate(series, deployedContracts.PoolProxy): null, 
       ]);
 
       let tx:any;
-      // let minDai:BigNumber;
       let minFYDai:BigNumber;
 
       if ( !series.isMature() ) {
-
         // eslint-disable-next-line no-console
-        console.log('Removing liquidity BEFORE maturity "with signature" FALLBACK to approval txs');
+        console.log('Removing liquidity BEFORE maturity "with signature" with FALLBACK to approval txs');
 
-        /* calculate expected trade values  */      
+        /* calculate expected trade values  */    
         const preview = await previewPoolTx('buydai', series, ethers.utils.parseEther('1'));   
         if ( !(preview instanceof Error) ) {
           minFYDai = utils.divRay( preview.mul(BigNumber.from('1000000000')), utils.toRay(1.1));
         } else {
           throw(preview);
-        }     
+        }
+
         tx = await tempProxyContract.removeLiquidityEarlyDaiFixedWithSignature(
           poolAddr, 
           parsedTokens, 
@@ -288,12 +285,12 @@ export const useTempProxy = () => {
           '0x',
           overrides );
       } else {
-
         // eslint-disable-next-line no-console
-        console.log('Removing liquidity AFTER maturity "with signature" FALLBACK to approval txs');      
+        console.log('Removing liquidity AFTER maturity "with signature" with FALLBACK to approval txs'); 
+
         tx = await tempProxyContract.removeLiquidityMatureWithSignature(
           poolAddr, 
-          parsedTokens, 
+          parsedTokens,
           '0x',
           '0x',
           { gasLimit: BigNumber.from('500000') } );
@@ -302,9 +299,10 @@ export const useTempProxy = () => {
       await handleTx({ tx, msg: `Removing ${tokens} DAI liquidity from ${series.displayNameMobile}`, type:'REMOVE_LIQUIDITY', series });
 
     } catch (e) {
+
       // eslint-disable-next-line no-console
       console.log(e);
-           
+
     }
   };
 
