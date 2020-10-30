@@ -80,7 +80,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
         <Box gap='small'>
           <Box direction='row' gap='medium' align='center'>
             <Box onClick={() => close()}><ArrowLeft /></Box>
-            <Text weight='bold' size={mobile?'small':'medium'} style={{ textTransform: 'capitalize' }}> Choose a Series</Text>
+            <Text weight='bold' size={mobile?'small':'medium'}> Choose a Series</Text>
           </Box>
           <Text alignSelf='start' size={mobile?'xxsmall':'small'} color='text-weak'>Select a series from the list below</Text>
         </Box>

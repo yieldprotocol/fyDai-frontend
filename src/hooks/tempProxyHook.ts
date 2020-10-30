@@ -47,8 +47,8 @@ export const useTempProxy = () => {
 
   /* Temporary signing messages */
   const auths = new Map([
-    [1, { id: 'removeLiquidity1', desc:'Authorize Yield proxy to use interact with Dai' }],
-    [2, { id: 'removeLiquidity2', desc:'Authorize Yield Series to move your fyDai tokens to repay Dai debt.' }],
+    [1, { id: 'removeLiquidity1', desc:'Authorize Yield proxy to interact with Dai' }],
+    [2, { id: 'removeLiquidity2', desc:'Authorize Yield to move your fyDai tokens to repay Dai debt.' }],
   ]);
   
   /* Preset the poolProxy contract to be used with all fns */
@@ -169,16 +169,18 @@ export const useTempProxy = () => {
         }
       } catch (e) {
         handleTxRejectError(e);
+        dispatch({ type: 'requestSigs', payload:[] });
         return;
       }
       await handleTx({ tx, msg: `Removing ${tokens} DAI liquidity from ${series.displayNameMobile}`, type:'REMOVE_LIQUIDITY', series });
+      dispatch({ type: 'requestSigs', payload:[] });
 
     } else {
       handleSignError('Fallback to approval transactions');
+      dispatch({ type: 'requestSigs', payload:[] });
       await fallbackRemoveLiquidity(series, tokens);
     }
   };
-
 
   /* or, if the user is using the fallback approval transactions  */ 
   const fallbackRemoveLiquidity = async (
@@ -204,8 +206,8 @@ export const useTempProxy = () => {
       await Promise.all([
         !authorizations.hasDelegatedAltProxy ? addControllerDelegate(deployedContracts.PoolProxy): null,
         !series.hasPoolDelegatedAltProxy ? addPoolDelegate(series, deployedContracts.PoolProxy): null, 
-      ]);
-      
+      ]).catch((e:any) => handleSignError(e));
+
       dispatch({ type: 'requestSigs', payload:[] });
 
       let tx:any;
@@ -247,6 +249,7 @@ export const useTempProxy = () => {
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log(e);
+      dispatch({ type: 'requestSigs', payload:[] });
     }
   };
 
