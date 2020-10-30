@@ -1,18 +1,19 @@
 import { BigNumber } from 'ethers';
 
 export interface IYieldSeries {
-  name: string
   displayName: string;
+  displayNameMobile: string;
   maturity: number;
   maturity_: Date;
   poolAddress: string;
   fyDaiAddress: string;
   liquidityProxyAddress: string;
-  hasDelegatedPool: boolean;
+  hasPoolDelegatedProxy: boolean;
+  hasPoolDelegatedAltProxy: boolean;
   hasDaiAuth: boolean;
   hasFyDaiAuth: boolean;
-  hasCloseAuth:boolean;
-  authComplete:boolean;
+  hasCloseAuth: boolean;
+  authComplete: boolean;
   isMature: any; // function typeScript this out
   fyDaiBalance_: number;
   fyDaiBalance: BigNumber;
@@ -21,11 +22,14 @@ export interface IYieldSeries {
   poolTokens?:  BigNumber;
   poolTokens_?: number;
   poolState?: any;
+  poolPercent_?:string;
   symbol?: string;
   id?: string;
   currentValue?: any;
-  seriesColor?: string;
-  seriesTextColor?:string;
+  seriesColor: string;
+  seriesDarkColor: string;
+  seriesLightColor: string;
+  seriesTextColor:string;
   wethDebtDai?: BigNumber;
   wethDebtDai_?: number;
   wethDebtFYDai?: BigNumber;
@@ -79,10 +83,18 @@ export interface INotification {
 }
 
 export interface ITx {
+  tx: any, 
+  msg: string,
+  type: string,
+  series: IYieldSeries|null,
+}
+
+export interface ITxState {
   pendingTxs?: any,
   lastCompletedTx?: any,
   requestedSigs?: any,
 }
+
 
 export interface IDelegableMessage {
   user: string;

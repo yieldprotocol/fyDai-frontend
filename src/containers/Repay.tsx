@@ -199,7 +199,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
                     onClick={()=>repayProcedure(inputValue)}
                     label={`Repay ${inputValue || ''} DAI`}
                     disabled={repayDisabled}
-                    hasDelegatedPool={true}
+                    hasPoolDelegatedProxy={true}
                     clearInput={()=>setInputValue(undefined)}
                   />
 
@@ -240,7 +240,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
           </Box>
         </Box>}
       { repayActive && !txActive && <ApprovalPending /> }
-      { txActive && <TxStatus msg={`You are repaying ${inputValue} DAI`} tx={txActive} /> }
+      { txActive && <TxStatus tx={txActive} /> }
 
       {mobile && 
       !activeSeries?.isMature() && 

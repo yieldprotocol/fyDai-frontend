@@ -10,12 +10,15 @@ import YieldProxy from '../contracts/YieldProxy.json';
 import { TxContext } from '../contexts/TxContext';
 import { YieldContext } from '../contexts/YieldContext';
 import { UserContext } from '../contexts/UserContext';
+import { SeriesContext } from '../contexts/SeriesContext';
 
 import { useSignerAccount } from './connectionHooks';
 import { usePool } from './poolHook';
 import { useMath } from './mathHooks';
 import { useToken } from './tokenHook';
 import { useTxHelpers } from './txHooks';
+
+import { useTempProxy } from './tempProxyHook';
 
 const MAX_INT = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
 
@@ -46,6 +49,7 @@ export const useProxy = () => {
   /* contexts */
   const  { dispatch }  = useContext<any>(TxContext);
   const  { state: { deployedContracts } }  = useContext<any>(YieldContext);
+  const  { state: { seriesData } }  = useContext<any>(SeriesContext);
   const  { state: { preferences: { slippage, useTxApproval } } }  = useContext<any>(UserContext);
 
   /* hooks */ 
@@ -53,7 +57,9 @@ export const useProxy = () => {
   const { previewPoolTx } = usePool();
   const { splitDaiLiquidity } = useMath();
   const { getBalance, approveToken } = useToken();
-  const { handleTx, handleTxBuildError } = useTxHelpers();
+  const { handleTx, handleTxRejectError } = useTxHelpers();
+
+  const { removeLiquidityWithSignature } = useTempProxy();
   
   /* Activity flags */
   const [ postEthActive, setPostEthActive ] = useState<boolean>(false);
@@ -93,7 +99,6 @@ export const useProxy = () => {
       yieldProxyAbi,
       signer
     ));
-
   }, [signer, deployedContracts, yieldProxyAbi ]);
 
   /**
@@ -116,14 +121,14 @@ export const useProxy = () => {
     try {
       tx = await proxyContract.post(toAddr, { value: parsedAmount }); 
     } catch (e) {
-      handleTxBuildError(e);
+      handleTxRejectError(e);
       setPostEthActive(false);
       return;
     }
-    dispatch({ type: 'txPending', payload:{ tx, message: `Deposit of ${amount} ETH pending...`, type:'DEPOSIT' } } );
-    await handleTx(tx);
+    await handleTx({ tx, msg: `Depositing ${amount} ETH`, type:'DEPOSIT', series: null });
     setPostEthActive(false);
   };
+
 
   /**
    * @dev Withdraw ETH collateral via YieldProxy
@@ -143,14 +148,14 @@ export const useProxy = () => {
     try {
       tx = await proxyContract.withdraw(toAddr, parsedAmount);
     } catch (e) {
-      handleTxBuildError(e);
+      handleTxRejectError(e);
       setWithdrawEthActive(false);
       return;
     }
-    dispatch({ type: 'txPending', payload:{ tx, message: `Withdraw of ${amount} ETH pending...`, type:'WITHDRAW' } } );
-    await handleTx(tx);
+    await handleTx({ tx, msg: `Withdrawing ${amount} ETH `, type:'WITHDRAW', series: null });
     setWithdrawEthActive(false);
   };
+
 
   /**
    * @dev Borrow fyDai from Controller and sell it immediately for Dai, for a maximum fyDai debt.
@@ -201,13 +206,11 @@ export const useProxy = () => {
       );
 
     } catch (e) {
-      handleTxBuildError(e); 
+      handleTxRejectError(e); 
       setBorrowActive(false);
       return;
     }
-
-    dispatch({ type: 'txPending', payload:{ tx, message: `Borrowing ${daiToBorrow} Dai pending...`, type:'BORROW' } } );
-    await handleTx(tx);
+    await handleTx({ tx, msg: `Borrowing ${daiToBorrow} Dai from ${series.displayNameMobile}`, type:'BORROW', series });
     setBorrowActive(false);
   };
 
@@ -233,7 +236,6 @@ export const useProxy = () => {
     const fromAddr = account && ethers.utils.getAddress(account);
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const parsedMaturity = series.maturity.toString();
-
     const overrides = {
       gasLimit: BigNumber.from('250000')
     };
@@ -260,7 +262,7 @@ export const useProxy = () => {
           dispatch({ type: 'signed', payload: auths.get(1) });
           dispatch({ type: 'requestSigs', payload: [] });
         } catch (e) { 
-          handleTxBuildError(e);
+          handleTxRejectError(e);
           dispatch({ type: 'requestSigs', payload: [] });
           setRepayActive(false);
           return;
@@ -298,22 +300,21 @@ export const useProxy = () => {
       } else {
         // eslint-disable-next-line no-console
         console.log('Series has passed its maturity date, but has not yet been matured');
-      }     
-      
+      }      
     } catch (e) {
-      handleTxBuildError(e);
+      handleTxRejectError(e);
       setRepayActive(false);
       return;
     }
-    dispatch({ type: 'txPending', payload:{ tx, message: `Repaying ${repaymentInDai} Dai pending...`, type:'REPAY' } } );
-    await handleTx(tx);
+    await handleTx({ tx, msg: `Repaying ${repaymentInDai} Dai to ${series.displayNameMobile}`, type:'REPAY', series });
     setRepayActive(false);
   };
+
 
   /**
    * LIQUIDITY SECTION
    */
-  
+
   /**
    * @dev Add liquidity to a pool 
    * 
@@ -347,17 +348,17 @@ export const useProxy = () => {
       maxFYDai = utils.mulRay(fyDaiSplit, utils.toRay(1.1));
       tx = await proxyContract.addLiquidity(poolAddr, parsedDaiUsed, maxFYDai, overrides);
     } catch (e) {
-      handleTxBuildError(e);
+      handleTxRejectError(e);
       setAddLiquidityActive(false);
       return;
     }
-    dispatch({ type: 'txPending', payload:{ tx, message: `Adding ${daiUsed} DAI liquidity pending...`, type:'ADD_LIQUIDITY' } } );
-    await handleTx(tx);
+    await handleTx({ tx, msg: `Adding ${daiUsed} DAI liquidity to ${series.displayNameMobile}`, type:'ADD_LIQUIDITY', series });
     setAddLiquidityActive(false);
   };
 
+
   /**
-   * @dev removes liquidity from a pool
+   * @dev removes liquidity from a pool - redirects to removal with/without signature
    * 
    * @param {IYieldSeries} series series to act on.
    * @param {number|BigNumber} tokens amount of tokens to remove. 
@@ -365,8 +366,30 @@ export const useProxy = () => {
    * @note if BigNumber is used make sure it is in WEI
    */
   const removeLiquidity = async (
-    // removeLiquidityEarly(address from, uint256 poolTokens, uint256 DaiLimit)
-    // removeLiquidityMature(address from, uint256 poolTokens)
+    series: IYieldSeries,  
+    tokens: number|BigNumber,
+  ) => {
+    setRemoveLiquidityActive(true);
+    /* if the user has pool tokens in more than one series, then direct them to the temp proxy */
+    if ( Array.from(seriesData).filter(([ key, value ]: any) => value.poolTokens > 0 ).length > 1  ) {
+      /* temporary proxy patched for removing liquidity if user has liquidity in more than one series */
+      await removeLiquidityWithSignature(series, tokens);
+    } else {
+      /* else remove liquidity with no signature */
+      await removeLiquidityNoSignature(series, tokens);
+    }
+    setRemoveLiquidityActive(false);
+  };
+  
+
+  /**
+   * 
+   * @param {IYieldSeries} series series to act on.
+   * @param {number|BigNumber} tokens amount of tokens to remove. 
+   * 
+   * @note if BigNumber is used make sure it is in WEI
+   */
+  const removeLiquidityNoSignature = async (
     series: IYieldSeries,  
     tokens: number|BigNumber,
   ) => {
@@ -380,13 +403,13 @@ export const useProxy = () => {
 
     /* Contract interaction */
     let tx:any;
-    // let minDai:BigNumber;
     let minFYDai:BigNumber;
-    setRemoveLiquidityActive(true);
+
     try {
       if ( !series.isMature() ) {
         // eslint-disable-next-line no-console
         console.log('Removing liquidity BEFORE maturity');
+        
         /* calculate expected trade values  */      
         const preview = await previewPoolTx('buydai', series, ethers.utils.parseEther('1'));   
         if ( !(preview instanceof Error) ) {
@@ -394,21 +417,18 @@ export const useProxy = () => {
         } else {
           throw(preview);
         }
-
         tx = await proxyContract.removeLiquidityEarlyDaiFixed(poolAddr, parsedTokens, minFYDai, overrides );
-
       } else {
-        console.log('removing liquidity AFTER maturity');
+        console.log('Removing liquidity AFTER maturity');
         tx = await proxyContract.removeLiquidityMature(poolAddr, parsedTokens, { gasLimit: BigNumber.from('500000') } );
       }
     } catch (e) {
-      handleTxBuildError(e);
+      handleTxRejectError(e);
       setRemoveLiquidityActive(false);
       return;
     }
-    dispatch({ type: 'txPending', payload:{ tx, message: `Removing ${tokens} DAI liquidity pending...`, type:'REMOVE_LIQUIDITY' } } );
-    await handleTx(tx);
-    setRemoveLiquidityActive(false);
+    await handleTx({ tx, msg: `Removing ${tokens} DAI liquidity from ${series.displayNameMobile}`, type:'REMOVE_LIQUIDITY', series });
+
   };
 
 
@@ -444,25 +464,23 @@ export const useProxy = () => {
       const preview = await previewPoolTx('selldai', series, daiIn);
       if ( !(preview instanceof Error) ) {
         minFYDaiOut = valueWithSlippage(preview, true);
+        tx = await proxyContract.sellDai(poolAddr, toAddr, parsedDaiIn, minFYDaiOut, overrides);
       } else {
         // minFYDaiOut = ethers.utils.parseEther('0');
         throw(preview);
       }
-      tx = await proxyContract.sellDai(poolAddr, toAddr, parsedDaiIn, minFYDaiOut, overrides);
+      // tx = await proxyContract.sellDai(poolAddr, toAddr, parsedDaiIn, minFYDaiOut, overrides);
     } catch (e) {
-      handleTxBuildError(e);
+      handleTxRejectError(e);
       setSellActive(false);
       return;
     }
-    dispatch({ type: 'txPending', payload:{ tx, message: `Selling ${daiIn} DAI pending...`, type:'SELL_DAI' } } );
-    await handleTx(tx);
+    await handleTx({ tx, msg: `Lending ${daiIn} DAI to ${series.displayNameMobile} `, type:'SELL_DAI', series });
     setSellActive(false);
   };
 
-
-
   /**
-   * @dev Buy Dai with fyDai
+   * @dev This selects which type of buy to use depending on maturity and authorisations.
    * @param {IYieldSeries} series yield series to act on.
    * @param daiOut Amount of dai being bought
    * */ 
@@ -529,12 +547,11 @@ export const useProxy = () => {
       tx = await proxyContract.buyDai(poolAddr, toAddr, parsedDaiOut, maxFYDaiIn, overrides);
 
     } catch (e) {
-      handleTxBuildError(e);
+      handleTxRejectError(e);
       setBuyActive(false);
       return;
     }
-    dispatch({ type: 'txPending', payload:{ tx, message: `Buying back ${daiOut} DAI pending...`, type:'BUY_DAI' } } );
-    await handleTx(tx);
+    await handleTx({ tx, msg: `Closing ${daiOut} DAI from ${series.displayNameMobile}`, type:'BUY_DAI', series });
     setBuyActive(false);
   };
 
@@ -610,12 +627,11 @@ export const useProxy = () => {
         overrides
       );
     } catch (e) {
-      handleTxBuildError(e);  
+      handleTxRejectError(e);  
       setBuyActive(false);
       return;
     }
-    dispatch({ type: 'txPending', payload:{ tx, message: `Buying back ${daiOut} DAI pending...`, type:'BUY_DAI' } } );
-    await handleTx(tx);
+    await handleTx({ tx, msg: `Closing ${daiOut} DAI from ${series.displayNameMobile}`, type:'BUY_DAI', series });
     setBuyActive(false);
   };
 

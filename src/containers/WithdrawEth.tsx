@@ -186,7 +186,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
           onClick={()=> withdrawProcedure()}
           label={`Withdraw ${inputValue || ''} Eth`}
           disabled={withdrawDisabled}
-          hasDelegatedPool={true}
+          hasPoolDelegatedProxy={true}
           clearInput={()=>setInputValue(undefined)}
         />  
           
@@ -217,7 +217,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
           gap='medium'
           justify='between'
         > 
-          <TxStatus msg={`You are withdrawing ${inputValue} ETH`} tx={txActive} />
+          <TxStatus tx={txActive} />
 
           <Box alignSelf='start'>
             <Box

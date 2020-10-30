@@ -25,7 +25,7 @@ export function useToken() {
   // const { state: { provider, account } } = useContext(ConnectionContext);
   const { signer, provider, account, fallbackProvider } = useSignerAccount();
   const  { dispatch }  = useContext<any>(TxContext);
-  const { handleTx, handleTxBuildError } = useTxHelpers();
+  const { handleTx, handleTxRejectError } = useTxHelpers();
 
   /**
    * Get the user account balance of ETH  (omit args) or an ERC20token (provide args)
@@ -108,12 +108,11 @@ export function useToken() {
     try {
       tx = await contract.approve(delegateAddr, parsedAmount);
     } catch (e) {
-      handleTxBuildError(e);
+      handleTxRejectError(e);
       return e;
     }
     /* Transaction reporting & tracking */
-    dispatch({ type: 'txPending', payload:{ tx, message: 'Token authorization pending...', type: 'AUTH', series: series?.maturity||null } } );
-    await handleTx(tx);
+    await handleTx({ tx, msg: 'Token authorization pending...', type: 'AUTH', series: series||null });
   };
 
   return { approveToken, getTokenAllowance, getBalance } as const;

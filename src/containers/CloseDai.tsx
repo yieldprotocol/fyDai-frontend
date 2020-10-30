@@ -143,7 +143,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
             onClick={()=> withdrawProcedure()}
             label={`Reclaim ${inputValue || ''} Dai`}
             disabled={withdrawDisabled}
-            hasDelegatedPool={activeSeries.hasDelegatedPool}
+            hasPoolDelegatedProxy={activeSeries.hasPoolDelegatedProxy}
             clearInput={()=>setInputValue(undefined)}
           />
           
@@ -172,11 +172,11 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
           <ApprovalPending />}
 
         { txActive?.type === 'AUTH' && 
-          <TxStatus msg='Approval transaction pending...' tx={txActive} />}
+          <TxStatus tx={txActive} />}
 
         { txActive?.type === 'BUY_DAI' &&
         <>
-          <TxStatus msg={`You are closing ${inputValue} DAI`} tx={txActive} />
+          <TxStatus tx={txActive} />
           <Box alignSelf='start'>
             <Box
               round

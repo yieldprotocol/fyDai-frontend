@@ -2,15 +2,16 @@ import React, { useEffect, useState, useContext } from 'react';
 import { Box, Text } from 'grommet';
 import { UserContext } from '../contexts/UserContext';
 import { TxContext } from '../contexts/TxContext';
-import FlatButton from './FlatButton';
+import RaisedButton from './RaisedButton';
 import EtherscanButton from './EtherscanButton';
 import Loading from './Loading';
 import HashWrap from './HashWrap';
 import { abbreviateHash } from '../utils';
+import FlatButton from './FlatButton';
 
 const TxRecent = ({ setView }: any) => {
 
-  const { state: { lastCompletedTx, pendingTxs } } = useContext(TxContext);
+  const { state: { lastCompletedTx, pendingTxs }, dispatch } = useContext(TxContext);
   const { state: { txHistory } } = useContext(UserContext);
 
   const [ lastTx, setLastTx] = useState<any>(null);
@@ -22,72 +23,93 @@ const TxRecent = ({ setView }: any) => {
   }, [txHistory]);
 
   return (
-    <Box pad="small" gap="small">
-      <Box direction='row' justify='between'>
+    <Box gap="medium" pad='small'>
+
+      <Box direction='row' gap='medium' align='center' justify='between'>
         <Text alignSelf='start' size='large' color='brand' weight='bold'>Transactions</Text>   
-        <Box round>
-          <FlatButton
-            onClick={()=>setView()}
-            label={<Text size='xsmall'>View full history</Text>}
-          /> 
-        </Box>
+        <RaisedButton
+          onClick={()=>setView()}
+          label={<Box pad={{ vertical:'xsmall', horizontal:'xsmall' }}><Text size='xxsmall'>Full history</Text></Box>}
+        /> 
       </Box> 
 
-      {lastTx &&
-      <Box
-        pad={{ vertical:'small' }}
-        gap='small'
-        align='start'
-      >
-        <Text weight='bold' size='xxsmall'>Last successful transaction: </Text>
-        <HashWrap hash={lastTx?.transactionHash}> 
-          <Text size='xxsmall'>{lastTx?.transactionHash} </Text>    
-        </HashWrap> 
-        <Box> 
-          <EtherscanButton txHash={lastTx?.transactionHash} />
-        </Box>
-      </Box>}
+      <Box gap='xsmall'>
+        {lastTx &&
+        <Box 
+          direction='row'
+          justify='between'
+          align='center'
+          gap='small'
+        >
+          <Text size='xsmall'>Last successful transaction: </Text>
+          <HashWrap hash={lastTx?.transactionHash}> 
+            <Box direction='row' gap='medium' align='center'>
+              <Text weight='bold' size='xsmall'>{abbreviateHash(lastTx?.transactionHash, 8)} </Text>  
+              <EtherscanButton txHash={lastTx?.transactionHash} /> 
+            </Box> 
+          </HashWrap> 
+        </Box>}
+    
+        {lastCompletedTx &&
+        <Box
+          gap='small'
+          align='center'
+          direction='row'
+          justify='between'
+        > 
+          <Text size='xsmall'>Last transaction this session: </Text>
+          <HashWrap hash={lastCompletedTx?.transactionHash}> 
+            <Box direction='row' gap='medium' align='center'>
+              <Text weight='bold' size='xsmall'>{abbreviateHash(lastCompletedTx?.transactionHash, 8)} </Text>  
+              <EtherscanButton txHash={lastCompletedTx?.transactionHash} /> 
+            </Box> 
+          </HashWrap> 
+        </Box>}
 
-      { lastCompletedTx && 
-      <Box
-        pad={{ vertical:'small' }}
-        gap='small'
-        align='start'
-      >
-        <Text weight='bold' size='xxsmall'>Last transaction this session: </Text>
-        <HashWrap hash={lastCompletedTx.transactionHash}> 
-          <Text size='xxsmall'>{lastCompletedTx.transactionHash} </Text>   
-        </HashWrap>
-        <Box>
-          <EtherscanButton txHash={lastCompletedTx?.transactionHash} /> 
-        </Box>
-      </Box>}
+        { pendingTxs.length>0 && 
+        <Box gap='small'>
+          <Text size='xsmall'>Pending Transactions: </Text>
+          <Box
+            round='xsmall'
+            border='all'
+            pad='xsmall'
+          >
+          
+            { pendingTxs.map((x:any)=>(
+            
+              <Box
+                gap='small'
+                align='center'
+                direction='row'
+                key={x.tx.hash}
+              >       
+                <Text weight='bold' size='xxsmall'> {x.msg} </Text>
+                <HashWrap hash={x.tx.hash}> 
+                  <Box direction='row' gap='medium' align='center'>
+                    <Text weight='bold' size='xxsmall'>{abbreviateHash(x.tx.hash, 4)} </Text>  
+                    <EtherscanButton txHash={x.tx.hash} />
+                  </Box>
+                </HashWrap>
+                <FlatButton 
+                  label={<Text size='xxsmall'>Stuck?</Text>}
+                  onClick={()=> dispatch({ type:'txComplete', payload: x.tx })}
+                />
+               
+              </Box>
+            ))}
+          </Box>
+        </Box>}
 
-      { pendingTxs.length>0 && 
-      <Box
-        pad={{ vertical:'small' }}
-        gap='small'
-        align='start'
-      >
-        <Text size='xxsmall'>Last transaction this session: </Text>
-        <Loading condition={lastCompletedTx?.transactionHash} size='small'>
-          <HashWrap hash={lastCompletedTx?.transactionHash}>
-            <Text size='xxsmall'>{lastCompletedTx?.transactionHash} </Text>
-          </HashWrap>
-        </Loading>
-        <Box>
-          <EtherscanButton txHash={lastCompletedTx?.transactionHash} /> 
-        </Box>
-      </Box>}
+        { !lastTx && !lastCompletedTx && !pendingTxs &&
+        <Box
+          pad={{ vertical:'small' }}
+          gap='small'
+          align='start'
+        >
+          <Text size='xsmall'>There are transactions to show. </Text>
+        </Box>}
 
-      { !lastTx && !lastCompletedTx && !pendingTxs &&
-      <Box
-        pad={{ vertical:'small' }}
-        gap='small'
-        align='start'
-      >
-        <Text size='xsmall'>There are transactions to show. </Text>
-      </Box>}
+      </Box>
     </Box>
   );
 };

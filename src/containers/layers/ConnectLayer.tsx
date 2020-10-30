@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
 import {
-  Anchor,
   Layer,
   Image,
   Footer,
@@ -34,7 +33,6 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
   const { handleSelectConnector } = useConnection();
 
   const { account, provider, chainId } = useSignerAccount();
-  const web3React = useWeb3React();
   const [ layerView, setLayerView] = useState<string>(view);
   const [ histOpen, setHistOpen] = useState<string>('BORROW');
 
@@ -60,7 +58,6 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
             width={!mobile?{ min:'620px', max:'620px' }: undefined}
             height={!mobile?{ max:'750px' }: undefined}
             background="background-front"
-            // direction="column"
             fill="vertical"
             style={{
               borderRadius: '0.5rem',
@@ -75,12 +72,12 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
               <Box gap='medium' flex={false}>
                 <Box pad="small" gap="small">
                   <Box direction='row' justify='between'>
-                    <Text alignSelf='start' size='large' color='brand' weight='bold'>Connected Wallet</Text>   
-                    <Box round>
-                      <FlatButton
+                    <Text alignSelf='center' size='large' color='brand' weight='bold'>Connected Wallet</Text>   
+                    <Box direction='row' gap='small'>
+                      <RaisedButton
                         onClick={()=>setLayerView('CONNECT')}
-                        label={<Text size='xsmall'>Change Wallet Provider</Text>}
-                      /> 
+                        label={<Box pad={{ vertical:'xsmall', horizontal:'xsmall' }}><Text size='xxsmall'>Change Wallet Provider</Text></Box>}
+                      />      
                     </Box>
                   </Box>
 
@@ -94,21 +91,16 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                       <Text size='xsmall'> <HashWrap hash={account}>{account}</HashWrap> </Text>                   
                     </Box>               
 
+                    {/* <Box direction='row' justify='between' > */}
                     <Box direction='row' gap='small'>
                       <Text size='xsmall'>ETH balance:</Text>
                       <Text size='xsmall'>{ position?.ethBalance_ || '' }</Text>
                     </Box>
-
                     <Box direction='row' gap='small'>
                       <Text size='xsmall'>DAI balance:</Text>
                       <Text size='xsmall'>{ position?.daiBalance_ || '' }</Text>
                     </Box>
-                  </Box>
-                  <Box direction='row'>
-                    <RaisedButton 
-                      label={<Box pad='xsmall'><Text size='xxsmall'>Disconnect wallet</Text></Box>}
-                      onClick={()=>web3React.deactivate()}
-                    />
+                    {/* </Box> */}
                   </Box>
                 </Box>
 
@@ -118,25 +110,25 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                 <Box pad="small" gap="small" border='all' round='xsmall'>
                   <Box direction='row' justify='between'>
                     <Text alignSelf='start' size='small' weight='bold'>Diagnostics Info</Text> 
-                  </Box>
-                  <Text size='xxsmall'>App Version: Beta 0.2.1</Text>
-                  <Text size='xxsmall'>Connected Network: { provider?.network?.name }</Text>
-                  <Text size='xxsmall'>Yield protocol ref contract: {process.env[`REACT_APP_MIGRATION_${chainId}`]} </Text> 
-                  <Box direction='row'>
                     <RaisedButton 
                       label={<Box pad='xsmall'><Text size='xxsmall'>Factory Reset</Text></Box>}
                     // eslint-disable-next-line no-restricted-globals
                       onClick={()=>{localStorage.clear(); location.reload();}}
-                    />  
-                  </Box>         
+                    /> 
+
+                  </Box>
+                  <Text size='xxsmall'>App Version: Beta 0.2.2</Text>
+                  <Text size='xxsmall'>Connected Network: { provider?.network?.name }</Text>
+                  <Text size='xxsmall'>Yield protocol ref contract: {process.env[`REACT_APP_MIGRATION_${chainId}`]} </Text>       
                 </Box>
               </Box> }
 
               { layerView === 'CONNECT' &&      
-              <Box pad="medium" gap="small">
+              <Box pad="medium" gap="large">
+                <Box align='center'>
+                  <Text size='large' color='brand' weight='bold'>Connect a wallet</Text>
+                </Box>
                 <Box align="center" pad="medium" gap="small">
-                  <Text size='xxlarge' color='brand' weight='bold'>Connect a wallet</Text>
-                  <Text>Try connecting with:</Text>
                   {connectorList.map((x:any, i:number) => {          
                     const ConnectButton = ()=> (
                       <RaisedButton
@@ -165,13 +157,15 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                       />);                 
                     if (x.trial) {
                       return <ExperimentWrap key={x.name}><ConnectButton /></ExperimentWrap>;
-                    // eslint-disable-next-line react/jsx-key
+                      // eslint-disable-next-line react/jsx-key
                     } return <ConnectButton key={x.name} />;
                   }
                   )}
-                  {/* <Box gap="xsmall" direction="row">
-                    <Anchor href='https://ethereum.org/en/learn/' label="Help!" size="xsmall" color="brand" target="_blank" />
-                    <Text size="xsmall"> I'm not sure what this means.</Text>
+                  {/* <Box align='end'>
+                    <FlatButton 
+                      label={<Text size='xxsmall'>Disconnect current wallet</Text>}
+                      onClick={()=>web3React.deactivate()}
+                    /> 
                   </Box> */}
                 </Box>
               </Box>}

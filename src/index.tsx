@@ -31,17 +31,21 @@ ReactDOM.render(
     <Router>
       <Web3ReactProvider getLibrary={getLibrary}> 
         <Web3ReactProviderFallback getLibrary={getFallbackLibrary}> 
+          
           <NotifyProvider>
             <YieldProvider>
               <UserProvider>
                 <SeriesProvider>
                   <TxProvider>
+    
                     <App />
+                    
                   </TxProvider>
                 </SeriesProvider>
               </UserProvider>
             </YieldProvider>
           </NotifyProvider>
+          
         </Web3ReactProviderFallback>
       </Web3ReactProvider>
     </Router>

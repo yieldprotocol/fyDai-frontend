@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from 'react';
+import { useMemo, useEffect, useState, useContext } from 'react';
 import { ethers, BigNumber }  from 'ethers';
 
 import { TxContext } from '../contexts/TxContext';
@@ -39,31 +39,28 @@ export const useController = () => {
   /* controller contract for reading, calls */
   const [controllerProvider, setControllerProvider] = useState<any>();
 
-  const { handleTx, handleTxBuildError } = useTxHelpers();
+  const { handleTx, handleTxRejectError } = useTxHelpers();
 
-  useEffect(()=>{
-
+  useMemo(()=>{
     try {
       deployedContracts.Controller && signer &&
-    setControllerContract( new ethers.Contract( 
-      ethers.utils.getAddress(deployedContracts.Controller), 
-      controllerAbi,
-      signer
-    ));
+      setControllerContract( new ethers.Contract( 
+        ethers.utils.getAddress(deployedContracts.Controller), 
+        controllerAbi,
+        signer
+      ));
 
       deployedContracts.Controller && fallbackProvider &&
-    setControllerProvider( new ethers.Contract( 
-      ethers.utils.getAddress(deployedContracts.Controller), 
-      controllerAbi,
-      fallbackProvider
-    ));
+      setControllerProvider( new ethers.Contract( 
+        ethers.utils.getAddress(deployedContracts.Controller), 
+        controllerAbi,
+        fallbackProvider
+      ));
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log(e);
     }
-
   }, [signer, fallbackProvider, deployedContracts]);
-
 
   /**
    * NB: USE PROXYHOOK FOR ETH-A DEPOSITS
@@ -88,12 +85,11 @@ export const useController = () => {
     try {
       tx = await controllerContract.post(collateralBytes, fromAddr, toAddr, parsedAmount);
     } catch (e) {
-      handleTxBuildError(e);
+      handleTxRejectError(e);
       setPostActive(false);
       return;
     }
-    dispatch({ type: 'txPending', payload:{ tx, message: `Deposit of ${amount} pending...`, type:'DEPOSIT' } } );
-    await handleTx(tx);
+    await handleTx({ tx, msg: `Deposit of ${amount} pending...`, type:'DEPOSIT', series:null });
     setPostActive(false);
   };
 
@@ -121,12 +117,11 @@ export const useController = () => {
     try {
       tx = await controllerContract.withdraw(collateralBytes, fromAddr, toAddr, parsedAmount);
     } catch (e) {
-      handleTxBuildError(e);
+      handleTxRejectError(e);
       setWithdrawActive(false);
       return;
     }
-    dispatch({ type: 'txPending', payload:{ tx, message: `Withdraw of ${amount} pending...`, type:'WITHDRAW' } } );
-    await handleTx(tx);
+    await handleTx({ tx, msg: `Withdraw of ${amount} pending...`, type:'WITHDRAW', series:null });
     setWithdrawActive(false);
   };
 
@@ -159,12 +154,11 @@ export const useController = () => {
     try {
       tx = await controllerContract.borrow(collateralBytes, matdate, fromAddr, toAddr, parsedAmount);
     } catch (e) {
-      handleTxBuildError(e);
+      handleTxRejectError(e);
       setBorrowActive(false);
       return;
     }
-    dispatch({ type: 'txPending', payload:{ tx, message: `Borrowing of ${amount} pending...`, type:'BORROW' } } );
-    await handleTx(tx);
+    await handleTx({ tx, msg: `Borrowing of ${amount} pending...`, type:'BORROW', series: null });
     setBorrowActive(false);
   };
 
@@ -203,12 +197,11 @@ export const useController = () => {
         tx = await controllerContract.repayDai(collateralBytes, maturity, fromAddr, toAddr, parsedAmount);
       }
     } catch (e) {
-      handleTxBuildError(e);
+      handleTxRejectError(e);
       setRepayActive(false);
       return;
     }
-    dispatch({ type: 'txPending', payload:{ tx, message: `Repayment of ${amount} pending...`, type:'REPAY' } } );
-    await handleTx(tx);
+    await handleTx({ tx, msg: `Repayment of ${amount} pending...`, type:'REPAY', series: null});
     setRepayActive(false);
   };
 
@@ -226,12 +219,14 @@ export const useController = () => {
     try {
       tx = await controllerContract.addDelegate(delegatedAddr);
     } catch (e) {
-      handleTxBuildError(e);
+      handleTxRejectError(e);
       return;
     }
     /* Transaction reporting & tracking */
-    dispatch({ type: 'txPending', payload:{ tx, message: 'Pending once-off controller delegation ...', type: 'AUTH', series: null } } );
-    await handleTx(tx);
+    await handleTx({ tx, msg: 'Pending once-off controller delegation ...', type: 'AUTH', series: null });
+    
+    // eslint-disable-next-line consistent-return
+    return true;
   };
 
   /**

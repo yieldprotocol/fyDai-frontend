@@ -22,6 +22,8 @@ import { useProxy } from './yieldProxyHook';
 import { usePool } from './poolHook';
 import { useFYDai } from './fyDaiHook';
 
+// import { useTempProxy } from './tempProxyHook';
+
 export {
 
   useTxActive,
@@ -44,6 +46,8 @@ export {
   useToken,
 
   useWeb3React,
+
+  // useTempProxy,
   
   useSignerAccount, 
   useConnection,

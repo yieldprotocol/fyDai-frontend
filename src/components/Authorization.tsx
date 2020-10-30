@@ -128,13 +128,13 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
           background='#555555'
           align='center'
         >
-          { (!series.hasDaiAuth && !series.hasFyDaiAuth && !series.hasDelegatedPool) && 
+          { (!series.hasDaiAuth && !series.hasFyDaiAuth && !series.hasPoolDelegatedProxy) && 
           <Box direction='row' gap='small'>
             <Text color='#DDDDDD'> <Warning /> </Text>
             <Text size='xsmall' color='#DDDDDD'>A once-off authorization is required to use this series </Text>
           </Box> }
 
-          { !(!series.hasDaiAuth && !series.hasFyDaiAuth && !series.hasDelegatedPool) && 
+          { !(!series.hasDaiAuth && !series.hasFyDaiAuth && !series.hasPoolDelegatedProxy) && 
           <Box direction='row' gap='small'>
             <Text color='#DDDDDD'> <Warning /> </Text>
             <Box>
@@ -213,8 +213,9 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
               <Text size='xsmall' weight='bold'>
                 Finally, confirm sending the signatures to Yield in a transaction...
               </Text>}
+              
             {/* { txActive && <Text size='xsmall' weight='bold'> Submitting your signed authorizations ... transaction pending.</Text> } */}
-            { txActive && <TxStatus msg='Submitting your Authorizations.' tx={txActive} /> }
+            { txActive && <TxStatus tx={txActive} /> }
             
             { authPending && 
               txActive &&
@@ -274,7 +275,7 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
             pad='large'
             gap='medium'
           >
-            { txActive && <TxStatus msg='Submitting your Authorizations.' tx={txActive} /> }
+            { txActive && <TxStatus tx={txActive} /> }
             { authPending && 
               txActive &&
               <Box alignSelf='start'>

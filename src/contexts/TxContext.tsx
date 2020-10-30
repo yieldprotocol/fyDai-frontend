@@ -1,8 +1,11 @@
-import React, { useEffect, useReducer } from 'react';
-import { useTxHelpers } from '../hooks/txHooks';
+import React, { useState, useContext, useEffect, useReducer } from 'react';
+import { useWeb3React } from '@web3-react/core';
+
 import { useCachedState } from '../hooks/appHooks';
-import { IReducerAction, ITx } from '../types';
-import { useSignerAccount } from '../hooks/connectionHooks';
+import { IReducerAction, ITxState, ITx } from '../types';
+
+import { SeriesContext } from './SeriesContext';
+// import { useSignerAccount } from '../hooks';
 
 const TxContext = React.createContext<any>({});
 
@@ -12,10 +15,9 @@ const initState = {
   requestedSigs: [],
 };
 
-function txReducer(state:ITx, action:IReducerAction) {
+function txReducer(state:ITxState, action:IReducerAction) {
   switch (action.type) {
     case 'txPending':
-      console.log(state.pendingTxs);
       return {
         ...state,
         pendingTxs: [ ...state.pendingTxs, action.payload],
@@ -23,13 +25,13 @@ function txReducer(state:ITx, action:IReducerAction) {
     case 'txComplete':
       return {
         ...state,
-        pendingTxs: state.pendingTxs.filter((x:any) => x.tx.hash !== ( action.payload.transactionHash || action.payload.hash)),
+        pendingTxs: state.pendingTxs?.filter((x:any) => x.tx.hash !== ( action.payload.transactionHash || action.payload.hash)),
         lastCompletedTx: { ...action.payload, transactionHash: action.payload.transactionHash || action.payload.hash },
       };
     case 'requestSigs':
       return {
         ...state,
-        requestedSigs: action.payload.map((x:any)=> { return { ...x, signed: false };} ),
+        requestedSigs: action.payload.map((x:any)=> { return { ...x };} ),
       };
     case 'signed':
       return {
@@ -46,19 +48,35 @@ function txReducer(state:ITx, action:IReducerAction) {
 }
 
 const TxProvider = ({ children }:any) => {
-
-  const [ pendingCache ] = useCachedState('txPending', []);
   const [ state, dispatch ] = useReducer(txReducer, initState );
 
-  const { handleCachedTx } = useTxHelpers();
-  const { fallbackProvider } = useSignerAccount();
+  const { state: { seriesLoading } } = useContext(SeriesContext);
+  const [ pendingCache, setPendingCache ] = useCachedState('txPending', []);
+  const { library } = useWeb3React('fallback');
+  const [ hasReadCache, setHasReadCache] = useState<boolean>(false);
+  
 
-  useEffect( () => {
-    /* bring in cached serialized transactions if any */
-    fallbackProvider && pendingCache.map((x:any) => {
-      handleCachedTx(x);
-    });
-  }, [ fallbackProvider ]);
+  useEffect(() => {
+    /* handle registering and monitoring the cached transactions if any */
+    ( async () => {
+      if (!seriesLoading && library && !hasReadCache) {
+        await Promise.all( pendingCache.map(async (x:any) => {
+          dispatch({ type:'txPending', payload: x });
+          await library.waitForTransaction(x.tx.hash, 1)
+            .then((receipt:any) => {
+              dispatch({ type: 'txComplete', payload: receipt } );
+            });
+          console.log(x.tx.hash);
+          setPendingCache( pendingCache.filter((t:any) => t.tx.hash !== x.tx.hash));
+        })
+        );
+        console.log('cache txs processed');
+        setPendingCache(state.pendingTxs);
+        setHasReadCache(true);
+      }
+    })();
+
+  }, [library, seriesLoading]);
 
   return (
     <TxContext.Provider value={{ state, dispatch }}>

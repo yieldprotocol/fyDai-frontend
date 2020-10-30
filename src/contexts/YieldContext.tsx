@@ -49,6 +49,7 @@ const contractList = [
   'Dai',
   'Vat',
   'YieldProxy',
+  'PoolProxy',
 ];
 
 // reducer

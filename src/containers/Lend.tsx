@@ -304,7 +304,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
                   onClick={()=>lendProcedure()}
                   label={`Lend ${inputValue || ''} DAI`}
                   disabled={lendDisabled}
-                  hasDelegatedPool={activeSeries.hasDelegatedPool}
+                  hasPoolDelegatedProxy={activeSeries.hasPoolDelegatedProxy}
                   clearInput={()=>setInputValue(undefined)}
                 />       
               </Box>
@@ -320,7 +320,11 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
             <Redeem />}
 
             <Box direction='row' fill justify='between'>
-              { activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) && 
+              { 
+                // activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) && 
+                // !mobile &&
+                !activeSeries?.isMature() && 
+                activeSeries?.fyDaiBalance_ > 0 &&
                 !mobile &&
                 <Box alignSelf='start' margin={{ top:'medium' }}>
                   <FlatButton 
@@ -357,7 +361,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
 
         {/* If there is a transaction active, show the applicable view */}
         { sellActive && !txActive && <ApprovalPending /> }
-        { txActive && <TxStatus msg={`You are lending ${inputValue} DAI`} tx={txActive} /> }
+        { txActive && <TxStatus tx={txActive} /> }
       </Keyboard>
 
       {mobile &&

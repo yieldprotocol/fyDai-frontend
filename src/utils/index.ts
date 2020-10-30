@@ -10,6 +10,8 @@ export const SECONDS_PER_YEAR = 365 * 24 * 60 * 60;
 export const ETH = ethers.utils.formatBytes32String('ETH-A');
 export const CHAI = ethers.utils.formatBytes32String('CHAI');
 
+export const MAX_INT = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+
 // / @dev Converts a number to RAY precision, for number up to 10 decimal places
 export const toRay = (value:number) => {
   const exponent = BigNumber.from('10').pow(BigNumber.from('17'));
@@ -51,8 +53,8 @@ export const cleanValue = (input:string, decimals:number=12) => {
 };
 
 /* handle Address/hash shortening */
-export const abbreviateHash = (addr:string) => {
-  return `${addr?.substring(0, 4)}...${addr?.substring(addr.length - 4)}`; 
+export const abbreviateHash = (addr:string, buffer:number=4) => {
+  return `${addr?.substring(0, buffer)}...${addr?.substring(addr.length - buffer)}`; 
 };
 
 /**

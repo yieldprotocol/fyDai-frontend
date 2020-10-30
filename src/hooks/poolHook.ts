@@ -19,25 +19,25 @@ export const usePool = () => {
   const [ buyActive, setBuyActive ] = useState<boolean>(false);
   const [ callActive, setCallActive ] = useState<boolean>(false);
 
-  const { handleTx, handleTxBuildError } = useTxHelpers();
+  const { handleTx, handleTxRejectError } = useTxHelpers();
 
   /**
    * @dev Sell fyDai for Dai ( Chai )
    * @note NOT limit pool
    * 
-   * @param {string} poolAddress address of the fyDai market series
+   * @param {IYieldSeries} series of the fyDai market series
    * @param {number} fyDaiIn Amount of fyDai being sold that will be taken from the user's wallet (in human numbers)
    *
    * @return Amount of chai that will be deposited on `to` wallet
    */
   const sellFYDai = async (
-    poolAddress:string,
+    series:IYieldSeries,
     fyDaiIn: number,
   ) => {
     const parsedAmount = ethers.utils.parseEther(fyDaiIn.toString());
     const fromAddr = account && ethers.utils.getAddress(account);
     const toAddr = fromAddr;
-    const marketAddr = ethers.utils.getAddress(poolAddress);
+    const marketAddr = ethers.utils.getAddress(series.poolAddress);
     const overrides = { 
       gasLimit: BigNumber.from('300000')
     };
@@ -48,12 +48,11 @@ export const usePool = () => {
     try {
       tx = await contract.sellFYDai(fromAddr, toAddr, parsedAmount, overrides);
     } catch (e) {
-      handleTxBuildError(e);
+      handleTxRejectError(e);
       setSellActive(false);
       return;
     }
-    dispatch({ type: 'txPending', payload:{ tx, message: `Sell fyDai ${fyDaiIn} pending...`, type:'SELL' } } );
-    await handleTx(tx);
+    await handleTx({ tx, msg: `Sell fyDai ${fyDaiIn} pending...`, type:'SELL', series });
     setSellActive(false);
   };
 
@@ -62,19 +61,18 @@ export const usePool = () => {
    * @dev Buy fyDai with dai/chai
    * @note NOT limit pool
    *
-   * @param {string} poolAddress address of the fyDai series market.
+   * @param {IYieldSeries} series fyDai series market.
    * @param {number} fyDaiOut Amount of fyDai being bought that will be deposited in `to` wallet
    * @return Amount of chai/Dai that will be taken from `from` wallet
    */
   const buyFYDai = async (
-    fyDaiAddress:string,
-    poolAddress:string,
+    series:IYieldSeries,
     fyDaiOut: number
   ) => {
     const parsedAmount = ethers.utils.parseEther(fyDaiOut.toString());
-    const fromAddr = ethers.utils.getAddress(fyDaiAddress);
+    const fromAddr = ethers.utils.getAddress(series.fyDaiAddress);
     const toAddr = account && ethers.utils.getAddress(account);
-    const marketAddr = ethers.utils.getAddress(poolAddress);
+    const marketAddr = ethers.utils.getAddress(series.poolAddress);
     const overrides = { 
       gasLimit: BigNumber.from('250000')
     };
@@ -85,12 +83,11 @@ export const usePool = () => {
     try {
       tx = await contract.buyFYDai(fromAddr, toAddr, parsedAmount, overrides);
     } catch (e) {
-      handleTxBuildError(e);
+      handleTxRejectError(e);
       setSellActive(false);
       return;
     }
-    dispatch({ type: 'txPending', payload:{ tx, message: `Buying fyDai ${fyDaiOut} pending...`, type:'BUY' } } );
-    await handleTx(tx);
+    await handleTx({ tx, msg: `Buying fyDai ${fyDaiOut} pending...`, type:'BUY', series });
     setSellActive(false);
   };
 
@@ -98,19 +95,19 @@ export const usePool = () => {
    * @dev Sell Dai/Chai for fyDai
    * @note NOT limit pool
    * 
-   * @param {string} poolAddress address of the fyDai series market.
+   * @param {IYieldSeries} series fyDai.
    * @param {number} daiIn Amount of fyDai being bought that will be deposited in `to` wallet
    * @return Amount of fyDai that will be deposited on `to` wallet
    * 
    */
   const sellDai = async (
-    poolAddress:string,
+    series:IYieldSeries,
     daiIn: number,
   ) => {
     const parsedAmount = ethers.utils.parseEther(daiIn.toString());
     const fromAddr = account && ethers.utils.getAddress(account);
     const toAddr = fromAddr;
-    const marketAddr = ethers.utils.getAddress(poolAddress);
+    const marketAddr = ethers.utils.getAddress(series.poolAddress);
 
     const overrides = { 
       gasLimit: BigNumber.from('300000')
@@ -122,12 +119,11 @@ export const usePool = () => {
     try {
       tx = await contract.sellDai(fromAddr, toAddr, parsedAmount, overrides);
     } catch (e) {
-      handleTxBuildError(e);
+      handleTxRejectError(e);
       setSellActive(false);
       return;
     }
-    dispatch({ type: 'txPending', payload:{ tx, message: `Selling ${daiIn} DAI pending...`, type:'SELL' } } );
-    await handleTx(tx);
+    await handleTx({ tx, msg: `Selling ${daiIn} DAI pending...`, type:'SELL', series });
     setSellActive(false);
   };
 
@@ -136,21 +132,20 @@ export const usePool = () => {
    * @dev Buy Dai/Chai with fyDai
    * @note NOT limit pool
    * 
-   * @param {string} fyDaiAddress address of the fyDai contract.
-   * @param {string} poolAddress address of the fyDai series market.
+   * @param {IYieldSeries} series fyDai contract.
    * @param {number} daiOut Amount of dai/chai being bought that will be deposited in `to` wallet
    * 
    * @return Amount of fyDai that will be taken from `from` wallet
    *
    */
   const buyDai = async (
-    poolAddress:string,
+    series:IYieldSeries,
     daiOut: number,
   ) => {
     const parsedAmount = ethers.utils.parseEther(daiOut.toString());
     const fromAddr = account && ethers.utils.getAddress(account);
     const toAddr = account && ethers.utils.getAddress(account);
-    const marketAddr = ethers.utils.getAddress(poolAddress);
+    const marketAddr = ethers.utils.getAddress(series.poolAddress);
     
     const overrides = { 
       gasLimit: BigNumber.from('300000')
@@ -162,18 +157,17 @@ export const usePool = () => {
     try {
       tx = await contract.buyDai(fromAddr, toAddr, parsedAmount, overrides );
     } catch (e) {
-      handleTxBuildError(e);
+      handleTxRejectError(e);
       setBuyActive(false);
       return;
     }
-    dispatch({ type: 'txPending', payload:{ tx, message: `Buying ${daiOut} Dai pending...`, type:'BUY' } } );
-    await handleTx(tx);
+    await handleTx({ tx, msg: `Buying ${daiOut} Dai pending...`, type:'BUY', series });
     setBuyActive(false);
   };
 
   /**
    * @dev Delegate a 3rd party to act on behalf of the user in the Pool contracts
-   * @param {string} poolAddress address of the market in question.
+   * @param {IYieldSeries} series in question.
    * @param {string} delegatedAddress address of the contract/entity getting delegated. 
    */
   const addPoolDelegate = async (
@@ -193,23 +187,22 @@ export const usePool = () => {
     try {
       tx = await contract.addDelegate(delegatedAddr);
     } catch (e) {
-      handleTxBuildError(e);
+      handleTxRejectError(e);
       return;
     }
     /* Transaction reporting & tracking */
-    dispatch({ type: 'txPending', payload:{ tx, message: 'Pending once-off Pool delegation ...', type:'AUTH', series: series.maturity } } );
-    await handleTx(tx);
+    await handleTx({ tx, msg: 'Pending once-off Pool delegation ...', type:'AUTH', series });
+
+    // eslint-disable-next-line consistent-return
+    return true;
   };
 
   
   /**
    * @dev Checks to see if an account (user) has delegated a contract/3rd Party for a particular market. 
-   * 
    * @param {string} poolAddress address of the market in question.
    * @param {string} delegateAddress address of the Proxy (contract getting approved). 
-   * 
    * @returns {Promise<boolean>} approved ?
-   * 
    * @note call function 
    */
   const checkPoolDelegate = async (
