@@ -356,6 +356,15 @@ export const useProxy = () => {
     setAddLiquidityActive(false);
   };
 
+
+  /**
+   * @dev removes liquidity from a pool - redirects to removal with/without signature
+   * 
+   * @param {IYieldSeries} series series to act on.
+   * @param {number|BigNumber} tokens amount of tokens to remove. 
+   * 
+   * @note if BigNumber is used make sure it is in WEI
+   */
   const removeLiquidity = async (
     series: IYieldSeries,  
     tokens: number|BigNumber,
@@ -371,9 +380,9 @@ export const useProxy = () => {
     }
     setRemoveLiquidityActive(false);
   };
+  
 
   /**
-   * @dev removes liquidity from a pool
    * 
    * @param {IYieldSeries} series series to act on.
    * @param {number|BigNumber} tokens amount of tokens to remove. 
@@ -400,6 +409,7 @@ export const useProxy = () => {
       if ( !series.isMature() ) {
         // eslint-disable-next-line no-console
         console.log('Removing liquidity BEFORE maturity');
+        
         /* calculate expected trade values  */      
         const preview = await previewPoolTx('buydai', series, ethers.utils.parseEther('1'));   
         if ( !(preview instanceof Error) ) {

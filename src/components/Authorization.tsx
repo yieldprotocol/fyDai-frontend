@@ -213,6 +213,7 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
               <Text size='xsmall' weight='bold'>
                 Finally, confirm sending the signatures to Yield in a transaction...
               </Text>}
+              
             {/* { txActive && <Text size='xsmall' weight='bold'> Submitting your signed authorizations ... transaction pending.</Text> } */}
             { txActive && <TxStatus tx={txActive} /> }
             

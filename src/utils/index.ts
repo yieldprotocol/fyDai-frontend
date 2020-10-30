@@ -10,6 +10,8 @@ export const SECONDS_PER_YEAR = 365 * 24 * 60 * 60;
 export const ETH = ethers.utils.formatBytes32String('ETH-A');
 export const CHAI = ethers.utils.formatBytes32String('CHAI');
 
+export const MAX_INT = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+
 // / @dev Converts a number to RAY precision, for number up to 10 decimal places
 export const toRay = (value:number) => {
   const exponent = BigNumber.from('10').pow(BigNumber.from('17'));

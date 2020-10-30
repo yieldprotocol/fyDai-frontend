@@ -1,16 +1,12 @@
 import { useState, useContext } from 'react';
 import { ethers, BigNumber  }  from 'ethers';
-import { signDaiPermit, signERC2612Permit } from 'eth-permit';
 
 import Controller from '../contracts/Controller.json';
 import Pool from '../contracts/Pool.json';
 import YieldProxy from '../contracts/YieldProxy.json';
 
-import {
-  IDelegableMessage,
-  IDomain,
-  IYieldSeries
-} from '../types';
+import { IYieldSeries } from '../types';
+import { MAX_INT } from '../utils';
 
 import { TxContext } from '../contexts/TxContext';
 import { YieldContext } from '../contexts/YieldContext';
@@ -23,50 +19,26 @@ import { useController } from './controllerHook';
 import { usePool } from './poolHook';
 import { useToken } from './tokenHook';
 
+import { useTxSigning } from './txSigningHook';
 
-const MAX_INT = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
-const EIP712Domain = [
-  { name: 'name', type: 'string' },
-  { name: 'version', type: 'string' },
-  { name: 'chainId', type: 'uint256' },
-  { name: 'verifyingContract', type: 'address' },
-];
-const createTypedDelegableData = (message: IDelegableMessage, domain: IDomain) => {
-  const typedData = {
-    types: {
-      EIP712Domain,
-      Signature: [
-        { name: 'user', type: 'address' },
-        { name: 'delegate', type: 'address' },
-        { name: 'nonce', type: 'uint256' },
-        { name: 'deadline', type: 'uint256' },
-      ],
-    },
-    primaryType: 'Signature',
-    domain,
-    message,
-  };
-  return JSON.stringify(typedData);
-};
 
 const auths = new Map([
-  [1, { id: 1, desc:'Allow the Yield smart contracts to interact on your behalf' }],
-  [2, { id: 2, desc:'Allow the Yield smart contracts to interact with Dai on your behalf' }],
-  [3, { id: 3, desc:'Allow the Yield smart contracts to interact with this series on your behalf' }],
-  [4, { id: 4, desc:'Allow the Yield smart contracts to trade Dai on your behalf' }],
-  [5, { id: 5, desc:'Allow the Yield smart contracts to trade fyDai on your behalf' }],
+  [1, { id: 'yieldAuth1', desc:'Allow the Yield smart contracts to interact on your behalf' }],
+  [2, { id: 'yieldAuth2', desc:'Allow the Yield smart contracts to interact with Dai on your behalf' }],
+  [3, { id: 'poolAuth1', desc:'Allow the Yield smart contracts to interact with this series on your behalf' }],
+  [4, { id: 'poolAuth2', desc:'Allow the Yield smart contracts to trade Dai on your behalf' }],
+  [5, { id: 'poolAuth3', desc:'Allow the Yield smart contracts to trade fyDai on your behalf' }],
 ]);
 
 export const useAuth = () => {
-  const { account, provider, signer, chainId } = useSignerAccount();
+  const { account, provider, signer } = useSignerAccount();
   const { state: { deployedContracts } } = useContext(YieldContext);
   const { dispatch } = useContext(TxContext);
   const { state: { preferences, authorizations } } = useContext(UserContext);
   const { hasDelegatedProxy, hasAuthorisedProxy } = authorizations;
   
-  const controllerAddr = ethers.utils.getAddress(deployedContracts.Controller);
-  const controllerContract = new ethers.Contract( controllerAddr, Controller.abi, provider);
-  const proxyAddr = ethers.utils.getAddress(deployedContracts.YieldProxy);
+  const controllerContract = new ethers.Contract( deployedContracts?.Controller, Controller?.abi, provider);
+  const proxyAddr = ethers.utils.getAddress(deployedContracts?.YieldProxy);
   const proxyContract = new ethers.Contract( proxyAddr, YieldProxy.abi, signer);
 
   const daiAddr = ethers.utils.getAddress(deployedContracts.Dai);
@@ -75,57 +47,12 @@ export const useAuth = () => {
   const [authActive, setAuthActive] = useState<boolean>(false);
   const [fallbackAuthActive, setFallbackAuthActive] = useState<boolean>(false);
 
+  const { delegationSignature, daiPermitSignature, ERC2612PermitSignature, handleSignError } = useTxSigning();
   const { handleTx, handleTxRejectError } = useTxHelpers();
+
   const { addControllerDelegate } = useController();
   const { approveToken } = useToken();
   const { addPoolDelegate } = usePool();
-
-  const sendForSig = (_provider: any, method: string, params?: any[]) => new Promise<any>((resolve, reject) => {
-    const payload = {
-      method,
-      params, 
-      from: fromAddr,   
-    };
-    const callback = (err: any, result: any) => {
-      if (err) {
-        reject(err);
-      } else if (result.error) {
-        reject(result.error);
-      } else {
-        resolve(result.result);
-      }
-    };
-    _provider.sendAsync( payload, callback );
-  });
-
-  const delegationSignature = async (delegationContract:any, delegateAddr:string ) => {
-    const _nonce = await delegationContract.signatureCount(fromAddr) ;
-    const msg: IDelegableMessage = {
-      // @ts-ignore
-      user: fromAddr,
-      delegate: delegateAddr,
-      nonce: _nonce.toHexString(),
-      deadline: MAX_INT,
-    };
-    const domain: IDomain = {
-      name: 'Yield',
-      version: '1',
-      chainId: chainId || 1,
-      verifyingContract: delegationContract.address,
-    };
-    return sendForSig(
-      provider.provider, 
-      'eth_signTypedData_v4', 
-      [fromAddr, createTypedDelegableData(msg, domain)],
-    );
-  };
-
-  const handleSignError = (e:any) =>{
-    // eslint-disable-next-line no-console
-    console.log(e);
-    dispatch({ type: 'requestSigs', payload:[] });
-    setAuthActive(false);
-  };
 
   /**
    *  Once off Yield Controller and Dai authorizations
@@ -144,15 +71,15 @@ export const useAuth = () => {
       setAuthActive(true);
       dispatch({ type: 'requestSigs', payload:[ auths.get(1), auths.get(2) ] });
       try {
-      /* yieldProxy | Controller delegation */ 
+
+        /* yieldProxy | Controller delegation */ 
         controllerSig = await delegationSignature( controllerContract, proxyAddr); 
         dispatch({ type: 'signed', payload: auths.get(1) });
 
         /* Dai permit yieldProxy */
-        // @ts-ignore
-        const result = await signDaiPermit(provider.provider, daiAddr, fromAddr, proxyAddr);
-        daiPermitSig = ethers.utils.joinSignature(result);
+        daiPermitSig = await daiPermitSignature(daiAddr, proxyAddr ); 
         dispatch({ type: 'signed', payload: auths.get(2) });
+
       } catch (e) {
       /* If there is a problem with the signing, use the approve txs as a fallback, but ignore if error code 4001 (user reject) */
         if ( e.code !== 4001 ) {
@@ -179,7 +106,7 @@ export const useAuth = () => {
       await handleTx({ tx, msg: 'Authorization pending...', type:'AUTH', series: null } );
       dispatch({ type: 'requestSigs', payload:[] });
       setAuthActive(false);
-
+      
     } else {
       handleSignError('Fallback to approval transactions');
       setFallbackAuthActive(true);
@@ -191,13 +118,13 @@ export const useAuth = () => {
     try {
       await Promise.all([
         !hasAuthorisedProxy? approveToken(daiAddr, proxyAddr, MAX_INT, null): null,
-        !hasDelegatedProxy? addControllerDelegate(proxyAddr): null, 
+        !hasDelegatedProxy? addControllerDelegate(proxyAddr): null,
       ]);
       setFallbackAuthActive(false);
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log(e);
-      setFallbackAuthActive(false);     
+      setFallbackAuthActive(false);  
     }
   };
 
@@ -232,19 +159,15 @@ export const useAuth = () => {
       try {
 
         /* YieldProxy | Pool delegation */
-        poolSig = await delegationSignature( poolContract, proxyAddr);
+        poolSig = await delegationSignature( poolContract, proxyAddr );
         dispatch({ type: 'signed', payload: auths.get(3) });
 
         /* Dai permit pool */
-        // @ts-ignore
-        const dResult = await signDaiPermit(provider.provider, daiAddr, fromAddr, poolAddr);
-        daiSig = ethers.utils.joinSignature(dResult);
+        daiSig = await daiPermitSignature(daiAddr, poolAddr );
         dispatch({ type: 'signed', payload: auths.get(4) });
 
         /* fyDai permit proxy */
-        // @ts-ignore
-        const yResult = await signERC2612Permit(provider.provider, fyDaiAddr, fromAddr, proxyAddr, MAX_INT);
-        fyDaiSig = ethers.utils.joinSignature(yResult);
+        fyDaiSig = await ERC2612PermitSignature(fyDaiAddr, proxyAddr);
         dispatch({ type: 'signed', payload: auths.get(5) });
 
       } catch (e) {
@@ -292,7 +215,7 @@ export const useAuth = () => {
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log(e);
-      setFallbackAuthActive(false);      
+      setFallbackAuthActive(false);
     }
   };
 

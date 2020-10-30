@@ -22,6 +22,7 @@ import FlatButton from '../components/FlatButton';
 import YieldMark from '../components/logos/YieldMark';
 
 import YieldMobileNav from '../components/YieldMobileNav';
+import ConfirmationRequired from '../components/ConfirmationRequired';
 
 interface IRemoveLiquidityProps {
   openConnectLayer?:any
@@ -222,8 +223,10 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
         </Box>}
         
       </Box>}
-      { removeLiquidityPending && !txActive && <ApprovalPending /> }   
-      { txActive && 
+
+      { removeLiquidityPending && !txActive && <ConfirmationRequired /> }
+      
+      { txActive &&
       <Box 
         width={{ max:'600px' }}
         alignSelf='center'

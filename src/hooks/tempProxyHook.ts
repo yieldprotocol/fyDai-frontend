@@ -2,7 +2,7 @@ import { useEffect, useState, useContext } from 'react';
 import { ethers, BigNumber }  from 'ethers';
 import * as utils from '../utils';
 
-import { IDelegableMessage, IDomain, IYieldSeries } from '../types';
+import { IYieldSeries } from '../types';
 
 import PoolProxy from '../contracts/PoolProxy.json';
 import Controller from '../contracts/Controller.json';
@@ -17,31 +17,7 @@ import { usePool } from './poolHook';
 import { useTxHelpers } from './txHooks';
 import { useController } from './controllerHook';
 
-const MAX_INT = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
-
-const EIP712Domain = [
-  { name: 'name', type: 'string' },
-  { name: 'version', type: 'string' },
-  { name: 'chainId', type: 'uint256' },
-  { name: 'verifyingContract', type: 'address' },
-];
-const createTypedDelegableData = (message: IDelegableMessage, domain: IDomain) => {
-  const typedData = {
-    types: {
-      EIP712Domain,
-      Signature: [
-        { name: 'user', type: 'address' },
-        { name: 'delegate', type: 'address' },
-        { name: 'nonce', type: 'uint256' },
-        { name: 'deadline', type: 'uint256' },
-      ],
-    },
-    primaryType: 'Signature',
-    domain,
-    message,
-  };
-  return JSON.stringify(typedData);
-};
+import { useTxSigning } from './txSigningHook';
 
 /**
  * Hook for interacting with the Temporary/ Alternate Yield Proxy Contract.
@@ -54,12 +30,13 @@ const createTypedDelegableData = (message: IDelegableMessage, domain: IDomain) =
 export const useTempProxy = () => {
 
   /* hooks */ 
-  const { signer, provider, account, chainId } = useSignerAccount();
-  const fromAddr = account && ethers.utils.getAddress(account);
+  const { signer, provider } = useSignerAccount();
 
   const { previewPoolTx, addPoolDelegate } = usePool();
   const { addControllerDelegate } = useController();
   const { handleTx, handleTxRejectError } = useTxHelpers();
+
+  const { delegationSignature, handleSignError } = useTxSigning();
 
   /* contexts */
   const  { dispatch }  = useContext<any>(TxContext);
@@ -70,56 +47,10 @@ export const useTempProxy = () => {
 
   /* Temporary signing messages */
   const auths = new Map([
-    [1, { id: 1, desc:'Authorize Yield proxy to use interact with Dai' }],
-    [2, { id: 2, desc:'Authorize Yield Series to move your fyDai tokens to repay Dai debt.' }],
+    [1, { id: 'removeLiquidity1', desc:'Authorize Yield proxy to use interact with Dai' }],
+    [2, { id: 'removeLiquidity2', desc:'Authorize Yield Series to move your fyDai tokens to repay Dai debt.' }],
   ]);
-
-  const handleSignError = (e:any) =>{
-    // eslint-disable-next-line no-console
-    console.log(e);
-    dispatch({ type: 'requestSigs', payload:[] });
-  };
-
-  const sendForSig = (_provider: any, method: string, params?: any[]) => new Promise<any>((resolve, reject) => {
-    const payload = {
-      method,
-      params, 
-      from: fromAddr,   
-    };
-    const callback = (err: any, result: any) => {
-      if (err) {
-        reject(err);
-      } else if (result.error) {
-        reject(result.error);
-      } else {
-        resolve(result.result);
-      }
-    };
-    _provider.sendAsync( payload, callback );
-  });
-
-  const delegationSignature = async (delegationContract:any, delegateAddr:string ) => {
-    const _nonce = await delegationContract.signatureCount(fromAddr) ;
-    const msg: IDelegableMessage = {
-      // @ts-ignore
-      user: fromAddr,
-      delegate: delegateAddr,
-      nonce: _nonce.toHexString(),
-      deadline: MAX_INT,
-    };
-    const domain: IDomain = {
-      name: 'Yield',
-      version: '1',
-      chainId: chainId || 1,
-      verifyingContract: delegationContract.address,
-    };
-    return sendForSig(
-      provider.provider, 
-      'eth_signTypedData_v4', 
-      [fromAddr, createTypedDelegableData(msg, domain)],
-    );
-  };
-
+  
   /* Preset the poolProxy contract to be used with all fns */
   const [ tempProxyContract, setTempProxyContract] = useState<any>();
   useEffect(()=>{
@@ -154,29 +85,34 @@ export const useTempProxy = () => {
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const parsedTokens = BigNumber.isBigNumber(tokens)? tokens : ethers.utils.parseEther(tokens.toString());
     const overrides = { 
-      gasLimit: BigNumber.from('600000')
+      gasLimit: BigNumber.from('1000000')
     };
   
     const fallback = useTxApproval;
-    
+
     if (!fallback ) {
 
       let controllerSig: any = '0x'; 
       let poolSig: any = '0x';
 
-      dispatch({ type: 'requestSigs', payload:[ auths.get(1), auths.get(2) ] });
+      dispatch({ 
+        type: 'requestSigs', 
+        payload:[ 
+          { ...auths.get(1), signed: authorizations.hasDelegatedAltProxy }, 
+          { ...auths.get(2), signed: series.hasPoolDelegatedAltProxy }
+        ] });
 
-      /* Deal wth the signtures in a try..catch */ 
+      /* Deal wth the signtures  */ 
       try {
 
         /* AltProxy | Controller delegation if required */ 
-        const controllerContract = new ethers.Contract( deployedContracts.Controller, Controller.abi, provider);
-        controllerSig = !authorizations.hasDelegatedAltProxy? await delegationSignature( controllerContract, deployedContracts.PoolProxy) : '0x';
+        const controllerContract = new ethers.Contract( deployedContracts?.Controller, Controller?.abi, provider);
+        controllerSig = authorizations.hasDelegatedAltProxy ? '0x' : await delegationSignature( controllerContract, deployedContracts.PoolProxy);
         dispatch({ type: 'signed', payload: auths.get(1) });
 
         /* altProxy | pool delegation */
         const poolContract = new ethers.Contract( poolAddr, Pool.abi, provider);
-        poolSig = !series.hasPoolDelegatedAltProxy? await delegationSignature( poolContract, deployedContracts.PoolProxy): '0x';
+        poolSig = series.hasPoolDelegatedAltProxy ? '0x' : await delegationSignature( poolContract, deployedContracts.PoolProxy);
         dispatch({ type: 'signed', payload: auths.get(2) });
 
       } catch (e) {
@@ -228,7 +164,7 @@ export const useTempProxy = () => {
             parsedTokens,
             controllerSig,
             poolSig,
-            { gasLimit: BigNumber.from('500000') } );
+            { gasLimit: BigNumber.from('1000000') } );
         }
       } catch (e) {
         handleTxRejectError(e);
@@ -244,7 +180,6 @@ export const useTempProxy = () => {
 
 
   /* or, if the user is using the fallback approval transactions  */ 
-
   const fallbackRemoveLiquidity = async (
     series: IYieldSeries,  
     tokens: number|BigNumber,
@@ -256,11 +191,21 @@ export const useTempProxy = () => {
       gasLimit: BigNumber.from('600000')
     };
 
+    dispatch({ 
+      type: 'requestSigs', 
+      payload:[ 
+        { ...auths.get(1), signed: authorizations.hasDelegatedAltProxy }, 
+        { ...auths.get(2), signed: series.hasPoolDelegatedAltProxy }
+      ] });
+
     try {
+
       await Promise.all([
         !authorizations.hasDelegatedAltProxy ? addControllerDelegate(deployedContracts.PoolProxy): null,
         !series.hasPoolDelegatedAltProxy ? addPoolDelegate(series, deployedContracts.PoolProxy): null, 
       ]);
+      
+      dispatch({ type: 'requestSigs', payload:[] });
 
       let tx:any;
       let minFYDai:BigNumber;
@@ -284,6 +229,7 @@ export const useTempProxy = () => {
           '0x',
           '0x',
           overrides );
+
       } else {
         // eslint-disable-next-line no-console
         console.log('Removing liquidity AFTER maturity "with signature" with FALLBACK to approval txs'); 
@@ -297,12 +243,9 @@ export const useTempProxy = () => {
       }
 
       await handleTx({ tx, msg: `Removing ${tokens} DAI liquidity from ${series.displayNameMobile}`, type:'REMOVE_LIQUIDITY', series });
-
     } catch (e) {
-
       // eslint-disable-next-line no-console
       console.log(e);
-
     }
   };
 

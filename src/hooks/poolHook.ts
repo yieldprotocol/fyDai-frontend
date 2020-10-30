@@ -192,6 +192,9 @@ export const usePool = () => {
     }
     /* Transaction reporting & tracking */
     await handleTx({ tx, msg: 'Pending once-off Pool delegation ...', type:'AUTH', series });
+
+    // eslint-disable-next-line consistent-return
+    return true;
   };
 
   

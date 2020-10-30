@@ -1,12 +1,10 @@
-import { useMemo, useEffect, useState, useContext } from 'react';
+import { useEffect, useState, useContext } from 'react';
 
 import { ITx } from '../types';
-
 import { NotifyContext } from '../contexts/NotifyContext';
 import { TxContext } from '../contexts/TxContext';
 
 import { useCachedState } from './appHooks';
-import { useSignerAccount } from './connectionHooks';
 
 /* Simple Hook for checking if a transaction family/families is in process */
 export const useTxActive = (typeList:string[]) => {
@@ -23,7 +21,6 @@ export const useTxHelpers = () => {
   const  { dispatch: notify }  = useContext<any>(NotifyContext);
   const  { state, dispatch  }  = useContext<any>(TxContext);
   const [ pendingCache, setPendingCache ] = useCachedState('txPending', []);
-  const { fallbackProvider } = useSignerAccount();
 
   /* Notification Helpers */
   const txComplete = (receipt:any) => {  
@@ -47,7 +44,7 @@ export const useTxHelpers = () => {
       });
     }
   };
-
+  
   const handleTxError = (msg:string, receipt: any, error:any) => {
     // eslint-disable-next-line no-console
     console.log(error.message);
