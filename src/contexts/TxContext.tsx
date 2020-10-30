@@ -31,7 +31,7 @@ function txReducer(state:ITxState, action:IReducerAction) {
     case 'requestSigs':
       return {
         ...state,
-        requestedSigs: action.payload.map((x:any)=> { return { ...x, signed: false };} ),
+        requestedSigs: action.payload.map((x:any)=> { return { ...x };} ),
       };
     case 'signed':
       return {

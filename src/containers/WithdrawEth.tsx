@@ -186,7 +186,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
           onClick={()=> withdrawProcedure()}
           label={`Withdraw ${inputValue || ''} Eth`}
           disabled={withdrawDisabled}
-          hasDelegatedPool={true}
+          hasPoolDelegatedProxy={true}
           clearInput={()=>setInputValue(undefined)}
         />  
           

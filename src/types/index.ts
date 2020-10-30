@@ -8,7 +8,8 @@ export interface IYieldSeries {
   poolAddress: string;
   fyDaiAddress: string;
   liquidityProxyAddress: string;
-  hasDelegatedPool: boolean;
+  hasPoolDelegatedProxy: boolean;
+  hasPoolDelegatedAltProxy: boolean;
   hasDaiAuth: boolean;
   hasFyDaiAuth: boolean;
   hasCloseAuth: boolean;

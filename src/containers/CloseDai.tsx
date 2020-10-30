@@ -143,7 +143,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
             onClick={()=> withdrawProcedure()}
             label={`Reclaim ${inputValue || ''} Dai`}
             disabled={withdrawDisabled}
-            hasDelegatedPool={activeSeries.hasDelegatedPool}
+            hasPoolDelegatedProxy={activeSeries.hasPoolDelegatedProxy}
             clearInput={()=>setInputValue(undefined)}
           />
           

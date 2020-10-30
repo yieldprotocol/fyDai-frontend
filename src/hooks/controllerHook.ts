@@ -224,6 +224,9 @@ export const useController = () => {
     }
     /* Transaction reporting & tracking */
     await handleTx({ tx, msg: 'Pending once-off controller delegation ...', type: 'AUTH', series: null });
+    
+    // eslint-disable-next-line consistent-return
+    return true;
   };
 
   /**

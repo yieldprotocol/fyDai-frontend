@@ -22,6 +22,7 @@ import FlatButton from '../components/FlatButton';
 import YieldMark from '../components/logos/YieldMark';
 
 import YieldMobileNav from '../components/YieldMobileNav';
+import ConfirmationRequired from '../components/ConfirmationRequired';
 
 interface IRemoveLiquidityProps {
   openConnectLayer?:any
@@ -42,6 +43,8 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
 
   const [newShare, setNewShare] = useState<string>(activeSeries?.poolPercent);
   const [calculating, setCalculating] = useState<boolean>(false);
+
+  const [showConfirm, setShowConfirm] = useState<boolean>(true);
 
   const [ inputValue, setInputValue ] = useState<any>();
   const debouncedInput = useDebounce(inputValue, 500);
@@ -204,7 +207,7 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
           onClick={()=> removeLiquidityProcedure(inputValue)}
           label={`Remove ${inputValue || ''} tokens`}
           disabled={removeLiquidityDisabled}
-          hasDelegatedPool={activeSeries?.hasDelegatedPool}
+          hasPoolDelegatedProxy={activeSeries?.hasPoolDelegatedProxy}
           clearInput={()=>setInputValue(undefined)}
         />
 
@@ -222,8 +225,10 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
         </Box>}
         
       </Box>}
-      { removeLiquidityPending && !txActive && <ApprovalPending /> }   
-      { txActive && 
+
+      { removeLiquidityPending && !txActive &&  <ConfirmationRequired close={()=>close()} /> }
+      
+      { txActive &&
       <Box 
         width={{ max:'600px' }}
         alignSelf='center'
