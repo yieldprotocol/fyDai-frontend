@@ -60,7 +60,7 @@ const ConfirmationRequired = ({ close }:any) => {
               gap='medium'
             >
               { !txActive && allSigned ? 
-                <Text weight='bold'> All the required permissions have previously been granted 👍 </Text> : 
+                <Text weight='bold'> All the required permissions have previously been granted. </Text> : 
                 <Text weight='bold'> The following signatures are required: </Text>}
 
               { requestedSigs.map((x:any, i:number)=> {
