@@ -44,6 +44,8 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
   const [newShare, setNewShare] = useState<string>(activeSeries?.poolPercent);
   const [calculating, setCalculating] = useState<boolean>(false);
 
+  const [showConfirm, setShowConfirm] = useState<boolean>(true);
+
   const [ inputValue, setInputValue ] = useState<any>();
   const debouncedInput = useDebounce(inputValue, 500);
   const [inputRef, setInputRef] = useState<any>(null);
@@ -224,7 +226,7 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
         
       </Box>}
 
-      { removeLiquidityPending && !txActive && <ConfirmationRequired /> }
+      { removeLiquidityPending && !txActive &&  <ConfirmationRequired close={()=>close()} /> }
       
       { txActive &&
       <Box 

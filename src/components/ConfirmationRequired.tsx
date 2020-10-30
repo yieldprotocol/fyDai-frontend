@@ -17,7 +17,7 @@ import TxStatus from './TxStatus';
 import { abbreviateHash } from '../utils';
 import EtherscanButton from './EtherscanButton';
  
-const ConfirmationRequired = React.forwardRef( (props, ref) => {
+const ConfirmationRequired = ({ close }:any) => {
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   const { state: { requestedSigs, pendingTxs } }  = useContext(TxContext);
@@ -48,8 +48,6 @@ const ConfirmationRequired = React.forwardRef( (props, ref) => {
       responsive={mobile?false: undefined}
       full={mobile?true: undefined}
     >
-      {console.log(requestedSigs)}
-
       { !preferences?.useTxApproval && 
         <>
           { sigsRequested ?
@@ -114,8 +112,7 @@ const ConfirmationRequired = React.forwardRef( (props, ref) => {
             </Box>}
         </>}
 
-
-      { preferences?.useTxApproval && 
+      { preferences?.useTxApproval &&
         <>
           { sigsRequested ?
             <Box 
@@ -127,7 +124,7 @@ const ConfirmationRequired = React.forwardRef( (props, ref) => {
             >
               <Text weight='bold'> Please approve the following authorization transactions with your wallet or provider </Text>
 
-              { txActive && 
+              { txActive &&
               <Box gap='medium'>
                 <Box gap='medium'>
                   <Text size='xsmall' weight='bold'> 
@@ -142,9 +139,10 @@ const ConfirmationRequired = React.forwardRef( (props, ref) => {
                     )}
                   </Box>
                 </Box>
+                
                 <Box alignSelf='start'>
                   <FlatButton 
-                    // onClick={()=>closeAuth()}
+                    onClick={()=>close()}
                     label={
                       <Box direction='row' gap='medium' align='center'>
                         <ArrowLeft color='text-weak' />
@@ -170,6 +168,6 @@ const ConfirmationRequired = React.forwardRef( (props, ref) => {
 
     </Layer>
   );
-});
+};
 
 export default ConfirmationRequired;
