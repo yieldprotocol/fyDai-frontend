@@ -87,7 +87,10 @@ export const useTempProxy = () => {
     const overrides = { 
       gasLimit: BigNumber.from('1000000')
     };
-  
+
+    const controllerContract = new ethers.Contract( deployedContracts.Controller, Controller.abi as any, provider);
+    const poolContract = new ethers.Contract( poolAddr, Pool.abi as any, provider);
+
     const fallback = useTxApproval;
 
     if (!fallback ) {
@@ -105,13 +108,11 @@ export const useTempProxy = () => {
       /* Deal wth the signtures  */ 
       try {
 
-        /* AltProxy | Controller delegation if required */ 
-        const controllerContract = new ethers.Contract( deployedContracts?.Controller, Controller?.abi, provider);
+        /* AltProxy | Controller delegation if required */       
         controllerSig = authorizations.hasDelegatedAltProxy ? '0x' : await delegationSignature( controllerContract, deployedContracts.PoolProxy);
         dispatch({ type: 'signed', payload: auths.get(1) });
 
         /* altProxy | pool delegation */
-        const poolContract = new ethers.Contract( poolAddr, Pool.abi, provider);
         poolSig = series.hasPoolDelegatedAltProxy ? '0x' : await delegationSignature( poolContract, deployedContracts.PoolProxy);
         dispatch({ type: 'signed', payload: auths.get(2) });
 
