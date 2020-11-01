@@ -191,7 +191,7 @@ export const useTempProxy = () => {
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const parsedTokens = BigNumber.isBigNumber(tokens)? tokens : ethers.utils.parseEther(tokens.toString());
     const overrides = { 
-      gasLimit: BigNumber.from('600000')
+      gasLimit: BigNumber.from('1000000')
     };
 
     dispatch({ 
@@ -242,7 +242,7 @@ export const useTempProxy = () => {
           parsedTokens,
           '0x',
           '0x',
-          { gasLimit: BigNumber.from('500000') } );
+          { gasLimit: BigNumber.from('1000000') } );
       }
 
       await handleTx({ tx, msg: `Removing ${tokens} DAI liquidity from ${series.displayNameMobile}`, type:'REMOVE_LIQUIDITY', series });
