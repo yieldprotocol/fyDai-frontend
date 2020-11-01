@@ -398,7 +398,7 @@ export const useProxy = () => {
     const parsedTokens = BigNumber.isBigNumber(tokens)? tokens : ethers.utils.parseEther(tokens.toString());
 
     const overrides = { 
-      gasLimit: BigNumber.from('600000')
+      gasLimit: BigNumber.from('1000000')
     };
 
     /* Contract interaction */
@@ -420,7 +420,7 @@ export const useProxy = () => {
         tx = await proxyContract.removeLiquidityEarlyDaiFixed(poolAddr, parsedTokens, minFYDai, overrides );
       } else {
         console.log('Removing liquidity AFTER maturity');
-        tx = await proxyContract.removeLiquidityMature(poolAddr, parsedTokens, { gasLimit: BigNumber.from('500000') } );
+        tx = await proxyContract.removeLiquidityMature(poolAddr, parsedTokens, { gasLimit: BigNumber.from('1000000') } );
       }
     } catch (e) {
       handleTxRejectError(e);

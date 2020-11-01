@@ -41,7 +41,6 @@ const ConfirmationRequired = ({ close }:any) => {
     setAllSigned(_allSigned);
   }, [requestedSigs]);
 
-
   return (
     <Layer
       modal={true}

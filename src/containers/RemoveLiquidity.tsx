@@ -74,7 +74,7 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
         userActions.updatePosition();
         seriesActions.updateActiveSeries();
       }
-      setRemoveLiquidityPending(true);
+      setRemoveLiquidityPending(false);
       !activeSeries?.isMature() && close();
     }
   };
