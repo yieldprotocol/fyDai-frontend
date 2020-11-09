@@ -67,7 +67,7 @@ const AccountButton = (props: any) => {
       >
         <Box 
           fill
-          background="background-front"
+          background="background"
           round='small'
           pad="none"
           align='center'

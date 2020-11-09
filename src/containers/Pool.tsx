@@ -215,7 +215,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
           width={{ max:'600px' }}
           alignSelf='center'
           fill='horizontal'
-          background='background-front'
+          background='background'
           round='small'
           pad='large'
           gap='medium'

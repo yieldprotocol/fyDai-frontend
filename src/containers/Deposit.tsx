@@ -243,7 +243,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
         <Box
           alignSelf="center"
           fill
-          background="background-front"
+          background="background"
           round='small'
           pad='large'
           gap='medium'

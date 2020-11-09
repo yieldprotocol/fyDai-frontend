@@ -72,7 +72,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
       <Box
         round='small'
         fill
-        background='background-front'
+        background='background'
         pad={{ horizontal: 'medium', vertical:'large' }}
         gap='medium'
         width={!mobile?{ min:'620px', max:'620px' }: undefined}

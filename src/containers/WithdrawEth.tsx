@@ -130,7 +130,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
         width={!mobile?{ min:'620px', max:'620px' }: undefined}
         alignSelf='center'
         fill
-        background='background-front'
+        background='background'
         round='small'
         pad='large'
         gap='medium'
@@ -211,7 +211,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
           width={{ max:'600px' }}
           alignSelf='center'
           fill
-          background='background-front'
+          background='background'
           round='small'
           pad='large'
           gap='medium'

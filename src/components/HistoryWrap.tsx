@@ -24,7 +24,7 @@ const HistoryWrap = ({ children, closeLayer, series } : any) => {
     >
       <Box
         width={!mobile?{ min:'620px', max:'620px' }: undefined}
-        background="background-front"
+        background="background"
         direction="column"
         fill="vertical"
         style={{

@@ -115,7 +115,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
         width={!mobile?{ min:'620px', max:'620px' }: undefined}
         alignSelf='center'
         fill
-        background='background-front'
+        background='background'
         round='small'
         pad='large'
         gap='medium'

@@ -226,7 +226,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
           width={{ max:'600px' }}
           alignSelf='center'
           fill='horizontal'
-          background='background-front'
+          background='background'
           round='small'
           pad='large'
           gap='medium'

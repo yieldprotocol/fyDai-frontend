@@ -140,7 +140,7 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
         width={!mobile?{ min:'600px', max:'600px' }: undefined}
         alignSelf='center'
         fill
-        background='background-front'
+        background='background'
         round='small'
         pad='large'
         gap='medium'
@@ -233,7 +233,7 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
         width={{ max:'600px' }}
         alignSelf='center'
         fill
-        background='background-front'
+        background='background'
         round='small'
         pad='large'
         gap='medium'

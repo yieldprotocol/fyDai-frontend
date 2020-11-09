@@ -126,7 +126,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
           width={!mobile?{ min: activeSeries.isMature()?'600px':'620px', max: activeSeries.isMature()?'600px':'620px' } : undefined}
           alignSelf="center"
           fill
-          background="background-front" 
+          background="background" 
           round='small'
           pad="large"
         >

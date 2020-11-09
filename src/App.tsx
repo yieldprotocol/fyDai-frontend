@@ -109,10 +109,10 @@ const App = (props:any) => {
         </Box>}
 
       <Main 
-        pad={{ bottom:'large' }}
+        pad={{ vertical:'medium' }}
         align='center'
         flex
-      >      
+      >     
         <Switch>
           <Route path="/post/:amnt?"> <Deposit openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route>
           <Route path="/withdraw/:amnt?"> <WithdrawEth /> </Route>
@@ -142,7 +142,7 @@ const App = (props:any) => {
 };
 
 const WrappedApp = () => {
-  const [darkMode, setDarkMode] = useState(false);
+  const [ darkMode, setDarkMode ] = useState(true);
   const [ moodLight, setMoodLight] = useState(true);
   return (
     <Suspense fallback={null}>
@@ -155,7 +155,7 @@ const WrappedApp = () => {
           <App 
             darkMode={darkMode}
             setDarkMode={setDarkMode}
-            moodLight={moodLight}
+            moodLight={darkMode?false:moodLight}
             toggleMoodLight={()=>setMoodLight(!moodLight)}
           />
         </ErrorBoundary>

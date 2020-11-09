@@ -363,7 +363,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
           width={{ max: '600px' }}
           alignSelf="center"
           fill
-          background="background-front"
+          background="background"
           round='small'
           pad="large"
           gap='small'

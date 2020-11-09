@@ -57,7 +57,7 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
           <Box
             width={!mobile?{ min:'620px', max:'620px' }: undefined}
             height={!mobile?{ max:'750px' }: undefined}
-            background="background-front"
+            background="background"
             fill="vertical"
             style={{
               borderRadius: '0.5rem',

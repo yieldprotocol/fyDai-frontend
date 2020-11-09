@@ -93,7 +93,7 @@ const TxHistory = ( { filterTerms, series }: HistoryProps) => {
   return (
     <Loading condition={state.userLoading} size='large'>
       <Box
-        background='background-front'
+        background='background'
         fill='horizontal'
         round='small'
         pad='none'

@@ -104,7 +104,7 @@ const ConfirmationRequired = ({ close }:any) => {
               pad="medium"
               gap="small"
               round='small'
-              background='background-front'
+              background='background'
             >
               <Text weight='bold'>Confirmation required</Text>
               <Text>Please check your wallet or provider to approve the transaction</Text>            
@@ -158,7 +158,7 @@ const ConfirmationRequired = ({ close }:any) => {
               pad="medium"
               gap="small"
               round='small'
-              background='background-front'
+              background='background'
             >
               <Text weight='bold'>Confirmation required</Text>
               <Text>Please check your wallet or provider to approve the transaction</Text>            
