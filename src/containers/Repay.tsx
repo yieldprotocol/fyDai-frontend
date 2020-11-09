@@ -123,10 +123,10 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
     >
       { !txActive &&
         <Box
-          width={!mobile?{ min:'620px', max:'620px' }: undefined}
+          width={!mobile?{ min: activeSeries.isMature()?'600px':'620px', max: activeSeries.isMature()?'600px':'620px' } : undefined}
           alignSelf="center"
           fill
-          background="background-front"
+          background="background-front" 
           round='small'
           pad="large"
         >
@@ -243,7 +243,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
       { txActive && <TxStatus tx={txActive} /> }
 
       {mobile && 
-      !activeSeries?.isMature() && 
+      !activeSeries?.isMature() &&
         <YieldMobileNav noMenu={true}>
           <NavLink 
             to={`/borrow/${activeSeries?.maturity}`}
