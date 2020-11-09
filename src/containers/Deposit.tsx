@@ -305,7 +305,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
                   valueExtra: () => (
                     <Box pad={{ top:'small' }}>
                       <RaisedButton
-                        label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Connect a wallet</Text></Box>}
+                        label={<Box pad='xsmall'><Text size='xsmall'>Connect a wallet</Text></Box>}
                         onClick={() => openConnectLayer()}
                       /> 
                     </Box>

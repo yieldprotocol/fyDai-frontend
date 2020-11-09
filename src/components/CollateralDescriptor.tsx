@@ -34,7 +34,7 @@ function CollateralDescriptor( { backToBorrow, children }: ICollateralDescriptor
           pad={{ horizontal:'large', vertical:'medium' }}
           justify='between'
         >
-          <Text size='large' weight='bold' color='brand'> 
+          <Text size='large' weight='bold'> 
             Manage ETH Collateral 
           </Text>
 

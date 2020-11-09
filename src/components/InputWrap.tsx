@@ -1,8 +1,9 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Box, Collapsible } from 'grommet';
+import { Box, Collapsible, ThemeContext } from 'grommet';
 
 import InlineAlert from './InlineAlert';
+import { modColor } from '../utils';
 
 interface IInputProps {
   warningMsg: string|null;
@@ -12,22 +13,25 @@ interface IInputProps {
 
 const InsetBox = styled(Box)`
 border-radius: 8px;
-background: #f8f8f8;
-box-shadow: inset 6px 6px 11px #e9e9e9, 
-            inset -6px -6px 11px #ffffff;
   ${(props:any) => props.background && css`
     background: ${props.background};
-    color: black;
+    box-shadow: inset 6px 6px 11px ${modColor(props.background, -20)}, 
+            inset -6px -6px 11px ${modColor(props.background, 10)};
   `}
 `;
 
 function InputWrap( { warningMsg, errorMsg, children }: IInputProps) {
+
+  const theme:any = React.useContext(ThemeContext);
+  const themeBackground = theme.global.colors.background;
+  const defaultBackground = theme.dark === true ? themeBackground.dark: themeBackground.light;
 
   return (
     <InsetBox
       fill='horizontal'
       gap='none'
       align='center'
+      background={defaultBackground}
     >
       <Box 
         round='small' 

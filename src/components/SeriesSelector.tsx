@@ -140,12 +140,12 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
 
                   <Box fill='horizontal' direction='row' justify='between' gap='small'>
                     <Box fill align={mobile?'start':'start'}>
-                      <Text size='xsmall' color='brand'>
+                      <Text size='xsmall'>
                         { mobile? x.displayNameMobile : x.displayName }
                       </Text>
                     </Box>
                     <Box fill align={mobile?'end':undefined}>
-                      <Text size='xsmall' color='brand'>
+                      <Text size='xsmall'>
                         {x[field]}
                       </Text>
                     </Box>                 

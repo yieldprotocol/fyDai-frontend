@@ -1,41 +1,41 @@
 import React, { useContext } from 'react';
 import styled, { css } from 'styled-components';
-import { Text, Box, Layer, ResponsiveContext } from 'grommet';
+import { Text, Box, Layer, ResponsiveContext, ThemeContext } from 'grommet';
 import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
 
 import Authorization from './Authorization';
-
-const color = '#f8f8f8';
+import { modColor } from '../utils';
 
 const StyledBox = styled(Box)`
-  background: ${color};
   border-radius: 8px;
   transition: all 0.3s ease-in-out;
 
   ${(props:any) => props.disabled && css`
-  box-shadow:  0px 0px 0px #dfdfdf, 
-  -0px -0px 0px #ffffff;
+  background: ${ props.background };
+  box-shadow:  0px 0px 0px ${modColor(props.background, -15)}, 
+  -0px -0px 0px ${modColor(props.background, 10)};
   :hover {
     transform: scale(1);
-    box-shadow:  0px 0px 0px #dfdfdf,  
-    -0px -0px 0px #ffffff;
+    box-shadow:  0px 0px 0px ${modColor(props.background, -15)},  
+    -0px -0px 0px ${modColor(props.background, 10)};
     }
   `}
 
   ${(props:any) => !(props.disabled) && css`
-  box-shadow:  6px 6px 11px #dfdfdf,  
-  -6px -6px 11px #ffffff;
+  background: ${ props.background };
+  box-shadow:  6px 6px 11px ${modColor(props.background, -15)},  
+  -6px -6px 11px ${modColor(props.background, 10)};
   :active:hover {
-    box-shadow:  0px 0px 0px #dfdfdf, 
-        -0px -0px 0px #ffffff;
+    box-shadow:  0px 0px 0px ${modColor(props.background, -15)}, 
+        -0px -0px 0px ${modColor(props.background, 10)};
     } 
   :hover {
     transform: scale(1.01);
-    box-shadow:  8px 8px 11px #dfdfdf,  
-    -8px -8px 11px #ffffff;
+    box-shadow:  8px 8px 11px ${modColor(props.background, -15)},  
+    -8px -8px 11px ${modColor(props.background, 10)};
     }
   `}
 `;
@@ -43,6 +43,10 @@ const StyledBox = styled(Box)`
 function ActionButton({ ...props }:any ) {
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
+  const theme:any = React.useContext(ThemeContext);
+  const themeBackground = theme.global.colors.background;
+  const defaultBackground = theme.dark === true ? themeBackground.dark: themeBackground.light;
+
   const { state: seriesState } = useContext(SeriesContext);
   const { activeSeries } = seriesState;
   
@@ -59,11 +63,11 @@ function ActionButton({ ...props }:any ) {
            fill='horizontal'
            align='center'
            pad='small'
+           background={defaultBackground}
          >
            <Text 
              weight='bold'
              size='large'
-             color={activeSeries?.seriesTextColor}
            >
              {props.label}
            </Text>
@@ -76,12 +80,13 @@ function ActionButton({ ...props }:any ) {
            full='horizontal'
          >
            <Box
-             background='background'
+             // background='background'
              direction="row"  
              elevation='medium'
              pad="medium"
              justify='between'
              align='center'
+             background={defaultBackground}
            >          
              <Box
                onClick={()=>props.clearInput()}
@@ -107,10 +112,10 @@ function ActionButton({ ...props }:any ) {
               align='center'
               pad='small'
               onClick={()=>{ }}
+              background={defaultBackground}
             >
               <Text 
                 size='medium'
-                color={activeSeries?.seriesTextColor}
               >
                 Please authorize Yield before going any further
               </Text>
@@ -123,7 +128,8 @@ function ActionButton({ ...props }:any ) {
               full='horizontal'
             >
               <Box
-                background='background'
+                // background='background'
+                background={defaultBackground}
                 direction="row"  
                 elevation='medium'
                 pad="medium"
@@ -158,10 +164,10 @@ function ActionButton({ ...props }:any ) {
               align='center'
               pad='small'
               onClick={()=>{ }}
+              background={defaultBackground}
             >
               <Text 
                 size='medium'
-                color={activeSeries?.seriesTextColor}
               >
                 Please unlock this series first
               </Text>
@@ -174,12 +180,13 @@ function ActionButton({ ...props }:any ) {
               full='horizontal'
             >
               <Box
-                background='background'
+                // background='background'
                 direction="row"  
                 elevation='medium'
                 pad="medium"
                 justify='between'
                 align='center'
+                background={defaultBackground}
               >          
                 <Box
                   onClick={(e:any)=>{e.stopPropagation(); props.clearInput();}}
@@ -195,20 +202,12 @@ function ActionButton({ ...props }:any ) {
         </Authorization>}
 
       { !mobile && props.disabled && 
-        <StyledBox 
-          {...props} 
+        <Box 
           fill='horizontal'
           align='center'
-          pad='small'
-        >
-          <Text 
-            size='medium'
-            color='background'
-          >
-            click me.
-          </Text>
-        </StyledBox>}
-
+          pad='medium'
+          background={defaultBackground}
+        />}
     </>
   );
 }

@@ -192,7 +192,7 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
                 valueExtra: () => (
                   <Button
                     color='brand-transparent'
-                    label={<Text size='xsmall' color='brand'>Connect a wallet</Text>}
+                    label={<Text size='xsmall'>Connect a wallet</Text>}
                     onClick={() => openConnectLayer()}
                     hoverIndicator='brand-transparent'
                   /> 
@@ -245,7 +245,6 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
           <Box
             round
             onClick={()=>close()}
-            hoverIndicator='brand-transparent'
             pad={{ horizontal:'small', vertical:'small' }}
             justify='center'
           >

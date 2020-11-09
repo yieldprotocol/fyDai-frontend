@@ -231,7 +231,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
                         <Check />
                       </Box>
                       <Box> 
-                        <Text size='small' color='brand'>You do not have any debt in this series.</Text>         
+                        <Text size='small'>You do not have any debt in this series.</Text>         
                       </Box>
                     </Box>
                   </Box>             

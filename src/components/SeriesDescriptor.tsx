@@ -51,7 +51,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
           ${modColor( activeSeries?.seriesColor, 50)}, 
           ${modColor( activeSeries?.seriesColor, 0)}, 
           ${modColor( activeSeries?.seriesColor, 0)})`}
-          margin={{ bottom:'-16px' }}
+          margin={{ bottom:'-18px' }}
         >
           <Box
             pad='small'   

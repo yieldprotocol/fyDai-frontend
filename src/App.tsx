@@ -119,7 +119,7 @@ const App = (props:any) => {
           <Route path="/borrow/:series?/:amnt?"> <Borrow openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route> 
           <Route path="/repay/:series/:amnt?"> <Repay /> </Route>
           <Route path="/lend/:series?/:amnt?"> <Lend openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route>
-          <Route path="/close/:series/:amnt?"> <CloseDai /> </Route>
+          <Route path="/close/:series/:amnt?"> <CloseDai close={()=>null} /> </Route>
           <Route path="/pool/:series?/:amnt?"> <Pool openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route>
           <Route path="/removeLiquidity/:series/:amnt?"> <RemoveLiquidity /> </Route>           
           <Route exact path="/"> <Redirect to={`${cachedLastVisit || '/borrow/'}`} /> </Route>

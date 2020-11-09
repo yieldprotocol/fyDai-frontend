@@ -20,6 +20,7 @@ const TxStatus= ({ tx }:TxStatusProps) => {
   } = useContext(TxContext);
 
   const theme:any = useContext(ThemeContext);
+  const defaultColor = theme.dark? theme.global.colors.text.dark: theme.global.colors.text.light;
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' ); 
   const txRef = React.useRef<any>(null);
 
@@ -36,9 +37,9 @@ const TxStatus= ({ tx }:TxStatusProps) => {
           gap='medium'
           width={!mobile?{ min:'600px', max:'600px' }: undefined}
         >
-          <Text size='xlarge' color='brand' weight='bold'>Transaction pending...</Text>
+          <Text size='xlarge' weight='bold'>Transaction pending...</Text>
           <Text>{tx.msg}</Text>
-          <ScaleLoader color={theme?.global?.colors?.brand.dark || 'grey'} height='25px' />
+          <ScaleLoader color={defaultColor} height='25px' />
           <Box direction='row' gap='xsmall'>
             <HashWrap hash={tx.tx.hash}> <Text size='xsmall' ref={txRef}> { abbreviateHash(tx.tx.hash) } </Text></HashWrap>  
           </Box>
@@ -56,7 +57,7 @@ const TxStatus= ({ tx }:TxStatusProps) => {
         gap='medium'
         width={!mobile?{ min:'600px', max:'600px' }: undefined}
       >
-        <Text size='xlarge' color='brand' weight='bold'>Transaction complete. </Text>
+        <Text size='xlarge' weight='bold'>Transaction complete. </Text>
         <Text>{(lastCompletedTx.status === 1)? 'Transaction succeeded': 'Transaction failed'}</Text>
         <Box direction='row' gap='xsmall'>
           <Text size='xsmall' ref={txRef}> <HashWrap hash={lastCompletedTx?.transactionHash}>{ abbreviateHash(lastCompletedTx?.transactionHash) }</HashWrap> </Text>

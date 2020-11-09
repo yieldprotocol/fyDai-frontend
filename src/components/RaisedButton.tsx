@@ -1,6 +1,6 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Box, Button, Text } from 'grommet';
+import { Box, Button, Text, ThemeContext } from 'grommet';
 
 import { modColor } from '../utils';
 
@@ -35,14 +35,19 @@ ${(props:any) => props.background && css`
 
 function RaisedButton({ selected=true, ...props }:any ) {
 
+  const theme:any = React.useContext(ThemeContext);
+  const themeBackground = theme.global.colors.background;
+  const defaultBackground = theme.dark === true ? themeBackground.dark: themeBackground.light;
+
   return (
     <>
       <StyledButton 
         {...props} 
+        background={props.background? props.background : defaultBackground}
         plain
         label={
           <Box pad={{ horizontal:'small' }}>
-            <Text size='xxsmall' color='brand'>
+            <Text size='xxsmall'>
               {props.label}
             </Text>
           </Box>

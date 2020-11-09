@@ -1,6 +1,6 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Box, Button, Text } from 'grommet';
+import { Box, Button, Text, ThemeContext } from 'grommet';
 
 import { modColor } from '../utils';
 
@@ -39,25 +39,31 @@ const StyledButton = styled(Button)`
 ${(props:any) => props.background && css`
     background: ${ props.background };
     border: 1px solid ${props.background};
-    box-shadow:  0px 0px 0px ${modColor(props.background, -20)}, -0px -0px 0px ${modColor(props.background, 10)};
+    box-shadow:  0px 0px 0px ${modColor(props.background, -15)}, -0px -0px 0px ${modColor(props.background, 10)};
     :active:hover {
       border: 1px solid ${ props.background };
     transform: scale(1);
-    box-shadow:  6px 6px 11px ${modColor(props.background, -20)}, -6px -6px 11px ${modColor(props.background, 10)};
+    box-shadow:  6px 6px 11px ${modColor(props.background, -15)}, -6px -6px 11px ${modColor(props.background, 10)};
     }
     :hover {
       border: 1px solid ${ props.background };
     transform: scale(1.02);
-    box-shadow:  6px 6px 11px ${modColor(props.background, -20)}, -6px -6px 11px ${modColor(props.background, 10)};
+    box-shadow:  6px 6px 11px ${modColor(props.background, -15)}, -6px -6px 11px ${modColor(props.background, 10)};
 }
 `}
 `;
 
 function FlatButton({ ...props }:any ) {
+
+  const theme:any = React.useContext(ThemeContext);
+  const themeBackground = theme.global.colors.background;
+  const defaultBackground = theme.dark === true ? themeBackground.dark: themeBackground.light;
+
   return (
     <>
       <StyledButton 
-        {...props} 
+        {...props}
+        background={props.background? props.background : defaultBackground}
         plain
         label={
           <Box pad={{ horizontal:'small', vertical:'xsmall' }}>
