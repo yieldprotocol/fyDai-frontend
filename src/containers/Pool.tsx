@@ -40,6 +40,7 @@ import RaisedBox from '../components/RaisedBox';
 import DaiMark from '../components/logos/DaiMark';
 import YieldMobileNav from '../components/YieldMobileNav';
 
+import { logEvent } from '../utils/analytics';
 
 interface IPoolProps {
   openConnectLayer:any;
@@ -88,6 +89,11 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
     if (inputValue && !addLiquidityDisabled ) {
       setAddLiquidityPending(true);
       await addLiquidity( activeSeries, inputValue );
+      logEvent({
+        category: 'Pool',
+        action: inputValue,
+        label: activeSeries.displayName || activeSeries.poolAddress,
+      });
       setInputValue(undefined);
       userActions.updateHistory();
       await Promise.all([

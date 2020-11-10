@@ -32,6 +32,14 @@ import Authorization from './components/Authorization';
 import ErrorBoundary from './components/ErrorBoundry';
 import YieldNav from './components/YieldNav';
 
+import { initGA, logPageView } from './utils/analytics';
+
+declare global {
+  interface Window {
+    GA_INITIALIZED: any;
+  }
+}
+
 const App = (props:any) => {
   const { state: { seriesLoading, activeSeries } } = useContext(SeriesContext);
   const { state: { yieldLoading } } = useContext(YieldContext);
@@ -72,6 +80,15 @@ const App = (props:any) => {
         });
       } 
     });
+  }, []);
+
+  /* Google Analytics */
+  useEffect(() => {
+    if (!window.GA_INITIALIZED as boolean) {
+      initGA();
+      window.GA_INITIALIZED = true;
+    }
+    logPageView();
   }, []);
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );

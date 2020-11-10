@@ -11,6 +11,8 @@ import ApprovalPending from '../components/ApprovalPending';
 import TxStatus from '../components/TxStatus';
 import ActionButton from '../components/ActionButton';
 
+import { logEvent } from '../utils/analytics';
+
 interface IRedeemProps {
   close?:any,
 }
@@ -33,6 +35,11 @@ const Redeem  = ({ close }:IRedeemProps)  => {
     if(!redeemDisabled) {
       await redeem(activeSeries, activeSeries.fyDaiBalance.toString());
       userActions.updateHistory();
+      logEvent({
+        category: 'Redeem',
+        action: String(activeSeries.fyDaiBalance),
+        label: activeSeries.displayName || activeSeries.poolAddress,
+      });
       await Promise.all([
         userActions.updatePosition(),
         seriesActions.updateActiveSeries()

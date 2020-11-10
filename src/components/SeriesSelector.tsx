@@ -14,6 +14,8 @@ import FlatButton from './FlatButton';
 import RaisedButton from './RaisedButton';
 import YieldMobileNav from './YieldMobileNav';
 
+import { logEvent } from '../utils/analytics';
+
 interface ISeriesSelectorProps {
   activeView:string;
   close:any;
@@ -37,8 +39,13 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
     ['POOL', { head: 'POOL PERCENTAGE', field: 'poolPercent' }],
   ]);
 
-  const handleSelectSeries = (seriesMaturity: number) => {
+  const handleSelectSeries = (seriesMaturity: number, displayName: string) => {
     setActiveSeries(seriesMaturity);
+    logEvent({
+      category: 'Series',
+      action: 'Select Series',
+      label: displayName,
+    });
     navHistory.push(`/${pathname.split('/')[1]}/${seriesMaturity}`);
     close();
   };
@@ -124,7 +131,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
                   key={_key}
                   direction='row' 
                   justify='between'
-                  onClick={()=>handleSelectSeries(x.maturity)}
+                  onClick={()=>handleSelectSeries(x.maturity, x.displayName)}
                   hoverIndicator='background-mid'
                   background={activeSeries.maturity === x.maturity ?'background-mid':undefined}
                   border='top'

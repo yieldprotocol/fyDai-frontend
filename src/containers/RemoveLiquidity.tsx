@@ -24,6 +24,8 @@ import YieldMark from '../components/logos/YieldMark';
 import YieldMobileNav from '../components/YieldMobileNav';
 import ConfirmationRequired from '../components/ConfirmationRequired';
 
+import { logEvent } from '../utils/analytics';
+
 interface IRemoveLiquidityProps {
   openConnectLayer?:any
   close?: any;
@@ -63,6 +65,11 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
     if ( !removeLiquidityDisabled ) {
       setRemoveLiquidityPending(true);
       await removeLiquidity(activeSeries, value);
+      logEvent({
+        category: 'Remove Liquidity',
+        action: String(value),
+        label: activeSeries.displayName || activeSeries.poolAddress,
+      });
       setInputValue(undefined);
       userActions.updateHistory();
       if (activeSeries?.isMature()) {

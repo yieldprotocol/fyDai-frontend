@@ -38,6 +38,8 @@ import HistoryWrap from '../components/HistoryWrap';
 import RaisedBox from '../components/RaisedBox';
 import YieldMobileNav from '../components/YieldMobileNav';
 
+import { logEvent } from '../utils/analytics';
+
 interface IBorrowProps {
   borrowAmount?:number|null;
   openConnectLayer:any;
@@ -104,6 +106,11 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
       setBorrowPending(true);
       autoSell && await borrowDai(activeSeries, 'ETH-A', inputValue);
       !autoSell && await borrow('ETH-A', activeSeries.maturity, inputValue);
+      logEvent({
+        category: 'Borrow',
+        action: inputValue,
+        label: activeSeries.displayName || activeSeries.poolAddress,
+      });
       setInputValue(undefined);
       userActions.updateHistory();
       await Promise.all([

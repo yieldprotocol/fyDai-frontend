@@ -46,6 +46,8 @@ import RaisedBox from '../components/RaisedBox';
 import EthMark from '../components/logos/EthMark';
 import YieldMobileNav from '../components/YieldMobileNav';
 
+import { logEvent } from '../utils/analytics';
+
 interface DepositProps {
   /* deposit amount prop is for quick linking into component */
   openConnectLayer:any;
@@ -100,6 +102,10 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
     if (inputValue && !depositDisabled ) {
       setDepositPending(true);
       await postEth(inputValue);
+      logEvent({
+        category: 'Deposit',
+        action: inputValue
+      });
       setInputValue(undefined);
       userActions.updateHistory();
       await userActions.updatePosition();

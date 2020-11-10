@@ -32,6 +32,8 @@ import FlatButton from '../components/FlatButton';
 import DaiMark from '../components/logos/DaiMark';
 import YieldMobileNav from '../components/YieldMobileNav';
 
+import { logEvent } from '../utils/analytics';
+
 interface IRepayProps {
   repayAmount?:any
   setActiveView?: any;
@@ -68,6 +70,11 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
       setRepayPending(true);
       /* repay using proxy */
       await repayDaiDebt(activeSeries, 'ETH-A', value);
+      logEvent({
+        category: 'Repay',
+        action: String(value),
+        label: activeSeries.displayName || activeSeries.poolAddress,
+      });
       setInputValue(undefined);
       userActions.updateHistory();
       if (activeSeries?.isMature()) {
