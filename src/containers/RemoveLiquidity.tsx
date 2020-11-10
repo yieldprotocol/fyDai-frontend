@@ -74,7 +74,7 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
         userActions.updatePosition();
         seriesActions.updateActiveSeries();
       }
-      setRemoveLiquidityPending(true);
+      setRemoveLiquidityPending(false);
       !activeSeries?.isMature() && close();
     }
   };
@@ -140,7 +140,7 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
         width={!mobile?{ min:'600px', max:'600px' }: undefined}
         alignSelf='center'
         fill
-        background='background-front'
+        background='background'
         round='small'
         pad='large'
         gap='medium'
@@ -192,7 +192,7 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
                 valueExtra: () => (
                   <Button
                     color='brand-transparent'
-                    label={<Text size='xsmall' color='brand'>Connect a wallet</Text>}
+                    label={<Text size='xsmall'>Connect a wallet</Text>}
                     onClick={() => openConnectLayer()}
                     hoverIndicator='brand-transparent'
                   /> 
@@ -233,7 +233,7 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
         width={{ max:'600px' }}
         alignSelf='center'
         fill
-        background='background-front'
+        background='background'
         round='small'
         pad='large'
         gap='medium'
@@ -245,7 +245,6 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
           <Box
             round
             onClick={()=>close()}
-            hoverIndicator='brand-transparent'
             pad={{ horizontal:'small', vertical:'small' }}
             justify='center'
           >

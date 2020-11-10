@@ -264,9 +264,9 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
                     </Box>
                     <Box gap='xsmall'>
                       <Box> 
-                        <Text weight='bold' color='text-weak'> Deposit Collateral </Text>
+                        <Text weight='bold' color={activeSeries?.seriesTextColor}> Deposit Collateral </Text>
                       </Box>
-                      <Text size='xxsmall' color='text-weak'>
+                      <Text size='xxsmall' color={activeSeries?.seriesTextColor}>
                         Use the 'manage collateral' button to post some ETH
                       </Text>
                     </Box>
@@ -363,7 +363,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
           width={{ max: '600px' }}
           alignSelf="center"
           fill
-          background="background-front"
+          background="background"
           round='small'
           pad="large"
           gap='small'
@@ -419,7 +419,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
                       valueExtra: () => (
                         <Box pad={{ top:'small' }}>
                           <RaisedButton
-                            label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Connect a wallet</Text></Box>}
+                            label={<Box pad='xsmall'><Text size='xsmall'>Connect a wallet</Text></Box>}
                             onClick={() => openConnectLayer()}
                           /> 
                         </Box>
@@ -453,8 +453,8 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
                       valueExtra: () => (
                         <Box pad={{ top:'small' }}>
                           <RaisedButton
-                            color={inputValue? 'brand': 'brand-transparent'}
-                            label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Deposit collateral</Text></Box>}
+                            // color={inputValue? 'brand': 'brand-transparent'}
+                            label={<Box pad='xsmall'><Text size='xsmall'>Deposit collateral</Text></Box>}
                             onClick={()=>navHistory.push('/post/')}
                           /> 
                         </Box>

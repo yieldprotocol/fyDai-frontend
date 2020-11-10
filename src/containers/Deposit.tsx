@@ -181,6 +181,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
         <CollateralDescriptor backToBorrow={()=>history.push('/borrow')}>
            
           <InfoGrid
+            alt
             entries={[
               {
                 label: 'Max Borrowing Power',
@@ -243,7 +244,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
         <Box
           alignSelf="center"
           fill
-          background="background-front"
+          background="background"
           round='small'
           pad='large'
           gap='medium'
@@ -269,49 +270,50 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
 
           <Box fill>
             <Collapsible open={!!inputValue&&inputValue>0}> 
-              <InfoGrid entries={[
-                {
-                  label: 'Borrowing Power',
-                  labelExtra: `est. after posting ${inputValue && cleanValue(inputValue, 2)} ETH`,
-                  visible: !!account,
-                  active: debouncedInput,
-                  loading: !ethPosted_ && depositPending && ethPosted_ !== 0,
-                  value: estPower? `${estPower} DAI`: '0 DAI',           
-                  valuePrefix: null,
-                  valueExtra: null,
-                },
-                {
-                  label: 'Collateralization Ratio',
-                  labelExtra: `est. after posting ${inputValue && cleanValue(inputValue, 2)} ETH`,
-                  visible: !!account && collateralPercent_ > 0,
-                  active: debouncedInput && collateralPercent_ > 0,
-                  loading: !ethPosted_ && depositPending && ethPosted_ !== 0,           
-                  value: (estRatio && estRatio !== 0)? `${estRatio}%`: `${collateralPercent_}%` || '',
-                  valuePrefix: null,
+              <InfoGrid
+                entries={[
+                  {
+                    label: 'Borrowing Power',
+                    labelExtra: `est. after posting ${inputValue && cleanValue(inputValue, 2)} ETH`,
+                    visible: !!account,
+                    active: debouncedInput,
+                    loading: !ethPosted_ && depositPending && ethPosted_ !== 0,
+                    value: estPower? `${estPower} DAI`: '0 DAI',           
+                    valuePrefix: null,
+                    valueExtra: null,
+                  },
+                  {
+                    label: 'Collateralization Ratio',
+                    labelExtra: `est. after posting ${inputValue && cleanValue(inputValue, 2)} ETH`,
+                    visible: !!account && collateralPercent_ > 0,
+                    active: debouncedInput && collateralPercent_ > 0,
+                    loading: !ethPosted_ && depositPending && ethPosted_ !== 0,           
+                    value: (estRatio && estRatio !== 0)? `${estRatio}%`: `${collateralPercent_}%` || '',
+                    valuePrefix: null,
                   // valueExtra: () => (
                   //   <Text color='green' size='medium'> 
                   //     {/* { inputValue && collateralPercent_ && ( (estRatio-collateralPercent_) !== 0) && `(+ ${(estRatio-collateralPercent_).toFixed(0)}%)` } */}
                   //   </Text>
                   // )
-                },
-                {
-                  label: '',
-                  labelExtra:'Connect a wallet to get started',
-                  visible: !account && !!inputValue,
-                  active: inputValue,
-                  loading: false,            
-                  value: '',
-                  valuePrefix: null,
-                  valueExtra: () => (
-                    <Box pad={{ top:'small' }}>
-                      <RaisedButton
-                        label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Connect a wallet</Text></Box>}
-                        onClick={() => openConnectLayer()}
-                      /> 
-                    </Box>
-                  )
-                },
-              ]}
+                  },
+                  {
+                    label: '',
+                    labelExtra:'Connect a wallet to get started',
+                    visible: !account && !!inputValue,
+                    active: inputValue,
+                    loading: false,            
+                    value: '',
+                    valuePrefix: null,
+                    valueExtra: () => (
+                      <Box pad={{ top:'small' }}>
+                        <RaisedButton
+                          label={<Box pad='xsmall'><Text size='xsmall'>Connect a wallet</Text></Box>}
+                          onClick={() => openConnectLayer()}
+                        /> 
+                      </Box>
+                    )
+                  },
+                ]}
               />
             </Collapsible>
           </Box>

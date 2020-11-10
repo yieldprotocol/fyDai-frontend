@@ -56,8 +56,8 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
         >
           <Box
             width={!mobile?{ min:'620px', max:'620px' }: undefined}
-            height={!mobile?{ max:'750px' }: undefined}
-            background="background-front"
+            // height={!mobile?{ min:'750px', max:'750px' }: undefined}
+            background="background"
             fill="vertical"
             style={{
               borderRadius: '0.5rem',
@@ -72,7 +72,7 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
               <Box gap='medium' flex={false}>
                 <Box pad="small" gap="small">
                   <Box direction='row' justify='between'>
-                    <Text alignSelf='center' size='large' color='brand' weight='bold'>Connected Wallet</Text>   
+                    <Text alignSelf='center' size='large' weight='bold'>Connected Wallet</Text>   
                     <Box direction='row' gap='small'>
                       <RaisedButton
                         onClick={()=>setLayerView('CONNECT')}
@@ -126,7 +126,7 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
               { layerView === 'CONNECT' &&      
               <Box pad="medium" gap="large">
                 <Box align='center'>
-                  <Text size='large' color='brand' weight='bold'>Connect a wallet</Text>
+                  <Text size='large' weight='bold'>Connect a wallet</Text>
                 </Box>
                 <Box align="center" pad="medium" gap="small">
                   {connectorList.map((x:any, i:number) => {          

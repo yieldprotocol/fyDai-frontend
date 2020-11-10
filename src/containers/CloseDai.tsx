@@ -24,7 +24,7 @@ import DaiMark from '../components/logos/DaiMark';
 import YieldMobileNav from '../components/YieldMobileNav';
 
 interface ICloseDaiProps {
-  close?: any;
+  close: any;
 }
 
 const CloseDai = ({ close }:ICloseDaiProps) => {
@@ -115,13 +115,13 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
         width={!mobile?{ min:'620px', max:'620px' }: undefined}
         alignSelf='center'
         fill
-        background='background-front'
+        background='background'
         round='small'
         pad='large'
         gap='medium'
       >
         { !txActive && !CloseDaiPending && 
-        <>
+        <Box gap='medium'>
           <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to close</Text>
           <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
             <TextInput
@@ -159,7 +159,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
                 }
             />
           </Box>}
-        </>}
+        </Box>}
 
         { CloseDaiPending && 
           !txActive && 
@@ -181,7 +181,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
             <Box
               round
               onClick={() => close()}
-              hoverIndicator='brand-transparent'
+              // hoverIndicator='brand-transparent'
               pad={{ horizontal: 'small', vertical: 'small' }}
               justify='center'
             >
@@ -209,7 +209,5 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
     </Keyboard>
   );
 };
-
-CloseDai.defaultProps={ close:null };
 
 export default CloseDai;

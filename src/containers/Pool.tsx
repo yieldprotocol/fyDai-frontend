@@ -215,7 +215,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
           width={{ max:'600px' }}
           alignSelf='center'
           fill='horizontal'
-          background='background-front'
+          background='background'
           round='small'
           pad='large'
           gap='medium'
@@ -267,7 +267,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                         valueExtra: () => (
                           <Box pad={{ top:'small' }}>
                             <RaisedButton
-                              label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Connect a wallet</Text></Box>}
+                              label={<Box pad='xsmall'><Text size='xsmall'>Connect a wallet</Text></Box>}
                               onClick={() => openConnectLayer()}
                             /> 
                           </Box>

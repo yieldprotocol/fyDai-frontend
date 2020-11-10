@@ -25,6 +25,7 @@ const YieldNav = (props: any) => {
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   const { state: { activeSeries } } = useContext(SeriesContext);
   const theme = useContext<any>(ThemeContext);
+  const textColor = theme.dark? theme.global.colors.text.dark : theme.global.colors.text.light;
 
   return (
     <>
@@ -36,7 +37,7 @@ const YieldNav = (props: any) => {
       >
         <StyledLink 
           to={`/borrow/${activeSeries?.maturity}`}
-          activeStyle={{ transform: 'scale(1.1)', fontWeight: 'bold', color: `${theme.global.colors.active}` }}
+          activeStyle={{ transform: 'scale(1.1)', fontWeight: 'bold', color: `${textColor}` }}
           isActive={(match, location:any) => {
             return (location.pathname.includes('borrow'));
           }}
@@ -50,7 +51,7 @@ const YieldNav = (props: any) => {
 
         <StyledLink 
           to={`/lend/${activeSeries?.maturity}`}
-          activeStyle={{ transform: 'scale(1.1)', fontWeight: 'bold', color: `${theme.global.colors.active}` }}
+          activeStyle={{ transform: 'scale(1.1)', fontWeight: 'bold', color: `${textColor}` }}
         >
           <Text 
             weight='bold' 
@@ -61,7 +62,7 @@ const YieldNav = (props: any) => {
 
         <StyledLink 
           to={`/pool/${activeSeries?.maturity}`}
-          activeStyle={{ transform: 'scale(1.1)', fontWeight: 'bold', color: `${theme.global.colors.active}` }}
+          activeStyle={{ transform: 'scale(1.1)', fontWeight: 'bold', color: `${textColor}` }}
         >
           <Text 
             weight='bold' 

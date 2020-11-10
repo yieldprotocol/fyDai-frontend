@@ -124,7 +124,6 @@ const YieldProvider = ({ children }: any) => {
     let _deployedContracts: any;
 
     if (chainId === undefined) {
-      console.log('chainId call');
       chainId = (await fallbackProvider.getNetwork()).chainId;
     }
 

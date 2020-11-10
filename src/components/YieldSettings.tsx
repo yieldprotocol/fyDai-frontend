@@ -1,43 +1,47 @@
 import React, { useEffect, useState, useContext } from 'react';
 import styled, { css } from 'styled-components';
-import { Box, Text } from 'grommet';
+import { Box, Text, ThemeContext } from 'grommet';
 
 import { UserContext } from '../contexts/UserContext';
 import FlatButton from './FlatButton';
+import { modColor } from '../utils';
 
 const StyledBox = styled(Box)`
-  background: #f8f8f8;
   border-radius: 25px;
-  border-color: #f8f8f8;
   transition: all 0.3s ease-in-out;
+
   ${(props:any) => !(props.border) && css`
-  box-shadow: 0px 0px 0px #dfdfdf, -0px -0px 0px #ffffff;
+  background: ${ props.background };
+  border-color: ${ props.background };
+  box-shadow: 0px 0px 0px ${modColor(props.background, -15)}, -0px -0px 0px ${modColor(props.background, 10)};
   :active:hover {
     transform: scale(1);
-    box-shadow: inset 6px 6px 11px #dfdfdf, inset -6px -6px 11px #ffffff;
+    box-shadow: inset 6px 6px 11px ${modColor(props.background, -15)}, inset -6px -6px 11px ${modColor(props.background, 10)};
     }
   :hover {
     transform: scale(1.02);
-    box-shadow:  6px 6px 11px #dfdfdf, -6px -6px 11px #ffffff;
+    box-shadow:  6px 6px 11px ${modColor(props.background, -15)}, -6px -6px 11px ${modColor(props.background, 10)};
     }
   `}
   ${(props:any) => (props.border) && css`
-  box-shadow:  inset 6px 6px 11px #dfdfdf,  
-    inset -6px -6px 11px #ffffff;
+  background: ${ props.background };
+  border-color: ${ props.background };
+  box-shadow:  inset 6px 6px 11px ${modColor(props.background, -15)},  
+    inset -6px -6px 11px ${modColor(props.background, 10)};
   :active:hover {
-    box-shadow:  0px 0px 0px #dfdfdf, 
-        -0px -0px 0px #ffffff;
+    box-shadow:  0px 0px 0px ${modColor(props.background, -15)}, 
+        -0px -0px 0px ${modColor(props.background, 10)};
     }
   :hover {
     /* transform: scale(1.01); */
     }
   `}
   ${(props:any) => (props.disabled) && css`
-  box-shadow:  0px 0px 0px #dfdfdf, 
-    -0px -0px 0px #ffffff;
+  box-shadow:  0px 0px 0px ${modColor(props.background, -15)}, 
+    -0px -0px 0px ${modColor(props.background, 10)};
   :active:hover {
-    box-shadow:  0px 0px 0px #dfdfdf, 
-        -0px -0px 0px #ffffff;
+    box-shadow:  0px 0px 0px ${modColor(props.background, -15)}, 
+        -0px -0px 0px ${modColor(props.background, 10)};
     }
   :hover {
     transform: scale(1);
@@ -51,6 +55,10 @@ const YieldSettings = () => {
 
   const { state: { preferences }, actions: { updatePreferences } } = useContext(UserContext);
   const [ useTxApproval, setUseTxApproval] = useState<boolean>(!preferences.useTxApproval);
+  
+  const theme:any = React.useContext(ThemeContext);
+  const themeBackground = theme.global.colors.background;
+  const defaultBackground = theme.dark === true ? themeBackground.dark: themeBackground.light;
 
   useEffect(()=>{
     setUseTxApproval(!preferences.useTxApproval);
@@ -60,7 +68,7 @@ const YieldSettings = () => {
     <>
       <Box pad="small" gap="small">
         <Box direction='row' justify='between'>
-          <Text alignSelf='start' size='large' color='brand' weight='bold'>Settings</Text> 
+          <Text alignSelf='start' size='large' weight='bold'>Settings</Text> 
           <Box round>
             <FlatButton
               disabled
@@ -86,6 +94,7 @@ const YieldSettings = () => {
                 pad={{ horizontal: 'large', vertical: 'xsmall' }}
                 onClick={() => updatePreferences({ slippage: slippageList[i] })}
                 border={slippageList.indexOf(preferences.slippage)!== i ? undefined : 'all'}
+                background={defaultBackground}
               >
                 <Text size="xxsmall">
                   {x*100} %
@@ -109,6 +118,7 @@ const YieldSettings = () => {
               pad={{ horizontal: 'large', vertical: 'xsmall' }}
               onClick={() => updatePreferences({ useTxApproval: false })}
               border={useTxApproval? 'all':undefined}
+              background={defaultBackground}
             >
               <Text size="xxsmall">
                 Sign permits
@@ -121,6 +131,7 @@ const YieldSettings = () => {
               pad={{ horizontal: 'small', vertical: 'xsmall' }}
               onClick={() => updatePreferences({ useTxApproval: true })}
               border={useTxApproval?undefined:'all'}
+              background={defaultBackground}
             >
               <Text size="xxsmall">
                 Approval transactions

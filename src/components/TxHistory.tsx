@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
+import styled, { css } from 'styled-components';
 import moment from 'moment';
-import { Box, Text, Collapsible } from 'grommet';
+import { Box, Text, Collapsible, ThemeContext } from 'grommet';
 
 import {
   FiChevronDown as ChevronDown,
@@ -12,16 +13,31 @@ import EtherscanButton from './EtherscanButton';
 import { IYieldSeries } from '../types';
 import Loading from './Loading';
 import HashWrap from './HashWrap';
+import { modColor } from '../utils';
 
 interface HistoryProps {
   filterTerms: string[];
   series: IYieldSeries | null;
 }
 
+const InsetBox = styled(Box)`
+  border-radius: 8px;
+    ${(props:any) => props.background && css`
+    background: ${props.background};
+    box-shadow: inset 6px 6px 11px ${modColor(props.background, -20)}, 
+            inset -6px -6px 11px ${modColor(props.background, 10)};
+  `}
+`;
+
+
 const TxHistory = ( { filterTerms, series }: HistoryProps) => {
   const { state } = useContext(UserContext);
   const [ txHistory, setTxHistory] = useState<any>([]);
   const [ itemOpen, setItemOpen ] = useState<any>(null);
+
+  const theme:any = React.useContext(ThemeContext);
+  const themeBackground = theme.global.colors.background;
+  const defaultBackground = theme.dark === true ? themeBackground.dark: themeBackground.light;
 
   const HistoryItemName = (props:any) => {
     const { item } = props; 
@@ -65,7 +81,7 @@ const TxHistory = ( { filterTerms, series }: HistoryProps) => {
 
         <Box fill>
           <Box alignSelf='end' direction='row' gap='small'>
-            <EtherscanButton txHash={item.transactionHash} />
+            <EtherscanButton txHash={item.transactionHash} background={modColor(defaultBackground, -10)} />
             <HashWrap hash={item.transactionHash} /> 
           </Box>
           
@@ -92,13 +108,13 @@ const TxHistory = ( { filterTerms, series }: HistoryProps) => {
 
   return (
     <Loading condition={state.userLoading} size='large'>
-      <Box
-        background='background-front'
+      <InsetBox
+        background={defaultBackground}
         fill='horizontal'
         round='small'
         pad='none'
         border
-        height={{ max:'350px' }}
+        height={{ max:'500px' }}
         overflow='auto'
       >
       
@@ -106,11 +122,11 @@ const TxHistory = ( { filterTerms, series }: HistoryProps) => {
           direction='row'
           gap='xsmall'
           justify='between'
-          background='background-mid'
           pad='small'
           round={{ size:'small', corner:'top' }}
+          background={modColor(defaultBackground, -10)}
         >
-          <Box basis='50%'><Text color='text-weak' size='xxsmall'>TRANSACTION</Text></Box>
+          <Box basis='45%'><Text color='text-weak' size='xxsmall'>TRANSACTION</Text></Box>
           <Box basis='25%' align='center'><Text color='text-weak' size='xxsmall'>AMOUNT</Text></Box>
           <Box basis='25%' align='center'><Text color='text-weak' size='xxsmall'>DATE</Text></Box>
           <Box><Text color='text-weak' size='xxsmall'>{' '}</Text></Box>
@@ -128,8 +144,8 @@ const TxHistory = ( { filterTerms, series }: HistoryProps) => {
                   key={key_}
                   pad='small'          
                   gap='xsmall'             
-                  hoverIndicator='background-mid'
-                  background={itemOpen === key_ ? 'background-mid' : undefined}
+                  hoverIndicator={modColor(defaultBackground, -10)}
+                  background={itemOpen === key_ ? modColor(defaultBackground, -10) : undefined}
                   onClick={itemOpen === key_ ? ()=>setItemOpen(null):()=>setItemOpen(key_)}
                 >         
                   <Box
@@ -143,7 +159,7 @@ const TxHistory = ( { filterTerms, series }: HistoryProps) => {
                       </Text>
                     </Box>
                     <Box basis='25%' align='center'><Text size='xsmall'> {x.amount.toFixed(2)} </Text></Box>
-                    <Box basis='25%' align='center'><Text size='xsmall'> {moment(x.date_).format('DD MMMM YYYY')} </Text></Box>
+                    <Box basis='25%' align='center'><Text size='xsmall'> {moment(x.date_).format('DD MMM YYYY')} </Text></Box>
                     <Box>
                       <Text size='xsmall'> 
                         {itemOpen !== key_ ? <ChevronDown /> : <ChevronUp /> }
@@ -165,9 +181,8 @@ const TxHistory = ( { filterTerms, series }: HistoryProps) => {
             </Box>}
           </Box>    
         </Box>  
-      </Box>
+      </InsetBox>
     </Loading>
-    
   );
 };
 

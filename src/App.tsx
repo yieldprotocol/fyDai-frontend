@@ -109,17 +109,17 @@ const App = (props:any) => {
         </Box>}
 
       <Main 
-        pad={{ bottom:'large' }}
+        pad={{ vertical:'medium' }}
         align='center'
         flex
-      >      
+      >     
         <Switch>
           <Route path="/post/:amnt?"> <Deposit openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route>
           <Route path="/withdraw/:amnt?"> <WithdrawEth /> </Route>
           <Route path="/borrow/:series?/:amnt?"> <Borrow openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route> 
           <Route path="/repay/:series/:amnt?"> <Repay /> </Route>
           <Route path="/lend/:series?/:amnt?"> <Lend openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route>
-          <Route path="/close/:series/:amnt?"> <CloseDai /> </Route>
+          <Route path="/close/:series/:amnt?"> <CloseDai close={()=>null} /> </Route>
           <Route path="/pool/:series?/:amnt?"> <Pool openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route>
           <Route path="/removeLiquidity/:series/:amnt?"> <RemoveLiquidity /> </Route>           
           <Route exact path="/"> <Redirect to={`${cachedLastVisit || '/borrow/'}`} /> </Route>
@@ -142,7 +142,7 @@ const App = (props:any) => {
 };
 
 const WrappedApp = () => {
-  const [darkMode, setDarkMode] = useState(false);
+  const [ darkMode, setDarkMode ] = useState(true);
   const [ moodLight, setMoodLight] = useState(true);
   return (
     <Suspense fallback={null}>
@@ -155,7 +155,7 @@ const WrappedApp = () => {
           <App 
             darkMode={darkMode}
             setDarkMode={setDarkMode}
-            moodLight={moodLight}
+            moodLight={darkMode?false:moodLight}
             toggleMoodLight={()=>setMoodLight(!moodLight)}
           />
         </ErrorBoundary>

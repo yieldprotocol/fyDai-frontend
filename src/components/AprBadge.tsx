@@ -62,7 +62,7 @@ function AprBadge({ activeView, series, animate }:IAprBadgeProps) {
             direction='row'
           >
             <Loading condition={!seriesApr} size='xsmall'>
-              <Text size={mobile?'xxsmall':'xsmall'} color={series?.seriesTextColor}> { activeView==='pool'? moment(series?.maturity_).format('MMM \'YY') : seriesApr } </Text> 
+              <Text size={mobile?'xxsmall':'xsmall'} color={series?.seriesTextColor}> { activeView==='pool'? moment.utc(series?.maturity_).format('MMM \'YY') : seriesApr } </Text> 
             </Loading>
           </Box>
         </Box>}
