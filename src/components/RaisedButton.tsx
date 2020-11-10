@@ -7,9 +7,17 @@ import { modColor } from '../utils';
 const StyledButton = styled(Button)`
   border-radius: 25px;
   
-  transition: background 0s ease-in-out;
-  transition: box-shadow .3s ease-in-out;
-  transition: transform .3s ease-in-out;
+  -webkit-transition: background 0.3s ease-in-out;
+  -moz-transition: background 0.3s ease-in-out;
+  transition: background 0.3s ease-in-out;
+
+  -webkit-transition: box-shadow 0.3s ease-in-out;
+  -moz-transition: box-shadow 0.3s ease-in-out;
+  transition: box-shadow 0.3s ease-in-out;
+
+  -webkit-transition: transform 0.3s ease-in-out;
+  -moz-transition: transform 0.3s ease-in-out;
+  transition: transform 0.3s ease-in-out;
 
 ${(props:any) => props.background && css`
      background: ${ props.background };
