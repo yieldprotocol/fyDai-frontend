@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Box, Text, Collapsible, ResponsiveContext } from 'grommet';
+import { Box, Text, Collapsible, ResponsiveContext, ThemeContext } from 'grommet';
 
 import { SeriesContext } from '../contexts/SeriesContext';
 
@@ -14,6 +14,7 @@ function CollateralDescriptor( { backToBorrow, children }: ICollateralDescriptor
 
   const { state: seriesState } = useContext(SeriesContext);
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
+  const theme:any = React.useContext(ThemeContext);
 
   return (
     <Box
@@ -34,7 +35,7 @@ function CollateralDescriptor( { backToBorrow, children }: ICollateralDescriptor
           pad={{ horizontal:'large', vertical:'medium' }}
           justify='between'
         >
-          <Text size='large' weight='bold'> 
+          <Text size='large' weight='bold' color={theme.global.colors.text.light}> 
             Manage ETH Collateral 
           </Text>
 
@@ -42,7 +43,7 @@ function CollateralDescriptor( { backToBorrow, children }: ICollateralDescriptor
             background='#add8e6'
             label={
               <Box align='center' direction='row' gap='small' pad='xsmall'>
-                <Text size='xsmall'>
+                <Text size='xsmall' color={theme.global.colors.text.light}>
                   Back to Borrow           
                 </Text>
               </Box>

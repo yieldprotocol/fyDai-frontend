@@ -48,7 +48,7 @@ export const yieldTheme = {
         light: '#627EEA1A',
       },
       background: {
-        dark: '#333333',
+        dark: '#222222',
         light: '#f8f8f8',
       },
       'background-back': {
@@ -77,7 +77,7 @@ export const yieldTheme = {
       },
       'text-weak': {
         dark: '#DDDDDD',
-        light: '#555555',
+        light: '#444444',
       },
       'text-xweak': {
         dark: '#999999',
@@ -524,7 +524,7 @@ export const yieldTheme = {
     },
     zIndex: '15',
     overlay: {
-      background: '#000000A6', // 60%
+      background: '#000000B3', // 60%
     },
   },
 

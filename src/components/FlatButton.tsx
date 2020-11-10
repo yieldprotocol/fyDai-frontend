@@ -6,36 +6,11 @@ import { modColor } from '../utils';
 
 const StyledButton = styled(Button)`
   border-radius: 25px;
-  transition: all .3s ease-in-out;
-  background: #f8f8f8;
-
-  /* border: 1px solid #dfdfdf; */
-  border: 1px solid #f8f8f8;
-  box-shadow:  0px 0px 0px #dfdfdf, -0px -0px 0px #ffffff;
-
-  :active:hover {
-    border: 1px solid #f8f8f8;
-    transform: scale(1);
-    box-shadow: inset 6px 6px 11px #dfdfdf, inset -6px -6px 11px #ffffff;
-  }
-  :hover {
-    border: 1px solid #f8f8f8;
-    transform: scale(1.02);
-    box-shadow:  6px 6px 11px #dfdfdf, -6px -6px 11px #ffffff;
-  }
-
-  ${(props:any) => (props.selected) && css`
-  box-shadow:  inset 6px 6px 11px #dfdfdf,  
-    inset -6px -6px 11px #ffffff;
-  :active:hover {
-    box-shadow:  0px 0px 0px #dfdfdf, 
-        -0px -0px 0px #ffffff;
-    }
-  :hover {
-    /* transform: scale(1.01); */
-    }
-  `}
-
+  
+  transition: background 0s ease-in-out;
+  transition: box-shadow .3s ease-in-out;
+  transition: transform .3s ease-in-out;
+  
 ${(props:any) => props.background && css`
     background: ${ props.background };
     border: 1px solid ${props.background};
@@ -51,6 +26,20 @@ ${(props:any) => props.background && css`
     box-shadow:  6px 6px 11px ${modColor(props.background, -15)}, -6px -6px 11px ${modColor(props.background, 10)};
 }
 `}
+
+${(props:any) => (props.selected) && css`
+background: ${ props.background };
+box-shadow:  inset 6px 6px 11px ${modColor(props.background, -15)},  
+  inset -6px -6px 11px ${modColor(props.background, 10)};
+:active:hover {
+  box-shadow:  0px 0px 0px ${modColor(props.background, -15)}, 
+      -0px -0px 0px ${modColor(props.background, 10)};
+  }
+:hover {
+  /* transform: scale(1.01); */
+  }
+`}
+
 `;
 
 function FlatButton({ ...props }:any ) {
