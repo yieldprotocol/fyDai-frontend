@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
+import styled, { css } from 'styled-components';
 import { useLocation, useHistory } from 'react-router-dom';
-import { Text, Box, Layer, ResponsiveContext, Button } from 'grommet';
+import { Text, Box, Layer, ResponsiveContext, ThemeContext, Button } from 'grommet';
 import { 
   FiArrowLeft as ArrowLeft,
   FiCheck as Check,
@@ -13,6 +14,15 @@ import Loading from './Loading';
 import FlatButton from './FlatButton';
 import RaisedButton from './RaisedButton';
 import YieldMobileNav from './YieldMobileNav';
+import { modColor } from '../utils';
+
+const InsetBox = styled(Box)`
+  border-radius: 8px;
+    ${(props:any) => props.background && 
+      css`
+      background: ${props.background}; 
+      box-shadow: inset 6px 6px 11px ${modColor(props.background, -20)}, inset -6px -6px 11px ${modColor(props.background, 10)};
+  `}`;
 
 interface ISeriesSelectorProps {
   activeView:string;
@@ -24,6 +34,10 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   const { pathname } = useLocation();
   const navHistory = useHistory();
+
+  const theme:any = React.useContext(ThemeContext);
+  const themeBackground = theme.global.colors.background;
+  const defaultBackground = theme.dark === true ? themeBackground.dark: themeBackground.light;
 
   const { state: seriesState, actions: seriesActions } = useContext( SeriesContext );
   const { seriesLoading, activeSeries, seriesData } = seriesState; 
@@ -85,8 +99,8 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
           <Text alignSelf='start' size={mobile?'xxsmall':'small'} color='text-weak'>Select a series from the list below</Text>
         </Box>
 
-        <Box 
-          gap='none'
+        <InsetBox 
+          background={defaultBackground}
         >
           <Box 
             direction='row'
@@ -94,9 +108,10 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
             fill='horizontal'
             justify='between'
             gap='small'
+            // background={modColor(defaultBackground, -10)}
           >
             <Box basis={mobile?'30%':'30%'}>
-              <Text size='small' color='text-weak'>APR</Text>
+              <Text alignSelf='start' size='small' color='text-weak'>APR</Text>
             </Box>
             <Box fill='horizontal' direction='row' justify='between' gap='small'>
               <Box fill align={mobile?'end':undefined}>
@@ -125,15 +140,15 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
                   direction='row' 
                   justify='between'
                   onClick={()=>handleSelectSeries(x.maturity)}
-                  hoverIndicator='background-mid'
-                  background={activeSeries.maturity === x.maturity ?'background-mid':undefined}
-                  border='top'
+                  hoverIndicator={modColor(defaultBackground, -10)}
+                  background={activeSeries.maturity === x.maturity ? modColor(defaultBackground, -10):undefined}
+                  // border='top'
                   fill='horizontal'
                   pad='medium'
                   gap='small'
                 >
                   <Box basis={mobile?'30%':'30%'} align='center'>
-                    <Box direction='row'>
+                    <Box direction='row' alignSelf='start'>
                       <AprBadge activeView={activeView} series={x} />
                     </Box>
                   </Box>
@@ -163,6 +178,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
                         icon={<Check />}
                       /> : 
                       <RaisedButton 
+                        background={activeSeries.maturity === x.maturity ? modColor(defaultBackground, -10):undefined}
                         secondary
                         label={<Text size='small'>Select</Text>}
                       />}
@@ -171,7 +187,8 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
               );     
             })}
           </Loading>        
-        </Box>
+        </InsetBox>
+
         {!mobile &&
         <Box alignSelf='start' margin={{ top:'medium' }}>
           <FlatButton 

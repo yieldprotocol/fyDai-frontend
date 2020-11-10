@@ -22,13 +22,11 @@ interface HistoryProps {
 
 const InsetBox = styled(Box)`
   border-radius: 8px;
-    ${(props:any) => props.background && css`
-    background: ${props.background};
-    box-shadow: inset 6px 6px 11px ${modColor(props.background, -20)}, 
-            inset -6px -6px 11px ${modColor(props.background, 10)};
-  `}
-`;
-
+    ${(props:any) => props.background && 
+      css`
+      background: ${props.background}; 
+      box-shadow: inset 6px 6px 11px ${modColor(props.background, -20)}, inset -6px -6px 11px ${modColor(props.background, 10)};
+  `}`;
 
 const TxHistory = ( { filterTerms, series }: HistoryProps) => {
   const { state } = useContext(UserContext);
