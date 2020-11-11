@@ -142,22 +142,20 @@ const App = (props:any) => {
 };
 
 const WrappedApp = () => {
-  const [ userPreferences, setUserPreferences ] = useCachedState('userPreferences', null);
-  const { darkMode, moodLight } = userPreferences;
-
+  const [ userPreferences, setUserPreferences ] = useCachedState('userPreferences', { moodLight:true, darkMode:false });
   return (
     <Suspense fallback={null}>
       <Grommet
         theme={deepMerge(base, yieldTheme)}
-        themeMode={darkMode ? 'dark' : 'light'}
+        themeMode={userPreferences?.darkMode ? 'dark' : 'light' || 'light'}
         full
       >
         <ErrorBoundary>
           <App 
-            darkMode={userPreferences.darkMode}
-            setDarkMode={()=>setUserPreferences({ ...userPreferences, darkMode: !darkMode })}
-            moodLight={darkMode?false:moodLight}
-            toggleMoodLight={()=>setUserPreferences({ ...userPreferences, moodLight: !moodLight })}
+            darkMode={userPreferences?.darkMode}
+            setDarkMode={()=>setUserPreferences({ ...userPreferences, darkMode: !userPreferences?.darkMode })}
+            moodLight={userPreferences?.darkMode? false: userPreferences?.moodLight}
+            toggleMoodLight={()=>setUserPreferences({ ...userPreferences, moodLight: !userPreferences?.moodLight })}
           />
         </ErrorBoundary>
       </Grommet>
