@@ -88,15 +88,12 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
         fill
         background='background'
         pad={{ horizontal: 'medium', vertical:'large' }}
-        gap='medium'
+        gap='large'
         width={!mobile?{ min:'620px', max:'620px' }: undefined}
       >
-        <Box gap='small'>
-          <Box direction='row' gap='medium' align='center'>
-            <Box onClick={() => close()}><ArrowLeft /></Box>
-            <Text weight='bold' size={mobile?'small':'medium'}> Choose a Series</Text>
-          </Box>
-          <Text alignSelf='start' size={mobile?'xxsmall':'small'} color='text-weak'>Select a series from the list below</Text>
+        <Box direction='row' gap='large' align='center'>
+          { mobile && <Box onClick={() => close()}><ArrowLeft /></Box>}
+          <Text weight='bold' size={mobile?'small':'medium'}> Choose a Series</Text>
         </Box>
 
         <InsetBox 

@@ -142,8 +142,9 @@ const App = (props:any) => {
 };
 
 const WrappedApp = () => {
-  const [ darkMode, setDarkMode ] = useState(true);
-  const [ moodLight, setMoodLight] = useState(true);
+  const [ userPreferences, setUserPreferences ] = useCachedState('userPreferences', null);
+  const { darkMode, moodLight } = userPreferences;
+
   return (
     <Suspense fallback={null}>
       <Grommet
@@ -153,10 +154,10 @@ const WrappedApp = () => {
       >
         <ErrorBoundary>
           <App 
-            darkMode={darkMode}
-            setDarkMode={setDarkMode}
+            darkMode={userPreferences.darkMode}
+            setDarkMode={()=>setUserPreferences({ ...userPreferences, darkMode: !darkMode })}
             moodLight={darkMode?false:moodLight}
-            toggleMoodLight={()=>setMoodLight(!moodLight)}
+            toggleMoodLight={()=>setUserPreferences({ ...userPreferences, moodLight: !moodLight })}
           />
         </ErrorBoundary>
       </Grommet>

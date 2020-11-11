@@ -57,7 +57,7 @@ const YieldFooter = (props: any) => {
         }}
       >
         <Box onClick={()=> setShowDisclaimer(true)}>
-          <Text size='xxsmall' color='text-weak'>
+          <Text size='xxsmall' color='grey'>
             This software is in BETA v0.2
           </Text>
           {/* {showDisclaimer && <YieldDisclaimer forceShow={true} />} */}
