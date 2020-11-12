@@ -12,6 +12,8 @@ import { useController } from '../hooks/controllerHook';
 import { useEvents } from '../hooks/eventHooks';
 import { useSignerAccount } from '../hooks/connectionHooks';
 
+import { useDsRegistry } from '../hooks/dsRegistryHook';
+
 const UserContext = createContext<any>({});
 
 // reducer
@@ -31,7 +33,7 @@ function reducer(state: any, action: any) {
     case 'updateAuthorizations':
       return {
         ...state,
-        authorizations: action.payload,
+        authorization: action.payload,
       };
     case 'updateTxHistory':
       return {
@@ -55,7 +57,7 @@ const initState = {
     lastBlock: 11066942, 
     items:[],
   },
-  authorizations:{},
+  authorization:{},
   preferences:{
     slippage: 0.005, // default === 0.5%
     useTxApproval: false,
@@ -78,6 +80,8 @@ const UserProvider = ({ children }: any) => {
   /* hook declarations */
   const { getEventHistory, parseEventList } = useEvents();
   const { getBalance, getTokenAllowance } = useToken();
+
+  const { getDsProxyAddress } = useDsRegistry();
   const { 
     collateralPosted, 
     collateralLocked,
@@ -93,6 +97,8 @@ const UserProvider = ({ children }: any) => {
     calcAPR,
     daiAvailable,
   } = useMath();
+
+  
 
   /**
    * @dev gets and updates yield positions {}
@@ -139,6 +145,7 @@ const UserProvider = ({ children }: any) => {
       collateralPercent,
       maxDaiAvailable,
     };
+
     /* parse to human usable */
     const parsedValues = {  
       ethBalance_ : cleanValue(ethers.utils.formatEther(ethBalance), 6),
@@ -164,12 +171,13 @@ const UserProvider = ({ children }: any) => {
    * @dev gets confirmation of contracts that the user has delegated to operate on thier behalf.
    */
   const _getAuthorizations = async () => {
+
     const _auths:any={};
+    _auths.dsProxyAddress = await getDsProxyAddress();
     _auths.hasDelegatedProxy = await checkControllerDelegate(deployedContracts.YieldProxy);
     _auths.hasAuthorisedProxy = (await getTokenAllowance(deployedContracts.Dai, deployedContracts.YieldProxy, 'Dai') > 0);
     _auths.hasDelegatedAltProxy = await checkControllerDelegate(deployedContracts.PoolProxy);
     dispatch( { type: 'updateAuthorizations', payload: _auths });
-
     console.log(_auths);
     return _auths;
   };
@@ -185,7 +193,7 @@ const UserProvider = ({ children }: any) => {
     const _lastBlock = await provider.getBlockNumber();
     const lastCheckedBlock = (txHistory && forceUpdate)? 11066942: txHistory?.lastBlock || 11066942;
 
-    /* get the collateral transaction history */ 
+    /* get the collateral transaction history */
     const collateralHistory = await getEventHistory(
       deployedContracts.Controller,
       'Controller',
@@ -206,7 +214,7 @@ const UserProvider = ({ children }: any) => {
             dai: x.args_[2],
             dai_: ethers.utils.formatEther( x.args_[2] ),
           };
-        });     
+        });
       });
     
     /* get the repayment hisotry from the controller */
@@ -413,13 +421,11 @@ const UserProvider = ({ children }: any) => {
     updatePosition: () => _getPosition(),
     updateAuthorizations: () => _getAuthorizations(),
     updateHistory: () => _getTxHistory(false),
-
     rebuildHistory: async () => {
       dispatch({ type: 'isLoading', payload: true });
       await _getTxHistory(true);
       dispatch({ type: 'isLoading', payload: false });
     },
-
     updatePreferences: (x:any) => _updatePreferences(x),
     resetPreferences: () => localStorage.removeItem('userPreferences'),
   };

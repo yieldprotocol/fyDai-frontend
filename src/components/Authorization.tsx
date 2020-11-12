@@ -14,7 +14,7 @@ import { TxContext } from '../contexts/TxContext';
 import { UserContext } from '../contexts/UserContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 
-import { useAuth, useSignerAccount, useTxActive } from '../hooks';
+import { useAuth, useDsRegistry, useSignerAccount, useTxActive } from '../hooks';
 import RaisedButton from './RaisedButton';
 import FlatButton from './FlatButton';
 import EtherscanButton from './EtherscanButton';
@@ -30,8 +30,8 @@ interface IAuthorizationProps {
 const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => { 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   const { state: { requestedSigs, pendingTxs } } = useContext(TxContext);
-  const { state: { authorizations, preferences }, actions: userActions } = useContext(UserContext);
-  const { hasDelegatedProxy, hasAuthorisedProxy } = authorizations;
+  const { state: { authorization, preferences }, actions: userActions } = useContext(UserContext);
+  const { hasDelegatedProxy, hasAuthorisedProxy } = authorization;
   const { actions: seriesActions } = useContext(SeriesContext);
 
   // flags 
@@ -43,6 +43,8 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
 
   const { account } = useSignerAccount();
   const { yieldAuth, poolAuth, authActive, fallbackAuthActive } = useAuth();
+
+  const { buildDsProxy } = useDsRegistry();
   const [ txActive ] = useTxActive(['AUTH']);
 
   const authProcedure = async () => {
@@ -54,6 +56,14 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
       seriesActions.updateActiveSeries()
     ]);
     // setAuthPending(false);
+  };
+
+  const buildProxyProcedure = async () => {
+    await buildDsProxy();
+    await Promise.all([
+      userActions.updateAuthorizations(),
+      seriesActions.updateActiveSeries()
+    ]);
   };
 
   const closeAuth = () => {
@@ -98,7 +108,7 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
         >
           { (!hasDelegatedProxy && !hasAuthorisedProxy) &&
           <Box> 
-            <Text size={mobile?'xsmall': undefined}>Feel free to look around and play. However, before you make any transactions you will need to sign a few authorizations.</Text>
+            <Text size={mobile?'xsmall': undefined}>Feel free to look around and play. However, before you make any transactions you will need to sign a few authorization.</Text>
           </Box>}
           { !(!hasDelegatedProxy && !hasAuthorisedProxy) &&
           <Box>
@@ -111,6 +121,33 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
               background='#555555'
               label={<Box pad={{ horizontal:'small', vertical:'xsmall' }} align='center'><Text size='small' color='#DDDDDD'><Unlock /> Authorize Yield</Text></Box>}
               onClick={()=>{authProcedure();}}
+            />
+            :
+            <Box pad={{ horizontal:'small', vertical:'xsmall' }} align='center'><Text size='small' color='#DDDDDD'><Unlock />Pending...</Text></Box>}
+        </Box>}
+
+      { authorization?.dsProxyAddress === '0x0000000000000000000000000000000000000000' &&
+        !series && 
+        account && 
+        !authWrap &&
+        <Box 
+          fill='horizontal'
+          pad={mobile?{ horizontal:'medium', top:'medium', bottom:'large' }:{ horizontal:'xlarge', vertical:'medium' }}
+          direction='row-responsive'
+          gap='medium'
+          background='#555555'
+          justify='between'
+          margin={mobile?{ bottom:'-10px' }:undefined}
+        >
+          <Box> 
+            <Text size={mobile?'xsmall': undefined}>Feel free to look around and play. However, before you make any transactions you will need connect a proxy account </Text>
+          </Box>
+
+          { !pendingTxs.some((x:any) => (x.type === 'AUTH') && (x.series === null) )?
+            <RaisedButton 
+              background='#555555'
+              label={<Box pad={{ horizontal:'small', vertical:'xsmall' }} align='center'><Text size='small' color='#DDDDDD'><Unlock /> Create Vault</Text></Box>}
+              onClick={()=>buildProxyProcedure()}
             />
             :
             <Box pad={{ horizontal:'small', vertical:'xsmall' }} align='center'><Text size='small' color='#DDDDDD'><Unlock />Pending...</Text></Box>}
@@ -214,7 +251,7 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
                 Finally, confirm sending the signatures to Yield in a transaction...
               </Text>}
               
-            {/* { txActive && <Text size='xsmall' weight='bold'> Submitting your signed authorizations ... transaction pending.</Text> } */}
+            {/* { txActive && <Text size='xsmall' weight='bold'> Submitting your signed authorization ... transaction pending.</Text> } */}
             { txActive && <TxStatus tx={txActive} /> }
             
             { authPending && 
@@ -249,7 +286,7 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
             gap='medium'
           >
             <Box>
-              <Text weight='bold' size='large'>It seems there was a problem signing the authorizations.</Text>
+              <Text weight='bold' size='large'>It seems there was a problem signing the authorization.</Text>
               {!mobile && <Text size='xsmall'>( Its not your fault, some wallets dont provide signing functionality just yet :| )</Text>}
             </Box>
             <Box>
@@ -258,7 +295,7 @@ const Authorization = ({ series, authWrap, children }:IAuthorizationProps) => {
             <Box>
               <CheckBox 
                 checked={preferences?.useTxApproval}
-                label={<Text size='xsmall'>In future, always use individual transactions for authorizations</Text>}
+                label={<Text size='xsmall'>In future, always use individual transactions for authorization</Text>}
                 onChange={(e:any) => userActions.updatePreferences({ useTxApproval: true })}
               />
               <Box margin={{ left:'large' }}>

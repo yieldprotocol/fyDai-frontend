@@ -21,7 +21,6 @@ import { useToken } from './tokenHook';
 
 import { useTxSigning } from './txSigningHook';
 
-
 const auths = new Map([
   [1, { id: 'yieldAuth1', desc:'Allow the Yield smart contracts to interact on your behalf' }],
   [2, { id: 'yieldAuth2', desc:'Allow the Yield smart contracts to interact with Dai on your behalf' }],
@@ -34,8 +33,8 @@ export const useAuth = () => {
   const { account, provider, signer } = useSignerAccount();
   const { state: { deployedContracts } } = useContext(YieldContext);
   const { dispatch } = useContext(TxContext);
-  const { state: { preferences, authorizations } } = useContext(UserContext);
-  const { hasDelegatedProxy, hasAuthorisedProxy } = authorizations;
+  const { state: { preferences, authorization } } = useContext(UserContext);
+  const { hasDelegatedProxy, hasAuthorisedProxy } = authorization;
   
   const controllerContract = new ethers.Contract( deployedContracts?.Controller, Controller?.abi, provider);
   const proxyAddr = ethers.utils.getAddress(deployedContracts?.YieldProxy);
@@ -55,7 +54,7 @@ export const useAuth = () => {
   const { addPoolDelegate } = usePool();
 
   /**
-   *  Once off Yield Controller and Dai authorizations
+   *  Once off Yield Controller and Dai authorization
    */
   const yieldAuth = async ( ) => {
     let controllerSig:any;
@@ -129,7 +128,7 @@ export const useAuth = () => {
   };
 
   /**
-   * Series/Pool authorizations that are required for each series.
+   * Series/Pool authorization that are required for each series.
    * 
    * @param series {IYieldSeries} series to be authorised
    * 

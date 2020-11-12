@@ -29,8 +29,8 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
-  const { state: { position, authorizations }, actions: userActions } = useContext(UserContext);
-  const { hasDelegatedProxy } = authorizations;
+  const { state: { position, authorization }, actions: userActions } = useContext(UserContext);
+  const { hasDelegatedProxy } = authorization;
   const {
     ethPosted,
     ethPosted_,

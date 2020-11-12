@@ -119,7 +119,8 @@ export const useProxy = () => {
     let tx:any;
     setPostEthActive(true);
     try {
-      tx = await proxyContract.post(toAddr, { value: parsedAmount }); 
+      tx = await proxyContract.post(toAddr, { value: parsedAmount });
+      
     } catch (e) {
       handleTxRejectError(e);
       setPostEthActive(false);

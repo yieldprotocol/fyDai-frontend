@@ -17,6 +17,7 @@ const EIP712Domain = [
   { name: 'chainId', type: 'uint256' },
   { name: 'verifyingContract', type: 'address' },
 ];
+
 const createTypedDelegableData = (message: IDelegableMessage, domain: IDomain) => {
   const typedData = {
     types: {

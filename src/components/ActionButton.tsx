@@ -51,7 +51,7 @@ function ActionButton({ ...props }:any ) {
   const { activeSeries } = seriesState;
   
   const { state: userState } = useContext(UserContext);
-  const { authorizations: { hasDelegatedProxy } } = userState;
+  const { authorization: { hasDelegatedProxy } } = userState;
 
   return (
     <>

@@ -1,9 +1,8 @@
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 import { ethers, BigNumber }  from 'ethers';
 
 import Pool from '../contracts/Pool.json';
 
-import { TxContext } from '../contexts/TxContext';
 import { useSignerAccount } from './connectionHooks';
 import { IYieldSeries } from '../types';
 import { useTxHelpers } from './txHooks';
@@ -14,7 +13,6 @@ import { useTxHelpers } from './txHooks';
 export const usePool = () => {
   const { fallbackProvider, provider, signer, account } = useSignerAccount();
   const { abi: poolAbi } = Pool;
-  const  { dispatch }  = useContext<any>(TxContext);
   const [ sellActive, setSellActive ] = useState<boolean>(false);
   const [ buyActive, setBuyActive ] = useState<boolean>(false);
   const [ callActive, setCallActive ] = useState<boolean>(false);
@@ -55,7 +53,6 @@ export const usePool = () => {
     await handleTx({ tx, msg: `Sell fyDai ${fyDaiIn} pending...`, type:'SELL', series });
     setSellActive(false);
   };
-
 
   /**
    * @dev Buy fyDai with dai/chai

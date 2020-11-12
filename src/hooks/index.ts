@@ -22,7 +22,8 @@ import { useProxy } from './yieldProxyHook';
 import { usePool } from './poolHook';
 import { useFYDai } from './fyDaiHook';
 
-// import { useTempProxy } from './tempProxyHook';
+import { useDsRegistry } from './dsRegistryHook';
+import { useDsProxy } from './dsProxyHook';
 
 export {
 
@@ -47,7 +48,8 @@ export {
 
   useWeb3React,
 
-  // useTempProxy,
+  useDsRegistry,
+  useDsProxy,
   
   useSignerAccount, 
   useConnection,

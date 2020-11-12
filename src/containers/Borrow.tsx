@@ -53,7 +53,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
   const { amnt }:any = useParams();
 
   const { state: userState, actions: userActions } = useContext(UserContext);
-  const { position, authorizations: { hasDelegatedProxy } } = userState;
+  const { position, authorization: { hasDelegatedProxy } } = userState;
   const { 
     ethPosted,
     ethPosted_,

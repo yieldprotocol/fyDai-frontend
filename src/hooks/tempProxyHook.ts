@@ -31,17 +31,15 @@ export const useTempProxy = () => {
 
   /* hooks */ 
   const { signer, provider } = useSignerAccount();
-
   const { previewPoolTx, addPoolDelegate } = usePool();
   const { addControllerDelegate } = useController();
   const { handleTx, handleTxRejectError } = useTxHelpers();
-
   const { delegationSignature, handleSignError } = useTxSigning();
 
   /* contexts */
   const  { dispatch }  = useContext<any>(TxContext);
   const  { state: { deployedContracts } }  = useContext<any>(YieldContext);
-  const  { state: { authorizations, preferences: { useTxApproval } } }  = useContext<any>(UserContext);
+  const  { state: { authorization, preferences: { useTxApproval } } }  = useContext<any>(UserContext);
 
   const { abi: tempProxyAbi } = PoolProxy;
 
@@ -61,7 +59,6 @@ export const useTempProxy = () => {
       signer
     ));
   }, [signer, deployedContracts, tempProxyAbi ]);
-
 
   /**
    * LIQUIDITY REMOVAL
@@ -101,7 +98,7 @@ export const useTempProxy = () => {
       dispatch({ 
         type: 'requestSigs', 
         payload:[ 
-          { ...auths.get(1), signed: authorizations.hasDelegatedAltProxy }, 
+          { ...auths.get(1), signed: authorization.hasDelegatedAltProxy }, 
           { ...auths.get(2), signed: series.hasPoolDelegatedAltProxy }
         ] });
 
@@ -109,7 +106,7 @@ export const useTempProxy = () => {
       try {
 
         /* AltProxy | Controller delegation if required */       
-        controllerSig = authorizations.hasDelegatedAltProxy ? '0x' : await delegationSignature( controllerContract, deployedContracts.PoolProxy);
+        controllerSig = authorization.hasDelegatedAltProxy ? '0x' : await delegationSignature( controllerContract, deployedContracts.PoolProxy);
         dispatch({ type: 'signed', payload: auths.get(1) });
 
         /* altProxy | pool delegation */
@@ -187,7 +184,6 @@ export const useTempProxy = () => {
     series: IYieldSeries,  
     tokens: number|BigNumber,
   ) => {
-
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const parsedTokens = BigNumber.isBigNumber(tokens)? tokens : ethers.utils.parseEther(tokens.toString());
     const overrides = { 
@@ -197,14 +193,13 @@ export const useTempProxy = () => {
     dispatch({ 
       type: 'requestSigs', 
       payload:[ 
-        { ...auths.get(1), signed: authorizations.hasDelegatedAltProxy }, 
+        { ...auths.get(1), signed: authorization.hasDelegatedAltProxy }, 
         { ...auths.get(2), signed: series.hasPoolDelegatedAltProxy }
       ] });
 
     try {
-
       await Promise.all([
-        !authorizations.hasDelegatedAltProxy ? addControllerDelegate(deployedContracts.PoolProxy): null,
+        !authorization.hasDelegatedAltProxy ? addControllerDelegate(deployedContracts.PoolProxy): null,
         !series.hasPoolDelegatedAltProxy ? addPoolDelegate(series, deployedContracts.PoolProxy): null, 
       ]).catch((e:any) => handleSignError(e));
 
@@ -219,6 +214,7 @@ export const useTempProxy = () => {
 
         /* calculate expected trade values  */    
         const preview = await previewPoolTx('buydai', series, ethers.utils.parseEther('1'));   
+        
         if ( !(preview instanceof Error) ) {
           minFYDai = utils.divRay( preview.mul(BigNumber.from('1000000000')), utils.toRay(1.1));
         } else {
@@ -246,6 +242,7 @@ export const useTempProxy = () => {
       }
 
       await handleTx({ tx, msg: `Removing ${tokens} DAI liquidity from ${series.displayNameMobile}`, type:'REMOVE_LIQUIDITY', series });
+      
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log(e);
