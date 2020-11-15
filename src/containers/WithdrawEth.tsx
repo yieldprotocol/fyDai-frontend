@@ -8,7 +8,7 @@ import { FiArrowLeft as ArrowLeft } from 'react-icons/fi';
 import { cleanValue } from '../utils';
 
 import { UserContext } from '../contexts/UserContext';
-import { useProxy, useMath, useTxActive, useDebounce, useIsLol } from '../hooks';
+import { useBorrowProxy, useMath, useTxActive, useDebounce, useIsLol } from '../hooks';
 
 import ApprovalPending from '../components/ApprovalPending';
 import TxStatus from '../components/TxStatus';
@@ -41,7 +41,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
     debtValue_,
   } = position;
   
-  const { withdrawEth } = useProxy();
+  const { withdrawEth } = useBorrowProxy();
   const { estCollRatio: estimateRatio } = useMath();
   const [ txActive ] = useTxActive(['WITHDRAW']);
 

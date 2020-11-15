@@ -14,7 +14,7 @@ import {
   useController,
   usePool,
   useMath,
-  useProxy, 
+  useBorrowProxy, 
   useTxActive, 
   useSignerAccount, 
   useDebounce,
@@ -71,7 +71,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
   /* hooks init */
   const { borrow }  = useController();
   const { previewPoolTx }  = usePool();
-  const { borrowDai, borrowActive } = useProxy();
+  const { borrowDai, borrowActive } = useBorrowProxy();
   const { calcAPR, estCollRatio: estimateRatio } = useMath();
   const { account } = useSignerAccount();
 

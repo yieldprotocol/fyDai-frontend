@@ -5,7 +5,8 @@ import * as utils from '../utils';
 
 import { IYieldSeries } from '../types';
 
-import YieldProxy from '../contracts/YieldProxy.json';
+import BorrowProxy from '../contracts/BorrowProxy.json';
+import Controller from '../contracts/Controller.json';
 
 import { TxContext } from '../contexts/TxContext';
 import { YieldContext } from '../contexts/YieldContext';
@@ -17,6 +18,10 @@ import { usePool } from './poolHook';
 import { useMath } from './mathHooks';
 import { useToken } from './tokenHook';
 import { useTxHelpers } from './txHooks';
+
+import { useTxSigning } from './txSigningHook';
+
+import { useDsProxy } from './dsProxyHook';
 
 import { useTempProxy } from './tempProxyHook';
 
@@ -44,13 +49,13 @@ const MAX_INT = '0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
  * @returns { boolean } sellActive
  * 
  */
-export const useProxy = () => {
+export const useBorrowProxy = () => {
 
   /* contexts */
   const  { dispatch }  = useContext<any>(TxContext);
   const  { state: { deployedContracts } }  = useContext<any>(YieldContext);
   const  { state: { seriesData } }  = useContext<any>(SeriesContext);
-  const  { state: { preferences: { slippage, useTxApproval } } }  = useContext<any>(UserContext);
+  const  { state: { preferences: { slippage, useTxApproval }, authorization: { dsProxyAddress } } }  = useContext<any>(UserContext);
 
   /* hooks */ 
   const { signer, provider, account } = useSignerAccount();
@@ -60,6 +65,8 @@ export const useProxy = () => {
   const { handleTx, handleTxRejectError } = useTxHelpers();
 
   const { removeLiquidityWithSignature } = useTempProxy();
+  const { proxyExecute } = useDsProxy();
+  const { delegationSignature, handleSignError } = useTxSigning();
   
   /* Activity flags */
   const [ postEthActive, setPostEthActive ] = useState<boolean>(false);
@@ -72,7 +79,7 @@ export const useProxy = () => {
   const [ buyApprovalActive, setBuyApprovalActive ] = useState<boolean>(false);
   const [ sellActive, setSellActive ] = useState<boolean>(false);
 
-  const { abi: yieldProxyAbi } = YieldProxy;
+  const { abi: borrowProxyAbi } = BorrowProxy;
 
   /* Temporary signing messages */
   const auths = new Map([
@@ -93,13 +100,14 @@ export const useProxy = () => {
   /* Preset the yieldProxy contract to be used with all fns */
   const [ proxyContract, setProxyContract] = useState<any>();
   useEffect(()=>{
-    deployedContracts?.YieldProxy && signer &&
+    deployedContracts?.BorrowProxy && signer &&
     setProxyContract( new ethers.Contract( 
-      ethers.utils.getAddress(deployedContracts?.YieldProxy), 
-      yieldProxyAbi,
+      ethers.utils.getAddress(deployedContracts?.BorrowProxy), 
+      borrowProxyAbi,
       signer
     ));
-  }, [signer, deployedContracts, yieldProxyAbi ]);
+  }, [signer, deployedContracts, borrowProxyAbi ]);
+
 
   /**
    * @dev Post ETH collateral via yieldProxy
@@ -109,26 +117,20 @@ export const useProxy = () => {
   const postEth = async (
     amount:string | BigNumber,
   ) => {
-
     /* Processing and/or sanitizing input */
     const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(utils.cleanValue(amount));
-    /* 'to' in this case represents the vault to be depositied into within controller */
-    const toAddr = account && ethers.utils.getAddress(account);   
-    
-    /* Contract interaction */
-    let tx:any;
-    setPostEthActive(true);
-    try {
-      tx = await proxyContract.post(toAddr, { value: parsedAmount });
-      
-    } catch (e) {
-      handleTxRejectError(e);
-      setPostEthActive(false);
-      return;
-    }
+    const toAddr = account && ethers.utils.getAddress(account); /* 'to' in this case represents the vault to be depositied into within controller */
 
-    await handleTx({ tx, msg: `Depositing ${amount} ETH`, type:'DEPOSIT', series: null });
-    setPostEthActive(false);
+    /* construct the calldata from method and reqd. args */ 
+    const calldata = proxyContract.interface.encodeFunctionData( 'post', [ toAddr ] );
+
+    /* send to the proxy for execution */
+    await proxyExecute( 
+      proxyContract.address, 
+      calldata,
+      { value: parsedAmount },
+      { tx:null, msg: `Depositing ${amount} ETH`, type:'DEPOSIT', series: null }
+    );
   };
 
 
@@ -144,20 +146,19 @@ export const useProxy = () => {
     const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(utils.cleanValue(amount));
     const toAddr = account && ethers.utils.getAddress(account);
 
-    /* Contract interaction */
-    let tx:any;
-    setWithdrawEthActive(true);
-    try {
-      tx = await proxyContract.withdraw(toAddr, parsedAmount);
-    } catch (e) {
-      handleTxRejectError(e);
-      setWithdrawEthActive(false);
-      return;
-    }
-    await handleTx({ tx, msg: `Withdrawing ${amount} ETH `, type:'WITHDRAW', series: null });
-    setWithdrawEthActive(false);
-  };
+    const controllerContract = new ethers.Contract( deployedContracts.Controller, Controller.abi as any, provider);
+    const sig = true? '0x': await delegationSignature( controllerContract, dsProxyAddress );
 
+    /* construct the calldata from method and reqd. args and sigs */
+    const calldata = proxyContract.interface.encodeFunctionData( 'withdrawWithSignature', [ toAddr, parsedAmount, sig ] );
+    /* send to the proxy for execution */
+    await proxyExecute( 
+      proxyContract.address,
+      calldata,
+      { },
+      { tx:null, msg: `Withdrawing ${amount} ETH `, type:'WITHDRAW', series: null }
+    );
+  };
 
   /**
    * @dev Borrow fyDai from Controller and sell it immediately for Dai, for a maximum fyDai debt.
@@ -182,39 +183,31 @@ export const useProxy = () => {
     const collatType = ethers.utils.formatBytes32String(collateralType);
 
     const overrides = { 
-      gasLimit: BigNumber.from('300000')
+      gasLimit: BigNumber.from('300000'),
+      value: 0,
     };
 
-    setBorrowActive(true);
-    let tx:any;
     let maxFYDai:BigNumber;
-
-    try {
-      /* Calculate expected trade values and factor in slippage */
-      const preview = await previewPoolTx('buydai', series, daiToBorrow); 
-      if ( !(preview instanceof Error) ) {
-        maxFYDai = valueWithSlippage(preview);
-      } else {
-        throw(preview);
-      }
-      tx = await proxyContract.borrowDaiForMaximumFYDai( 
-        poolAddr, 
-        collatType,
-        parsedMaturity, 
-        toAddr, 
-        maxFYDai, 
-        dai, 
-        overrides 
-      );
-
-    } catch (e) {
-      handleTxRejectError(e); 
-      setBorrowActive(false);
-      return;
+    const preview = await previewPoolTx('buydai', series, daiToBorrow); 
+    if ( !(preview instanceof Error) ) {
+      maxFYDai = valueWithSlippage(preview);
+    } else {
+      throw(preview);
     }
 
-    await handleTx({ tx, msg: `Borrowing ${daiToBorrow} Dai from ${series.displayNameMobile}`, type:'BORROW', series });
-    setBorrowActive(false);
+    /* construct the calldata from method and reqd. args */ 
+    const calldata = proxyContract.interface.encodeFunctionData( 
+      'borrowDaiForMaximumFYDai', 
+      [ poolAddr, collatType, parsedMaturity, toAddr, maxFYDai, dai ]
+    );
+
+    /* send to the proxy for execution */
+    await proxyExecute( 
+      proxyContract.address, 
+      calldata,
+      overrides,
+      { tx:null, msg: `Borrowing ${daiToBorrow} Dai from ${series.displayNameMobile}`, type:'BORROW', series  }
+    );
   };
 
   /**
@@ -242,75 +235,114 @@ export const useProxy = () => {
     const overrides = {
       gasLimit: BigNumber.from('250000')
     };
+    
+    /* construct the calldata from method, reqd. args, required sigs and maturity state */ 
+    let calldata:any = null;
 
-    setRepayActive(true);
-    let tx:any;
-    let daiPermitSig:any;
-    let minFYDai:BigNumber;
-    try {
-      if ( series.isMature() ) {  
-        try {     
-          /* Repay using a signature authorizing treasury */
-          // eslint-disable-next-line no-console
-          console.log('Repaying after maturity - Signature required');
-          dispatch({ type: 'requestSigs', payload:[ auths.get(1) ] });
-          const result = await signDaiPermit( 
-            provider.provider, 
-            deployedContracts.Dai, 
-            // @ts-ignore
-            fromAddr,
-            deployedContracts.Treasury
-          );
-          daiPermitSig = ethers.utils.joinSignature(result);
-          dispatch({ type: 'signed', payload: auths.get(1) });
-          dispatch({ type: 'requestSigs', payload: [] });
-        } catch (e) { 
-          handleTxRejectError(e);
-          dispatch({ type: 'requestSigs', payload: [] });
-          setRepayActive(false);
-          return;
-        }
-        tx = await proxyContract.repayDaiWithSignature(
-          collatType,
-          parsedMaturity,
-          toAddr,
-          dai,
-          daiPermitSig,
-          { gasLimit: BigNumber.from('400000') }
-        );
+    if ( !series.isMature() ) {
+      // eslint-disable-next-line no-console
+      console.log('Repaying before maturity - no signature required');
 
-      } else if ( !series.isMature() ) {
-        // eslint-disable-next-line no-console
-        console.log('Repaying before maturity - no signature required');
-        /* calculate expected trade values and factor in slippage */
-        const preview = await previewPoolTx('selldai', series, repaymentInDai);
-        if ( !(preview instanceof Error) ) {
-          minFYDai = valueWithSlippage(preview, true);
-        } else {
-          // minFYDai = ethers.utils.parseEther('0');
-          throw(preview);
-        }
-
-        tx = await proxyContract.repayMinimumFYDaiDebtForDai(
-          poolAddr,
-          collatType,
-          parsedMaturity,
-          toAddr,
-          minFYDai,
-          dai,
-          overrides
-        );
+      /* calculate expected trade values and factor in slippage */
+      let minFYDai:BigNumber; 
+      const preview = await previewPoolTx('selldai', series, repaymentInDai);
+      if ( !(preview instanceof Error) ) {
+        minFYDai = valueWithSlippage(preview, true);
       } else {
-        // eslint-disable-next-line no-console
-        console.log('Series has passed its maturity date, but has not yet been matured');
-      }      
-    } catch (e) {
-      handleTxRejectError(e);
-      setRepayActive(false);
-      return;
+        // minFYDai = ethers.utils.parseEther('0');
+        throw(preview);
+      }
+      
+      calldata = proxyContract.interface.encodeFunctionData( 
+        'repayMinimumFYDaiDebtForDai', 
+        [ poolAddr, collatType, parsedMaturity, toAddr, minFYDai, dai ]
+      );
+
+    } else {
+      /* Repay using a signature authorizing treasury */
+      // calldata = proxyContract.interface.encodeFunctionData( 
+      //   'borrowDaiForMaximumFYDai', 
+      //   [ poolAddr, collatType, parsedMaturity, toAddr, dai, daiPermitsig ]
+      // );
     }
-    await handleTx({ tx, msg: `Repaying ${repaymentInDai} Dai to ${series.displayNameMobile}`, type:'REPAY', series });
-    setRepayActive(false);
+    
+    /* send to the proxy for execution */
+    await proxyExecute( 
+      proxyContract.address, 
+      calldata,
+      overrides,
+      { tx:null, msg: `Repaying ${repaymentInDai} Dai to ${series.displayNameMobile}`, type:'REPAY', series  }
+    );
+
+    // setRepayActive(true);
+    // let tx:any;
+    // let daiPermitSig:any;
+    // let minFYDai:BigNumber;
+    // try {
+    //   if ( series.isMature() ) {  
+    //     try {     
+    //       /* Repay using a signature authorizing treasury */
+    //       // eslint-disable-next-line no-console
+    //       console.log('Repaying after maturity - Signature required');
+    //       dispatch({ type: 'requestSigs', payload:[ auths.get(1) ] });
+    //       const result = await signDaiPermit( 
+    //         provider.provider, 
+    //         deployedContracts.Dai, 
+    //         // @ts-ignore
+    //         fromAddr,
+    //         deployedContracts.Treasury
+    //       );
+    //       daiPermitSig = ethers.utils.joinSignature(result);
+    //       dispatch({ type: 'signed', payload: auths.get(1) });
+    //       dispatch({ type: 'requestSigs', payload: [] });
+    //     } catch (e) { 
+    //       handleTxRejectError(e);
+    //       dispatch({ type: 'requestSigs', payload: [] });
+    //       setRepayActive(false);
+    //       return;
+    //     }
+    //     tx = await proxyContract.repayDaiWithSignature(
+    //       collatType,
+    //       parsedMaturity,
+    //       toAddr,
+    //       dai,
+    //       daiPermitSig,
+    //       { gasLimit: BigNumber.from('400000') }
+    //     );
+
+    //   } else if ( !series.isMature() ) {
+
+    //     // eslint-disable-next-line no-console
+    //     console.log('Repaying before maturity - no signature required');
+    //     /* calculate expected trade values and factor in slippage */
+    //     const preview = await previewPoolTx('selldai', series, repaymentInDai);
+    //     if ( !(preview instanceof Error) ) {
+    //       minFYDai = valueWithSlippage(preview, true);
+    //     } else {
+    //       // minFYDai = ethers.utils.parseEther('0');
+    //       throw(preview);
+    //     }
+
+    //     tx = await proxyContract.repayMinimumFYDaiDebtForDai(
+    //       poolAddr,
+    //       collatType,
+    //       parsedMaturity,
+    //       toAddr,
+    //       minFYDai,
+    //       dai,
+    //       overrides
+    //     );
+    //   } else {
+    //     // eslint-disable-next-line no-console
+    //     console.log('Series has passed its maturity date, but has not yet been matured');
+    //   }      
+    // } catch (e) {
+    //   handleTxRejectError(e);
+    //   setRepayActive(false);
+    //   return;
+    // }
+    // await handleTx({ tx, msg: `Repaying ${repaymentInDai} Dai to ${series.displayNameMobile}`, type:'REPAY', series });
+    // setRepayActive(false);
   };
 
 
@@ -433,6 +465,8 @@ export const useProxy = () => {
     await handleTx({ tx, msg: `Removing ${tokens} DAI liquidity from ${series.displayNameMobile}`, type:'REMOVE_LIQUIDITY', series });
 
   };
+
+
 
   /**
    * LIMITPOOL SECTION

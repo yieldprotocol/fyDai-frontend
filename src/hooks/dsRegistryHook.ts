@@ -37,19 +37,18 @@ export const useDsRegistry = () => {
         ProxyRegistryAbi,
         signer
       ));
-  }, [signer, deployedContracts, ProxyRegistryAbi]);
+
+  }, [signer, deployedContracts.ProxyRegistry, ProxyRegistryAbi]);
 
   /**
-   * @dev builds a dsproxy.
+   * @dev builds a DsProxy for the caller.
    * @param daiOut Amount of dai being bought
    * */
-
   const buildDsProxy = async () => {
     let tx:any;
     setBuildActive(true);
     try {
-      console.log(proxyRegistryContract);
-      tx = await proxyRegistryContract.build();
+      tx = await proxyRegistryContract['build()']();
     } catch (e) {
       handleTxRejectError(e);
       setBuildActive(false);

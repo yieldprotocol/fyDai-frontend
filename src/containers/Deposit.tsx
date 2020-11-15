@@ -23,8 +23,8 @@ import { UserContext } from '../contexts/UserContext';
 import { YieldContext } from '../contexts/YieldContext';
 
 import { 
-  useProxy, 
-  useTxActive, 
+  useBorrowProxy, 
+  useTxActive,
   useMath, 
   useSignerAccount, 
   useDebounce,
@@ -73,7 +73,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
-  const { postEth, postEthActive }  = useProxy();
+  const { postEth, postEthActive }  = useBorrowProxy();
   const { estCollRatio: estimateRatio, collValue } = useMath();
   const [ txActive ] = useTxActive(['DEPOSIT', 'WITHDRAW']);
   const { account } = useSignerAccount();

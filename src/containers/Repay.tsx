@@ -14,7 +14,7 @@ import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
 
 import {
-  useProxy,
+  useBorrowProxy,
   useTxActive,
   useSignerAccount,
   useDebounce,
@@ -46,7 +46,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
   const { daiBalance } = userState.position;
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
-  const { repayDaiDebt, repayActive } = useProxy();
+  const { repayDaiDebt, repayActive } = useBorrowProxy();
   const [ txActive ] = useTxActive(['repay']);
   const { account } = useSignerAccount();
 

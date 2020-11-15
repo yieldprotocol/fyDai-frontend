@@ -98,8 +98,6 @@ const UserProvider = ({ children }: any) => {
     daiAvailable,
   } = useMath();
 
-  
-
   /**
    * @dev gets and updates yield positions {}
    */

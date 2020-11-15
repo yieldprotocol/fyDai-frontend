@@ -3,11 +3,9 @@ import { ethers, BigNumber }  from 'ethers';
 import { signDaiPermit, signERC2612Permit } from 'eth-permit';
 import * as utils from '../utils';
 
-import { IYieldSeries } from '../types';
+import { IProxyExecutable, ITx, IYieldSeries } from '../types';
 
 import DSProxy from '../contracts/DSProxy.json';
-
-import { TxContext } from '../contexts/TxContext';
 import { UserContext } from '../contexts/UserContext';
 
 import { useSignerAccount } from './connectionHooks';
@@ -23,11 +21,10 @@ import { useTxHelpers } from './txHooks';
 export const useDsProxy = () => {
 
   /* contexts */
-  const  { dispatch }  = useContext<any>(TxContext);
   const  { state: { authorization } }  = useContext<any>(UserContext);
 
   /* hooks */ 
-  const { signer, account } = useSignerAccount();
+  const { signer } = useSignerAccount();
   const { handleTx, handleTxRejectError } = useTxHelpers();
   
   /* Activity flags */
@@ -45,29 +42,27 @@ export const useDsProxy = () => {
       ));
   }, [signer, authorization, DsProxyAbi]);
 
-  const dsExecute = async (
+  const proxyExecute = async (
     contractAddress: string,
     calldata: any,
     overrides: any,
-    msg: string,
-    type: string,
-    series: IYieldSeries,
+    txInfo: ITx,
   ) => {
     let tx:any; // type
     setExecuteActive(true);
     try {
-      tx = await dsProxyContract.methods['execute(address,bytes)'](contractAddress, calldata, overrides);
+      tx = await dsProxyContract['execute(address,bytes)'](contractAddress, calldata, overrides);
     } catch (e) {
       handleTxRejectError(e);
       setExecuteActive(false);
       return;
     }
-    await handleTx({ tx, msg, type, series });
+    await handleTx({ ...txInfo, tx });
     setExecuteActive(true);
   };
 
   return {
     /* dsProxy eq. fns */
-    dsExecute, executeActive,
+    proxyExecute, executeActive,
   } as const;
 };

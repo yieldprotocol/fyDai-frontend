@@ -25,6 +25,8 @@ import { useFYDai } from './fyDaiHook';
 import { useDsRegistry } from './dsRegistryHook';
 import { useDsProxy } from './dsProxyHook';
 
+import { useBorrowProxy } from './borrowProxyHook';
+
 export {
 
   useTxActive,
@@ -50,6 +52,8 @@ export {
 
   useDsRegistry,
   useDsProxy,
+
+  useBorrowProxy,
   
   useSignerAccount, 
   useConnection,
