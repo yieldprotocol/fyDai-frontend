@@ -10,6 +10,7 @@ export interface IYieldSeries {
   liquidityProxyAddress: string;
   hasPoolDelegatedProxy: boolean;
   hasPoolDelegatedAltProxy: boolean;
+  hasPoolDelegatedDsProxy: boolean;
   hasDaiAuth: boolean;
   hasFyDaiAuth: boolean;
   hasCloseAuth: boolean;
@@ -88,6 +89,14 @@ export interface ITx {
   msg: string,
   type: string,
   series: IYieldSeries|null,
+}
+
+export interface ISignListItem {
+  id: string, 
+  desc: string, 
+  conditional: boolean,
+  signFn: any,
+  fallbackFn: any,
 }
 
 export interface IDelegableMessage {

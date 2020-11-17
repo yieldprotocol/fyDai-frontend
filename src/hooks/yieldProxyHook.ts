@@ -252,6 +252,7 @@ export const useProxy = () => {
           /* Repay using a signature authorizing treasury */
           // eslint-disable-next-line no-console
           console.log('Repaying after maturity - Signature required');
+
           dispatch({ type: 'requestSigs', payload:[ auths.get(1) ] });
           const result = await signDaiPermit( 
             provider.provider, 
@@ -261,6 +262,7 @@ export const useProxy = () => {
             deployedContracts.Treasury
           );
           daiPermitSig = ethers.utils.joinSignature(result);
+          
           dispatch({ type: 'signed', payload: auths.get(1) });
           dispatch({ type: 'requestSigs', payload: [] });
         } catch (e) { 

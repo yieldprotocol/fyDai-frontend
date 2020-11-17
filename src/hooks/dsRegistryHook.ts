@@ -37,7 +37,6 @@ export const useDsRegistry = () => {
         ProxyRegistryAbi,
         signer
       ));
-
   }, [signer, deployedContracts.ProxyRegistry, ProxyRegistryAbi]);
 
   /**

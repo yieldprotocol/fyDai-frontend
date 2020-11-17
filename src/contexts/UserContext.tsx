@@ -172,8 +172,16 @@ const UserProvider = ({ children }: any) => {
 
     const _auths:any={};
     _auths.dsProxyAddress = await getDsProxyAddress();
+    
+    _auths.hasDelegatedDsProxy = await checkControllerDelegate(_auths.dsProxyAddress);
+    _auths.hasAuthorisedTreasury = (await getTokenAllowance(deployedContracts.Dai, deployedContracts.Treasury, 'Dai') > 0);
+
     _auths.hasDelegatedProxy = await checkControllerDelegate(deployedContracts.YieldProxy);
+    
     _auths.hasAuthorisedProxy = (await getTokenAllowance(deployedContracts.Dai, deployedContracts.YieldProxy, 'Dai') > 0);
+
+    _auths.hasAuthorisedTreasury = (await getTokenAllowance(deployedContracts.Dai, deployedContracts.Treasury, 'Dai') > 0);
+
     _auths.hasDelegatedAltProxy = await checkControllerDelegate(deployedContracts.PoolProxy);
     dispatch( { type: 'updateAuthorizations', payload: _auths });
     console.log(_auths);

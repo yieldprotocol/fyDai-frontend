@@ -5,7 +5,17 @@ import { ethers, BigNumber } from 'ethers';
 import * as utils from '../utils';
 import { IYieldSeries } from '../types';
 import { YieldContext } from './YieldContext';
-import { useCallTx, useMath, usePool, useSignerAccount, useWeb3React, useController, useToken } from '../hooks';
+
+import { UserContext } from './UserContext';
+
+import {  useWeb3React } from '../hooks';
+
+import { useSignerAccount } from '../hooks/connectionHooks';
+import { usePool } from '../hooks/poolHook';
+import { useMath } from '../hooks/mathHooks';
+import { useToken } from '../hooks/tokenHook';
+import { useController } from '../hooks/controllerHook';
+import { useCallTx } from '../hooks/chainHooks';
 
 const SeriesContext = React.createContext<any>({});
 
@@ -39,11 +49,13 @@ function reducer(state:any, action:any) {
 
 const SeriesProvider = ({ children }:any) => {
 
-  const { account, provider, fallbackProvider } = useSignerAccount();
-  const { chainId } = useWeb3React();
+  const { account, provider, fallbackProvider, chainId } = useSignerAccount();
+  // const { chainId } = useWeb3React();
   const [ state, dispatch ] = React.useReducer(reducer, initState);
   const { state: yieldState } = useContext(YieldContext);
   const { yieldLoading, deployedContracts } = yieldState;
+
+  const { state: { authorization: { dsProxyAddress } } } = useContext(UserContext);
 
   const { previewPoolTx, checkPoolDelegate, checkPoolState } = usePool();
   const { debtDai } = useController();
@@ -75,6 +87,7 @@ const SeriesProvider = ({ children }:any) => {
           await previewPoolTx('sellFYDai', _x, 1),
           await callTx(_x.poolAddress, 'Pool', 'totalSupply', []),
         ]);
+
         /* with user */
         const [ poolTokens, hasPoolDelegatedProxy, hasPoolDelegatedAltProxy, hasDaiAuth, hasFyDaiAuth, hasCloseAuth, ethDebtDai, ethDebtFYDai, fyDaiBalance] =  account && await Promise.all([
           getBalance(_x.poolAddress, 'Pool', account),
@@ -95,6 +108,7 @@ const SeriesProvider = ({ children }:any) => {
           poolTokens: poolTokens || BigNumber.from('0'),
           hasPoolDelegatedProxy: hasPoolDelegatedProxy || false,
           hasPoolDelegatedAltProxy: hasPoolDelegatedAltProxy || false,
+
           hasDaiAuth: (hasDaiAuth && hasDaiAuth>0) || false, 
           hasFyDaiAuth: (hasFyDaiAuth && hasFyDaiAuth>0) || false,
           hasCloseAuth: (hasCloseAuth && hasCloseAuth>0) || false,

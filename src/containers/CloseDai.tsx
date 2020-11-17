@@ -11,7 +11,14 @@ import { cleanValue } from '../utils';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
 
-import { usePool, useProxy, useSignerAccount, useTxActive, useDebounce, useIsLol } from '../hooks';
+import { 
+  usePool, 
+  useProxy, 
+  useSignerAccount, 
+  useTxActive, 
+  useDebounce, 
+  useIsLol 
+} from '../hooks';
 
 import InputWrap from '../components/InputWrap';
 import TxStatus from '../components/TxStatus';

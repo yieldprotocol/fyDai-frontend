@@ -105,7 +105,7 @@ export const useTempProxy = () => {
       /* Deal wth the signtures  */ 
       try {
 
-        /* AltProxy | Controller delegation if required */       
+        /* AltProxy | Controller delegation if required */
         controllerSig = authorization.hasDelegatedAltProxy ? '0x' : await delegationSignature( controllerContract, deployedContracts.PoolProxy);
         dispatch({ type: 'signed', payload: auths.get(1) });
 
