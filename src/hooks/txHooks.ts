@@ -34,16 +34,17 @@ export const useTxHelpers = () => {
     if ( error.code === 4001 ) {
       notify({ 
         type: 'notify',
-        payload: { message: 'Transaction rejected by user.' } 
-      });    
-    } else {
-      // eslint-disable-next-line no-console
-      console.log(error.message);
-      notify({ 
-        type: 'notify', 
-        payload: { message: 'The transaction was rejected by the wallet provider. Please see console', type:'error' } 
+        payload: { message: 'Transaction rejected by user' } 
       });
-    }
+      return new Error('Transaction rejected by user');   
+    } 
+    // eslint-disable-next-line no-console
+    console.log(error.message);
+    notify({ 
+      type: 'notify', 
+      payload: { message: 'The transaction was rejected by the wallet provider. Please see console', type:'error' } 
+    });
+    return new Error('Transaction rejected by wallet or provider');
   };
   
   const handleTxError = (msg:string, receipt: any, error:any) => {
@@ -67,5 +68,5 @@ export const useTxHelpers = () => {
       });
   };
 
-  return { handleTx, handleTxError, txComplete, handleTxRejectError };
+  return { handleTx, txComplete, handleTxRejectError };
 };

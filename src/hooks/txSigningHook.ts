@@ -117,25 +117,35 @@ export const useTxSigning = () => {
     return sig;
   };
 
-  const handleSignList = async ( requestedSigs:Map<string, ISignListItem> ): Promise< Map<string, string|undefined> > => {
+  const handleSignList = async ( requestedSigs:Map<string, ISignListItem> ): Promise<Map<string, string|undefined>> => {
     
     const signedMap: Map<string, string|undefined> = new Map();
 
     /* Send the requested signatures to the txContext for tracking */
     dispatch({ 
       type: 'requestSigs', 
-      payload: Array.from(requestedSigs.values()).map((x:any) => { return { id: x.id, desc: x.desc, signed: x.conditional }; })
+      payload: Array.from( requestedSigs.values()).map((x:any) => { 
+        return { id: x.id, desc: x.desc, signed: x.conditional }; 
+      })
     });
 
     /* Fallback function for when using Tx approvals instead of signing permits */
     const fallback = async (list:any[]) => {
+      // eslint-disable-next-line no-console
       console.log('Using fallback function: Approvals by transaction');
-   
+
       /* stack and wait for ALL the approval transactions to be complete */
       await Promise.all(
-        list.map((x:any, i:number) =>  {
+        list.map((x:any) =>  {
           if (!x.conditional) {
-            return x.fallbackFn();       
+            try {
+              return x.fallbackFn();
+            } catch (e) {
+              handleSignError(e);
+              // /* on error, return the map with values 'undefined' to cancel the transaction process */
+              requestedSigs.forEach((value:any, key:string) => signedMap.set(key, undefined));
+              return signedMap;
+            }
           } return null;
         })
       ).catch((e:any) => {
@@ -145,8 +155,8 @@ export const useTxSigning = () => {
         return signedMap;
       });
 
-      dispatch({ type: 'requestSigs', payload:[] });  
-      /* then set all sigs to '0x' and return the Map */
+      dispatch({ type: 'requestSigs', payload:[] });
+      /* then set all sigs to '0x' */
       requestedSigs.forEach((value:any, key:string) => signedMap.set(key, '0x'));       
       return signedMap;
 

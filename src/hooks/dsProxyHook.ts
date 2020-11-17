@@ -1,7 +1,5 @@
 import { useEffect, useState, useContext } from 'react';
-import { ethers, BigNumber }  from 'ethers';
-import { signDaiPermit, signERC2612Permit } from 'eth-permit';
-import * as utils from '../utils';
+import { ethers }  from 'ethers';
 
 import { IProxyExecutable, ITx, IYieldSeries } from '../types';
 
