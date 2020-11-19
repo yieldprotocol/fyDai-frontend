@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
 import { Box, Text, ResponsiveContext, Collapsible } from 'grommet';
 import { FiLayers as ChangeSeries } from 'react-icons/fi';
 
@@ -22,11 +22,6 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
   const { state: seriesState } = useContext(SeriesContext);
   const { activeSeries } = seriesState; 
   const [ selectorOpen, setSelectorOpen ] = useState<boolean>(false);
-  const [ delegated, setDelegated ] = useState<boolean>(true);
-
-  useEffect(()=>{
-    activeSeries && setDelegated(activeSeries.authComplete);
-  }, [ activeSeries ]);
 
   return (
     <>

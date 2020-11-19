@@ -21,7 +21,6 @@ import {
   useIsLol,
 } from '../hooks';
 
-import TxStatus from '../components/TxStatus';
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
 import RaisedButton from '../components/RaisedButton';
@@ -32,12 +31,10 @@ import DaiMark from '../components/logos/DaiMark';
 import YieldMobileNav from '../components/YieldMobileNav';
 
 interface IRepayProps {
-  repayAmount?:any
-  setActiveView?: any;
   close?:any;
 }
 
-function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
+function Repay({ close }:IRepayProps) {
 
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { activeSeries } = seriesState;
@@ -260,6 +257,6 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
   );
 }
 
-Repay.defaultProps = { repayAmount:null, setActiveView: 2, close:()=>null };
+Repay.defaultProps = { close:()=>null };
 
 export default Repay;

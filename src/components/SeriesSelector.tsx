@@ -108,21 +108,21 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
             // background={modColor(defaultBackground, -10)}
           >
             <Box basis={mobile?'30%':'30%'}>
-              <Text alignSelf='start' size='small' color='text-weak'>APR</Text>
+              <Text alignSelf='start' size='small' color='text-weak' weight='bold'>APR</Text>
             </Box>
             <Box fill='horizontal' direction='row' justify='between' gap='small'>
               <Box fill align={mobile?'end':undefined}>
-                <Text size={mobile? 'xsmall':'small'} color='text-weak'>{mobile? 'SERIES' : 'SERIES MATURITY'}</Text>
+                <Text size={mobile? 'xsmall':'small'} color='text-weak' weight='bold'>{mobile? 'SERIES' : 'SERIES MATURITY'}</Text>
               </Box>
               <Box fill align={mobile?'end':undefined}>
-                <Text size={mobile? 'xsmall':'small'} color='text-weak'>
+                <Text size={mobile? 'xsmall':'small'} color='text-weak' weight='bold' >
                   { viewMap.get(activeView.toUpperCase())?.head }         
                 </Text>
               </Box>
             </Box>
             { !mobile && 
               <Box direction='row' justify='end' basis='25%'>
-                <Text size={mobile? 'xsmall':'small'} color='text-weak'> </Text>
+                <Text size={mobile? 'xsmall':'small'} color='text-weak' weight='bold'> </Text>
               </Box>}
           </Box>
 

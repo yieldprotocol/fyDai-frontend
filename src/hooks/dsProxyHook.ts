@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext } from 'react';
 import { ethers }  from 'ethers';
 
-import { IProxyExecutable, ITx, IYieldSeries } from '../types';
+import { ITx } from '../types';
 
 import DSProxy from '../contracts/DSProxy.json';
 import { UserContext } from '../contexts/UserContext';

@@ -118,10 +118,11 @@ It is only shown when there is a transaction in progress or signature required *
             gap='medium'
           >
 
-            { ( requestedSigs.length===0  || allSigned )  &&
+            { (requestedSigs.length===0  || allSigned)  && 
+              !(txActive?.txCode === txProcessActive) &&
               <Text> Please confirm the transaction with your Wallet or Provider. </Text>}
 
-            { ( requestedSigs.length>0  && !allSigned ) &&
+            { (requestedSigs.length>0  && !allSigned) &&
             <>
               <Text size='large' weight='bold'> The following {requestedSigs.length===1? 'signature is' : 'signatures are'} required: </Text>
               { requestedSigs.map((x:any, i:number)=> {
@@ -156,16 +157,11 @@ It is only shown when there is a transaction in progress or signature required *
               })}
             </>}
 
-            {/* { allSigned && !txActive && 
-            <Text size='xsmall' weight='bold'>
-              Finally, confirm sending the signatures to Yield in a transaction...
-            </Text>} */}
-
             { (txActive?.txCode === txProcessActive) && <TxStatus tx={txActive || authActive} /> }
 
-            { (txActive || authActive) && 
+            { (txActive?.txCode === txProcessActive) && 
             <Box alignSelf='start'>
-              <FlatButton 
+              <FlatButton
                 onClick={()=>closeAuth()}
                 label={
                   <Box direction='row' gap='medium' align='center'>

@@ -114,7 +114,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
       userActions.updateHistory();
       await Promise.all([
         userActions.updatePosition(),
-        seriesActions.updateActiveSeries()
+        seriesActions.updateSeries([activeSeries])
       ]);
       setBorrowPending(false);
     }
@@ -200,7 +200,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
         target='document'
       >
         { repayOpen && 
-        <Layer 
+        <Layer
           onClickOutside={()=>setRepayOpen(false)}
           responsive={true}
         >
@@ -278,7 +278,6 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
                     </Box>
                   </Box>)
               },
-
               /* dummy placeholder */
               {
                 label: null,
@@ -292,7 +291,6 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
                 valuePrefix: null,
                 valueExtra:null,
               },
-
               {
                 label: 'Dai Debt + Interest',
                 labelExtra: 'owed at maturity',
@@ -359,7 +357,6 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
                 valuePrefix: null,
                 valueExtra: null,
               },
-
             ]}
           />
         </SeriesDescriptor>
@@ -487,8 +484,8 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
             
             { !txActive && 
             !!account && 
-            activeSeries?.isMature() && 
-            activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) && 
+            activeSeries?.isMature() &&
+            activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) &&
             <Repay />}
 
             <Box direction='row' fill justify='between'>

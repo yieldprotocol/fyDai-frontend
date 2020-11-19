@@ -1,6 +1,7 @@
 import { useEffect, useState, useContext } from 'react';
 import { ethers, BigNumber }  from 'ethers';
 import { signDaiPermit, signERC2612Permit } from 'eth-permit';
+import { concat } from 'ethers/lib/utils';
 import * as utils from '../utils';
 
 import { ISignListItem, IYieldSeries } from '../types';
@@ -23,7 +24,6 @@ import { useSigning } from './signingHook';
 import { useDsProxy } from './dsProxyHook';
 
 import { useController } from './controllerHook';
-import { concat } from 'ethers/lib/utils';
 import { genTxCode } from '../utils';
 
 const MAX_INT = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
@@ -53,9 +53,8 @@ const MAX_INT = '0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
 export const useBorrowProxy = () => {
 
   /* contexts */
-  const  { dispatch }  = useContext<any>(TxContext);
   const  { state: { deployedContracts } }  = useContext<any>(YieldContext);
-  const  { state: { preferences: { slippage, useTxApproval }, authorization: { dsProxyAddress, hasDelegatedDsProxy, hasAuthorisedTreasury } } }  = useContext<any>(UserContext);
+  const  { state: { preferences: { slippage }, authorization: { dsProxyAddress, hasDelegatedDsProxy, hasAuthorisedTreasury } } }  = useContext<any>(UserContext);
 
   /* hooks */ 
   const { signer, provider, account } = useSignerAccount();
@@ -65,7 +64,7 @@ export const useBorrowProxy = () => {
   const { addControllerDelegate } = useController();
 
   const { proxyExecute } = useDsProxy();
-  const { delegationSignature, daiPermitSignature, handleSignList } = useSigning();
+  const { delegationSignature, daiPermitSignature, ERC2612PermitSignature, handleSignList } = useSigning();
   
   const { abi: borrowProxyAbi } = BorrowProxy;
   const { abi: controllerAbi } = Controller;
@@ -384,152 +383,75 @@ export const useBorrowProxy = () => {
 
   };
 
-
   /**
-   * @dev This selects which type of buy to use depending on maturity and authorisations.
+   * @dev buy dai - closing a position
    * @param {IYieldSeries} series yield series to act on.
    * @param daiOut Amount of dai being bought
    * */ 
-  const buyDai = async (
-    series: IYieldSeries, 
-    daiOut:number,
-    forceTxApproval:boolean=false,
-  ) => {
-        
-    /* if the user preferes to use tx approvals, or the series has previously been approved */
-    if ( useTxApproval || series.hasCloseAuth || forceTxApproval ) {
-      /* authorised the series if it hasnt already been authorized  (eg. in the case to approval transaction users) */
-      if (!series.hasCloseAuth) {
-        /* handle signing */
-        await approveToken(series?.fyDaiAddress, series?.poolAddress, MAX_INT, series).then(async (x:any) => {
-          if ( x === undefined ) {
-            await buyDaiNoSignature(series, daiOut);
-          } else {
-            // eslint-disable-next-line no-console
-            console.log(x);
-          }   
-        }); 
-      } else { await buyDaiNoSignature(series, daiOut); }
-    } else {
-      /* if the user uses permits as auth and hasn't authed for pre-maturity closes */
-      await buyDaiWithSignature(series, daiOut);
-    }
-  };
-
-
-  /**
-   * @dev for use as the when user has already authorised buying the series OR, no signing abilities (eg. ledger)
-   * @param {IYieldSeries} series yield series to act on.
-   * @param daiOut Amount of dai being bought
-   * */ 
-  const buyDaiNoSignature = async ( 
+  const buyDai = async ( 
     series: IYieldSeries, 
     daiOut:number,
   ) => {
     /* Processing and/or sanitizing input */
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
-    const parsedDaiOut = BigNumber.isBigNumber(daiOut)? daiOut : ethers.utils.parseEther(daiOut.toString());
-    const toAddr = account && ethers.utils.getAddress(account);
-    const overrides = { 
-      gasLimit: BigNumber.from('200000')
-    };
-    
-    /* Contract interaction */
-    let tx:any;
-    let maxFYDaiIn:BigNumber;
+    const poolContract = new ethers.Contract( poolAddr, Pool.abi as any, provider);
 
-    try {
-      /* calculate expected trade values and factor in slippage */
-      const preview = await previewPoolTx('buydai', series, daiOut);
-      if ( !(preview instanceof Error) ) {
-        maxFYDaiIn = valueWithSlippage(preview);
-      } else {
-        // maxFYDaiIn = ethers.utils.parseEther('1000000');
-        throw(preview);
-      }
-      tx = await proxyContract.buyDai(poolAddr, toAddr, parsedDaiOut, maxFYDaiIn, overrides);
-
-    } catch (e) {
-      handleTxRejectError(e);
-      return;
-    }
-    await handleTx({ tx, msg: `Closing ${daiOut} DAI from ${series.displayNameMobile}`, type:'BUY_DAI', series });
-  };
-
-  /**
-   * @dev for when a user hasnt authrorised the series, and prefers signing using permits
-   * @param {IYieldSeries} series yield series to act on.
-   * @param daiOut Amount of dai being bought
-   * */ 
-  const buyDaiWithSignature = async ( 
-    series: IYieldSeries, 
-    daiOut:number,
-  ) => {
-    /* Processing and/or sanitizing input */
-    const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const fyDaiAddr = ethers.utils.getAddress(series.fyDaiAddress);
     const parsedDaiOut = BigNumber.isBigNumber(daiOut)? daiOut : ethers.utils.parseEther(daiOut.toString());
     const toAddr = account && ethers.utils.getAddress(account);
-    const fromAddr = account && ethers.utils.getAddress(account);
 
     const overrides = { 
       gasLimit: BigNumber.from('250000')
     };
-
-    /* Contract interaction */
-    let tx:any;
+  
+    /* calculate expected trade values and factor in slippage */
     let maxFYDaiIn:BigNumber;
-    let fyDaiPermitSig:any;
-
-    try {
-      /* calculate expected trade values and factor in slippage */
-      const preview = await previewPoolTx('buydai', series, daiOut);
-      if ( !(preview instanceof Error) ) {
-        maxFYDaiIn = valueWithSlippage(preview);
-      } else {
-        throw(preview);
-      }
-      /* Get the user signature authorizing fyDai to interact with Dai */
-      try {
-        const result = await signERC2612Permit(
-          provider.provider, 
-          fyDaiAddr,
-          // @ts-ignore 
-          fromAddr, 
-          poolAddr
-        );
-        fyDaiPermitSig = ethers.utils.joinSignature(result);
-        dispatch({ type: 'signed', payload: auths.get(2) });
-      } catch (e) {
-        /* If there is a problem with the signing, try to use an approval tx as the fallback flow, but ignore if error code 4001 (user reject) */
-        if ( e.code !== 4001 ) {
-          console.log(e);
-          // eslint-disable-next-line no-console
-          console.log('Fallback to approval transaction');
-          await buyDai(series, daiOut, true);
-          return;
-        }
-        return;
-      }
-
-      tx = await proxyContract.buyDaiWithSignature(
-        poolAddr, 
-        toAddr, 
-        parsedDaiOut,
-        maxFYDaiIn, 
-        fyDaiPermitSig,
-        overrides
-      );
-
-    } catch (e) {
-      handleTxRejectError(e);  
-
-      return;
+    const preview = await previewPoolTx('buydai', series, daiOut);
+    if ( !(preview instanceof Error) ) {
+      maxFYDaiIn = valueWithSlippage(preview);
+    } else {
+      throw(preview);
     }
-    await handleTx({ tx, msg: `Closing ${daiOut} DAI from ${series.displayNameMobile}`, type:'BUY_DAI', series });
 
+    /* build and use signature if required , else '0x' */
+    const requestedSigs:Map<string, ISignListItem> = new Map([]);
+               
+    requestedSigs.set('poolSig',
+      { id: 'buyAuth_1',
+        desc: 'Authorise Proxy to interact with the liquidity pool',
+        conditional: await checkPoolDelegate(poolAddr, dsProxyAddress),
+        signFn: () => delegationSignature( poolContract, dsProxyAddress ),    
+        fallbackFn: () => addPoolDelegate(series, dsProxyAddress),
+      });
+    
+    requestedSigs.set('fyDaiSig',
+      { id: 'buyAuth_2',
+        desc: 'Authorise Yield Pool with fyDai',
+        conditional: true,
+        signFn: () => ERC2612PermitSignature( fyDaiAddr, poolAddr ),    
+        fallbackFn: () => approveToken(fyDaiAddr, poolAddr, MAX_INT, series ), 
+      });
+            
+    /* Send the required signatures out for signing, or approval tx if fallback is required */
+    const signedSigs = await handleSignList(requestedSigs, genTxCode('BUY_DAI', series));
+    /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
+    if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
+
+    /* construct the calldata. Fn selection Based on current authorisation status */
+    /* contract fn: buyDaiWithSignature( IPool pool, address to, uint128 daiOut, uint128 maxFYDaiIn, bytes memory fyDaiSig, bytes memory poolSig ) */
+    const calldata = proxyContract.interface.encodeFunctionData( 
+      'buyDaiWithSignature',
+      [ poolAddr, toAddr, parsedDaiOut, maxFYDaiIn, signedSigs.get('fyDaiPermitSig'), signedSigs.get('poolSig') ]
+    );
+    
+    /* send to the proxy for execution */
+    await proxyExecute( 
+      proxyContract.address, 
+      calldata,
+      overrides,
+      { tx:null, msg: `Closing ${daiOut} DAI from ${series.displayNameMobile}`, type:'BUY_DAI', series  }
+    );
   };
-
 
   return {
 

@@ -19,9 +19,7 @@ import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
 
 import YieldMark from '../components/logos/YieldMark';
-
 import YieldMobileNav from '../components/YieldMobileNav';
-import ConfirmationRequired from '../components/ConfirmationRequired';
 
 interface IRemoveLiquidityProps {
   openConnectLayer?:any
@@ -43,7 +41,6 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
   const [newShare, setNewShare] = useState<string>(activeSeries?.poolPercent);
   const [calculating, setCalculating] = useState<boolean>(false);
 
-  const [showConfirm, setShowConfirm] = useState<boolean>(true);
 
   const [ inputValue, setInputValue ] = useState<any>();
   const debouncedInput = useDebounce(inputValue, 500);
@@ -56,20 +53,23 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
   const isLol = useIsLol(inputValue);
 
-
   /* Remove Liquidity sequence */
   const removeLiquidityProcedure = async (value:number) => {
     if ( !removeLiquidityDisabled ) {
       setRemoveLiquidityPending(true);
-      await removeLiquidity(activeSeries, value);
-      setInputValue(undefined);
-      userActions.updateHistory();
       if (activeSeries?.isMature()) {
+        await removeLiquidity(activeSeries, value);
+        setInputValue(undefined);
+        userActions.updateHistory();
         await Promise.all([
           userActions.updatePosition(),
           seriesActions.updateActiveSeries()
         ]);
       } else {
+        close();
+        await removeLiquidity(activeSeries, value);
+        setInputValue(undefined);
+        userActions.updateHistory();
         userActions.updatePosition();
         seriesActions.updateActiveSeries();
       }
@@ -224,8 +224,6 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
         </Box>}
         
       </Box>}
-
-      { removeLiquidityPending && !txActive &&  <ConfirmationRequired close={()=>close()} /> }
       
       { txActive &&
       <Box 

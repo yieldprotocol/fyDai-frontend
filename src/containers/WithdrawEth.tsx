@@ -50,7 +50,6 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
   const [ maxWithdraw, setMaxWithdraw ] = useState<string>();
 
   const [ withdrawDisabled, setWithdrawDisabled ] = useState<boolean>(true);
-  const [ withdrawPending, setWithdrawPending ] = useState<boolean>(false);
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
 
@@ -59,13 +58,11 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
   /* Withdraw execution flow */
   const withdrawProcedure = async () => {
     if (inputValue && !withdrawDisabled ) {
-      setWithdrawPending(true);
+      close(); // close immediately, no need to track withdrawPending
       await withdrawEth(inputValue);
       setInputValue(undefined);
       userActions.updateHistory();
-      userActions.updatePosition();
-      setWithdrawPending(false);
-      close();
+      userActions.updatePosition();  
     }
   };
 
@@ -122,7 +119,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
       }}
       target='document'
     >
-      { !txActive && !withdrawPending && 
+      { !txActive &&
       <Box 
         width={!mobile?{ min:'620px', max:'620px' }: undefined}
         alignSelf='center'
@@ -193,41 +190,12 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
             label={
               <Box direction='row' gap='medium' align='center'>
                 <ArrowLeft color='text-weak' />
-                <Text size='small' color='text-weak'> { !withdrawPending? 'cancel, and go back.': 'go back'}</Text>
+                <Text size='small' color='text-weak'> cancel, and go back. </Text>
               </Box>
                 }
           />
         </Box>        
       </Box>}
-
-      {/* { txActive && 
-        <Box
-          width={{ max:'600px' }}
-          alignSelf='center'
-          fill
-          background='background'
-          round='small'
-          pad='large'
-          gap='medium'
-          justify='between'
-        > 
-          <TxStatus tx={txActive} />
-
-          <Box alignSelf='start'>
-            <Box
-              round
-              onClick={()=>close()}
-              hoverIndicator='brand-transparent'
-              pad={{ horizontal:'small', vertical:'small' }}
-              justify='center'
-            >
-              <Box direction='row' gap='small' align='center'>
-                <ArrowLeft color='text-weak' />
-                <Text size='xsmall' color='text-weak'> { !withdrawPending? 'cancel, and go back.': 'go back'}  </Text>
-              </Box>
-            </Box>
-          </Box>
-        </Box>} */}
 
       {mobile && 
         <YieldMobileNav noMenu={true}>

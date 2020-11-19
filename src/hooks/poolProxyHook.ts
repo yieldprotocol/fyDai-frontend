@@ -65,6 +65,7 @@ export const usePoolProxy = () => {
   /* Preset the yieldProxy controller contracts to be used with all fns */
   const [ proxyContract, setProxyContract] = useState<any>();
   const [ controllerContract, setControllerContract ] = useState<any>();
+  
   useEffect(()=>{
     deployedContracts?.PoolProxy && signer &&
     setProxyContract( new ethers.Contract( 
@@ -78,7 +79,6 @@ export const usePoolProxy = () => {
       signer
     ));
   }, [signer, deployedContracts]);
-
 
   /**
    * @dev Add liquidity to a pool 
@@ -117,7 +117,7 @@ export const usePoolProxy = () => {
         signFn: () => delegationSignature(controllerContract, dsProxyAddress),    
         fallbackFn: () => addControllerDelegate(dsProxyAddress),
       });
-    
+
     requestedSigs.set('daiSig',
       { id: 'addLiquidityAuth_2',
         desc: 'Authorise Yield Treasury with Dai',
