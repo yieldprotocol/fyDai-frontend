@@ -148,7 +148,8 @@ export const useSigning = () => {
         return signedMap;
       });
 
-      dispatch({ type: 'setTxProcessActive', payload:{ txCode:null, sigs:[] }  });
+      // dispatch({ type: 'setTxProcessActive', payload:{ txCode:null, sigs:[] }  });
+
       /* then set all sigs to '0x' */
       requestedSigs.forEach((value:any, key:string) => signedMap.set(key, '0x'));       
       return signedMap;
@@ -168,7 +169,7 @@ export const useSigning = () => {
           }
         } catch (e) {
           /* If there is a problem with the signing, use the approve txs as a fallback, HOWEVER ignore if error code 4001 (user reject) */
-          if ( e.code === 4001 ) {
+          if ( e.code !== 4001 ) {
             handleSignError(e);
             // eslint-disable-next-line no-console
             console.log('Falling back to approval transactions');

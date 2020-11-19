@@ -7,7 +7,6 @@ import { UserContext } from '../contexts/UserContext';
 import { useFYDai, useTxActive } from '../hooks';
 
 import InlineAlert from '../components/InlineAlert';
-import ApprovalPending from '../components/ApprovalPending';
 import TxStatus from '../components/TxStatus';
 import ActionButton from '../components/ActionButton';
 
@@ -65,7 +64,6 @@ const Redeem  = ({ close }:IRedeemProps)  => {
           hasPoolDelegatedProxy={true}
         />
       </>}
-      { redeemActive && !txActive && <ApprovalPending /> } 
       { txActive && <TxStatus tx={txActive} /> }
     </Box>
   );

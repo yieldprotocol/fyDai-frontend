@@ -6,7 +6,7 @@ import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 import { VscHistory as History } from 'react-icons/vsc';
 
 import { NavLink, useParams } from 'react-router-dom';
-import { cleanValue, nFormatter } from '../utils';
+import { cleanValue, genTxCode, nFormatter } from '../utils';
 
 import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
@@ -26,7 +26,6 @@ import RemoveLiquidity from './RemoveLiquidity';
 
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
-import ApprovalPending from '../components/ApprovalPending';
 import TxStatus from '../components/TxStatus';
 import SeriesDescriptor from '../components/SeriesDescriptor';
 import RaisedButton from '../components/RaisedButton';
@@ -75,6 +74,11 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
 
   const [ removeLiquidityOpen, setRemoveLiquidityOpen ] = useState<boolean>(false);
   const [ histOpen, setHistOpen ] = useState<boolean>(false);
+
+  const [showTxPending, setShowTxPending] = useState<boolean>(false);
+  useEffect(()=>{
+    setShowTxPending( txActive?.txCode === genTxCode('ADD_LIQUIDITY', activeSeries));
+  }, [txActive, activeSeries]);
 
   const [ addLiquidityDisabled, setAddLiquidityDisabled ] = useState<boolean>(true);
 

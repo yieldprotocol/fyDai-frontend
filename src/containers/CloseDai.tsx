@@ -22,7 +22,6 @@ import {
 
 import InputWrap from '../components/InputWrap';
 import TxStatus from '../components/TxStatus';
-import ApprovalPending from '../components/ApprovalPending';
 import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';

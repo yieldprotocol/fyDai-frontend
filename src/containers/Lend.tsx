@@ -5,7 +5,7 @@ import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 import { VscHistory as History } from 'react-icons/vsc';
 
 import { NavLink, useParams } from 'react-router-dom';
-import { cleanValue } from '../utils';
+import { cleanValue, genTxCode } from '../utils';
 
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
@@ -25,7 +25,6 @@ import Redeem from './Redeem';
 
 import InputWrap from '../components/InputWrap';
 import InfoGrid from '../components/InfoGrid';
-import ApprovalPending from '../components/ApprovalPending';
 import TxStatus from '../components/TxStatus';
 import SeriesDescriptor from '../components/SeriesDescriptor';
 import RaisedButton from '../components/RaisedButton';
@@ -65,6 +64,11 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
 
   const [ CloseDaiOpen, setCloseDaiOpen ] = useState<boolean>(false);
   const [ histOpen, setHistOpen ] = useState<boolean>(false);
+  
+  const [showTxPending, setShowTxPending] = useState<boolean>(false);
+  useEffect(()=>{
+    setShowTxPending( txActive?.txCode === genTxCode('SELL_DAI', activeSeries));
+  }, [txActive, activeSeries]);
   
   const [ inputValue, setInputValue ] = useState<any>(amnt || undefined);
   const debouncedInput = useDebounce(inputValue, 500);
@@ -221,7 +225,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
         </SeriesDescriptor>
    
         {/* If there is no applicable transaction active, show the lending page */}
-        { !txActive &&
+        { !showTxPending &&
         <Box
           width={{ max:'600px' }}
           alignSelf='center'
@@ -360,7 +364,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
           </Box>
         </Box>}
 
-        { txActive && <TxStatus tx={txActive} /> }
+        { showTxPending && <TxStatus tx={txActive} /> }
         
       </Keyboard>
 

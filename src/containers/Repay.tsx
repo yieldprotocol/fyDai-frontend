@@ -21,7 +21,6 @@ import {
   useIsLol,
 } from '../hooks';
 
-import ApprovalPending from '../components/ApprovalPending';
 import TxStatus from '../components/TxStatus';
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';

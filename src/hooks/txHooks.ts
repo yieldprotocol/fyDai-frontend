@@ -1,5 +1,4 @@
 import { useEffect, useState, useContext } from 'react';
-
 import { ITx } from '../types';
 import { NotifyContext } from '../contexts/NotifyContext';
 
@@ -21,7 +20,7 @@ export const useTxActive = (typeList:string[]) => {
 export const useTxHelpers = () => { 
   const  { dispatch: notify }  = useContext(NotifyContext);
   const  { state, dispatch  }  = useContext(TxContext);
-  const [ pendingCache, setPendingCache ] = useCachedState('txPending', []);
+  const [ , setPendingCache ] = useCachedState('txPending', []);
 
   /* Notification Helpers */
   const txComplete = (receipt:any, txCode:string|null=null) => {
@@ -62,7 +61,6 @@ export const useTxHelpers = () => {
     txComplete(receipt);
   };
   
-
   const handleTx = async ( tx:ITx ) => {
     /* assign an internal tracking code for the series and type of tx */
     const txCode = tx.type.concat( tx?.series?.maturity.toString() || '' );

@@ -13,7 +13,6 @@ import { useSignerAccount, usePoolProxy, useTxActive, useDebounce, useIsLol } fr
 
 import InputWrap from '../components/InputWrap';
 import InfoGrid from '../components/InfoGrid';
-import ApprovalPending from '../components/ApprovalPending';
 import TxStatus from '../components/TxStatus';
 import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';

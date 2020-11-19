@@ -130,7 +130,6 @@ export interface IDomain {
   verifyingContract: string;
 }
 
-
 export interface ITxState {
   pendingTxs: any[],
   lastCompletedTx: any,

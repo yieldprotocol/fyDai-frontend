@@ -35,7 +35,6 @@ import WithdrawEth from './WithdrawEth';
 
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
-import ApprovalPending from '../components/ApprovalPending';
 import TxStatus from '../components/TxStatus';
 import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
