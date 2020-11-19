@@ -5,37 +5,46 @@ import { useCachedState } from '../hooks/appHooks';
 import { IReducerAction, ITxState, ITx } from '../types';
 
 import { SeriesContext } from './SeriesContext';
-// import { useSignerAccount } from '../hooks';
 
 const TxContext = React.createContext<any>({});
 
 const initState = {
   pendingTxs: [],
-  lastCompletedTx: null,
   requestedSigs: [],
+  lastCompletedTx: null,
+  txProcessActive: null,
 };
 
 function txReducer(state:ITxState, action:IReducerAction) {
   switch (action.type) {
+    case 'setTxProcessActive':
+      return {
+        ...state,
+        /* set tthe current active process */
+        txProcessActive: action.payload.txCode,
+        /* set the list of sigs required for the current process */
+        requestedSigs: action.payload.sigs.map((x:any)=> { return { ...x };} ),
+      };
     case 'txPending':
       return {
         ...state,
+        /* add the tx to the list of pending txs */
         pendingTxs: [ ...state.pendingTxs, action.payload],
       };
     case 'txComplete':
       return {
         ...state,
-        pendingTxs: state.pendingTxs?.filter((x:any) => x.tx.hash !== ( action.payload.transactionHash || action.payload.hash)),
-        lastCompletedTx: { ...action.payload, transactionHash: action.payload.transactionHash || action.payload.hash },
-      };
-    case 'requestSigs':
-      return {
-        ...state,
-        requestedSigs: action.payload.map((x:any)=> { return { ...x };} ),
+        /* remove the tx from the pending tx list */
+        pendingTxs: state.pendingTxs?.filter((x:any) => x.tx.hash !== ( action.payload.receipt.transactionHash || action.payload.receipt.hash)),
+        /* set the last completed tx to the one just finished */
+        lastCompletedTx: { ...action.payload.receipt, transactionHash: action.payload.receipt.transactionHash || action.payload.receipt.hash },
+        /* if the txCode is the same as the current activeProcces,. then reset that process */
+        txProcessActive: (action.payload.txCode === state?.txProcessActive)? null : state?.txProcessActive,
       };
     case 'signed':
       return {
         ...state,
+        /* mark the signature as signed */ 
         requestedSigs: state.requestedSigs.map( (x:any) => {           
           if ( x.id === action.payload.id) {
             return { ...x, signed:true };
@@ -49,13 +58,11 @@ function txReducer(state:ITxState, action:IReducerAction) {
 
 const TxProvider = ({ children }:any) => {
   const [ state, dispatch ] = useReducer(txReducer, initState );
-
   const { state: { seriesLoading } } = useContext(SeriesContext);
   const [ pendingCache, setPendingCache ] = useCachedState('txPending', []);
   const { library } = useWeb3React('fallback');
   const [ hasReadCache, setHasReadCache] = useState<boolean>(false);
   
-
   useEffect(() => {
     /* handle registering and monitoring the cached transactions if any */
     ( async () => {
@@ -64,9 +71,8 @@ const TxProvider = ({ children }:any) => {
           dispatch({ type:'txPending', payload: x });
           await library.waitForTransaction(x.tx.hash, 1)
             .then((receipt:any) => {
-              dispatch({ type: 'txComplete', payload: receipt } );
+              dispatch({ type: 'txComplete', payload: { receipt, txCode: x.txCode } } );
             });
-          console.log(x.tx.hash);
           setPendingCache( pendingCache.filter((t:any) => t.tx.hash !== x.tx.hash));
         })
         );

@@ -15,9 +15,10 @@ import { useSignerAccount } from './connectionHooks';
 import { usePool } from './poolHook';
 import { useMath } from './mathHooks';
 import { useToken } from './tokenHook';
-import { useTxSigning } from './txSigningHook';
+import { useSigning } from './signingHook';
 import { useDsProxy } from './dsProxyHook';
 import { useController } from './controllerHook';
+import { genTxCode } from '../utils';
 
 /**
  * Hook for interacting with the Yield Proxy Contract.
@@ -41,7 +42,7 @@ import { useController } from './controllerHook';
  * @returns { boolean } sellActive
  * 
  */
-export const useBorrowProxy = () => {
+export const usePoolProxy = () => {
 
   /* contexts */
   const  { state: { deployedContracts } }  = useContext<any>(YieldContext);
@@ -56,14 +57,10 @@ export const useBorrowProxy = () => {
   const { addControllerDelegate } = useController();
 
   const { proxyExecute } = useDsProxy();
-  const { delegationSignature, daiPermitSignature, handleSignList } = useTxSigning();
+  const { delegationSignature, daiPermitSignature, handleSignList } = useSigning();
 
   const { abi: poolProxyAbi } = PoolProxy;
   const { abi: controllerAbi } = Controller;
-  
-  /* Activity flags */
-  const [ addLiquidityActive, setAddLiquidityActive ] = useState<boolean>(false);
-  const [ removeLiquidityActive, setRemoveLiquidityActive ] = useState<boolean>(false);
 
   /* Preset the yieldProxy controller contracts to be used with all fns */
   const [ proxyContract, setProxyContract] = useState<any>();
@@ -94,6 +91,7 @@ export const useBorrowProxy = () => {
     series:IYieldSeries,
     daiUsed:number|BigNumber,
   ) => {
+
     /* Processing and sanitizing input */
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const parsedDaiUsed = BigNumber.isBigNumber(daiUsed)? daiUsed : ethers.utils.parseEther(daiUsed.toString());
@@ -129,7 +127,7 @@ export const useBorrowProxy = () => {
       });
         
     /* Send the required signatures out for signing, or approval tx if fallback is required */
-    const signedSigs = await handleSignList(requestedSigs);
+    const signedSigs = await handleSignList(requestedSigs, genTxCode('ADD_LIQUIDITY', series));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
 
@@ -192,7 +190,7 @@ export const useBorrowProxy = () => {
       });
     
     /* Send the required signatures out for signing, or approval tx if fallback is required */
-    const signedSigs = await handleSignList(requestedSigs);
+    const signedSigs = await handleSignList(requestedSigs, genTxCode('REMOVE_LIQUIDITY', series));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
 
@@ -229,6 +227,7 @@ export const useBorrowProxy = () => {
       overrides,
       { tx:null, msg: `Removing ${tokens} DAI liquidity from ${series.displayNameMobile}`, type:'REMOVE_LIQUIDITY', series  }
     );
+
   };
   
   return {

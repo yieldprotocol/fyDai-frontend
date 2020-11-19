@@ -8,17 +8,18 @@ import { useEvents } from './eventHooks';
 
 /* Utility hooks */
 import { useMath } from './mathHooks';
-import { useAuth } from './authsHook';
 
 /* Generic blockchain transactional hooks */
 import { useCallTx, useSendTx, useTimeTravel } from './chainHooks'; 
 import { useToken } from './tokenHook';
+
 import { useTxActive, useTxHelpers } from './txHooks';
+
+import { useSigning } from './signingHook';
 
 /* Contract hooks */
 import { useMigrations } from './migrationHook';
 import { useController } from './controllerHook';
-import { useProxy } from './yieldProxyHook';
 import { usePool } from './poolHook';
 import { useFYDai } from './fyDaiHook';
 
@@ -26,23 +27,27 @@ import { useDsRegistry } from './dsRegistryHook';
 import { useDsProxy } from './dsProxyHook';
 
 import { useBorrowProxy } from './borrowProxyHook';
+import { usePoolProxy } from './poolProxyHook';
 
 export {
 
   useTxActive,
   useTxHelpers,
+  useSigning,
+
   useCachedState,
   useDebounce,
   useSendTx,
   useCallTx,
   useIsLol,
   
-  useAuth,
-  useProxy,
   useController,
   useFYDai,
   useMigrations,
   usePool,
+
+  useBorrowProxy,
+  usePoolProxy,
 
   useEvents,
   useMath,
@@ -52,8 +57,6 @@ export {
 
   useDsRegistry,
   useDsProxy,
-
-  useBorrowProxy,
   
   useSignerAccount, 
   useConnection,

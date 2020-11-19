@@ -15,17 +15,16 @@ import { UserContext } from '../contexts/UserContext';
 
 import { useSignerAccount } from './connectionHooks';
 import { usePool } from './poolHook';
-import { useMath } from './mathHooks';
 import { useToken } from './tokenHook';
 import { useTxHelpers } from './txHooks';
 
-import { useTxSigning } from './txSigningHook';
+import { useSigning } from './signingHook';
 
 import { useDsProxy } from './dsProxyHook';
 
-import { useTempProxy } from './tempProxyHook';
-import Authorization from '../components/Authorization';
 import { useController } from './controllerHook';
+import { concat } from 'ethers/lib/utils';
+import { genTxCode } from '../utils';
 
 const MAX_INT = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
 
@@ -66,18 +65,8 @@ export const useBorrowProxy = () => {
   const { addControllerDelegate } = useController();
 
   const { proxyExecute } = useDsProxy();
-  const { delegationSignature, daiPermitSignature, handleSignList } = useTxSigning();
+  const { delegationSignature, daiPermitSignature, handleSignList } = useSigning();
   
-  /* Activity flags */
-  const [ postEthActive, setPostEthActive ] = useState<boolean>(false);
-  const [ withdrawEthActive, setWithdrawEthActive ] = useState<boolean>(false);
-  const [ borrowActive, setBorrowActive ] = useState<boolean>(false);
-  const [ repayActive, setRepayActive ] = useState<boolean>(false);
-  const [ sellActive, setSellActive ] = useState<boolean>(false);
-
-  const [ buyActive, setBuyActive ] = useState<boolean>(false);
-  const [ buyApprovalActive, setBuyApprovalActive ] = useState<boolean>(false);
-
   const { abi: borrowProxyAbi } = BorrowProxy;
   const { abi: controllerAbi } = Controller;
 
@@ -122,19 +111,31 @@ export const useBorrowProxy = () => {
   const postEth = async (
     amount:string | BigNumber,
   ) => {
+
     /* Processing and/or sanitizing input */
     const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(utils.cleanValue(amount));
     const toAddr = account && ethers.utils.getAddress(account); /* 'to' in this case represents the vault to be depositied into within controller */
+
+    /* NB. postEth is the only function with NO sig requirements - nevertheless, send to empty array to handleSignList() */
+    /* build and use signatures if required */
+    const requestedSigs:Map<string, ISignListItem> = new Map([]);
+
+    /* NB. fn POSTETH is the only function with NO sig requirements - nevertheless, send to empty Map to handleSignList() */
+
+    /* Send the required signatures out for signing, or approval tx if fallback is required */
+    const signedSigs = await handleSignList(requestedSigs, genTxCode('POST', null));
+    /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
+    if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
 
     /* construct the calldata from method and reqd. args */ 
     const calldata = proxyContract.interface.encodeFunctionData( 'post', [ toAddr ] );
 
     /* send to the proxy for execution */
-    await proxyExecute( 
+    await proxyExecute(
       proxyContract.address, 
       calldata,
       { value: parsedAmount },
-      { tx:null, msg: `Depositing ${amount} ETH`, type:'DEPOSIT', series: null }
+      { tx:null, msg: `Depositing ${amount} ETH`, type:'POST', series: null }
     );
   };
 
@@ -161,7 +162,7 @@ export const useBorrowProxy = () => {
         fallbackFn: () => addControllerDelegate(dsProxyAddress),
       });
     /* Send the required signatures out for signing, or approval tx if fallback is required */
-    const signedSigs = await handleSignList(requestedSigs);
+    const signedSigs = await handleSignList(requestedSigs, genTxCode('WITHDRAW', null));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
 
@@ -178,6 +179,7 @@ export const useBorrowProxy = () => {
       { },
       { tx:null, msg: `Withdrawing ${amount} ETH `, type:'WITHDRAW', series: null }
     );
+
   };
 
   /**
@@ -228,7 +230,7 @@ export const useBorrowProxy = () => {
       });
 
     /* Send the required signatures out for signing, or approval tx if fallback is required */
-    const signedSigs = await handleSignList(requestedSigs);
+    const signedSigs = await handleSignList(requestedSigs, genTxCode('BORROW', series));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
 
@@ -243,10 +245,9 @@ export const useBorrowProxy = () => {
       proxyContract.address, 
       calldata,
       overrides,
-      { tx:null, msg: `Borrowing ${daiToBorrow} Dai from ${series.displayNameMobile}`, type:'BORROW', series  }
+      { tx:null, msg: `Borrowing ${daiToBorrow} Dai from ${series.displayNameMobile}`, type:'BORROW', series }
     );
   };
-
 
   /**
    * @dev Repay an amount of fyDai debt in Controller using a given amount of Dai exchanged for fyDai at pool rates, with a minimum of fyDai debt required to be paid.
@@ -264,6 +265,7 @@ export const useBorrowProxy = () => {
     collateralType: string,
     repaymentInDai: number,
   ) => {
+
     const dai = ethers.utils.parseEther(repaymentInDai.toString());   
     const collatType = ethers.utils.formatBytes32String(collateralType);
     const toAddr = account && ethers.utils.getAddress(account);
@@ -292,7 +294,7 @@ export const useBorrowProxy = () => {
       });
     
     /* Send the required signatures out for signing, or approval tx if fallback is required */
-    const signedSigs = await handleSignList(requestedSigs);
+    const signedSigs = await handleSignList(requestedSigs, genTxCode('REPAY', series));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
           
@@ -309,6 +311,7 @@ export const useBorrowProxy = () => {
       overrides,
       { tx:null, msg: `Repaying ${repaymentInDai} Dai to ${series.displayNameMobile}`, type:'REPAY', series  }
     );
+
   };
 
   /**
@@ -321,6 +324,7 @@ export const useBorrowProxy = () => {
     series: IYieldSeries,
     daiIn: number| BigNumber, 
   ) => {
+
     /* Processing and/or sanitizing input */
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const parsedDaiIn = BigNumber.isBigNumber(daiIn)? daiIn : ethers.utils.parseEther(daiIn.toString());
@@ -345,7 +349,7 @@ export const useBorrowProxy = () => {
             
     requestedSigs.set('poolSig',
       { id: 'sellAuth_1',
-        desc: 'Authorise Yield Protocol Controller',
+        desc: 'Authorise Proxy to interact with the liquidity pool',
         conditional: await checkPoolDelegate(poolAddr, dsProxyAddress),
         signFn: () => delegationSignature( poolContract, dsProxyAddress ),    
         fallbackFn: () => addPoolDelegate(series, dsProxyAddress),
@@ -360,7 +364,7 @@ export const useBorrowProxy = () => {
       });
         
     /* Send the required signatures out for signing, or approval tx if fallback is required */
-    const signedSigs = await handleSignList(requestedSigs);
+    const signedSigs = await handleSignList(requestedSigs, genTxCode('SELL_DAI', series));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
 
@@ -391,20 +395,18 @@ export const useBorrowProxy = () => {
     daiOut:number,
     forceTxApproval:boolean=false,
   ) => {
+        
     /* if the user preferes to use tx approvals, or the series has previously been approved */
     if ( useTxApproval || series.hasCloseAuth || forceTxApproval ) {
       /* authorised the series if it hasnt already been authorized  (eg. in the case to approval transaction users) */
       if (!series.hasCloseAuth) {
-        setBuyApprovalActive(true);
         /* handle signing */
         await approveToken(series?.fyDaiAddress, series?.poolAddress, MAX_INT, series).then(async (x:any) => {
           if ( x === undefined ) {
-            setBuyApprovalActive(false);
             await buyDaiNoSignature(series, daiOut);
           } else {
             // eslint-disable-next-line no-console
             console.log(x);
-            setBuyApprovalActive(false);
           }   
         }); 
       } else { await buyDaiNoSignature(series, daiOut); }
@@ -436,7 +438,6 @@ export const useBorrowProxy = () => {
     let tx:any;
     let maxFYDaiIn:BigNumber;
 
-    setBuyActive(true);
     try {
       /* calculate expected trade values and factor in slippage */
       const preview = await previewPoolTx('buydai', series, daiOut);
@@ -450,11 +451,9 @@ export const useBorrowProxy = () => {
 
     } catch (e) {
       handleTxRejectError(e);
-      setBuyActive(false);
       return;
     }
     await handleTx({ tx, msg: `Closing ${daiOut} DAI from ${series.displayNameMobile}`, type:'BUY_DAI', series });
-    setBuyActive(false);
   };
 
   /**
@@ -481,8 +480,7 @@ export const useBorrowProxy = () => {
     let tx:any;
     let maxFYDaiIn:BigNumber;
     let fyDaiPermitSig:any;
-    
-    setBuyActive(true);
+
     try {
       /* calculate expected trade values and factor in slippage */
       const preview = await previewPoolTx('buydai', series, daiOut);
@@ -493,7 +491,6 @@ export const useBorrowProxy = () => {
       }
       /* Get the user signature authorizing fyDai to interact with Dai */
       try {
-        dispatch({ type: 'requestSigs', payload:[ auths.get(2) ] });
         const result = await signERC2612Permit(
           provider.provider, 
           fyDaiAddr,
@@ -503,20 +500,15 @@ export const useBorrowProxy = () => {
         );
         fyDaiPermitSig = ethers.utils.joinSignature(result);
         dispatch({ type: 'signed', payload: auths.get(2) });
-        dispatch({ type: 'requestSigs', payload: [] });
       } catch (e) {
         /* If there is a problem with the signing, try to use an approval tx as the fallback flow, but ignore if error code 4001 (user reject) */
         if ( e.code !== 4001 ) {
           console.log(e);
-          dispatch({ type: 'requestSigs', payload:[] });
-          setBuyActive(false);
           // eslint-disable-next-line no-console
           console.log('Fallback to approval transaction');
           await buyDai(series, daiOut, true);
           return;
         }
-        dispatch({ type: 'requestSigs', payload:[] });
-        setBuyActive(false);
         return;
       }
 
@@ -531,27 +523,27 @@ export const useBorrowProxy = () => {
 
     } catch (e) {
       handleTxRejectError(e);  
-      setBuyActive(false);
+
       return;
     }
     await handleTx({ tx, msg: `Closing ${daiOut} DAI from ${series.displayNameMobile}`, type:'BUY_DAI', series });
-    setBuyActive(false);
+
   };
 
 
   return {
 
     /* ethProxy eq. fns */
-    postEth, postEthActive,
-    withdrawEth, withdrawEthActive,
+    postEth,
+    withdrawEth,
 
     /* daiProxy eq. fns */
-    borrowDai, borrowActive,
-    repayDaiDebt, repayActive,
+    borrowDai,
+    repayDaiDebt,
 
     /* Trade fns */
-    sellDai, sellActive,
-    buyDai, buyActive, buyApprovalActive,
+    sellDai,
+    buyDai,
 
   } as const;
 };

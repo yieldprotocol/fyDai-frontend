@@ -13,7 +13,7 @@ import { UserContext } from '../contexts/UserContext';
 
 import { 
   usePool, 
-  useProxy, 
+  useBorrowProxy, 
   useSignerAccount, 
   useTxActive, 
   useDebounce, 
@@ -45,7 +45,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
   const { actions: userActions } = useContext(UserContext);
 
   const { previewPoolTx }  = usePool();
-  const { buyDai, buyApprovalActive }  = useProxy();
+  const { buyDai }  = useBorrowProxy();
   const { account, fallbackProvider } = useSignerAccount();
 
   const [ inputValue, setInputValue ] = useState<any>();
@@ -167,7 +167,8 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
             />
           </Box>}
         </Box>}
-
+        
+        {/* 
         { CloseDaiPending && 
           !txActive && 
           buyApprovalActive && 
@@ -176,10 +177,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
         { CloseDaiPending && 
           !txActive && 
           !buyApprovalActive && 
-          <ApprovalPending />}
-
-        { txActive?.type === 'AUTH' && 
-          <TxStatus tx={txActive} />}
+          <ApprovalPending />} */}
 
         { txActive?.type === 'BUY_DAI' &&
         <>

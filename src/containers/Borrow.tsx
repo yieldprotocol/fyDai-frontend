@@ -71,11 +71,11 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
   /* hooks init */
   const { borrow }  = useController();
   const { previewPoolTx }  = usePool();
-  const { borrowDai, borrowActive } = useBorrowProxy();
+  const { borrowDai } = useBorrowProxy();
   const { calcAPR, estCollRatio: estimateRatio } = useMath();
   const { account } = useSignerAccount();
 
-  const [ txActive ] = useTxActive(['BORROW', 'BUY' ]);
+  const [ txActive ] = useTxActive(['BORROW']);
 
   const [ repayOpen, setRepayOpen ] = useState<boolean>(false);
   const [ histOpen, setHistOpen ] = useState<boolean>(false);
@@ -358,7 +358,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
           />
         </SeriesDescriptor>
    
-        { txActive?.type !== 'BORROW' && txActive?.type !== 'BUY' &&  
+        { txActive?.type !== 'BORROW' && 
         <Box
           width={{ max: '600px' }}
           alignSelf="center"
@@ -369,7 +369,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
           gap='small'
         >       
           <Box gap='small' align='center' fill='horizontal'>
-
+            
             { !activeSeries?.isMature() && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
             <Box gap='medium' align='center' fill='horizontal'>
               <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to borrow</Text>
@@ -524,9 +524,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
           </Box>
         </Box>}
 
-        {/* If there is a transaction active, show the applicable view */}
-        { borrowActive && !txActive && <ApprovalPending /> } 
-        { txActive && <TxStatus tx={txActive} /> }
+        { txActive?.type === 'BORROW' && <TxStatus tx={txActive} /> }
 
       </Keyboard>
 

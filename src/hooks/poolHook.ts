@@ -184,12 +184,11 @@ export const usePool = () => {
     try {
       tx = await contract.addDelegate(delegatedAddr);
     } catch (e) {
-      handleTxRejectError(e);
-      return;
+      return handleTxRejectError(e);
     }
     /* Transaction reporting & tracking */
     await handleTx({ tx, msg: 'Pending once-off Pool delegation ...', type:'AUTH', series });
-
+    
     // eslint-disable-next-line consistent-return
     return true;
   };

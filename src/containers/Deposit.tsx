@@ -73,9 +73,9 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
-  const { postEth, postEthActive }  = useBorrowProxy();
+  const { postEth }  = useBorrowProxy();
   const { estCollRatio: estimateRatio, collValue } = useMath();
-  const [ txActive ] = useTxActive(['DEPOSIT', 'WITHDRAW']);
+  const [ txActive ] = useTxActive(['POST', 'WITHDRAW']);
   const { account } = useSignerAccount();
 
   const [ inputValue, setInputValue ] = useState<any>(amnt || undefined);
@@ -257,7 +257,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
               type='number'
               placeholder={(!mobile && !modalView) ? 'Enter the ETH amount to deposit': 'ETH'}
               value={inputValue || ''}
-              disabled={postEthActive}
+              // disabled={postEthActive}
               plain
               onChange={(event:any) => setInputValue( cleanValue(event.target.value) )}
               icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <EthMark />}
@@ -356,8 +356,9 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
           </Box>}
        
         </Box>}
-        { postEthActive && !txActive && <ApprovalPending /> } 
-        { txActive && txActive.type !== 'WITHDRAW' && <TxStatus tx={txActive} /> }
+ 
+        { txActive && txActive.type === 'POST' && <TxStatus tx={txActive} /> }
+    
       </Keyboard>
 
       {mobile && 

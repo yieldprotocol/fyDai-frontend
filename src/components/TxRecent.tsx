@@ -75,8 +75,7 @@ const TxRecent = ({ setView }: any) => {
             pad='xsmall'
           >
           
-            { pendingTxs.map((x:any)=>(
-            
+            { pendingTxs.map((x:any)=>(        
               <Box
                 gap='small'
                 align='center'

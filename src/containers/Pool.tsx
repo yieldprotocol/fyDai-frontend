@@ -15,7 +15,7 @@ import { UserContext } from '../contexts/UserContext';
 import { 
   useSignerAccount,
   useTxActive,
-  useProxy,
+  usePoolProxy,
   useToken,
   useDebounce,
   useIsLol,
@@ -57,7 +57,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
   const { daiBalance } = userState.position;
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
-  const { addLiquidity, addLiquidityActive } = useProxy();
+  const { addLiquidity } = usePoolProxy();
   const { getBalance } = useToken();
   const { poolPercent, calcTokensMinted } = useMath();
 
@@ -336,8 +336,8 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
           </Box>
         </Box>}
 
-        { addLiquidityActive && !txActive && <ApprovalPending /> } 
         { txActive && txActive.type !== 'REMOVE_LIQUIDITY' && <TxStatus tx={txActive} /> }
+        
       </Keyboard>
 
       { mobile && 

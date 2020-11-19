@@ -7,9 +7,9 @@ import {
   FiAlertTriangle as Warn,
 } from 'react-icons/fi';
 
-import { NotifyContext } from '../../contexts/NotifyContext';
-import RaisedButton from '../../components/RaisedButton';
-import YieldDisclaimer from '../../components/YieldDisclaimer';
+import { NotifyContext } from '../contexts/NotifyContext';
+import RaisedButton from '../components/RaisedButton';
+import YieldDisclaimer from '../components/YieldDisclaimer';
 
 function NotifyLayer(target:any) {
 

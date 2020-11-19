@@ -89,6 +89,7 @@ export interface ITx {
   msg: string,
   type: string,
   series: IYieldSeries|null,
+  code?: string, // internal tracking code
 }
 
 export interface ISignListItem {
@@ -131,9 +132,10 @@ export interface IDomain {
 
 
 export interface ITxState {
-  pendingTxs?: any,
-  lastCompletedTx?: any,
-  requestedSigs?: any,
+  pendingTxs: any[],
+  lastCompletedTx: any,
+  requestedSigs: any[],
+  txProcessActive: string|null,
 }
 
 export interface IReducerAction {

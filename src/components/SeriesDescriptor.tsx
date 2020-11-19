@@ -8,7 +8,6 @@ import { SeriesContext } from '../contexts/SeriesContext';
 
 import SeriesSelector from './SeriesSelector';
 import AprBadge from './AprBadge';
-import Authorization from './Authorization';
 import RaisedButton from './RaisedButton';
 
 interface ISeriesDescriptorProps {
@@ -110,12 +109,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
                 { children }
               </Collapsible>
             </Box>
-          </Box>
-  
-          { !seriesState.seriesLoading && !delegated && !activeSeries.isMature() &&
-            <Collapsible open={!delegated}>
-              <Authorization series={activeSeries} />
-            </Collapsible>}       
+          </Box>     
         </Box>}
     </>
   );

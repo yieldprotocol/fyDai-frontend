@@ -46,7 +46,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
   const { daiBalance } = userState.position;
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
-  const { repayDaiDebt, repayActive } = useBorrowProxy();
+  const { repayDaiDebt } = useBorrowProxy();
   const [ txActive ] = useTxActive(['repay']);
   const { account } = useSignerAccount();
 
@@ -239,8 +239,9 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
             </Box>
           </Box>
         </Box>}
-      { repayActive && !txActive && <ApprovalPending /> }
-      { txActive && <TxStatus tx={txActive} /> }
+
+      {/* { repayActive && !txActive && <ApprovalPending /> }
+      { txActive && <TxStatus tx={txActive} /> } */}
 
       {mobile && 
       !activeSeries?.isMature() &&

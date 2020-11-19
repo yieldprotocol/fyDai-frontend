@@ -89,7 +89,7 @@ export const useController = () => {
       setPostActive(false);
       return;
     }
-    await handleTx({ tx, msg: `Deposit of ${amount} pending...`, type:'DEPOSIT', series:null });
+    await handleTx({ tx, msg: `Deposit of ${amount} pending...`, type:'POST', series:null });
     setPostActive(false);
   };
 

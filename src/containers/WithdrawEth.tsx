@@ -10,7 +10,6 @@ import { cleanValue } from '../utils';
 import { UserContext } from '../contexts/UserContext';
 import { useBorrowProxy, useMath, useTxActive, useDebounce, useIsLol } from '../hooks';
 
-import ApprovalPending from '../components/ApprovalPending';
 import TxStatus from '../components/TxStatus';
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
@@ -33,9 +32,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
   const { hasDelegatedProxy } = authorization;
   const {
     ethPosted,
-    ethPosted_,
     ethLocked,
-    ethLocked_,
     collateralPercent_,
     debtValue,
     debtValue_,
@@ -183,12 +180,12 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
         </Box>
 
         <ActionButton
-          onClick={()=> withdrawProcedure()}
+          onClick={() => withdrawProcedure()}
           label={`Withdraw ${inputValue || ''} Eth`}
           disabled={withdrawDisabled}
           hasPoolDelegatedProxy={true}
           clearInput={()=>setInputValue(undefined)}
-        />  
+        />
           
         <Box alignSelf='start' margin={{ top:'medium' }}>
           <FlatButton 
@@ -200,14 +197,11 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
               </Box>
                 }
           />
-        </Box>
-            
+        </Box>        
       </Box>}
 
-      { withdrawPending && !txActive && <ApprovalPending /> }
-          
-      { txActive && 
-        <Box 
+      {/* { txActive && 
+        <Box
           width={{ max:'600px' }}
           alignSelf='center'
           fill
@@ -233,7 +227,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
               </Box>
             </Box>
           </Box>
-        </Box>}
+        </Box>} */}
 
       {mobile && 
         <YieldMobileNav noMenu={true}>

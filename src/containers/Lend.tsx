@@ -56,7 +56,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
   const { previewPoolTx } = usePool();
-  const { sellDai, sellActive } = useBorrowProxy();
+  const { sellDai } = useBorrowProxy();
   const { calcAPR } = useMath();
   const { account, fallbackProvider } = useSignerAccount();
   const [ txActive ] = useTxActive(['SELL_DAI']);
@@ -360,9 +360,8 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
           </Box>
         </Box>}
 
-        {/* If there is a transaction active, show the applicable view */}
-        { sellActive && !txActive && <ApprovalPending /> }
         { txActive && <TxStatus tx={txActive} /> }
+        
       </Keyboard>
 
       {mobile &&

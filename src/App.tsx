@@ -14,8 +14,9 @@ import { NotifyContext } from './contexts/NotifyContext';
 
 import { useCachedState } from './hooks';
 
-import ConnectLayer from './containers/layers/ConnectLayer';
-import NotifyLayer from './containers/layers/NotifyLayer';
+import ConnectLayer from './layers/ConnectLayer';
+import NotifyLayer from './layers/NotifyLayer';
+import SignConfirmLayer from './layers/SignConfirmLayer';
 
 import Borrow from './containers/Borrow';
 import Lend from './containers/Lend';
@@ -28,7 +29,7 @@ import RemoveLiquidity from './containers/RemoveLiquidity';
 
 import YieldHeader from './components/YieldHeader';
 import YieldFooter from './components/YieldFooter';
-import Authorization from './components/Authorization';
+
 import ErrorBoundary from './components/ErrorBoundry';
 import YieldNav from './components/YieldNav';
 
@@ -76,7 +77,7 @@ const App = (props:any) => {
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   const leftSideRef = useRef<any>(null);
-  const [showConnectLayer, setShowConnectLayer] = useState<string|null>(null);
+  const [ showConnectLayer, setShowConnectLayer ] = useState<string|null>(null);
 
   return (
     <div
@@ -96,10 +97,9 @@ const App = (props:any) => {
 
       <ConnectLayer view={showConnectLayer} closeLayer={() => setShowConnectLayer(null)} />
 
-      {!yieldLoading &&
-        <Collapsible open={!seriesLoading} ref={leftSideRef}>
-          <Authorization />
-        </Collapsible>}
+      <Collapsible open={!seriesLoading} ref={leftSideRef}>
+        <SignConfirmLayer />
+      </Collapsible>
 
       <NotifyLayer target={!mobile?leftSideRef.current:undefined} />
 

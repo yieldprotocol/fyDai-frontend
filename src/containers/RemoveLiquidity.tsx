@@ -9,7 +9,7 @@ import { cleanValue } from '../utils';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
 
-import { useSignerAccount, useProxy, useTxActive, useDebounce, useIsLol } from '../hooks';
+import { useSignerAccount, usePoolProxy, useTxActive, useDebounce, useIsLol } from '../hooks';
 
 import InputWrap from '../components/InputWrap';
 import InfoGrid from '../components/InfoGrid';
@@ -38,7 +38,7 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
   const { actions: userActions } = useContext(UserContext);
 
   const { account } = useSignerAccount();
-  const { removeLiquidity } = useProxy();
+  const { removeLiquidity } = usePoolProxy();
   const [ txActive ] = useTxActive(['REMOVE_LIQUIDITY']);
 
   const [newShare, setNewShare] = useState<string>(activeSeries?.poolPercent);
