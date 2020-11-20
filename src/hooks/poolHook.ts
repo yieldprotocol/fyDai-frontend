@@ -187,7 +187,7 @@ export const usePool = () => {
       return handleTxRejectError(e);
     }
     /* Transaction reporting & tracking */
-    await handleTx({ tx, msg: 'Pending once-off Pool delegation ...', type:'AUTH', series });
+    await handleTx({ tx, msg: 'Yield Series Pool authorization', type:'AUTH_POOL', series });
     
     // eslint-disable-next-line consistent-return
     return true;

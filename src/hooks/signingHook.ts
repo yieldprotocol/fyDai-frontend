@@ -110,7 +110,11 @@ export const useSigning = () => {
     return sig;
   };
 
-  const handleSignList = async ( requestedSigs:Map<string, ISignListItem>, txCode:string ): Promise<Map<string, string|undefined>> => {
+  const handleSignList = async ( 
+    requestedSigs:Map<string, 
+    ISignListItem>, txCode:string 
+  ): Promise<Map<string, string|undefined>> => {
+
     const signedMap: Map<string, string|undefined> = new Map();
 
     /* Set activity flag and Send the requested signatures to the txContext for tracking */
@@ -124,12 +128,14 @@ export const useSigning = () => {
     });
 
     /* Fallback function for when using Tx approvals instead of signing permits */
-    const fallback = async (list:any[]) => {
+    const fallback = async () => {
       // eslint-disable-next-line no-console
-      console.log('Using fallback function: Approvals by transaction');
+      console.log('Using fallback authorization strategy: Approvals by transaction');
+      dispatch({ type: 'setFallbackActive', payload: true });
+
       /* stack and wait for ALL the approval transactions to be complete */
       await Promise.all(
-        list.map((x:any) =>  {
+        Array.from(requestedSigs.values()).map((x:any) =>  {
           if (!x.conditional) {
             try {
               return x.fallbackFn();          
@@ -142,13 +148,12 @@ export const useSigning = () => {
           } return null;
         })
       ).catch((e:any) => {
+
         handleSignError(e);
         // /* on error, return the map with values 'undefined' to cancel the transaction process */
         requestedSigs.forEach((value:any, key:string) => signedMap.set(key, undefined));
         return signedMap;
       });
-
-      // dispatch({ type: 'setTxProcessActive', payload:{ txCode:null, sigs:[] }  });
 
       /* then set all sigs to '0x' */
       requestedSigs.forEach((value:any, key:string) => signedMap.set(key, '0x'));       
@@ -157,6 +162,10 @@ export const useSigning = () => {
 
     /* Auth using the SIGN PERMIT auth strategy */
     if (!useTxApproval) {
+      // eslint-disable-next-line no-console
+      console.log('Using primary authorisation strategy: Approvals by signing permit messages');
+      dispatch({ type: 'setFallbackActive', payload: false });
+
       /* Deal wth the signtures  */    
       for await (const [key, value] of requestedSigs) {
         try {
@@ -169,11 +178,8 @@ export const useSigning = () => {
           }
         } catch (e) {
           /* If there is a problem with the signing, use the approve txs as a fallback, HOWEVER ignore if error code 4001 (user reject) */
-          if ( e.code !== 4001 ) {
-            handleSignError(e);
-            // eslint-disable-next-line no-console
-            console.log('Falling back to approval transactions');
-            return fallback( Array.from(requestedSigs.values()) );
+          if ( e.code === 4001 ) {
+            return fallback();
           }       
           handleSignError(e);
           /* on error, return the map with an undefined to cancel the transaction process */
@@ -184,7 +190,7 @@ export const useSigning = () => {
       return signedMap;
     } 
     /* ELSE, if using TX APPROVAL auth strategy - got straight to fallback */
-    return fallback( Array.from(requestedSigs.values()) );
+    return fallback();
   };
 
   const handleSignError = (e:any) =>{
@@ -195,7 +201,6 @@ export const useSigning = () => {
 
   return {
     handleSignList,
-    // handleSignError,
     delegationSignature,
     daiPermitSignature,
     ERC2612PermitSignature,

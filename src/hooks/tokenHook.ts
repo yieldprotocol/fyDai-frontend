@@ -107,7 +107,7 @@ export function useToken() {
       return handleTxRejectError(e);
     }
     /* Transaction reporting & tracking */
-    await handleTx({ tx, msg: 'Token authorization pending...', type: 'AUTH', series: series||null });
+    await handleTx({ tx, msg: 'Token authorization', type: 'AUTH_TOKEN', series: series||null });
   };
 
   return { approveToken, getTokenAllowance, getBalance } as const;

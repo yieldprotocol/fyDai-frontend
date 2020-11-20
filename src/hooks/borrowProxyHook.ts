@@ -154,8 +154,8 @@ export const useBorrowProxy = () => {
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
 
     requestedSigs.set('controllerSig',
-      { id: 'withdrawAuth_1',
-        desc: 'Authorise Yield Protocol Controller',
+      { id: genTxCode('AUTH_CONTROLLER', null),
+        desc: 'Authorise Yield Protocol',
         conditional: hasDelegatedDsProxy,
         signFn: () => delegationSignature(controllerContract, dsProxyAddress),    
         fallbackFn: () => addControllerDelegate(dsProxyAddress),
@@ -221,8 +221,8 @@ export const useBorrowProxy = () => {
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
 
     requestedSigs.set('controllerSig',
-      { id: 'borrowAuth_1',
-        desc: 'Authorise Yield Protocol Controller',
+      { id: genTxCode('AUTH_CONTROLLER', null),
+        desc: 'Authorise Yield Protocol',
         conditional: hasDelegatedDsProxy,
         signFn: () => delegationSignature(controllerContract, dsProxyAddress),    
         fallbackFn: () => addControllerDelegate(dsProxyAddress),
@@ -277,15 +277,15 @@ export const useBorrowProxy = () => {
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
 
     requestedSigs.set('controllerSig',
-      { id: 'repayAuth_2',
-        desc: 'Authorise Yield Protocol Controller',
+      { id: genTxCode('AUTH_CONTROLLER', null),
+        desc: 'Authorise Yield Protocol',
         conditional: hasDelegatedDsProxy,
         signFn: () => delegationSignature(controllerContract, dsProxyAddress),    
         fallbackFn: () => addControllerDelegate(dsProxyAddress),
       });
 
     requestedSigs.set('daiSig',
-      { id: 'repayAuth_2',
+      { id: genTxCode('AUTH_TOKEN', series),
         desc: 'Authorise Yield Treasury with Dai',
         conditional: hasAuthorisedTreasury,
         signFn: () => daiPermitSignature( deployedContracts.Dai, deployedContracts.Treasury ),    
@@ -347,7 +347,7 @@ export const useBorrowProxy = () => {
     const poolContract = new ethers.Contract( poolAddr, Pool.abi as any, provider);
             
     requestedSigs.set('poolSig',
-      { id: 'sellAuth_1',
+      { id: genTxCode('AUTH_POOL', series),
         desc: 'Authorise Proxy to interact with the liquidity pool',
         conditional: await checkPoolDelegate(poolAddr, dsProxyAddress),
         signFn: () => delegationSignature( poolContract, dsProxyAddress ),    
@@ -355,7 +355,7 @@ export const useBorrowProxy = () => {
       });
 
     requestedSigs.set('daiSig',
-      { id: 'sellAuth_2',
+      { id: genTxCode('AUTH_TOKEN', series),
         desc: 'Authorise Yield Pool Address with Dai',
         conditional: hasAuthorisedTreasury,
         signFn: () => daiPermitSignature( deployedContracts.Dai, poolAddr ),    
@@ -417,7 +417,7 @@ export const useBorrowProxy = () => {
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
                
     requestedSigs.set('poolSig',
-      { id: 'buyAuth_1',
+      { id: genTxCode('AUTH_POOL', series),
         desc: 'Authorise Proxy to interact with the liquidity pool',
         conditional: await checkPoolDelegate(poolAddr, dsProxyAddress),
         signFn: () => delegationSignature( poolContract, dsProxyAddress ),    
@@ -425,13 +425,13 @@ export const useBorrowProxy = () => {
       });
     
     requestedSigs.set('fyDaiSig',
-      { id: 'buyAuth_2',
+      { id: genTxCode('AUTH_TOKEN', series),
         desc: 'Authorise Yield Pool with fyDai',
         conditional: true,
         signFn: () => ERC2612PermitSignature( fyDaiAddr, poolAddr ),    
         fallbackFn: () => approveToken(fyDaiAddr, poolAddr, MAX_INT, series ), 
       });
-            
+    
     /* Send the required signatures out for signing, or approval tx if fallback is required */
     const signedSigs = await handleSignList(requestedSigs, genTxCode('BUY_DAI', series));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
