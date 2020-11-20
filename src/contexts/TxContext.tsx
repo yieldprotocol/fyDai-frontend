@@ -13,6 +13,7 @@ const initState = {
   requestedSigs: [],
   lastCompletedTx: null,
   txProcessActive: null,
+  fallbackActive: false,
 };
 
 function txReducer(state:ITxState, action:IReducerAction) {
@@ -40,6 +41,11 @@ function txReducer(state:ITxState, action:IReducerAction) {
         lastCompletedTx: { ...action.payload.receipt, transactionHash: action.payload.receipt.transactionHash || action.payload.receipt.hash },
         /* if the txCode is the same as the current activeProcces,. then reset that process */
         txProcessActive: (action.payload.txCode === state?.txProcessActive)? null : state?.txProcessActive,
+      };
+    case 'setFallbackActive':
+      return {
+        ...state,
+        fallbackActive: action.payload,
       };
     case 'signed':
       return {
