@@ -26,8 +26,6 @@
         "Version" : "4ee6d9756b027e9d378b2b35ad56ddc9fec2c163",
         "Weth" : "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
         "WethJoin" : "0x2F0b23f53734252Bda2277357e97e1517d6B042A",
-        
-        "YieldProxy" : "0x5Cd6B40763f0D79Cd2198425C42Efc7ae5B18bc7",
 
         "ProxyFactory": "0xe11E3b391F7E8bC47247866aF32AF67Dd58Dc800",
         "ProxyRegistry": "0x64A436ae831C1672AE81F674CAb8B6775df3475C",
@@ -63,11 +61,9 @@
         "Weth" : "0x81381eEDBB965C69A74DB2D09Ac747E86E053B15",
         "WethJoin" : "0x667731F5356adaA60cb2ac6FD49AA77fC00Fda30",
 
-        "YieldProxy" : "0xF355ea28308Fe6A6D5Ade775bBFFAe47579C6860",
-
         "ProxyFactory": "0xe11E3b391F7E8bC47247866aF32AF67Dd58Dc800",
         "ProxyRegistry": "0x64A436ae831C1672AE81F674CAb8B6775df3475C",
-        "BorrowProxy": "0x1ebbF8f3e880996AFd0E53C729C68e375eAB40ca",
+        "BorrowProxy": "0xD58930f4446FAd867aAF7150d958fd4dfDaE593D",
         "PoolProxy": "0x973a94D8cB1940b189b310bbD92FC728279bD333"
     }
 }
