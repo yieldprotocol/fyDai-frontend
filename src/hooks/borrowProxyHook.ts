@@ -434,6 +434,8 @@ export const useBorrowProxy = () => {
     
     /* Send the required signatures out for signing, or approval tx if fallback is required */
     const signedSigs = await handleSignList(requestedSigs, genTxCode('BUY_DAI', series));
+
+    console.log( poolAddr, toAddr, parsedDaiOut, maxFYDaiIn, signedSigs.get('fyDaiSig'), signedSigs.get('poolSig') );
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
 
@@ -441,7 +443,7 @@ export const useBorrowProxy = () => {
     /* contract fn: buyDaiWithSignature( IPool pool, address to, uint128 daiOut, uint128 maxFYDaiIn, bytes memory fyDaiSig, bytes memory poolSig ) */
     const calldata = proxyContract.interface.encodeFunctionData( 
       'buyDaiWithSignature',
-      [ poolAddr, toAddr, parsedDaiOut, maxFYDaiIn, signedSigs.get('fyDaiPermitSig'), signedSigs.get('poolSig') ]
+      [ poolAddr, toAddr, parsedDaiOut, maxFYDaiIn, signedSigs.get('fyDaiSig'), signedSigs.get('poolSig') ]
     );
     
     /* send to the proxy for execution */

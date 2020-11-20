@@ -16,7 +16,7 @@ import { useCachedState } from './hooks';
 
 import ConnectLayer from './layers/ConnectLayer';
 import NotifyLayer from './layers/NotifyLayer';
-import SignConfirmLayer from './layers/SignConfirmLayer';
+import TxLayer from './layers/TxLayer';
 
 import Borrow from './containers/Borrow';
 import Lend from './containers/Lend';
@@ -98,7 +98,7 @@ const App = (props:any) => {
       <ConnectLayer view={showConnectLayer} closeLayer={() => setShowConnectLayer(null)} />
 
       <Collapsible open={!seriesLoading} ref={leftSideRef}>
-        <SignConfirmLayer />
+        <TxLayer />
       </Collapsible>
 
       <NotifyLayer target={!mobile?leftSideRef.current:undefined} />

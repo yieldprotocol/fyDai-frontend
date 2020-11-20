@@ -21,7 +21,7 @@ import { abbreviateHash } from '../utils';
 import TxStatus from '../components/TxStatus';
 import Loading from '../components/Loading';
 
-const SignConfirmLayer = () => {
+const TxLayer = () => {
   // contexts
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   const { state: { requestedSigs, pendingTxs, txProcessActive, fallbackActive }, dispatch } = useContext(TxContext);
@@ -36,7 +36,8 @@ const SignConfirmLayer = () => {
   const [ txActive ] = useTxActive(['POST', 'WITHDRAW', 'BORROW', 'REPAY', 'SELL_DAI', 'BUY_DAI', 'REDEEM', 'ADD_LIQUIDITY', 'REMOVE_LIQUIDITY' ]);
 
   // flags
-  const [ allSigned, setAllSigned ] = useState<boolean>(false);
+  const [ allSigned, setAllSigned ] = useState<boolean>(false); // tracking signatures
+  const [ allComplete, setAllComplete ] = useState<boolean>(false); // tracking if all required authorizations are complete
   const [ layerOpen, setLayerOpen ] = useState<boolean>(false);
 
   const buildProxyProcedure = async () => {
@@ -65,6 +66,12 @@ const SignConfirmLayer = () => {
       return nextItem.signed;
     }, false);
     setAllSigned(_allSigned);
+
+    const _allComplete = requestedSigs.reduce((acc:boolean, nextItem:any)=> {
+      return nextItem.complete;
+    }, false);
+    setAllComplete(_allComplete);
+
   }, [requestedSigs]);
 
   return (
@@ -110,9 +117,11 @@ It is only shown when there is a transaction in progress or signature required *
             gap='medium'
           >
 
-            { requestedSigs.length>0 &&
+            { 
+            requestedSigs.length>0 &&
             !(txActive?.txCode === txProcessActive) &&
             !fallbackActive &&
+            
             <>
               <Box gap='medium'>
                 { allSigned? 
@@ -197,8 +206,11 @@ It is only shown when there is a transaction in progress or signature required *
 
                       <Box basis='30' alignSelf='end'> 
 
-                        { authActive?.type === x.id ? 
+                        { authActive?.type === x.id ?
                           <Box gap='small'>
+                            {
+                              abbreviateHash( pendingTxs.find((tx:any)=> tx.txCode === x.id).tx.hash )
+                            }
                             <Text size='xxsmall'> Pending</Text>
                             <Loading condition={true} size='xxsmall'>.</Loading>
                           </Box>
@@ -241,9 +253,9 @@ It is only shown when there is a transaction in progress or signature required *
             { (requestedSigs.length===0 )  && 
               !(txActive?.txCode === txProcessActive) &&
               <Box gap='medium'>
-                <Text weight='bold'>Confirmation required. </Text>
-                <Text weight='bold'> 
-                  Please confirm the transaction.
+                <Text weight='bold'>Confirmation required</Text>
+                <Text > 
+                  Please check your wallet or provider to approve the transaction.
                 </Text>
               </Box>}
 
@@ -314,5 +326,5 @@ It is only shown when there is a transaction in progress or signature required *
     </>);
 };
 
-SignConfirmLayer.defaultProps={ series:null, authWrap:false, children:null };
-export default SignConfirmLayer;
+TxLayer.defaultProps={ series:null, authWrap:false, children:null };
+export default TxLayer;

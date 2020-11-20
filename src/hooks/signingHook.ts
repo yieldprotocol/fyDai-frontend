@@ -123,7 +123,7 @@ export const useSigning = () => {
       payload: {
         txCode,
         sigs: Array.from( requestedSigs.values()).map((x:any) => { 
-          return { id: x.id, desc: x.desc, signed: x.conditional }; 
+          return { id: x.id, desc: x.desc, complete:x.conditional, signed: x.conditional }; 
         }) }
     });
 
@@ -183,7 +183,7 @@ export const useSigning = () => {
           }       
           handleSignError(e);
           /* on error, return the map with an undefined to cancel the transaction process */
-          requestedSigs.forEach((v:any, k:string) => signedMap.set(key, undefined)); 
+          requestedSigs.forEach((v:any, k:string) => signedMap.set(k, undefined)); 
           return signedMap;
         }
       }

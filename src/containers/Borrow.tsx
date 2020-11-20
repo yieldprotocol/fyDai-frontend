@@ -53,7 +53,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
   const { amnt }:any = useParams();
 
   const { state: userState, actions: userActions } = useContext(UserContext);
-  const { position, authorization: { hasDelegatedProxy } } = userState;
+  const { position } = userState;
   const { 
     ethPosted,
     ethPosted_,
@@ -158,11 +158,10 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
       (ethPosted && ethPosted.eq(ethers.constants.Zero) ) ||
       (inputValue && maxDaiAvailable && ethers.utils.parseEther(inputValue).gte(maxDaiAvailable)) ||
       !account ||
-      !hasDelegatedProxy ||  
       !inputValue ||
       parseFloat(inputValue) <= 0
     )? setBorrowDisabled(true): setBorrowDisabled(false);
-  }, [ inputValue, hasDelegatedProxy ]);
+  }, [ inputValue ]);
 
   /* Handle input exception logic */
   useEffect(() => {
