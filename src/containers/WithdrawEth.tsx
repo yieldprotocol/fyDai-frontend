@@ -10,7 +10,6 @@ import { cleanValue } from '../utils';
 import { UserContext } from '../contexts/UserContext';
 import { useBorrowProxy, useMath, useTxActive, useDebounce, useIsLol } from '../hooks';
 
-import TxStatus from '../components/TxStatus';
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
 import RaisedButton from '../components/RaisedButton';
@@ -27,9 +26,7 @@ interface IWithDrawProps {
 const WithdrawEth = ({ close }:IWithDrawProps) => {
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
-
-  const { state: { position, authorization }, actions: userActions } = useContext(UserContext);
-  const { hasDelegatedProxy } = authorization;
+  const { state: { position }, actions: userActions } = useContext(UserContext);
   const {
     ethPosted,
     ethLocked,
@@ -88,14 +85,12 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
     ( estRatio < 150 ||
       txActive ||
       !inputValue ||
-      !hasDelegatedProxy ||
       parseFloat(inputValue) <= 0
     )? setWithdrawDisabled(true) : setWithdrawDisabled(false);
-  }, [ inputValue, estRatio, hasDelegatedProxy ]);
+  }, [ inputValue, estRatio ]);
 
   /* show warnings and errors with collateralization ratio levels and inputs */
   useEffect(()=>{
-
     if ( debouncedInput && maxWithdraw && (debouncedInput > maxWithdraw) ) {
       setWarningMsg(null);
       setErrorMsg('That exceeds the amount of ETH you can withdraw right now.');
@@ -137,7 +132,6 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
             ref={(el:any) => {el && !mobile && el.focus(); setInputRef(el);}} 
             type="number"
             placeholder='ETH'
-            disabled={!hasDelegatedProxy}
             value={inputValue || ''}
             plain
             onChange={(event:any) => setInputValue(cleanValue(event.target.value))}
@@ -145,7 +139,6 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
           />
           <RaisedButton 
             label='Withdraw maximum'
-            disabled={!hasDelegatedProxy}
             onClick={()=>maxWithdraw && setInputValue(cleanValue(maxWithdraw))}
           />
         </InputWrap>
@@ -156,7 +149,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
               {
                 label: 'Max withdraw',
                 visible: true,
-                active: hasDelegatedProxy,
+                active: true,
                 loading: false, 
                 value: maxWithdraw? `${parseFloat(maxWithdraw).toFixed(4)} Eth` : '-',
                 valuePrefix: null,
