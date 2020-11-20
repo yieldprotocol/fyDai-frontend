@@ -101,6 +101,9 @@ export const usePoolProxy = () => {
       value: ethers.utils.parseEther('0')
     };
 
+    /* Check the signature requirements */
+    const checkSigs = await proxyContract.removeLiquidityEarlyDaiFixedCheck(poolAddr);
+
     /* calculate max expected fyDai value and factor in slippage */
     const daiReserves = await getBalance(deployedContracts.Dai, 'Dai', poolAddr);
     const fyDaiReserves = await getBalance(series.fyDaiAddress, 'FYDai', poolAddr);
@@ -163,20 +166,24 @@ export const usePoolProxy = () => {
 
     /* Processing and sanitizing input */
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
+    const poolContract = new ethers.Contract( poolAddr, Pool.abi as any, provider);
+
     const parsedTokens = BigNumber.isBigNumber(tokens)? tokens : ethers.utils.parseEther(tokens.toString());
     
     const overrides = { 
       gasLimit: BigNumber.from('1000000')
     };
 
+    /* Check the signature requirements */
+    const checkSigs = await proxyContract.removeLiquidityEarlyDaiFixedCheck(poolAddr);
+
     /* build and use signature if required , else '0x' */
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
-    const poolContract = new ethers.Contract( poolAddr, Pool.abi as any, provider);
-        
+    
     requestedSigs.set('controllerSig',
       { id: 'removeLiquidityAuth_1',
         desc: 'Authorise Yield PoolProxy with the controller',
-        conditional: hasDelegatedPoolProxy,
+        conditional: checkSigs[1],
         signFn: () => delegationSignature(controllerContract, deployedContracts.PoolProxy),    
         fallbackFn: () => addControllerDelegate(deployedContracts.PoolProxy), 
       });
@@ -184,7 +191,7 @@ export const usePoolProxy = () => {
     requestedSigs.set('poolSig',
       { id: 'removeLiquidityAuth_2',
         desc: 'Authorise Yield PoolProxy with the series/pool',
-        conditional: series.hasPoolDelegatedAltProxy,
+        conditional: checkSigs[2],
         signFn: () => delegationSignature(poolContract, deployedContracts.PoolProxy),    
         fallbackFn: () => addPoolDelegate(series, deployedContracts.PoolProxy), 
       });
