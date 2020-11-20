@@ -48,9 +48,6 @@ const contractList = [
   'Treasury',
   'Dai',
   'Vat',
-
-  'YieldProxy',
-
   'PoolProxy',
   'BorrowProxy',
   'ProxyRegistry',
