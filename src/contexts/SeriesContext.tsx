@@ -90,17 +90,11 @@ const SeriesProvider = ({ children }:any) => {
         /* with user */
         const [ 
           poolTokens, 
-          // hasPoolDelegatedProxy,
-          // hasDaiAuth,
-          // hasFyDaiAuth,
           ethDebtDai, 
           ethDebtFYDai, 
           fyDaiBalance
         ] =  account && await Promise.all([
           getBalance(_x.poolAddress, 'Pool', account),
-          // checkPoolDelegate(_x.poolAddress, deployedContracts.PoolProxy),
-          // getTokenAllowance(deployedContracts.Dai, 'Dai', _x.poolAddress ),
-          // getTokenAllowance(_x.fyDaiAddress, 'FYDai', _x.poolAddress),
           debtDai('ETH-A', _x.maturity ),
           callTx(deployedContracts.Controller, 'Controller', 'debtFYDai', [utils.ETH, _x.maturity, account]),
           getBalance(_x.fyDaiAddress, 'FYDai', account),
@@ -111,12 +105,6 @@ const SeriesProvider = ({ children }:any) => {
           sellFYDaiRate: !(sellFYDaiRate instanceof Error)? sellFYDaiRate : BigNumber.from('0'),
           totalSupply,
           poolTokens: poolTokens || BigNumber.from('0'),
-          hasPoolDelegatedProxy: hasPoolDelegatedProxy || false,
-          hasDaiAuth: (hasDaiAuth && hasDaiAuth>0) || false, 
-          hasFyDaiAuth: (hasFyDaiAuth && hasFyDaiAuth>0) || false,
-
-          authComplete: ( !!hasDaiAuth && !!hasFyDaiAuth && !!hasPoolDelegatedProxy),
-          
           ethDebtDai: ethDebtDai || BigNumber.from('0'),
           ethDebtFYDai : ethDebtFYDai || BigNumber.from('0'),
           fyDaiBalance : fyDaiBalance || BigNumber.from('0'),
