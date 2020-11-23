@@ -95,7 +95,7 @@ export interface ITx {
 export interface ISignListItem {
   id: string, 
   desc: string, 
-  conditional: boolean,
+  conditional: boolean| ( ()=>Promise<boolean> ),
   signFn: any,
   fallbackFn: any,
 }

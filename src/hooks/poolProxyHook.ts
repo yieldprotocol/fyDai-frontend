@@ -46,15 +46,15 @@ export const usePoolProxy = () => {
 
   /* contexts */
   const  { state: { deployedContracts } }  = useContext<any>(YieldContext);
-  const  { state: { authorization: { dsProxyAddress, hasDelegatedDsProxy, hasDelegatedPoolProxy } } }  = useContext<any>(UserContext);
+  const  { state: { authorization: { dsProxyAddress, hasDelegatedDsProxy } } }  = useContext<any>(UserContext);
 
   /* hooks */ 
   const { signer, provider } = useSignerAccount();
   const { previewPoolTx, checkPoolDelegate, addPoolDelegate } = usePool();
   const { splitDaiLiquidity } = useMath();
-  const { getBalance, approveToken } = useToken();
+  const { getBalance, approveToken, getTokenAllowance } = useToken();
   
-  const { addControllerDelegate } = useController();
+  const { addControllerDelegate, checkControllerDelegate } = useController();
 
   const { proxyExecute } = useDsProxy();
   const { delegationSignature, daiPermitSignature, handleSignList } = useSigning();
@@ -97,12 +97,13 @@ export const usePoolProxy = () => {
     const parsedDaiUsed = BigNumber.isBigNumber(daiUsed)? daiUsed : ethers.utils.parseEther(daiUsed.toString());
 
     const overrides = { 
-      gasLimit: BigNumber.from('600000'),
+      gasLimit: BigNumber.from('750000'),
       value: ethers.utils.parseEther('0')
     };
 
     /* Check the signature requirements */
-    const checkSigs = await proxyContract.removeLiquidityEarlyDaiFixedCheck(poolAddr);
+    const checkSigs = await proxyContract.addLiquidityCheck(poolAddr);
+    console.log(checkSigs);
 
     /* calculate max expected fyDai value and factor in slippage */
     const daiReserves = await getBalance(deployedContracts.Dai, 'Dai', poolAddr);
@@ -114,26 +115,27 @@ export const usePoolProxy = () => {
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
     
     requestedSigs.set('controllerSig',
-      { id: 'addLiquidityAuth_1',
-        desc: 'Authorise Yield Protocol Controller',
+      { id: genTxCode('AUTH_CONTROLLER', null),
+        desc: 'Authorise Yield Protocol contract',
         conditional: hasDelegatedDsProxy,
         signFn: () => delegationSignature(controllerContract, dsProxyAddress),    
         fallbackFn: () => addControllerDelegate(dsProxyAddress),
       });
 
     requestedSigs.set('daiSig',
-      { id: 'addLiquidityAuth_2',
-        desc: 'Authorise Yield Treasury with Dai',
-        conditional: false,
-        signFn: () => daiPermitSignature( deployedContracts.Dai, deployedContracts.Treasury ),    
-        fallbackFn: () => addControllerDelegate(dsProxyAddress), // fallbakc > 
+      { id: genTxCode('AUTH_TOKEN', series),
+        desc: 'Authorise Yield with Dai',
+        conditional: await getTokenAllowance(deployedContracts.Dai, dsProxyAddress, 'Dai') > 0,
+        signFn: () => daiPermitSignature(deployedContracts.Dai, dsProxyAddress),    
+        fallbackFn: () => approveToken(deployedContracts.Dai, dsProxyAddress, utils.MAX_INT, series ),
       });
-        
+  
     /* Send the required signatures out for signing, or approval tx if fallback is required */
     const signedSigs = await handleSignList(requestedSigs, genTxCode('ADD_LIQUIDITY', series));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
 
+    console.log(signedSigs.get('daiSig'), signedSigs.get('controllerSig'));
 
     // contract fn used: addLiquidityWithSignature(IPool pool,uint256 daiUsed,uint256 maxFYDai,bytes memory daiSig,bytes memory controllerSig)
     const calldata = proxyContract.interface.encodeFunctionData( 
@@ -176,24 +178,25 @@ export const usePoolProxy = () => {
 
     /* Check the signature requirements */
     const checkSigs = await proxyContract.removeLiquidityEarlyDaiFixedCheck(poolAddr);
+    console.log(checkSigs);
 
     /* build and use signature if required , else '0x' */
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
-    
+
     requestedSigs.set('controllerSig',
-      { id: 'removeLiquidityAuth_1',
-        desc: 'Authorise Yield PoolProxy with the controller',
-        conditional: checkSigs[1],
-        signFn: () => delegationSignature(controllerContract, deployedContracts.PoolProxy),    
-        fallbackFn: () => addControllerDelegate(deployedContracts.PoolProxy), 
+      { id: genTxCode('AUTH_CONTROLLER', null),
+        desc: 'Authorise Yield Protocol contract',
+        conditional: hasDelegatedDsProxy,
+        signFn: () => delegationSignature(controllerContract, dsProxyAddress),    
+        fallbackFn: () => addControllerDelegate(dsProxyAddress),
       });
         
     requestedSigs.set('poolSig',
-      { id: 'removeLiquidityAuth_2',
-        desc: 'Authorise Yield PoolProxy with the series/pool',
-        conditional: checkSigs[2],
-        signFn: () => delegationSignature(poolContract, deployedContracts.PoolProxy),    
-        fallbackFn: () => addPoolDelegate(series, deployedContracts.PoolProxy), 
+      { id: genTxCode('AUTH_POOL', series),
+        desc: 'Authorise your proxy contract to interact with the series/pool',
+        conditional: await checkPoolDelegate(poolAddr, dsProxyAddress),
+        signFn: () => delegationSignature(poolContract, dsProxyAddress),    
+        fallbackFn: () => addPoolDelegate(series, dsProxyAddress), 
       });
     
     /* Send the required signatures out for signing, or approval tx if fallback is required */
@@ -201,11 +204,12 @@ export const usePoolProxy = () => {
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
 
-    /* Build the call data based , function dependant on series maturity */ 
+    /* Build the call data based, function dependant on series maturity */ 
     let calldata:any;
 
-    if (!series.isMature()) {
+    console.log(signedSigs.get('controllerSig'), signedSigs.get('poolSig'));
 
+    if (!series.isMature()) {
       /* calculate expected trade values  */  
       let minFYDai:BigNumber;    
       const preview = await previewPoolTx('buydai', series, ethers.utils.parseEther('1'));   
@@ -220,9 +224,7 @@ export const usePoolProxy = () => {
         'removeLiquidityEarlyDaiFixedWithSignature', 
         [ poolAddr, parsedTokens, minFYDai, signedSigs.get('controllerSig'), signedSigs.get('poolSig') ]
       );
-
     } else {
-
       // contract fn used: removeLiquidityMatureWithSignature(IPool pool,uint256 poolTokens,bytes memory controllerSig,bytes memory poolSig)
       calldata = proxyContract.interface.encodeFunctionData( 
         'removeLiquidityMatureWithSignature', 

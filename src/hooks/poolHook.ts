@@ -6,6 +6,7 @@ import Pool from '../contracts/Pool.json';
 import { useSignerAccount } from './connectionHooks';
 import { IYieldSeries } from '../types';
 import { useTxHelpers } from './txHooks';
+import { useDsProxy } from './dsProxyHook';
 
 /**
  * Hook for interacting with the yield 'Pool' Contract
@@ -18,6 +19,7 @@ export const usePool = () => {
   const [ callActive, setCallActive ] = useState<boolean>(false);
 
   const { handleTx, handleTxRejectError } = useTxHelpers();
+  const { proxyExecute } = useDsProxy();
 
   /**
    * @dev Sell fyDai for Dai ( Chai )
@@ -170,25 +172,38 @@ export const usePool = () => {
   const addPoolDelegate = async (
     series:IYieldSeries,
     delegatedAddress:string,
+    asProxy: boolean = false,
   ) => {
     let tx:any;
     /* Processing and sanitizing input */
-    const marketAddr = ethers.utils.getAddress(series.poolAddress);
+    const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const delegatedAddr = ethers.utils.getAddress(delegatedAddress);
     /* Contract interaction */
     const contract = new ethers.Contract(
-      marketAddr,
+      poolAddr,
       poolAbi,
       signer
     );
-    try {
-      tx = await contract.addDelegate(delegatedAddr);
-    } catch (e) {
-      return handleTxRejectError(e);
-    }
-    /* Transaction reporting & tracking */
-    await handleTx({ tx, msg: 'Yield Series Pool authorization', type:'AUTH_POOL', series });
+
+    if (!asProxy) {
+      try {
+        tx = await contract.addDelegate(delegatedAddr);
+      } catch (e) {
+        return handleTxRejectError(e);
+      }
+      /* Transaction reporting & tracking */
+      await handleTx({ tx, msg: 'Yield Series Pool authorization', type:'AUTH_POOL', series });
     
+    } else { 
+      const calldata = contract.interface.encodeFunctionData('approve', [delegatedAddr]);
+      tx = await proxyExecute( 
+        poolAddr,
+        calldata,
+        { },
+        { tx: null, msg: 'Yield Series Pool authorization', type:'AUTH_POOL', series  }
+      );
+    }
+
     // eslint-disable-next-line consistent-return
     return true;
   };

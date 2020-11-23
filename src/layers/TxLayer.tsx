@@ -13,7 +13,11 @@ import { TxContext } from '../contexts/TxContext';
 import { UserContext } from '../contexts/UserContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 
-import { useDsRegistry, useSignerAccount, useTxActive } from '../hooks';
+/* hook pack */
+import { useSignerAccount } from '../hooks/connectionHooks';
+import { useTxActive } from '../hooks/txHooks';
+import { useDsRegistry } from '../hooks/dsRegistryHook';
+
 import RaisedButton from '../components/RaisedButton';
 import FlatButton from '../components/FlatButton';
 import EtherscanButton from '../components/EtherscanButton';
@@ -78,7 +82,8 @@ const TxLayer = () => {
     <>
       {/* This following section is the 'non-layer' notification section. 
 It is only shown on main view if the user doesn't have a dsProxy */}
-      { account && authorization?.dsProxyAddress === '0x0000000000000000000000000000000000000000' &&
+      {     
+      account && authorization?.dsProxyAddress === '0x0000000000000000000000000000000000000000' &&
         <Box
           fill='horizontal'
           pad={mobile?{ horizontal:'medium', top:'medium', bottom:'large' }:{ horizontal:'xlarge', vertical:'medium' }}
@@ -91,15 +96,18 @@ It is only shown on main view if the user doesn't have a dsProxy */}
           <Box>
             <Text size={mobile?'xsmall': undefined}>Feel free to look around and play. However, before you make any transactions you will need connect a proxy account </Text>
           </Box>  
-          { !pendingTxs.some((x:any) => (x.type === 'CREATE_PROXY') && (x.series === null) )?
+          { 
+          !pendingTxs.some((x:any) => (x.type === 'CREATE_PROXY') && (x.series === null) )?
             <RaisedButton 
               background='#555555'
               label={<Box pad={{ horizontal:'small', vertical:'xsmall' }} align='center'><Text size='small' color='#DDDDDD'><Unlock /> Create Vault</Text></Box>}
               onClick={()=>buildProxyProcedure()}
             />
             :
-            <Box pad={{ horizontal:'small', vertical:'xsmall' }} align='center'><Text size='small' color='#DDDDDD'><Unlock />Pending...</Text></Box>}
-        </Box>}
+            <Box pad={{ horizontal:'small', vertical:'xsmall' }} align='center'><Text size='small' color='#DDDDDD'><Unlock />Pending...</Text></Box>
+          }
+        </Box>
+      }
 
       {/* This following section is the 'layer' section. 
 It is only shown when there is a transaction in progress or signature required */}    
@@ -119,9 +127,9 @@ It is only shown when there is a transaction in progress or signature required *
 
             { 
             requestedSigs.length>0 &&
+            !allComplete && 
             !(txActive?.txCode === txProcessActive) &&
-            !fallbackActive &&
-            
+            !fallbackActive && 
             <>
               <Box gap='medium'>
                 { allSigned? 
@@ -158,10 +166,12 @@ It is only shown when there is a transaction in progress or signature required *
                   );
                 })}
               </Box>
-            </>}
+            </>
+            }
 
 
-            { requestedSigs.length>0 &&
+            { requestedSigs.length>0 && 
+            !allComplete && 
             fallbackActive &&
             <Box gap='medium'> 
 
@@ -180,12 +190,9 @@ It is only shown when there is a transaction in progress or signature required *
 
               <Box gap='medium'>
 
-                {console.log(requestedSigs)}
-
                 { requestedSigs.map((x:any, i:number)=> {
                   const iKey = i;
 
-                  console.log(x.id, x.signed);
                   return ( 
                     <Box key={iKey} gap='small' direction='row' justify='between' fill>
                       <Box basis='70' direction='row' gap='small'> 
@@ -209,7 +216,7 @@ It is only shown when there is a transaction in progress or signature required *
                         { authActive?.type === x.id ?
                           <Box gap='small'>
                             {
-                              abbreviateHash( pendingTxs.find((tx:any)=> tx.txCode === x.id).tx.hash )
+                              abbreviateHash( pendingTxs.find((tx:any)=> tx.txCode === x.id)?.tx?.hash )
                             }
                             <Text size='xxsmall'> Pending</Text>
                             <Loading condition={true} size='xxsmall'>.</Loading>
@@ -250,11 +257,11 @@ It is only shown when there is a transaction in progress or signature required *
               </Box>}
             </Box>}
 
-            { (requestedSigs.length===0 )  && 
+            { (requestedSigs.length===0 || allComplete )  && 
               !(txActive?.txCode === txProcessActive) &&
               <Box gap='medium'>
                 <Text weight='bold'>Confirmation required</Text>
-                <Text > 
+                <Text> 
                   Please check your wallet or provider to approve the transaction.
                 </Text>
               </Box>}
@@ -268,59 +275,13 @@ It is only shown when there is a transaction in progress or signature required *
                 label={
                   <Box direction='row' gap='medium' align='center'>
                     <ArrowLeft color='text-weak' />
-                    <Text size='small' color='text-weak'>go back to the app</Text>
+                    <Text size='small' color='text-weak'>go back</Text>
                   </Box>
                   }
               />
             </Box>}
 
           </Box>
-        </Layer>}
-
-      { false &&
-        <Layer
-          modal={true}
-          responsive={mobile?false: undefined}
-          full={mobile?true: undefined}
-        >
-
-          {preferences?.useTxApproval &&
-          <Box 
-            width={!mobile?{ min:'620px', max:'620px' }: undefined}
-            round={mobile?undefined:'small'}
-            background='background'
-            pad='large'
-            gap='medium'
-          >
-            <Text weight='bold'> Please approve the following set of authorization transactions with your wallet or provider </Text>
-            { txActive &&  
-            <Box gap='medium'>
-              <Box gap='medium'>
-                <Text size='xsmall' weight='bold'> 
-                  Authorization transactions pending: 
-                </Text>
-                <Box gap='small' fill='horizontal'>
-                  { pendingTxs.map((x:any, i:number)=> (
-                    <Box key={x.tx.hash} direction='row' fill='horizontal' justify='between'>
-                      <Box> { abbreviateHash(x.tx.hash) }</Box>
-                      <EtherscanButton txHash={x.tx.hash} />
-                    </Box>)
-                  )}
-                </Box>
-              </Box>
-              <Box alignSelf='start'>
-                <FlatButton 
-                  onClick={()=>closeAuth()}
-                  label={
-                    <Box direction='row' gap='medium' align='center'>
-                      <ArrowLeft color='text-weak' />
-                      <Text size='small' color='text-weak'>close, and go back to the app</Text>
-                    </Box>
-                  }
-                />
-              </Box>
-            </Box>}
-          </Box>}
         </Layer>}
 
     </>);

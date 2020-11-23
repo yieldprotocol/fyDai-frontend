@@ -12,7 +12,7 @@ import { SeriesContext } from './contexts/SeriesContext';
 import { YieldContext } from './contexts/YieldContext';
 import { NotifyContext } from './contexts/NotifyContext';
 
-import { useCachedState } from './hooks';
+import { useCachedState } from './hooks/appHooks';
 
 import ConnectLayer from './layers/ConnectLayer';
 import NotifyLayer from './layers/NotifyLayer';

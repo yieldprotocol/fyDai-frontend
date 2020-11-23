@@ -1,14 +1,13 @@
 import { useMemo, useEffect, useState, useContext } from 'react';
 import { ethers, BigNumber }  from 'ethers';
 
-import { TxContext } from '../contexts/TxContext';
 import { YieldContext } from '../contexts/YieldContext';
 
 import Controller from '../contracts/Controller.json';
 
 import { useSignerAccount } from './connectionHooks';
 import { useTxHelpers } from './txHooks';
-
+import { useDsProxy } from './dsProxyHook';
 
 /**
  * Hook for interacting with the yield 'CRONTROLLER' Contract
@@ -26,7 +25,6 @@ import { useTxHelpers } from './txHooks';
 export const useController = () => {
   const { abi: controllerAbi } = Controller;
   const { signer, fallbackProvider, account } = useSignerAccount();
-  const  { dispatch }  = useContext<any>(TxContext);
   
   const { state : { deployedContracts } } = useContext<any>(YieldContext);
   const [ postActive, setPostActive ] = useState<boolean>(false);
@@ -40,6 +38,7 @@ export const useController = () => {
   const [controllerProvider, setControllerProvider] = useState<any>();
 
   const { handleTx, handleTxRejectError } = useTxHelpers();
+  const { proxyExecute } = useDsProxy();
 
   useMemo(()=>{
     try {
@@ -201,7 +200,7 @@ export const useController = () => {
       setRepayActive(false);
       return;
     }
-    await handleTx({ tx, msg: `Repayment of ${amount} pending...`, type:'REPAY', series: null});
+    await handleTx({ tx, msg: `Repayment of ${amount} pending...`, type:'REPAY', series: null });
     setRepayActive(false);
   };
 
@@ -211,20 +210,33 @@ export const useController = () => {
    */
   const addControllerDelegate = async (
     delegatedAddress:string,
+    asProxy: boolean = false,
   ) => {
     let tx:any;
     /* Processing and sanitizing input */
     const delegatedAddr = ethers.utils.getAddress(delegatedAddress);
     /* Contract interaction */
-    try {
-      tx = await controllerContract.addDelegate(delegatedAddr);
-    } catch (e) {
-      handleTxRejectError(e);
-      return;
+
+    if (!asProxy) {
+      try {
+        tx = await controllerContract.addDelegate(delegatedAddr);
+      } catch (e) {
+        handleTxRejectError(e);
+        return;
+      }
+      /* Transaction reporting & tracking */
+      await handleTx({ tx, msg: 'Once-off Yield authorization', type: 'AUTH_CONTROLLER', series: null });
+
+    } else {   
+      const calldata = controllerContract.interface.encodeFunctionData('approve', [delegatedAddr]);
+      tx = await proxyExecute( 
+        controllerContract.address,
+        calldata,
+        { },
+        { tx:null, msg: 'Once-off Yield authorization', type: 'AUTH_CONTROLLER', series: null  }
+      );
     }
-    /* Transaction reporting & tracking */
-    await handleTx({ tx, msg: 'Once-off Yield authorization', type: 'AUTH_CONTROLLER', series: null });
-    
+  
     // eslint-disable-next-line consistent-return
     return true;
   };

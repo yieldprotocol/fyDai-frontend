@@ -1,10 +1,7 @@
 import { Box, Text } from 'grommet';
 import React, { useState, useEffect } from 'react';
-import RaisedButton from './RaisedButton';
-
+import { useWeb3React } from '@web3-react/core';
 import FlatButton from './FlatButton';
-
-import { useWeb3React } from '../hooks';
 
 const networkMap = new Map([
   [1, ''],

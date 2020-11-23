@@ -13,13 +13,20 @@ import { cleanValue } from '../utils';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
 
-import {
-  useBorrowProxy,
-  useTxActive,
-  useSignerAccount,
-  useDebounce,
-  useIsLol,
-} from '../hooks';
+/* hook pack */
+import { useSignerAccount, useConnection } from '../hooks/connectionHooks';
+import { useCachedState, useDebounce, useIsLol } from '../hooks/appHooks';
+import { useEvents } from '../hooks/eventHooks';
+import { useMath } from '../hooks/mathHooks';
+import { useCallTx, useSendTx, useTimeTravel } from '../hooks/chainHooks'; 
+import { useToken } from '../hooks/tokenHook';
+import { useTxActive, useTxHelpers } from '../hooks/txHooks';
+import { useMigrations } from '../hooks/migrationHook';
+import { useController } from '../hooks/controllerHook';
+import { usePool } from '../hooks/poolHook';
+import { useFYDai } from '../hooks/fyDaiHook';
+import { useBorrowProxy } from '../hooks/borrowProxyHook';
+import { usePoolProxy } from '../hooks/poolProxyHook';
 
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';

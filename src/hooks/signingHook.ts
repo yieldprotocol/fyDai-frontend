@@ -41,8 +41,9 @@ const createTypedDelegableData = (message: IDelegableMessage, domain: IDomain) =
 export const useSigning = () => {
   const { account, provider, chainId } = useSignerAccount();
   const { dispatch } = useContext(TxContext);
-  const { state: { preferences: { useTxApproval } } } = useContext(UserContext);
+  const { state: { preferences: { useTxApproval }, authorization: { dsProxyAddress } } } = useContext(UserContext);
 
+  // const fromAddr = dsProxyAddress && ethers.utils.getAddress(dsProxyAddress);
   const fromAddr = account && ethers.utils.getAddress(account);
 
   const sendForSig = (_provider: any, method: string, params?: any[]) => new Promise<any>((resolve, reject) => {
@@ -123,7 +124,7 @@ export const useSigning = () => {
       payload: {
         txCode,
         sigs: Array.from( requestedSigs.values()).map((x:any) => { 
-          return { id: x.id, desc: x.desc, complete:x.conditional, signed: x.conditional }; 
+          return { id: x.id, desc: x.desc, complete:x.conditional, signed:x.conditional }; 
         }) }
     });
 
@@ -178,7 +179,7 @@ export const useSigning = () => {
           }
         } catch (e) {
           /* If there is a problem with the signing, use the approve txs as a fallback, HOWEVER ignore if error code 4001 (user reject) */
-          if ( e.code === 4001 ) {
+          if ( e.code !== 4001 ) {
             return fallback();
           }       
           handleSignError(e);

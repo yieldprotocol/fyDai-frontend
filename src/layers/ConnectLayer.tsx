@@ -12,7 +12,9 @@ import {
   FiRefreshCcw as Refresh,
 
 } from 'react-icons/fi';
-import { useConnection, useSignerAccount, useWeb3React } from '../hooks';
+
+import { useSignerAccount, useConnection } from '../hooks/connectionHooks';
+
 import { injected, walletconnect } from '../connectors';
 import metamaskImage from '../assets/images/providers/metamask.png';
 import walletConnectImage from '../assets/images/providers/walletconnect.png';

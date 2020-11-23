@@ -1,14 +1,13 @@
 import React, { useEffect, useContext } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ethers, BigNumber } from 'ethers';
+import {  useWeb3React } from '@web3-react/core';
 
 import * as utils from '../utils';
 import { IYieldSeries } from '../types';
 import { YieldContext } from './YieldContext';
 
 import { UserContext } from './UserContext';
-
-import {  useWeb3React } from '../hooks';
 
 import { useSignerAccount } from '../hooks/connectionHooks';
 import { usePool } from '../hooks/poolHook';
@@ -93,7 +92,6 @@ const SeriesProvider = ({ children }:any) => {
           getBalance(_x.poolAddress, 'Pool', account),
           checkPoolDelegate(_x.poolAddress, deployedContracts.PoolProxy),
           getTokenAllowance(deployedContracts.Dai, _x.poolAddress, 'Dai'),
-
           getTokenAllowance(_x.fyDaiAddress, _x.poolAddress, 'FYDai'),
           debtDai('ETH-A', _x.maturity ),
           callTx(deployedContracts.Controller, 'Controller', 'debtFYDai', [utils.ETH, _x.maturity, account]),

@@ -19,7 +19,8 @@ import { useTxHelpers } from './txHooks';
 export const useDsProxy = () => {
 
   /* contexts */
-  const  { state: { authorization } }  = useContext<any>(UserContext);
+  const  { state }  = useContext<any>(UserContext);
+  const { authorization } =  state?.authorization || {}; 
 
   /* hooks */ 
   const { signer } = useSignerAccount();
@@ -31,6 +32,7 @@ export const useDsProxy = () => {
   /* Preset the dsProxy contract for the user to be used with all fns */
   const { abi: DsProxyAbi } = DSProxy;
   const [ dsProxyContract, setDsProxyContract] = useState<any>();
+  
   useEffect(()=>{
       authorization?.dsProxyAddress && signer &&
       setDsProxyContract( new ethers.Contract(
@@ -46,6 +48,9 @@ export const useDsProxy = () => {
     overrides: any,
     txInfo: ITx,
   ) => {
+
+    console.log(dsProxyContract.address);
+
     let tx:any; // type
     setExecuteActive(true);
     try {
