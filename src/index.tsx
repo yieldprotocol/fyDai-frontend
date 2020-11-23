@@ -26,6 +26,14 @@ function getFallbackLibrary(provider: any) {
 }
 const Web3ReactProviderFallback = createWeb3ReactRoot('fallback');
 
+window.addEventListener('offline', () => {
+  console.log('I am offline.');
+});
+
+window.addEventListener('online', () => {
+  console.log('I am back online.');
+});
+
 ReactDOM.render(
   <React.StrictMode>
     <Router>

@@ -6,7 +6,6 @@ import Pool from '../contracts/Pool.json';
 import { useSignerAccount } from './connectionHooks';
 import { IYieldSeries } from '../types';
 import { useTxHelpers } from './txHooks';
-import { useDsProxy } from './dsProxyHook';
 
 /**
  * Hook for interacting with the yield 'Pool' Contract
@@ -19,7 +18,6 @@ export const usePool = () => {
   const [ callActive, setCallActive ] = useState<boolean>(false);
 
   const { handleTx, handleTxRejectError } = useTxHelpers();
-  const { proxyExecute } = useDsProxy();
 
   /**
    * @dev Sell fyDai for Dai ( Chai )
@@ -194,15 +192,17 @@ export const usePool = () => {
       /* Transaction reporting & tracking */
       await handleTx({ tx, msg: 'Yield Series Pool authorization', type:'AUTH_POOL', series });
     
-    } else { 
-      const calldata = contract.interface.encodeFunctionData('approve', [delegatedAddr]);
-      tx = await proxyExecute( 
-        poolAddr,
-        calldata,
-        { },
-        { tx: null, msg: 'Yield Series Pool authorization', type:'AUTH_POOL', series  }
-      );
-    }
+    } 
+    
+    // if (asProxy) { 
+    //   const calldata = contract.interface.encodeFunctionData('approve', [delegatedAddr]);
+    //   tx = await proxyExecute( 
+    //     poolAddr,
+    //     calldata,
+    //     { },
+    //     { tx: null, msg: 'Yield Series Pool authorization', type:'AUTH_POOL', series  }
+    //   );
+    // }
 
     // eslint-disable-next-line consistent-return
     return true;

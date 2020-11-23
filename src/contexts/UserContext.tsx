@@ -110,7 +110,7 @@ const UserProvider = ({ children }: any) => {
       ethPosted,  
     ]:any[] = await Promise.all([
       getBalance(), 
-      getBalance(deployedContracts.Dai, 'Dai'), 
+      getBalance(deployedContracts.Dai, 'Dai'),
       collateralPosted('ETH-A'),
     ]);
 
@@ -172,8 +172,6 @@ const UserProvider = ({ children }: any) => {
     const _auths:any={};
     _auths.dsProxyAddress = await getDsProxyAddress();
     _auths.hasDelegatedDsProxy = await checkControllerDelegate(_auths.dsProxyAddress);
-    // _auths.hasAuthorisedTreasury = (await getTokenAllowance(deployedContracts.Dai, deployedContracts.Treasury, 'Dai') > 0);
-    // _auths.hasDelegatedAltProxy = await checkControllerDelegate(deployedContracts.PoolProxy);
     dispatch( { type: 'updateAuthorizations', payload: _auths });
     console.log(_auths);
     return _auths;

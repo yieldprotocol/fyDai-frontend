@@ -192,10 +192,8 @@ export const useBorrowProxy = () => {
     const toAddr = account && ethers.utils.getAddress(account);
     const parsedMaturity = series.maturity.toString();
     const collatType = ethers.utils.formatBytes32String(collateralType);
-
     const overrides = { 
-      gasLimit: BigNumber.from('400000'),
-      // value: 0,
+      gasLimit: BigNumber.from('400000')
     };
 
     /* Check the signature requirements */
@@ -354,11 +352,11 @@ export const useBorrowProxy = () => {
     requestedSigs.set('daiSig',
       { id: genTxCode('AUTH_TOKEN', series),
         desc: 'Authorise Yield Pool Contact with Dai',
-        conditional: ( await getTokenAllowance(deployedContracts.Dai, poolAddr, 'Dai', dsProxyAddress) ) > 0,
-        signFn: () => daiPermitSignature(deployedContracts.Dai, poolAddr),    
+        conditional: ( await getTokenAllowance(deployedContracts.Dai, poolAddr, 'Dai') ) > 0,
+        signFn: () => daiPermitSignature(deployedContracts.Dai, poolAddr),
         fallbackFn: () => approveToken(deployedContracts.Dai, poolAddr, utils.MAX_INT, series ), 
       });
-            
+        
     requestedSigs.set('poolSig',
       { id: genTxCode('AUTH_POOL', series),
         desc: 'Delegate a Proxy to interact with the Yield Series/Pool',

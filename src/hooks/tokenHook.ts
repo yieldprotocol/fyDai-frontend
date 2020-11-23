@@ -1,12 +1,14 @@
 import { ethers }  from 'ethers';
 import { useSignerAccount } from './connectionHooks';
 
+import { IYieldSeries } from '../types';
+
 import FYDai from '../contracts/FYDai.json';
 import Dai from '../contracts/Dai.json';
 import Pool from '../contracts/Pool.json';
+
 import { useTxHelpers } from './txHooks';
-import { IYieldSeries } from '../types';
-import { useDsProxy } from './dsProxyHook';
+
 
 const contractMap = new Map<string, any>([
   ['FYDai', FYDai.abi],
@@ -23,8 +25,6 @@ export function useToken() {
   // const { state: { provider, account } } = useContext(ConnectionContext);
   const { signer, provider, account, fallbackProvider } = useSignerAccount();
   const { handleTx, handleTxRejectError } = useTxHelpers();
-
-  const { proxyExecute } = useDsProxy();
 
   /**
    * Get the user account balance of ETH  (omit args) or an ERC20token (provide args)
@@ -116,15 +116,16 @@ export function useToken() {
       /* Transaction reporting & tracking */
       await handleTx({ tx, msg: 'Token authorization', type: 'AUTH_TOKEN', series: series||null });
       
-    } else {  
-      const calldata = contract.interface.encodeFunctionData('approve', [delegateAddr, parsedAmount]);
-      tx = await proxyExecute( 
-        tokenAddr,
-        calldata,
-        { },
-        { tx:null, msg: 'Token authorization', type: 'AUTH_TOKEN', series: series||null  }
-      );
-    }
+    } 
+    // else {  
+    //   const calldata = contract.interface.encodeFunctionData('approve', [delegateAddr, parsedAmount]);
+    //   tx = await proxyExecute( 
+    //     tokenAddr,
+    //     calldata,
+    //     { },
+    //     { tx:null, msg: 'Token authorization', type: 'AUTH_TOKEN', series: series||null  }
+    //   );
+    // }
 
   };
 

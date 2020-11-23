@@ -9,6 +9,7 @@ import { UserContext } from '../contexts/UserContext';
 import { useSignerAccount } from './connectionHooks';
 import { useTxHelpers } from './txHooks';
 
+
 /**
  * Hook for interacting with the Yield Proxy Contract.
  * 
@@ -19,8 +20,7 @@ import { useTxHelpers } from './txHooks';
 export const useDsProxy = () => {
 
   /* contexts */
-  const  { state }  = useContext<any>(UserContext);
-  const { authorization } =  state?.authorization || {}; 
+  const  { state: { authorization } }  = useContext<any>(UserContext);
 
   /* hooks */ 
   const { signer } = useSignerAccount();
@@ -48,8 +48,6 @@ export const useDsProxy = () => {
     overrides: any,
     txInfo: ITx,
   ) => {
-
-    console.log(dsProxyContract.address);
 
     let tx:any; // type
     setExecuteActive(true);

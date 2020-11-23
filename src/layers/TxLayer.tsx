@@ -64,18 +64,21 @@ const TxLayer = () => {
     !!txProcessActive && setLayerOpen(true);
   }, [txProcessActive]);
 
-  /* set allSigned when all sigs are signed */
+
+  /* set Sigs status ( All previously complete or all been signed ) */
   useEffect(()=>{
-    const _allSigned = requestedSigs.reduce((acc:boolean, nextItem:any)=> {
-      return nextItem.signed;
-    }, false);
-    setAllSigned(_allSigned);
-
-    const _allComplete = requestedSigs.reduce((acc:boolean, nextItem:any)=> {
-      return nextItem.complete;
-    }, false);
-    setAllComplete(_allComplete);
-
+    if (Array.from(requestedSigs.values()).length ) {
+      const _allSigned = Array.from(requestedSigs.values()).reduce((acc:boolean, nextItem:any)=> {  
+        return nextItem.signed;
+      }, false);
+      setAllSigned(_allSigned);
+      const _allComplete = Array.from(requestedSigs.values()).reduce((acc:boolean, nextItem:any)=> {  
+        return nextItem.complete;
+      }, false);
+      setAllComplete(_allComplete);
+    } else {
+      setAllComplete(true);
+    }
   }, [requestedSigs]);
 
   return (
@@ -132,7 +135,7 @@ It is only shown when there is a transaction in progress or signature required *
             !fallbackActive && 
             <>
               <Box gap='medium'>
-                { allSigned? 
+                { allSigned ? 
                   <Text weight='bold'> The required authorisations have been granted: </Text> :
                   <Text weight='bold'> The following {requestedSigs.length===1? 'signature is' : 'signatures are'} required: </Text>}
                 { requestedSigs.map((x:any, i:number)=> {
@@ -165,6 +168,12 @@ It is only shown when there is a transaction in progress or signature required *
                     </Box>
                   );
                 })}
+
+                { allSigned &&
+                  <Text> 
+                    Finally, please check your wallet or provider to approve the transaction.
+                  </Text>}
+
               </Box>
             </>
             }
@@ -257,7 +266,7 @@ It is only shown when there is a transaction in progress or signature required *
               </Box>}
             </Box>}
 
-            { (requestedSigs.length===0 || allComplete )  && 
+            { ( allComplete ) &&
               !(txActive?.txCode === txProcessActive) &&
               <Box gap='medium'>
                 <Text weight='bold'>Confirmation required</Text>

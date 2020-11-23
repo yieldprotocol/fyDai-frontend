@@ -7,7 +7,6 @@ import Controller from '../contracts/Controller.json';
 
 import { useSignerAccount } from './connectionHooks';
 import { useTxHelpers } from './txHooks';
-import { useDsProxy } from './dsProxyHook';
 
 /**
  * Hook for interacting with the yield 'CRONTROLLER' Contract
@@ -38,7 +37,6 @@ export const useController = () => {
   const [controllerProvider, setControllerProvider] = useState<any>();
 
   const { handleTx, handleTxRejectError } = useTxHelpers();
-  const { proxyExecute } = useDsProxy();
 
   useMemo(()=>{
     try {
@@ -227,15 +225,17 @@ export const useController = () => {
       /* Transaction reporting & tracking */
       await handleTx({ tx, msg: 'Once-off Yield authorization', type: 'AUTH_CONTROLLER', series: null });
 
-    } else {   
-      const calldata = controllerContract.interface.encodeFunctionData('approve', [delegatedAddr]);
-      tx = await proxyExecute( 
-        controllerContract.address,
-        calldata,
-        { },
-        { tx:null, msg: 'Once-off Yield authorization', type: 'AUTH_CONTROLLER', series: null  }
-      );
-    }
+    } 
+
+    // if (asProxy) {   
+    //   const calldata = controllerContract.interface.encodeFunctionData('approve', [delegatedAddr]);
+    //   tx = await proxyExecute( 
+    //     controllerContract.address,
+    //     calldata,
+    //     { },
+    //     { tx:null, msg: 'Once-off Yield authorization', type: 'AUTH_CONTROLLER', series: null  }
+    //   );
+    // }
   
     // eslint-disable-next-line consistent-return
     return true;

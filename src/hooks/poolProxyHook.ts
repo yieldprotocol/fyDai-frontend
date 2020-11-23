@@ -96,7 +96,7 @@ export const usePoolProxy = () => {
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const parsedDaiUsed = BigNumber.isBigNumber(daiUsed)? daiUsed : ethers.utils.parseEther(daiUsed.toString());
 
-    const overrides = { 
+    const overrides = {
       gasLimit: BigNumber.from('750000'),
       value: ethers.utils.parseEther('0')
     };
@@ -125,7 +125,7 @@ export const usePoolProxy = () => {
     requestedSigs.set('daiSig',
       { id: genTxCode('AUTH_TOKEN', series),
         desc: 'Authorise Yield with Dai',
-        conditional: await getTokenAllowance(deployedContracts.Dai, dsProxyAddress, 'Dai') > 0,
+        conditional: (await getTokenAllowance(deployedContracts.Dai, dsProxyAddress, 'Dai')) > 0,
         signFn: () => daiPermitSignature(deployedContracts.Dai, dsProxyAddress),    
         fallbackFn: () => approveToken(deployedContracts.Dai, dsProxyAddress, utils.MAX_INT, series ),
       });
