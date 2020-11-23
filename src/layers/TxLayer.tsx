@@ -21,7 +21,7 @@ import { useDsRegistry } from '../hooks/dsRegistryHook';
 import RaisedButton from '../components/RaisedButton';
 import FlatButton from '../components/FlatButton';
 import EtherscanButton from '../components/EtherscanButton';
-import { abbreviateHash } from '../utils';
+import { abbreviateHash, genTxCode } from '../utils';
 import TxStatus from '../components/TxStatus';
 import Loading from '../components/Loading';
 
@@ -36,7 +36,7 @@ const TxLayer = () => {
   const { account } = useSignerAccount();
   const { buildDsProxy } = useDsRegistry();
 
-  const [ authActive ] = useTxActive([ 'AUTH_TOKEN', 'AUTH_CONTROLLER', 'AUTH_POOL' ]);
+  const [ authActive ] = useTxActive([ 'AUTH_TOKEN', 'AUTH_CONTROLLER', 'AUTH_POOL', 'CREATE_PROXY' ]);
   const [ txActive ] = useTxActive(['POST', 'WITHDRAW', 'BORROW', 'REPAY', 'SELL_DAI', 'BUY_DAI', 'REDEEM', 'ADD_LIQUIDITY', 'REMOVE_LIQUIDITY' ]);
 
   // flags
@@ -64,18 +64,16 @@ const TxLayer = () => {
     !!txProcessActive && setLayerOpen(true);
   }, [txProcessActive]);
 
-
   /* set Sigs status ( All previously complete or all been signed ) */
   useEffect(()=>{
     if (Array.from(requestedSigs.values()).length ) {
-      const _allSigned = Array.from(requestedSigs.values()).reduce((acc:boolean, nextItem:any)=> {  
-        return nextItem.signed;
-      }, false);
+
+      const _allSigned = Array.from(requestedSigs.values()).every((x:any) => x.signed === true );
       setAllSigned(_allSigned);
-      const _allComplete = Array.from(requestedSigs.values()).reduce((acc:boolean, nextItem:any)=> {  
-        return nextItem.complete;
-      }, false);
+
+      const _allComplete = Array.from(requestedSigs.values()).every((x:any) => x.complete === true );
       setAllComplete(_allComplete);
+
     } else {
       setAllComplete(true);
     }
@@ -86,7 +84,7 @@ const TxLayer = () => {
       {/* This following section is the 'non-layer' notification section. 
 It is only shown on main view if the user doesn't have a dsProxy */}
       {     
-      account && authorization?.dsProxyAddress === '0x0000000000000000000000000000000000000000' &&
+      account && !authorization.hasDsProxy &&
         <Box
           fill='horizontal'
           pad={mobile?{ horizontal:'medium', top:'medium', bottom:'large' }:{ horizontal:'xlarge', vertical:'medium' }}
@@ -132,7 +130,7 @@ It is only shown when there is a transaction in progress or signature required *
             requestedSigs.length>0 &&
             !allComplete && 
             !(txActive?.txCode === txProcessActive) &&
-            !fallbackActive && 
+            !fallbackActive &&
             <>
               <Box gap='medium'>
                 { allSigned ? 
@@ -168,12 +166,10 @@ It is only shown when there is a transaction in progress or signature required *
                     </Box>
                   );
                 })}
-
                 { allSigned &&
                   <Text> 
                     Finally, please check your wallet or provider to approve the transaction.
                   </Text>}
-
               </Box>
             </>
             }
@@ -185,7 +181,7 @@ It is only shown when there is a transaction in progress or signature required *
             <Box gap='medium'> 
 
               {preferences?.useTxApproval ? 
-                <Text weight='bold'>Please approve the following authorization transactions: { allSigned? 'done' : 'x' } </Text>
+                <Text weight='bold'>Please approve the following authorization transactions: </Text>
                 :
                 <Box gap='medium'>
                   <Box>
@@ -221,36 +217,35 @@ It is only shown when there is a transaction in progress or signature required *
                       </Box>
 
                       <Box basis='30' alignSelf='end'> 
-
-                        { authActive?.type === x.id ?
-                          <Box gap='small'>
-                            {
-                              abbreviateHash( pendingTxs.find((tx:any)=> tx.txCode === x.id)?.tx?.hash )
-                            }
+                        { pendingTxs.some((tx:any) => tx.txCode  === x.id) ?
+                          <Box gap='small' direction='row'>
                             <Text size='xxsmall'> Pending</Text>
                             <Loading condition={true} size='xxsmall'>.</Loading>
+                            {/* <EtherscanButton txHash={pendingTxs.find((tx:any)=> tx.txCode === x.id)?.tx?.hash} /> */}
                           </Box>
                           :
                           <>
-                            { !x.signed ? 
-                              <Clock /> :
-                              <Box animation='zoomIn'>
-                                <Check color='green' />
-                              </Box>}
-                          </>}                  
+                            { 
+                              x.signed ?
+                                <Box animation='zoomIn'>
+                                  <Check color='green' />
+                                </Box>:
+                                <Clock />
+                            }
+                          </> }                  
                       </Box>
                     </Box>
                   );
                 })}
 
-                <Box gap='small' fill='horizontal'>
+                {/* <Box gap='small' fill='horizontal'>
                   { pendingTxs.map((x:any, i:number)=> (
                     <Box key={x.tx.hash} direction='row' fill='horizontal' justify='between'>
                       <Box> { abbreviateHash(x.tx.hash) }</Box>
                       <EtherscanButton txHash={x.tx.hash} />
                     </Box>)
                   )}
-                </Box>
+                </Box> */}
               </Box>
 
               {!preferences?.useTxApproval &&

@@ -8,6 +8,7 @@ import Dai from '../contracts/Dai.json';
 import Pool from '../contracts/Pool.json';
 
 import { useTxHelpers } from './txHooks';
+import { useDsProxy } from './dsProxyHook';
 
 
 const contractMap = new Map<string, any>([
@@ -25,6 +26,8 @@ export function useToken() {
   // const { state: { provider, account } } = useContext(ConnectionContext);
   const { signer, provider, account, fallbackProvider } = useSignerAccount();
   const { handleTx, handleTxRejectError } = useTxHelpers();
+
+  const { proxyExecute } = useDsProxy();
 
   /**
    * Get the user account balance of ETH  (omit args) or an ERC20token (provide args)
@@ -55,17 +58,17 @@ export function useToken() {
   /**
    * Get the transaction allowance of a user for an ERC20token
    * @param {string} tokenAddr address of the Token
-   * @param {string} operatorAddr address of the operator whose allowance you are checking
    * @param {string} tokenName name of the token (probably ERC20 in most cases)
+   * @param {string} operatorAddr address of the operator whose allowance you are checking
    * @returns whatever token value
    */
   const getTokenAllowance = async (
     tokenAddress:string,
-    operatorAddress:string,
     tokenName: string,
+    operatorAddress:string,
     fromAddress: string|null = null,
   ) => {
-    const fromAddr = fromAddress ? ethers.utils.getAddress(fromAddress) : ( account && ethers.utils.getAddress(account) ) ;
+    const fromAddr = fromAddress ? ethers.utils.getAddress(fromAddress) : ( account && ethers.utils.getAddress(account) ); 
     const tokenAddr = ethers.utils.getAddress(tokenAddress);
     const operatorAddr = ethers.utils.getAddress(operatorAddress);
     const contract = new ethers.Contract( tokenAddr, contractMap.get(tokenName), provider );
@@ -116,16 +119,15 @@ export function useToken() {
       /* Transaction reporting & tracking */
       await handleTx({ tx, msg: 'Token authorization', type: 'AUTH_TOKEN', series: series||null });
       
-    } 
-    // else {  
-    //   const calldata = contract.interface.encodeFunctionData('approve', [delegateAddr, parsedAmount]);
-    //   tx = await proxyExecute( 
-    //     tokenAddr,
-    //     calldata,
-    //     { },
-    //     { tx:null, msg: 'Token authorization', type: 'AUTH_TOKEN', series: series||null  }
-    //   );
-    // }
+    } else {  
+      const calldata = contract.interface.encodeFunctionData('approve', [delegateAddr, parsedAmount]);
+      tx = await proxyExecute( 
+        tokenAddr,
+        calldata,
+        { },
+        { tx:null, msg: 'Token authorization', type: 'AUTH_TOKEN', series: series||null  }
+      );
+    }
 
   };
 

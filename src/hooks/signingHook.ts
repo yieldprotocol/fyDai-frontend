@@ -136,10 +136,12 @@ export const useSigning = () => {
 
       /* stack and wait for ALL the approval transactions to be complete */
       await Promise.all(
-        Array.from(requestedSigs.values()).map((x:any) =>  {
+        Array.from(requestedSigs.values()).map(async (x:any) =>  {
           if (!x.conditional) {
             try {
-              return x.fallbackFn();          
+              const done = await x.fallbackFn();
+              dispatch({ type: 'signed', payload:x });
+              return done;    
             } catch (e) {
               handleSignError(e);
               // /* on error, return the map with values 'undefined' to cancel the transaction process */

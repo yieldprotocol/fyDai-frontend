@@ -20,7 +20,7 @@ import { useTxHelpers } from './txHooks';
 export const useDsProxy = () => {
 
   /* contexts */
-  const  { state: { authorization } }  = useContext<any>(UserContext);
+  const  { state }  = useContext<any>(UserContext);
 
   /* hooks */ 
   const { signer } = useSignerAccount();
@@ -31,23 +31,31 @@ export const useDsProxy = () => {
 
   /* Preset the dsProxy contract for the user to be used with all fns */
   const { abi: DsProxyAbi } = DSProxy;
-  const [ dsProxyContract, setDsProxyContract] = useState<any>();
-  
-  useEffect(()=>{
-      authorization?.dsProxyAddress && signer &&
-      setDsProxyContract( new ethers.Contract(
-        ethers.utils.getAddress(authorization?.dsProxyAddress),
-        DsProxyAbi,
-        signer
-      ));
-  }, [signer, authorization, DsProxyAbi]);
+
+  // const [ dsProxyContract, setDsProxyContract] = useState<any>();
+  // useEffect(()=>{
+  //     authorization?.dsProxyAddress && signer &&
+  //     setDsProxyContract( new ethers.Contract(
+  //       ethers.utils.getAddress(authorization?.dsProxyAddress),
+  //       DsProxyAbi,
+  //       signer
+  //     ));
+  // }, [signer, authorization, DsProxyAbi]);
 
   const proxyExecute = async (
     contractAddress: string,
     calldata: any,
     overrides: any,
     txInfo: ITx,
+    
   ) => {
+
+    const proxyAddr = state.authorization?.dsProxyAddress || null;
+    const dsProxyContract = new ethers.Contract(
+      ethers.utils.getAddress(proxyAddr),
+      DsProxyAbi,
+      signer
+    );
 
     let tx:any; // type
     setExecuteActive(true);

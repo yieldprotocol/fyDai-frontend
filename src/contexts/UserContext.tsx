@@ -79,7 +79,7 @@ const UserProvider = ({ children }: any) => {
   
   /* hook declarations */
   const { getEventHistory, parseEventList } = useEvents();
-  const { getBalance, getTokenAllowance } = useToken();
+  const { getBalance } = useToken();
 
   const { getDsProxyAddress } = useDsRegistry();
   const { 
@@ -171,6 +171,7 @@ const UserProvider = ({ children }: any) => {
   const _getAuthorizations = async () => {
     const _auths:any={};
     _auths.dsProxyAddress = await getDsProxyAddress();
+    _auths.hasDsProxy = _auths.dsProxyAddress !== '0x0000000000000000000000000000000000000000';
     _auths.hasDelegatedDsProxy = await checkControllerDelegate(_auths.dsProxyAddress);
     dispatch( { type: 'updateAuthorizations', payload: _auths });
     console.log(_auths);

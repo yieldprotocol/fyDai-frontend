@@ -88,11 +88,19 @@ const SeriesProvider = ({ children }:any) => {
         ]);
 
         /* with user */
-        const [ poolTokens, hasPoolDelegatedProxy, hasDaiAuth, hasFyDaiAuth, ethDebtDai, ethDebtFYDai, fyDaiBalance] =  account && await Promise.all([
+        const [ 
+          poolTokens, 
+          // hasPoolDelegatedProxy,
+          // hasDaiAuth,
+          // hasFyDaiAuth,
+          ethDebtDai, 
+          ethDebtFYDai, 
+          fyDaiBalance
+        ] =  account && await Promise.all([
           getBalance(_x.poolAddress, 'Pool', account),
-          checkPoolDelegate(_x.poolAddress, deployedContracts.PoolProxy),
-          getTokenAllowance(deployedContracts.Dai, _x.poolAddress, 'Dai'),
-          getTokenAllowance(_x.fyDaiAddress, _x.poolAddress, 'FYDai'),
+          // checkPoolDelegate(_x.poolAddress, deployedContracts.PoolProxy),
+          // getTokenAllowance(deployedContracts.Dai, 'Dai', _x.poolAddress ),
+          // getTokenAllowance(_x.fyDaiAddress, 'FYDai', _x.poolAddress),
           debtDai('ETH-A', _x.maturity ),
           callTx(deployedContracts.Controller, 'Controller', 'debtFYDai', [utils.ETH, _x.maturity, account]),
           getBalance(_x.fyDaiAddress, 'FYDai', account),

@@ -4,8 +4,10 @@ import { Text, Box, Layer, ResponsiveContext, ThemeContext } from 'grommet';
 import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 
 import { SeriesContext } from '../contexts/SeriesContext';
+import { UserContext } from '../contexts/UserContext';
 
 import { modColor } from '../utils';
+import { useDsRegistry } from '../hooks/dsRegistryHook';
 
 const StyledBox = styled(Box)`
   border-radius: 8px;
@@ -48,12 +50,16 @@ function ActionButton({ ...props }:any ) {
   const { state: seriesState } = useContext(SeriesContext);
   const { activeSeries } = seriesState;
 
+  const { state: { authorization:{ hasDsProxy } } } = useContext(UserContext);
+  const { buildDsProxy } = useDsRegistry();
+
   return (
     <>
       { !props.disabled &&
        ( !mobile ? 
          <StyledBox 
-           {...props} 
+           {...props}
+           onClick={hasDsProxy ? props.onClick : ()=> buildDsProxy()}
            fill='horizontal'
            align='center'
            pad='small'
@@ -63,7 +69,7 @@ function ActionButton({ ...props }:any ) {
              weight='bold'
              size='large'
            >
-             {props.label}
+             {hasDsProxy ? props.label : 'First, create a proxy' } 
            </Text>
          </StyledBox> 
          :

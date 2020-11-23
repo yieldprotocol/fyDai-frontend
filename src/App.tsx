@@ -75,6 +75,15 @@ const App = (props:any) => {
     });
   }, []);
 
+  useEffect(()=>{
+    window.addEventListener('offline', () => {
+      console.log('I am offline.');
+    });
+    window.addEventListener('online', () => {
+      console.log('I am back online.');
+    });
+  }, []);
+
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   const leftSideRef = useRef<any>(null);
   const [ showConnectLayer, setShowConnectLayer ] = useState<string|null>(null);

@@ -125,8 +125,8 @@ export const usePoolProxy = () => {
     requestedSigs.set('daiSig',
       { id: genTxCode('AUTH_TOKEN', series),
         desc: 'Authorise Yield with Dai',
-        conditional: (await getTokenAllowance(deployedContracts.Dai, dsProxyAddress, 'Dai')) > 0,
-        signFn: () => daiPermitSignature(deployedContracts.Dai, dsProxyAddress),    
+        conditional: (await getTokenAllowance(deployedContracts.Dai, 'Dai', dsProxyAddress)) > 0,
+        signFn: () => daiPermitSignature(deployedContracts.Dai, dsProxyAddress), 
         fallbackFn: () => approveToken(deployedContracts.Dai, dsProxyAddress, utils.MAX_INT, series ),
       });
   

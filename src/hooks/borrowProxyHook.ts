@@ -280,13 +280,13 @@ export const useBorrowProxy = () => {
         signFn: () => delegationSignature(controllerContract, dsProxyAddress),    
         fallbackFn: () => addControllerDelegate(dsProxyAddress),
       });
-
+ 
     requestedSigs.set('daiSig',
       { id: genTxCode('AUTH_TOKEN', series),
         desc: 'Authorise Yield Treasury with Dai',
-        conditional: await getTokenAllowance(deployedContracts.Dai, deployedContracts.Treasury, 'Dai', dsProxyAddress) > 0,
-        signFn: () => daiPermitSignature( deployedContracts.Dai, deployedContracts.Treasury ),    
-        fallbackFn: () => approveToken(deployedContracts.Dai, deployedContracts.Treasury, utils.MAX_INT, series ),
+        conditional: ( await getTokenAllowance(deployedContracts.Dai, 'Dai', deployedContracts.Treasury) ) > 0,
+        signFn: () => daiPermitSignature( deployedContracts.Dai, deployedContracts.Treasury),
+        fallbackFn: () => approveToken(deployedContracts.Dai, deployedContracts.Treasury, utils.MAX_INT, series),
       });
 
     /* Send the required signatures out for signing, or approval tx if fallback is required */
@@ -335,7 +335,7 @@ export const useBorrowProxy = () => {
 
     /* Check the signature requirements */
     const checkSigs = await proxyContract.sellDaiCheck(poolAddr);
-    console.log(checkSigs); 
+    console.log(checkSigs);
 
     /* calculate expected trade values and factor in slippage */
     let minFYDaiOut:BigNumber;
@@ -352,9 +352,9 @@ export const useBorrowProxy = () => {
     requestedSigs.set('daiSig',
       { id: genTxCode('AUTH_TOKEN', series),
         desc: 'Authorise Yield Pool Contact with Dai',
-        conditional: ( await getTokenAllowance(deployedContracts.Dai, poolAddr, 'Dai') ) > 0,
+        conditional: ( await getTokenAllowance(deployedContracts.Dai, 'Dai', poolAddr) ) > 0,
         signFn: () => daiPermitSignature(deployedContracts.Dai, poolAddr),
-        fallbackFn: () => approveToken(deployedContracts.Dai, poolAddr, utils.MAX_INT, series ), 
+        fallbackFn: () => approveToken(deployedContracts.Dai, poolAddr, utils.MAX_INT, series), 
       });
         
     requestedSigs.set('poolSig',
@@ -428,7 +428,7 @@ export const useBorrowProxy = () => {
     requestedSigs.set('fyDaiSig',
       { id: genTxCode('AUTH_TOKEN', series),
         desc: 'Authorise Yield Pool with fyDai',
-        conditional: ( await getTokenAllowance(fyDaiAddr, poolAddr, 'FYDai', dsProxyAddress) ) > 0,
+        conditional: ( await getTokenAllowance(fyDaiAddr, 'FYDai', poolAddr,  dsProxyAddress) ) > 0,
         signFn: () => ERC2612PermitSignature(fyDaiAddr, poolAddr),    
         fallbackFn: () => approveToken(fyDaiAddr, poolAddr, utils.MAX_INT, series ), 
       });
