@@ -9,8 +9,8 @@ import { yieldTheme } from './themes';
 import { modColor } from './utils';
 
 import { SeriesContext } from './contexts/SeriesContext';
-import { YieldContext } from './contexts/YieldContext';
 import { NotifyContext } from './contexts/NotifyContext';
+import { UserContext } from './contexts/UserContext';
 
 import { useCachedState } from './hooks/appHooks';
 
@@ -34,8 +34,9 @@ import ErrorBoundary from './components/ErrorBoundry';
 import YieldNav from './components/YieldNav';
 
 const App = (props:any) => {
-  const { state: { seriesLoading, activeSeries } } = useContext(SeriesContext);
-  const { state: { yieldLoading } } = useContext(YieldContext);
+
+  const { state: { seriesLoading, activeSeries }, actions: seriesActions } = useContext(SeriesContext);
+  const { actions: userActions } = useContext(UserContext);
   const { dispatch } = useContext(NotifyContext);
   const [ cachedLastVisit, setCachedLastVisit ] = useCachedState('lastVisit', null);
 
@@ -79,8 +80,13 @@ const App = (props:any) => {
     window.addEventListener('offline', () => {
       console.log('I am offline.');
     });
+
     window.addEventListener('online', () => {
       console.log('I am back online.');
+      dispatch({ type:'notify', payload:{ message:'Back Online', type:'success' } });
+      seriesActions.updateSeries();
+      userActions.updatePosition();
+      userActions.updateAuthorizations();
     });
   }, []);
 

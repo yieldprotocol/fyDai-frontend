@@ -170,10 +170,10 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                 label: 'Your Pool Tokens',
                 labelExtra: 'owned in this series',
                 visible: 
-                  (!!account && txActive?.type !== 'ADD_LIQUIDITY' && !activeSeries?.isMature()) || 
+                  (!!account && !activeSeries?.isMature()) || 
                   (activeSeries?.isMature() && activeSeries?.poolTokens_>0 ),
                 active: true,
-                loading: addLiquidityPending,     
+                loading: false,     
                 value: activeSeries?.poolTokens_,
                 valuePrefix: null,
                 valueExtra: null, 
@@ -183,10 +183,10 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                 // labelExtra: ()=>(<Text size='xxsmall'> of the total <Text size='xxsmall' color='text'>{nFormatter(activeSeries?.totalSupply_, 0)}</Text> tokens </Text>),
                 labelExtra: ()=>(<Text size='xxsmall'> of the total tokens </Text>),
                 visible: 
-                    (!!account && txActive?.type !== 'ADD_LIQUIDITY' && !activeSeries?.isMature()) || 
+                    (!!account && !activeSeries?.isMature()) || 
                     (activeSeries?.isMature() && activeSeries?.poolTokens_>0 ),
                 active: true,
-                loading: addLiquidityPending,           
+                loading: false,           
                 value: activeSeries?` ${activeSeries?.poolPercent}%`: '',
                 valuePrefix: null,
                 valueExtra: null,
@@ -194,9 +194,9 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
               {
                 label: 'Total Liquidity',
                 labelExtra: ' staked in this series',
-                visible: (txActive?.type !== 'ADD_LIQUIDITY' && !activeSeries?.isMature()),
+                visible: !activeSeries?.isMature(),
                 active: true,
-                loading: addLiquidityPending,           
+                loading: false,           
                 value: activeSeries?` ${nFormatter(activeSeries?.totalSupply_, 2)} tokens`: '',
                 valuePrefix: null,
                 valueExtra: null,

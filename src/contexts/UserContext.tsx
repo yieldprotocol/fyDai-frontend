@@ -412,8 +412,8 @@ const UserProvider = ({ children }: any) => {
 
   /* Exposed actions */
   const actions = {
-    updatePosition: () => _getPosition(),
-    updateAuthorizations: () => _getAuthorizations(),
+    updatePosition: () => account && _getPosition(),
+    updateAuthorizations: () => account && _getAuthorizations(),
     updateHistory: () => _getTxHistory(false),
     rebuildHistory: async () => {
       dispatch({ type: 'isLoading', payload: true });

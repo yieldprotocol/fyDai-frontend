@@ -291,7 +291,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
                   (!activeSeries?.isMature() && !txActive)  || 
                   (activeSeries?.isMature() && activeSeries?.ethDebtDai_ > 0 ),
                 active: true,
-                loading: borrowPending,    
+                loading: false,    
                 value: activeSeries?.ethDebtDai_? `${activeSeries.ethDebtDai_} DAI`: '0 DAI',
                 valuePrefix: null,
                 valueExtra: null, 
@@ -300,13 +300,12 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
                 label: 'Borrowing Power',
                 labelExtra: 'based on collateral posted',
                 visible: 
-                  !txActive && 
                   activeSeries && 
                   !activeSeries.isMature() && 
                   !!account && 
                   parseFloat(ethPosted_) > 0,
                 active: maxDaiAvailable_,
-                loading: borrowPending,
+                loading: false,
                 value: maxDaiAvailable_? `${maxDaiAvailable_} DAI`: '0 DAI',           
                 valuePrefix: null,
                 valueExtra: null,
@@ -325,8 +324,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
               {
                 label: 'Collateralization Ratio',
                 labelExtra: 'based on ETH posted',
-                visible: 
-                  !txActive && 
+                visible:
                   activeSeries && 
                   !activeSeries.isMature() && 
                   !!account && 
@@ -341,10 +339,10 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
                 label: 'Dai Balance',
                 labelExtra: abbreviateHash('0x6b175474e89094c44da98b954eedeac495271d0f'),
                 visible: 
-                  (!!account && !txActive && !activeSeries?.isMature()) || 
+                  (!!account && !activeSeries?.isMature()) || 
                   (activeSeries?.isMature() && activeSeries?.fyDaiBalance_>0),
                 active: true,
-                loading: borrowPending,            
+                loading: false,            
                 value: daiBalance_?`${daiBalance_} DAI`: '0 DAI',
                 valuePrefix: null,
                 valueExtra: null,

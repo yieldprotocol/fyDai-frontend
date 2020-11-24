@@ -181,10 +181,10 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
                 label: 'Portfolio Value',
                 labelExtra: 'at maturity',
                 visible: 
-                  (!!account && !txActive && !activeSeries?.isMature()) || 
+                  (!!account && !activeSeries?.isMature()) || 
                   ( activeSeries?.isMature() && activeSeries?.fyDaiBalance_>0),
                 active: true,
-                loading: lendPending,  
+                loading: false,  
                 value: activeSeries? `${activeSeries?.fyDaiBalance_} DAI` : '-',
                 valuePrefix: null,
                 valueExtra: null,
@@ -192,9 +192,9 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
               {
                 label: 'Current Value',
                 labelExtra: 'if closing your position now',
-                visible: !!account && !txActive && !activeSeries?.isMature(),
+                visible: !!account && !activeSeries?.isMature(),
                 active: true,
-                loading: lendPending || !currentValue,           
+                loading: false || !currentValue,           
                 value: currentValue?`${cleanValue(currentValue, 2)} DAI`: '- Dai',
                 valuePrefix: null,
                 valueExtra: null,
@@ -202,7 +202,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
               {
                 label: null,
                 labelExtra: null,
-                visible: !!account && !txActive && !activeSeries?.isMature(),
+                visible: !!account && !activeSeries?.isMature(),
                 active: true,
                 loading: false,           
                 value: null,
@@ -213,7 +213,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
                 label: 'Dai Balance',
                 visible: false,
                 active: true,
-                loading: lendPending,            
+                loading: false,            
                 value: daiBalance_?`${daiBalance_} DAI`: '0 DAI',
                 valuePrefix: null,
                 valueExtra: null,
