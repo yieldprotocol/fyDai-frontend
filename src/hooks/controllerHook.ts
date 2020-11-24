@@ -2,6 +2,7 @@ import { useMemo, useState, useContext } from 'react';
 import { ethers, BigNumber }  from 'ethers';
 
 import { YieldContext } from '../contexts/YieldContext';
+import { UserContext } from '../contexts/UserContext';
 
 import Controller from '../contracts/Controller.json';
 
@@ -27,6 +28,8 @@ export const useController = () => {
   const { signer, fallbackProvider, account } = useSignerAccount();
   
   const { state : { deployedContracts } } = useContext<any>(YieldContext);
+  const { actions: userActions } = useContext(UserContext);
+
   const [ postActive, setPostActive ] = useState<boolean>(false);
   const [ withdrawActive, setWithdrawActive ] = useState<boolean>(false);
   const [ borrowActive, setBorrowActive ] = useState<boolean>(false);
@@ -226,7 +229,8 @@ export const useController = () => {
       }
       /* Transaction reporting & tracking */
       await handleTx({ tx, msg: 'Once-off Yield authorization', type: 'AUTH_CONTROLLER', series: null });
-      
+      userActions.updateAuthorizations();
+
     } else {   
       const calldata = controllerContract.interface.encodeFunctionData('addDelegate', [delegatedAddr]);
       tx = await proxyExecute( 
@@ -235,6 +239,7 @@ export const useController = () => {
         { },
         { tx:null, msg: 'Once-off Yield authorization', type: 'AUTH_CONTROLLER', series: null  }
       );
+      userActions.updateAuthorizations();
     }
   
     // eslint-disable-next-line consistent-return

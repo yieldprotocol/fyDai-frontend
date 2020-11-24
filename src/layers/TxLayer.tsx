@@ -143,8 +143,7 @@ const TxLayer = () => {
             !fallbackActive &&
             !allComplete && 
             !processIsCurrentTx &&
-            requestedSigs.length>0 &&
-            
+            requestedSigs.length>0 &&          
             <>
               <Box gap='medium'>
                 { allSigned ? 
@@ -281,6 +280,7 @@ const TxLayer = () => {
                 </Box>
               }
               
+              { authActive &&
               <Box alignSelf='start'>
                 <FlatButton
                   onClick={()=>closeAuth()}
@@ -291,7 +291,7 @@ const TxLayer = () => {
                     </Box>
                   }
                 />
-              </Box>
+              </Box>}
 
             </Box>
             }
