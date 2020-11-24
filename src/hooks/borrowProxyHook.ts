@@ -353,7 +353,7 @@ export const useBorrowProxy = () => {
     requestedSigs.set('daiSig',
       { id: genTxCode('AUTH_TOKEN', series),
         desc: 'Authorise Yield Pool Contact with Dai',
-        conditional: ( await getTokenAllowance(deployedContracts.Dai, 'Dai', poolAddr) ) > 0,
+        conditional: await getTokenAllowance(deployedContracts.Dai, 'Dai', poolAddr) > 0,
         signFn: () => daiPermitSignature(deployedContracts.Dai, poolAddr),
         fallbackFn: () => approveToken(deployedContracts.Dai, poolAddr, utils.MAX_INT, series), 
       });
@@ -362,7 +362,7 @@ export const useBorrowProxy = () => {
       { id: genTxCode('AUTH_POOL', series),
         desc: 'Delegate a Proxy to interact with the Yield Series/Pool',
         conditional: await checkPoolDelegate(poolAddr, dsProxyAddress),
-        signFn: () => delegationSignature( poolContract, dsProxyAddress ),    
+        signFn: () => delegationSignature(poolContract, dsProxyAddress),    
         fallbackFn: () => addPoolDelegate(series, dsProxyAddress),
       });
         
@@ -374,8 +374,7 @@ export const useBorrowProxy = () => {
     /* construct the calldata. Fn selection Based on current authorisation status */
     const calldata = proxyContract.interface.encodeFunctionData( 
       'sellDaiWithSignature',
-      // [ poolAddr, toAddr, parsedDaiIn, minFYDaiOut, signedSigs.get('daiSig'), signedSigs.get('poolSig') ]
-      [poolAddr, toAddr, parsedDaiIn, minFYDaiOut, '0x', '0x']
+      [ poolAddr, toAddr, parsedDaiIn, minFYDaiOut, signedSigs.get('daiSig'), signedSigs.get('poolSig') ]
     );
 
     /* send to the proxy for execution */
