@@ -79,12 +79,12 @@ const App = (props:any) => {
   useEffect(()=>{
     window.addEventListener('offline', () => {
       console.log('I am offline.');
+      dispatch({ type:'notify', payload:{ message:'App offline', type:'error' } });
     });
 
     window.addEventListener('online', () => {
-      console.log('I am back online.');
       dispatch({ type:'notify', payload:{ message:'Back Online', type:'success' } });
-      seriesActions.updateSeries();
+      seriesActions.updateAllSeries();
       userActions.updatePosition();
       userActions.updateAuthorizations();
     });
@@ -157,7 +157,7 @@ const App = (props:any) => {
 };
 
 const WrappedApp = () => {
-  const [ userPreferences, setUserPreferences ] = useCachedState('userPreferences', { moodLight:true, darkMode:false });
+  const [ userPreferences, setUserPreferences ] = useCachedState('userPreferences', { moodLight:true, darkMode:true });
   return (
     <Suspense fallback={null}>
       <Grommet
