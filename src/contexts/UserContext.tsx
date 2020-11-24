@@ -11,7 +11,6 @@ import { useCachedState, } from '../hooks/appHooks';
 import { useController } from '../hooks/controllerHook';
 import { useEvents } from '../hooks/eventHooks';
 import { useSignerAccount } from '../hooks/connectionHooks';
-
 import { useDsRegistry } from '../hooks/dsRegistryHook';
 
 const UserContext = createContext<any>({});
@@ -382,7 +381,6 @@ const UserProvider = ({ children }: any) => {
     setCachedPreferences(allPrefs);
     return { allPrefs };
   };
-
 
   /* initiate the user */
   const initUser = async () => {

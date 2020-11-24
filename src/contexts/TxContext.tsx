@@ -4,7 +4,7 @@ import { useWeb3React } from '@web3-react/core';
 import { useCachedState } from '../hooks/appHooks';
 import { IReducerAction, ITxState, ITx } from '../types';
 
-import { SeriesContext } from './SeriesContext';
+import { YieldContext } from './YieldContext';
 
 const TxContext = React.createContext<any>({});
 
@@ -64,7 +64,7 @@ function txReducer(state:ITxState, action:IReducerAction) {
 
 const TxProvider = ({ children }:any) => {
   const [ state, dispatch ] = useReducer(txReducer, initState );
-  const { state: { seriesLoading } } = useContext(SeriesContext);
+  const { state: { yieldLoading } } = useContext(YieldContext);
   const [ pendingCache, setPendingCache ] = useCachedState('txPending', []);
   const { library } = useWeb3React('fallback');
   const [ hasReadCache, setHasReadCache] = useState<boolean>(false);
@@ -72,7 +72,7 @@ const TxProvider = ({ children }:any) => {
   useEffect(() => {
     /* handle registering and monitoring the cached transactions if any */
     ( async () => {
-      if (!seriesLoading && library && !hasReadCache) {
+      if (!yieldLoading && library && !hasReadCache) {
         await Promise.all( pendingCache.map(async (x:any) => {
           dispatch({ type:'txPending', payload: x });
           await library.waitForTransaction(x.tx.hash, 1)
@@ -88,7 +88,7 @@ const TxProvider = ({ children }:any) => {
         setHasReadCache(true);
       }
     })();
-  }, [library, seriesLoading]);
+  }, [library, yieldLoading]);
 
   return (
     <TxContext.Provider value={{ state, dispatch }}>

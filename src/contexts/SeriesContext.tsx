@@ -1,13 +1,10 @@
 import React, { useEffect, useContext } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ethers, BigNumber } from 'ethers';
-import {  useWeb3React } from '@web3-react/core';
 
 import * as utils from '../utils';
 import { IYieldSeries } from '../types';
 import { YieldContext } from './YieldContext';
-
-import { UserContext } from './UserContext';
 
 import { useSignerAccount } from '../hooks/connectionHooks';
 import { usePool } from '../hooks/poolHook';
@@ -54,11 +51,9 @@ const SeriesProvider = ({ children }:any) => {
   const { state: yieldState } = useContext(YieldContext);
   const { yieldLoading, deployedContracts } = yieldState;
 
-  const { state: { authorization: { dsProxyAddress } } } = useContext(UserContext);
-
-  const { previewPoolTx, checkPoolDelegate, checkPoolState } = usePool();
+  const { previewPoolTx, checkPoolState } = usePool();
   const { debtDai } = useController();
-  const { getBalance, getTokenAllowance } = useToken();
+  const { getBalance } = useToken();
 
   const [ callTx ] = useCallTx();
   const { calcAPR, poolPercent: calcPercent }  = useMath();
