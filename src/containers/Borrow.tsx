@@ -9,22 +9,14 @@ import { abbreviateHash, cleanValue, genTxCode } from '../utils';
 
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
-import { TxContext } from '../contexts/TxContext';
 
 /* hook pack */
-import { useSignerAccount, useConnection } from '../hooks/connectionHooks';
-import { useCachedState, useDebounce, useIsLol } from '../hooks/appHooks';
-import { useEvents } from '../hooks/eventHooks';
+import { useSignerAccount } from '../hooks/connectionHooks';
+import { useDebounce, useIsLol } from '../hooks/appHooks';
 import { useMath } from '../hooks/mathHooks';
-import { useCallTx, useSendTx, useTimeTravel } from '../hooks/chainHooks'; 
-import { useToken } from '../hooks/tokenHook';
-import { useTxActive, useTxHelpers } from '../hooks/txHooks';
-import { useMigrations } from '../hooks/migrationHook';
-import { useController } from '../hooks/controllerHook';
+import { useTxActive } from '../hooks/txHooks';
 import { usePool } from '../hooks/poolHook';
-import { useFYDai } from '../hooks/fyDaiHook';
 import { useBorrowProxy } from '../hooks/borrowProxyHook';
-import { usePoolProxy } from '../hooks/poolProxyHook';
 
 import Repay from './Repay';
 
@@ -51,7 +43,6 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
 
   const navHistory = useHistory();
   const { state: { activeSeries }, actions: seriesActions } = useContext(SeriesContext);
-  const { state: { txProcessActive } } = useContext(TxContext);
 
   /* check if the user sent in any requested amount in the url */ 
   const { amnt }:any = useParams();
@@ -73,7 +64,6 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
   const theme = useContext<any>(ThemeContext);
 
   /* hooks init */
-  const { borrow }  = useController();
   const { previewPoolTx }  = usePool();
   const { borrowDai } = useBorrowProxy();
   const { calcAPR, estCollRatio: estimateRatio } = useMath();
@@ -109,11 +99,10 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
   const [ estRatio, setEstRatio ] = useState<number>(0);
 
   /* Borrow execution flow */
-  const borrowProcedure = async (autoSell:boolean=true) => {
+  const borrowProcedure = async () => {
     if (inputValue && !borrowDisabled) {
       setBorrowPending(true);
-      autoSell && await borrowDai(activeSeries, 'ETH-A', inputValue);
-      !autoSell && await borrow('ETH-A', activeSeries.maturity, inputValue);
+      await borrowDai(activeSeries, 'ETH-A', inputValue);
       setInputValue(undefined);
       userActions.updateHistory();
       await Promise.all([
@@ -194,7 +183,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
     <RaisedBox>
       <Keyboard 
         onEsc={() => setInputValue(undefined)}
-        onEnter={()=> borrowProcedure(inputValue)}
+        onEnter={()=> borrowProcedure()}
         onBackspace={()=> {
           inputValue && 
           (document.activeElement !== inputRef) && 

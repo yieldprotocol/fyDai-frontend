@@ -6,25 +6,17 @@ import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 import { VscHistory as History } from 'react-icons/vsc';
 
 import { NavLink, useParams } from 'react-router-dom';
-import { cleanValue, genTxCode, nFormatter } from '../utils';
+import { cleanValue, nFormatter } from '../utils';
 
 import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
 
-/* hook pack */
-import { useSignerAccount, useConnection } from '../hooks/connectionHooks';
-import { useCachedState, useDebounce, useIsLol } from '../hooks/appHooks';
-import { useEvents } from '../hooks/eventHooks';
+import { useSignerAccount } from '../hooks/connectionHooks';
+import { useDebounce, useIsLol } from '../hooks/appHooks';
 import { useMath } from '../hooks/mathHooks';
-import { useCallTx, useSendTx, useTimeTravel } from '../hooks/chainHooks'; 
 import { useToken } from '../hooks/tokenHook';
-import { useTxActive, useTxHelpers } from '../hooks/txHooks';
-import { useMigrations } from '../hooks/migrationHook';
-import { useController } from '../hooks/controllerHook';
-import { usePool } from '../hooks/poolHook';
-import { useFYDai } from '../hooks/fyDaiHook';
-import { useBorrowProxy } from '../hooks/borrowProxyHook';
+import { useTxActive } from '../hooks/txHooks';
 import { usePoolProxy } from '../hooks/poolProxyHook';
 
 import RemoveLiquidity from './RemoveLiquidity';
@@ -43,7 +35,6 @@ import RaisedBox from '../components/RaisedBox';
 
 import DaiMark from '../components/logos/DaiMark';
 import YieldMobileNav from '../components/YieldMobileNav';
-
 
 interface IPoolProps {
   openConnectLayer:any;
@@ -79,11 +70,6 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
 
   const [ removeLiquidityOpen, setRemoveLiquidityOpen ] = useState<boolean>(false);
   const [ histOpen, setHistOpen ] = useState<boolean>(false);
-
-  const [showTxPending, setShowTxPending] = useState<boolean>(false);
-  useEffect(()=>{
-    setShowTxPending( txActive?.txCode === genTxCode('ADD_LIQUIDITY', activeSeries));
-  }, [txActive, activeSeries]);
 
   const [ addLiquidityDisabled, setAddLiquidityDisabled ] = useState<boolean>(true);
 
