@@ -9,20 +9,21 @@ import { cleanValue } from '../utils';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
 
-import { useSignerAccount, useProxy, useTxActive, useDebounce, useIsLol } from '../hooks';
+/* hook pack */
+import { useSignerAccount } from '../hooks/connectionHooks';
+import { useDebounce, useIsLol } from '../hooks/appHooks';
+import { useTxActive } from '../hooks/txHooks';
+import { usePoolProxy } from '../hooks/poolProxyHook';
 
 import InputWrap from '../components/InputWrap';
 import InfoGrid from '../components/InfoGrid';
-import ApprovalPending from '../components/ApprovalPending';
 import TxStatus from '../components/TxStatus';
 import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
 
 import YieldMark from '../components/logos/YieldMark';
-
 import YieldMobileNav from '../components/YieldMobileNav';
-import ConfirmationRequired from '../components/ConfirmationRequired';
 
 interface IRemoveLiquidityProps {
   openConnectLayer?:any
@@ -38,44 +39,42 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
   const { actions: userActions } = useContext(UserContext);
 
   const { account } = useSignerAccount();
-  const { removeLiquidity } = useProxy();
+  const { removeLiquidity } = usePoolProxy();
   const [ txActive ] = useTxActive(['REMOVE_LIQUIDITY']);
 
   const [newShare, setNewShare] = useState<string>(activeSeries?.poolPercent);
   const [calculating, setCalculating] = useState<boolean>(false);
 
-  const [showConfirm, setShowConfirm] = useState<boolean>(true);
 
   const [ inputValue, setInputValue ] = useState<any>();
   const debouncedInput = useDebounce(inputValue, 500);
   const [inputRef, setInputRef] = useState<any>(null);
 
   const [ removeLiquidityDisabled, setRemoveLiquidityDisabled ] = useState<boolean>(true);
-  const [ removeLiquidityPending, setRemoveLiquidityPending] = useState<boolean>(false);
 
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
   const isLol = useIsLol(inputValue);
 
-
   /* Remove Liquidity sequence */
   const removeLiquidityProcedure = async (value:number) => {
     if ( !removeLiquidityDisabled ) {
-      setRemoveLiquidityPending(true);
-      await removeLiquidity(activeSeries, value);
-      setInputValue(undefined);
-      userActions.updateHistory();
+      !activeSeries?.isMature() && close();
       if (activeSeries?.isMature()) {
+        await removeLiquidity(activeSeries, value);
+        setInputValue(undefined);
+        userActions.updateHistory();
         await Promise.all([
           userActions.updatePosition(),
           seriesActions.updateActiveSeries()
         ]);
       } else {
+        await removeLiquidity(activeSeries, value);
+        setInputValue(undefined);
+        userActions.updateHistory();
         userActions.updatePosition();
         seriesActions.updateActiveSeries();
       }
-      setRemoveLiquidityPending(false);
-      !activeSeries?.isMature() && close();
     }
   };
 
@@ -135,7 +134,7 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
       }}
       target='document'
     >
-      {!txActive && !removeLiquidityPending && 
+      {!txActive &&  
       <Box 
         width={!mobile?{ min:'600px', max:'600px' }: undefined}
         alignSelf='center'
@@ -225,8 +224,6 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
         </Box>}
         
       </Box>}
-
-      { removeLiquidityPending && !txActive &&  <ConfirmationRequired close={()=>close()} /> }
       
       { txActive &&
       <Box 
@@ -250,7 +247,7 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
           >
             <Box direction='row' gap='small' align='center'>
               <ArrowLeft color='text-weak' />
-              <Text size='xsmall' color='text-weak'> { !removeLiquidityPending? 'cancel, and go back.': 'go back'}  </Text>
+              <Text size='xsmall' color='text-weak'> go back </Text>
             </Box>
           </Box>
         </Box>

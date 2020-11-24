@@ -12,18 +12,20 @@ import {
   FiRefreshCcw as Refresh,
 
 } from 'react-icons/fi';
-import { useConnection, useSignerAccount, useWeb3React } from '../../hooks';
-import { injected, walletconnect } from '../../connectors';
-import metamaskImage from '../../assets/images/providers/metamask.png';
-import walletConnectImage from '../../assets/images/providers/walletconnect.png';
-import { UserContext } from '../../contexts/UserContext';
-import RaisedButton from '../../components/RaisedButton';
-import FlatButton from '../../components/FlatButton';
-import TxHistory from '../../components/TxHistory';
-import YieldSettings from '../../components/YieldSettings';
-import ExperimentWrap from '../../components/ExperimentWrap';
-import HashWrap from '../../components/HashWrap';
-import TxRecent from '../../components/TxRecent';
+
+import { useSignerAccount, useConnection } from '../hooks/connectionHooks';
+
+import { injected, walletconnect } from '../connectors';
+import metamaskImage from '../assets/images/providers/metamask.png';
+import walletConnectImage from '../assets/images/providers/walletconnect.png';
+import { UserContext } from '../contexts/UserContext';
+import RaisedButton from '../components/RaisedButton';
+import FlatButton from '../components/FlatButton';
+import TxHistory from '../components/TxHistory';
+import YieldSettings from '../components/YieldSettings';
+import ExperimentWrap from '../components/ExperimentWrap';
+import HashWrap from '../components/HashWrap';
+import TxRecent from '../components/TxRecent';
 
 const ConnectLayer = ({ view, target, closeLayer }: any) => {
 

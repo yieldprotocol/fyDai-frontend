@@ -4,8 +4,15 @@ import { ethers, BigNumber } from 'ethers';
 
 import * as utils from '../utils';
 import { IYieldSeries } from '../types';
+
 import { YieldContext } from './YieldContext';
-import { useCallTx, useMath, usePool, useSignerAccount, useWeb3React, useController, useToken } from '../hooks';
+
+import { useSignerAccount } from '../hooks/connectionHooks';
+import { usePool } from '../hooks/poolHook';
+import { useMath } from '../hooks/mathHooks';
+import { useToken } from '../hooks/tokenHook';
+import { useController } from '../hooks/controllerHook';
+import { useCallTx } from '../hooks/chainHooks';
 
 const SeriesContext = React.createContext<any>({});
 
@@ -39,15 +46,15 @@ function reducer(state:any, action:any) {
 
 const SeriesProvider = ({ children }:any) => {
 
-  const { account, provider, fallbackProvider } = useSignerAccount();
-  const { chainId } = useWeb3React();
+  const { account, provider, fallbackProvider, chainId } = useSignerAccount();
+  // const { chainId } = useWeb3React();
   const [ state, dispatch ] = React.useReducer(reducer, initState);
   const { state: yieldState } = useContext(YieldContext);
   const { yieldLoading, deployedContracts } = yieldState;
 
-  const { previewPoolTx, checkPoolDelegate, checkPoolState } = usePool();
+  const { previewPoolTx, checkPoolState } = usePool();
   const { debtDai } = useController();
-  const { getBalance, getTokenAllowance } = useToken();
+  const { getBalance } = useToken();
 
   const [ callTx ] = useCallTx();
   const { calcAPR, poolPercent: calcPercent }  = useMath();
@@ -75,14 +82,15 @@ const SeriesProvider = ({ children }:any) => {
           await previewPoolTx('sellFYDai', _x, 1),
           await callTx(_x.poolAddress, 'Pool', 'totalSupply', []),
         ]);
+
         /* with user */
-        const [ poolTokens, hasPoolDelegatedProxy, hasPoolDelegatedAltProxy, hasDaiAuth, hasFyDaiAuth, hasCloseAuth, ethDebtDai, ethDebtFYDai, fyDaiBalance] =  account && await Promise.all([
+        const [ 
+          poolTokens, 
+          ethDebtDai, 
+          ethDebtFYDai, 
+          fyDaiBalance
+        ] =  account && await Promise.all([
           getBalance(_x.poolAddress, 'Pool', account),
-          checkPoolDelegate(_x.poolAddress, deployedContracts.YieldProxy),
-          checkPoolDelegate(_x.poolAddress, deployedContracts.PoolProxy),
-          getTokenAllowance(deployedContracts.Dai, _x.poolAddress, 'Dai'),
-          getTokenAllowance(_x.fyDaiAddress, deployedContracts.YieldProxy, 'FYDai'),
-          getTokenAllowance(_x.fyDaiAddress, _x.poolAddress, 'FYDai'),
           debtDai('ETH-A', _x.maturity ),
           callTx(deployedContracts.Controller, 'Controller', 'debtFYDai', [utils.ETH, _x.maturity, account]),
           getBalance(_x.fyDaiAddress, 'FYDai', account),
@@ -93,12 +101,6 @@ const SeriesProvider = ({ children }:any) => {
           sellFYDaiRate: !(sellFYDaiRate instanceof Error)? sellFYDaiRate : BigNumber.from('0'),
           totalSupply,
           poolTokens: poolTokens || BigNumber.from('0'),
-          hasPoolDelegatedProxy: hasPoolDelegatedProxy || false,
-          hasPoolDelegatedAltProxy: hasPoolDelegatedAltProxy || false,
-          hasDaiAuth: (hasDaiAuth && hasDaiAuth>0) || false, 
-          hasFyDaiAuth: (hasFyDaiAuth && hasFyDaiAuth>0) || false,
-          hasCloseAuth: (hasCloseAuth && hasCloseAuth>0) || false,
-          authComplete: ( !!hasDaiAuth && !!hasFyDaiAuth && !!hasPoolDelegatedProxy),
           ethDebtDai: ethDebtDai || BigNumber.from('0'),
           ethDebtFYDai : ethDebtFYDai || BigNumber.from('0'),
           fyDaiBalance : fyDaiBalance || BigNumber.from('0'),
@@ -191,6 +193,7 @@ const SeriesProvider = ({ children }:any) => {
 
   /* Actions for updating the series Context */
   const actions = {
+    updateAllSeries: () => updateSeries(yieldState.deployedSeries, false),
     updateSeries: (series:IYieldSeries[]) => updateSeries(series, false), /* updates one, or any number of series */
     updateActiveSeries: () => updateSeries([state.activeSeries], false), /* updates only the active series */
     setActiveSeries: (seriesMaturity:string) => dispatch({ type:'setActiveSeries', payload: state.seriesData.get(seriesMaturity) }),

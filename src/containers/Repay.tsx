@@ -13,16 +13,12 @@ import { cleanValue } from '../utils';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
 
-import {
-  useProxy,
-  useTxActive,
-  useSignerAccount,
-  useDebounce,
-  useIsLol,
-} from '../hooks';
+/* hook pack */
+import { useSignerAccount } from '../hooks/connectionHooks';
+import { useDebounce, useIsLol } from '../hooks/appHooks';
+import { useTxActive } from '../hooks/txHooks';
+import { useBorrowProxy } from '../hooks/borrowProxyHook';
 
-import ApprovalPending from '../components/ApprovalPending';
-import TxStatus from '../components/TxStatus';
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
 import RaisedButton from '../components/RaisedButton';
@@ -33,12 +29,10 @@ import DaiMark from '../components/logos/DaiMark';
 import YieldMobileNav from '../components/YieldMobileNav';
 
 interface IRepayProps {
-  repayAmount?:any
-  setActiveView?: any;
   close?:any;
 }
 
-function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
+function Repay({ close }:IRepayProps) {
 
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
   const { activeSeries } = seriesState;
@@ -46,7 +40,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
   const { daiBalance } = userState.position;
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
-  const { repayDaiDebt, repayActive } = useProxy();
+  const { repayDaiDebt } = useBorrowProxy();
   const [ txActive ] = useTxActive(['repay']);
   const { account } = useSignerAccount();
 
@@ -55,8 +49,6 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
   const [inputRef, setInputRef] = useState<any>(null);
 
   const [maxRepay, setMaxRepay] = useState<any>();
-
-  const [ repayPending, setRepayPending ] = useState<boolean>(false);
   const [ repayDisabled, setRepayDisabled ] = useState<boolean>(true);
 
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
@@ -65,7 +57,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
 
   const repayProcedure = async (value:number) => {
     if (!repayDisabled) {
-      setRepayPending(true);
+      !activeSeries?.isMature() && close();
       /* repay using proxy */
       await repayDaiDebt(activeSeries, 'ETH-A', value);
       setInputValue(undefined);
@@ -78,9 +70,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
       } else {
         userActions.updatePosition();
         seriesActions.updateActiveSeries();
-      }
-      setRepayPending(false);
-      !activeSeries?.isMature() && close();    
+      }      
     }
   };
 
@@ -162,7 +152,7 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
                             label: 'Total amount owed',
                             visible: false,
                             active: true,
-                            loading: repayPending,    
+                            loading: false,    
                             value: activeSeries?.ethDebtFYDai_? `${activeSeries?.ethDebtFYDai_} DAI`: '0 DAI',
                             valuePrefix: null,
                             valueExtra: null, 
@@ -239,8 +229,9 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
             </Box>
           </Box>
         </Box>}
-      { repayActive && !txActive && <ApprovalPending /> }
-      { txActive && <TxStatus tx={txActive} /> }
+
+      {/* { repayActive && !txActive && <ApprovalPending /> }
+      { txActive && <TxStatus tx={txActive} /> } */}
 
       {mobile && 
       !activeSeries?.isMature() &&
@@ -260,6 +251,6 @@ function Repay({ setActiveView, repayAmount, close }:IRepayProps) {
   );
 }
 
-Repay.defaultProps = { repayAmount:null, setActiveView: 2, close:()=>null };
+Repay.defaultProps = { close:()=>null };
 
 export default Repay;

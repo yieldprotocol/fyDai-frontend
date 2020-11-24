@@ -1,4 +1,5 @@
 import { ethers, BigNumber } from 'ethers';
+import { IYieldSeries } from '../types';
 
 /* constants */
 export const BN_RAY = BigNumber.from('1000000000000000000000000000');
@@ -50,6 +51,11 @@ export const cleanValue = (input:string, decimals:number=12) => {
     return inpu[1];
   }
   return input.valueOf();
+};
+
+/* creates internal tracking code of a transaction type */
+export const genTxCode = (txType: string, series:IYieldSeries|null) => {
+  return `${txType}${series?.maturity || ''}`; 
 };
 
 /* handle Address/hash shortening */

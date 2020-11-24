@@ -19,7 +19,7 @@ const YieldContext = createContext<any>({});
 
 /**
  * Gets the addresses from the provided contract names
- * @param {string[]} contractNameList list of contract names registered in the migrations contract.
+ * @param {string[]} contractNameList list of contract names registered.
  * @returns {Promise<Map>} keyed with contract names
  */
 const getAddresses = (
@@ -48,8 +48,10 @@ const contractList = [
   'Treasury',
   'Dai',
   'Vat',
-  'YieldProxy',
   'PoolProxy',
+  'BorrowProxy',
+  'ProxyRegistry',
+  'ProxyFactory',
 ];
 
 // reducer
@@ -121,22 +123,18 @@ const YieldProvider = ({ children }: any) => {
     forceUpdate: boolean
   ): Promise<any[]> => {
     const _deployedSeries: any[] = [];
-    let _deployedContracts: any;
 
     if (chainId === undefined) {
       chainId = (await fallbackProvider.getNetwork()).chainId;
     }
 
-    /* Load yield core contract addresses */
-    if ( !cachedContracts || forceUpdate) {
-      _deployedContracts = getAddresses(contractList, chainId!);
-      window.localStorage.removeItem('deployedContracts');
-      setCachedContracts(_deployedContracts);
-      // eslint-disable-next-line no-console
-      console.log('Yield contract addresses updated:', _deployedContracts);
-    } else {
-      _deployedContracts = cachedContracts;
-    }
+    /* Load/Read yield core contract addresses */
+    const _deployedContracts = getAddresses(contractList, chainId!);
+    window.localStorage.removeItem('deployedContracts');
+    setCachedContracts(_deployedContracts);
+    // eslint-disable-next-line no-console
+    console.log('Yield contract addresses:', _deployedContracts);
+
     /* Load series specific contract addrs */
     const fyDaiList = getFyDaiNames(chainId!);
     if (!cachedSeries || (cachedSeries.length !== fyDaiList.length) || forceUpdate) {
@@ -219,7 +217,6 @@ const YieldProvider = ({ children }: any) => {
   };
 
   const init = async () => {
-    
     /* Init start */
     dispatch({ type: 'isLoading', payload: true });
 
@@ -244,7 +241,7 @@ const YieldProvider = ({ children }: any) => {
     } catch (e) {
       notifyDispatch({
         type: 'notify',
-        payload: { message: 'Error Accessing the Yield Protocol. Please check your network connection.' },
+        payload: { message: 'Error Accessing the Yield Protocol: Network issues' },
       });
       // eslint-disable-next-line no-console
       console.log(e);

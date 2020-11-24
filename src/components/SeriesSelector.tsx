@@ -88,15 +88,12 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
         fill
         background='background'
         pad={{ horizontal: 'medium', vertical:'large' }}
-        gap='medium'
+        gap='large'
         width={!mobile?{ min:'620px', max:'620px' }: undefined}
       >
-        <Box gap='small'>
-          <Box direction='row' gap='medium' align='center'>
-            <Box onClick={() => close()}><ArrowLeft /></Box>
-            <Text weight='bold' size={mobile?'small':'medium'}> Choose a Series</Text>
-          </Box>
-          <Text alignSelf='start' size={mobile?'xxsmall':'small'} color='text-weak'>Select a series from the list below</Text>
+        <Box direction='row' gap='large' align='center'>
+          { mobile && <Box onClick={() => close()}><ArrowLeft /></Box>}
+          <Text weight='bold' size={mobile?'small':'medium'}> Choose a Series</Text>
         </Box>
 
         <InsetBox 
@@ -111,21 +108,21 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
             // background={modColor(defaultBackground, -10)}
           >
             <Box basis={mobile?'30%':'30%'}>
-              <Text alignSelf='start' size='small' color='text-weak'>APR</Text>
+              <Text alignSelf='start' size='small' color='text-weak' weight='bold'>APR</Text>
             </Box>
             <Box fill='horizontal' direction='row' justify='between' gap='small'>
               <Box fill align={mobile?'end':undefined}>
-                <Text size={mobile? 'xsmall':'small'} color='text-weak'>{mobile? 'SERIES' : 'SERIES MATURITY'}</Text>
+                <Text size={mobile? 'xsmall':'small'} color='text-weak' weight='bold'>{mobile? 'SERIES' : 'SERIES MATURITY'}</Text>
               </Box>
               <Box fill align={mobile?'end':undefined}>
-                <Text size={mobile? 'xsmall':'small'} color='text-weak'>
+                <Text size={mobile? 'xsmall':'small'} color='text-weak' weight='bold' >
                   { viewMap.get(activeView.toUpperCase())?.head }         
                 </Text>
               </Box>
             </Box>
             { !mobile && 
               <Box direction='row' justify='end' basis='25%'>
-                <Text size={mobile? 'xsmall':'small'} color='text-weak'> </Text>
+                <Text size={mobile? 'xsmall':'small'} color='text-weak' weight='bold'> </Text>
               </Box>}
           </Box>
 

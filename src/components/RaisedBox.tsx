@@ -10,7 +10,7 @@ border-radius: 8px;
 
 ${(props:any) => props.background && css`
      background: ${ props.background };
-     box-shadow:  8px 8px 11px ${modColor(props.background, -20)}, 
+     box-shadow:  8px 8px 11px ${modColor(props.background, -10)}, 
              -8px -8px 11px ${modColor(props.background, 10)};
 }
 `}

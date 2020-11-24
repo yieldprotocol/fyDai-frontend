@@ -9,13 +9,14 @@ import { yieldTheme } from './themes';
 import { modColor } from './utils';
 
 import { SeriesContext } from './contexts/SeriesContext';
-import { YieldContext } from './contexts/YieldContext';
 import { NotifyContext } from './contexts/NotifyContext';
+import { UserContext } from './contexts/UserContext';
 
-import { useCachedState } from './hooks';
+import { useCachedState } from './hooks/appHooks';
 
-import ConnectLayer from './containers/layers/ConnectLayer';
-import NotifyLayer from './containers/layers/NotifyLayer';
+import ConnectLayer from './layers/ConnectLayer';
+import NotifyLayer from './layers/NotifyLayer';
+import TxLayer from './layers/TxLayer';
 
 import Borrow from './containers/Borrow';
 import Lend from './containers/Lend';
@@ -28,13 +29,14 @@ import RemoveLiquidity from './containers/RemoveLiquidity';
 
 import YieldHeader from './components/YieldHeader';
 import YieldFooter from './components/YieldFooter';
-import Authorization from './components/Authorization';
+
 import ErrorBoundary from './components/ErrorBoundry';
 import YieldNav from './components/YieldNav';
 
 const App = (props:any) => {
-  const { state: { seriesLoading, activeSeries } } = useContext(SeriesContext);
-  const { state: { yieldLoading } } = useContext(YieldContext);
+
+  const { state: { seriesLoading, activeSeries }, actions: seriesActions } = useContext(SeriesContext);
+  const { actions: userActions } = useContext(UserContext);
   const { dispatch } = useContext(NotifyContext);
   const [ cachedLastVisit, setCachedLastVisit ] = useCachedState('lastVisit', null);
 
@@ -74,9 +76,23 @@ const App = (props:any) => {
     });
   }, []);
 
+  useEffect(()=>{
+    window.addEventListener('offline', () => {
+      console.log('I am offline.');
+      dispatch({ type:'notify', payload:{ message:'App offline', type:'error' } });
+    });
+
+    window.addEventListener('online', () => {
+      dispatch({ type:'notify', payload:{ message:'Back Online', type:'success' } });
+      seriesActions.updateAllSeries();
+      userActions.updatePosition();
+      userActions.updateAuthorizations();
+    });
+  }, []);
+
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   const leftSideRef = useRef<any>(null);
-  const [showConnectLayer, setShowConnectLayer] = useState<string|null>(null);
+  const [ showConnectLayer, setShowConnectLayer ] = useState<string|null>(null);
 
   return (
     <div
@@ -96,10 +112,9 @@ const App = (props:any) => {
 
       <ConnectLayer view={showConnectLayer} closeLayer={() => setShowConnectLayer(null)} />
 
-      {!yieldLoading &&
-        <Collapsible open={!seriesLoading} ref={leftSideRef}>
-          <Authorization />
-        </Collapsible>}
+      <Collapsible open={!seriesLoading} ref={leftSideRef}>
+        <TxLayer />
+      </Collapsible>
 
       <NotifyLayer target={!mobile?leftSideRef.current:undefined} />
 
@@ -142,21 +157,20 @@ const App = (props:any) => {
 };
 
 const WrappedApp = () => {
-  const [ darkMode, setDarkMode ] = useState(true);
-  const [ moodLight, setMoodLight] = useState(true);
+  const [ userPreferences, setUserPreferences ] = useCachedState('userPreferences', { moodLight:true, darkMode:true });
   return (
     <Suspense fallback={null}>
       <Grommet
         theme={deepMerge(base, yieldTheme)}
-        themeMode={darkMode ? 'dark' : 'light'}
+        themeMode={userPreferences?.darkMode ? 'dark' : 'light' || 'light'}
         full
       >
         <ErrorBoundary>
           <App 
-            darkMode={darkMode}
-            setDarkMode={setDarkMode}
-            moodLight={darkMode?false:moodLight}
-            toggleMoodLight={()=>setMoodLight(!moodLight)}
+            darkMode={userPreferences?.darkMode}
+            setDarkMode={()=>setUserPreferences({ ...userPreferences, darkMode: !userPreferences?.darkMode })}
+            moodLight={userPreferences?.darkMode? false: userPreferences?.moodLight}
+            toggleMoodLight={()=>setUserPreferences({ ...userPreferences, moodLight: !userPreferences?.moodLight })}
           />
         </ErrorBoundary>
       </Grommet>
