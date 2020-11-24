@@ -52,28 +52,29 @@ const App = (props:any) => {
 
   /* Serivce Worker registraion and handle app updates and user confirmations */
   useEffect(()=>{
-    serviceWorker.register({ 
-      onUpdate: (registration:any)=> {
-        // eslint-disable-next-line no-console
-        console.log( 'A new version of the app is available' );
-        dispatch({ 
-          type: 'updateAvailable',
-          payload: { 
-            updateAvailable:true,
-            updateAccept: ()=> { 
-              registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-              /* Clear the cache (except user Preferences) on update - in future, save user preferences */
-              localStorage.removeItem('deployedContracts');
-              localStorage.removeItem('lastFeed');
-              localStorage.removeItem('deployedSeries');
-              localStorage.removeItem('cache_chainId');
-              localStorage.removeItem('txHistory');
-              window.location.reload();
-            },    
-          },
-        });
-      } 
-    });
+    // serviceWorker.register({ 
+    //   onUpdate: (registration:any)=> {
+    //     // eslint-disable-next-line no-console
+    //     console.log( 'A new version of the app is available' );
+    //     dispatch({ 
+    //       type: 'updateAvailable',
+    //       payload: { 
+    //         updateAvailable:true,
+    //         updateAccept: ()=> { 
+    //           registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+    //           /* Clear the cache (except user Preferences) on update - in future, save user preferences */
+    //           localStorage.removeItem('deployedContracts');
+    //           localStorage.removeItem('lastFeed');
+    //           localStorage.removeItem('deployedSeries');
+    //           localStorage.removeItem('cache_chainId');
+    //           localStorage.removeItem('txHistory');
+    //           window.location.reload();
+    //         },    
+    //       },
+    //     });
+    //   } 
+    // });
+    serviceWorker.unregister();
   }, []);
 
   useEffect(()=>{
