@@ -98,18 +98,28 @@ const TxLayer = () => {
           justify='between'
           margin={mobile?{ bottom:'-10px' }:undefined}
         >
-          <Box>
-            <Text size={mobile?'xsmall': undefined}>Feel free to look around and play. However, before you make any transactions you will need connect a proxy account </Text>
-          </Box>  
+
+
           { 
-          !pendingTxs.some((x:any) => (x.type === 'CREATE_PROXY') && (x.series === null) )?
-            <RaisedButton 
-              background='#555555'
-              label={<Box pad={{ horizontal:'small', vertical:'xsmall' }} align='center'><Text size='small' color='#DDDDDD'><Unlock /> Create Vault</Text></Box>}
-              onClick={()=>buildProxyProcedure()}
-            />
+          !pendingTxs.some((x:any) => x.type === 'CREATE_PROXY')?
+            <>
+              <Box>
+                <Text size={mobile?'xsmall': undefined}>Feel free to look around and play. However, before you make any transactions you will need connect a proxy account </Text>
+              </Box>  
+              <RaisedButton 
+                background='#555555'
+                label={<Box pad={{ horizontal:'small', vertical:'xsmall' }} align='center'><Text size='small' color='#DDDDDD'><Unlock /> Create Proxy</Text></Box>}
+                onClick={()=>buildProxyProcedure()}
+              />
+            </>
             :
-            <Box pad={{ horizontal:'small', vertical:'xsmall' }} align='center'><Text size='small' color='#DDDDDD'><Unlock />Pending...</Text></Box>
+            <>
+              <Box>
+                <Text size={mobile?'xsmall': undefined}>Building your Yield proxy. </Text>
+              </Box> 
+
+              <Box pad={{ horizontal:'small', vertical:'xsmall' }} align='center'><Text size='small' color='#DDDDDD'><Unlock />Pending...</Text></Box>
+            </>
           }
         </Box>
       }

@@ -122,12 +122,13 @@ export const usePoolProxy = () => {
         fallbackFn: () => addControllerDelegate(dsProxyAddress),
       });
 
+    // dsProxy must be spender
     requestedSigs.set('daiSig',
       { id: genTxCode('AUTH_TOKEN', series),
         desc: 'Authorise Yield with Dai',
         conditional: (await getTokenAllowance(deployedContracts.Dai, 'Dai', dsProxyAddress)) > 0,
         signFn: () => daiPermitSignature(deployedContracts.Dai, dsProxyAddress), 
-        fallbackFn: () => approveToken(deployedContracts.Dai, dsProxyAddress, utils.MAX_INT, series ),
+        fallbackFn: () => approveToken(deployedContracts.Dai, dsProxyAddress, utils.MAX_INT, series), // executed as user!
       });
   
     /* Send the required signatures out for signing, or approval tx if fallback is required */

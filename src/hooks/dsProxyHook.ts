@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from 'react';
+import { useState, useContext } from 'react';
 import { ethers }  from 'ethers';
 
 import { ITx } from '../types';

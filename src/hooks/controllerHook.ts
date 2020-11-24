@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useState, useContext } from 'react';
+import { useMemo, useState, useContext } from 'react';
 import { ethers, BigNumber }  from 'ethers';
 
 import { YieldContext } from '../contexts/YieldContext';
