@@ -51,7 +51,6 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
   const [inputRef, setInputRef] = useState<any>(null);
 
   const [ removeLiquidityDisabled, setRemoveLiquidityDisabled ] = useState<boolean>(true);
-  const [ removeLiquidityPending, setRemoveLiquidityPending] = useState<boolean>(false);
 
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
@@ -60,7 +59,7 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
   /* Remove Liquidity sequence */
   const removeLiquidityProcedure = async (value:number) => {
     if ( !removeLiquidityDisabled ) {
-      setRemoveLiquidityPending(true);
+      !activeSeries?.isMature() && close();
       if (activeSeries?.isMature()) {
         await removeLiquidity(activeSeries, value);
         setInputValue(undefined);
@@ -70,15 +69,12 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
           seriesActions.updateActiveSeries()
         ]);
       } else {
-        close();
         await removeLiquidity(activeSeries, value);
         setInputValue(undefined);
         userActions.updateHistory();
         userActions.updatePosition();
         seriesActions.updateActiveSeries();
       }
-      setRemoveLiquidityPending(false);
-      !activeSeries?.isMature() && close();
     }
   };
 
@@ -138,7 +134,7 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
       }}
       target='document'
     >
-      {!txActive && !removeLiquidityPending && 
+      {!txActive &&  
       <Box 
         width={!mobile?{ min:'600px', max:'600px' }: undefined}
         alignSelf='center'
@@ -251,7 +247,7 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
           >
             <Box direction='row' gap='small' align='center'>
               <ArrowLeft color='text-weak' />
-              <Text size='xsmall' color='text-weak'> { !removeLiquidityPending? 'cancel, and go back.': 'go back'}  </Text>
+              <Text size='xsmall' color='text-weak'> go back </Text>
             </Box>
           </Box>
         </Box>

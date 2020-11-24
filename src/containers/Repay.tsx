@@ -49,8 +49,6 @@ function Repay({ close }:IRepayProps) {
   const [inputRef, setInputRef] = useState<any>(null);
 
   const [maxRepay, setMaxRepay] = useState<any>();
-
-  const [ repayPending, setRepayPending ] = useState<boolean>(false);
   const [ repayDisabled, setRepayDisabled ] = useState<boolean>(true);
 
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
@@ -59,7 +57,7 @@ function Repay({ close }:IRepayProps) {
 
   const repayProcedure = async (value:number) => {
     if (!repayDisabled) {
-      setRepayPending(true);
+      !activeSeries?.isMature() && close();
       /* repay using proxy */
       await repayDaiDebt(activeSeries, 'ETH-A', value);
       setInputValue(undefined);
@@ -72,9 +70,7 @@ function Repay({ close }:IRepayProps) {
       } else {
         userActions.updatePosition();
         seriesActions.updateActiveSeries();
-      }
-      setRepayPending(false);
-      !activeSeries?.isMature() && close();    
+      }      
     }
   };
 
@@ -156,7 +152,7 @@ function Repay({ close }:IRepayProps) {
                             label: 'Total amount owed',
                             visible: false,
                             active: true,
-                            loading: repayPending,    
+                            loading: false,    
                             value: activeSeries?.ethDebtFYDai_? `${activeSeries?.ethDebtFYDai_} DAI`: '0 DAI',
                             valuePrefix: null,
                             valueExtra: null, 

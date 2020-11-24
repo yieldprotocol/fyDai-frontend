@@ -35,6 +35,7 @@ import HistoryWrap from '../components/HistoryWrap';
 import DaiMark from '../components/logos/DaiMark';
 import RaisedBox from '../components/RaisedBox';
 import YieldMobileNav from '../components/YieldMobileNav';
+import Loading from '../components/Loading';
 
 interface ILendProps {
   openConnectLayer:any;
@@ -57,6 +58,10 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
   const { calcAPR } = useMath();
   const { account, fallbackProvider } = useSignerAccount();
   const [ txActive ] = useTxActive(['SELL_DAI']);
+
+  const [ closeTxActive ] = useTxActive(['BUY_DAI']);
+
+
 
   const [ hasDelegated ] = useState<boolean>(true);
 
@@ -342,20 +347,27 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
                   />
                 </Box>
               }
-
               { !activeSeries?.isMature() && 
                 activeSeries?.fyDaiBalance_ > 0 &&
                 !mobile &&
                 <Box alignSelf='end' margin={{ top:'medium' }}>
-                  <FlatButton 
-                    onClick={()=>setCloseDaiOpen(true)}
-                    label={
-                      <Box direction='row' gap='small' align='center'>
-                        <Box><Text size='xsmall' color='text-weak'><Text weight='bold' color={activeSeries?.seriesColor}>close</Text> your position in this series</Text></Box>
-                        <ArrowRight color='text-weak' />
-                      </Box>
-                    }
-                  />
+                  { closeTxActive ?
+                    <Box direction='row' gap='small'>
+                      <Text size='xsmall' color='text-weak'>
+                        <Text weight='bold' color={activeSeries?.seriesColor}>close</Text> pending
+                      </Text>
+                      <Loading condition={true} size='xxsmall'>.</Loading>
+                    </Box>
+                    : 
+                    <FlatButton 
+                      onClick={()=>setCloseDaiOpen(true)}
+                      label={
+                        <Box direction='row' gap='small' align='center'>
+                          <Box><Text size='xsmall' color='text-weak'><Text weight='bold' color={activeSeries?.seriesColor}>close</Text> your position in this series</Text></Box>
+                          <ArrowRight color='text-weak' />
+                        </Box>
+                        }
+                    />}
                 </Box>}
             </Box>
 

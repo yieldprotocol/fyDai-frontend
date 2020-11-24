@@ -33,6 +33,7 @@ import TxHistory from '../components/TxHistory';
 import HistoryWrap from '../components/HistoryWrap';
 import RaisedBox from '../components/RaisedBox';
 import YieldMobileNav from '../components/YieldMobileNav';
+import Loading from '../components/Loading';
 
 interface IBorrowProps {
   borrowAmount?:number|null;
@@ -70,6 +71,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
   const { account } = useSignerAccount();
 
   const [ txActive ] = useTxActive(['BORROW']);
+  const [ repayTxActive ] = useTxActive(['REPAY']);
 
   /* flags */
   const [ repayOpen, setRepayOpen ] = useState<boolean>(false);
@@ -80,12 +82,12 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
     setShowTxPending( txActive?.txCode === genTxCode('BORROW', activeSeries));
   }, [txActive, activeSeries]);
 
+
   /* input values */
   const [ inputValue, setInputValue ] = useState<any|undefined>(amnt || undefined);
   const debouncedInput = useDebounce(inputValue, 500);
 
   /* internal component state */
-  const [ borrowPending, setBorrowPending ] = useState<boolean>(false);
   const [ borrowDisabled, setBorrowDisabled ] = useState<boolean>(true);
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
@@ -101,7 +103,6 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
   /* Borrow execution flow */
   const borrowProcedure = async () => {
     if (inputValue && !borrowDisabled) {
-      setBorrowPending(true);
       await borrowDai(activeSeries, 'ETH-A', inputValue);
       setInputValue(undefined);
       userActions.updateHistory();
@@ -109,7 +110,6 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
         userActions.updatePosition(),
         seriesActions.updateSeries([activeSeries])
       ]);
-      setBorrowPending(false);
     }
   };
 
@@ -191,6 +191,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
         }}
         target='document'
       >
+
         { repayOpen && 
         <Layer
           onClickOutside={()=>setRepayOpen(false)}
@@ -198,6 +199,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
         >
           <Repay close={()=>setRepayOpen(false)} />      
         </Layer>}
+
 
         { histOpen && 
         <HistoryWrap closeLayer={()=>setHistOpen(false)}>
@@ -494,24 +496,36 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
                 />
               </Box>}
             
-              { !activeSeries?.isMature() &&
+              { 
+                !activeSeries?.isMature() &&
                 activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) &&
                 !mobile &&
                 <Box alignSelf='end' margin={{ top:'medium' }}>
-                  <FlatButton 
-                    onClick={()=>setRepayOpen(true)}
-                    label={
-                      <Box direction='row' gap='small' align='center'>
-                        <Box>
-                          <Text size='xsmall' color='text-weak'>
-                            <Text weight='bold' color={activeSeries?.seriesColor}>repay</Text> series debt
-                          </Text>
+                  {
+                  repayTxActive ?
+                    <Box direction='row' gap='small'>
+                      <Text size='xsmall' color='text-weak'>
+                        <Text weight='bold' color={activeSeries?.seriesColor}>repay</Text> pending
+                      </Text>
+                      <Loading condition={true} size='xxsmall'>.</Loading>
+                    </Box>
+                    : 
+                    <FlatButton 
+                      onClick={()=>setRepayOpen(true)}
+                      label={
+                        <Box direction='row' gap='small' align='center'>
+                          <Box>
+                            <Text size='xsmall' color='text-weak'>
+                              <Text weight='bold' color={activeSeries?.seriesColor}>repay</Text> series debt
+                            </Text>
+                          </Box>
+                          <ArrowRight color='text-weak' />
                         </Box>
-                        <ArrowRight color='text-weak' />
-                      </Box>
-                }
-                  />
-                </Box>}
+                    }
+                    />                
+                  }
+                </Box>
+              }
             </Box>
 
           </Box>

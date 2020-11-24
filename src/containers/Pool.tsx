@@ -35,6 +35,7 @@ import RaisedBox from '../components/RaisedBox';
 
 import DaiMark from '../components/logos/DaiMark';
 import YieldMobileNav from '../components/YieldMobileNav';
+import Loading from '../components/Loading';
 
 interface IPoolProps {
   openConnectLayer:any;
@@ -61,6 +62,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
 
   const { account } = useSignerAccount();
   const [ txActive ] = useTxActive(['ADD_LIQUIDITY', 'REMOVE_LIQUIDITY']);
+  const [ removeTxActive ] = useTxActive(['REMOVE_LIQUIDITY']);
 
   const [ hasDelegated ] = useState<boolean>(true);
 
@@ -73,7 +75,6 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
 
   const [ addLiquidityDisabled, setAddLiquidityDisabled ] = useState<boolean>(true);
 
-  const [ addLiquidityPending, setAddLiquidityPending ] = useState<boolean>(false);
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
   const isLol = useIsLol(inputValue);
@@ -81,7 +82,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
   /* Add Liquidity sequence */ 
   const addLiquidityProcedure = async () => { 
     if (inputValue && !addLiquidityDisabled ) {
-      setAddLiquidityPending(true);
+ 
       await addLiquidity( activeSeries, inputValue );
       setInputValue(undefined);
       userActions.updateHistory();
@@ -89,7 +90,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
         userActions.updatePosition(),
         seriesActions.updateActiveSeries()
       ]);
-      setAddLiquidityPending(false);
+
     }   
   };
 
@@ -316,15 +317,26 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                 activeSeries?.poolTokens_>0 &&
                 !mobile && 
                 <Box alignSelf='end' margin={{ top:'medium' }}>
-                  <FlatButton 
-                    onClick={()=>setRemoveLiquidityOpen(true)}
-                    label={
-                      <Box direction='row' gap='small' align='center'>
-                        <Text size='xsmall' color='text-weak'><Text weight='bold' color={activeSeries?.seriesColor}>Remove Liquidity</Text> from this series</Text>
-                        <ArrowRight color='text-weak' />
-                      </Box>
-                }
-                  />
+                  {
+                  removeTxActive ?
+                    <Box direction='row' gap='small'>
+                      <Text size='xsmall' color='text-weak'>
+                        <Text weight='bold' color={activeSeries?.seriesColor}>remove Liquidity</Text> pending
+                      </Text>
+                      <Loading condition={true} size='xxsmall'>.</Loading>
+                    </Box>
+                    : 
+                    <FlatButton 
+                      onClick={()=>setRemoveLiquidityOpen(true)}
+                      label={
+                        <Box direction='row' gap='small' align='center'>
+                          <Text size='xsmall' color='text-weak'><Text weight='bold' color={activeSeries?.seriesColor}>remove Liquidity</Text> from this series</Text>
+                          <ArrowRight color='text-weak' />
+                        </Box>
+                      }
+                    />               
+                  }
+
                 </Box>}
             </Box>
 

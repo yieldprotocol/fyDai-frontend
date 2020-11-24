@@ -51,7 +51,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
 
   const [ maxWithdraw, setMaxWithdraw ] = useState<string>();
   
-  const [ withdrawDisabled, setWithdrawDisabled ] = useState<boolean>(true);
+  const [ closeDisabled, setCloseDisabled ] = useState<boolean>(true);
   const [ CloseDaiPending, setCloseDaiPending] = useState<boolean>(false);
 
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
@@ -59,7 +59,9 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
   const isLol = useIsLol(inputValue);
 
   const withdrawProcedure = async () => {
-    if ( !withdrawDisabled ) {
+    if ( !closeDisabled ) {
+
+      !activeSeries?.isMature() && close();
       setCloseDaiPending(true);
       await buyDai(
         activeSeries,
@@ -70,7 +72,6 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
       userActions.updatePosition();
       seriesActions.updateActiveSeries();
       setCloseDaiPending(false);
-      close();
     }
   };
 
@@ -89,7 +90,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
       !account ||
       !inputValue || 
       parseFloat(inputValue) <= 0
-    ) ? setWithdrawDisabled(true): setWithdrawDisabled(false);
+    ) ? setCloseDisabled(true): setCloseDisabled(false);
   }, [ inputValue ]);
 
   /* show warnings and errors with collateralization ratio levels and inputs */
@@ -146,7 +147,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
           <ActionButton
             onClick={()=> withdrawProcedure()}
             label={`Reclaim ${inputValue || ''} Dai`}
-            disabled={withdrawDisabled}
+            disabled={closeDisabled}
             hasPoolDelegatedProxy={activeSeries.hasPoolDelegatedProxy}
             clearInput={()=>setInputValue(undefined)}
           />

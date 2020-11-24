@@ -74,6 +74,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
   const { postEth }  = useBorrowProxy();
   const { estCollRatio: estimateRatio, collValue } = useMath();
   const [ txActive ] = useTxActive(['POST', 'WITHDRAW']);
+
   const { account } = useSignerAccount();
 
   const [ inputValue, setInputValue ] = useState<any>(amnt || undefined);
@@ -356,16 +357,18 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
             { ethPosted_ > 0 &&
               txActive?.type === 'WITHDRAW' ?
                 <Box direction='row' gap='small'>
-                  <Text size='xsmall' color='text-weak'><Text weight='bold'>Withdraw</Text> pending</Text>
+                  <Text size='xsmall' color='text-weak'><Text weight='bold'>withdraw</Text> pending</Text>
                   <Loading condition={true} size='xxsmall'>.</Loading>
-                </Box> :
+                </Box> 
+              :
                 <FlatButton 
                   onClick={()=>setWithdrawOpen(true)} 
                   label={
                     <Box direction='row' gap='small' align='center'>
-                      <Box><Text size='xsmall' color='text-weak'><Text weight='bold'>Withdraw</Text> collateral</Text></Box>
+                      <Box><Text size='xsmall' color='text-weak'><Text weight='bold'>withdraw</Text> collateral</Text></Box>
                       <ArrowRight color='text-weak' />
-                    </Box>}
+                    </Box>
+                  }
                 />}
           </Box>}        
         </Box>}
