@@ -75,7 +75,7 @@ export const useBorrowProxy = () => {
   /* Preset the yieldProxy and contorller contracts to be used with all fns */
   const [ proxyContract, setProxyContract] = useState<any>();
   const [ controllerContract, setControllerContract ] = useState<any>();
-  useEffect(()=>{
+  useEffect(()=> {
     deployedContracts?.BorrowProxy && signer &&
     setProxyContract( new ethers.Contract( 
       ethers.utils.getAddress(deployedContracts?.BorrowProxy), 

@@ -8,7 +8,6 @@ import {
   FiArrowLeft as ArrowLeft,
 } from 'react-icons/fi';
 
-import { IYieldSeries } from '../types';
 import { TxContext } from '../contexts/TxContext';
 import { UserContext } from '../contexts/UserContext';
 import { SeriesContext } from '../contexts/SeriesContext';
@@ -42,6 +41,7 @@ const TxLayer = () => {
   // flags
   const [ allSigned, setAllSigned ] = useState<boolean>(false); // tracking signatures
   const [ allComplete, setAllComplete ] = useState<boolean>(false); // tracking if all required authorizations are complete
+  const [ processIsCurrentTx, setProcessIsCurrentTx ] = useState<boolean>(false);
   const [ layerOpen, setLayerOpen ] = useState<boolean>(false);
 
   const buildProxyProcedure = async () => {
@@ -62,7 +62,7 @@ const TxLayer = () => {
   /* set layer open if a txs is in process - but bypassable with closeAuth() */
   useEffect(()=>{
     !!txProcessActive && setLayerOpen(true);
-  }, [txProcessActive]);
+  }, [txProcessActive, ]);
 
   /* set Sigs status ( All previously complete or all been signed ) */
   useEffect(()=>{
@@ -79,12 +79,16 @@ const TxLayer = () => {
     }
   }, [requestedSigs]);
 
+  /* determine if the current action/process is already processing */
+  useEffect(()=>{
+    txProcessActive && setProcessIsCurrentTx(txActive?.txCode === txProcessActive);
+  }, [txProcessActive, txActive]);
+
+
   return (
     <>
-      {/* This following section is the 'non-layer' notification section. 
-It is only shown on main view if the user doesn't have a dsProxy */}
-      {     
-      account && !authorization.hasDsProxy &&
+      { // This following section is the 'non-layer' notification section. It is only shown on main view if the user doesn't have a dsProxy
+        account && !authorization.hasDsProxy &&
         <Box
           fill='horizontal'
           pad={mobile?{ horizontal:'medium', top:'medium', bottom:'large' }:{ horizontal:'xlarge', vertical:'medium' }}
@@ -109,10 +113,9 @@ It is only shown on main view if the user doesn't have a dsProxy */}
           }
         </Box>
       }
-
-      {/* This following section is the 'layer' section. 
-It is only shown when there is a transaction in progress or signature required */}    
-      { txProcessActive && layerOpen &&
+  
+      { //  This following section is the 'layer' section. It is only shown when there is a transaction in progress or signature required
+        txProcessActive && layerOpen &&
         <Layer
           modal={true}
           responsive={mobile?false: undefined}
@@ -127,10 +130,11 @@ It is only shown when there is a transaction in progress or signature required *
           >
 
             { 
-            requestedSigs.length>0 &&
-            !allComplete && 
-            !(txActive?.txCode === txProcessActive) &&
             !fallbackActive &&
+            !allComplete && 
+            !processIsCurrentTx &&
+            requestedSigs.length>0 &&
+            
             <>
               <Box gap='medium'>
                 { allSigned ? 
@@ -166,127 +170,154 @@ It is only shown when there is a transaction in progress or signature required *
                     </Box>
                   );
                 })}
-                { allSigned &&
+                { 
+                  !processIsCurrentTx &&
+                  allSigned && 
                   <Text> 
                     Finally, please check your wallet or provider to approve the transaction.
-                  </Text>}
+                  </Text>
+                }
               </Box>
             </>
             }
 
-
-            { requestedSigs.length>0 && 
-            !allComplete && 
+            { // the fallback authentication method is being used (either by choice, or signing error fallback): 
             fallbackActive &&
-            <Box gap='medium'> 
+            !allComplete && 
+            requestedSigs.length>0 && 
 
-              {preferences?.useTxApproval ? 
-                <Text weight='bold'>Please approve the following authorization transactions: </Text>
-                :
-                <Box gap='medium'>
-                  <Box>
-                    <Text weight='bold'>It seems there was a problem signing the authorization.</Text>
-                    {!mobile && <Text size='xsmall'>( Its not your fault, some wallets don't provide signing functionality just yet :| )</Text>}
-                  </Box>
-                  <Box>
-                    <Text size='small'>You can continue by approving the set of authorization transactions individually with your wallet or provider:</Text>
-                  </Box>
-                </Box>}
+            <Box gap='medium'> 
+              {
+                preferences?.useTxApproval ?
+                  <>
+                    <Text weight='bold'> { !allSigned? 'Please approve the following authorization transactions:': 'The required authorisations have all been granted:'} </Text> 
+                  </>        
+                  :
+                  <>
+                    <Box gap='medium'>
+                      <Box>
+                        <Text weight='bold'>It seems there was a problem signing the authorization.</Text>
+                        {!mobile && <Text size='xsmall'>( Its not your fault, some wallets don't provide signing functionality just yet :| )</Text>}
+                      </Box>
+                      <Box>
+                        <Text size='small'>You can continue by approving the set of authorization transactions individually with your wallet or provider:</Text>
+                      </Box>
+                    </Box>
+                  </>
+              }
 
               <Box gap='medium'>
+                { // list the pending transactions, and their status
+                  requestedSigs.map((x:any, i:number)=> {
+                    const iKey = i;
+                    return ( 
+                      <Box key={iKey} gap='small' direction='row' justify='between' fill>
+                        <Box basis='70' direction='row' gap='small'> 
+                          <Text 
+                            size='xsmall'
+                            color={x.signed?'green':undefined}
+                          >
+                            {i+1}.
+                          </Text>
 
-                { requestedSigs.map((x:any, i:number)=> {
-                  const iKey = i;
+                          <Text 
+                            size='xsmall'
+                            color={x.signed?'green':undefined}
+                          >
+                            {x.desc}
+                          </Text>
+                        </Box>
 
-                  return ( 
-                    <Box key={iKey} gap='small' direction='row' justify='between' fill>
-                      <Box basis='70' direction='row' gap='small'> 
-                        <Text 
-                          size='xsmall'
-                          color={x.signed?'green':undefined}
-                        >
-                          {i+1}.
-                        </Text>
-
-                        <Text 
-                          size='xsmall'
-                          color={x.signed?'green':undefined}
-                        >
-                          {x.desc}
-                        </Text>
-                      </Box>
-
-                      <Box basis='30' alignSelf='end'> 
-                        { pendingTxs.some((tx:any) => tx.txCode  === x.id) ?
-                          <Box gap='small' direction='row'>
-                            <Text size='xxsmall'> Pending</Text>
-                            <Loading condition={true} size='xxsmall'>.</Loading>
-                            {/* <EtherscanButton txHash={pendingTxs.find((tx:any)=> tx.txCode === x.id)?.tx?.hash} /> */}
-                          </Box>
-                          :
-                          <>
-                            { 
+                        <Box basis='30' alignSelf='end'> 
+                          { pendingTxs.some((tx:any) => tx.txCode  === x.id) ?
+                            <Box gap='small' direction='row'>
+                              <Text size='xxsmall'>Pending</Text>
+                              <Loading condition={true} size='xxsmall'>.</Loading>
+                            </Box>
+                            :
+                            <>
+                              { 
                               x.signed ?
                                 <Box animation='zoomIn'>
                                   <Check color='green' />
                                 </Box>:
                                 <Clock />
                             }
-                          </> }                  
+                            </> }                  
+                        </Box>
                       </Box>
-                    </Box>
-                  );
-                })}
+                    );
+                  })
+                }
 
-                {/* <Box gap='small' fill='horizontal'>
-                  { pendingTxs.map((x:any, i:number)=> (
-                    <Box key={x.tx.hash} direction='row' fill='horizontal' justify='between'>
-                      <Box> { abbreviateHash(x.tx.hash) }</Box>
-                      <EtherscanButton txHash={x.tx.hash} />
-                    </Box>)
-                  )}
-                </Box> */}
+                {
+                  !processIsCurrentTx && 
+                  allSigned && 
+                  <Text weight='bold'>Finally, please check your wallet or provider to confirm the transaction.</Text>         
+                }
               </Box>
 
-              {!preferences?.useTxApproval &&
-              <Box>
-                <CheckBox 
-                  checked={preferences?.useTxApproval}
-                  label={<Text size='xsmall'>In future, always use individual transactions for authorization</Text>}
-                  onChange={(e:any) => userActions.updatePreferences({ useTxApproval: true })}
-                />
-                <Box margin={{ left:'large' }}>
-                  <Text size='xxsmall'>(You can always change back to using permit-style authorization in the settings)</Text>
+              { // checkbox to always use fallback option
+                !preferences?.useTxApproval &&
+                <Box>
+                  <CheckBox 
+                    checked={preferences?.useTxApproval}
+                    label={<Text size='xsmall'>In future, always use individual transactions for authorization</Text>}
+                    onChange={(e:any) => userActions.updatePreferences({ useTxApproval: true })}
+                  />
+                  <Box margin={{ left:'large' }}>
+                    <Text size='xxsmall'>(You can always change back to using permit-style authorization in the settings)</Text>
+                  </Box>
                 </Box>
-              </Box>}
-            </Box>}
+              }
+              
+              <Box alignSelf='start'>
+                <FlatButton
+                  onClick={()=>closeAuth()}
+                  label={
+                    <Box direction='row' gap='medium' align='center'>
+                      <ArrowLeft color='text-weak' />
+                      <Text size='small' color='text-weak'>go back</Text>
+                    </Box>
+                  }
+                />
+              </Box>
 
-            { ( allComplete ) &&
-              !(txActive?.txCode === txProcessActive) &&
+            </Box>
+            }
+
+            {  // All signing was completed from the beginning: 
+              allComplete &&
+              !processIsCurrentTx &&
               <Box gap='medium'>
                 <Text weight='bold'>Confirmation required</Text>
                 <Text> 
                   Please check your wallet or provider to approve the transaction.
                 </Text>
-              </Box>}
+              </Box>
+            }
 
-            { (txActive?.txCode === txProcessActive) && <TxStatus tx={txActive || authActive} /> }
-
-            { (txActive?.txCode === txProcessActive) && 
-            <Box alignSelf='start'>
-              <FlatButton
-                onClick={()=>closeAuth()}
-                label={
-                  <Box direction='row' gap='medium' align='center'>
-                    <ArrowLeft color='text-weak' />
-                    <Text size='small' color='text-weak'>go back</Text>
-                  </Box>
+            { // if the action is already being processed: 
+              processIsCurrentTx && 
+              <>
+                <TxStatus tx={txActive || authActive} />
+                <Box alignSelf='start'>
+                  <FlatButton
+                    onClick={()=>closeAuth()}
+                    label={
+                      <Box direction='row' gap='medium' align='center'>
+                        <ArrowLeft color='text-weak' />
+                        <Text size='small' color='text-weak'>go back</Text>
+                      </Box>
                   }
-              />
-            </Box>}
+                  />
+                </Box>
+              </>
+            }
 
           </Box>
-        </Layer>}
+        </Layer>
+      }
 
     </>);
 };

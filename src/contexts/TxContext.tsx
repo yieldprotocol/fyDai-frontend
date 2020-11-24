@@ -82,12 +82,12 @@ const TxProvider = ({ children }:any) => {
           setPendingCache( pendingCache.filter((t:any) => t.tx.hash !== x.tx.hash));
         })
         );
+        // eslint-disable-next-line no-console
         console.log('cache txs processed');
         setPendingCache(state.pendingTxs);
         setHasReadCache(true);
       }
     })();
-
   }, [library, seriesLoading]);
 
   return (

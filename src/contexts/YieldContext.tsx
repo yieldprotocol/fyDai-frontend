@@ -19,7 +19,7 @@ const YieldContext = createContext<any>({});
 
 /**
  * Gets the addresses from the provided contract names
- * @param {string[]} contractNameList list of contract names registered in the migrations contract.
+ * @param {string[]} contractNameList list of contract names registered.
  * @returns {Promise<Map>} keyed with contract names
  */
 const getAddresses = (
@@ -217,7 +217,6 @@ const YieldProvider = ({ children }: any) => {
   };
 
   const init = async () => {
-    
     /* Init start */
     dispatch({ type: 'isLoading', payload: true });
 
