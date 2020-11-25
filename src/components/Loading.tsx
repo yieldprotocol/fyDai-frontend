@@ -11,11 +11,12 @@ interface ILoadingProps {
 
 function Loading({ condition, size, children, color }:ILoadingProps) {
   const theme:any = useContext(ThemeContext);
+  const defaultColor = theme.dark? theme?.global?.colors['text'].dark: theme?.global?.colors['text'].light;
   return (
     <>
       { condition ? 
         <ScaleLoader 
-          color={color || theme?.global?.colors['brand-transparent'].dark}
+          color={color || defaultColor}
           height={`${(theme?.text[size].size).slice(0, -2)}px`}
         />
         :

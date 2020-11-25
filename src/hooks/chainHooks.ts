@@ -6,7 +6,6 @@ import { useSignerAccount } from './connectionHooks';
 import FYDai from '../contracts/FYDai.json';
 import Controller from '../contracts/Controller.json';
 import Dai from '../contracts/Dai.json';
-import YieldProxy from '../contracts/YieldProxy.json';
 import Migrations from '../contracts/Migrations.json';
 import Pool from '../contracts/Pool.json';
 import Vat from '../contracts/Vat.json';
@@ -15,7 +14,6 @@ const contractMap = new Map<string, any>([
   ['FYDai', FYDai.abi],
   ['Controller', Controller.abi],
   ['Dai', Dai.abi],
-  ['YieldProxy', YieldProxy.abi],
   ['Migrations', Migrations.abi],
   ['Pool', Pool.abi],
   ['Vat', Vat.abi], 

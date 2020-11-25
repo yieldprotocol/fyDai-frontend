@@ -12,21 +12,17 @@ import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
 
-import { 
-  useSignerAccount,
-  useTxActive,
-  useProxy,
-  useToken,
-  useDebounce,
-  useIsLol,
-  useMath
-} from '../hooks';
+import { useSignerAccount } from '../hooks/connectionHooks';
+import { useDebounce, useIsLol } from '../hooks/appHooks';
+import { useMath } from '../hooks/mathHooks';
+import { useToken } from '../hooks/tokenHook';
+import { useTxActive } from '../hooks/txHooks';
+import { usePoolProxy } from '../hooks/poolProxyHook';
 
 import RemoveLiquidity from './RemoveLiquidity';
 
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
-import ApprovalPending from '../components/ApprovalPending';
 import TxStatus from '../components/TxStatus';
 import SeriesDescriptor from '../components/SeriesDescriptor';
 import RaisedButton from '../components/RaisedButton';
@@ -41,6 +37,9 @@ import DaiMark from '../components/logos/DaiMark';
 import YieldMobileNav from '../components/YieldMobileNav';
 
 import { logEvent } from '../utils/analytics';
+
+import Loading from '../components/Loading';
+
 
 interface IPoolProps {
   openConnectLayer:any;
@@ -58,7 +57,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
   const { daiBalance } = userState.position;
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
-  const { addLiquidity, addLiquidityActive } = useProxy();
+  const { addLiquidity } = usePoolProxy();
   const { getBalance } = useToken();
   const { poolPercent, calcTokensMinted } = useMath();
 
@@ -67,6 +66,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
 
   const { account } = useSignerAccount();
   const [ txActive ] = useTxActive(['ADD_LIQUIDITY', 'REMOVE_LIQUIDITY']);
+  const [ removeTxActive ] = useTxActive(['REMOVE_LIQUIDITY']);
 
   const [ hasDelegated ] = useState<boolean>(true);
 
@@ -79,7 +79,6 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
 
   const [ addLiquidityDisabled, setAddLiquidityDisabled ] = useState<boolean>(true);
 
-  const [ addLiquidityPending, setAddLiquidityPending ] = useState<boolean>(false);
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
   const isLol = useIsLol(inputValue);
@@ -87,7 +86,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
   /* Add Liquidity sequence */ 
   const addLiquidityProcedure = async () => { 
     if (inputValue && !addLiquidityDisabled ) {
-      setAddLiquidityPending(true);
+ 
       await addLiquidity( activeSeries, inputValue );
       logEvent({
         category: 'Pool',
@@ -100,7 +99,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
         userActions.updatePosition(),
         seriesActions.updateActiveSeries()
       ]);
-      setAddLiquidityPending(false);
+
     }   
   };
 
@@ -181,10 +180,10 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                 label: 'Your Pool Tokens',
                 labelExtra: 'owned in this series',
                 visible: 
-                  (!!account && txActive?.type !== 'ADD_LIQUIDITY' && !activeSeries?.isMature()) || 
+                  (!!account && !activeSeries?.isMature()) || 
                   (activeSeries?.isMature() && activeSeries?.poolTokens_>0 ),
                 active: true,
-                loading: addLiquidityPending,     
+                loading: false,     
                 value: activeSeries?.poolTokens_,
                 valuePrefix: null,
                 valueExtra: null, 
@@ -194,10 +193,10 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                 // labelExtra: ()=>(<Text size='xxsmall'> of the total <Text size='xxsmall' color='text'>{nFormatter(activeSeries?.totalSupply_, 0)}</Text> tokens </Text>),
                 labelExtra: ()=>(<Text size='xxsmall'> of the total tokens </Text>),
                 visible: 
-                    (!!account && txActive?.type !== 'ADD_LIQUIDITY' && !activeSeries?.isMature()) || 
+                    (!!account && !activeSeries?.isMature()) || 
                     (activeSeries?.isMature() && activeSeries?.poolTokens_>0 ),
                 active: true,
-                loading: addLiquidityPending,           
+                loading: false,           
                 value: activeSeries?` ${activeSeries?.poolPercent}%`: '',
                 valuePrefix: null,
                 valueExtra: null,
@@ -205,9 +204,9 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
               {
                 label: 'Total Liquidity',
                 labelExtra: ' staked in this series',
-                visible: (txActive?.type !== 'ADD_LIQUIDITY' && !activeSeries?.isMature()),
+                visible: !activeSeries?.isMature(),
                 active: true,
-                loading: addLiquidityPending,           
+                loading: false,           
                 value: activeSeries?` ${nFormatter(activeSeries?.totalSupply_, 2)} tokens`: '',
                 valuePrefix: null,
                 valueExtra: null,
@@ -221,7 +220,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
           width={{ max:'600px' }}
           alignSelf='center'
           fill='horizontal'
-          background='background-front'
+          background='background'
           round='small'
           pad='large'
           gap='medium'
@@ -273,7 +272,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                         valueExtra: () => (
                           <Box pad={{ top:'small' }}>
                             <RaisedButton
-                              label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Connect a wallet</Text></Box>}
+                              label={<Box pad='xsmall'><Text size='xsmall'>Connect a wallet</Text></Box>}
                               onClick={() => openConnectLayer()}
                             /> 
                           </Box>
@@ -327,23 +326,34 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                 activeSeries?.poolTokens_>0 &&
                 !mobile && 
                 <Box alignSelf='end' margin={{ top:'medium' }}>
-                  <FlatButton 
-                    onClick={()=>setRemoveLiquidityOpen(true)}
-                    label={
-                      <Box direction='row' gap='small' align='center'>
-                        <Text size='xsmall' color='text-weak'><Text weight='bold' color={activeSeries?.seriesColor}>Remove Liquidity</Text> from this series</Text>
-                        <ArrowRight color='text-weak' />
-                      </Box>
-                }
-                  />
+                  {
+                  removeTxActive ?
+                    <Box direction='row' gap='small'>
+                      <Text size='xsmall' color='text-weak'>
+                        <Text weight='bold' color={activeSeries?.seriesColor}>remove Liquidity</Text> pending
+                      </Text>
+                      <Loading condition={true} size='xxsmall'>.</Loading>
+                    </Box>
+                    : 
+                    <FlatButton 
+                      onClick={()=>setRemoveLiquidityOpen(true)}
+                      label={
+                        <Box direction='row' gap='small' align='center'>
+                          <Text size='xsmall' color='text-weak'><Text weight='bold' color={activeSeries?.seriesColor}>remove Liquidity</Text> from this series</Text>
+                          <ArrowRight color='text-weak' />
+                        </Box>
+                      }
+                    />               
+                  }
+
                 </Box>}
             </Box>
 
           </Box>
         </Box>}
 
-        { addLiquidityActive && !txActive && <ApprovalPending /> } 
         { txActive && txActive.type !== 'REMOVE_LIQUIDITY' && <TxStatus tx={txActive} /> }
+        
       </Keyboard>
 
       { mobile && 

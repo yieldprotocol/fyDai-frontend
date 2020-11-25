@@ -4,10 +4,10 @@ import { Box } from 'grommet';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
 
-import { useFYDai, useTxActive } from '../hooks';
+import { useTxActive } from '../hooks/txHooks';
+import { useFYDai } from '../hooks/fyDaiHook';
 
 import InlineAlert from '../components/InlineAlert';
-import ApprovalPending from '../components/ApprovalPending';
 import TxStatus from '../components/TxStatus';
 import ActionButton from '../components/ActionButton';
 
@@ -22,7 +22,7 @@ const Redeem  = ({ close }:IRedeemProps)  => {
   const { activeSeries } = seriesState;
   const { actions: userActions } = useContext(UserContext);
 
-  const { hasBeenMatured, redeem, redeemActive } = useFYDai();
+  const { hasBeenMatured, redeem } = useFYDai();
   const [ txActive ] = useTxActive(['redeem']);
 
   const [ redeemDisabled, setRedeemDisabled] = useState<boolean>(true);
@@ -72,7 +72,6 @@ const Redeem  = ({ close }:IRedeemProps)  => {
           hasPoolDelegatedProxy={true}
         />
       </>}
-      { redeemActive && !txActive && <ApprovalPending /> } 
       { txActive && <TxStatus tx={txActive} /> }
     </Box>
   );

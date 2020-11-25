@@ -11,11 +11,15 @@ import { cleanValue } from '../utils';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
 
-import { usePool, useProxy, useSignerAccount, useTxActive, useDebounce, useIsLol } from '../hooks';
+/* hook pack */
+import { useSignerAccount } from '../hooks/connectionHooks';
+import { useDebounce, useIsLol } from '../hooks/appHooks';
+import { useTxActive } from '../hooks/txHooks';
+import { usePool } from '../hooks/poolHook';
+import { useBorrowProxy } from '../hooks/borrowProxyHook';
 
 import InputWrap from '../components/InputWrap';
 import TxStatus from '../components/TxStatus';
-import ApprovalPending from '../components/ApprovalPending';
 import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
@@ -24,7 +28,7 @@ import DaiMark from '../components/logos/DaiMark';
 import YieldMobileNav from '../components/YieldMobileNav';
 
 interface ICloseDaiProps {
-  close?: any;
+  close: any;
 }
 
 const CloseDai = ({ close }:ICloseDaiProps) => {
@@ -38,7 +42,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
   const { actions: userActions } = useContext(UserContext);
 
   const { previewPoolTx }  = usePool();
-  const { buyDai, buyApprovalActive }  = useProxy();
+  const { buyDai }  = useBorrowProxy();
   const { account, fallbackProvider } = useSignerAccount();
 
   const [ inputValue, setInputValue ] = useState<any>();
@@ -47,7 +51,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
 
   const [ maxWithdraw, setMaxWithdraw ] = useState<string>();
   
-  const [ withdrawDisabled, setWithdrawDisabled ] = useState<boolean>(true);
+  const [ closeDisabled, setCloseDisabled ] = useState<boolean>(true);
   const [ CloseDaiPending, setCloseDaiPending] = useState<boolean>(false);
 
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
@@ -55,7 +59,9 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
   const isLol = useIsLol(inputValue);
 
   const withdrawProcedure = async () => {
-    if ( !withdrawDisabled ) {
+    if ( !closeDisabled ) {
+
+      !activeSeries?.isMature() && close();
       setCloseDaiPending(true);
       await buyDai(
         activeSeries,
@@ -66,7 +72,6 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
       userActions.updatePosition();
       seriesActions.updateActiveSeries();
       setCloseDaiPending(false);
-      close();
     }
   };
 
@@ -85,7 +90,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
       !account ||
       !inputValue || 
       parseFloat(inputValue) <= 0
-    ) ? setWithdrawDisabled(true): setWithdrawDisabled(false);
+    ) ? setCloseDisabled(true): setCloseDisabled(false);
   }, [ inputValue ]);
 
   /* show warnings and errors with collateralization ratio levels and inputs */
@@ -115,13 +120,13 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
         width={!mobile?{ min:'620px', max:'620px' }: undefined}
         alignSelf='center'
         fill
-        background='background-front'
+        background='background'
         round='small'
         pad='large'
         gap='medium'
       >
         { !txActive && !CloseDaiPending && 
-        <>
+        <Box gap='medium'>
           <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to close</Text>
           <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
             <TextInput
@@ -142,7 +147,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
           <ActionButton
             onClick={()=> withdrawProcedure()}
             label={`Reclaim ${inputValue || ''} Dai`}
-            disabled={withdrawDisabled}
+            disabled={closeDisabled}
             hasPoolDelegatedProxy={activeSeries.hasPoolDelegatedProxy}
             clearInput={()=>setInputValue(undefined)}
           />
@@ -159,8 +164,9 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
                 }
             />
           </Box>}
-        </>}
-
+        </Box>}
+        
+        {/* 
         { CloseDaiPending && 
           !txActive && 
           buyApprovalActive && 
@@ -169,10 +175,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
         { CloseDaiPending && 
           !txActive && 
           !buyApprovalActive && 
-          <ApprovalPending />}
-
-        { txActive?.type === 'AUTH' && 
-          <TxStatus tx={txActive} />}
+          <ApprovalPending />} */}
 
         { txActive?.type === 'BUY_DAI' &&
         <>
@@ -181,7 +184,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
             <Box
               round
               onClick={() => close()}
-              hoverIndicator='brand-transparent'
+              // hoverIndicator='brand-transparent'
               pad={{ horizontal: 'small', vertical: 'small' }}
               justify='center'
             >
@@ -209,7 +212,5 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
     </Keyboard>
   );
 };
-
-CloseDai.defaultProps={ close:null };
 
 export default CloseDai;

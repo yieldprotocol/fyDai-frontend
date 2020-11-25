@@ -6,7 +6,8 @@ import {
   Box,
   ResponsiveContext,
   Layer,
-  Collapsible
+  Collapsible,
+  ThemeContext,
 } from 'grommet';
 
 import { 
@@ -22,7 +23,7 @@ import FlatButton from './FlatButton';
 import DaiMark from './logos/DaiMark';
 import Loading from './Loading';
 import TxStatus from './TxStatus';
-import { abbreviateHash } from '../utils';
+import { abbreviateHash, modColor } from '../utils';
 import EthMark from './logos/EthMark';
 
 
@@ -37,6 +38,9 @@ const AccountButton = (props: any) => {
   const { state: { position } } = useContext(UserContext);
   const { state: { pendingTxs, lastCompletedTx } } = useContext(TxContext);
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
+
+  const theme:any = useContext(ThemeContext);
+  const background = theme.dark ? modColor(theme.global.colors.background.dark, -10): modColor(theme.global.colors.background.light, -10);
 
   // flags
   const [txStatusOpen, setTxStatusOpen] = useState(false);
@@ -58,7 +62,7 @@ const AccountButton = (props: any) => {
       round
       direction='row'
       align='center'
-      background={account?'#f0f0f0':undefined}
+      background={account?background:undefined}
     > 
       {txStatusOpen && 
       <Layer 
@@ -67,7 +71,7 @@ const AccountButton = (props: any) => {
       >
         <Box 
           fill
-          background="background-front"
+          background={background}
           round='small'
           pad="none"
           align='center'
@@ -157,8 +161,7 @@ const AccountButton = (props: any) => {
 
       { account ?
         <>{!mobile && <FlatButton
-          selected 
-          background='#f0f0f0'
+          background={background}
           onClick={()=>openConnectLayer('ACCOUNT')}
           label={
             <Box gap='small' direction='row' align='center'>

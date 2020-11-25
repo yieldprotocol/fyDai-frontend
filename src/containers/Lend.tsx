@@ -5,27 +5,24 @@ import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 import { VscHistory as History } from 'react-icons/vsc';
 
 import { NavLink, useParams } from 'react-router-dom';
-import { cleanValue } from '../utils';
+import { cleanValue, genTxCode } from '../utils';
 
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
   
-import { 
-  usePool, 
-  useMath,
-  useSignerAccount, 
-  useTxActive, 
-  useProxy,
-  useDebounce,
-  useIsLol,
-} from '../hooks';
+/* hook pack */
+import { useSignerAccount } from '../hooks/connectionHooks';
+import { useDebounce, useIsLol } from '../hooks/appHooks';
+import { useMath } from '../hooks/mathHooks';
+import { useTxActive } from '../hooks/txHooks';
+import { usePool } from '../hooks/poolHook';
+import { useBorrowProxy } from '../hooks/borrowProxyHook';
 
 import CloseDai from './CloseDai';
 import Redeem from './Redeem';
 
 import InputWrap from '../components/InputWrap';
 import InfoGrid from '../components/InfoGrid';
-import ApprovalPending from '../components/ApprovalPending';
 import TxStatus from '../components/TxStatus';
 import SeriesDescriptor from '../components/SeriesDescriptor';
 import RaisedButton from '../components/RaisedButton';
@@ -38,6 +35,7 @@ import HistoryWrap from '../components/HistoryWrap';
 import DaiMark from '../components/logos/DaiMark';
 import RaisedBox from '../components/RaisedBox';
 import YieldMobileNav from '../components/YieldMobileNav';
+import Loading from '../components/Loading';
 
 import { logEvent } from '../utils/analytics';
 
@@ -58,22 +56,30 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
   const { previewPoolTx } = usePool();
-  const { sellDai, sellActive } = useProxy();
+  const { sellDai } = useBorrowProxy();
   const { calcAPR } = useMath();
   const { account, fallbackProvider } = useSignerAccount();
   const [ txActive ] = useTxActive(['SELL_DAI']);
+
+  const [ closeTxActive ] = useTxActive(['BUY_DAI']);
+
+
 
   const [ hasDelegated ] = useState<boolean>(true);
 
   const [ CloseDaiOpen, setCloseDaiOpen ] = useState<boolean>(false);
   const [ histOpen, setHistOpen ] = useState<boolean>(false);
   
+  const [showTxPending, setShowTxPending] = useState<boolean>(false);
+  useEffect(()=>{
+    setShowTxPending( txActive?.txCode === genTxCode('SELL_DAI', activeSeries));
+  }, [txActive, activeSeries]);
+  
   const [ inputValue, setInputValue ] = useState<any>(amnt || undefined);
   const debouncedInput = useDebounce(inputValue, 500);
   const [inputRef, setInputRef] = useState<any>(null);
   
   const [ lendDisabled, setLendDisabled ] = useState<boolean>(true);
-  const [ lendPending, setLendPending ] = useState<boolean>(false);
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
   const isLol = useIsLol(inputValue);
@@ -85,7 +91,6 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
   /* Lend execution flow */
   const lendProcedure = async () => {
     if (inputValue && !lendDisabled ) {
-      setLendPending(true);
       await sellDai(
         activeSeries,
         inputValue
@@ -101,7 +106,6 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
         userActions.updatePosition(),
         seriesActions.updateActiveSeries()
       ]);
-      setLendPending(false);
     }  
   };
 
@@ -186,10 +190,10 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
                 label: 'Portfolio Value',
                 labelExtra: 'at maturity',
                 visible: 
-                  (!!account && !txActive && !activeSeries?.isMature()) || 
+                  (!!account && !activeSeries?.isMature()) || 
                   ( activeSeries?.isMature() && activeSeries?.fyDaiBalance_>0),
                 active: true,
-                loading: lendPending,  
+                loading: false,  
                 value: activeSeries? `${activeSeries?.fyDaiBalance_} DAI` : '-',
                 valuePrefix: null,
                 valueExtra: null,
@@ -197,9 +201,9 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
               {
                 label: 'Current Value',
                 labelExtra: 'if closing your position now',
-                visible: !!account && !txActive && !activeSeries?.isMature(),
+                visible: !!account && !activeSeries?.isMature(),
                 active: true,
-                loading: lendPending || !currentValue,           
+                loading: false || !currentValue,           
                 value: currentValue?`${cleanValue(currentValue, 2)} DAI`: '- Dai',
                 valuePrefix: null,
                 valueExtra: null,
@@ -207,7 +211,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
               {
                 label: null,
                 labelExtra: null,
-                visible: !!account && !txActive && !activeSeries?.isMature(),
+                visible: !!account && !activeSeries?.isMature(),
                 active: true,
                 loading: false,           
                 value: null,
@@ -218,7 +222,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
                 label: 'Dai Balance',
                 visible: false,
                 active: true,
-                loading: lendPending,            
+                loading: false,            
                 value: daiBalance_?`${daiBalance_} DAI`: '0 DAI',
                 valuePrefix: null,
                 valueExtra: null,
@@ -228,12 +232,12 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
         </SeriesDescriptor>
    
         {/* If there is no applicable transaction active, show the lending page */}
-        { !txActive &&
+        { !showTxPending &&
         <Box
           width={{ max:'600px' }}
           alignSelf='center'
           fill='horizontal'
-          background='background-front'
+          background='background'
           round='small'
           pad='large'
           gap='medium'
@@ -294,7 +298,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
                         valueExtra: () => (
                           <Box pad={{ top:'small' }}>
                             <RaisedButton
-                              label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Connect a wallet</Text></Box>}
+                              label={<Box pad='xsmall'><Text size='xsmall'>Connect a wallet</Text></Box>}
                               onClick={() => openConnectLayer()}
                             /> 
                           </Box>
@@ -345,30 +349,37 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
                       </Box>
                     }
                   />
-                </Box>}
-
+                </Box>
+              }
               { !activeSeries?.isMature() && 
                 activeSeries?.fyDaiBalance_ > 0 &&
                 !mobile &&
                 <Box alignSelf='end' margin={{ top:'medium' }}>
-                  <FlatButton 
-                    onClick={()=>setCloseDaiOpen(true)}
-                    label={
-                      <Box direction='row' gap='small' align='center'>
-                        <Box><Text size='xsmall' color='text-weak'><Text weight='bold' color={activeSeries?.seriesColor}>close</Text> your position in this series</Text></Box>
-                        <ArrowRight color='text-weak' />
-                      </Box>
-                    }
-                  />
+                  { closeTxActive ?
+                    <Box direction='row' gap='small'>
+                      <Text size='xsmall' color='text-weak'>
+                        <Text weight='bold' color={activeSeries?.seriesColor}>close</Text> pending
+                      </Text>
+                      <Loading condition={true} size='xxsmall'>.</Loading>
+                    </Box>
+                    : 
+                    <FlatButton 
+                      onClick={()=>setCloseDaiOpen(true)}
+                      label={
+                        <Box direction='row' gap='small' align='center'>
+                          <Box><Text size='xsmall' color='text-weak'><Text weight='bold' color={activeSeries?.seriesColor}>close</Text> your position in this series</Text></Box>
+                          <ArrowRight color='text-weak' />
+                        </Box>
+                        }
+                    />}
                 </Box>}
             </Box>
 
           </Box>
         </Box>}
 
-        {/* If there is a transaction active, show the applicable view */}
-        { sellActive && !txActive && <ApprovalPending /> }
-        { txActive && <TxStatus tx={txActive} /> }
+        { showTxPending && <TxStatus tx={txActive} /> }
+        
       </Keyboard>
 
       {mobile &&

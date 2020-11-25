@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
 import { Box, Text, ResponsiveContext, Collapsible } from 'grommet';
 import { FiLayers as ChangeSeries } from 'react-icons/fi';
 
@@ -8,7 +8,6 @@ import { SeriesContext } from '../contexts/SeriesContext';
 
 import SeriesSelector from './SeriesSelector';
 import AprBadge from './AprBadge';
-import Authorization from './Authorization';
 import RaisedButton from './RaisedButton';
 
 interface ISeriesDescriptorProps {
@@ -23,11 +22,6 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
   const { state: seriesState } = useContext(SeriesContext);
   const { activeSeries } = seriesState; 
   const [ selectorOpen, setSelectorOpen ] = useState<boolean>(false);
-  const [ delegated, setDelegated ] = useState<boolean>(true);
-
-  useEffect(()=>{
-    activeSeries && setDelegated(activeSeries.authComplete);
-  }, [ activeSeries ]);
 
   return (
     <>
@@ -38,7 +32,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
           fill
           round='small'
           gap='small'
-          pad={{ bottom:'small' }}
+          pad={{ bottom:'large' }}
           background={`linear-gradient(to bottom right, 
           ${modColor( '#add8e6', -40)}, 
           ${modColor( '#add8e6', -20)},
@@ -51,7 +45,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
           ${modColor( activeSeries?.seriesColor, 50)}, 
           ${modColor( activeSeries?.seriesColor, 0)}, 
           ${modColor( activeSeries?.seriesColor, 0)})`}
-          margin={{ bottom:'-16px' }}
+          margin={{ bottom:'-18px' }}
         >
           <Box
             pad='small'   
@@ -110,12 +104,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
                 { children }
               </Collapsible>
             </Box>
-          </Box>
-  
-          { !seriesState.seriesLoading && !delegated && !activeSeries.isMature() &&
-            <Collapsible open={!delegated}>
-              <Authorization series={activeSeries} />
-            </Collapsible>}       
+          </Box>     
         </Box>}
     </>
   );

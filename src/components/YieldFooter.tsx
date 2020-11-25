@@ -4,8 +4,11 @@ import { FaDiscord as Discord } from 'react-icons/fa';
 import {
   FiGithub as Github,
   FiFileText as Docs,
+  FiSun as Sun,
+  FiMoon as Moon,
 } from 'react-icons/fi';
 import { CgSleep as Moodlight } from 'react-icons/cg';
+
 import YieldDisclaimer from './YieldDisclaimer';
 import { logEvent } from '../utils/analytics';
 
@@ -18,6 +21,8 @@ const handleExternal = (destination: string) => {
 
 const YieldFooter = (props: any) => {
   const {
+    darkMode,
+    setDarkMode,
     moodLight, 
     toggleMoodLight,
   } = props;
@@ -61,7 +66,7 @@ const YieldFooter = (props: any) => {
         }}
       >
         <Box onClick={()=> setShowDisclaimer(true)}>
-          <Text size='xxsmall' color='text-weak'>
+          <Text size='xxsmall' color='grey'>
             This software is in BETA v0.2
           </Text>
           {/* {showDisclaimer && <YieldDisclaimer forceShow={true} />} */}
@@ -71,6 +76,12 @@ const YieldFooter = (props: any) => {
           color={moodLight? 'pink':'grey'}
         >
           <Moodlight />
+        </Anchor>
+        <Anchor
+          onClick={()=>setDarkMode(!darkMode)}
+          color={moodLight? 'pink':'grey'}
+        >
+          { darkMode? <Sun /> : <Moon />}
         </Anchor>
       </Box>
     </Footer>

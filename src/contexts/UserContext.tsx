@@ -11,6 +11,7 @@ import { useCachedState, } from '../hooks/appHooks';
 import { useController } from '../hooks/controllerHook';
 import { useEvents } from '../hooks/eventHooks';
 import { useSignerAccount } from '../hooks/connectionHooks';
+import { useDsRegistry } from '../hooks/dsRegistryHook';
 
 const UserContext = createContext<any>({});
 
@@ -31,7 +32,7 @@ function reducer(state: any, action: any) {
     case 'updateAuthorizations':
       return {
         ...state,
-        authorizations: action.payload,
+        authorization: action.payload,
       };
     case 'updateTxHistory':
       return {
@@ -55,7 +56,7 @@ const initState = {
     lastBlock: 11066942, 
     items:[],
   },
-  authorizations:{},
+  authorization:{},
   preferences:{
     slippage: 0.005, // default === 0.5%
     useTxApproval: false,
@@ -77,7 +78,9 @@ const UserProvider = ({ children }: any) => {
   
   /* hook declarations */
   const { getEventHistory, parseEventList } = useEvents();
-  const { getBalance, getTokenAllowance } = useToken();
+  const { getBalance } = useToken();
+
+  const { getDsProxyAddress } = useDsRegistry();
   const { 
     collateralPosted, 
     collateralLocked,
@@ -100,13 +103,13 @@ const UserProvider = ({ children }: any) => {
   const _getPosition = async () => {
 
     /* Get balances and posted collateral */
-    const [ 
+    const [
       ethBalance, 
       daiBalance, 
       ethPosted,  
     ]:any[] = await Promise.all([
       getBalance(), 
-      getBalance(deployedContracts.Dai, 'Dai'), 
+      getBalance(deployedContracts.Dai, 'Dai'),
       collateralPosted('ETH-A'),
     ]);
 
@@ -139,6 +142,7 @@ const UserProvider = ({ children }: any) => {
       collateralPercent,
       maxDaiAvailable,
     };
+
     /* parse to human usable */
     const parsedValues = {  
       ethBalance_ : cleanValue(ethers.utils.formatEther(ethBalance), 6),
@@ -165,11 +169,10 @@ const UserProvider = ({ children }: any) => {
    */
   const _getAuthorizations = async () => {
     const _auths:any={};
-    _auths.hasDelegatedProxy = await checkControllerDelegate(deployedContracts.YieldProxy);
-    _auths.hasAuthorisedProxy = (await getTokenAllowance(deployedContracts.Dai, deployedContracts.YieldProxy, 'Dai') > 0);
-    _auths.hasDelegatedAltProxy = await checkControllerDelegate(deployedContracts.PoolProxy);
+    _auths.dsProxyAddress = await getDsProxyAddress();
+    _auths.hasDsProxy = _auths.dsProxyAddress !== '0x0000000000000000000000000000000000000000';
+    _auths.hasDelegatedDsProxy = await checkControllerDelegate(_auths.dsProxyAddress);
     dispatch( { type: 'updateAuthorizations', payload: _auths });
-
     console.log(_auths);
     return _auths;
   };
@@ -185,7 +188,7 @@ const UserProvider = ({ children }: any) => {
     const _lastBlock = await provider.getBlockNumber();
     const lastCheckedBlock = (txHistory && forceUpdate)? 11066942: txHistory?.lastBlock || 11066942;
 
-    /* get the collateral transaction history */ 
+    /* get the collateral transaction history */
     const collateralHistory = await getEventHistory(
       deployedContracts.Controller,
       'Controller',
@@ -206,7 +209,7 @@ const UserProvider = ({ children }: any) => {
             dai: x.args_[2],
             dai_: ethers.utils.formatEther( x.args_[2] ),
           };
-        });     
+        });
       });
     
     /* get the repayment hisotry from the controller */
@@ -379,7 +382,6 @@ const UserProvider = ({ children }: any) => {
     return { allPrefs };
   };
 
-
   /* initiate the user */
   const initUser = async () => {
     /* Init start */
@@ -410,16 +412,14 @@ const UserProvider = ({ children }: any) => {
 
   /* Exposed actions */
   const actions = {
-    updatePosition: () => _getPosition(),
-    updateAuthorizations: () => _getAuthorizations(),
+    updatePosition: () => account && _getPosition(),
+    updateAuthorizations: () => account && _getAuthorizations(),
     updateHistory: () => _getTxHistory(false),
-
     rebuildHistory: async () => {
       dispatch({ type: 'isLoading', payload: true });
       await _getTxHistory(true);
       dispatch({ type: 'isLoading', payload: false });
     },
-
     updatePreferences: (x:any) => _updatePreferences(x),
     resetPreferences: () => localStorage.removeItem('userPreferences'),
   };

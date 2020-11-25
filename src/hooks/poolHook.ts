@@ -1,12 +1,12 @@
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 import { ethers, BigNumber }  from 'ethers';
 
 import Pool from '../contracts/Pool.json';
 
-import { TxContext } from '../contexts/TxContext';
 import { useSignerAccount } from './connectionHooks';
 import { IYieldSeries } from '../types';
 import { useTxHelpers } from './txHooks';
+import { useDsProxy } from './dsProxyHook';
 
 /**
  * Hook for interacting with the yield 'Pool' Contract
@@ -14,12 +14,12 @@ import { useTxHelpers } from './txHooks';
 export const usePool = () => {
   const { fallbackProvider, provider, signer, account } = useSignerAccount();
   const { abi: poolAbi } = Pool;
-  const  { dispatch }  = useContext<any>(TxContext);
   const [ sellActive, setSellActive ] = useState<boolean>(false);
   const [ buyActive, setBuyActive ] = useState<boolean>(false);
   const [ callActive, setCallActive ] = useState<boolean>(false);
 
   const { handleTx, handleTxRejectError } = useTxHelpers();
+  const { proxyExecute } = useDsProxy();
 
   /**
    * @dev Sell fyDai for Dai ( Chai )
@@ -55,7 +55,6 @@ export const usePool = () => {
     await handleTx({ tx, msg: `Sell fyDai ${fyDaiIn} pending...`, type:'SELL', series });
     setSellActive(false);
   };
-
 
   /**
    * @dev Buy fyDai with dai/chai
@@ -173,25 +172,37 @@ export const usePool = () => {
   const addPoolDelegate = async (
     series:IYieldSeries,
     delegatedAddress:string,
+    asProxy: boolean = false,
   ) => {
     let tx:any;
     /* Processing and sanitizing input */
-    const marketAddr = ethers.utils.getAddress(series.poolAddress);
+    const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const delegatedAddr = ethers.utils.getAddress(delegatedAddress);
     /* Contract interaction */
     const contract = new ethers.Contract(
-      marketAddr,
+      poolAddr,
       poolAbi,
       signer
     );
-    try {
-      tx = await contract.addDelegate(delegatedAddr);
-    } catch (e) {
-      handleTxRejectError(e);
-      return;
+
+    if (!asProxy) {
+      try {
+        tx = await contract.addDelegate(delegatedAddr);
+      } catch (e) {
+        return handleTxRejectError(e);
+      }
+      /* Transaction reporting & tracking */
+      await handleTx({ tx, msg: 'Yield Series Pool authorization', type:'AUTH_POOL', series });
+      
+    } else { 
+      const calldata = contract.interface.encodeFunctionData('addDelegate', [delegatedAddr]);
+      tx = await proxyExecute( 
+        poolAddr,
+        calldata,
+        { },
+        { tx: null, msg: 'Yield Series Pool authorization', type:'AUTH_POOL', series  }
+      );
     }
-    /* Transaction reporting & tracking */
-    await handleTx({ tx, msg: 'Pending once-off Pool delegation ...', type:'AUTH', series });
 
     // eslint-disable-next-line consistent-return
     return true;
