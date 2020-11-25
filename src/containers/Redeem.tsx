@@ -40,6 +40,7 @@ const Redeem  = ({ close }:IRedeemProps)  => {
         action: String(activeSeries.fyDaiBalance),
         label: activeSeries.displayName || activeSeries.poolAddress,
       });
+      /* clean up and refresh */ 
       await Promise.all([
         userActions.updatePosition(),
         seriesActions.updateActiveSeries()

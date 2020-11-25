@@ -93,6 +93,8 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
         action: inputValue,
         label: activeSeries.displayName || activeSeries.poolAddress,
       });
+      
+      /* clean up and refresh */ 
       setInputValue(undefined);
       userActions.updateHistory();
       await Promise.all([

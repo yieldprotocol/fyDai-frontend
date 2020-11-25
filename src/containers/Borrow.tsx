@@ -106,12 +106,14 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
   const borrowProcedure = async () => {
     if (inputValue && !borrowDisabled) {
 
-       logEvent({
+      await borrowDai(activeSeries, 'ETH-A', inputValue);
+      logEvent({
         category: 'Borrow',
         action: inputValue,
         label: activeSeries.displayName || activeSeries.poolAddress,
       });
-                       
+
+      /* clean up and refresh */               
       setInputValue(undefined);
       userActions.updateHistory();
       await Promise.all([

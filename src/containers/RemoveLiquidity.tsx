@@ -61,37 +61,26 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
   /* Remove Liquidity sequence */
   const removeLiquidityProcedure = async (value:number) => {
     if ( !removeLiquidityDisabled ) {
-      
-      setRemoveLiquidityPending(true);
+
+      !activeSeries?.isMature() && close();
       await removeLiquidity(activeSeries, value);
+      
+      /* log event */
       logEvent({
         category: 'Remove Liquidity',
         action: String(value),
         label: activeSeries.displayName || activeSeries.poolAddress,
       });
+
+      /* clean up and refresh */ 
       setInputValue(undefined);
       userActions.updateHistory();
-
-      !activeSeries?.isMature() && close();
-             logEvent({
-        category: 'Remove Liquidity',
-        action: String(value),
-        label: activeSeries.displayName || activeSeries.poolAddress,
-      });
-      setInputValue(undefined);
-
       if (activeSeries?.isMature()) {
-        await removeLiquidity(activeSeries, value);
-        setInputValue(undefined);
-        userActions.updateHistory();
         await Promise.all([
           userActions.updatePosition(),
           seriesActions.updateActiveSeries()
         ]);
       } else {
-        await removeLiquidity(activeSeries, value);
-        setInputValue(undefined);
-        userActions.updateHistory();
         userActions.updatePosition();
         seriesActions.updateActiveSeries();
       }

@@ -67,6 +67,8 @@ function Repay({ close }:IRepayProps) {
         action: String(value),
         label: activeSeries.displayName || activeSeries.poolAddress,
       });
+      
+      /* clean up and refresh */ 
       setInputValue(undefined);
       userActions.updateHistory();
       if (activeSeries?.isMature()) {

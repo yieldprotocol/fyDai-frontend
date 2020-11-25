@@ -105,6 +105,8 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
         category: 'Deposit',
         action: inputValue
       });
+      
+      /* clean up and refresh */ 
       setInputValue(undefined);
       userActions.updateHistory();
       await userActions.updatePosition();

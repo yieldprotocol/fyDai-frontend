@@ -66,6 +66,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
         category: 'Withdraw',
         action: inputValue
       });
+      /* clean up and refresh */ 
       setInputValue(undefined);
       userActions.updateHistory();
       userActions.updatePosition();  

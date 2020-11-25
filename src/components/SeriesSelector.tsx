@@ -6,6 +6,7 @@ import {
   FiArrowLeft as ArrowLeft,
   FiCheck as Check,
 } from 'react-icons/fi';
+import { logEvent } from '../utils/analytics';
 
 import { SeriesContext } from '../contexts/SeriesContext';
 
@@ -23,8 +24,6 @@ const InsetBox = styled(Box)`
       background: ${props.background}; 
       box-shadow: inset 6px 6px 11px ${modColor(props.background, -20)}, inset -6px -6px 11px ${modColor(props.background, 10)};
   `}`;
-
-import { logEvent } from '../utils/analytics';
 
 interface ISeriesSelectorProps {
   activeView:string;

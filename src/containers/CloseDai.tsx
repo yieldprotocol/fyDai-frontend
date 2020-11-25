@@ -26,6 +26,7 @@ import FlatButton from '../components/FlatButton';
 
 import DaiMark from '../components/logos/DaiMark';
 import YieldMobileNav from '../components/YieldMobileNav';
+import { logEvent } from '../utils/analytics';
 
 interface ICloseDaiProps {
   close: any;
@@ -52,7 +53,6 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
   const [ maxWithdraw, setMaxWithdraw ] = useState<string>();
   
   const [ closeDisabled, setCloseDisabled ] = useState<boolean>(true);
-  const [ CloseDaiPending, setCloseDaiPending] = useState<boolean>(false);
 
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
@@ -62,16 +62,21 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
     if ( !closeDisabled ) {
 
       !activeSeries?.isMature() && close();
-      setCloseDaiPending(true);
       await buyDai(
         activeSeries,
         inputValue,
       );
+      logEvent({
+        category: 'ClosePosition',
+        action: inputValue,
+        label: activeSeries.displayName || activeSeries.poolAddress,
+      });
+      
+      /* clean up and refresh */ 
       setInputValue(undefined);
       userActions.updateHistory();
       userActions.updatePosition();
       seriesActions.updateActiveSeries();
-      setCloseDaiPending(false);
     }
   };
 
@@ -125,7 +130,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
         pad='large'
         gap='medium'
       >
-        { !txActive && !CloseDaiPending && 
+        { !txActive && 
         <Box gap='medium'>
           <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to close</Text>
           <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
@@ -190,7 +195,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
             >
               <Box direction='row' gap='small' align='center'>
                 <ArrowLeft color='text-weak' />
-                <Text size='xsmall' color='text-weak'> {!CloseDaiPending ? 'cancel, and go back.' : 'go back'}  </Text>
+                <Text size='xsmall' color='text-weak'> go back </Text>
               </Box>
             </Box>
           </Box>
