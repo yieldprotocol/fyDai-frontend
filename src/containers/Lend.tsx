@@ -37,6 +37,8 @@ import RaisedBox from '../components/RaisedBox';
 import YieldMobileNav from '../components/YieldMobileNav';
 import Loading from '../components/Loading';
 
+import { logEvent } from '../utils/analytics';
+
 interface ILendProps {
   openConnectLayer:any;
 }
@@ -93,6 +95,11 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
         activeSeries,
         inputValue
       );
+      logEvent({
+        category: 'Lend',
+        action: inputValue,
+        label: activeSeries.displayName || activeSeries.poolAddress,
+      });
       setInputValue(undefined);
       userActions.updateHistory();
       await Promise.all([

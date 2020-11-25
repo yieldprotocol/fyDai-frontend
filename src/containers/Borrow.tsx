@@ -35,6 +35,8 @@ import RaisedBox from '../components/RaisedBox';
 import YieldMobileNav from '../components/YieldMobileNav';
 import Loading from '../components/Loading';
 
+import { logEvent } from '../utils/analytics';
+
 interface IBorrowProps {
   borrowAmount?:number|null;
   openConnectLayer:any;
@@ -103,7 +105,13 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
   /* Borrow execution flow */
   const borrowProcedure = async () => {
     if (inputValue && !borrowDisabled) {
-      await borrowDai(activeSeries, 'ETH-A', inputValue);
+
+       logEvent({
+        category: 'Borrow',
+        action: inputValue,
+        label: activeSeries.displayName || activeSeries.poolAddress,
+      });
+                       
       setInputValue(undefined);
       userActions.updateHistory();
       await Promise.all([

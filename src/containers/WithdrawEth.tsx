@@ -22,6 +22,8 @@ import FlatButton from '../components/FlatButton';
 import EthMark from '../components/logos/EthMark';
 import YieldMobileNav from '../components/YieldMobileNav';
 
+import { logEvent } from '../utils/analytics';
+
 interface IWithDrawProps {
   close?: any;
 }
@@ -60,6 +62,10 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
     if (inputValue && !withdrawDisabled ) {
       close(); // close immediately, no need to track withdrawPending
       await withdrawEth(inputValue);
+      logEvent({
+        category: 'Withdraw',
+        action: inputValue
+      });
       setInputValue(undefined);
       userActions.updateHistory();
       userActions.updatePosition();  

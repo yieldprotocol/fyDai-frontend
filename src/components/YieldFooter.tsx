@@ -9,6 +9,15 @@ import {
 } from 'react-icons/fi';
 import { CgSleep as Moodlight } from 'react-icons/cg';
 
+import YieldDisclaimer from './YieldDisclaimer';
+import { logEvent } from '../utils/analytics';
+
+const handleExternal = (destination: string) => {
+  logEvent({
+    category: 'External Link',
+    action: destination
+  });
+};
 
 const YieldFooter = (props: any) => {
   const {
@@ -38,13 +47,13 @@ const YieldFooter = (props: any) => {
           top: '2px',
         }}
       >
-        <Anchor color="grey" href='https://github.com/yieldprotocol' target="_blank">
+        <Anchor color="grey" href='https://github.com/yieldprotocol' target="_blank" onClick={() => handleExternal('Github')}>
           <Github size={IconSize} />
         </Anchor>
-        <Anchor color="grey" href='http://docs.yield.is' target="_blank">
+        <Anchor color="grey" href='http://docs.yield.is' target="_blank" onClick={() => handleExternal('Docs')}>
           <Docs size={IconSize} />
         </Anchor>
-        <Anchor color="grey" href='https://discord.gg/JAFfDj5' target="_blank">
+        <Anchor color="grey" href='https://discord.gg/JAFfDj5' target="_blank" onClick={() => handleExternal('Discord')}>
           <Discord size={IconSize} />
         </Anchor>
       </Box>

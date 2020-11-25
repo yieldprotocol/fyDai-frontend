@@ -24,6 +24,8 @@ const InsetBox = styled(Box)`
       box-shadow: inset 6px 6px 11px ${modColor(props.background, -20)}, inset -6px -6px 11px ${modColor(props.background, 10)};
   `}`;
 
+import { logEvent } from '../utils/analytics';
+
 interface ISeriesSelectorProps {
   activeView:string;
   close:any;
@@ -53,6 +55,11 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
 
   const handleSelectSeries = (seriesMaturity: number) => {
     setActiveSeries(seriesMaturity);
+    logEvent({
+      category: 'Series',
+      action: 'Select Series',
+      label: activeSeries.displayName,
+    });
     navHistory.push(`/${pathname.split('/')[1]}/${seriesMaturity}`);
     close();
   };

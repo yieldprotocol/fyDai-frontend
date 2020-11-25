@@ -25,6 +25,8 @@ import FlatButton from '../components/FlatButton';
 import YieldMark from '../components/logos/YieldMark';
 import YieldMobileNav from '../components/YieldMobileNav';
 
+import { logEvent } from '../utils/analytics';
+
 interface IRemoveLiquidityProps {
   openConnectLayer?:any
   close?: any;
@@ -59,7 +61,25 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
   /* Remove Liquidity sequence */
   const removeLiquidityProcedure = async (value:number) => {
     if ( !removeLiquidityDisabled ) {
+      
+      setRemoveLiquidityPending(true);
+      await removeLiquidity(activeSeries, value);
+      logEvent({
+        category: 'Remove Liquidity',
+        action: String(value),
+        label: activeSeries.displayName || activeSeries.poolAddress,
+      });
+      setInputValue(undefined);
+      userActions.updateHistory();
+
       !activeSeries?.isMature() && close();
+             logEvent({
+        category: 'Remove Liquidity',
+        action: String(value),
+        label: activeSeries.displayName || activeSeries.poolAddress,
+      });
+      setInputValue(undefined);
+
       if (activeSeries?.isMature()) {
         await removeLiquidity(activeSeries, value);
         setInputValue(undefined);

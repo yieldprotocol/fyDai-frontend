@@ -130,6 +130,13 @@ export interface IDomain {
   verifyingContract: string;
 }
 
+
+export interface IAnalytics {
+  category: string;
+  action: string;
+  label?: string | '';
+}
+
 export interface ITxState {
   pendingTxs: any[],
   lastCompletedTx: any,
@@ -141,4 +148,3 @@ export interface IReducerAction {
   type:string,
   payload?:any,
 }
-
