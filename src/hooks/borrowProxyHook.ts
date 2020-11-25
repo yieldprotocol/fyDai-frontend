@@ -330,7 +330,7 @@ export const useBorrowProxy = () => {
     const toAddr = account && ethers.utils.getAddress(account);
 
     const overrides = { 
-      gasLimit: BigNumber.from('200000'),
+      gasLimit: BigNumber.from('250000'),
       value: 0,
     };
 
@@ -350,20 +350,20 @@ export const useBorrowProxy = () => {
     /* build and use signature if required , else '0x' */
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
 
-    requestedSigs.set('daiSig',
-      { id: genTxCode('AUTH_TOKEN', series),
-        desc: 'Authorise Yield Pool Contact with Dai',
-        conditional: await getTokenAllowance(deployedContracts.Dai, 'Dai', poolAddr) > 0,
-        signFn: () => daiPermitSignature(deployedContracts.Dai, poolAddr),
-        fallbackFn: () => approveToken(deployedContracts.Dai, poolAddr, utils.MAX_INT, series), 
-      });
-        
     requestedSigs.set('poolSig',
       { id: genTxCode('AUTH_POOL', series),
         desc: 'Delegate a Proxy to interact with the Yield Series/Pool',
         conditional: await checkPoolDelegate(poolAddr, dsProxyAddress),
         signFn: () => delegationSignature(poolContract, dsProxyAddress),    
         fallbackFn: () => addPoolDelegate(series, dsProxyAddress),
+      });
+
+    requestedSigs.set('daiSig',
+      { id: genTxCode('AUTH_TOKEN', series),
+        desc: 'Authorise Yield Pool Contact with Dai',
+        conditional: await getTokenAllowance(deployedContracts.Dai, 'Dai', poolAddr) > 0,
+        signFn: () => daiPermitSignature(deployedContracts.Dai, poolAddr),
+        fallbackFn: () => approveToken(deployedContracts.Dai, poolAddr, utils.MAX_INT, series), 
       });
         
     /* Send the required signatures out for signing, or approval tx if fallback is required */
