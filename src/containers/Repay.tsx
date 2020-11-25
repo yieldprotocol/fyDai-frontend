@@ -121,7 +121,7 @@ function Repay({ close }:IRepayProps) {
           pad="large"
         >
           <Box flex='grow' justify='between'>
-            <Box gap='medium' align='center' fill='horizontal'>
+            <Box align='center' fill='horizontal'>
 
               { (activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero)) ?
              
@@ -185,13 +185,17 @@ function Repay({ close }:IRepayProps) {
                     </Collapsible>
                   </Box>
 
-                  <ActionButton
-                    onClick={()=>repayProcedure(inputValue)}
-                    label={`Repay ${inputValue || ''} DAI`}
-                    disabled={repayDisabled}
-                    hasPoolDelegatedProxy={true}
-                    clearInput={()=>setInputValue(undefined)}
-                  />
+                  {
+                   !repayDisabled &&
+                   <ActionButton
+                     onClick={()=>repayProcedure(inputValue)}
+                     label={`Repay ${inputValue || ''} DAI`}
+                     disabled={repayDisabled}
+                     hasPoolDelegatedProxy={true}
+                     clearInput={()=>setInputValue(undefined)}
+                   />                 
+                  }
+               
 
                   {!activeSeries?.isMature() && !mobile &&
                   <Box alignSelf='start' margin={{ top:'medium' }}> 

@@ -99,9 +99,7 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
         })}
       </Box>
 
-      <Box
-        margin={visibleEntries.length <= 3? { bottom:'large' }: undefined}
-      >
+      <Box>
         <Collapsible open={detailsOpen}>
           <Box 
             pad={{ horizontal:'small', top:'small' }} 

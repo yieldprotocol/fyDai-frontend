@@ -32,7 +32,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
           fill
           round='small'
           gap='small'
-          pad={{ bottom:'small' }}
+          pad={{ bottom:'large' }}
           background={`linear-gradient(to bottom right, 
           ${modColor( '#add8e6', -40)}, 
           ${modColor( '#add8e6', -20)},

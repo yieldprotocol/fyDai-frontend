@@ -202,13 +202,14 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
           </Collapsible>
         </Box>
 
+        {!removeLiquidityDisabled &&
         <ActionButton
           onClick={()=> removeLiquidityProcedure(inputValue)}
           label={`Remove ${inputValue || ''} tokens`}
           disabled={removeLiquidityDisabled}
           hasPoolDelegatedProxy={activeSeries?.hasPoolDelegatedProxy}
           clearInput={()=>setInputValue(undefined)}
-        />
+        />}
 
         {!activeSeries?.isMature() && !mobile && 
         <Box alignSelf='start' margin={{ top:'medium' }}>
