@@ -425,14 +425,6 @@ export const useBorrowProxy = () => {
     /* build and use signature if required , else '0x' */
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
 
-    requestedSigs.set('fyDaiSig',
-      { id: genTxCode('AUTH_TOKEN', series),
-        desc: 'Authorise Yield Pool with fyDai',
-        conditional: ( await getTokenAllowance(fyDaiAddr, 'FYDai', poolAddr) ) > 0,
-        signFn: () => ERC2612PermitSignature(fyDaiAddr, poolAddr),    
-        fallbackFn: () => approveToken(fyDaiAddr, poolAddr, utils.MAX_INT, series ), 
-      });
-               
     requestedSigs.set('poolSig',
       { id: genTxCode('AUTH_POOL', series),
         desc: 'Authorise Proxy to interact with the liquidity pool',
@@ -441,7 +433,15 @@ export const useBorrowProxy = () => {
         signFn: () => delegationSignature(poolContract, dsProxyAddress),    
         fallbackFn: () => addPoolDelegate(series, dsProxyAddress),
       });
-    
+
+    requestedSigs.set('fyDaiSig',
+      { id: genTxCode('AUTH_TOKEN', series),
+        desc: 'Authorise Yield Pool with fyDai',
+        conditional: ( await getTokenAllowance(fyDaiAddr, 'FYDai', poolAddr) ) > 0,
+        signFn: () => ERC2612PermitSignature(fyDaiAddr, poolAddr),    
+        fallbackFn: () => approveToken(fyDaiAddr, poolAddr, utils.MAX_INT, series ), 
+      });
+          
     /* Send the required signatures out for signing, or approval tx if fallback is required */
     const signedSigs = await handleSignList(requestedSigs, genTxCode('BUY_DAI', series));
 
