@@ -54,7 +54,7 @@ export const usePoolProxy = () => {
   const { splitDaiLiquidity } = useMath();
   const { getBalance, approveToken, getTokenAllowance } = useToken();
   
-  const { addControllerDelegate, checkControllerDelegate } = useController();
+  const { addControllerDelegate } = useController();
 
   const { proxyExecute } = useDsProxy();
   const { delegationSignature, daiPermitSignature, handleSignList } = useSigning();

@@ -9,7 +9,6 @@ import { UserContext } from '../contexts/UserContext';
 import { useSignerAccount } from './connectionHooks';
 import { useTxHelpers } from './txHooks';
 
-
 /**
  * Hook for interacting with the Yield Proxy Contract.
  * 
@@ -17,6 +16,7 @@ import { useTxHelpers } from './txHooks';
  * @returns { boolean } buildActive
  * 
  */
+
 export const useDsProxy = () => {
 
   /* contexts */
@@ -46,10 +46,8 @@ export const useDsProxy = () => {
     contractAddress: string,
     calldata: any,
     overrides: any,
-    txInfo: ITx,
-    
+    txInfo: ITx,   
   ) => {
-
     const proxyAddr = state.authorization?.dsProxyAddress || null;
     const dsProxyContract = new ethers.Contract(
       ethers.utils.getAddress(proxyAddr),

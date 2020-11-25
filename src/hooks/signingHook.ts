@@ -119,7 +119,7 @@ export const useSigning = () => {
     const signedMap: Map<string, string|undefined> = new Map();
 
     /* Set activity flag and Send the requested signatures to the txContext for tracking */
-    dispatch({ 
+    dispatch({
       type: 'setTxProcessActive',
       payload: {
         txCode,
@@ -166,7 +166,7 @@ export const useSigning = () => {
     /* Auth using the SIGN PERMIT auth strategy */
     if (!useTxApproval) {
       // eslint-disable-next-line no-console
-      console.log('Using primary authorisation strategy: Approvals by signing permit messages');
+      console.log('Using primary authorization strategy: Approvals by signing permit messages');
       dispatch({ type: 'setFallbackActive', payload: false });
 
       /* Deal wth the signtures  */    

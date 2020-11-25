@@ -99,7 +99,6 @@ const TxLayer = () => {
           margin={mobile?{ bottom:'-10px' }:undefined}
         >
 
-
           { 
           !pendingTxs.some((x:any) => x.type === 'CREATE_PROXY')?
             <>
@@ -147,7 +146,7 @@ const TxLayer = () => {
             <>
               <Box gap='medium'>
                 { allSigned ? 
-                  <Text weight='bold'> The required authorisations have been granted: </Text> :
+                  <Text weight='bold'> The required authorizations have been granted: </Text> :
                   <Text weight='bold'> The following {requestedSigs.length===1? 'signature is' : 'signatures are'} required: </Text>}
                 { requestedSigs.map((x:any, i:number)=> {
                   const iKey = i;
@@ -199,7 +198,7 @@ const TxLayer = () => {
               {
                 preferences?.useTxApproval ?
                   <>
-                    <Text weight='bold'> { !allSigned? 'Please approve the following authorization transactions:': 'The required authorisations have all been granted:'} </Text> 
+                    <Text weight='bold'> { !allSigned? 'Please approve the following authorization transactions:': 'The required authorizations have all been granted:'} </Text> 
                   </>        
                   :
                   <>

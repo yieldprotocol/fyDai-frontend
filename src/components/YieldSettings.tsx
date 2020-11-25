@@ -111,7 +111,7 @@ const YieldSettings = () => {
           direction='row'
           align='center'
         >
-          <Text size='xsmall'>Authorisation strategy: </Text>
+          <Text size='xsmall'>Authorization strategy: </Text>
 
           <Box gap='small' align='center'>
             <StyledBox

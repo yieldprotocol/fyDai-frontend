@@ -194,7 +194,6 @@ export const usePool = () => {
       /* Transaction reporting & tracking */
       await handleTx({ tx, msg: 'Yield Series Pool authorization', type:'AUTH_POOL', series });
       
-    
     } else { 
       const calldata = contract.interface.encodeFunctionData('addDelegate', [delegatedAddr]);
       tx = await proxyExecute( 

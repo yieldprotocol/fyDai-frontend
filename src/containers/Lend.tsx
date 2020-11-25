@@ -78,7 +78,6 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
   const [inputRef, setInputRef] = useState<any>(null);
   
   const [ lendDisabled, setLendDisabled ] = useState<boolean>(true);
-  const [ lendPending, setLendPending ] = useState<boolean>(false);
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
   const isLol = useIsLol(inputValue);
@@ -90,7 +89,6 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
   /* Lend execution flow */
   const lendProcedure = async () => {
     if (inputValue && !lendDisabled ) {
-      setLendPending(true);
       await sellDai(
         activeSeries,
         inputValue
@@ -101,7 +99,6 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
         userActions.updatePosition(),
         seriesActions.updateActiveSeries()
       ]);
-      setLendPending(false);
     }  
   };
 

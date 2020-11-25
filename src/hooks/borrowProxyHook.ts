@@ -371,7 +371,7 @@ export const useBorrowProxy = () => {
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
 
-    /* construct the calldata. Fn selection Based on current authorisation status */
+    /* construct the calldata. Fn selection Based on current authorization status */
     const calldata = proxyContract.interface.encodeFunctionData( 
       'sellDaiWithSignature',
       [ poolAddr, toAddr, parsedDaiIn, minFYDaiOut, signedSigs.get('daiSig'), signedSigs.get('poolSig') ]
@@ -379,7 +379,7 @@ export const useBorrowProxy = () => {
 
     /* send to the proxy for execution */
     await proxyExecute( 
-      proxyContract.address, 
+      proxyContract.address,
       calldata,
       overrides,
       { tx:null, msg: `Lending ${daiIn} DAI to ${series.displayNameMobile} `, type:'SELL_DAI', series  }
@@ -461,7 +461,6 @@ export const useBorrowProxy = () => {
       { tx:null, msg: `Closing ${daiOut} DAI from ${series.displayNameMobile}`, type:'BUY_DAI', series  }
     );
   };
-
 
 
   return {

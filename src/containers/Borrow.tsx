@@ -113,7 +113,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
     }
   };
 
-  /* 
+  /*
   * Handle input (debounced input) changes:
   * 1. dai to fyDai conversion and get APR (fyDai needed to compare with the approved allowance)
   * 2. calcalute yield APR
