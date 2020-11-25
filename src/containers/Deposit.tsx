@@ -140,7 +140,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
     (
       (account && ethBalance?.eq(ethers.constants.Zero)) ||
       (account && inputValue && ethBalance && ethers.utils.parseEther(inputValue).gt(ethBalance)) ||
-      (ethBalance && inputValue && (parseFloat(inputValue)<= 0.05) ) ||
+      (ethBalance && inputValue && (parseFloat(inputValue)<0.05) ) ||
       txActive ||
       !account ||
       !inputValue ||
@@ -156,7 +156,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
     } else if (ethBalance && debouncedInput && (ethers.utils.parseEther(debouncedInput).eq(ethBalance)) ) {
       setErrorMsg(null);
       setWarningMsg('If you deposit all your ETH you may not be able to make any further transactions!');
-    } else if (debouncedInput && debouncedInput<=0.05) {
+    } else if (debouncedInput && debouncedInput<0.05) {
       setErrorMsg('Initial collateral balance must be larger than 0.05 ETH.');
       setWarningMsg(null);
     } else {
