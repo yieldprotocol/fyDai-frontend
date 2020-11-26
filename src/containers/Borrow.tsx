@@ -115,9 +115,8 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
 
       /* clean up and refresh */               
       setInputValue(undefined);
-      userActions.updateHistory();
       await Promise.all([
-        userActions.updatePosition(),
+        userActions.updateUser(),
         seriesActions.updateSeries([activeSeries])
       ]);
     }

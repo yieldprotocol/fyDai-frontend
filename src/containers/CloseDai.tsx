@@ -74,8 +74,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
       
       /* clean up and refresh */ 
       setInputValue(undefined);
-      userActions.updateHistory();
-      userActions.updatePosition();
+      userActions.updateUser();
       seriesActions.updateActiveSeries();
     }
   };

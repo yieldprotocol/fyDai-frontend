@@ -70,14 +70,14 @@ function Repay({ close }:IRepayProps) {
       
       /* clean up and refresh */ 
       setInputValue(undefined);
-      userActions.updateHistory();
+
       if (activeSeries?.isMature()) {
         await Promise.all([
-          userActions.updatePosition(),
+          userActions.updateUser(),
           seriesActions.updateActiveSeries()
         ]);
       } else {
-        userActions.updatePosition();
+        userActions.updateUser();
         seriesActions.updateActiveSeries();
       }      
     }

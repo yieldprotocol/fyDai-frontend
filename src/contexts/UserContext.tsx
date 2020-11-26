@@ -393,7 +393,7 @@ const UserProvider = ({ children }: any) => {
         _getTxHistory(false),
         _updatePreferences(null),
       ]);
-      console.log('User initialised.');
+      console.log('User data updated');
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log(e);
@@ -412,6 +412,7 @@ const UserProvider = ({ children }: any) => {
 
   /* Exposed actions */
   const actions = {
+    updateUser: () =>  account && initUser(),
     updatePosition: () => account && _getPosition(),
     updateAuthorizations: () => account && _getAuthorizations(),
     updateHistory: () => _getTxHistory(false),

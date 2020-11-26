@@ -106,10 +106,9 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
         action: inputValue
       });
       
-      /* clean up and refresh */ 
+      /* clean up and refresh */
       setInputValue(undefined);
-      userActions.updateHistory();
-      await userActions.updatePosition();
+      await userActions.updateUser();
       setDepositPending(false);
     }
   };

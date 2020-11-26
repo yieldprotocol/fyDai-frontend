@@ -68,8 +68,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
       });
       /* clean up and refresh */ 
       setInputValue(undefined);
-      userActions.updateHistory();
-      userActions.updatePosition();  
+      userActions.updateUser();
     }
   };
 

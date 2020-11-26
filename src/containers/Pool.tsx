@@ -96,9 +96,8 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
       
       /* clean up and refresh */ 
       setInputValue(undefined);
-      userActions.updateHistory();
       await Promise.all([
-        userActions.updatePosition(),
+        userActions.updateUser(),
         seriesActions.updateActiveSeries()
       ]);
 
