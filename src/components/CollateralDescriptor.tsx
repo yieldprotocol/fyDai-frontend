@@ -21,7 +21,7 @@ function CollateralDescriptor( { backToBorrow, children }: ICollateralDescriptor
       alignSelf="center"
       fill
       round='small'
-      pad='small'
+      pad={{ top:'small', bottom:'large', horizontal:'small' }}
       gap='small'
       background="linear-gradient(to bottom right, #f0817f, #ff86c8, #82d4bb, #6ab6f1, #cb90c9, #aed175, #add8e6, #add8e6, #add8e6, #add8e6, #add8e6, #add8e6, #ffdc5c, #ffbf81, #95a4db)"
       margin={{ bottom:'-16px' }}
@@ -34,6 +34,7 @@ function CollateralDescriptor( { backToBorrow, children }: ICollateralDescriptor
           align='center'
           pad={{ horizontal:'large', vertical:'medium' }}
           justify='between'
+          
         >
           <Text size='large' weight='bold' color={theme.global.colors.text.light}> 
             Manage ETH Collateral 
