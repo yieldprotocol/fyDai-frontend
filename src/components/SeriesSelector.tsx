@@ -99,7 +99,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
       >
         <Box direction='row' gap='large' align='center'>
           { mobile && <Box onClick={() => close()}><ArrowLeft /></Box>}
-          <Text weight='bold' size={mobile?'small':'medium'}> Choose a Series</Text>
+          <Text weight='bold' size={mobile?'small':'large'}> Choose a Series</Text>
         </Box>
 
         <InsetBox 

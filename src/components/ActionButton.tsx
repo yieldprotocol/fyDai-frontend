@@ -11,8 +11,10 @@ import { modColor } from '../utils';
 import { useDsRegistry } from '../hooks/dsRegistryHook';
 
 const StyledBox = styled(Box)`
-  border-radius: 8px;
-  transition: all 0.3s ease-in-out;
+  border-radius: 25px;
+  -webkit-transition: transform 0.3s ease, box-shadow 0.3s ease  ; 
+  -moz-transition: transform 0.3s ease, box-shadow 0.3s ease ; 
+  transition: transform 0.3s ease, box-shadow 0.3s ease; 
 
   ${(props:any) => props.disabled && css`
   background: ${ props.background };
