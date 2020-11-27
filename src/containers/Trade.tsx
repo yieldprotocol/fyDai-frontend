@@ -66,6 +66,9 @@ const Trade = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
 
   const theme = useContext<any>(ThemeContext);
 
+  const { buyDai }  = useBorrowProxy();
+
+
   /* hooks init */
   const { previewPoolTx }  = usePool();
   const { borrowDai } = useBorrowProxy();
@@ -102,6 +105,7 @@ const Trade = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
   const [ APR, setAPR ] = useState<number>();
   const [ estRatio, setEstRatio ] = useState<number>(0);
 
+
   /* Borrow execution flow */
   const borrowProcedure = async () => {
     if (inputValue && !borrowDisabled) {
@@ -121,6 +125,26 @@ const Trade = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
       ]);
     }
   };
+
+  const withdrawProcedure = async () => {
+    await buyDai(
+      activeSeries,
+      inputValue,
+    );
+    logEvent({
+      category: 'ClosePosition',
+      action: inputValue,
+      label: activeSeries.displayName || activeSeries.poolAddress,
+    });
+    
+    /* clean up and refresh */ 
+    setInputValue(undefined);
+    userActions.updateUser();
+    seriesActions.updateActiveSeries();
+  };
+
+      
+
 
   /*
   * Handle input (debounced input) changes:
