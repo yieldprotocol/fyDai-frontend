@@ -144,7 +144,7 @@ export const useBorrowProxy = () => {
 
     requestedSigs.set('controllerSig',
       { id: genTxCode('AUTH_CONTROLLER', null),
-        desc: 'Authorise Yield Protocol contract',
+        desc: 'Allow your proxy to interact with your collateralized positions',
         conditional: hasDelegatedDsProxy,
         signFn: () => delegationSignature(controllerContract, dsProxyAddress),    
         fallbackFn: () => addControllerDelegate(dsProxyAddress),
@@ -214,7 +214,7 @@ export const useBorrowProxy = () => {
 
     requestedSigs.set('controllerSig',
       { id: genTxCode('AUTH_CONTROLLER', null),
-        desc: 'Authorise Yield Protocol contract',
+        desc: 'Allow your proxy to interact with your collateralized positions',
         conditional: hasDelegatedDsProxy,
         signFn: () => delegationSignature(controllerContract, dsProxyAddress),    
         fallbackFn: () => addControllerDelegate(dsProxyAddress),
@@ -275,7 +275,7 @@ export const useBorrowProxy = () => {
 
     requestedSigs.set('controllerSig',
       { id: genTxCode('AUTH_CONTROLLER', null),
-        desc: 'Authorise Yield Protocol contract',
+        desc: 'Allow your proxy to interact with your collateralized positions',
         conditional: hasDelegatedDsProxy,
         signFn: () => delegationSignature(controllerContract, dsProxyAddress),    
         fallbackFn: () => addControllerDelegate(dsProxyAddress),
@@ -284,7 +284,7 @@ export const useBorrowProxy = () => {
     // User to treasury no ds proxy 
     requestedSigs.set('daiSig',
       { id: genTxCode('AUTH_TOKEN', series),
-        desc: 'Authorise Yield Treasury with Dai',
+        desc: 'Allow Dai transfers to the fyDai Treasury',
         conditional: ( await getTokenAllowance(deployedContracts.Dai, 'Dai', deployedContracts.Treasury) ) > 0,
         signFn: () => daiPermitSignature( deployedContracts.Dai, deployedContracts.Treasury),
         fallbackFn: () => approveToken(deployedContracts.Dai, deployedContracts.Treasury, utils.MAX_INT, series),
@@ -352,7 +352,7 @@ export const useBorrowProxy = () => {
 
     requestedSigs.set('poolSig',
       { id: genTxCode('AUTH_POOL', series),
-        desc: 'Delegate a Proxy to interact with the Yield Series/Pool',
+        desc: `Allow your proxy to interact with the ${series.displayName} pool`,
         conditional: await checkPoolDelegate(poolAddr, dsProxyAddress),
         signFn: () => delegationSignature(poolContract, dsProxyAddress),    
         fallbackFn: () => addPoolDelegate(series, dsProxyAddress),
@@ -360,7 +360,7 @@ export const useBorrowProxy = () => {
 
     requestedSigs.set('daiSig',
       { id: genTxCode('AUTH_TOKEN', series),
-        desc: 'Authorise Yield Pool Contact with Dai',
+        desc: `Allow Dai transfers to the ${series.displayName} pool`,
         conditional: await getTokenAllowance(deployedContracts.Dai, 'Dai', poolAddr) > 0,
         signFn: () => daiPermitSignature(deployedContracts.Dai, poolAddr),
         fallbackFn: () => approveToken(deployedContracts.Dai, poolAddr, utils.MAX_INT, series), 
@@ -427,8 +427,7 @@ export const useBorrowProxy = () => {
 
     requestedSigs.set('poolSig',
       { id: genTxCode('AUTH_POOL', series),
-        desc: 'Authorise Proxy to interact with the liquidity pool',
-        // conditional: checkSigs[2],
+        desc: `Allow your proxy to interact with the ${series.displayName} pool`,
         conditional: await checkPoolDelegate(poolAddr, dsProxyAddress),
         signFn: () => delegationSignature(poolContract, dsProxyAddress),    
         fallbackFn: () => addPoolDelegate(series, dsProxyAddress),
@@ -436,7 +435,7 @@ export const useBorrowProxy = () => {
 
     requestedSigs.set('fyDaiSig',
       { id: genTxCode('AUTH_TOKEN', series),
-        desc: 'Authorise Yield Pool with fyDai',
+        desc: `Allow fyDai transfers to the ${series.displayName} pool`,
         conditional: ( await getTokenAllowance(fyDaiAddr, 'FYDai', poolAddr) ) > 0,
         signFn: () => ERC2612PermitSignature(fyDaiAddr, poolAddr),    
         fallbackFn: () => approveToken(fyDaiAddr, poolAddr, utils.MAX_INT, series ), 

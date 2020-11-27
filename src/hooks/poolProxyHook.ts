@@ -116,7 +116,7 @@ export const usePoolProxy = () => {
     
     requestedSigs.set('controllerSig',
       { id: genTxCode('AUTH_CONTROLLER', null),
-        desc: 'Authorise Yield Protocol contract',
+        desc: 'Allow your proxy to interact with your collateralized positions',
         conditional: hasDelegatedDsProxy,
         signFn: () => delegationSignature(controllerContract, dsProxyAddress),    
         fallbackFn: () => addControllerDelegate(dsProxyAddress),
@@ -125,7 +125,7 @@ export const usePoolProxy = () => {
     // dsProxy must be spender
     requestedSigs.set('daiSig',
       { id: genTxCode('AUTH_TOKEN', series),
-        desc: 'Authorise Yield with Dai',
+        desc: 'Allow transfers of Dai to your Proxy',
         conditional: (await getTokenAllowance(deployedContracts.Dai, 'Dai', dsProxyAddress)) > 0,
         signFn: () => daiPermitSignature(deployedContracts.Dai, dsProxyAddress), 
         fallbackFn: () => approveToken(deployedContracts.Dai, dsProxyAddress, utils.MAX_INT, series), // executed as user!
@@ -186,7 +186,7 @@ export const usePoolProxy = () => {
 
     requestedSigs.set('controllerSig',
       { id: genTxCode('AUTH_CONTROLLER', null),
-        desc: 'Authorise Yield Protocol contract',
+        desc: 'Allow your proxy to interact with your collateralized positions',
         conditional: hasDelegatedDsProxy,
         signFn: () => delegationSignature(controllerContract, dsProxyAddress),    
         fallbackFn: () => addControllerDelegate(dsProxyAddress),
@@ -194,7 +194,7 @@ export const usePoolProxy = () => {
         
     requestedSigs.set('poolSig',
       { id: genTxCode('AUTH_POOL', series),
-        desc: 'Authorise your proxy contract to interact with the series/pool',
+        desc: `Allow your proxy to interact with the ${series.displayName} pool`,
         conditional: await checkPoolDelegate(poolAddr, dsProxyAddress),
         signFn: () => delegationSignature(poolContract, dsProxyAddress),    
         fallbackFn: () => addPoolDelegate(series, dsProxyAddress), 
