@@ -67,16 +67,19 @@ const YieldFooter = (props: any) => {
       >
         <Box onClick={()=> setShowDisclaimer(true)}>
           <Text size='xxsmall' color='grey'>
-            This software is in BETA v0.2
+            This software is in BETA v0.3.0
           </Text>
           {/* {showDisclaimer && <YieldDisclaimer forceShow={true} />} */}
         </Box>
-        <Anchor
-          onClick={()=>toggleMoodLight()}
-          color={moodLight? 'pink':'grey'}
-        >
-          <Moodlight />
-        </Anchor>
+        {
+          !darkMode &&
+          <Anchor
+            onClick={()=>toggleMoodLight()}
+            color={moodLight? 'pink':'grey'}
+          >
+            <Moodlight />
+          </Anchor>
+        }
         <Anchor
           onClick={()=>setDarkMode(!darkMode)}
           color={moodLight? 'pink':'grey'}
