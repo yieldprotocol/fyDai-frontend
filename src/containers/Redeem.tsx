@@ -42,7 +42,7 @@ const Redeem  = ({ close }:IRedeemProps)  => {
       /* clean up and refresh */ 
       await Promise.all([
         userActions.updateUser(),
-        seriesActions.updateActiveSeries()
+        seriesActions.updateSeries([activeSeries]),
       ]);
     }
   };

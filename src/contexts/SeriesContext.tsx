@@ -162,12 +162,9 @@ const SeriesProvider = ({ children }:any) => {
       /* Build/Re-build series map with data */ 
       const seriesMap:any = await _getSeriesData(seriesArr); 
 
-      /* Set the active series */
-      if (seriesArr.length===1 ){ 
-      /* if there was only one series updated set that one as the active series */   
-        dispatch({ type:'setActiveSeries', payload: seriesMap.get(seriesArr[0].maturity) }); 
-      } else {
-      /* if no active series or multiple updated, set it to non-mature series that is maturing soonest. */
+      /* Set the activeSeries if there isn't one already */
+      if (!state.activeSeries) {
+        /* if no active series, set it to non-mature series that is maturing soonest. */
         const unmatureSeries: IYieldSeries[] = Array.from(seriesMap.values());
         const toSelect = unmatureSeries
           .filter((x:IYieldSeries)=>!x.isMature())
@@ -179,7 +176,13 @@ const SeriesProvider = ({ children }:any) => {
         } else {
           dispatch({ type:'setActiveSeries', payload: seriesMap.get(toSelect[0].maturity) });
         }
-      } 
+      }
+
+      // keep the current view up-to-date (if the activeSeries and the recently updated Series are the same )
+      if ( (seriesArr.length === 1) && (seriesArr[0]?.maturity === state.activeSeries?.maturity) ) {
+        dispatch({ type:'setActiveSeries', payload: seriesMap.get(seriesArr[0].maturity) });
+      }
+
       dispatch({ type:'isLoading', payload: false });
     }
   };

@@ -75,7 +75,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
       /* clean up and refresh */ 
       setInputValue(undefined);
       userActions.updateUser();
-      seriesActions.updateActiveSeries();
+      seriesActions.updateSeries([activeSeries]);
     }
   };
 

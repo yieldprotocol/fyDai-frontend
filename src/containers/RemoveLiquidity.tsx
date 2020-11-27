@@ -77,11 +77,11 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
       if (activeSeries?.isMature()) {
         await Promise.all([
           userActions.updateUser(),
-          seriesActions.updateActiveSeries()
+          seriesActions.updateSeries([activeSeries])
         ]);
       } else {
         userActions.updateUser();
-        seriesActions.updateActiveSeries();
+        seriesActions.updateSeries([activeSeries]);
       }
     }
   };

@@ -98,7 +98,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
       setInputValue(undefined);
       await Promise.all([
         userActions.updateUser(),
-        seriesActions.updateActiveSeries()
+        seriesActions.updateSeries([activeSeries]),
       ]);
 
     }   

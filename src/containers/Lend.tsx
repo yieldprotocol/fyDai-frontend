@@ -101,7 +101,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
       setInputValue(undefined);
       await Promise.all([
         userActions.updateUser(),
-        seriesActions.updateActiveSeries()
+        seriesActions.updateSeries([activeSeries]),
       ]);
     }  
   };
