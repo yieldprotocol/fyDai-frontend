@@ -208,14 +208,19 @@ export const usePoolProxy = () => {
     /* Build the call data based, function dependant on series maturity */ 
     let calldata:any;
 
-    console.log(signedSigs.get('controllerSig'), signedSigs.get('poolSig'));
-
     if (!series.isMature()) {
       /* calculate expected trade values  */  
-      let minFYDai:BigNumber;    
+      let minFYDaiPrice:BigNumber;    
       const preview = await previewPoolTx('buydai', series, ethers.utils.parseEther('1'));   
       if ( !(preview instanceof Error) ) {
-        minFYDai = utils.divRay( preview.mul(BigNumber.from('1000000000')), utils.toRay(1.1));
+
+        const one = utils.toRay(1);
+        const pointNine = utils.toRay(0.9);
+        const rayPrice = preview.mul(BigNumber.from('1000000000'));
+        minFYDaiPrice = one.add(pointNine.mul( rayPrice.sub(one) ));
+
+        console.log(minFYDaiPrice.toString());
+        // minFYDaiPrice = utils.divRay( preview.mul(BigNumber.from('1000000000')), utils.toRay(1.1)); // 1+ 0.9*(price - 1)
       } else {
         throw(preview);
       }
@@ -223,7 +228,7 @@ export const usePoolProxy = () => {
       // contract fn used: removeLiquidityEarlyDaiFixedWithSignature(IPool pool,uint256 poolTokens,uint256 minimumFYDaiPrice,bytes memory controllerSig,bytes memory poolSig)
       calldata = proxyContract.interface.encodeFunctionData( 
         'removeLiquidityEarlyDaiFixedWithSignature', 
-        [ poolAddr, parsedTokens, minFYDai, signedSigs.get('controllerSig'), signedSigs.get('poolSig') ]
+        [ poolAddr, parsedTokens, minFYDaiPrice, signedSigs.get('controllerSig'), signedSigs.get('poolSig') ]
       );
     } else {
       // contract fn used: removeLiquidityMatureWithSignature(IPool pool,uint256 poolTokens,bytes memory controllerSig,bytes memory poolSig)
