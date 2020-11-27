@@ -26,6 +26,7 @@ import CloseDai from './containers/CloseDai';
 import WithdrawEth from './containers/WithdrawEth';
 import Repay from './containers/Repay';
 import RemoveLiquidity from './containers/RemoveLiquidity';
+import Trade from './containers/Trade';
 
 import YieldHeader from './components/YieldHeader';
 import YieldFooter from './components/YieldFooter';
@@ -155,6 +156,7 @@ const App = (props:any) => {
           <Route path="/close/:series/:amnt?"> <CloseDai close={()=>null} /> </Route>
           <Route path="/pool/:series?/:amnt?"> <Pool openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route>
           <Route path="/removeLiquidity/:series/:amnt?"> <RemoveLiquidity /> </Route>           
+          <Route path="/trade/:series?/:amnt?"> <Trade openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route> 
           <Route exact path="/"> <Redirect to={`${cachedLastVisit || '/borrow/'}`} /> </Route>
           <Route path="/*"> 404 </Route>
         </Switch>              

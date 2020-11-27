@@ -78,6 +78,18 @@ const YieldNav = (props: any) => {
           >Pool
           </Text>
         </StyledLink> 
+
+        <StyledLink 
+          to={`/trade/${activeSeries?.maturity}`}
+          activeStyle={{ transform: 'scale(1.1)', fontWeight: 'bold', color: `${textColor}` }}
+        >
+          <Text 
+            weight='bold' 
+            size={mobile? 'small':'xxlarge'} 
+          > Trade
+          </Text>
+        </StyledLink> 
+
       </Box>
     </>
   );
