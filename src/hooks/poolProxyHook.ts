@@ -243,7 +243,7 @@ export const usePoolProxy = () => {
       proxyContract.address, 
       calldata,
       overrides,
-      { tx:null, msg: `Removing ${tokens} DAI liquidity from ${series.displayNameMobile}`, type:'REMOVE_LIQUIDITY', series  }
+      { tx:null, msg: `Removing ${tokens} liquidity tokens from ${series.displayNameMobile}`, type:'REMOVE_LIQUIDITY', series  }
     );
 
   };

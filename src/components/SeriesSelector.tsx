@@ -121,7 +121,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
                 <Text size={mobile? 'xsmall':'small'} color='text-weak' weight='bold'>{mobile? 'SERIES' : 'SERIES MATURITY'}</Text>
               </Box>
               <Box fill align={mobile?'end':undefined}>
-                <Text size={mobile? 'xsmall':'small'} color='text-weak' weight='bold' >
+                <Text size={mobile? 'xsmall':'small'} color='text-weak' weight='bold'>
                   { viewMap.get(activeView.toUpperCase())?.head }         
                 </Text>
               </Box>

@@ -50,6 +50,7 @@ export const cleanValue = (input:string, decimals:number=12) => {
   if (inpu) {
     return inpu[1];
   }
+  if (input === '0.0') { return '0.00';}
   return input.valueOf();
 };
 
