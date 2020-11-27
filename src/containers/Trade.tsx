@@ -105,6 +105,12 @@ const Trade = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
   const [ APR, setAPR ] = useState<number>();
   const [ estRatio, setEstRatio ] = useState<number>(0);
 
+  const [ maxWithdraw, setMaxWithdraw ] = useState<string>();
+  
+  const [ closeDisabled, setCloseDisabled ] = useState<boolean>(true);
+
+
+
 
   /* Borrow execution flow */
   const borrowProcedure = async () => {
@@ -216,7 +222,7 @@ const Trade = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
     <RaisedBox>
       <Keyboard 
         onEsc={() => setInputValue(undefined)}
-        onEnter={()=> borrowProcedure()}
+        onEnter={()=> withdrawProcedure()}
         onBackspace={()=> {
           inputValue && 
           (document.activeElement !== inputRef) && 
@@ -560,6 +566,30 @@ const Trade = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
                 </Box>
               }
             </Box>
+            <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to close</Text>
+          <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
+            <TextInput
+              ref={(el:any) => {el && !mobile && el.focus(); setInputRef(el);}} 
+              type="number"
+              placeholder='DAI'
+              value={inputValue || ''}
+              plain
+              onChange={(event:any) => setInputValue(( cleanValue(event.target.value, 6)))}
+              icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <DaiMark />}
+            />
+            <RaisedButton 
+              label='Maximum'
+              onClick={()=> setInputValue(maxWithdraw)}
+            />
+          </InputWrap>
+
+          <ActionButton
+            onClick={()=> withdrawProcedure()}
+            label={`Reclaim ${inputValue || ''} Dai`}
+            disabled={closeDisabled}
+            hasPoolDelegatedProxy={activeSeries.hasPoolDelegatedProxy}
+            clearInput={()=>setInputValue(undefined)}
+          />
 
           </Box>
         </Box>}
