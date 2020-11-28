@@ -86,6 +86,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
 
   const [ APR, setAPR ] = useState<number>();
   const [ fyDaiValue, setFYDaiValue ] = useState<number>(0);
+  const [ minFYDaiOut, setMinFYDaiOut ] = useState<number>(0);
   const [ currentValue, setCurrentValue ] = useState<string>();
   
   /* Lend execution flow */
@@ -112,6 +113,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
       const preview = await previewPoolTx('sellDai', activeSeries, debouncedInput);
       if (!(preview instanceof Error)) {
         setFYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
+        setMinFYDaiOut(parseFloat(ethers.utils.formatEther(preview)));
         setAPR( calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) );      
       } else {
         /* if the market doesnt have liquidity just estimate from rate */
@@ -206,6 +208,16 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
                 valueExtra: null,
               },
               {
+                label: 'minFYDaiOut',
+                visible: true,
+                active: true,
+                loading: false,            
+                value: minFYDaiOut?`${minFYDaiOut} fyDAI`: '- fyDai',
+                valuePrefix: null,
+                valueExtra: null,
+              },
+
+              {
                 label: null,
                 labelExtra: null,
                 visible: !!account && !activeSeries?.isMature(),
@@ -224,6 +236,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
                 valuePrefix: null,
                 valueExtra: null,
               },
+
             ]}
           />
         </SeriesDescriptor>
