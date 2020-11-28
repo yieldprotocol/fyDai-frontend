@@ -212,7 +212,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
                 visible: true,
                 active: true,
                 loading: false,            
-                value: minFYDaiOut?`${minFYDaiOut} fyDAI`: '- fyDai',
+                value: minFYDaiOut?`${minFYDaiOut.toFixed(2)} fyDAI`: '- fDai',
                 valuePrefix: null,
                 valueExtra: null,
               },
@@ -257,7 +257,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
             { !activeSeries?.isMature() && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
             <>
               <Box fill gap='medium'>
-                <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to lend</Text>
+                <Text alignSelf='start' size='large' color='text' weight='bold'>From Dai </Text>
                 <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
                   <TextInput
                     ref={(el:any) => {el && !CloseDaiOpen && !mobile && el.focus(); setInputRef(el);}}
