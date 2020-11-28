@@ -186,7 +186,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
             alt 
             entries={[
               {
-                label: 'Portfolio Value',
+                label: 'fyDai Portfolio Value',
                 labelExtra: 'at maturity',
                 visible: 
                   (!!account && !activeSeries?.isMature()) || 
@@ -198,7 +198,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
                 valueExtra: null,
               },
               {
-                label: 'Current Value',
+                label: 'fyDai Current Value',
                 labelExtra: 'if closing your position now',
                 visible: !!account && !activeSeries?.isMature(),
                 active: true,
@@ -324,7 +324,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
               <Box gap='small' fill='horizontal' align='center' pad={{ vertical:'small' }}>
                 <ActionButton
                   onClick={()=>lendProcedure()}
-                  label={`Lend ${inputValue || ''} DAI`}
+                  label={`Swap`}
                   disabled={lendDisabled}
                   hasPoolDelegatedProxy={activeSeries.hasPoolDelegatedProxy}
                   clearInput={()=>setInputValue(undefined)}
