@@ -208,11 +208,12 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
                 valueExtra: null,
               },
               {
-                label: 'minFYDaiOut',
+                label: 'To fyDai',
+                labelExtra: 'minimum you will receive',
                 visible: true,
                 active: true,
                 loading: false,            
-                value: minFYDaiOut?`${minFYDaiOut.toFixed(2)} fyDAI`: '- fDai',
+                value: minFYDaiOut?`${minFYDaiOut.toFixed(2)} `: '0',
                 valuePrefix: null,
                 valueExtra: null,
               },
@@ -262,7 +263,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
                   <TextInput
                     ref={(el:any) => {el && !CloseDaiOpen && !mobile && el.focus(); setInputRef(el);}}
                     type="number"
-                    placeholder={!mobile ? 'Enter the amount of Dai to lend': 'DAI'}
+                    placeholder={!mobile ? 'Enter the amount of Dai to swap': 'DAI'}
                     value={inputValue || ''}
                     plain
                     onChange={(event:any) => setInputValue( cleanValue(event.target.value, 6) )}
