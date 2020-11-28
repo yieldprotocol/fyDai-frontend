@@ -271,7 +271,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
                   />
                   {account &&
                   <RaisedButton 
-                    label={!mobile ? 'Lend Maximum': 'Maximum'}
+                    label={!mobile ? 'Swap Maximum': 'Maximum'}
                     onClick={()=>setInputValue( cleanValue(ethers.utils.formatEther(daiBalance), 6) )}
                   />}
                 </InputWrap>
