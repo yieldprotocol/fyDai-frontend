@@ -355,35 +355,13 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
                       <Box direction='row' gap='small' align='center'>
                         <Text size='xsmall' color='text-xweak'><History /></Text>                
                         <Text size='xsmall' color='text-xweak'>
-                          Series Lend History
+                          Series Swap History
                         </Text>              
                       </Box>
                     }
                   />
                 </Box>
               }
-              { !activeSeries?.isMature() && 
-                activeSeries?.fyDaiBalance_ > 0 &&
-                !mobile &&
-                <Box alignSelf='end' margin={{ top:'medium' }}>
-                  { closeTxActive ?
-                    <Box direction='row' gap='small'>
-                      <Text size='xsmall' color='text-weak'>
-                        <Text weight='bold' color={activeSeries?.seriesColor}>close</Text> pending
-                      </Text>
-                      <Loading condition={true} size='xxsmall'>.</Loading>
-                    </Box>
-                    : 
-                    <FlatButton 
-                      onClick={()=>setCloseDaiOpen(true)}
-                      label={
-                        <Box direction='row' gap='small' align='center'>
-                          <Box><Text size='xsmall' color='text-weak'><Text weight='bold' color={activeSeries?.seriesColor}>close</Text> your position in this series</Text></Box>
-                          <ArrowRight color='text-weak' />
-                        </Box>
-                        }
-                    />}
-                </Box>}
             </Box>
 
           </Box>
