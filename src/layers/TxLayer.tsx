@@ -19,8 +19,6 @@ import { useDsRegistry } from '../hooks/dsRegistryHook';
 
 import RaisedButton from '../components/RaisedButton';
 import FlatButton from '../components/FlatButton';
-import EtherscanButton from '../components/EtherscanButton';
-import { abbreviateHash, genTxCode } from '../utils';
 import TxStatus from '../components/TxStatus';
 import Loading from '../components/Loading';
 
@@ -35,6 +33,7 @@ const TxLayer = () => {
   const { account } = useSignerAccount();
   const { buildDsProxy } = useDsRegistry();
 
+  /* Monitor All possible tx's */ 
   const [ authActive ] = useTxActive([ 'AUTH_TOKEN', 'AUTH_CONTROLLER', 'AUTH_POOL', 'CREATE_PROXY' ]);
   const [ txActive ] = useTxActive(['POST', 'WITHDRAW', 'BORROW', 'REPAY', 'SELL_DAI', 'BUY_DAI', 'REDEEM', 'ADD_LIQUIDITY', 'REMOVE_LIQUIDITY' ]);
 

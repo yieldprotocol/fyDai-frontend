@@ -164,8 +164,8 @@ const App = (props:any) => {
       <Footer margin={mobile? undefined: { horizontal:'xlarge' }}>
         {!mobile &&
         <YieldFooter
-          darkMode={props.darkMode}
-          setDarkMode={props.setDarkMode}
+          themeMode={props.themeMode}
+          cycleThemeMode={props.cycleThemeMode}
           moodLight={props.moodLight}
           toggleMoodLight={props.toggleMoodLight}
           openConnectLayer={() => setShowConnectLayer('CONNECT')}
@@ -176,19 +176,41 @@ const App = (props:any) => {
 };
 
 const WrappedApp = () => {
-  const [ userPreferences, setUserPreferences ] = useCachedState('userPreferences', { moodLight:true, darkMode:true });
+ 
+  const [ colorScheme, setColorScheme ] = useState<'light'|'dark'>('light');
+  const [ userPreferences, setUserPreferences ] = useCachedState('userPreferences', { moodLight:true, themeMode: 'auto' });
+
+  useEffect(()=>{
+    if (userPreferences.themeMode === 'auto') {
+      (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? setColorScheme('dark') : setColorScheme('light');
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+        const newColorScheme = e.matches ? 'dark' : 'light';
+        userPreferences.themeMode === 'auto' && setColorScheme(newColorScheme);
+      });
+    } else {
+      setColorScheme(userPreferences.themeMode);
+    }
+  }, [userPreferences.themeMode]);
+
+  // eslint-disable-next-line consistent-return
+  const cycleOptions = (option:string) => {
+    if ( option === 'auto') { return 'light'; }
+    if ( option === 'light' ) { return 'dark'; }
+    if ( option === 'dark' ) { return 'auto'; }
+  };
+
   return (
     <Suspense fallback={null}>
       <Grommet
         theme={deepMerge(base, yieldTheme)}
-        themeMode={userPreferences?.darkMode ? 'dark' : 'light' || 'light'}
+        themeMode={colorScheme === 'dark'? 'dark':'light' || 'light'}
         full
       >
         <ErrorBoundary>
-          <App 
-            darkMode={userPreferences?.darkMode}
-            setDarkMode={()=>setUserPreferences({ ...userPreferences, darkMode: !userPreferences?.darkMode })}
-            moodLight={userPreferences?.darkMode? false: userPreferences?.moodLight}
+          <App
+            themeMode={userPreferences.themeMode}
+            cycleThemeMode={() =>setUserPreferences({ ...userPreferences, themeMode: cycleOptions(userPreferences.themeMode) })}
+            moodLight={colorScheme==='dark'? false: userPreferences?.moodLight}
             toggleMoodLight={()=>setUserPreferences({ ...userPreferences, moodLight: !userPreferences?.moodLight })}
           />
         </ErrorBoundary>

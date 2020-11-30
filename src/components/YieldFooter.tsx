@@ -6,6 +6,7 @@ import {
   FiFileText as Docs,
   FiSun as Sun,
   FiMoon as Moon,
+  FiClock as Clock,
 } from 'react-icons/fi';
 import { CgSleep as Moodlight } from 'react-icons/cg';
 
@@ -21,8 +22,8 @@ const handleExternal = (destination: string) => {
 
 const YieldFooter = (props: any) => {
   const {
-    darkMode,
-    setDarkMode,
+    themeMode,
+    cycleThemeMode,
     moodLight, 
     toggleMoodLight,
   } = props;
@@ -71,8 +72,23 @@ const YieldFooter = (props: any) => {
           </Text>
           {/* {showDisclaimer && <YieldDisclaimer forceShow={true} />} */}
         </Box>
+
+        <Box>
+          <Text size='xxsmall' color='grey'>
+            Current theme: 
+          </Text>
+        </Box>
+
+        <Anchor
+          onClick={()=>cycleThemeMode()}
+        >
+          { themeMode === 'dark'  && <Box align='center' direction='row' gap='xsmall'><Moon /> <Text size='xxsmall'>Dark</Text></Box>}
+          { themeMode === 'light'  && <Box align='center' direction='row' gap='xsmall'><Sun /> <Text size='xxsmall'>Light</Text></Box> }
+          { themeMode === 'auto'  && <Box align='center' direction='row' gap='xsmall'><Clock /> <Text size='xxsmall'>Auto</Text></Box> }      
+        </Anchor>
+
         {
-          !darkMode &&
+          themeMode === 'light' &&
           <Anchor
             onClick={()=>toggleMoodLight()}
             color={moodLight? 'pink':'grey'}
@@ -80,12 +96,7 @@ const YieldFooter = (props: any) => {
             <Moodlight />
           </Anchor>
         }
-        <Anchor
-          onClick={()=>setDarkMode(!darkMode)}
-          color={moodLight? 'pink':'grey'}
-        >
-          { darkMode? <Sun /> : <Moon />}
-        </Anchor>
+        
       </Box>
     </Footer>
   );

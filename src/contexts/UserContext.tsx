@@ -61,6 +61,7 @@ const initState = {
     slippage: 0.005, // default === 0.5%
     useTxApproval: false,
     showDisclaimer: true,
+    theme:'auto',
   },
   makerData:{},
 };
