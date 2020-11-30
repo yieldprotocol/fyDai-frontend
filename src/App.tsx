@@ -188,7 +188,7 @@ const WrappedApp = () => {
         userPreferences.themeMode === 'auto' && setColorScheme(newColorScheme);
       });
     } else {
-      setColorScheme(userPreferences.themeMode);
+      setColorScheme( userPreferences.themeMode || 'auto');
     }
   }, [userPreferences.themeMode]);
 
