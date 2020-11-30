@@ -6,6 +6,7 @@ import * as utils from '../utils';
 import { IYieldSeries } from '../types';
 
 import { YieldContext } from './YieldContext';
+import { TxContext } from './TxContext';
 
 import { useSignerAccount } from '../hooks/connectionHooks';
 import { usePool } from '../hooks/poolHook';
@@ -51,6 +52,8 @@ const SeriesProvider = ({ children }:any) => {
   const [ state, dispatch ] = React.useReducer(reducer, initState);
   const { state: yieldState } = useContext(YieldContext);
   const { yieldLoading, deployedContracts } = yieldState;
+
+  const { state: pendingTxs } = useContext(TxContext);
 
   const { previewPoolTx, checkPoolState } = usePool();
   const { debtDai } = useController();
@@ -118,8 +121,9 @@ const SeriesProvider = ({ children }:any) => {
         { ...x,
           sellFYDaiRate_: utils.cleanValue(ethers.utils.formatEther(x.sellFYDaiRate), 2),
           totalSupply_: utils.cleanValue(ethers.utils.formatEther(x.totalSupply), 2),
-          fyDaiBalance_: utils.cleanValue(ethers.utils.formatEther(x.fyDaiBalance), 2),
-          ethDebtFYDai_: utils.cleanValue(ethers.utils.formatEther(x.ethDebtFYDai), 2),
+          /* formating below for visual consistenciy - 0.00 */
+          fyDaiBalance_: ethers.utils.formatEther(x.fyDaiBalance) === '0.0' ? '0.00' : utils.cleanValue(ethers.utils.formatEther(x.fyDaiBalance), 2),
+          ethDebtFYDai_: ethers.utils.formatEther(x.ethDebtFYDai) === '0.0'  ? '0.00' : utils.cleanValue(ethers.utils.formatEther(x.ethDebtFYDai), 2),
           ethDebtDai_: utils.cleanValue(ethers.utils.formatEther(x.ethDebtDai), 2),
           poolTokens_: utils.cleanValue(ethers.utils.formatEther(x.poolTokens), 6),
           yieldAPR_: yieldAPR.toFixed(2),
@@ -179,7 +183,7 @@ const SeriesProvider = ({ children }:any) => {
       }
 
       // keep the current view up-to-date (if the activeSeries and the recently updated Series are the same )
-      if ( (seriesArr.length === 1) && (seriesArr[0]?.maturity === state.activeSeries?.maturity) ) {
+      if ( seriesArr.length === 1 ) {
         dispatch({ type:'setActiveSeries', payload: seriesMap.get(seriesArr[0].maturity) });
       }
 

@@ -103,7 +103,7 @@ const TxLayer = () => {
           !pendingTxs.some((x:any) => x.type === 'CREATE_PROXY')?
             <>
               <Box>
-                <Text size={mobile?'xsmall': undefined}>Feel free to look around and play. However, before you make any transactions you will need connect a proxy account </Text>
+                <Text size={mobile?'xsmall': undefined}>Feel free to look around and play. However, before you make any transactions you will need build a proxy account </Text>
               </Box>  
               <RaisedButton 
                 background='#555555'
