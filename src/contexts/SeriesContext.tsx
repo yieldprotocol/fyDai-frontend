@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from 'react';
+import React, { useEffect, useContext, useState} from 'react';
 import { useLocation } from 'react-router-dom';
 import { ethers, BigNumber } from 'ethers';
 
@@ -6,7 +6,6 @@ import * as utils from '../utils';
 import { IYieldSeries } from '../types';
 
 import { YieldContext } from './YieldContext';
-import { TxContext } from './TxContext';
 
 import { useSignerAccount } from '../hooks/connectionHooks';
 import { usePool } from '../hooks/poolHook';
@@ -53,8 +52,6 @@ const SeriesProvider = ({ children }:any) => {
   const { state: yieldState } = useContext(YieldContext);
   const { yieldLoading, deployedContracts } = yieldState;
 
-  const { state: pendingTxs } = useContext(TxContext);
-
   const { previewPoolTx, checkPoolState } = usePool();
   const { debtDai } = useController();
   const { getBalance } = useToken();
@@ -63,6 +60,11 @@ const SeriesProvider = ({ children }:any) => {
   const { calcAPR, poolPercent: calcPercent }  = useMath();
 
   const { pathname } = useLocation();
+  const [ seriesFromUrl, setSeriesFromUrl] = useState<number|null>(null);
+
+  useEffect(()=> {
+    pathname && setSeriesFromUrl(parseInt(pathname.split('/')[2], 10));
+  }, [ pathname ]);
 
   const _prePopulateSeriesData = (seriesArr:IYieldSeries[]) => {
     /* preMap is for faster loading - creates an initial map from the cached data */
@@ -143,8 +145,6 @@ const SeriesProvider = ({ children }:any) => {
   /* PUBLIC EXPOSED (via actions) Update series from a list of series */
   const updateSeries = async (seriesArr:IYieldSeries[], firstLoad:boolean ) => {
 
-    const seriesFromUrl = parseInt(pathname.split('/')[2], 10);
-
     if(!yieldLoading) {
       dispatch({ type:'isLoading', payload: true });
 
@@ -167,7 +167,7 @@ const SeriesProvider = ({ children }:any) => {
       const seriesMap:any = await _getSeriesData(seriesArr); 
 
       /* Set the activeSeries if there isn't one already */
-      if (!state.activeSeries) {
+      if (!state.activeSeries || seriesArr.length > 1) {
         /* if no active series, set it to non-mature series that is maturing soonest. */
         const unmatureSeries: IYieldSeries[] = Array.from(seriesMap.values());
         const toSelect = unmatureSeries
@@ -182,14 +182,10 @@ const SeriesProvider = ({ children }:any) => {
         }
       }
 
-      // keep the current view up-to-date (if the activeSeries and the recently updated Series are the same )
-      if ( seriesArr.length === 1 ) {
-        dispatch({ type:'setActiveSeries', payload: seriesMap.get(seriesArr[0].maturity) });
-      }
-
       dispatch({ type:'isLoading', payload: false });
     }
   };
+
 
   /* Init all the series once yieldState is not loading and re-init on any user and/or network change */
   useEffect( () => {
