@@ -26,11 +26,10 @@
         "Version" : "4ee6d9756b027e9d378b2b35ad56ddc9fec2c163",
         "Weth" : "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
         "WethJoin" : "0x2F0b23f53734252Bda2277357e97e1517d6B042A",
-
-        "ProxyFactory": "0xe11E3b391F7E8bC47247866aF32AF67Dd58Dc800",
-        "ProxyRegistry": "0x64A436ae831C1672AE81F674CAb8B6775df3475C",
-        "BorrowProxy": "0x1ebbF8f3e880996AFd0E53C729C68e375eAB40ca",
-        "PoolProxy": "0x80f6C0342FFB3462D07fC0fF7d65b8EC41914741"
+        "ProxyFactory": "0xA26e15C895EFc0616177B7c1e7270A4C7D51C997",
+        "ProxyRegistry": "0x4678f0a6958e4D2Bc4F1BAF7Bc52E8F3564f3fE4",
+        "BorrowProxy": "0xf30B142F50E2b59c4C7ca15eB2bd8427907B7Dca",
+        "PoolProxy": "0x1BA14edD2fDaFe4F145283cA01cF0Cb2235Bce13"
     },
 
     "42": {
@@ -60,7 +59,6 @@
         "Version" : "f98d57b70c9aba4bebc322ae2c066da4ba46759f",
         "Weth" : "0x81381eEDBB965C69A74DB2D09Ac747E86E053B15",
         "WethJoin" : "0x667731F5356adaA60cb2ac6FD49AA77fC00Fda30",
-
         "ProxyFactory": "0xe11E3b391F7E8bC47247866aF32AF67Dd58Dc800",
         "ProxyRegistry": "0x64A436ae831C1672AE81F674CAb8B6775df3475C",
         "BorrowProxy": "0xD58930f4446FAd867aAF7150d958fd4dfDaE593D",
