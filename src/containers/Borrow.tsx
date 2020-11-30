@@ -45,7 +45,9 @@ interface IBorrowProps {
 const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
 
   const navHistory = useHistory();
-  const { state: { activeSeries }, actions: seriesActions } = useContext(SeriesContext);
+
+  const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
+  const activeSeries = seriesData.get(activeSeriesId);
 
   /* check if the user sent in any requested amount in the url */ 
   const { amnt }:any = useParams();

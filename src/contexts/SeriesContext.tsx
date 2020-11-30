@@ -18,7 +18,7 @@ const SeriesContext = React.createContext<any>({});
 
 const initState = { 
   seriesData : new Map(),
-  activeSeries: null,
+  activeSeriesId: null,
   seriesLoading : true,
 };
 
@@ -29,10 +29,10 @@ function reducer(state:any, action:any) {
         ...state,
         seriesData: action.payload,
       };
-    case 'setActiveSeries':
+    case 'setActiveSeriesId':
       return {
         ...state,
-        activeSeries: action.payload,
+        activeSeriesId: action.payload,
       };
     case 'isLoading':
       return { 
@@ -157,9 +157,9 @@ const SeriesProvider = ({ children }:any) => {
           .sort((a:IYieldSeries, b:IYieldSeries)=> a.maturity-b.maturity );
         /* check if the value in the url is a valid series date, if so, use it */
         if (preMap.get(seriesFromUrl)) {
-          dispatch({ type:'setActiveSeries', payload: preMap.get(seriesFromUrl) });
+          dispatch({ type:'setActiveSeriesId', seriesFromUrl });
         } else {
-          dispatch({ type:'setActiveSeries', payload: preMap.get(preSelect[0].maturity) });
+          dispatch({ type:'setActiveSeriesId', payload: preSelect[0].maturity });
         }
       }
       
@@ -167,7 +167,7 @@ const SeriesProvider = ({ children }:any) => {
       const seriesMap:any = await _getSeriesData(seriesArr); 
 
       /* Set the activeSeries if there isn't one already */
-      if (!state.activeSeries || seriesArr.length > 1) {
+      if (!state.activeSeriesId || seriesArr.length > 1) {
         /* if no active series, set it to non-mature series that is maturing soonest. */
         const unmatureSeries: IYieldSeries[] = Array.from(seriesMap.values());
         const toSelect = unmatureSeries
@@ -176,16 +176,14 @@ const SeriesProvider = ({ children }:any) => {
 
         /* check if the value in the url is a valid series date, if so, use it */
         if (seriesMap.get(seriesFromUrl)) {
-          dispatch({ type:'setActiveSeries', payload: seriesMap.get(seriesFromUrl) });
+          dispatch({ type:'setActiveSeriesId', payload: seriesFromUrl });
         } else {
-          dispatch({ type:'setActiveSeries', payload: seriesMap.get(toSelect[0].maturity) });
+          dispatch({ type:'setActiveSeriesId', payload: toSelect[0].maturity });
         }
       }
-
       dispatch({ type:'isLoading', payload: false });
     }
   };
-
 
   /* Init all the series once yieldState is not loading and re-init on any user and/or network change */
   useEffect( () => {
@@ -198,8 +196,8 @@ const SeriesProvider = ({ children }:any) => {
   const actions = {
     updateAllSeries: () => updateSeries(yieldState.deployedSeries, false),
     updateSeries: (series:IYieldSeries[]) => updateSeries(series, false), /* updates one, or any number of series */
-    updateActiveSeries: () => updateSeries([state.activeSeries], false), /* updates only the active series */
-    setActiveSeries: (seriesMaturity:string) => dispatch({ type:'setActiveSeries', payload: state.seriesData.get(seriesMaturity) }),
+    updateActiveSeries: () => updateSeries([state.seriesData.get(state.activeSeriesId)], false), /* updates only the active series */
+    setActiveSeries: (seriesMaturity:string) => dispatch({ type:'setActiveSeriesId', payload: seriesMaturity }),
   };
 
   return (

@@ -51,8 +51,9 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
   const { amnt }:any = useParams();
 
   const { state: { deployedContracts } } = useContext(YieldContext);
-  const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
-  const { activeSeries } = seriesState;
+  const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
+  const activeSeries = seriesData.get(activeSeriesId);
+
   const { state: userState, actions: userActions } = useContext(UserContext);
   const { daiBalance } = userState.position;
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );

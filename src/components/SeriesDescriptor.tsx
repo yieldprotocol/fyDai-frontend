@@ -19,8 +19,10 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
 
   const { activeView, children } = props;
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
-  const { state: seriesState } = useContext(SeriesContext);
-  const { activeSeries } = seriesState; 
+
+  const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
+  const activeSeries = seriesData.get(activeSeriesId);
+
   const [ selectorOpen, setSelectorOpen ] = useState<boolean>(false);
 
   return (
@@ -100,9 +102,9 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
             <Box
               pad={{ horizontal:'medium' }}
             >
-              <Collapsible open={seriesState && !seriesState.seriesLoading}>
-                { children }
-              </Collapsible>
+              {/* <Collapsible open={!seriesLoading}> */}
+              { children }
+              {/* </Collapsible> */}
             </Box>
           </Box>     
         </Box>}

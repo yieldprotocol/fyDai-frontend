@@ -39,9 +39,10 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
   const theme:any = React.useContext(ThemeContext);
   const themeBackground = theme.global.colors.background;
   const defaultBackground = theme.dark === true ? themeBackground.dark: themeBackground.light;
+  
+  const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
+  const activeSeries = seriesData.get(activeSeriesId);
 
-  const { state: seriesState, actions: seriesActions } = useContext( SeriesContext );
-  const { seriesLoading, activeSeries, seriesData } = seriesState; 
   const { setActiveSeries } = seriesActions;
 
   const [sortedList, setSortedList] = useState<any>(seriesData);

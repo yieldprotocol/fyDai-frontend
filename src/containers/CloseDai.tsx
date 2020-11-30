@@ -35,8 +35,9 @@ interface ICloseDaiProps {
 const CloseDai = ({ close }:ICloseDaiProps) => {
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
-  const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
-  const { activeSeries  } = seriesState;
+
+  const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
+  const activeSeries = seriesData.get(activeSeriesId);
 
   const [ txActive ] = useTxActive(['BUY_DAI', 'AUTH']);
 

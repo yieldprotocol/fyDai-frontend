@@ -18,8 +18,9 @@ interface IRedeemProps {
 }
 
 const Redeem  = ({ close }:IRedeemProps)  => {
-  const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
-  const { activeSeries } = seriesState;
+  const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
+  const activeSeries = seriesData.get(activeSeriesId);
+  
   const { actions: userActions } = useContext(UserContext);
 
   const { hasBeenMatured, redeem } = useFYDai();

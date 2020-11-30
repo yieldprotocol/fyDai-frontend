@@ -53,7 +53,9 @@ function ActionButton({ ...props }:any ) {
   const { state: { pendingTxs }, dispatch } = useContext(TxContext);
 
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
-  const { activeSeries } = seriesState;
+
+  const { activeSeriesId, seriesData } = seriesState;
+  const activeSeries = seriesData.get(activeSeriesId);
 
   const { state: { authorization:{ hasDsProxy } }, actions: userActions } = useContext(UserContext);
   const { buildDsProxy } = useDsRegistry();

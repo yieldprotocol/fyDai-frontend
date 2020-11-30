@@ -13,6 +13,7 @@ interface ICollateralDescriptorProps {
 function CollateralDescriptor( { backToBorrow, children }: ICollateralDescriptorProps ) {
 
   const { state: seriesState } = useContext(SeriesContext);
+
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   const theme:any = React.useContext(ThemeContext);
 
@@ -54,9 +55,9 @@ function CollateralDescriptor( { backToBorrow, children }: ICollateralDescriptor
         </Box>}
         
       <Box pad={{ horizontal:'small' }}>
-        <Collapsible open={!seriesState.seriesLoading}>
-          { children }
-        </Collapsible>
+        {/* <Collapsible open={!seriesState.seriesLoading}> */}
+        { children }
+        {/* </Collapsible> */}
       </Box>
     </Box>
   );

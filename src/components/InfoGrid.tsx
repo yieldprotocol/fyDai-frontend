@@ -25,7 +25,10 @@ interface IInfoGridProps {
 function InfoGrid({ entries, alt }:IInfoGridProps) {
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
-  const { state:{ activeSeries } } = useContext(SeriesContext);
+
+  const { state: { activeSeriesId, seriesData } } = useContext(SeriesContext);
+  const activeSeries = seriesData.get(activeSeriesId);
+
   const [ detailsOpen, setDetailsOpen ] = useState<boolean>();
   const [visibleEntries, setVisibleEntries] = useState<any[]>([]);
 

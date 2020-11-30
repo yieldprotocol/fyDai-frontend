@@ -43,7 +43,9 @@ declare global {
 
 const App = (props:any) => {
 
-  const { state: { seriesLoading, activeSeries }, actions: seriesActions } = useContext(SeriesContext);
+  const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
+  const activeSeries = seriesData.get(activeSeriesId);
+
   const { actions: userActions } = useContext(UserContext);
   const { dispatch } = useContext(NotifyContext);
   const [ cachedLastVisit, setCachedLastVisit ] = useCachedState('lastVisit', null);

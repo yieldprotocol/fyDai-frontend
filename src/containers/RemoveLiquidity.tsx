@@ -36,8 +36,8 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
-  const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
-  const { activeSeries  } = seriesState;
+  const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
+  const activeSeries = seriesData.get(activeSeriesId);
   const { actions: userActions } = useContext(UserContext);
 
   const { account } = useSignerAccount();
