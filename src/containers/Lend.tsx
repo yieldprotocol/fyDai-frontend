@@ -187,8 +187,8 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
                 label: 'Portfolio Value',
                 labelExtra: 'at maturity',
                 visible: 
-                  (!!account && !activeSeries?.isMature()) || 
-                  ( activeSeries?.isMature() && activeSeries?.fyDaiBalance_>0),
+                  ( activeSeries?.isMature() && activeSeries?.fyDaiBalance_>0) ||
+                  (!!account && !activeSeries?.isMature()),
                 active: true,
                 loading: false,  
                 value: activeSeries? `${activeSeries?.fyDaiBalance_} DAI` : '-',
@@ -324,7 +324,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
             { !txActive && 
             !!account && 
             activeSeries?.isMature() && 
-            activeSeries?.fyDaiBalance?.gt(ethers.constants.Zero) && 
+            activeSeries?.fyDaiBalance?.gt(ethers.constants.Zero) &&
             <Redeem />}
 
             <Box direction='row' fill justify='between'>

@@ -301,7 +301,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
                 labelExtra: 'owed at maturity',
                 visible:
                   !!account &&
-                  (!activeSeries?.isMature() && !txActive)  || 
+                  !activeSeries?.isMature() || 
                   (activeSeries?.isMature() && activeSeries?.ethDebtDai_ > 0 ),
                 active: true,
                 loading: false,    
