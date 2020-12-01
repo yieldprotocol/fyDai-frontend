@@ -208,7 +208,7 @@ const WrappedApp = () => {
       >
         <ErrorBoundary>
           <App
-            themeMode={userPreferences.themeMode}
+            themeMode={userPreferences.themeMode || 'auto'}
             cycleThemeMode={() =>setUserPreferences({ ...userPreferences, themeMode: cycleOptions(userPreferences.themeMode) })}
             moodLight={colorScheme==='dark'? false: userPreferences?.moodLight}
             toggleMoodLight={()=>setUserPreferences({ ...userPreferences, moodLight: !userPreferences?.moodLight })}
