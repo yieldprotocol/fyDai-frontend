@@ -179,12 +179,7 @@ const App = (props:any) => {
 const WrappedApp = () => {
  
   const [ colorScheme, setColorScheme ] = useState<'light'|'dark'>('light');
-  const [ userPreferences, setUserPreferences ] = useCachedState('userPreferences', {
-    slippage: 0.005, // default === 0.5%
-    useTxApproval: false,
-    showDisclaimer: true,
-    themeMode:'auto',
-  });
+  const { state: { preferences: userPreferences }, actions: { updatePreferences } } = useContext(UserContext);
 
   useEffect(()=>{
     if (userPreferences.themeMode === 'auto') {
@@ -194,17 +189,15 @@ const WrappedApp = () => {
         userPreferences.themeMode === 'auto' && setColorScheme(newColorScheme);
       });
     } else {
-      setColorScheme( userPreferences.themeMode || 'auto');
+      setColorScheme( userPreferences.themeMode );
     }
-  }, [userPreferences.themeMode]);
-
-
+  }, [userPreferences]);
 
   // eslint-disable-next-line consistent-return
-  const cycleOptions = (option:string) => {
-    if ( option === 'auto') { return 'light'; }
-    if ( option === 'light' ) { return 'dark'; }
-    if ( option === 'dark' ) { return 'auto'; }
+  const cycleOptions = () => {
+    if ( userPreferences.themeMode === 'auto') { return 'light'; }
+    if ( userPreferences.themeMode  === 'light' ) { return 'dark'; }
+    if ( userPreferences.themeMode  === 'dark' ) { return 'auto'; }
   };
 
   return (
@@ -216,11 +209,10 @@ const WrappedApp = () => {
       >
         <ErrorBoundary>
           <App
-            themeMode={userPreferences.themeMode || 'auto'}
-            // cycleThemeMode={() =>setUserPreferences({ ...userPreferences, themeMode: cycleOptions(userPreferences.themeMode) })}
-            cycleThemeMode={() =>setUserPreferences({ ...userPreferences, themeMode: cycleOptions(userPreferences.themeMode)  })}
-            moodLight={colorScheme==='dark'? false: userPreferences?.moodLight}
-            toggleMoodLight={()=>setUserPreferences({ ...userPreferences, moodLight: !userPreferences?.moodLight })}
+            themeMode={userPreferences.themeMode}
+            cycleThemeMode={()=>updatePreferences({ ...userPreferences, themeMode: cycleOptions() })}
+            moodLight={colorScheme==='dark'? false: userPreferences.moodLight}
+            // toggleMoodLight={()=>updatePreferences({ moodLight: !preferences?.moodLight })}
           />
         </ErrorBoundary>
       </Grommet>

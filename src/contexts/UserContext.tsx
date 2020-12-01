@@ -56,7 +56,7 @@ const initState = {
     lastBlock: 11066942, 
     items:[],
   },
-  authorization:{},
+  authorization:{ hasDsProxy:true },
   preferences:{
     slippage: 0.005, // default === 0.5%
     useTxApproval: false,
@@ -109,7 +109,7 @@ const UserProvider = ({ children }: any) => {
       daiBalance, 
       ethPosted,  
     ]:any[] = await Promise.all([
-      getBalance(), 
+      getBalance(),
       getBalance(deployedContracts.Dai, 'Dai'),
       collateralPosted('ETH-A'),
     ]);
@@ -182,7 +182,6 @@ const UserProvider = ({ children }: any) => {
    * @dev gets user transaction history.
    */
   const _getTxHistory = async ( forceUpdate:boolean ) => {
-
     /* Get transaction history (from cache first or rebuild if an update is forced) */
     // eslint-disable-next-line no-console
     forceUpdate && console.log('Re-building transaction History...');
@@ -408,6 +407,9 @@ const UserProvider = ({ children }: any) => {
     !yieldState?.yieldLoading && account && initUser();
     // If user has changed, rebuild and re-cache the history
     !yieldState?.yieldLoading && account && !(txHistory?.account === account) && _getTxHistory(true);
+
+    // re-update preferences 
+    !yieldState?.yieldLoading && _updatePreferences(null);
 
   }, [ account, yieldState.yieldLoading ]);
 

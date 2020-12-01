@@ -9,7 +9,7 @@ import FlatButton from './FlatButton';
 const YieldDisclaimer = ({ forceShow=false, closeCallback }:any) =>  {
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
-  const  { state: { yieldLoading }}  = useContext<any>(YieldContext);
+  const  { state: { yieldLoading } }  = useContext<any>(YieldContext);
   const  { state: { preferences }, actions: { updatePreferences } }  = useContext<any>(UserContext);
   const [ silenceDisclaimerChecked, setSilenceDisclaimerChecked] = useState<boolean>(false);
 
@@ -22,7 +22,7 @@ const YieldDisclaimer = ({ forceShow=false, closeCallback }:any) =>  {
   return (
     <> 
       {
-        (showDisclaimer || forceShow) &&
+        ( showDisclaimer || forceShow) &&
         <Layer
           modal={true}
           onEsc={()=>{ 
