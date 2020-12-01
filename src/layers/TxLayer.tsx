@@ -91,16 +91,13 @@ const TxLayer = () => {
         <Box
           fill='horizontal'
           pad={mobile?{ horizontal:'medium', top:'medium', bottom:'large' }:{ horizontal:'xlarge', vertical:'medium' }}
-          direction='row-responsive'
-          gap='medium'
           background='#555555'
           justify='between'
           margin={mobile?{ bottom:'-10px' }:undefined}
         >
-
           { 
           !pendingTxs.some((x:any) => x.type === 'CREATE_PROXY')?
-            <>
+            <Box gap='medium' direction='row-responsive'>
               <Box>
                 <Text size={mobile?'xsmall': undefined}>Feel free to look around and play. However, before you make any transactions you will need build a proxy account </Text>
               </Box>  
@@ -109,7 +106,7 @@ const TxLayer = () => {
                 label={<Box pad={{ horizontal:'small', vertical:'xsmall' }} align='center'><Text size='small' color='#DDDDDD'><Unlock /> Create Proxy</Text></Box>}
                 onClick={()=>buildProxyProcedure()}
               />
-            </>
+            </Box>
             :
             <>
               <Box>
