@@ -70,7 +70,7 @@ const TxProvider = ({ children }:any) => {
   const [ hasReadCache, setHasReadCache] = useState<boolean>(false);
   
   useEffect(() => {
-    /* handle registering and monitoring the cached transactions if any */
+    /* handle registering and monitoring the cached transaction if any */
     ( async () => {
       if (!yieldLoading && library && !hasReadCache) {
         await Promise.all( pendingCache.map(async (x:any) => {
@@ -79,16 +79,18 @@ const TxProvider = ({ children }:any) => {
             .then((receipt:any) => {
               dispatch({ type: 'txComplete', payload: { receipt, txCode: x.txCode } } );
             });
-          setPendingCache( pendingCache.filter((t:any) => t.tx.hash !== x.tx.hash));
+          setPendingCache([]);
         })
         );
+
         // eslint-disable-next-line no-console
         console.log('cache txs processed');
-        setPendingCache(state.pendingTxs);
+        setPendingCache( state.pendingTxs );
         setHasReadCache(true);
       }
     })();
   }, [library, yieldLoading]);
+
 
   return (
     <TxContext.Provider value={{ state, dispatch }}>

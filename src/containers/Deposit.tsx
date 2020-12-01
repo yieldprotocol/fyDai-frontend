@@ -133,7 +133,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
     if (debouncedInput) {
       const val = collValue(ethers.utils.parseEther(debouncedInput));
       const newPower = parseFloat(ethers.utils.formatEther(val))/2;
-      if (maxDaiAvailable_) {
+      if (parseFloat(maxDaiAvailable_) > 0) {
         const pl = parseFloat(maxDaiAvailable_) + newPower;
         setEstPower(pl.toFixed(2));
       } else {

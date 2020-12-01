@@ -23,9 +23,11 @@ export const useTxHelpers = () => {
   const [ pendingCache, setPendingCache ] = useCachedState('txPending', []);
 
   /* Notification Helpers */
-  const txComplete = (receipt:any, txCode:string|null=null) => {   
-    setPendingCache( pendingCache.filter((x:any) => x.tx.hash !== ( receipt.transactionHash || receipt.hash)));
+  const txComplete = (receipt:any, txCode:string|null=null) => {  
+
     dispatch({ type: 'txComplete', payload: { receipt, txCode } } );
+    console.log(pendingCache);
+
   };
 
   const handleTxRejectError = (error:any) => {
@@ -67,8 +69,7 @@ export const useTxHelpers = () => {
     /* add the tx to txContent */
     dispatch({ type: 'txPending', payload: { ...tx, txCode } });
     /* add the tx to the cache, for picking up on reload */
-    setPendingCache([...state.pendingTxs, { ...tx, txCode } ]);
-    console.log( pendingCache ); 
+    setPendingCache([{ ...tx, txCode }]);
 
     await tx.tx.wait()
       .then((receipt:any) => {

@@ -125,7 +125,7 @@ const AccountButton = (props: any) => {
       </Box>}
 
         
-      {pendingTxs.length>0 &&  
+      {pendingTxs.length>0 && !txCompleteOpen &&
       <Box
         ref={pendingRef}
         direction='row'
@@ -135,10 +135,10 @@ const AccountButton = (props: any) => {
         animation='slideLeft'
         onClick={()=>setTxStatusOpen(true)}
       >
-        <Text size='xsmall'> Transaction pending ... </Text>   
+        <Text size='xsmall'> Transaction pending ... </Text>  
       </Box>}
 
-      {txCompleteOpen &&
+      {txCompleteOpen && 
       <>
         <Box
           ref={completeRef}
@@ -152,10 +152,12 @@ const AccountButton = (props: any) => {
           {lastCompletedTx?.status === 1 &&
           <Box direction='row' gap='xsmall'> 
             <Text color='green' textAlign='center' size='xsmall'><Check /></Text>
-            <Text color='green' textAlign='center' size='xsmall'>Transaction Complete</Text>
+            { pendingTxs.length===0 && <Text color='green' textAlign='center' size='xsmall'>Transaction Complete</Text>}
           </Box>}
           {lastCompletedTx?.status !== 1 &&
-          <Text color='red' textAlign='center' size='xsmall'>  Transaction failed  </Text>}
+          <Box direction='row' gap='xsmall'>
+            <Text color='red' textAlign='center' size='xsmall'>  Transaction failed  </Text>
+          </Box>}
         </Box> 
       </>}
 

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useEffect, useContext, useState } from 'react';
 import { Layer, Box, Text, ResponsiveContext } from 'grommet';
 import {
   FiCheckCircle as CheckCircle,
@@ -15,6 +15,7 @@ function NotifyLayer(target:any) {
 
   const  { state, dispatch }  = useContext<any>(NotifyContext);
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
+  const [ disclaimerShown, setDisclaimerShown] = useState(false); 
 
   const notificationTypeMap = (_type:string ) => {
     switch(_type) {
@@ -24,6 +25,10 @@ function NotifyLayer(target:any) {
       default: return { color: '#555555', icon: <Text size='small' color='#DDDDDD'><Info /></Text>, textColor: '#DDDDDD'  };
     }
   };
+
+  useEffect(()=>{
+    setDisclaimerShown(true);
+  }, []);
 
   return (
     <>
@@ -113,10 +118,12 @@ function NotifyLayer(target:any) {
             label={<Box pad='xsmall'><Text size='small' color={notificationTypeMap(state.type).textColor}>{mobile?'Update Yield app': 'Update now'}</Text></Box>}
           />
         </Box>
-        
       </Box>}
-
-      <YieldDisclaimer />
+      
+      { 
+        disclaimerShown &&
+        <YieldDisclaimer />
+      }
 
     </>
   );
