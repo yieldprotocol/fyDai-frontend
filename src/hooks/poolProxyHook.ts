@@ -97,7 +97,7 @@ export const usePoolProxy = () => {
     const parsedDaiUsed = BigNumber.isBigNumber(daiUsed)? daiUsed : ethers.utils.parseEther(daiUsed.toString());
 
     const overrides = {
-      gasLimit: BigNumber.from('750000'),
+      gasLimit: BigNumber.from('800000'),
       value: ethers.utils.parseEther('0')
     };
 
