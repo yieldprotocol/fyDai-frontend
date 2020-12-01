@@ -89,7 +89,7 @@ const App = (props:any) => {
 
   useEffect(()=>{
     window.addEventListener('offline', () => {
-      console.log('I am offline.');
+      console.log('App offline.');
       dispatch({ type:'notify', payload:{ message:'No Network', type:'error' } });
     });
 
