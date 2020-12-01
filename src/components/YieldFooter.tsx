@@ -88,7 +88,8 @@ const YieldFooter = (props: any) => {
         </Anchor>
 
         {
-          themeMode === 'light' &&
+          themeMode === 'light' && 
+          false &&
           <Anchor
             onClick={()=>toggleMoodLight()}
             color={moodLight? 'pink':'grey'}
