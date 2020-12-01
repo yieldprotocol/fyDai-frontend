@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useState} from 'react';
+import React, { useEffect, useContext, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ethers, BigNumber } from 'ethers';
 
@@ -78,6 +78,7 @@ const SeriesProvider = ({ children }:any) => {
 
   /* PRIVATE Get the data for a particular series, OR set of series  */
   const _getSeriesData = async (seriesArr:IYieldSeries[]) => {
+    
     /* concurrently get all the series data */
     const _seriesData = await Promise.all(
       seriesArr.map( async (x:IYieldSeries, i:number) => {
@@ -164,7 +165,7 @@ const SeriesProvider = ({ children }:any) => {
       }
       
       /* Build/Re-build series map with data */ 
-      const seriesMap:any = await _getSeriesData(seriesArr); 
+      const seriesMap:any = await _getSeriesData(seriesArr);
 
       /* Set the activeSeries if there isn't one already */
       if (!state.activeSeriesId || seriesArr.length > 1) {
@@ -188,7 +189,11 @@ const SeriesProvider = ({ children }:any) => {
   /* Init all the series once yieldState is not loading and re-init on any user and/or network change */
   useEffect( () => {
     (provider || fallbackProvider) && !yieldLoading && ( async () => {
-      await updateSeries(yieldState.deployedSeries, true);
+      try {
+        await updateSeries(yieldState.deployedSeries, true);
+      } catch (e) {
+        console.log(e);
+      }
     })();
   }, [ provider, fallbackProvider, chainId, account, yieldLoading ]);
 

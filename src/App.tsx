@@ -166,9 +166,7 @@ const App = (props:any) => {
         {!mobile &&
         <YieldFooter
           themeMode={props.themeMode}
-          cycleThemeMode={props.cycleThemeMode}
           moodLight={props.moodLight}
-          toggleMoodLight={props.toggleMoodLight}
           openConnectLayer={() => setShowConnectLayer('CONNECT')}
         />}                  
       </Footer>
@@ -179,7 +177,7 @@ const App = (props:any) => {
 const WrappedApp = () => {
  
   const [ colorScheme, setColorScheme ] = useState<'light'|'dark'>('light');
-  const { state: { preferences: userPreferences }, actions: { updatePreferences } } = useContext(UserContext);
+  const { state: { preferences: userPreferences } } = useContext(UserContext);
 
   useEffect(()=>{
     if (userPreferences.themeMode === 'auto') {
@@ -193,13 +191,6 @@ const WrappedApp = () => {
     }
   }, [userPreferences]);
 
-  // eslint-disable-next-line consistent-return
-  const cycleOptions = () => {
-    if ( userPreferences.themeMode === 'auto') { return 'light'; }
-    if ( userPreferences.themeMode  === 'light' ) { return 'dark'; }
-    if ( userPreferences.themeMode  === 'dark' ) { return 'auto'; }
-  };
-
   return (
     <Suspense fallback={null}>
       <Grommet
@@ -210,9 +201,7 @@ const WrappedApp = () => {
         <ErrorBoundary>
           <App
             themeMode={userPreferences.themeMode}
-            cycleThemeMode={()=>updatePreferences({ ...userPreferences, themeMode: cycleOptions() })}
             moodLight={colorScheme==='dark'? false: userPreferences.moodLight}
-            // toggleMoodLight={()=>updatePreferences({ moodLight: !preferences?.moodLight })}
           />
         </ErrorBoundary>
       </Grommet>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Anchor, Footer, Text, Box } from 'grommet';
 import { FaDiscord as Discord } from 'react-icons/fa';
 import {
@@ -10,14 +10,22 @@ import {
 } from 'react-icons/fi';
 import { CgSleep as Moodlight } from 'react-icons/cg';
 
-import YieldDisclaimer from './YieldDisclaimer';
 import { logEvent } from '../utils/analytics';
+
+import { UserContext } from '../contexts/UserContext';
 
 const handleExternal = (destination: string) => {
   logEvent({
     category: 'External Link',
     action: destination
   });
+};
+
+// eslint-disable-next-line consistent-return
+const cycleOptions = (option:string) => {
+  if ( option === 'auto') { return 'light'; }
+  if ( option === 'light' ) { return 'dark'; }
+  if ( option  === 'dark' ) { return 'auto'; }
 };
 
 const YieldFooter = (props: any) => {
@@ -29,6 +37,8 @@ const YieldFooter = (props: any) => {
   } = props;
 
   const [ showDisclaimer, setShowDisclaimer] = useState<boolean>(false);
+
+  const { state: { preferences }, actions: { updatePreferences } } = useContext(UserContext);
 
   const IconSize = '1.15rem';
   const IconGap = 'small';
@@ -80,7 +90,7 @@ const YieldFooter = (props: any) => {
         </Box>
 
         <Anchor
-          onClick={()=>cycleThemeMode()}
+          onClick={()=>updatePreferences({ ...preferences, themeMode: cycleOptions(themeMode) })}
         >
           { themeMode === 'dark'  && <Box align='center' direction='row' gap='xsmall'><Moon /> <Text size='xxsmall'>Dark</Text></Box>}
           { themeMode === 'light'  && <Box align='center' direction='row' gap='xsmall'><Sun /> <Text size='xxsmall'>Light</Text></Box> }
