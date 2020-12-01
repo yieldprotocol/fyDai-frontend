@@ -7,7 +7,6 @@ import {
   ResponsiveContext,
   Layer,
   Collapsible,
-  ThemeContext,
 } from 'grommet';
 
 import { 
@@ -23,7 +22,7 @@ import FlatButton from './FlatButton';
 import DaiMark from './logos/DaiMark';
 import Loading from './Loading';
 import TxStatus from './TxStatus';
-import { abbreviateHash, modColor } from '../utils';
+import { abbreviateHash } from '../utils';
 import EthMark from './logos/EthMark';
 
 
@@ -38,9 +37,6 @@ const AccountButton = (props: any) => {
   const { state: { position } } = useContext(UserContext);
   const { state: { pendingTxs, lastCompletedTx } } = useContext(TxContext);
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
-
-  const theme:any = useContext(ThemeContext);
-  const background = theme.dark ? modColor(theme.global.colors.background.dark, -10): modColor(theme.global.colors.background.light, -10);
 
   // flags
   const [txStatusOpen, setTxStatusOpen] = useState(false);
@@ -62,7 +58,7 @@ const AccountButton = (props: any) => {
       round
       direction='row'
       align='center'
-      background={account?background:undefined}
+      background='background'
     > 
       {txStatusOpen && 
       <Layer 
@@ -71,7 +67,7 @@ const AccountButton = (props: any) => {
       >
         <Box 
           fill
-          background={background}
+          background='background'
           round='small'
           pad="none"
           align='center'
@@ -104,8 +100,7 @@ const AccountButton = (props: any) => {
         onFocus={() => setDetailsOpen(true)}
         onBlur={() => setDetailsOpen(false)}
       >
-
-        
+       
         <Collapsible open={detailsOpen} direction='horizontal'>
           { detailsOpen && 
           <Box overflow='scroll' gap='xsmall' direction='row' animation='slideLeft'>    
@@ -156,14 +151,13 @@ const AccountButton = (props: any) => {
           </Box>}
           {lastCompletedTx?.status !== 1 &&
           <Box direction='row' gap='xsmall'>
-            <Text color='red' textAlign='center' size='xsmall'>  Transaction failed  </Text>
+            <Text color='red' textAlign='center' size='xsmall'>Transaction failed</Text>
           </Box>}
         </Box> 
       </>}
 
       { account ?
         <>{!mobile && <FlatButton
-          background={background}
           onClick={()=>openConnectLayer('ACCOUNT')}
           label={
             <Box gap='small' direction='row' align='center'>

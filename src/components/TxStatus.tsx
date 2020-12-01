@@ -30,7 +30,6 @@ const TxStatus= ({ tx }:TxStatusProps) => {
         <Box
           alignSelf="center"
           fill
-          // background="background"
           round='small'
           pad="large"
           align='center'
