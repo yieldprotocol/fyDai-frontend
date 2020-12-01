@@ -179,7 +179,12 @@ const App = (props:any) => {
 const WrappedApp = () => {
  
   const [ colorScheme, setColorScheme ] = useState<'light'|'dark'>('light');
-  const [ userPreferences, setUserPreferences ] = useCachedState('userPreferences', { moodLight:true, themeMode: 'auto' });
+  const [ userPreferences, setUserPreferences ] = useCachedState('userPreferences', {
+    slippage: 0.005, // default === 0.5%
+    useTxApproval: false,
+    showDisclaimer: true,
+    themeMode:'auto',
+  });
 
   useEffect(()=>{
     if (userPreferences.themeMode === 'auto') {
@@ -192,6 +197,8 @@ const WrappedApp = () => {
       setColorScheme( userPreferences.themeMode || 'auto');
     }
   }, [userPreferences.themeMode]);
+
+
 
   // eslint-disable-next-line consistent-return
   const cycleOptions = (option:string) => {
@@ -210,7 +217,8 @@ const WrappedApp = () => {
         <ErrorBoundary>
           <App
             themeMode={userPreferences.themeMode || 'auto'}
-            cycleThemeMode={() =>setUserPreferences({ ...userPreferences, themeMode: cycleOptions(userPreferences.themeMode) })}
+            // cycleThemeMode={() =>setUserPreferences({ ...userPreferences, themeMode: cycleOptions(userPreferences.themeMode) })}
+            cycleThemeMode={() =>setUserPreferences({ ...userPreferences, themeMode: cycleOptions(userPreferences.themeMode)  })}
             moodLight={colorScheme==='dark'? false: userPreferences?.moodLight}
             toggleMoodLight={()=>setUserPreferences({ ...userPreferences, moodLight: !userPreferences?.moodLight })}
           />
