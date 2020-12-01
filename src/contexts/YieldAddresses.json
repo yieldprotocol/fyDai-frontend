@@ -61,7 +61,7 @@
         "WethJoin" : "0x667731F5356adaA60cb2ac6FD49AA77fC00Fda30",
         "ProxyFactory": "0xe11E3b391F7E8bC47247866aF32AF67Dd58Dc800",
         "ProxyRegistry": "0x64A436ae831C1672AE81F674CAb8B6775df3475C",
-        "BorrowProxy": "0xD58930f4446FAd867aAF7150d958fd4dfDaE593D",
+        "BorrowProxy": "0x7017C54e38A5eD41980d20ec163baA5622577B37",
         "PoolProxy": "0x80f6C0342FFB3462D07fC0fF7d65b8EC41914741"
     }
 }
