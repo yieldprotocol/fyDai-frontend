@@ -243,6 +243,7 @@ export const yieldTheme = {
   },
   meter: {},
   anchor: {
+    color: 'text',
     hover: {
       extend: {
         opacity: '0.5',
@@ -264,7 +265,9 @@ export const yieldTheme = {
       `
   },
   checkBox: {
+    color: 'text',
     check: {
+      color: 'text',
       radius: '24px',
     },
     toggle: {
