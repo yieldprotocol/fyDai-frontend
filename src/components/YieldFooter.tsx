@@ -21,12 +21,18 @@ const handleExternal = (destination: string) => {
   });
 };
 
-// eslint-disable-next-line consistent-return
 const cycleOptions = (option:string) => {
   if ( option === 'auto') { return 'light'; }
   if ( option === 'light' ) { return 'dark'; }
   if ( option  === 'dark' ) { return 'auto'; }
 };
+
+const resetApp = () => {
+  localStorage.clear();
+  // eslint-disable-next-line no-restricted-globals
+  location.reload();
+};
+
 
 const YieldFooter = (props: any) => {
   const {
@@ -57,6 +63,7 @@ const YieldFooter = (props: any) => {
           position: 'relative',
           top: '2px',
         }}
+        align='center'
       >
         <Anchor color="grey" href='https://github.com/yieldprotocol' target="_blank" onClick={() => handleExternal('Github')}>
           <Github size={IconSize} />
@@ -67,6 +74,15 @@ const YieldFooter = (props: any) => {
         <Anchor color="grey" href='https://discord.gg/JAFfDj5' target="_blank" onClick={() => handleExternal('Discord')}>
           <Discord size={IconSize} />
         </Anchor>
+
+        <Box margin={{ left:'small' }}>
+          <Text size='xxsmall' color='grey'>
+            This software is in BETA v0.3.0
+          </Text>
+          <Text size='xxsmall' color='grey'> Having issues? Try an app <Anchor onClick={()=>resetApp()}>RESET</Anchor>, or get hold of us via <Anchor href='https://discord.gg/JAFfDj5' target="_blank" onClick={() => handleExternal('Discord')}>discord</Anchor>. </Text>
+          {/* {showDisclaimer && <YieldDisclaimer forceShow={true} />} */}
+        </Box>
+
       </Box>
       <Box
         direction="row"
@@ -76,12 +92,9 @@ const YieldFooter = (props: any) => {
           top: '2px',
         }}
       >
-        <Box onClick={()=> setShowDisclaimer(true)}>
-          <Text size='xxsmall' color='grey'>
-            This software is in BETA v0.3.0
-          </Text>
-          {/* {showDisclaimer && <YieldDisclaimer forceShow={true} />} */}
-        </Box>
+
+
+
 
         <Box>
           <Text size='xxsmall' color='grey'>
