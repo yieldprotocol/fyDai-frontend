@@ -97,7 +97,7 @@ const TxLayer = () => {
         >
           { 
           !pendingTxs.some((x:any) => x.type === 'CREATE_PROXY')?
-            <Box gap='medium' direction='row-responsive'>
+            <Box gap='medium' direction='row-responsive' justify='between'>
               <Box>
                 <Text size={mobile?'xsmall': undefined}>Feel free to look around and play. However, before you make any transactions you will need build a proxy account </Text>
               </Box>  
@@ -108,12 +108,12 @@ const TxLayer = () => {
               />
             </Box>
             :
-            <>
+            <Box gap='medium' direction='row-responsive' justify='between'>
               <Box>
                 <Text size={mobile?'xsmall': undefined}>Building your Yield proxy. </Text>
               </Box> 
               <Box pad={{ horizontal:'small', vertical:'xsmall' }} align='center'><Text size='small' color='#DDDDDD'><Unlock />Pending...</Text></Box>
-            </>
+            </Box>
           }
         </Box>
       }
