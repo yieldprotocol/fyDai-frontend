@@ -46,8 +46,8 @@ const TxLayer = () => {
   const buildProxyProcedure = async () => {
     await buildDsProxy();
     await Promise.all([
-      userActions.updateAuthorizations(),
-      seriesActions.updateActiveSeries()
+      userActions.updateUser(),
+      seriesActions.updateAllSeries()
     ]);
   };
 
@@ -61,7 +61,7 @@ const TxLayer = () => {
   /* set layer open if a txs is in process - but bypassable with closeAuth() */
   useEffect(()=>{
     !!txProcessActive && setLayerOpen(true);
-  }, [txProcessActive, ]);
+  }, [txProcessActive]);
 
   /* set Sigs status ( All previously complete or all been signed ) */
   useEffect(()=>{
@@ -115,7 +115,6 @@ const TxLayer = () => {
               <Box>
                 <Text size={mobile?'xsmall': undefined}>Building your Yield proxy. </Text>
               </Box> 
-
               <Box pad={{ horizontal:'small', vertical:'xsmall' }} align='center'><Text size='small' color='#DDDDDD'><Unlock />Pending...</Text></Box>
             </>
           }
@@ -123,7 +122,8 @@ const TxLayer = () => {
       }
   
       { //  This following section is the 'layer' section. It is only shown when there is a transaction in progress or signature required
-        txProcessActive && layerOpen &&
+        txProcessActive && 
+        layerOpen &&
         <Layer
           modal={true}
           responsive={mobile?false: undefined}
@@ -191,8 +191,7 @@ const TxLayer = () => {
             { // the fallback authentication method is being used (either by choice, or signing error fallback): 
             fallbackActive &&
             !allComplete && 
-            requestedSigs.length>0 && 
-
+            requestedSigs.length>0 &&
             <Box gap='medium'> 
               {
                 preferences?.useTxApproval ?
@@ -299,7 +298,7 @@ const TxLayer = () => {
               !processIsCurrentTx &&
               <Box gap='medium'>
                 <Text weight='bold'>Confirmation required</Text>
-                <Text> 
+                <Text>
                   Please check your wallet or provider to approve the transaction.
                 </Text>
               </Box>

@@ -78,6 +78,7 @@ const App = (props:any) => {
               localStorage.removeItem('deployedSeries');
               localStorage.removeItem('cache_chainId');
               localStorage.removeItem('txHistory');
+              localStorage.removeItem('txPending');
               window.location.reload();
             },    
           },

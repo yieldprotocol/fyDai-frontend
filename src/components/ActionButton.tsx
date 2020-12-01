@@ -69,8 +69,8 @@ function ActionButton({ ...props }:any ) {
     if (!pendingTxs.some((x:any) => x.type === 'CREATE_PROXY')) {
       await buildDsProxy();
       await Promise.all([
-        userActions.updateAuthorizations(),
-        seriesActions.updateActiveSeries()
+        userActions.updateUser(),
+        seriesActions.updateAllSeries()
       ]);
     }
   };
