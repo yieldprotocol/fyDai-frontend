@@ -26,7 +26,7 @@ const TxRecent = ({ setView }: any) => {
     <Box gap="medium" pad='small'>
 
       <Box direction='row' gap='medium' align='center' justify='between'>
-        <Text alignSelf='start' size='large' color='brand' weight='bold'>Transactions</Text>   
+        <Text alignSelf='start' size='large' weight='bold'>Transactions</Text>   
         <RaisedButton
           onClick={()=>setView()}
           label={<Box pad={{ vertical:'xsmall', horizontal:'xsmall' }}><Text size='xxsmall'>Full history</Text></Box>}
@@ -75,8 +75,7 @@ const TxRecent = ({ setView }: any) => {
             pad='xsmall'
           >
           
-            { pendingTxs.map((x:any)=>(
-            
+            { pendingTxs.map((x:any)=>(        
               <Box
                 gap='small'
                 align='center'

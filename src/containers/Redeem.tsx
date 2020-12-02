@@ -4,23 +4,26 @@ import { Box } from 'grommet';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
 
-import { useFYDai, useTxActive } from '../hooks';
+import { useTxActive } from '../hooks/txHooks';
+import { useFYDai } from '../hooks/fyDaiHook';
 
 import InlineAlert from '../components/InlineAlert';
-import ApprovalPending from '../components/ApprovalPending';
 import TxStatus from '../components/TxStatus';
 import ActionButton from '../components/ActionButton';
+
+import { logEvent } from '../utils/analytics';
 
 interface IRedeemProps {
   close?:any,
 }
 
 const Redeem  = ({ close }:IRedeemProps)  => {
-  const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
-  const { activeSeries } = seriesState;
+  const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
+  const activeSeries = seriesData.get(activeSeriesId);
+  
   const { actions: userActions } = useContext(UserContext);
 
-  const { hasBeenMatured, redeem, redeemActive } = useFYDai();
+  const { hasBeenMatured, redeem } = useFYDai();
   const [ txActive ] = useTxActive(['redeem']);
 
   const [ redeemDisabled, setRedeemDisabled] = useState<boolean>(true);
@@ -32,10 +35,15 @@ const Redeem  = ({ close }:IRedeemProps)  => {
   const redeemProcedure = async () =>{
     if(!redeemDisabled) {
       await redeem(activeSeries, activeSeries.fyDaiBalance.toString());
-      userActions.updateHistory();
+      logEvent({
+        category: 'Redeem',
+        action: String(activeSeries.fyDaiBalance),
+        label: activeSeries.displayName || activeSeries.poolAddress,
+      });
+      /* clean up and refresh */ 
       await Promise.all([
-        userActions.updatePosition(),
-        seriesActions.updateActiveSeries()
+        userActions.updateUser(),
+        seriesActions.updateSeries([activeSeries]),
       ]);
     }
   };
@@ -65,7 +73,6 @@ const Redeem  = ({ close }:IRedeemProps)  => {
           hasPoolDelegatedProxy={true}
         />
       </>}
-      { redeemActive && !txActive && <ApprovalPending /> } 
       { txActive && <TxStatus tx={txActive} /> }
     </Box>
   );

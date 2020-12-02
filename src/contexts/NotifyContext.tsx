@@ -14,8 +14,7 @@ const initState = {
   fatalMsg: '',
 
   updateAvailable: false,
-  // eslint-disable-next-line no-console
-  updateAccept: ()=>console.log('No update available'),
+  updateAccept: ()=> console.log('No app update available'),
 };
 
 function notifyReducer(state:INotification, action:IReducerAction) {
@@ -42,7 +41,7 @@ function notifyReducer(state:INotification, action:IReducerAction) {
         ...state,
         updateAvailable: action.payload.updateAvailable,
         // eslint-disable-next-line no-console
-        updateAccept: action.payload.updateAccept || ( ()=>console.log('No update available') ),
+        updateAccept: action.payload.updateAccept,
       };
 
     /* internal - maybe find a better way to do these two */ 
@@ -56,7 +55,9 @@ function notifyReducer(state:INotification, action:IReducerAction) {
 }
 
 const NotifyProvider = ({ children }:any) => {
+
   const [state, dispatch] = React.useReducer(notifyReducer, initState); 
+
   useEffect( () => {
     state.notifyOpen && ( () => {
       if (state.timerMs === 0) {

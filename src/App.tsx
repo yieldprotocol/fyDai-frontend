@@ -9,13 +9,14 @@ import { yieldTheme } from './themes';
 import { modColor } from './utils';
 
 import { SeriesContext } from './contexts/SeriesContext';
-import { YieldContext } from './contexts/YieldContext';
 import { NotifyContext } from './contexts/NotifyContext';
+import { UserContext } from './contexts/UserContext';
 
-import { useCachedState } from './hooks';
+import { useCachedState } from './hooks/appHooks';
 
-import ConnectLayer from './containers/layers/ConnectLayer';
-import NotifyLayer from './containers/layers/NotifyLayer';
+import ConnectLayer from './layers/ConnectLayer';
+import NotifyLayer from './layers/NotifyLayer';
+import TxLayer from './layers/TxLayer';
 
 import Borrow from './containers/Borrow';
 import Lend from './containers/Lend';
@@ -28,13 +29,24 @@ import RemoveLiquidity from './containers/RemoveLiquidity';
 
 import YieldHeader from './components/YieldHeader';
 import YieldFooter from './components/YieldFooter';
-import Authorization from './components/Authorization';
+
 import ErrorBoundary from './components/ErrorBoundry';
 import YieldNav from './components/YieldNav';
 
+import { initGA, logPageView } from './utils/analytics';
+
+declare global {
+  interface Window {
+    GA_INITIALIZED: any;
+  }
+}
+
 const App = (props:any) => {
-  const { state: { seriesLoading, activeSeries } } = useContext(SeriesContext);
-  const { state: { yieldLoading } } = useContext(YieldContext);
+
+  const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
+  const activeSeries = seriesData.get(activeSeriesId);
+
+  const { actions: userActions } = useContext(UserContext);
   const { dispatch } = useContext(NotifyContext);
   const [ cachedLastVisit, setCachedLastVisit ] = useCachedState('lastVisit', null);
 
@@ -48,35 +60,76 @@ const App = (props:any) => {
     setCachedLastVisit(`/${location.pathname.split('/')[1]}/${activeSeries?.maturity}` );
   }, [location]);
 
-  /* Serivce Worker registraion and handle app updates and user confirmations */
+  /* Service Worker registraion and handle app updates and user confirmations */
   useEffect(()=>{
+    const cachesToClear = ['txPending', 'lastFeed', 'lastVisit', 'deployedSeries', 'cache_chainId', 'txHistory' ];
+    
     serviceWorker.register({ 
-      onUpdate: (registration:any)=> {
+      onUpdate: (registration:any) => {
         // eslint-disable-next-line no-console
-        console.log( 'A new version of the app is available' );
+        console.log( 'A new version of the app is available!' );
         dispatch({ 
           type: 'updateAvailable',
-          payload: { 
-            updateAvailable:true,
-            updateAccept: ()=> { 
-              registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-              /* Clear the cache (except user Preferences) on update - in future, save user preferences */
-              localStorage.removeItem('deployedContracts');
-              localStorage.removeItem('lastFeed');
-              localStorage.removeItem('deployedSeries');
-              localStorage.removeItem('cache_chainId');
-              localStorage.removeItem('txHistory');
+          payload: {
+            updateAvailable: true,
+            updateAccept: ()=> {         
+              registration.waiting && registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+              /* clear the cache (except user Preferences) on update - in future, save user preferences */
+              for (const cache of cachesToClear) {
+                localStorage.removeItem(cache);
+              }
               window.location.reload();
-            },    
+            },
           },
         });
-      } 
+      },
+      onWaiting: (registration:any) => { 
+        // eslint-disable-next-line no-console
+        console.log( 'A new version of the app is still available.' );
+        dispatch({ 
+          type: 'updateAvailable',
+          payload: {
+            updateAvailable: true,
+            updateAccept: ()=> {
+              registration.waiting && registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+              /* Clear the cache (except user Preferences) on update - in future, save user preferences */
+              for (const cache of cachesToClear) {
+                localStorage.removeItem(cache);
+              }
+              window.location.reload();
+            },  
+          },
+        });
+      }
     });
+  }, []);
+
+  useEffect(()=>{
+    window.addEventListener('offline', () => {
+      console.log('App is offline.');
+      dispatch({ type:'notify', payload:{ message:'No Network', type:'error' } });
+    });
+
+    window.addEventListener('online', () => {
+      dispatch({ type:'notify', payload:{ message:'Back Online', type:'success' } });
+      seriesActions.updateAllSeries();
+      userActions.updatePosition();
+      userActions.updateAuthorizations();
+    });
+  }, []);
+
+  /* Google Analytics */
+  useEffect(() => {
+    if (!window.GA_INITIALIZED as boolean) {
+      initGA();
+      window.GA_INITIALIZED = true;
+    }
+    logPageView();
   }, []);
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   const leftSideRef = useRef<any>(null);
-  const [showConnectLayer, setShowConnectLayer] = useState<string|null>(null);
+  const [ showConnectLayer, setShowConnectLayer ] = useState<string|null>(null);
 
   return (
     <div
@@ -96,10 +149,9 @@ const App = (props:any) => {
 
       <ConnectLayer view={showConnectLayer} closeLayer={() => setShowConnectLayer(null)} />
 
-      {!yieldLoading &&
-        <Collapsible open={!seriesLoading} ref={leftSideRef}>
-          <Authorization />
-        </Collapsible>}
+      <Collapsible open={!seriesLoading} ref={leftSideRef}>
+        <TxLayer />
+      </Collapsible>
 
       <NotifyLayer target={!mobile?leftSideRef.current:undefined} />
 
@@ -109,17 +161,17 @@ const App = (props:any) => {
         </Box>}
 
       <Main 
-        pad={{ bottom:'large' }}
+        pad={{ vertical:'medium' }}
         align='center'
         flex
-      >      
+      >     
         <Switch>
           <Route path="/post/:amnt?"> <Deposit openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route>
           <Route path="/withdraw/:amnt?"> <WithdrawEth /> </Route>
           <Route path="/borrow/:series?/:amnt?"> <Borrow openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route> 
           <Route path="/repay/:series/:amnt?"> <Repay /> </Route>
           <Route path="/lend/:series?/:amnt?"> <Lend openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route>
-          <Route path="/close/:series/:amnt?"> <CloseDai /> </Route>
+          <Route path="/close/:series/:amnt?"> <CloseDai close={()=>null} /> </Route>
           <Route path="/pool/:series?/:amnt?"> <Pool openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route>
           <Route path="/removeLiquidity/:series/:amnt?"> <RemoveLiquidity /> </Route>           
           <Route exact path="/"> <Redirect to={`${cachedLastVisit || '/borrow/'}`} /> </Route>
@@ -130,10 +182,8 @@ const App = (props:any) => {
       <Footer margin={mobile? undefined: { horizontal:'xlarge' }}>
         {!mobile &&
         <YieldFooter
-          darkMode={props.darkMode}
-          setDarkMode={props.setDarkMode}
+          themeMode={props.themeMode}
           moodLight={props.moodLight}
-          toggleMoodLight={props.toggleMoodLight}
           openConnectLayer={() => setShowConnectLayer('CONNECT')}
         />}                  
       </Footer>
@@ -142,21 +192,33 @@ const App = (props:any) => {
 };
 
 const WrappedApp = () => {
-  const [darkMode, setDarkMode] = useState(false);
-  const [ moodLight, setMoodLight] = useState(true);
+ 
+  const [ colorScheme, setColorScheme ] = useState<'light'|'dark'>('light');
+  const { state: { preferences: userPreferences } } = useContext(UserContext);
+
+  useEffect(()=>{
+    if (userPreferences.themeMode === 'auto') {
+      (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? setColorScheme('dark') : setColorScheme('light');
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+        const newColorScheme = e.matches ? 'dark' : 'light';
+        userPreferences.themeMode === 'auto' && setColorScheme(newColorScheme);
+      });
+    } else {
+      setColorScheme( userPreferences.themeMode );
+    }
+  }, [userPreferences]);
+
   return (
     <Suspense fallback={null}>
       <Grommet
         theme={deepMerge(base, yieldTheme)}
-        themeMode={darkMode ? 'dark' : 'light'}
+        themeMode={colorScheme === 'dark'? 'dark':'light' || 'light'}
         full
       >
         <ErrorBoundary>
-          <App 
-            darkMode={darkMode}
-            setDarkMode={setDarkMode}
-            moodLight={moodLight}
-            toggleMoodLight={()=>setMoodLight(!moodLight)}
+          <App
+            themeMode={userPreferences.themeMode}
+            moodLight={colorScheme==='dark'? false: userPreferences.moodLight}
           />
         </ErrorBoundary>
       </Grommet>

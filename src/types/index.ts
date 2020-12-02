@@ -10,6 +10,7 @@ export interface IYieldSeries {
   liquidityProxyAddress: string;
   hasPoolDelegatedProxy: boolean;
   hasPoolDelegatedAltProxy: boolean;
+  hasPoolDelegatedDsProxy: boolean;
   hasDaiAuth: boolean;
   hasFyDaiAuth: boolean;
   hasCloseAuth: boolean;
@@ -61,11 +62,6 @@ export interface IYieldUser {
   ethAvailable_?:BigNumber;
 }
 
-export interface IReducerAction {
-  type:string,
-  payload?:any,
-}
-
 export interface INotification {
   message: string;
   type?: string;
@@ -82,19 +78,27 @@ export interface INotification {
   requestedSigs?: any,
 }
 
+export interface IProxyExecutable {
+  contractAddress: string,
+  calldata: any,
+  overrides: any,
+}
+
 export interface ITx {
   tx: any, 
   msg: string,
   type: string,
   series: IYieldSeries|null,
+  code?: string, // internal tracking code
 }
 
-export interface ITxState {
-  pendingTxs?: any,
-  lastCompletedTx?: any,
-  requestedSigs?: any,
+export interface ISignListItem {
+  id: string, 
+  desc: string, 
+  conditional: boolean| ( ()=>Promise<boolean> ),
+  signFn: any,
+  fallbackFn: any,
 }
-
 
 export interface IDelegableMessage {
   user: string;
@@ -124,4 +128,23 @@ export interface IDomain {
   version: string;
   chainId: number;
   verifyingContract: string;
+}
+
+
+export interface IAnalytics {
+  category: string;
+  action: string;
+  label?: string | '';
+}
+
+export interface ITxState {
+  pendingTxs: any[],
+  lastCompletedTx: any,
+  requestedSigs: any[],
+  txProcessActive: string|null,
+}
+
+export interface IReducerAction {
+  type:string,
+  payload?:any,
 }

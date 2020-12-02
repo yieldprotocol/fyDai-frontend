@@ -22,20 +22,17 @@ import { cleanValue } from '../utils';
 import { UserContext } from '../contexts/UserContext';
 import { YieldContext } from '../contexts/YieldContext';
 
-import { 
-  useProxy, 
-  useTxActive, 
-  useMath, 
-  useSignerAccount, 
-  useDebounce,
-  useIsLol
-} from '../hooks';
+/* hook pack */
+import { useSignerAccount } from '../hooks/connectionHooks';
+import { useDebounce, useIsLol } from '../hooks/appHooks';
+import { useMath } from '../hooks/mathHooks';
+import { useTxActive } from '../hooks/txHooks';
+import { useBorrowProxy } from '../hooks/borrowProxyHook';
 
 import WithdrawEth from './WithdrawEth';
 
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
-import ApprovalPending from '../components/ApprovalPending';
 import TxStatus from '../components/TxStatus';
 import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
@@ -45,6 +42,9 @@ import RaisedBox from '../components/RaisedBox';
 
 import EthMark from '../components/logos/EthMark';
 import YieldMobileNav from '../components/YieldMobileNav';
+import Loading from '../components/Loading';
+
+import { logEvent } from '../utils/analytics';
 
 interface DepositProps {
   /* deposit amount prop is for quick linking into component */
@@ -73,9 +73,10 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
-  const { postEth, postEthActive }  = useProxy();
+  const { postEth }  = useBorrowProxy();
   const { estCollRatio: estimateRatio, collValue } = useMath();
-  const [ txActive ] = useTxActive(['DEPOSIT', 'WITHDRAW']);
+  const [ txActive ] = useTxActive(['POST', 'WITHDRAW']);
+
   const { account } = useSignerAccount();
 
   const [ inputValue, setInputValue ] = useState<any>(amnt || undefined);
@@ -100,9 +101,14 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
     if (inputValue && !depositDisabled ) {
       setDepositPending(true);
       await postEth(inputValue);
+      logEvent({
+        category: 'Deposit',
+        action: inputValue
+      });
+      
+      /* clean up and refresh */
       setInputValue(undefined);
-      userActions.updateHistory();
-      await userActions.updatePosition();
+      await userActions.updateUser();
       setDepositPending(false);
     }
   };
@@ -127,7 +133,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
     if (debouncedInput) {
       const val = collValue(ethers.utils.parseEther(debouncedInput));
       const newPower = parseFloat(ethers.utils.formatEther(val))/2;
-      if (maxDaiAvailable_) {
+      if (parseFloat(maxDaiAvailable_) > 0) {
         const pl = parseFloat(maxDaiAvailable_) + newPower;
         setEstPower(pl.toFixed(2));
       } else {
@@ -141,7 +147,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
     (
       (account && ethBalance?.eq(ethers.constants.Zero)) ||
       (account && inputValue && ethBalance && ethers.utils.parseEther(inputValue).gt(ethBalance)) ||
-      (ethBalance && inputValue && (parseFloat(inputValue)<= 0.05) ) ||
+      (ethBalance && inputValue && (parseFloat(inputValue)<0.05) ) ||
       txActive ||
       !account ||
       !inputValue ||
@@ -157,7 +163,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
     } else if (ethBalance && debouncedInput && (ethers.utils.parseEther(debouncedInput).eq(ethBalance)) ) {
       setErrorMsg(null);
       setWarningMsg('If you deposit all your ETH you may not be able to make any further transactions!');
-    } else if (debouncedInput && debouncedInput<=0.05) {
+    } else if (debouncedInput && debouncedInput<0.05) {
       setErrorMsg('Initial collateral balance must be larger than 0.05 ETH.');
       setWarningMsg(null);
     } else {
@@ -181,6 +187,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
         <CollateralDescriptor backToBorrow={()=>history.push('/borrow')}>
            
           <InfoGrid
+            alt
             entries={[
               {
                 label: 'Max Borrowing Power',
@@ -191,7 +198,19 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
                 value: maxPower && `${maxPower} DAI`,           
                 valuePrefix: null,
                 valueExtra: null, 
-              },       
+              },
+              {
+                label: null,
+                labelExtra: null,
+                visible:
+                  !!account &&
+                  parseFloat(ethPosted_) === 0,
+                active: true,
+                loading: false,    
+                value: null,
+                valuePrefix: null,
+                valueExtra: null,
+              },                  
               {
                 label: 'Did you know?',
                 labelExtra: null,
@@ -204,7 +223,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
                 valuePrefix: null,
                 valueExtra: ()=>( 
                   <Box width={{ max:'200px' }}>
-                    <Text size='xxsmall' color='text-weak'>
+                    <Text size='xxsmall' color='#333333'>
                       Collateral posted can be used to borrow Dai from any one of the Yield series.
                     </Text>
                   </Box>),
@@ -214,7 +233,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
                 labelExtra: 'posted in the Yield Protocol',
                 visible: !!account && parseFloat(ethPosted_) > 0,
                 active: true,
-                loading: depositPending || txActive?.type ==='WITHDRAW',     
+                loading: !ethPosted_ && depositPending && ethPosted_ !== 0, 
                 value: ethPosted_ ? `${ethPosted_} Eth` : '0 Eth',
                 valuePrefix: null,
                 valueExtra: null,
@@ -234,16 +253,16 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
           />
         </CollateralDescriptor>
       
-        { withdrawOpen && 
+        { withdrawOpen &&
           <Layer onClickOutside={()=>setWithdrawOpen(false)}>
-            <WithdrawEth close={()=>setWithdrawOpen(false)} /> 
+            <WithdrawEth close={()=>setWithdrawOpen(false)} />
           </Layer>}
-        
+      
         { (!txActive || txActive?.type === 'WITHDRAW') &&
         <Box
           alignSelf="center"
           fill
-          background="background-front"
+          background="background"
           round='small'
           pad='large'
           gap='medium'
@@ -256,7 +275,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
               type='number'
               placeholder={(!mobile && !modalView) ? 'Enter the ETH amount to deposit': 'ETH'}
               value={inputValue || ''}
-              disabled={postEthActive}
+              // disabled={postEthActive}
               plain
               onChange={(event:any) => setInputValue( cleanValue(event.target.value) )}
               icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <EthMark />}
@@ -269,49 +288,50 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
 
           <Box fill>
             <Collapsible open={!!inputValue&&inputValue>0}> 
-              <InfoGrid entries={[
-                {
-                  label: 'Borrowing Power',
-                  labelExtra: `est. after posting ${inputValue && cleanValue(inputValue, 2)} ETH`,
-                  visible: !!account,
-                  active: debouncedInput,
-                  loading: !ethPosted_ && depositPending && ethPosted_ !== 0,
-                  value: estPower? `${estPower} DAI`: '0 DAI',           
-                  valuePrefix: null,
-                  valueExtra: null,
-                },
-                {
-                  label: 'Collateralization Ratio',
-                  labelExtra: `est. after posting ${inputValue && cleanValue(inputValue, 2)} ETH`,
-                  visible: !!account && collateralPercent_ > 0,
-                  active: debouncedInput && collateralPercent_ > 0,
-                  loading: !ethPosted_ && depositPending && ethPosted_ !== 0,           
-                  value: (estRatio && estRatio !== 0)? `${estRatio}%`: `${collateralPercent_}%` || '',
-                  valuePrefix: null,
+              <InfoGrid
+                entries={[
+                  {
+                    label: 'Borrowing Power',
+                    labelExtra: `est. after posting ${inputValue && cleanValue(inputValue, 2)} ETH`,
+                    visible: !!account,
+                    active: debouncedInput,
+                    loading: !ethPosted_ && depositPending && ethPosted_ !== 0,
+                    value: estPower? `${estPower} DAI`: '0 DAI',           
+                    valuePrefix: null,
+                    valueExtra: null,
+                  },
+                  {
+                    label: 'Collateralization Ratio',
+                    labelExtra: `est. after posting ${inputValue && cleanValue(inputValue, 2)} ETH`,
+                    visible: !!account && collateralPercent_ > 0,
+                    active: debouncedInput && collateralPercent_ > 0,
+                    loading: !ethPosted_ && depositPending && ethPosted_ !== 0,           
+                    value: (estRatio && estRatio !== 0)? `${estRatio}%`: `${collateralPercent_}%` || '',
+                    valuePrefix: null,
                   // valueExtra: () => (
                   //   <Text color='green' size='medium'> 
                   //     {/* { inputValue && collateralPercent_ && ( (estRatio-collateralPercent_) !== 0) && `(+ ${(estRatio-collateralPercent_).toFixed(0)}%)` } */}
                   //   </Text>
                   // )
-                },
-                {
-                  label: '',
-                  labelExtra:'Connect a wallet to get started',
-                  visible: !account && !!inputValue,
-                  active: inputValue,
-                  loading: false,            
-                  value: '',
-                  valuePrefix: null,
-                  valueExtra: () => (
-                    <Box pad={{ top:'small' }}>
-                      <RaisedButton
-                        label={<Box pad='xsmall'><Text size='xsmall' color='brand'>Connect a wallet</Text></Box>}
-                        onClick={() => openConnectLayer()}
-                      /> 
-                    </Box>
-                  )
-                },
-              ]}
+                  },
+                  {
+                    label: '',
+                    labelExtra:'Connect a wallet to get started',
+                    visible: !account && !!inputValue,
+                    active: inputValue,
+                    loading: false,            
+                    value: '',
+                    valuePrefix: null,
+                    valueExtra: () => (
+                      <Box pad={{ top:'small' }}>
+                        <RaisedButton
+                          label={<Box pad='xsmall'><Text size='xsmall'>Connect a wallet</Text></Box>}
+                          onClick={() => openConnectLayer()}
+                        /> 
+                      </Box>
+                    )
+                  },
+                ]}
               />
             </Collapsible>
           </Box>
@@ -342,20 +362,26 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
             }
             />
             { ethPosted_ > 0 &&
-            <FlatButton 
-              onClick={()=>setWithdrawOpen(true)}
-              label={
-                <Box direction='row' gap='small' align='center'>
-                  <Box><Text size='xsmall' color='text-weak'><Text weight='bold'>Withdraw</Text> collateral</Text></Box>
-                  <ArrowRight color='text-weak' />
-                </Box>
-              }
-            />}
-          </Box>}
-       
+              txActive?.type === 'WITHDRAW' ?
+                <Box direction='row' gap='small'>
+                  <Text size='xsmall' color='text-weak'><Text weight='bold'>withdraw</Text> pending</Text>
+                  <Loading condition={true} size='xxsmall'>.</Loading>
+                </Box> 
+              :
+                <FlatButton 
+                  onClick={()=>setWithdrawOpen(true)} 
+                  label={
+                    <Box direction='row' gap='small' align='center'>
+                      <Box><Text size='xsmall' color='text-weak'><Text weight='bold'>withdraw</Text> collateral</Text></Box>
+                      <ArrowRight color='text-weak' />
+                    </Box>
+                  }
+                />}
+          </Box>}        
         </Box>}
-        { postEthActive && !txActive && <ApprovalPending /> } 
-        { txActive && txActive.type !== 'WITHDRAW' && <TxStatus tx={txActive} /> }
+
+        { txActive?.type === 'POST' && <TxStatus tx={txActive} /> }
+    
       </Keyboard>
 
       {mobile && 

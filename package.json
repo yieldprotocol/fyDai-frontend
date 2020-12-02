@@ -1,9 +1,10 @@
 {
   "name": "@yieldprotocol/fydai-ui",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "private": true,
   "dependencies": {
     "@metamask/detect-provider": "^1.1.0",
+    "@types/react-ga": "^2.3.0",
     "@web3-react/core": "^6.0.9",
     "@web3-react/injected-connector": "^6.0.7",
     "@web3-react/network-connector": "^6.0.9",
@@ -15,6 +16,7 @@
     "moment": "^2.25.3",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-ga": "^3.2.1",
     "react-icons": "^3.10.0",
     "react-router-dom": "^5.2.0",
     "react-spinners": "^0.9.0",
@@ -33,7 +35,6 @@
     "extends": "react-app"
   },
   "devDependencies": {
-    "react-scripts": "3.4.1",
     "@babel/plugin-syntax-jsx": "^7.10.4",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
@@ -63,6 +64,7 @@
     "prettier": "^2.0.5",
     "prettier-eslint": "^9.0.1",
     "prettier-eslint-cli": "^5.0.0",
+    "react-scripts": "3.4.1",
     "typescript": "~3.7.2"
   },
   "browserslist": {

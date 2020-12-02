@@ -8,13 +8,21 @@ export const yieldTheme = {
   defaultMode: 'light',
   global: {
     elevation: {
+      light: {
+        none: 'none',
+        xsmall: '0px 2px 2px rgba(0, 0, 0, 0.5)',
+        small: '0px 4px 4px rgba(0, 0, 0, 0.5)',
+        medium: '0px 6px 8px rgba(0, 0, 0, 0.5)',
+        large: '0px 8px 16px rgba(0, 0, 0, 0.5)',
+        xlarge: '0px 12px 24px rgba(0, 0, 0, 0.5)',
+      },
       dark: {
         none: 'none',
-        xsmall: '0px 2px 2px rgba(255, 255, 255, 0.5)',
-        small: '0px 4px 4px rgba(255, 255, 255, 0.5)',
-        medium: '0px 6px 8px rgba(255, 255, 255, 0.5)',
-        large: '0px 8px 16px rgba(255, 255, 255, 0.5)',
-        xlarge: '0px 12px 24px rgba(255, 255, 255, 0.5)',
+        xsmall: '0px 2px 2px rgba(0, 0, 0, 0.5)',
+        small: '0px 4px 4px rgba(0, 0, 0, 0.5)',
+        medium: '0px 6px 8px rgba(0, 0, 0, 0.5)',
+        large: '0px 8px 16px rgba(0, 0, 0, 0.5)',
+        xlarge: '0px 12px 24px rgba(0, 0, 0, 0.5)',
       },
     },
     colors: {
@@ -25,8 +33,7 @@ export const yieldTheme = {
       },
       'brand-transparent': {
         dark: '#0057921A',
-        light: '#0000001A',
-        
+        light: '#0000001A',      
       },
       'brand-light': {
         dark: '#FFFFFF',
@@ -41,7 +48,7 @@ export const yieldTheme = {
         light: '#627EEA1A',
       },
       background: {
-        dark: '#111111',
+        dark: '#222222',
         light: '#f8f8f8',
       },
       'background-back': {
@@ -49,7 +56,7 @@ export const yieldTheme = {
         light:'#f1f1f1'
       },
       'background-mid': {
-        dark: 'dark-1',
+        dark: '333333',
         light:'#f1f1f1'
       },
       'background-front': {
@@ -61,7 +68,7 @@ export const yieldTheme = {
         light: '#11111111',
       },
       text: {
-        dark: '#EEEEEE',
+        dark: '#FFFFFF',
         light: '#222222',
       },
       'text-strong': {
@@ -69,8 +76,8 @@ export const yieldTheme = {
         light: '#000000',
       },
       'text-weak': {
-        dark: '#CCCCCC',
-        light: '#555555',
+        dark: '#DDDDDD',
+        light: '#444444',
       },
       'text-xweak': {
         dark: '#999999',
@@ -236,6 +243,7 @@ export const yieldTheme = {
   },
   meter: {},
   anchor: {
+    color: 'text',
     hover: {
       extend: {
         opacity: '0.5',
@@ -257,7 +265,9 @@ export const yieldTheme = {
       `
   },
   checkBox: {
+    color: 'text',
     check: {
+      color: 'text',
       radius: '24px',
     },
     toggle: {
@@ -517,7 +527,7 @@ export const yieldTheme = {
     },
     zIndex: '15',
     overlay: {
-      background: '#000000A6', // 60%
+      background: '#000000B3', // 60%
     },
   },
 

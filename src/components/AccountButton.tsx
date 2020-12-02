@@ -6,7 +6,7 @@ import {
   Box,
   ResponsiveContext,
   Layer,
-  Collapsible
+  Collapsible,
 } from 'grommet';
 
 import { 
@@ -58,7 +58,7 @@ const AccountButton = (props: any) => {
       round
       direction='row'
       align='center'
-      background={account?'#f0f0f0':undefined}
+      background='background'
     > 
       {txStatusOpen && 
       <Layer 
@@ -67,7 +67,7 @@ const AccountButton = (props: any) => {
       >
         <Box 
           fill
-          background="background-front"
+          background='background'
           round='small'
           pad="none"
           align='center'
@@ -100,8 +100,7 @@ const AccountButton = (props: any) => {
         onFocus={() => setDetailsOpen(true)}
         onBlur={() => setDetailsOpen(false)}
       >
-
-        
+       
         <Collapsible open={detailsOpen} direction='horizontal'>
           { detailsOpen && 
           <Box overflow='scroll' gap='xsmall' direction='row' animation='slideLeft'>    
@@ -121,7 +120,7 @@ const AccountButton = (props: any) => {
       </Box>}
 
         
-      {pendingTxs.length>0 &&  
+      {pendingTxs.length>0 && !txCompleteOpen &&
       <Box
         ref={pendingRef}
         direction='row'
@@ -131,10 +130,10 @@ const AccountButton = (props: any) => {
         animation='slideLeft'
         onClick={()=>setTxStatusOpen(true)}
       >
-        <Text size='xsmall'> Transaction pending ... </Text>   
+        <Text size='xsmall'> Transaction pending ... </Text>  
       </Box>}
 
-      {txCompleteOpen &&
+      {txCompleteOpen && 
       <>
         <Box
           ref={completeRef}
@@ -148,17 +147,17 @@ const AccountButton = (props: any) => {
           {lastCompletedTx?.status === 1 &&
           <Box direction='row' gap='xsmall'> 
             <Text color='green' textAlign='center' size='xsmall'><Check /></Text>
-            <Text color='green' textAlign='center' size='xsmall'>Transaction Complete</Text>
+            { pendingTxs.length===0 && <Text color='green' textAlign='center' size='xsmall'>Transaction Complete</Text>}
           </Box>}
           {lastCompletedTx?.status !== 1 &&
-          <Text color='red' textAlign='center' size='xsmall'>  Transaction failed  </Text>}
+          <Box direction='row' gap='xsmall'>
+            <Text color='red' textAlign='center' size='xsmall'>Transaction failed</Text>
+          </Box>}
         </Box> 
       </>}
 
       { account ?
         <>{!mobile && <FlatButton
-          selected 
-          background='#f0f0f0'
           onClick={()=>openConnectLayer('ACCOUNT')}
           label={
             <Box gap='small' direction='row' align='center'>

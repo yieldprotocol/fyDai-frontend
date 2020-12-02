@@ -17,7 +17,7 @@ const SeriesMatureBox = () => {
           <Clock />
         </Box>
         <Box> 
-          <Text size='small' color='brand'> This series has matured.</Text>         
+          <Text size='small'> This series has matured.</Text>         
         </Box>
       </Box>
     </Box>

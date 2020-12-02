@@ -8,18 +8,21 @@ import { FiArrowLeft as ArrowLeft } from 'react-icons/fi';
 import { cleanValue } from '../utils';
 
 import { UserContext } from '../contexts/UserContext';
-import { useProxy, useMath, useTxActive, useDebounce, useIsLol } from '../hooks';
 
-import ApprovalPending from '../components/ApprovalPending';
-import TxStatus from '../components/TxStatus';
+import { useDebounce, useIsLol } from '../hooks/appHooks';
+import { useMath } from '../hooks/mathHooks';
+import { useTxActive } from '../hooks/txHooks';
+import { useBorrowProxy } from '../hooks/borrowProxyHook';
+
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
 import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
-
 import EthMark from '../components/logos/EthMark';
 import YieldMobileNav from '../components/YieldMobileNav';
+
+import { logEvent } from '../utils/analytics';
 
 interface IWithDrawProps {
   close?: any;
@@ -28,20 +31,16 @@ interface IWithDrawProps {
 const WithdrawEth = ({ close }:IWithDrawProps) => {
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
-
-  const { state: { position, authorizations }, actions: userActions } = useContext(UserContext);
-  const { hasDelegatedProxy } = authorizations;
+  const { state: { position }, actions: userActions } = useContext(UserContext);
   const {
     ethPosted,
-    ethPosted_,
     ethLocked,
-    ethLocked_,
     collateralPercent_,
     debtValue,
     debtValue_,
   } = position;
   
-  const { withdrawEth } = useProxy();
+  const { withdrawEth } = useBorrowProxy();
   const { estCollRatio: estimateRatio } = useMath();
   const [ txActive ] = useTxActive(['WITHDRAW']);
 
@@ -53,7 +52,6 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
   const [ maxWithdraw, setMaxWithdraw ] = useState<string>();
 
   const [ withdrawDisabled, setWithdrawDisabled ] = useState<boolean>(true);
-  const [ withdrawPending, setWithdrawPending ] = useState<boolean>(false);
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
 
@@ -62,13 +60,15 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
   /* Withdraw execution flow */
   const withdrawProcedure = async () => {
     if (inputValue && !withdrawDisabled ) {
-      setWithdrawPending(true);
+      close(); // close immediately, no need to track withdrawPending
       await withdrawEth(inputValue);
+      logEvent({
+        category: 'Withdraw',
+        action: inputValue
+      });
+      /* clean up and refresh */ 
       setInputValue(undefined);
-      userActions.updateHistory();
-      userActions.updatePosition();
-      setWithdrawPending(false);
-      close();
+      userActions.updateUser();
     }
   };
 
@@ -94,14 +94,12 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
     ( estRatio < 150 ||
       txActive ||
       !inputValue ||
-      !hasDelegatedProxy ||
       parseFloat(inputValue) <= 0
     )? setWithdrawDisabled(true) : setWithdrawDisabled(false);
-  }, [ inputValue, estRatio, hasDelegatedProxy ]);
+  }, [ inputValue, estRatio ]);
 
   /* show warnings and errors with collateralization ratio levels and inputs */
   useEffect(()=>{
-
     if ( debouncedInput && maxWithdraw && (debouncedInput > maxWithdraw) ) {
       setWarningMsg(null);
       setErrorMsg('That exceeds the amount of ETH you can withdraw right now.');
@@ -125,12 +123,12 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
       }}
       target='document'
     >
-      { !txActive && !withdrawPending && 
+      { !txActive &&
       <Box 
         width={!mobile?{ min:'620px', max:'620px' }: undefined}
         alignSelf='center'
         fill
-        background='background-front'
+        background='background'
         round='small'
         pad='large'
         gap='medium'
@@ -143,7 +141,6 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
             ref={(el:any) => {el && !mobile && el.focus(); setInputRef(el);}} 
             type="number"
             placeholder='ETH'
-            disabled={!hasDelegatedProxy}
             value={inputValue || ''}
             plain
             onChange={(event:any) => setInputValue(cleanValue(event.target.value))}
@@ -151,7 +148,6 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
           />
           <RaisedButton 
             label='Withdraw maximum'
-            disabled={!hasDelegatedProxy}
             onClick={()=>maxWithdraw && setInputValue(cleanValue(maxWithdraw))}
           />
         </InputWrap>
@@ -162,7 +158,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
               {
                 label: 'Max withdraw',
                 visible: true,
-                active: hasDelegatedProxy,
+                active: true,
                 loading: false, 
                 value: maxWithdraw? `${parseFloat(maxWithdraw).toFixed(4)} Eth` : '-',
                 valuePrefix: null,
@@ -183,12 +179,12 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
         </Box>
 
         <ActionButton
-          onClick={()=> withdrawProcedure()}
+          onClick={() => withdrawProcedure()}
           label={`Withdraw ${inputValue || ''} Eth`}
           disabled={withdrawDisabled}
           hasPoolDelegatedProxy={true}
           clearInput={()=>setInputValue(undefined)}
-        />  
+        />
           
         <Box alignSelf='start' margin={{ top:'medium' }}>
           <FlatButton 
@@ -196,44 +192,12 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
             label={
               <Box direction='row' gap='medium' align='center'>
                 <ArrowLeft color='text-weak' />
-                <Text size='small' color='text-weak'> { !withdrawPending? 'cancel, and go back.': 'go back'}</Text>
+                <Text size='small' color='text-weak'> cancel, and go back. </Text>
               </Box>
                 }
           />
-        </Box>
-            
+        </Box>        
       </Box>}
-
-      { withdrawPending && !txActive && <ApprovalPending /> }
-          
-      { txActive && 
-        <Box 
-          width={{ max:'600px' }}
-          alignSelf='center'
-          fill
-          background='background-front'
-          round='small'
-          pad='large'
-          gap='medium'
-          justify='between'
-        > 
-          <TxStatus tx={txActive} />
-
-          <Box alignSelf='start'>
-            <Box
-              round
-              onClick={()=>close()}
-              hoverIndicator='brand-transparent'
-              pad={{ horizontal:'small', vertical:'small' }}
-              justify='center'
-            >
-              <Box direction='row' gap='small' align='center'>
-                <ArrowLeft color='text-weak' />
-                <Text size='xsmall' color='text-weak'> { !withdrawPending? 'cancel, and go back.': 'go back'}  </Text>
-              </Box>
-            </Box>
-          </Box>
-        </Box>}
 
       {mobile && 
         <YieldMobileNav noMenu={true}>

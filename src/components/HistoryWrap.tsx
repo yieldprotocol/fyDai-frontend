@@ -24,20 +24,24 @@ const HistoryWrap = ({ children, closeLayer, series } : any) => {
     >
       <Box
         width={!mobile?{ min:'620px', max:'620px' }: undefined}
-        background="background-front"
+        // height={!mobile?{ min:'620px', max:'620px' }: undefined}
+        background="background"
         direction="column"
         fill="vertical"
         style={{
           borderRadius: '0.5rem',
           padding: '2rem',
         }}
-      >   
-        <Box pad="medium" gap="small"> 
-          <Text size='xlarge' weight='bold'> Transaction History  {series?.displayName} </Text> 
+        justify='between'
+      >  
+        <Box>
+          <Box pad="medium" gap="small"> 
+            <Text size='xlarge' weight='bold'> Transaction History  {series?.displayName} </Text> 
+          </Box>
+          <Box pad="medium" gap="small"> 
+            {children}
+          </Box>
         </Box>
-        <Box pad="medium" gap="small"> 
-          {children}
-        </Box> 
         <Footer direction="row-responsive" justify='between' pad="medium" margin={{ top:'medium' }}>
           <FlatButton 
             onClick={() => closeLayer()}

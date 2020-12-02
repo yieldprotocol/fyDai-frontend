@@ -7,9 +7,10 @@ import {
   FiAlertTriangle as Warn,
 } from 'react-icons/fi';
 
-import { NotifyContext } from '../../contexts/NotifyContext';
-import RaisedButton from '../../components/RaisedButton';
-import YieldDisclaimer from '../../components/YieldDisclaimer';
+import { NotifyContext } from '../contexts/NotifyContext';
+import RaisedButton from '../components/RaisedButton';
+import YieldDisclaimer from '../components/YieldDisclaimer';
+
 
 function NotifyLayer(target:any) {
 
@@ -27,7 +28,7 @@ function NotifyLayer(target:any) {
 
   return (
     <>
-      { state.notifyOpen &&
+      {state.notifyOpen &&
       <Layer
         position='right'
         modal={false}
@@ -83,50 +84,38 @@ function NotifyLayer(target:any) {
       </Layer>}
 
       {state.updateAvailable &&
-      <Layer
-        position='bottom-right'
-        modal={false}
-        onEsc={()=>dispatch({ type:'closeNotify' })}
-        responsive={false}
-        plain
-        full={mobile?'horizontal': undefined}
+      <Box
+        fill='horizontal'
+        pad={mobile?{ horizontal:'medium', top:'medium', bottom:'large' }:{ horizontal:'xlarge', vertical:'medium' }}
+        direction='row'
+        gap='medium'
+        background='#555555'
+        margin={mobile?{ bottom:'-10px' }:undefined}
+        justify='center'
       >
         <Box 
-          width='1/2' 
+          width={{ max:'600px' }} 
+          justify={ !mobile && 'between' || 'center'} 
+          direction='row'
+          fill
         >
-          <Box
-            justify="center"
-            elevation="large"
-            pad={{ vertical:'small', horizontal:'small' }}
-            background={notificationTypeMap('null').color}
-            round='small'
-            margin={mobile?{ bottom:'50px', horizontal:'xsmall' }: { bottom:'xlarge', right:'large' }}
-            align='center'
-          >
+          { 
+            !mobile &&
             <Box direction='row' align='center'>
               { notificationTypeMap('null').icon }
               <Box align="center" direction="row" gap="small" pad='small'>
-                <Text size='small' color={notificationTypeMap('null').textColor}>An app update is available.</Text>
+                <Text size='small' color={notificationTypeMap('null').textColor}>A Yield app update is available.</Text>
               </Box>
             </Box>
-
-            <Box direction='row' gap='medium'>
-              <RaisedButton
-                background={notificationTypeMap('null').color}
-                onClick={() => state.updateAccept()}
-                label={<Text size='xsmall' color={notificationTypeMap(state.type).textColor}>Update now</Text>}
-              />
-              <RaisedButton
-                background={notificationTypeMap('null').color}
-                onClick={()=> dispatch({ type: 'updateAvailable', payload:{ updateAvailable:false } })}
-                label={<Text size='xsmall' color={notificationTypeMap(state.type).textColor}>Later</Text>}
-              />
-            </Box>
-          </Box>
-          <Box background={notificationTypeMap('null').color} />
-        </Box>      
-      </Layer>}
-
+          }
+          <RaisedButton
+            background={notificationTypeMap('null').color}
+            onClick={() => state.updateAccept()}
+            label={<Box pad='xsmall'><Text size='small' color={notificationTypeMap(state.type).textColor}>{mobile?'Update Yield app': 'Update now'}</Text></Box>}
+          />
+        </Box>
+      </Box>}
+      
       <YieldDisclaimer />
 
     </>

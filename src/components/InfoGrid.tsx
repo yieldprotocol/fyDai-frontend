@@ -25,7 +25,10 @@ interface IInfoGridProps {
 function InfoGrid({ entries, alt }:IInfoGridProps) {
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
-  const { state:{ activeSeries } } = useContext(SeriesContext);
+
+  const { state: { activeSeriesId, seriesData } } = useContext(SeriesContext);
+  const activeSeries = seriesData.get(activeSeriesId);
+
   const [ detailsOpen, setDetailsOpen ] = useState<boolean>();
   const [visibleEntries, setVisibleEntries] = useState<any[]>([]);
 
@@ -59,7 +62,8 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
               >
                 <Box>
                   <Text 
-                    color={alt? 'text-weak': 'text-weak'} 
+                    // color={alt? 'text-weak': 'text-weak'} 
+                    color={alt? activeSeries?.seriesTextColor : 'text-weak'}
                     size='xsmall'
                   >
                     { (typeof Label === 'function')? <Label />: Label }
@@ -73,21 +77,21 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
                   </Text>
                 </Box>  
 
-                <Loading condition={x.loading} size='small'>
+                <Loading condition={x.loading} size='small' color={alt? activeSeries?.seriesTextColor : 'text'}>
                   <Box direction='row-responsive' gap='xsmall' align='center'>
                     { x.valuePrefix && 
                       !mobile && 
-                      <Text color={x.active ? activeSeries?.seriesTextColor:'text-xweak'} size='medium' weight='bold'>
+                      <Text color={alt? activeSeries?.seriesTextColor : 'text-weak'} size='medium' weight='bold'>
                         {x.valuePrefix}                     
                       </Text>}
-                    <Text color={x.active? activeSeries?.seriesTextColor:'text-xweak'} weight='bold' size='medium'> 
+                    <Text color={alt? activeSeries?.seriesTextColor : 'text-weak'} weight='bold' size='medium'> 
                       { (typeof Value === 'function')? <Value />: Value }
                     </Text>
                   </Box>
 
                   { typeof ValueExtra === 'function' ? 
                     <ValueExtra />  :
-                    <Text color={alt? 'text-weak': 'text-weak'} size='xxsmall'> 
+                    <Text color={alt? activeSeries?.seriesTextColor : 'text-weak'} size='xxsmall'> 
                       { ValueExtra }
                     </Text>}                 
                 </Loading>
@@ -98,9 +102,7 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
         })}
       </Box>
 
-      <Box
-        margin={visibleEntries.length <= 3? { bottom:'large' }: undefined}
-      >
+      <Box>
         <Collapsible open={detailsOpen}>
           <Box 
             pad={{ horizontal:'small', top:'small' }} 
@@ -125,7 +127,7 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
                   >
                     <Box>
                       <Text 
-                        color={alt? 'text-weak': 'text-weak'} 
+                        color={alt? activeSeries?.seriesTextColor : 'text-weak'}
                         size='xsmall'
                       >
                         { (typeof Label === 'function')? <Label />: Label }
@@ -138,7 +140,7 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
                         { x.labelExtra}
                       </Text>
                     </Box> 
-                    <Loading condition={x.loading} size='small'>
+                    <Loading condition={x.loading} size='small' color={alt? activeSeries?.seriesTextColor : 'text'}>
                       <Box direction='row-responsive' gap='xsmall' align='center'>
                         { x.valuePrefix && 
                         !mobile && 
@@ -173,9 +175,9 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
       > 
         {/* {!detailsOpen?<ChevronDown size='25px' /> : <ChevronUp size='25px' />}   */}
         {!detailsOpen?
-          <Text size='xxsmall' color='text-weak'> more info </Text> 
+          <Text size='xxsmall' color={activeSeries?.seriesTextColor}> more info </Text> 
           :
-          <Text size='xxsmall' color='text-weak'> less info </Text>}
+          <Text size='xxsmall' color={activeSeries?.seriesTextColor}> less info </Text>}
       </Box> }
     </Box>
   );

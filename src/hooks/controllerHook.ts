@@ -1,14 +1,14 @@
-import { useMemo, useEffect, useState, useContext } from 'react';
+import { useMemo, useState, useContext } from 'react';
 import { ethers, BigNumber }  from 'ethers';
 
-import { TxContext } from '../contexts/TxContext';
 import { YieldContext } from '../contexts/YieldContext';
+import { UserContext } from '../contexts/UserContext';
 
 import Controller from '../contracts/Controller.json';
 
 import { useSignerAccount } from './connectionHooks';
 import { useTxHelpers } from './txHooks';
-
+import { useDsProxy } from './dsProxyHook';
 
 /**
  * Hook for interacting with the yield 'CRONTROLLER' Contract
@@ -26,9 +26,10 @@ import { useTxHelpers } from './txHooks';
 export const useController = () => {
   const { abi: controllerAbi } = Controller;
   const { signer, fallbackProvider, account } = useSignerAccount();
-  const  { dispatch }  = useContext<any>(TxContext);
   
   const { state : { deployedContracts } } = useContext<any>(YieldContext);
+  const { actions: userActions } = useContext(UserContext);
+
   const [ postActive, setPostActive ] = useState<boolean>(false);
   const [ withdrawActive, setWithdrawActive ] = useState<boolean>(false);
   const [ borrowActive, setBorrowActive ] = useState<boolean>(false);
@@ -40,6 +41,7 @@ export const useController = () => {
   const [controllerProvider, setControllerProvider] = useState<any>();
 
   const { handleTx, handleTxRejectError } = useTxHelpers();
+  const { proxyExecute } = useDsProxy();
 
   useMemo(()=>{
     try {
@@ -63,168 +65,40 @@ export const useController = () => {
   }, [signer, fallbackProvider, deployedContracts]);
 
   /**
-   * NB: USE PROXYHOOK FOR ETH-A DEPOSITS
-   * 
-   * Posts 'wrapped' collateral (Weth or Chai) - not ETH directly.
-   * @param {string} collateral 'ETH-A' || 'CHAI'
-   * @param {number} amount amount of collateral to post (in normal human numbers)
-   */
-  const post = async (
-    collateral:string,
-    amount:number
-  ) => {
-    /* Processing and sanitizing input */
-    const parsedAmount = ethers.utils.parseEther(amount.toString());
-    const fromAddr = account && ethers.utils.getAddress(account);
-    const toAddr = fromAddr;
-    const collateralBytes = ethers.utils.formatBytes32String(collateral);
-
-    /* Contract interaction */
-    let tx:any;
-    setPostActive(true);
-    try {
-      tx = await controllerContract.post(collateralBytes, fromAddr, toAddr, parsedAmount);
-    } catch (e) {
-      handleTxRejectError(e);
-      setPostActive(false);
-      return;
-    }
-    await handleTx({ tx, msg: `Deposit of ${amount} pending...`, type:'DEPOSIT', series:null });
-    setPostActive(false);
-  };
-
-  /**
-   * NB: USE PROXYHOOK FOR ETH-A WITHDRAWS
-   * 
-   * Withdraws 'wrapped' collateral (Weth or Chai) - not ETH directly.
-   * @param {string} controllerAddress address of the Controller (remnant of older protocol)
-   * @param {string} collateral 'ETH-A' || 'CHAI'
-   * @param {number} amount to withdraw (in human understandable numbers)
-   */
-  const withdraw = async (
-    collateral:string,
-    amount:number
-  ) => {
-    /* Processing and sanitizing input */
-    const parsedAmount = ethers.utils.parseEther(amount.toString());
-    const fromAddr = account && ethers.utils.getAddress(account);
-    const toAddr = fromAddr;
-    const collateralBytes = ethers.utils.formatBytes32String(collateral);
-
-    /* Contract interaction */
-    let tx:any;
-    setWithdrawActive(true);
-    try {
-      tx = await controllerContract.withdraw(collateralBytes, fromAddr, toAddr, parsedAmount);
-    } catch (e) {
-      handleTxRejectError(e);
-      setWithdrawActive(false);
-      return;
-    }
-    await handleTx({ tx, msg: `Withdraw of ${amount} pending...`, type:'WITHDRAW', series:null });
-    setWithdrawActive(false);
-  };
-
-  /**
-   * NB: USE PROXYHOOK FOR AUTOMMATIC TRADING
-   * 
-   * Borrow fyDai with available, posted collateral directly (any type of collateral).
-   * @note Direct transaction with no pool trading (doesn't automatically sell fyDai for Dai)
-   * 
-   * @param {string} collateral 'ETH-A' || 'CHAI' (use ETH-A for ETH collateral)
-   * @param {string} maturity UNIX timestamp as a string
-   * @param { number } amount borrow amount (in human understandable numbers)
-   * 
-   */
-  const borrow = async (
-    collateral:string,
-    maturity:string,
-    amount:number
-  ) => {
-    /* Processing and sanitizing input */
-    const parsedAmount = ethers.utils.parseEther(amount.toString());
-    const toAddr = account && ethers.utils.getAddress(account);
-    const fromAddr = account && ethers.utils.getAddress(account);
-    const collateralBytes = ethers.utils.formatBytes32String(collateral);
-    const matdate = maturity;
-
-    /* Contract interaction */
-    let tx:any;
-    setBorrowActive(true);
-    try {
-      tx = await controllerContract.borrow(collateralBytes, matdate, fromAddr, toAddr, parsedAmount);
-    } catch (e) {
-      handleTxRejectError(e);
-      setBorrowActive(false);
-      return;
-    }
-    await handleTx({ tx, msg: `Borrowing of ${amount} pending...`, type:'BORROW', series: null });
-    setBorrowActive(false);
-  };
-
-  /**
-   * 
-   * NB: USE PROXYHOOK FOR REPAYMENTS 
-   * 
-   * Repay fyDai debt directly with either Dai or FYDai.
-   * @note Direct transaction with no pool trading.
-   * 
-   * @param {string} collateral 'ETH-A' || 'CHAI' (use ETH-A for ETH collateral pool)
-   * @param {string} maturity UNIX timestamp as a string
-   * @param {number} amount to repay - either fyDai or Dai (in human understandable numbers)
-   * @param {string} type 'EDAI' || 'DAI' token used to pay back debt
-   */
-  const repay = async (
-    collateral:string,
-    maturity:string,
-    amount:number,
-    type:string,
-  ) => {
-    /* Processing and sanitizing input */
-    const parsedAmount = ethers.utils.parseEther(amount.toString());
-    const fromAddr = account && ethers.utils.getAddress(account);
-    const toAddr = account && ethers.utils.getAddress(account);
-    const typeCaps = type.toUpperCase();
-    const collateralBytes = ethers.utils.formatBytes32String(collateral);
-
-    /* Contract interaction */
-    let tx:any;
-    setRepayActive(true);
-    try {
-      if (typeCaps === 'EDAI') {
-        tx = await controllerContract.repayFYDai(collateralBytes, maturity, fromAddr, toAddr, parsedAmount);
-      } else if (typeCaps === 'DAI') {
-        tx = await controllerContract.repayDai(collateralBytes, maturity, fromAddr, toAddr, parsedAmount);
-      }
-    } catch (e) {
-      handleTxRejectError(e);
-      setRepayActive(false);
-      return;
-    }
-    await handleTx({ tx, msg: `Repayment of ${amount} pending...`, type:'REPAY', series: null});
-    setRepayActive(false);
-  };
-
-  /**
    * @dev Delegate a 3rd party to act on behalf of the user in the controller
    * @param {string} delegatedAddress address of the contract/entity getting delegated. 
    */
   const addControllerDelegate = async (
     delegatedAddress:string,
+    asProxy: boolean = false,
   ) => {
     let tx:any;
     /* Processing and sanitizing input */
     const delegatedAddr = ethers.utils.getAddress(delegatedAddress);
     /* Contract interaction */
-    try {
-      tx = await controllerContract.addDelegate(delegatedAddr);
-    } catch (e) {
-      handleTxRejectError(e);
-      return;
+
+    if (!asProxy) {
+      try {
+        tx = await controllerContract.addDelegate(delegatedAddr);
+      } catch (e) {
+        handleTxRejectError(e);
+        return;
+      }
+      /* Transaction reporting & tracking */
+      await handleTx({ tx, msg: 'Once-off Yield authorization', type: 'AUTH_CONTROLLER', series: null });
+      userActions.updateAuthorizations();
+
+    } else {   
+      const calldata = controllerContract.interface.encodeFunctionData('addDelegate', [delegatedAddr]);
+      tx = await proxyExecute( 
+        controllerContract.address,
+        calldata,
+        { },
+        { tx:null, msg: 'Once-off Yield authorization', type: 'AUTH_CONTROLLER', series: null  }
+      );
+      userActions.updateAuthorizations();
     }
-    /* Transaction reporting & tracking */
-    await handleTx({ tx, msg: 'Pending once-off controller delegation ...', type: 'AUTH', series: null });
-    
+  
     // eslint-disable-next-line consistent-return
     return true;
   };
@@ -365,10 +239,6 @@ export const useController = () => {
   };
 
   return {
-    post, postActive,
-    withdraw, withdrawActive,
-    borrow, borrowActive,
-    repay, repayActive,
 
     addControllerDelegate,
     checkControllerDelegate,

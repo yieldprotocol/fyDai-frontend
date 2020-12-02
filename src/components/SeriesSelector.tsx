@@ -1,10 +1,12 @@
 import React, { useEffect, useState, useContext } from 'react';
+import styled, { css } from 'styled-components';
 import { useLocation, useHistory } from 'react-router-dom';
-import { Text, Box, Layer, ResponsiveContext, Button } from 'grommet';
+import { Text, Box, Layer, ResponsiveContext, ThemeContext, Button } from 'grommet';
 import { 
   FiArrowLeft as ArrowLeft,
   FiCheck as Check,
 } from 'react-icons/fi';
+import { logEvent } from '../utils/analytics';
 
 import { SeriesContext } from '../contexts/SeriesContext';
 
@@ -13,6 +15,15 @@ import Loading from './Loading';
 import FlatButton from './FlatButton';
 import RaisedButton from './RaisedButton';
 import YieldMobileNav from './YieldMobileNav';
+import { modColor } from '../utils';
+
+const InsetBox = styled(Box)`
+  border-radius: 8px;
+    ${(props:any) => props.background && 
+      css`
+      background: ${props.background}; 
+      box-shadow: inset 6px 6px 11px ${modColor(props.background, -20)}, inset -6px -6px 11px ${modColor(props.background, 10)};
+  `}`;
 
 interface ISeriesSelectorProps {
   activeView:string;
@@ -25,8 +36,13 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
   const { pathname } = useLocation();
   const navHistory = useHistory();
 
-  const { state: seriesState, actions: seriesActions } = useContext( SeriesContext );
-  const { seriesLoading, activeSeries, seriesData } = seriesState; 
+  const theme:any = React.useContext(ThemeContext);
+  const themeBackground = theme.global.colors.background;
+  const defaultBackground = theme.dark === true ? themeBackground.dark: themeBackground.light;
+  
+  const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
+  const activeSeries = seriesData.get(activeSeriesId);
+
   const { setActiveSeries } = seriesActions;
 
   const [sortedList, setSortedList] = useState<any>(seriesData);
@@ -39,6 +55,11 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
 
   const handleSelectSeries = (seriesMaturity: number) => {
     setActiveSeries(seriesMaturity);
+    logEvent({
+      category: 'Series',
+      action: 'Select Series',
+      label: activeSeries.displayName,
+    });
     navHistory.push(`/${pathname.split('/')[1]}/${seriesMaturity}`);
     close();
   };
@@ -72,21 +93,18 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
       <Box
         round='small'
         fill
-        background='background-front'
+        background='background'
         pad={{ horizontal: 'medium', vertical:'large' }}
-        gap='medium'
+        gap='large'
         width={!mobile?{ min:'620px', max:'620px' }: undefined}
       >
-        <Box gap='small'>
-          <Box direction='row' gap='medium' align='center'>
-            <Box onClick={() => close()}><ArrowLeft /></Box>
-            <Text weight='bold' size={mobile?'small':'medium'}> Choose a Series</Text>
-          </Box>
-          <Text alignSelf='start' size={mobile?'xxsmall':'small'} color='text-weak'>Select a series from the list below</Text>
+        <Box direction='row' gap='large' align='center'>
+          { mobile && <Box onClick={() => close()}><ArrowLeft /></Box>}
+          <Text weight='bold' size={mobile?'small':'large'}> Choose a Series</Text>
         </Box>
 
-        <Box 
-          gap='none'
+        <InsetBox 
+          background={defaultBackground}
         >
           <Box 
             direction='row'
@@ -94,23 +112,24 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
             fill='horizontal'
             justify='between'
             gap='small'
+            // background={modColor(defaultBackground, -10)}
           >
             <Box basis={mobile?'30%':'30%'}>
-              <Text size='small' color='text-weak'>APR</Text>
+              <Text alignSelf='start' size='small' color='text-weak' weight='bold'>APR</Text>
             </Box>
             <Box fill='horizontal' direction='row' justify='between' gap='small'>
               <Box fill align={mobile?'end':undefined}>
-                <Text size={mobile? 'xsmall':'small'} color='text-weak'>{mobile? 'SERIES' : 'SERIES MATURITY'}</Text>
+                <Text size={mobile? 'xsmall':'small'} color='text-weak' weight='bold'>{mobile? 'SERIES' : 'SERIES MATURITY'}</Text>
               </Box>
               <Box fill align={mobile?'end':undefined}>
-                <Text size={mobile? 'xsmall':'small'} color='text-weak'>
+                <Text size={mobile? 'xsmall':'small'} color='text-weak' weight='bold'>
                   { viewMap.get(activeView.toUpperCase())?.head }         
                 </Text>
               </Box>
             </Box>
             { !mobile && 
               <Box direction='row' justify='end' basis='25%'>
-                <Text size={mobile? 'xsmall':'small'} color='text-weak'> </Text>
+                <Text size={mobile? 'xsmall':'small'} color='text-weak' weight='bold'> </Text>
               </Box>}
           </Box>
 
@@ -125,27 +144,27 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
                   direction='row' 
                   justify='between'
                   onClick={()=>handleSelectSeries(x.maturity)}
-                  hoverIndicator='background-mid'
-                  background={activeSeries.maturity === x.maturity ?'background-mid':undefined}
-                  border='top'
+                  hoverIndicator={modColor(defaultBackground, -10)}
+                  background={activeSeries.maturity === x.maturity ? modColor(defaultBackground, -10):undefined}
+                  // border='top'
                   fill='horizontal'
                   pad='medium'
                   gap='small'
                 >
                   <Box basis={mobile?'30%':'30%'} align='center'>
-                    <Box direction='row'>
+                    <Box direction='row' alignSelf='start'>
                       <AprBadge activeView={activeView} series={x} />
                     </Box>
                   </Box>
 
                   <Box fill='horizontal' direction='row' justify='between' gap='small'>
                     <Box fill align={mobile?'start':'start'}>
-                      <Text size='xsmall' color='brand'>
+                      <Text size='xsmall'>
                         { mobile? x.displayNameMobile : x.displayName }
                       </Text>
                     </Box>
                     <Box fill align={mobile?'end':undefined}>
-                      <Text size='xsmall' color='brand'>
+                      <Text size='xsmall'>
                         {x[field]}
                       </Text>
                     </Box>                 
@@ -163,6 +182,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
                         icon={<Check />}
                       /> : 
                       <RaisedButton 
+                        background={activeSeries.maturity === x.maturity ? modColor(defaultBackground, -10):undefined}
                         secondary
                         label={<Text size='small'>Select</Text>}
                       />}
@@ -171,7 +191,8 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
               );     
             })}
           </Loading>        
-        </Box>
+        </InsetBox>
+
         {!mobile &&
         <Box alignSelf='start' margin={{ top:'medium' }}>
           <FlatButton 

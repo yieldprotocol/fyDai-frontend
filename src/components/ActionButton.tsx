@@ -1,41 +1,44 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import styled, { css } from 'styled-components';
-import { Text, Box, Layer, ResponsiveContext } from 'grommet';
+import { Text, Box, Layer, ResponsiveContext, ThemeContext } from 'grommet';
 import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
+import { TxContext } from '../contexts/TxContext';
 
-import Authorization from './Authorization';
-
-const color = '#f8f8f8';
+import { modColor } from '../utils';
+import { useDsRegistry } from '../hooks/dsRegistryHook';
 
 const StyledBox = styled(Box)`
-  background: ${color};
-  border-radius: 8px;
-  transition: all 0.3s ease-in-out;
+  border-radius: 25px;
+  -webkit-transition: transform 0.3s ease, box-shadow 0.3s ease  ; 
+  -moz-transition: transform 0.3s ease, box-shadow 0.3s ease ; 
+  transition: transform 0.3s ease, box-shadow 0.3s ease; 
 
   ${(props:any) => props.disabled && css`
-  box-shadow:  0px 0px 0px #dfdfdf, 
-  -0px -0px 0px #ffffff;
+  background: ${ props.background };
+  box-shadow:  0px 0px 0px ${modColor(props.background, -15)}, 
+  -0px -0px 0px ${modColor(props.background, 10)};
   :hover {
     transform: scale(1);
-    box-shadow:  0px 0px 0px #dfdfdf,  
-    -0px -0px 0px #ffffff;
+    box-shadow:  0px 0px 0px ${modColor(props.background, -15)},  
+    -0px -0px 0px ${modColor(props.background, 10)};
     }
   `}
 
   ${(props:any) => !(props.disabled) && css`
-  box-shadow:  6px 6px 11px #dfdfdf,  
-  -6px -6px 11px #ffffff;
+  background: ${ props.background };
+  box-shadow:  6px 6px 11px ${modColor(props.background, -15)},  
+  -6px -6px 11px ${modColor(props.background, 10)};
   :active:hover {
-    box-shadow:  0px 0px 0px #dfdfdf, 
-        -0px -0px 0px #ffffff;
+    box-shadow:  0px 0px 0px ${modColor(props.background, -15)}, 
+        -0px -0px 0px ${modColor(props.background, 10)};
     } 
   :hover {
     transform: scale(1.01);
-    box-shadow:  8px 8px 11px #dfdfdf,  
-    -8px -8px 11px #ffffff;
+    box-shadow:  8px 8px 11px ${modColor(props.background, -15)},  
+    -8px -8px 11px ${modColor(props.background, 10)};
     }
   `}
 `;
@@ -43,29 +46,52 @@ const StyledBox = styled(Box)`
 function ActionButton({ ...props }:any ) {
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
-  const { state: seriesState } = useContext(SeriesContext);
-  const { activeSeries } = seriesState;
-  
-  const { state: userState } = useContext(UserContext);
-  const { authorizations: { hasDelegatedProxy } } = userState;
+  const theme:any = React.useContext(ThemeContext);
+  const themeBackground = theme.global.colors.background;
+  const defaultBackground = theme.dark === true ? themeBackground.dark: themeBackground.light;
+
+  const { state: { pendingTxs }, dispatch } = useContext(TxContext);
+
+  const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
+
+  const { activeSeriesId, seriesData } = seriesState;
+  const activeSeries = seriesData.get(activeSeriesId);
+
+  const { state: { authorization:{ hasDsProxy } }, actions: userActions } = useContext(UserContext);
+  const { buildDsProxy } = useDsRegistry();
+
+  const [proxyLabel, setProxyLabel] = useState<any>('First, create a Yield proxy'); 
+  useEffect(()=>{
+    pendingTxs.some((x:any) => x.type === 'CREATE_PROXY' ) ? setProxyLabel('Building a new proxy...') : setProxyLabel('First, create a Yield proxy');
+  }, [pendingTxs]);
+
+  const buildProxyProcedure = async () => {
+    if (!pendingTxs.some((x:any) => x.type === 'CREATE_PROXY')) {
+      await buildDsProxy();
+      await Promise.all([
+        userActions.updateUser(),
+        seriesActions.updateAllSeries()
+      ]);
+    }
+  };
 
   return (
     <>
-      {/* Handles the 'ALL clear to transact' case for mobile and other */}
-      { hasDelegatedProxy && props.hasPoolDelegatedProxy && !props.disabled &&
+      { !props.disabled &&
        ( !mobile ? 
          <StyledBox 
-           {...props} 
+           {...props}
+           onClick={hasDsProxy ? props.onClick : ()=> buildProxyProcedure()}
            fill='horizontal'
            align='center'
            pad='small'
+           background={defaultBackground}
          >
            <Text 
              weight='bold'
              size='large'
-             color={activeSeries?.seriesTextColor}
            >
-             {props.label}
+             {hasDsProxy ? props.label : proxyLabel } 
            </Text>
          </StyledBox> 
          :
@@ -76,12 +102,13 @@ function ActionButton({ ...props }:any ) {
            full='horizontal'
          >
            <Box
-             background='background'
+             // background='background'
              direction="row"  
              elevation='medium'
              pad="medium"
              justify='between'
              align='center'
+             background={defaultBackground}
            >          
              <Box
                onClick={()=>props.clearInput()}
@@ -96,122 +123,15 @@ function ActionButton({ ...props }:any ) {
          </Layer>
        )}
 
-      {/* Handles the 'No proxy authorised' case */}
-      { !hasDelegatedProxy && 
-        !props.disabled &&   
-        <Authorization authWrap>
-          { !mobile ?
-            <StyledBox 
-              {...props} 
-              fill='horizontal'
-              align='center'
-              pad='small'
-              onClick={()=>{ }}
-            >
-              <Text 
-                size='medium'
-                color={activeSeries?.seriesTextColor}
-              >
-                Please authorize Yield before going any further
-              </Text>
-            </StyledBox>
-            :
-            <Layer
-              position='bottom'
-              modal={false}
-              responsive={false}
-              full='horizontal'
-            >
-              <Box
-                background='background'
-                direction="row"  
-                elevation='medium'
-                pad="medium"
-                justify='between'
-                align='center'
-                fill
-              >    
-                <Box 
-                  onClick={(e:any)=>{e.stopPropagation(); props.clearInput();}}
-                >
-                  <Text size='xxsmall'>Cancel</Text>
-                </Box>
-                <Box width={{ max:'75%' }} direction='row' align='center' gap='small'>  
-                  <Text size='xsmall' textAlign='center'> Please authorize Yield before going any further</Text>
-                </Box>     
-              </Box>
-            </Layer>}
-        </Authorization>}
-
-      {/* Handles the 'No Series auth' case */}
-      { hasDelegatedProxy && 
-        !props.hasPoolDelegatedProxy &&
-        !props.disabled &&
-        <Authorization 
-          authWrap
-          series={activeSeries}
-        >
-          { !mobile? 
-            <StyledBox 
-              {...props} 
-              fill='horizontal'
-              align='center'
-              pad='small'
-              onClick={()=>{ }}
-            >
-              <Text 
-                size='medium'
-                color={activeSeries?.seriesTextColor}
-              >
-                Please unlock this series first
-              </Text>
-            </StyledBox>
-            :
-            <Layer
-              position='bottom'
-              modal={false}
-              responsive={false}
-              full='horizontal'
-            >
-              <Box
-                background='background'
-                direction="row"  
-                elevation='medium'
-                pad="medium"
-                justify='between'
-                align='center'
-              >          
-                <Box
-                  onClick={(e:any)=>{e.stopPropagation(); props.clearInput();}}
-                > 
-                  <Text size='xxsmall'>Cancel</Text>
-                </Box>
-                <Box direction='row' align='center' gap='small'>  
-                  <Text size='xsmall'>Please unlock this series first</Text>
-                  <ArrowRight color={activeSeries?.seriesColor} />
-                </Box>     
-              </Box>
-            </Layer>}
-        </Authorization>}
-
       { !mobile && props.disabled && 
-        <StyledBox 
-          {...props} 
+        <Box 
           fill='horizontal'
           align='center'
-          pad='small'
-        >
-          <Text 
-            size='medium'
-            color='background'
-          >
-            click me.
-          </Text>
-        </StyledBox>}
-
+          pad='medium'
+          background={defaultBackground}
+        />}
     </>
   );
 }
-
 
 export default ActionButton;
