@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import { Layer, Box, Text, ResponsiveContext } from 'grommet';
 import {
   FiCheckCircle as CheckCircle,
@@ -11,11 +11,11 @@ import { NotifyContext } from '../contexts/NotifyContext';
 import RaisedButton from '../components/RaisedButton';
 import YieldDisclaimer from '../components/YieldDisclaimer';
 
+
 function NotifyLayer(target:any) {
 
   const  { state, dispatch }  = useContext<any>(NotifyContext);
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
-  const [ disclaimerShown, setDisclaimerShown] = useState(false); 
 
   const notificationTypeMap = (_type:string ) => {
     switch(_type) {
@@ -26,13 +26,9 @@ function NotifyLayer(target:any) {
     }
   };
 
-  useEffect(()=>{
-    setDisclaimerShown(true);
-  }, []);
-
   return (
     <>
-      { state.notifyOpen &&
+      {state.notifyOpen &&
       <Layer
         position='right'
         modal={false}
@@ -120,10 +116,7 @@ function NotifyLayer(target:any) {
         </Box>
       </Box>}
       
-      { 
-        disclaimerShown &&
-        <YieldDisclaimer />
-      }
+      <YieldDisclaimer />
 
     </>
   );

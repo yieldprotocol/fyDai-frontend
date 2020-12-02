@@ -60,37 +60,53 @@ const App = (props:any) => {
     setCachedLastVisit(`/${location.pathname.split('/')[1]}/${activeSeries?.maturity}` );
   }, [location]);
 
-  /* Serivce Worker registraion and handle app updates and user confirmations */
+  /* Service Worker registraion and handle app updates and user confirmations */
   useEffect(()=>{
-    // serviceWorker.register({ 
-    //   onUpdate: (registration:any) => {
-    //     // eslint-disable-next-line no-console
-    //     console.log( 'A new version of the app is available' );
-    //     dispatch({ 
-    //       type: 'updateAvailable',
-    //       payload: { 
-    //         updateAvailable:true,
-    //         updateAccept: ()=> { 
-    //           registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-    //           /* Clear the cache (except user Preferences) on update - in future, save user preferences */
-    //           localStorage.removeItem('deployedContracts');
-    //           localStorage.removeItem('lastFeed');
-    //           localStorage.removeItem('deployedSeries');
-    //           localStorage.removeItem('cache_chainId');
-    //           localStorage.removeItem('txHistory');
-    //           localStorage.removeItem('txPending');
-    //           window.location.reload();
-    //         },    
-    //       },
-    //     });
-    //   } 
-    // });
-    serviceWorker.unregister();
+    const cachesToClear = ['txPending', 'lastFeed', 'lastVisit', 'deployedSeries', 'cache_chainId', 'txHistory' ];
+    
+    serviceWorker.register({ 
+      onUpdate: (registration:any) => {
+        // eslint-disable-next-line no-console
+        console.log( 'A new version of the app is available!' );
+        dispatch({ 
+          type: 'updateAvailable',
+          payload: {
+            updateAvailable: true,
+            updateAccept: ()=> {         
+              registration.waiting && registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+              /* clear the cache (except user Preferences) on update - in future, save user preferences */
+              for (const cache of cachesToClear) {
+                localStorage.removeItem(cache);
+              }
+              window.location.reload();
+            },
+          },
+        });
+      },
+      onWaiting: (registration:any) => { 
+        // eslint-disable-next-line no-console
+        console.log( 'A new version of the app is still available.' );
+        dispatch({ 
+          type: 'updateAvailable',
+          payload: {
+            updateAvailable: true,
+            updateAccept: ()=> {
+              registration.waiting && registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+              /* Clear the cache (except user Preferences) on update - in future, save user preferences */
+              for (const cache of cachesToClear) {
+                localStorage.removeItem(cache);
+              }
+              window.location.reload();
+            },  
+          },
+        });
+      }
+    });
   }, []);
 
   useEffect(()=>{
     window.addEventListener('offline', () => {
-      console.log('App offline.');
+      console.log('App is offline.');
       dispatch({ type:'notify', payload:{ message:'No Network', type:'error' } });
     });
 

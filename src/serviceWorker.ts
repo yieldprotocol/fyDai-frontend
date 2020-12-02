@@ -23,6 +23,7 @@ const isLocalhost = Boolean(
 type Config = {
   onSuccess?: (registration: ServiceWorkerRegistration) => void;
   onUpdate?: (registration: ServiceWorkerRegistration) => void;
+  onWaiting?: (registration: ServiceWorkerRegistration) => void;
 };
 
 export function register(config?: Config) {
@@ -63,9 +64,16 @@ export function register(config?: Config) {
 }
 
 function registerValidSW(swUrl: string, config?: Config) {
+
   navigator.serviceWorker
     .register(swUrl)
     .then(registration => {
+
+      registration.waiting ? console.log('An update is waiting.') : console.log('No update available')
+      if (registration.waiting && config && config.onWaiting ) {        
+        config.onWaiting(registration);
+      }
+
       registration.onupdatefound = () => {
         const installingWorker = registration.installing;
         if (installingWorker == null) {
@@ -73,17 +81,18 @@ function registerValidSW(swUrl: string, config?: Config) {
         }
         installingWorker.onstatechange = () => {
           if (installingWorker.state === 'installed') {
+
             if (navigator.serviceWorker.controller) {
               // At this point, the updated precached content has been fetched,
               // but the previous service worker will still serve the older
               // content until all client tabs are closed.
               console.log(
-                'New content is available and will be used when all ' +
+                'New content is available  and will be used when all ' +
                   'tabs for this page are closed. See https://bit.ly/CRA-PWA.'
               );
 
               // Execute callback
-              if (config && config.onUpdate) {
+              if (config && config.onUpdate) {          
                 config.onUpdate(registration);
               }
             } else {
@@ -91,7 +100,7 @@ function registerValidSW(swUrl: string, config?: Config) {
               // It's the perfect time to display a
               // "Content is cached for offline use." message.
               console.log('Content is cached for offline use.');
-
+              
               // Execute callback
               if (config && config.onSuccess) {
                 config.onSuccess(registration);
@@ -101,8 +110,9 @@ function registerValidSW(swUrl: string, config?: Config) {
         };
       };
     })
+
     .catch(error => {
-      console.error('Error during service worker registration:', error);
+      console.error('Error during service worker registration - ', error);
     });
 }
 
