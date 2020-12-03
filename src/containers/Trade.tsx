@@ -258,7 +258,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
             { !activeSeries?.isMature() && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
             <>
               <Box fill gap='medium'>
-                <Text alignSelf='start' size='large' color='text' weight='bold'>From Dai </Text>
+                <Text alignSelf='start' size='large' color='text' weight='bold'>From</Text>
                 <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
                   <TextInput
                     ref={(el:any) => {el && !CloseDaiOpen && !mobile && el.focus(); setInputRef(el);}}
@@ -275,6 +275,25 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
                     onClick={()=>setInputValue( cleanValue(ethers.utils.formatEther(daiBalance), 6) )}
                   />}
                 </InputWrap>
+
+                <Text alignSelf='start' size='large' color='text' weight='bold'>To</Text>
+                <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
+                  <TextInput
+                    ref={(el:any) => {el && !CloseDaiOpen && !mobile && el.focus(); setInputRef(el);}}
+                    type="number"
+                    placeholder={!mobile ? 'Enter the amount of Dai to swap': 'DAI'}
+                    value={inputValue || ''}
+                    plain
+                    onChange={(event:any) => setInputValue( cleanValue(event.target.value, 6) )}
+                    icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <DaiMark />}
+                  />
+                  {account &&
+                  <RaisedButton 
+                    label={!mobile ? 'Swap Maximum': 'Maximum'}
+                    onClick={()=>setInputValue( cleanValue(ethers.utils.formatEther(daiBalance), 6) )}
+                  />}
+                </InputWrap>
+
 
                 <Box fill>
                   <Collapsible open={!!inputValue&&inputValue>0}>
