@@ -211,16 +211,14 @@ export const usePoolProxy = () => {
     if (!series.isMature()) {
       /* calculate expected trade values  */  
       let minFYDaiPrice:BigNumber;    
-      const preview = await previewPoolTx('buydai', series, ethers.utils.parseEther('1'));   
+      const preview = await previewPoolTx('sellfydai', series, ethers.utils.parseEther('1'));   
       if ( !(preview instanceof Error) ) {
 
         const one = utils.toRay(1);
-        const pointNine = utils.toRay(0.9);
+        const onePointOne = utils.toRay(1.1);
         const rayPrice = preview.mul(BigNumber.from('1000000000'));
-        minFYDaiPrice = one.add(pointNine.mul( rayPrice.sub(one) ));
+        minFYDaiPrice = one.sub( utils.mulRay(one.sub(rayPrice), onePointOne) );
 
-        console.log(minFYDaiPrice.toString());
-        // minFYDaiPrice = utils.divRay( preview.mul(BigNumber.from('1000000000')), utils.toRay(1.1)); // 1+ 0.9*(price - 1)
       } else {
         throw(preview);
       }
