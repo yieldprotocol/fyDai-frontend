@@ -26,7 +26,7 @@ export const useTxHelpers = () => {
   const txComplete = (receipt:any, txCode:string|null=null) => {  
 
     dispatch({ type: 'txComplete', payload: { receipt, txCode } } );
-    console.log(pendingCache);
+    setPendingCache(pendingCache.filter( (x:any)=> x.tx.hash === receipt.hash )); 
 
   };
 
