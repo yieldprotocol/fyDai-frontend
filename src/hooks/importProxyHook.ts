@@ -59,7 +59,6 @@ export const useImportProxy = () => {
     ));
   }, [signer, deployedContracts]);
 
-
   /**
    * @dev Fork part of a user MakerDAO vault to ImportProxy, and call importProxy to transform it into a Yield vault 
    * 
@@ -173,11 +172,155 @@ export const useImportProxy = () => {
     );
   };
 
+
+  /**
+   * @dev Convert from MakerDAO debt to Dai
+   * @param {string|BigNumber} daiAmount debt amount
+   * @returns {Promise<BigNumber>} dai amount
+   * @note call function
+   */
+  const debtToDai = async (
+    diaAmount:string|BigNumber,
+  ): Promise<BigNumber> => {
+    const parsedAmount= BigNumber.isBigNumber(diaAmount)? diaAmount : ethers.utils.parseEther(utils.cleanValue(diaAmount));
+    let res;
+    try {
+      res = await proxyContract.debtToDai(parsedAmount);
+    }  catch (e) {
+      // eslint-disable-next-line no-console
+      console.log(e);
+      res = false;
+    }
+    return res;
+  };
+
+  /**
+   * @dev Convert from Dai to MakerDAO debt
+   * @param {string|BigNumber} daiAmount debt amount
+   * @returns {Promise<BigNumber>} dai amount
+   * @note call function
+   */
+  const daiToDebt = async (
+    diaAmount:string|BigNumber,
+  ): Promise<BigNumber> => {
+    const parsedAmount= BigNumber.isBigNumber(diaAmount)? diaAmount : ethers.utils.parseEther(utils.cleanValue(diaAmount));
+    let res;
+    try {
+      res = await proxyContract.daiToDebt(parsedAmount);
+    }  catch (e) {
+      // eslint-disable-next-line no-console
+      console.log(e);
+      res = false;
+    }
+    return res;
+  };
+
+
+  /**
+   * @dev Minimum weth needed to collateralize an amount of dai in MakerDAO
+   * @param {string|BigNumber} daiAmount debt amount
+   * @returns {Promise<BigNumber>} dai amount
+   * @note call function
+   */
+  const wethForDai = async (
+    diaAmount:string|BigNumber,
+  ): Promise<BigNumber> => {
+    const parsedAmount= BigNumber.isBigNumber(diaAmount)? diaAmount : ethers.utils.parseEther(utils.cleanValue(diaAmount));
+    let res;
+    try {
+      res = await proxyContract.wethForDai(parsedAmount);
+    }  catch (e) {
+      // eslint-disable-next-line no-console
+      console.log(e);
+      res = false;
+    }
+    return res;
+  };
+
+  /**
+   * @dev Minimum weth needed to collateralize an amount of fyDai in Yield.
+   * @param {string|BigNumber} fyDaiAmount debt amount
+   * @returns {Promise<BigNumber>} weth amount 
+   * @note call function
+   */
+  const wethForFYDai = async (
+    fyDaiAmount:string|BigNumber,
+  ): Promise<BigNumber> => {
+    const parsedAmount= BigNumber.isBigNumber(fyDaiAmount)? fyDaiAmount : ethers.utils.parseEther(utils.cleanValue(fyDaiAmount));
+    let res;
+    try {
+      res = await proxyContract.wethForFYDai(parsedAmount);
+    }  catch (e) {
+      // eslint-disable-next-line no-console
+      console.log(e);
+      res = false;
+    }
+    return res;
+  };
+
+  /**
+   * @dev Amount of fyDai debt that will result from migrating Dai debt from MakerDAO to Yield
+   * @param {string|BigNumber} fyDaiAmount debt amount
+   * @param {IYieldSeries} series series to act on.
+   * @returns {Promise<BigNumber>} weth amount 
+   * @note call function
+   */
+  const fyDaiForDai = async (
+    series:IYieldSeries,
+    fyDaiAmount:string|BigNumber,
+  ): Promise<BigNumber> => {
+    const poolAddr = ethers.utils.getAddress(series.poolAddress);
+    const parsedAmount= BigNumber.isBigNumber(fyDaiAmount)? fyDaiAmount : ethers.utils.parseEther(utils.cleanValue(fyDaiAmount));
+    let res;
+    try {
+      res = await proxyContract.fyDaiForDai(poolAddr, parsedAmount);
+    }  catch (e) {
+      // eslint-disable-next-line no-console
+      console.log(e);
+      res = false;
+    }
+    return res;
+  };
+
+  /**
+   * @dev Amount of dai debt that will result from migrating fyDai debt from Yield to MakerDAO
+   * @param {string|BigNumber} fyDaiAmount debt amount
+   * @param {IYieldSeries} series series to act on.
+   * @returns {Promise<BigNumber>} weth amount 
+   * @note call function
+   */
+  const daiForFYDai = async (
+    series:IYieldSeries,
+    fyDaiAmount:string|BigNumber,
+  ): Promise<BigNumber> => {
+    const poolAddr = ethers.utils.getAddress(series.poolAddress);
+    const parsedAmount= BigNumber.isBigNumber(fyDaiAmount)? fyDaiAmount : ethers.utils.parseEther(utils.cleanValue(fyDaiAmount));
+    let res;
+    try {
+      res = await proxyContract.daiForFYDai(poolAddr, parsedAmount);
+    }  catch (e) {
+      // eslint-disable-next-line no-console
+      console.log(e);
+      res = false;
+    }
+    return res;
+  };
+
   return {
 
     /* exported import Proxy fns */
     importPosition,
     importVault,
+
+    /* call fns */ 
+    daiToDebt,
+    debtToDai,
+
+    wethForDai,
+    wethForFYDai,
+
+    fyDaiForDai,
+    daiForFYDai,
 
   } as const;
 };
