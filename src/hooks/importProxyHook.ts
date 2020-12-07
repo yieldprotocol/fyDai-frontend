@@ -182,7 +182,9 @@ export const useImportProxy = () => {
   const debtToDai = async (
     diaAmount:string|BigNumber,
   ): Promise<BigNumber> => {
-    const parsedAmount= BigNumber.isBigNumber(diaAmount)? diaAmount : ethers.utils.parseEther(utils.cleanValue(diaAmount));
+    const parsedAmount= BigNumber.isBigNumber(diaAmount)? 
+      diaAmount : 
+      ethers.utils.parseEther(utils.cleanValue(diaAmount));
     let res;
     try {
       res = await proxyContract.debtToDai(parsedAmount);
@@ -203,7 +205,9 @@ export const useImportProxy = () => {
   const daiToDebt = async (
     diaAmount:string|BigNumber,
   ): Promise<BigNumber> => {
-    const parsedAmount= BigNumber.isBigNumber(diaAmount)? diaAmount : ethers.utils.parseEther(utils.cleanValue(diaAmount));
+    const parsedAmount= BigNumber.isBigNumber(diaAmount)? 
+      diaAmount : 
+      ethers.utils.parseEther(utils.cleanValue(diaAmount));
     let res;
     try {
       res = await proxyContract.daiToDebt(parsedAmount);
@@ -225,7 +229,9 @@ export const useImportProxy = () => {
   const wethForDai = async (
     diaAmount:string|BigNumber,
   ): Promise<BigNumber> => {
-    const parsedAmount= BigNumber.isBigNumber(diaAmount)? diaAmount : ethers.utils.parseEther(utils.cleanValue(diaAmount));
+    const parsedAmount= BigNumber.isBigNumber(diaAmount)? 
+      diaAmount : 
+      ethers.utils.parseEther(utils.cleanValue(diaAmount));
     let res;
     try {
       res = await proxyContract.wethForDai(parsedAmount);
@@ -246,7 +252,9 @@ export const useImportProxy = () => {
   const wethForFYDai = async (
     fyDaiAmount:string|BigNumber,
   ): Promise<BigNumber> => {
-    const parsedAmount= BigNumber.isBigNumber(fyDaiAmount)? fyDaiAmount : ethers.utils.parseEther(utils.cleanValue(fyDaiAmount));
+    const parsedAmount= BigNumber.isBigNumber(fyDaiAmount)? 
+      fyDaiAmount : 
+      ethers.utils.parseEther(utils.cleanValue(fyDaiAmount));
     let res;
     try {
       res = await proxyContract.wethForFYDai(parsedAmount);
@@ -270,7 +278,9 @@ export const useImportProxy = () => {
     fyDaiAmount:string|BigNumber,
   ): Promise<BigNumber> => {
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
-    const parsedAmount= BigNumber.isBigNumber(fyDaiAmount)? fyDaiAmount : ethers.utils.parseEther(utils.cleanValue(fyDaiAmount));
+    const parsedAmount= BigNumber.isBigNumber(fyDaiAmount)? 
+      fyDaiAmount : 
+      ethers.utils.parseEther(utils.cleanValue(fyDaiAmount));
     let res;
     try {
       res = await proxyContract.fyDaiForDai(poolAddr, parsedAmount);
@@ -294,7 +304,9 @@ export const useImportProxy = () => {
     fyDaiAmount:string|BigNumber,
   ): Promise<BigNumber> => {
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
-    const parsedAmount= BigNumber.isBigNumber(fyDaiAmount)? fyDaiAmount : ethers.utils.parseEther(utils.cleanValue(fyDaiAmount));
+    const parsedAmount= BigNumber.isBigNumber(fyDaiAmount)? 
+      fyDaiAmount : 
+      ethers.utils.parseEther(utils.cleanValue(fyDaiAmount));
     let res;
     try {
       res = await proxyContract.daiForFYDai(poolAddr, parsedAmount);
