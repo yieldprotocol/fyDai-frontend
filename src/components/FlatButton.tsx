@@ -53,7 +53,7 @@ function FlatButton({ ...props }:any ) {
         plain
         label={
           <Box pad={{ horizontal:'small', vertical:'xsmall' }}>
-            <Text size='xsmall'>
+            <Text size='xxsmall'>
               {props.label}
             </Text>
           </Box>

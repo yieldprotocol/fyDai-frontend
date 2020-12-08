@@ -143,7 +143,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
               onChange={(event:any) => setInputValue(( cleanValue(event.target.value, 6)))}
               icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <DaiMark />}
             />
-            <RaisedButton 
+            <FlatButton 
               label='Maximum'
               onClick={()=> setInputValue(maxWithdraw)}
             />

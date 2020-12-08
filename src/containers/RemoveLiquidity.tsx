@@ -163,7 +163,7 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
             onChange={(event:any) => setInputValue(( cleanValue(event.target.value, 6)))}
             icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <YieldMark />}
           />
-          <RaisedButton 
+          <FlatButton 
             label='Maximum'
             onClick={()=>setInputValue( cleanValue(ethers.utils.formatEther(activeSeries?.poolTokens), 6) )}
           />

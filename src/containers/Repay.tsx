@@ -147,7 +147,7 @@ function Repay({ close }:IRepayProps) {
                       onChange={(event:any) => setInputValue(( cleanValue(event.target.value, 6) ))}
                       icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <DaiMark />}
                     />
-                    <RaisedButton 
+                    <FlatButton 
                       label={!mobile ? 'Repay Maximum': 'Maximum'}
                       onClick={()=>setInputValue( cleanValue(ethers.utils.formatEther(maxRepay), 6) )}
                     />

@@ -245,7 +245,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                   />
                   
                   {account &&
-                  <RaisedButton 
+                  <FlatButton 
                     label={!mobile ? 'Add Maximum': 'Maximum'}
                     onClick={()=>setInputValue(cleanValue(ethers.utils.formatEther(daiBalance), 6))}
                   />}

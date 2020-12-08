@@ -146,7 +146,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
             onChange={(event:any) => setInputValue(cleanValue(event.target.value))}
             icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <EthMark />}
           />
-          <RaisedButton 
+          <FlatButton 
             label='Withdraw maximum'
             onClick={()=>maxWithdraw && setInputValue(cleanValue(maxWithdraw))}
           />

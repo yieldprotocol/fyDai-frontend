@@ -256,7 +256,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
                     icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <DaiMark />}
                   />
                   {account &&
-                  <RaisedButton 
+                  <FlatButton
                     label={!mobile ? 'Lend Maximum': 'Maximum'}
                     onClick={()=>setInputValue( cleanValue(ethers.utils.formatEther(daiBalance), 6) )}
                   />}
