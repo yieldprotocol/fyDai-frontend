@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { ethers } from 'ethers';
-import { Box, Keyboard, TextInput, Text, ResponsiveContext, Collapsible, Layer } from 'grommet';
+import { Box, Keyboard, TextInput, Select, Text, ResponsiveContext, Collapsible, Layer } from 'grommet';
 import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 import { VscHistory as History } from 'react-icons/vsc';
 
@@ -263,31 +263,41 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
                   <TextInput
                     ref={(el:any) => {el && !CloseDaiOpen && !mobile && el.focus(); setInputRef(el);}}
                     type="number"
-                    placeholder={!mobile ? 'Enter the amount of Dai to swap': 'DAI'}
+                    placeholder={!mobile ? '0.0': '0.0'}
                     value={inputValue || ''}
                     plain
                     onChange={(event:any) => setInputValue( cleanValue(event.target.value, 6) )}
-                    icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <DaiMark />}
                   />
                   {account &&
                   <RaisedButton 
-                    label={!mobile ? 'Swap Maximum': 'Maximum'}
+                    label={!mobile ? 'Max': 'Max'}
                     onClick={()=>setInputValue( cleanValue(ethers.utils.formatEther(daiBalance), 6) )}
                   />}
+                  <Select
+                    options={[<DaiMark /> + "aaa", 'DAI', 'fyDai']}
+                    placeholder='DAI'
+                    margin={{left: "medium"}}
+                  />
                 </InputWrap>
 
+                <Text alignSelf='start' size='large' color='text' weight='bold'>To</Text>
                 <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
                   <TextInput
                     ref={(el:any) => {el && !CloseDaiOpen && !mobile && el.focus(); setInputRef(el);}}
                     type="number"
-                    placeholder={!mobile ? 'Enter the amount of Dai to swap': 'DAI'}
                     value={inputValue || ''}
                     plain
                     onChange={(event:any) => setInputValue( cleanValue(event.target.value, 6) )}
-                    icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <DaiMark />}
+                    placeholder={!mobile ? '0.0': '0.0'}
                   >
-
                   </TextInput>
+                  <Select
+                    options={[<Text>
+                    <DaiMark />
+                    Dai
+          </Text>, 'DAI', 'fyDai']}
+                    placeholder='fyDAI'
+                    />
                 </InputWrap>
 
 
