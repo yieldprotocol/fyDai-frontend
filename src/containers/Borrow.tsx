@@ -19,8 +19,10 @@ import { usePool } from '../hooks/poolHook';
 import { useBorrowProxy } from '../hooks/borrowProxyHook';
 
 import Repay from './Repay';
+import MigrateMaker from './MigrateMaker';
 
 import DaiMark from '../components/logos/DaiMark';
+import MakerMark from '../components/logos/MakerMark';
 import SeriesDescriptor from '../components/SeriesDescriptor';
 import InputWrap from '../components/InputWrap';
 import TxStatus from '../components/TxStatus';
@@ -36,6 +38,8 @@ import YieldMobileNav from '../components/YieldMobileNav';
 import Loading from '../components/Loading';
 
 import { logEvent } from '../utils/analytics';
+
+
 
 interface IBorrowProps {
   borrowAmount?:number|null;
@@ -79,6 +83,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
 
   /* flags */
   const [ repayOpen, setRepayOpen ] = useState<boolean>(false);
+  const [ migrateOpen, setMigrateOpen ] = useState<boolean>(true);
   const [ histOpen, setHistOpen ] = useState<boolean>(false);
 
   const [showTxPending, setShowTxPending] = useState<boolean>(false);
@@ -211,6 +216,10 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
           <Repay close={()=>setRepayOpen(false)} />      
         </Layer>}
 
+        { migrateOpen &&
+          <Layer onClickOutside={()=>setMigrateOpen(false)} responsive={true}>
+            <MigrateMaker close={()=>setMigrateOpen(false)} />
+          </Layer>}
 
         { histOpen && 
         <HistoryWrap closeLayer={()=>setHistOpen(false)}>
@@ -373,16 +382,32 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
           round='small'
           pad="large"
           gap='small'
-        >       
+        > 
           <Box gap='small' align='center' fill='horizontal'>
-            
+                     
             { !activeSeries?.isMature() && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
             <Box gap='medium' align='center' fill='horizontal'>
-              <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to borrow</Text>
+
+              <Box direction='row' justify='between' fill>
+                <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to borrow</Text>
+                { 
+                  !mobile && 
+                  <RaisedButton
+                    disabled={!!inputValue}
+                    label={
+                      <Box pad='xsmall' gap='small' direction='row' align='center'>
+                        <Box><MakerMark /></Box>
+                        <Text size='xsmall'>Migrate a Maker vault</Text>
+                      </Box>
+                    }
+                    onClick={()=>setMigrateOpen(true)}
+                  />
+                }
+              </Box>
 
               <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
                 <TextInput
-                  ref={(el:any) => {el && !repayOpen && !mobile && el.focus(); setInputRef(el);}} 
+                  ref={(el:any) => {el && !repayOpen && !migrateOpen && !mobile && el.focus(); setInputRef(el);}} 
                   type="number"
                   placeholder={!mobile ? 'Enter the amount of Dai to borrow': 'DAI'} 
                   value={inputValue || ''}

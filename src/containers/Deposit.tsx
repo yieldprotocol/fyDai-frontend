@@ -30,6 +30,7 @@ import { useTxActive } from '../hooks/txHooks';
 import { useBorrowProxy } from '../hooks/borrowProxyHook';
 
 import WithdrawEth from './WithdrawEth';
+import MigrateMaker from './MigrateMaker';
 
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
@@ -45,6 +46,9 @@ import YieldMobileNav from '../components/YieldMobileNav';
 import Loading from '../components/Loading';
 
 import { logEvent } from '../utils/analytics';
+import ExperimentWrap from '../components/ExperimentWrap';
+import MakerMark from '../components/logos/MakerMark';
+import MakerLogo from '../components/logos/MakerLogo';
 
 interface DepositProps {
   /* deposit amount prop is for quick linking into component */
@@ -89,6 +93,8 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
   const [ maxPower, setMaxPower ] = useState<any>(0);
 
   const [ withdrawOpen, setWithdrawOpen ] = useState<boolean>(false);
+  const [ migrateOpen, setMigrateOpen ] = useState<boolean>(false);
+
   const [ depositPending, setDepositPending ] = useState<boolean>(false);
   const [ depositDisabled, setDepositDisabled ] = useState<boolean>(true);
 
@@ -257,6 +263,11 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
           <Layer onClickOutside={()=>setWithdrawOpen(false)}>
             <WithdrawEth close={()=>setWithdrawOpen(false)} />
           </Layer>}
+
+        { migrateOpen &&
+          <Layer onClickOutside={()=>setMigrateOpen(false)}>
+            <MigrateMaker close={()=>setMigrateOpen(false)} />
+          </Layer>}
       
         { (!txActive || txActive?.type === 'WITHDRAW') &&
         <Box
@@ -267,11 +278,24 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
           pad='large'
           gap='medium'
         >
-          <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to deposit</Text>
+
+          <Box direction='row-responsive' justify='between'>
+            <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to deposit</Text>
+            <RaisedButton 
+              disabled={!!inputValue}
+              label={
+                <Box pad='xsmall' gap='small' direction='row' align='center'>
+                  <Box><MakerMark /></Box>
+                  <Text size='xsmall'>Migrate a Maker vault</Text>
+                </Box>
+              }
+              onClick={()=>setMigrateOpen(true)}
+            />
+          </Box>
 
           <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
             <TextInput
-              ref={(el:any) => {el && !withdrawOpen && !mobile && el.focus(); setInputRef(el);}} 
+              ref={(el:any) => {el && !withdrawOpen && !migrateOpen && !mobile && el.focus(); setInputRef(el);}} 
               type='number'
               placeholder={(!mobile && !modalView) ? 'Enter the ETH amount to deposit': 'ETH'}
               value={inputValue || ''}
@@ -280,7 +304,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
               onChange={(event:any) => setInputValue( cleanValue(event.target.value) )}
               icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <EthMark />}
             />
-            <RaisedButton
+            <FlatButton
               label={(!mobile && !modalView) ? 'Deposit Maximum': 'Max'}
               onClick={()=>account && setInputValue(ethers.utils.formatEther(ethBalance))}
             />
