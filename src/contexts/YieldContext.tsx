@@ -52,6 +52,7 @@ const contractList = [
   'BorrowProxy',
   'ProxyRegistry',
   'ProxyFactory',
+  'GET_CDPS'
 ];
 
 // reducer
