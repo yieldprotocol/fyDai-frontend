@@ -276,6 +276,20 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
                   />}
                 </InputWrap>
 
+                <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
+                  <TextInput
+                    ref={(el:any) => {el && !CloseDaiOpen && !mobile && el.focus(); setInputRef(el);}}
+                    type="number"
+                    placeholder={!mobile ? 'Enter the amount of Dai to swap': 'DAI'}
+                    value={inputValue || ''}
+                    plain
+                    onChange={(event:any) => setInputValue( cleanValue(event.target.value, 6) )}
+                    icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <DaiMark />}
+                  >
+
+                  </TextInput>
+                </InputWrap>
+
 
 
                 <Box fill>
