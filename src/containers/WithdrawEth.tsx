@@ -192,7 +192,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
             label={
               <Box direction='row' gap='medium' align='center'>
                 <ArrowLeft color='text-weak' />
-                <Text size='small' color='text-weak'> cancel, and go back. </Text>
+                <Text size='xsmall' color='text-weak'> cancel, and go back. </Text>
               </Box>
                 }
           />
@@ -205,7 +205,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
             to="/post"
             style={{ textDecoration: 'none' }}
           >
-            <Box direction='row' gap='small'>
+            <Box direction='row' gap='xsmall'>
               <Text size='xxsmall' color='text-weak'><ArrowLeft /></Text>
               <Text size='xxsmall' color='text-weak'>back</Text>
             </Box>

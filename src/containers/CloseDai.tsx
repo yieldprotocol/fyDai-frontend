@@ -27,6 +27,7 @@ import FlatButton from '../components/FlatButton';
 import DaiMark from '../components/logos/DaiMark';
 import YieldMobileNav from '../components/YieldMobileNav';
 import { logEvent } from '../utils/analytics';
+import SeriesDescriptor from '../components/SeriesDescriptor';
 
 interface ICloseDaiProps {
   close: any;
@@ -120,6 +121,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
       }}
       target='document'
     >
+      <SeriesDescriptor activeView='lend' minimized />
 
       <Box    
         width={!mobile?{ min:'620px', max:'620px' }: undefined}

@@ -29,6 +29,7 @@ import DaiMark from '../components/logos/DaiMark';
 import YieldMobileNav from '../components/YieldMobileNav';
 
 import { logEvent } from '../utils/analytics';
+import SeriesDescriptor from '../components/SeriesDescriptor';
 
 interface IRepayProps {
   close?:any;
@@ -120,6 +121,8 @@ function Repay({ close }:IRepayProps) {
       }}
       target='document'
     >
+      <SeriesDescriptor activeView='borrow' minimized />
+      
       { !txActive &&
         <Box
           width={!mobile?{ min: activeSeries.isMature()?'600px':'620px', max: activeSeries.isMature()?'600px':'620px' } : undefined}

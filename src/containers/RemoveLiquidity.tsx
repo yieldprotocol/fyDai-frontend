@@ -26,6 +26,7 @@ import YieldMark from '../components/logos/YieldMark';
 import YieldMobileNav from '../components/YieldMobileNav';
 
 import { logEvent } from '../utils/analytics';
+import SeriesDescriptor from '../components/SeriesDescriptor';
 
 interface IRemoveLiquidityProps {
   openConnectLayer?:any
@@ -142,6 +143,8 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
       }}
       target='document'
     >
+      <SeriesDescriptor activeView='pool' minimized />
+      
       {!txActive &&  
       <Box 
         width={!mobile?{ min:'600px', max:'600px' }: undefined}

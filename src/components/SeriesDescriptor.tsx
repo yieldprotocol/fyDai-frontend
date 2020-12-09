@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Box, Text, ResponsiveContext, Collapsible } from 'grommet';
 import { FiLayers as ChangeSeries } from 'react-icons/fi';
 
@@ -13,11 +13,12 @@ import RaisedButton from './RaisedButton';
 interface ISeriesDescriptorProps {
   activeView: string;
   children?:any;
+  minimized?:boolean;
 }
 
 function SeriesDescriptor( props: ISeriesDescriptorProps ) {
 
-  const { activeView, children } = props;
+  const { activeView, children, minimized } = props;
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
   const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
@@ -34,7 +35,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
           fill
           round='small'
           gap='small'
-          pad={{ bottom:'large' }}
+          pad={minimized? undefined: { bottom:'large' }}
           background={`linear-gradient(to bottom right, 
           ${modColor( '#add8e6', -40)}, 
           ${modColor( '#add8e6', -20)},
@@ -50,7 +51,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
           margin={{ bottom:'-18px' }}
         >
           <Box
-            pad='small'   
+            pad='small' 
           >
             <Box
               direction='row-responsive'
@@ -112,6 +113,6 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
   );
 }
 
-SeriesDescriptor.defaultProps={ children:null };
+SeriesDescriptor.defaultProps={ children:null, minimized:false };
 
 export default SeriesDescriptor; 
