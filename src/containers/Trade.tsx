@@ -260,45 +260,32 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
               <Box fill gap='medium'>
                 <Text alignSelf='start' size='large' color='text' weight='bold'>From</Text>
                 <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
-                  <TextInput
-                    ref={(el:any) => {el && !CloseDaiOpen && !mobile && el.focus(); setInputRef(el);}}
-                    type="number"
-                    placeholder={!mobile ? '0.0': '0.0'}
-                    value={inputValue || ''}
-                    plain
-                    onChange={(event:any) => setInputValue( cleanValue(event.target.value, 6) )}
-                  />
-                  {account &&
-                  <RaisedButton 
-                    label={!mobile ? 'Max': 'Max'}
-                    onClick={()=>setInputValue( cleanValue(ethers.utils.formatEther(daiBalance), 6) )}
-                  />}
-                  <Select
-                    options={[<DaiMark /> + "aaa", 'DAI', 'fyDai']}
-                    placeholder='DAI'
-                    margin={{left: "medium"}}
-                  />
+                    <TextInput
+                      ref={(el:any) => {el && !CloseDaiOpen && !mobile && el.focus(); setInputRef(el);}}
+                      type="number"
+                      placeholder={!mobile ? '0.0': '0.0'}
+                      value={inputValue || ''}
+                      plain
+                      onChange={(event:any) => setInputValue( cleanValue(event.target.value, 6) )}
+                    />
+                    <Select
+                      options={['DAI', 'fyDai']}
+                      placeholder='DAI'
+                      />
                 </InputWrap>
-
                 <Text alignSelf='start' size='large' color='text' weight='bold'>To</Text>
                 <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
-                  <TextInput
-                    ref={(el:any) => {el && !CloseDaiOpen && !mobile && el.focus(); setInputRef(el);}}
-                    type="number"
-                    value={inputValue || ''}
-                    plain
-                    onChange={(event:any) => setInputValue( cleanValue(event.target.value, 6) )}
-                    placeholder={!mobile ? '0.0': '0.0'}
-                  >
-                  </TextInput>
-                  <Select
-                    options={[<Text>
-                    <DaiMark />
-                    Dai
-          </Text>, 'DAI', 'fyDai']}
-                    placeholder='fyDAI'
+                <TextInput
+                      type="number"
+                      value={minFYDaiOut.toFixed(2)}
+                      plain
+                      onChange={(event:any) => setInputValue( cleanValue(event.target.value, 6) )}
                     />
-                </InputWrap>
+                    <Select
+                      options={['DAI', 'fyDai']}
+                      placeholder='fyDAI'
+                      />
+               </InputWrap>
 
 
 
@@ -315,14 +302,14 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
                         valuePrefix: null,
                         valueExtra: null, 
                       },
-                      {
+                     {
                         label: 'Dai received',
                         labelExtra: 'at maturity',
                         visible: true,
                         active: inputValue,
                         loading: false,           
                         value: `${fyDaiValue.toFixed(2)} DAI`,
-                        valuePrefix: null,
+                         valuePrefix: null,
                         valueExtra: null,
                       },
                       {
