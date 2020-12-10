@@ -46,21 +46,19 @@ function FlatButton({ ...props }:any ) {
   const defaultBackground = theme.dark === true ? themeBackground.dark: themeBackground.light;
 
   return (
-    <>
-      <StyledButton 
-        {...props}
-        background={props.background? props.background : defaultBackground}
-        plain
-        label={
-          <Box pad={{ horizontal:'small', vertical:'xsmall' }}>
-            <Text size='xxsmall'>
-              {props.label}
-            </Text>
-          </Box>
-          }
-        pad={{ horizontal:'large', vertical:'none' }}
-      />
-    </>
+    <StyledButton 
+      {...props}
+      background={props.background? props.background : defaultBackground}
+      plain
+      label={null}
+      pad={{ horizontal:'large', vertical:'none' }}
+    >
+      <Box pad={{ horizontal:'small', vertical:'xsmall' }}>
+        <Text size='xxsmall'>
+          {props.label}
+        </Text>
+      </Box>
+    </StyledButton>
   );
 }
 

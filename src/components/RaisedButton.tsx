@@ -34,21 +34,19 @@ function RaisedButton({ selected=true, ...props }:any ) {
   const defaultBackground = theme.dark === true ? themeBackground.dark: themeBackground.light;
 
   return (
-    <>
-      <StyledButton 
-        {...props} 
-        background={props.background ? props.background : defaultBackground}
-        plain
-        label={
-          <Box pad={{ horizontal:'small' }}>
-            <Text size='xxsmall'>
-              {props.label}
-            </Text>
-          </Box>
-          }
-        pad={{ horizontal:'large', vertical:'none' }}
-      />
-    </>
+    <StyledButton
+      {...props} 
+      background={props.background ? props.background : defaultBackground}
+      plain
+      pad={{ horizontal:'large', vertical:'none' }}
+      label={null}
+    >
+      <Box pad={{ horizontal:'small' }}>
+        <Text size='xxsmall'>
+          {props.label}
+        </Text>
+      </Box>
+    </StyledButton>
   );
 }
 
