@@ -9,16 +9,18 @@ import { SeriesContext } from '../contexts/SeriesContext';
 import SeriesSelector from './SeriesSelector';
 import AprBadge from './AprBadge';
 import RaisedButton from './RaisedButton';
+import FlatButton from './FlatButton';
 
 interface ISeriesDescriptorProps {
   activeView: string;
   children?:any;
   minimized?:boolean;
+  greyedOut?:boolean;
 }
 
 function SeriesDescriptor( props: ISeriesDescriptorProps ) {
 
-  const { activeView, children, minimized } = props;
+  const { activeView, children, minimized, greyedOut } = props;
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
   const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
@@ -36,22 +38,24 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
           round='small'
           gap='small'
           pad={minimized? undefined: { bottom:'large' }}
-          background={`linear-gradient(to bottom right, 
-          ${modColor( '#add8e6', -40)}, 
-          ${modColor( '#add8e6', -20)},
-          ${modColor( '#add8e6', 10)},
-          ${modColor( '#add8e6', 0)},
-          ${modColor( activeSeries?.seriesColor, 50)}, 
-          ${modColor( activeSeries?.seriesColor, 50)}, 
-          ${modColor( activeSeries?.seriesColor, 50)}, 
-          ${modColor( activeSeries?.seriesColor, 50)},
-          ${modColor( activeSeries?.seriesColor, 50)}, 
-          ${modColor( activeSeries?.seriesColor, 0)}, 
-          ${modColor( activeSeries?.seriesColor, 0)})`}
+          background={
+              `linear-gradient(to bottom right, 
+              ${modColor( '#add8e6', -40)}, 
+              ${modColor( '#add8e6', -20)},
+              ${modColor( '#add8e6', 10)},
+              ${modColor( '#add8e6', 0)},
+              ${modColor( activeSeries?.seriesColor, 50)}, 
+              ${modColor( activeSeries?.seriesColor, 50)}, 
+              ${modColor( activeSeries?.seriesColor, 50)}, 
+              ${modColor( activeSeries?.seriesColor, 50)},
+              ${modColor( activeSeries?.seriesColor, 50)}, 
+              ${modColor( activeSeries?.seriesColor, 0)}, 
+              ${modColor( activeSeries?.seriesColor, 0)})`
+          }
           margin={{ bottom:'-18px' }}
         >
           <Box
-            pad='small' 
+            pad={minimized? { bottom:'small', horizontal:'small' }: 'small'}
           >
             <Box
               direction='row-responsive'
@@ -82,7 +86,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
                   </Text>
                 </Box>}
 
-                <RaisedButton
+                {!minimized && <RaisedButton
                   background={modColor( activeSeries?.seriesColor, 50)}
                   label={(!mobile ) ?        
                     <Box align='center' direction='row' gap='small' pad='xsmall'>
@@ -93,10 +97,34 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
                     </Box>
                     : 
                     <Box align='center' direction='row' gap='small' pad='xsmall'>
-                      <ChangeSeries /> Change 
+                      <ChangeSeries />
+                      <Text size='xsmall' color={activeSeries?.seriesTextColor}>
+                        Change          
+                      </Text>
                     </Box>}
                   onClick={()=>setSelectorOpen(true)}
-                />
+                />}
+
+                {minimized && <FlatButton
+                  background={modColor( activeSeries?.seriesColor, 50)}
+                  label={(!mobile ) ?        
+                    <Box align='center' direction='row' gap='small'>
+                      <Text size='xsmall' color={activeSeries?.seriesTextColor}> <ChangeSeries /> </Text>
+                      <Text size='xsmall' color={activeSeries?.seriesTextColor}>
+                        Change Series              
+                      </Text>
+                    </Box>
+                    : 
+                    <Box align='center' direction='row' gap='small'>
+                      <ChangeSeries />
+                      <Text size='xsmall' color={activeSeries?.seriesTextColor}>
+                        Change          
+                      </Text>
+                    </Box>}
+                  onClick={()=>setSelectorOpen(true)}
+                />} 
+
+
               </Box>
             </Box>
 
@@ -113,6 +141,6 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
   );
 }
 
-SeriesDescriptor.defaultProps={ children:null, minimized:false };
+SeriesDescriptor.defaultProps={ children:null, minimized:false, greyedOut:false };
 
 export default SeriesDescriptor; 
