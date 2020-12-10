@@ -57,7 +57,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
   const { amnt }:any = useParams();
 
   const { state: userState, actions: userActions } = useContext(UserContext);
-  const { position } = userState;
+  const { position, makerVaults, userLoading } = userState;
   const { 
     ethPosted,
     ethPosted_,
@@ -83,7 +83,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
 
   /* flags */
   const [ repayOpen, setRepayOpen ] = useState<boolean>(false);
-  const [ migrateOpen, setMigrateOpen ] = useState<boolean>(true);
+  const [ migrateOpen, setMigrateOpen ] = useState<boolean>(false);
   const [ histOpen, setHistOpen ] = useState<boolean>(false);
 
   const [showTxPending, setShowTxPending] = useState<boolean>(false);
@@ -216,7 +216,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
           <Repay close={()=>setRepayOpen(false)} />      
         </Layer>}
 
-        { migrateOpen &&
+        { migrateOpen && makerVaults.length>0 &&
           <Layer onClickOutside={()=>setMigrateOpen(false)} responsive={true}>
             <MigrateMaker close={()=>setMigrateOpen(false)} />
           </Layer>}
@@ -229,7 +229,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
           />
         </HistoryWrap>}
 
-        <SeriesDescriptor activeView='borrow'>
+        <SeriesDescriptor activeView='borrow' greyedOut={repayOpen || migrateOpen || histOpen}>
           <InfoGrid
             alt
             entries={[
@@ -391,9 +391,10 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
               <Box direction='row' justify='between' fill>
                 <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to borrow</Text>
                 { 
-                  !mobile && 
+                  !mobile &&  !userLoading &&
                   <RaisedButton
-                    disabled={!!inputValue}
+                    animation='slideRight'
+                    disabled={!!inputValue || makerVaults.length===0}
                     label={
                       <Box pad='xsmall' gap='small' direction='row' align='center'>
                         <Box><MakerMark /></Box>

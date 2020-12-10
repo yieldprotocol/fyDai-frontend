@@ -7,6 +7,14 @@ import { modColor } from '../utils';
 const StyledButton = styled(Button)`
 border-radius: 25px;
 
+${(props:any) => props.disabled && css`
+    background: ${ props.background };
+    box-shadow:  0px 0px 0px ${modColor(props.background, 0)}, -0px -0px 0px ${modColor(props.background, 0)};
+    -webkit-transition: transform 0.3s ease, box-shadow 0.3s ease-out; 
+    -moz-transition: transform 0.3s ease, box-shadow 0.3s ease-out; 
+    transition: transform 0.3s ease, box-shadow 0.3s ease-out;
+`}
+
 
 ${(props:any) => props.background && css`
     background: ${ props.background };
@@ -41,7 +49,7 @@ function RaisedButton({ selected=true, ...props }:any ) {
       pad={{ horizontal:'large', vertical:'none' }}
       label={null}
     >
-      <Box pad={{ horizontal:'small' }}>
+      <Box pad={{ horizontal:'small' }} animation='zoomIn'>
         <Text size='xxsmall'>
           {props.label}
         </Text>

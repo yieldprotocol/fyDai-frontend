@@ -59,6 +59,7 @@ interface DepositProps {
 const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
   const history = useHistory();
   const { state: userState, actions: userActions } = useContext(UserContext);
+  const { position, makerVaults, userLoading } = userState;
   const {
     ethBalance,
     ethBalance_,
@@ -67,7 +68,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
     maxDaiAvailable_,
     collateralPercent_,
     debtValue,
-  } = userState.position;
+  } = position;
 
   const { state: yieldState } = useContext(YieldContext);
   const { ethPrice_ } = yieldState.feedData;
@@ -264,7 +265,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
             <WithdrawEth close={()=>setWithdrawOpen(false)} />
           </Layer>}
 
-        { migrateOpen &&
+        { migrateOpen && makerVaults.length>0 &&
           <Layer onClickOutside={()=>setMigrateOpen(false)}>
             <MigrateMaker close={()=>setMigrateOpen(false)} />
           </Layer>}
@@ -281,8 +282,10 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
 
           <Box direction='row-responsive' justify='between'>
             <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to deposit</Text>
-            <RaisedButton 
-              disabled={!!inputValue}
+            {
+            !mobile && !userLoading &&
+            <RaisedButton
+              disabled={!!inputValue || makerVaults.length===0}
               label={
                 <Box pad='xsmall' gap='small' direction='row' align='center'>
                   <Box><MakerMark /></Box>
@@ -291,6 +294,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
               }
               onClick={()=>setMigrateOpen(true)}
             />
+            }
           </Box>
 
           <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
