@@ -88,7 +88,12 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
   const [ fyDaiValue, setFYDaiValue ] = useState<number>(0);
   const [ minFYDaiOut, setMinFYDaiOut ] = useState<number>(0);
   const [ currentValue, setCurrentValue ] = useState<string>();
-  
+  const [ fromToken, setFromToken ] = useState<string>("Dai");
+  const [ toToken, setToToken ] = useState<string>("fyDai");
+  const [ fromQuantity, setFromQuantity ] = useState<number>(0);
+  const [ toQuantity, setToQuantity ] = useState<number>(0);
+  const [ inputFromQuantity, setInputFromQuantity ] = useState<boolean>(true);
+
   /* Lend execution flow */
   const lendProcedure = async () => {
     if (inputValue && !lendDisabled ) {
@@ -155,6 +160,21 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
       setErrorMsg(null);
     }
   }, [ debouncedInput, daiBalance ]);
+
+  useEffect(() => {
+    console.log("fromToken: ", fromToken)
+    console.log("toToken: ", toToken)
+    console.log("fromQuantity: ", fromQuantity)
+    console.log("toQuantity: ", toQuantity)
+  })
+
+  useEffect(() => {
+    setFromQuantity( inputValue );
+    setInputFromQuantity(true);
+    setToQuantity(minFYDaiOut);
+  })
+
+
 
   return (
     <RaisedBox>
@@ -263,29 +283,57 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
                     <TextInput
                       ref={(el:any) => {el && !CloseDaiOpen && !mobile && el.focus(); setInputRef(el);}}
                       type="number"
-                      placeholder={!mobile ? '0.0': '0.0'}
-                      value={inputValue || ''}
+                      placeholder={!mobile ? '0.00': '0.00'}
+                      value={fromQuantity || ''}
                       plain
-                      onChange={(event:any) => setInputValue( cleanValue(event.target.value, 6) )}
+                      onChange={(event:any) => 
+                        { 
+                          setInputValue( cleanValue(event.target.value, 6) );
+                        }
+                      }
                     />
                     <Select
-                      options={['DAI', 'fyDai']}
+                      options={['DAI', 'fyDAI']}
                       placeholder='DAI'
-                      />
+                      value={fromToken}
+                      onChange={({ option }) => 
+                        {
+                          if (option === "DAI") {
+                            setFromToken("DAI");
+                            setToToken("fyDAI");
+                          } if (option === "fyDAI") {
+                            setFromToken("fyDAI");
+                            setToToken("DAI");
+                          }
+                        }
+                      }                      
+                    />
                 </InputWrap>
                 <Text alignSelf='start' size='large' color='text' weight='bold'>To</Text>
                 <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
-                <TextInput
-                      type="number"
-                      value={minFYDaiOut.toFixed(2)}
-                      plain
-                      onChange={(event:any) => setInputValue( cleanValue(event.target.value, 6) )}
+                  <TextInput
+                        type="number"
+                        value={minFYDaiOut.toFixed(2)}
+                        plain
+                        onChange={(event:any) => setInputValue( cleanValue(event.target.value, 6) )}
                     />
-                    <Select
-                      options={['DAI', 'fyDai']}
-                      placeholder='fyDAI'
-                      />
-               </InputWrap>
+                  <Select
+                    options={['DAI', 'fyDAI']}
+                    placeholder='fyDAI'
+                    value={toToken}
+                    onChange={({ option }) => 
+                      {
+                        if (option === "DAI") {
+                          setFromToken("fyDAI");
+                          setToToken("DAI");
+                        } if (option === "fyDAI") {
+                          setFromToken("DAI");
+                          setToToken("fyDAI");
+                        }
+                      }
+                    }
+                  />
+              </InputWrap>
 
 
 
