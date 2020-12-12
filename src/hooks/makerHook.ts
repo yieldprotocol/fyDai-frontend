@@ -4,7 +4,6 @@ import { ethers, BigNumber }  from 'ethers';
 import * as utils from '../utils';
 
 import { YieldContext } from '../contexts/YieldContext';
-import { UserContext } from '../contexts/UserContext';
 
 import Vat from '../contracts/Vat.json';
 
@@ -31,9 +30,7 @@ export const useMaker = () => {
   const getCdpsAbi = [{ 'constant':true, 'inputs':[{ 'internalType':'address', 'name':'manager', 'type':'address' }, { 'internalType':'address', 'name':'guy', 'type':'address' }], 'name':'getCdpsAsc', 'outputs':[{ 'internalType':'uint256[]', 'name':'ids', 'type':'uint256[]' }, { 'internalType':'address[]', 'name':'urns', 'type':'address[]' }, { 'internalType':'bytes32[]', 'name':'ilks', 'type':'bytes32[]' }], 'payable':false, 'stateMutability':'view', 'type':'function' }, { 'constant':true, 'inputs':[{ 'internalType':'address', 'name':'manager', 'type':'address' }, { 'internalType':'address', 'name':'guy', 'type':'address' }], 'name':'getCdpsDesc', 'outputs':[{ 'internalType':'uint256[]', 'name':'ids', 'type':'uint256[]' }, { 'internalType':'address[]', 'name':'urns', 'type':'address[]' }, { 'internalType':'bytes32[]', 'name':'ilks', 'type':'bytes32[]' }], 'payable':false, 'stateMutability':'view', 'type':'function' }];
 
   const { fallbackProvider, account } = useSignerAccount();
-  
   const { state : { deployedContracts } } = useContext<any>(YieldContext);
-  const { state: userState, actions: userActions } = useContext(UserContext);
 
   /* controller contract for txs */
   const [vatContract, setVatContract] = useState<any>();
@@ -51,9 +48,9 @@ export const useMaker = () => {
         fallbackProvider
       ));
 
-      deployedContracts.GET_CDPS && fallbackProvider &&
+      deployedContracts.getCdps && fallbackProvider &&
       setGetCdpsContract( new ethers.Contract( 
-        ethers.utils.getAddress(deployedContracts.GET_CDPS), 
+        ethers.utils.getAddress(deployedContracts.getCdps), 
         getCdpsAbi,
         fallbackProvider
       ));
@@ -74,18 +71,24 @@ export const useMaker = () => {
     dsProxyAddress:string,
     collateralType:string|null = null
   ): Promise<any> => {
-    let res;
+    let cdpList;
+    let cdpSingle;
+    const collateralBytes = collateralType? ethers.utils.formatBytes32String(collateralType): null;
     try {
-      res = await getCdpsContract.getCdpsDesc(deployedContracts.CDP_MANAGER, dsProxyAddress);
+      /* check for cdps registered to the dsProxy address in the manager and also directly in vat */ 
+      [cdpList, cdpSingle] = await Promise.all([
+        getCdpsContract.getCdpsDesc(deployedContracts.dssCdpManager, dsProxyAddress),
+        vatContract.urns(collateralBytes || ethers.utils.formatBytes32String('ETH-A'), dsProxyAddress)
+      ]);
     }  catch (e) {
       // eslint-disable-next-line no-console
       console.log(e);
-      res = [];
+      cdpList = [];
     }
-    if (!collateralType) {
-      return res;
+    if (!collateralBytes) {
+      return cdpList;
     }
-    return res.filter((x:any) => x.ilks !== ethers.utils.formatBytes32String(collateralType));
+    return cdpList.filter((x:any) => x.ilks !== collateralBytes);
   };
 
   /**
@@ -112,6 +115,16 @@ export const useMaker = () => {
     }
     return res;
   };
+
+
+  const debtToDai = async(
+    amount:number|BigNumber,
+  ) => {
+    // const parsedAmount  = 
+    // const rate = feedData.ilks.rate();
+  };
+
+
 
   return {
     getCDPList,
