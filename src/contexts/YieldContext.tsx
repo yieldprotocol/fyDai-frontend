@@ -52,8 +52,12 @@ const contractList = [
   'BorrowProxy',
   'ProxyRegistry',
   'ProxyFactory',
-  'GET_CDPS',
-  'CDP_MANAGER'
+  'getCdps',
+  'dssCdpManager',
+  'ImportProxy',
+  'ImportCdpProxy',
+  'ExportProxy',
+  'ExportCdpProxy', 
 ];
 
 // reducer
