@@ -162,16 +162,19 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
   }, [ debouncedInput, daiBalance ]);
 
   useEffect(() => {
+  })
+
+  useEffect(() => {
+    if (inputFromQuantity) {
+      setFromQuantity( inputValue );
+      setToQuantity(minFYDaiOut);
+      }
+    console.log("inputFromQuantity: ", inputFromQuantity)
+    console.log("inputValue: ", inputValue)
     console.log("fromToken: ", fromToken)
     console.log("toToken: ", toToken)
     console.log("fromQuantity: ", fromQuantity)
     console.log("toQuantity: ", toQuantity)
-  })
-
-  useEffect(() => {
-    setFromQuantity( inputValue );
-    setInputFromQuantity(true);
-    setToQuantity(minFYDaiOut);
   })
 
 
@@ -289,6 +292,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
                       onChange={(event:any) => 
                         { 
                           setInputValue( cleanValue(event.target.value, 6) );
+                          setInputFromQuantity(true);
                         }
                       }
                     />
