@@ -5,6 +5,9 @@ import * as utils from '../utils';
 import { ISignListItem, IYieldSeries } from '../types';
 
 import ImportProxy from '../contracts/ImportProxy.json';
+import ImportCdpProxy from '../contracts/ImportCdpProxy.json';
+
+
 import Controller from '../contracts/Controller.json';
 
 import { YieldContext } from '../contexts/YieldContext';
@@ -32,17 +35,20 @@ export const useImportProxy = () => {
   const  { state: { deployedContracts } }  = useContext<any>(YieldContext);
   const  { state: { authorization: { hasDelegatedDsProxy } } }  = useContext<any>(UserContext);
 
-  /* hooks */ 
+  /* hooks */
   const { account, signer } = useSignerAccount();
-  const { addControllerDelegate } = useController();
+  const { addControllerDelegate, checkControllerDelegate } = useController();
   const { proxyExecute } = useDsProxy();
   const { delegationSignature, handleSignList } = useSigning();
 
+  const { abi: importCdpProxyAbi } = ImportCdpProxy;
   const { abi: importProxyAbi } = ImportProxy;
+
   const { abi: controllerAbi } = Controller;
 
   /* Preset the importProxy and controller contracts to be used with all fns */
   const [ proxyContract, setProxyContract] = useState<any>();
+  const [ cdpProxyContract, setCdpProxyContract] = useState<any>();
   const [ controllerContract, setControllerContract ] = useState<any>();
   
   useEffect(()=>{
@@ -50,6 +56,12 @@ export const useImportProxy = () => {
     setProxyContract( new ethers.Contract( 
       ethers.utils.getAddress(deployedContracts?.ImportProxy), 
       importProxyAbi,
+      signer
+    ));
+    deployedContracts?.ImportCdpProxy && signer &&
+    setCdpProxyContract( new ethers.Contract( 
+      ethers.utils.getAddress(deployedContracts?.ImportCdpProxy), 
+      importCdpProxyAbi,
       signer
     ));
     deployedContracts?.Controller && signer && setControllerContract( new ethers.Contract( 
@@ -65,12 +77,18 @@ export const useImportProxy = () => {
    * @param {IYieldSeries} series series to act on.
    * @param {string|BigNumber} wethAmount Weth collateral to import
    * @param {string|BigNumber} debtAmount Normalized debt to move ndai * rate = dai
+   * 
+   * @param {number} cdpID vault number of the cdp to import
+   * @param {boolean} viaCdpManager is the cdp managed by the Maker dssCdpManager
+   * 
    * @note if BigNumber is used make sure it is already in WEI
    */
   const importPosition = async (
     series:IYieldSeries,
     wethAmount:string|BigNumber,
     debtAmount:string|BigNumber,
+    cdpId:number,
+    viaCdpMan:boolean=true, /* default to using cdpManager */
   ) => {
 
     /* Processing and sanitizing input */
@@ -84,36 +102,53 @@ export const useImportProxy = () => {
       value: ethers.utils.parseEther('0')
     };
 
-    /* Check the signature requirements */
-    const checkSigs = await proxyContract.importPositionCheck(poolAddr);
-    console.log(checkSigs);
+    // /* Check the signature requirements */
+    // const checkSigs = await proxyContract.importPositionCheck(poolAddr);
+    // console.log(checkSigs);
+
+    const maxDaiPrice = utils.toRay(2);
 
     /* build and use signature if required , else '0x' */
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
-    
+
     requestedSigs.set('controllerSig',
       { id: genTxCode('AUTH_CONTROLLER', null),
-        desc: 'Allow your proxy to interact with your collateralized positions',
-        conditional: hasDelegatedDsProxy,
+        desc: 'Allow your proxy to interact with your vault in Maker (CDP Manager)',
+        conditional: !viaCdpMan && await checkControllerDelegate(cdpProxyContract.address),  // skip signing if any are TRUE
+        signFn: () => delegationSignature(controllerContract, cdpProxyContract.address),    
+        fallbackFn: () => addControllerDelegate(cdpProxyContract.address),
+      });
+
+    requestedSigs.set('controllerSig',
+      { id: genTxCode('AUTH_CONTROLLER', null),
+        desc: 'Allow your proxy to interact with your vault in Maker',
+        conditional: viaCdpMan && await checkControllerDelegate(proxyContract.address), // skip signing if any are TRUE
         signFn: () => delegationSignature(controllerContract, proxyContract.address),    
         fallbackFn: () => addControllerDelegate(proxyContract.address),
       });
 
     /* Send the required signatures out for signing, or approval tx if fallback is required */
-    const signedSigs = await handleSignList(requestedSigs, genTxCode('ADD_LIQUIDITY', series));
+    const signedSigs = await handleSignList(requestedSigs, genTxCode('IMPORT_POSITION', series));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
 
-
-    // contract fn used: importPositionWithSignature(IPool pool, address user, uint256 wethAmount, uint256 debtAmount, bytes memory controllerSig)
-    const calldata = proxyContract.interface.encodeFunctionData( 
-      'importPositionWithSignature', 
-      [ poolAddr, userAddr, parsedWeth, parsedDebt, signedSigs.get('controllerSig') ]
-    );
+    console.log(poolAddr, cdpId, parsedWeth, parsedDebt, maxDaiPrice, signedSigs.get('controllerSig'));
+    /* contract fns used:
+      importPositionWithSignature(IPool pool, address user, uint256 wethAmount, uint256 debtAmount, uint256 maxDaiPrice, bytes memory controllerSig)
+      importCdpPositionWithSignature(IPool pool, uint256 cdp, uint256 wethAmount, uint256 debtAmount, uint256 maxDaiPrice, bytes memory controllerSig) */
+    const calldata = viaCdpMan ? 
+      cdpProxyContract.interface.encodeFunctionData(
+        'importCdpPositionWithSignature', 
+        [ poolAddr, cdpId.toString(), parsedWeth, parsedDebt, maxDaiPrice, signedSigs.get('controllerSig') ]
+      ) :
+      proxyContract.interface.encodeFunctionData(
+        'importPositionWithSignature', 
+        [ poolAddr, userAddr, parsedWeth, parsedDebt, maxDaiPrice, signedSigs.get('controllerSig') ]
+      );
 
     /* send to the proxy for execution */
     await proxyExecute( 
-      proxyContract.address, 
+      viaCdpMan ? cdpProxyContract.address: proxyContract.address, 
       calldata,
       overrides,
       { tx:null, msg: `Migrating ${parsedWeth} collateral and/or ${parsedDebt} Debt to ${series.displayNameMobile}`, type:'IMPORT_POSITION', series  }
@@ -125,9 +160,13 @@ export const useImportProxy = () => {
    * @dev Fork a user MakerDAO vault to ImportProxy, and call importProxy to transform it into a Yield vault
    * 
    * @param {IYieldSeries} series series to act on.
+   * @param {number} cdpID vault number of the cdp to import
+   * @param {boolean} viaCdpManager is the cdp managed by the Maker dssCdpManager
    */
   const importVault= async (
     series:IYieldSeries,
+    cdpId:number,
+    viaCdpMan:boolean=true, /* default to using cdpManager */
   ) => {
 
     /* Processing and sanitizing input */
@@ -139,33 +178,44 @@ export const useImportProxy = () => {
       value: ethers.utils.parseEther('0')
     };
 
-    /* Check the signature requirements */
-    const checkSigs = await proxyContract.importVaultCheck(poolAddr);
-    console.log(checkSigs);
+    const maxDaiPrice = utils.toRay(2);
 
     /* build and use signature if required , else '0x' */
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
+
     requestedSigs.set('controllerSig',
       { id: genTxCode('AUTH_CONTROLLER', null),
         desc: 'Allow your proxy to interact with your collateralized positions',
-        conditional: hasDelegatedDsProxy,
+        conditional: !viaCdpMan && await checkControllerDelegate(cdpProxyContract.address),
+        signFn: () => delegationSignature(controllerContract, cdpProxyContract.address),    
+        fallbackFn: () => addControllerDelegate(cdpProxyContract.address),
+      });
+
+    requestedSigs.set('controllerSig',
+      { id: genTxCode('AUTH_CONTROLLER', null),
+        desc: 'Allow your proxy to interact with your collateralized positions',
+        conditional: viaCdpMan && await checkControllerDelegate(proxyContract.address),
         signFn: () => delegationSignature(controllerContract, proxyContract.address),    
         fallbackFn: () => addControllerDelegate(proxyContract.address),
       });
+
     /* Send the required signatures out for signing, or approval tx if fallback is required */
     const signedSigs = await handleSignList(requestedSigs, genTxCode('ADD_LIQUIDITY', series));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
 
-    // contract fn used: importVaultWithSignature(IPool pool, address user, bytes memory controllerSig)
-    const calldata = proxyContract.interface.encodeFunctionData( 
-      'importVaultWithSignature', 
-      [ poolAddr, userAddr, signedSigs.get('controllerSig') ]
-    );
+    /* 
+      contract fn used: 
+      importCdpWithSignature(IPool pool, uint256 cdp, uint256 maxDaiPrice, bytes memory controllerSig)
+      importVaultWithSignature(IPool pool, address user, uint256 maxDaiPrice, bytes memory controllerSig) 
+    */
+    const calldata = viaCdpMan ?
+      cdpProxyContract.interface.encodeFunctionData( 'importCdpWithSignature', [ poolAddr, cdpId.toString(), maxDaiPrice, signedSigs.get('controllerSig') ] ) :
+      proxyContract.interface.encodeFunctionData( 'importVaultWithSignature', [ poolAddr, userAddr, maxDaiPrice, signedSigs.get('controllerSig') ] );
 
     /* send to the proxy for execution */
     await proxyExecute( 
-      proxyContract.address, 
+      viaCdpMan ? cdpProxyContract.address: proxyContract.address, 
       calldata,
       overrides,
       { tx:null, msg: `Migrating a MakerVault to  Yield series: ${series.displayNameMobile}`, type:'IMPORT_VAULT', series  }

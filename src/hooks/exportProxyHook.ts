@@ -46,9 +46,9 @@ export const useExportProxy = () => {
   const [ controllerContract, setControllerContract ] = useState<any>();
   
   useEffect(()=>{
-    deployedContracts?.ExportProxy && signer &&
+    deployedContracts?.ExportCdpProxy && signer &&
     setProxyContract( new ethers.Contract( 
-      ethers.utils.getAddress(deployedContracts?.ExportProxy), 
+      ethers.utils.getAddress(deployedContracts?.ExportCdpProxy), 
       exportProxyAbi,
       signer
     ));
@@ -94,7 +94,7 @@ export const useExportProxy = () => {
     requestedSigs.set('controllerSig',
       { id: genTxCode('AUTH_CONTROLLER', null),
         desc: 'Allow your proxy to interact with your collateralized positions',
-        conditional: hasDelegatedDsProxy,
+        conditional: hasDelegatedDsProxy, // NO NO -> must be somethign else
         signFn: () => delegationSignature(controllerContract, proxyContract.address),    
         fallbackFn: () => addControllerDelegate(proxyContract.address),
       });
