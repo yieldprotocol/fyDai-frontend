@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { ethers } from 'ethers';
 import { useParams, useHistory, NavLink } from 'react-router-dom';
-import { Keyboard, Box, TextInput, Text, ThemeContext, ResponsiveContext, Collapsible, Layer } from 'grommet';
+import { Keyboard, Box, TextInput, Text, ThemeContext, ResponsiveContext, Collapsible, Layer, Anchor } from 'grommet';
 import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 import { VscHistory as History } from 'react-icons/vsc';
 
@@ -99,7 +99,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
   /* internal component state */
   const [ borrowDisabled, setBorrowDisabled ] = useState<boolean>(true);
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
-  const [ errorMsg, setErrorMsg] = useState<string|null>(null);
+  const [ errorMsg, setErrorMsg] = useState<string|any>(null);
   const isLol = useIsLol(inputValue);
 
   const [inputRef, setInputRef] = useState<any>(null);
@@ -181,7 +181,15 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
       !(ethPosted.isZero())
     ) {
       setWarningMsg(null);
-      setErrorMsg('That amount exceeds the amount of Dai you can borrow based on your collateral'); 
+      setErrorMsg(
+        <Box direction='row-responsive' gap='small'>
+          <Text size='xsmall'>That amount exceeds the amount of Dai you can borrow based on your collateral.</Text>
+          <RaisedButton 
+            label={<Box pad={{ horizontal:'small' }}><Text size='xsmall'>Manage Collateral</Text></Box>}
+            onClick={()=>navHistory.push('/post/')}
+          />
+        </Box>
+      ); 
     } else if (
       debouncedInput && 
         ( debouncedInput > Math.round(maxDaiAvailable_- maxDaiAvailable_*0.05 ) &&
