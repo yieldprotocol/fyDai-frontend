@@ -35,7 +35,20 @@ const TxLayer = () => {
 
   /* Monitor All possible tx's */ 
   const [ authActive ] = useTxActive([ 'AUTH_TOKEN', 'AUTH_CONTROLLER', 'AUTH_POOL', 'CREATE_PROXY' ]);
-  const [ txActive ] = useTxActive(['POST', 'WITHDRAW', 'BORROW', 'REPAY', 'SELL_DAI', 'BUY_DAI', 'REDEEM', 'ADD_LIQUIDITY', 'REMOVE_LIQUIDITY' ]);
+  const [ txActive ] = useTxActive([
+    'POST', 
+    'WITHDRAW', 
+    'BORROW', 
+    'REPAY',
+    'SELL_DAI', 
+    'BUY_DAI', 
+    'REDEEM', 
+    'ADD_LIQUIDITY', 
+    'REMOVE_LIQUIDITY', 
+    'IMPORT_POSITION',
+    'IMPORT_VAULT',
+    'EXPORT_POSITION',
+  ]);
 
   // flags
   const [ allSigned, setAllSigned ] = useState<boolean>(false); // tracking signatures
