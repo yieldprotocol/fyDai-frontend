@@ -1,14 +1,19 @@
 import React, { useState, useContext, useEffect } from 'react';
+import { ethers } from 'ethers';
 import { NavLink } from 'react-router-dom';
 import { Box, Keyboard, TextInput, Text, ResponsiveContext, Collapsible } from 'grommet';
-import ethers from 'ethers';
+import styled, { css } from 'styled-components';
 
 import { 
   FiArrowLeft as ArrowLeft,
   FiInfo as Info,
+  FiChevronLeft as ChevronLeft, 
+  FiChevronRight as ChevronRight,
+  FiSearch as Search,
+  FiX as Close,
 } from 'react-icons/fi';
 
-import { cleanValue } from '../utils';
+import { cleanValue, modColor } from '../utils';
 
 import { UserContext } from '../contexts/UserContext';
 import { SeriesContext } from '../contexts/SeriesContext';
@@ -16,7 +21,9 @@ import { SeriesContext } from '../contexts/SeriesContext';
 import { useDebounce, useIsLol } from '../hooks/appHooks';
 import { useMath } from '../hooks/mathHooks';
 import { useTxActive } from '../hooks/txHooks';
-import { useBorrowProxy } from '../hooks/borrowProxyHook';
+import { usePool } from '../hooks/poolHook';
+import { useExportProxy } from '../hooks/exportProxyHook';
+import { useImportProxy } from '../hooks/importProxyHook';
 
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
@@ -26,21 +33,49 @@ import FlatButton from '../components/FlatButton';
 import EthMark from '../components/logos/EthMark';
 import YieldMobileNav from '../components/YieldMobileNav';
 
-import { logEvent } from '../utils/analytics';
+import DaiMark from '../components/logos/DaiMark';
+import MakerLogo from '../components/logos/MakerLogo';
+import AprBadge from '../components/AprBadge';
+import SeriesDescriptor from '../components/SeriesDescriptor';
 import Loading from '../components/Loading';
 import MakerMark from '../components/logos/MakerMark';
-import { useExportProxy } from '../hooks/exportProxyHook';
-import { useImportProxy } from '../hooks/importProxyHook';
-import DaiMark from '../components/logos/DaiMark';
+
+
+
+
 
 interface IMigrateMakerProps {
   close?: any;
 }
 
+const pointerEventsFriendlyTheme = {
+  box: {
+    extend: 'pointer-events: none;'
+  },
+  anchor: {
+    extend: 'pointer-events: auto;'
+  },
+  button: {
+    extend: 'pointer-events: auto;'
+  }
+};
+
+const InsetBox = styled(Box)`
+border-radius: 8px;
+${(props:any) => props.background && css`
+    background: ${props.background};
+    box-shadow: inset 6px 6px 11px ${modColor(props.background, -20)}, 
+            inset -6px -6px 11px ${modColor(props.background, 10)};
+`}
+`;
+
+const makerTextColor = '#48495f';
+const makerBackColor = '#f6f8f9';
+
 const MigrateMaker = ({ close }:IMigrateMakerProps) => {
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
-  const { state: { position }, actions: userActions } = useContext(UserContext);
+  const { state: { position, makerVaults }, actions: userActions } = useContext(UserContext);
   const {
     ethPosted,
     ethLocked,
@@ -52,24 +87,36 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
   const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
   const activeSeries = seriesData.get(activeSeriesId);
 
-  const { withdrawEth } = useBorrowProxy();
-
+  const { previewPoolTx }  = usePool();
   const { importPosition, importVault } = useImportProxy();
   const { exportPosition } = useExportProxy();
-  const { estCollRatio: estimateRatio } = useMath();
+  const { estCollRatio: estimateRatio, calcAPR } = useMath();
   const [ txActive ] = useTxActive(['WITHDRAW']);
 
+  /* vaults and selected vaults variables */
+  const [ selectedVaultIndex, setSelectedVaultIndex ] = useState<number>(0);
+  const [ selectedVault, setSelectedVault ] = useState<any>(null);
+  const [ filteredMakerVaults, setFilteredMakerVaults ] = useState<any>(makerVaults);
+  
+  /* component flags */ 
+  const [ searchOpen, setSearchOpen ] = useState<boolean>(false);
+
+  /* component input variables */
   const [ collInputValue, setCollInputValue ] = useState<any>();
   const [ debtInputValue, setDebtInputValue ] = useState<any>();
-  const [ inputDirty, setInputDirty ] = useState<boolean>(false);
-
+  const [ searchInputValue, setSearchInputValue ] = useState<any>();
   const debouncedCollInput = useDebounce(collInputValue, 500);
   const debouncedDebtInput = useDebounce(debtInputValue, 500);
-  
+  const debouncedSearchInput = useDebounce(searchInputValue, 1000);
   const [collInputRef, setCollInputRef] = useState<any>(null);
   const [debtInputRef, setDebtInputRef] = useState<any>(null);
+  const [ inputDirty, setInputDirty ] = useState<boolean>(false);
 
-  const [ estRatio, setEstRatio ] = useState<any>();
+
+  /* token balances and calculated values */
+  const [ fyDaiValue, setFYDaiValue ] = useState<number>(0);
+  const [ APR, setAPR ] = useState<number>();
+  const [ estRatio, setEstRatio ] = useState<number>(0);
   const [ maxWithdraw, setMaxWithdraw ] = useState<string>();
 
   const [ importDisabled, setImportDisabled ] = useState<boolean>(true);
@@ -83,21 +130,77 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
 
   const importProcedure = async () => {
     if (collInputValue || debtInputValue && !importDisabled) {
-      await importPosition(activeSeries, collInputValue, debtInputValue);
+      await importPosition(activeSeries, collInputValue, debtInputValue, selectedVault.vaultId);
       setCollInputValue(undefined);
       setDebtInputValue(undefined);
     }
   };
 
-  const importAllProcedure = async () => {
+  const importAllProcedure = async (id:number) => {
     if (!collInputValue || !debtInputValue && !importDisabled) {
-      await importVault(activeSeries);
+      await importVault(activeSeries, id);
     }
   };
 
+  const selectVault = (prevOrNext:'next'|'prev') => {
+    prevOrNext === 'prev' && selectedVaultIndex > 0 && setSelectedVaultIndex( selectedVaultIndex-1 );
+    prevOrNext === 'next' && selectedVaultIndex < filteredMakerVaults.length-1 && setSelectedVaultIndex( selectedVaultIndex+1 );
+  };
+
+  /*
+  * Handle input (debounced debt input) changes:
+  * 1. dai to fyDai conversion and get APR (fyDai needed to compare with the approved allowance)
+  * 2. calcalute yield APR
+  * 3. calculate estimated collateralization ratio
+  */
+
   useEffect(()=>{
-    (collInputValue || debtInputValue) && setInputDirty(true);
-  }, [collInputValue, debtInputValue]);
+    // (collInputValue || debtInputValue) && setInputDirty(true);
+
+    // account && position && position.debtValue && debouncedInput>0 && ( async () => {
+    //   const newRatio = estimateRatio(
+    //     position.ethPosted, 
+    //     ( position.debtValue.add(ethers.utils.parseEther(debouncedInput)) )
+    //   ); 
+    //   newRatio && setEstRatio(parseFloat(newRatio.toString()));
+    // })();
+
+    activeSeries && debouncedDebtInput>0 && ( async () => {
+      const preview = await previewPoolTx('buyDai', activeSeries, debouncedDebtInput);
+      
+      if (!(preview instanceof Error)) {
+        setFYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
+        setAPR(calcAPR( ethers.utils.parseEther(debouncedDebtInput.toString()), preview, activeSeries.maturity ) );      
+      } else {
+        /* if the market doesnt have liquidity just estimate from rate */
+        const rate = await previewPoolTx('buyDai', activeSeries, 1);
+        !(rate instanceof Error) && setFYDaiValue(debouncedDebtInput*parseFloat((ethers.utils.formatEther(rate))));
+        (rate instanceof Error) && setFYDaiValue(0);
+        setImportDisabled(true);
+        setErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
+      }
+    })();
+
+    setImportDisabled(false);
+  }, [debouncedCollInput, debouncedDebtInput, activeSeries]);
+
+  /* Filter vaults and set selected */ 
+  useEffect(()=>{
+    let _filteredVaults = [];
+    if ( debouncedSearchInput ) { 
+      _filteredVaults = makerVaults.filter((x:any)=> x.vaultId === debouncedSearchInput);
+      setFilteredMakerVaults(_filteredVaults);
+      setSelectedVault(_filteredVaults[0]);
+    } else {
+      _filteredVaults = makerVaults;
+      setFilteredMakerVaults(_filteredVaults);
+      setSelectedVault(_filteredVaults[selectedVaultIndex]);
+    }
+  }, [ makerVaults, debouncedSearchInput, selectedVaultIndex ]);
+
+  useEffect(()=>{
+    filteredMakerVaults.length>0 && setSelectedVaultIndex(0);
+  }, [filteredMakerVaults]);
 
   return (
     <Keyboard 
@@ -115,6 +218,8 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
       // }}
       target='document'
     >
+      <SeriesDescriptor activeView='borrow' minimized />
+
       { !txActive &&
       <Box 
         width={!mobile?{ min:'620px', max:'620px' }: undefined}
@@ -125,84 +230,80 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
         pad='large'
         gap='medium'
         justify='between'
-      >    
-        {/* <Box direction='row-responsive' justify='between' align='center' fill>
-          <Text color='text' weight='bold' size='large'> Import Maker Vault: </Text>
-          <Text color='text'> ETH-A #2344432</Text>
-          <RaisedButton 
-            label={ 
-              <Box pad='small'>
-                <Text size='xxsmall'>Import the entire <MakerMark /> vault </Text>
-              </Box>
-                }
-            onClick={()=>console.log('vault migrated')}
-          />
-        </Box>     */}
- 
-        <Box direction='row' gap='small' align='center'>
-          <Text size='large' color='text' weight='bold'>Import Maker Vault:</Text>
-        </Box> 
-
-        <Box round='3px' border pad='xxsmall'>
-          <Text color='text'> ETH-A #2344432</Text>
-
-          <InfoGrid entries={[
-            {
-              label: 'Collateral Locked',
-              visible: true,
-              active: true,
-              loading: false, 
-              value: '1000 ETH',
-              valuePrefix: null,
-              valueExtra: null, 
-            },
-            {
-              label: 'Dai Debt',
-              visible: true,
-              active: true,
-              loading: false,           
-              value: '1000 Dai',
-              valuePrefix: null,
-              valueExtra: null,
-            },
-            {
-              label: null,
-              visible: true,
-              active: true,
-              loading: false,           
-              value: null,
-              valuePrefix: null,
-              valueExtra: ()=> (
-                <Box>
-                  <RaisedButton 
-                    label={ 
-                      <Box pad='small'>
-                        <Text size='xxsmall'>Import the entire <MakerMark /> vault</Text>
-                      </Box>
-                }
-                    onClick={()=>console.log('vault migrated')}
-                  />
-                </Box>
-              ),
-            },
-          ]}
-          />
+      > 
+        <Box direction='row' gap='small' align='center' justify='between'>
+          <Text size='large' color='text' weight='bold'> Import Maker vault </Text>
+          { !mobile && 
+          <Box direction='row' align='center' gap='small'> 
+            <Search onClick={()=>{if(!searchOpen){setSearchOpen(true);} else {setSearchInputValue(undefined); setSearchOpen(false);}}} />
+            <Collapsible open={searchOpen} direction='horizontal'>
+              <InsetBox
+                background={makerBackColor}
+                justify='between'
+                direction='row'
+                align='center'
+              >
+                <TextInput
+                  type='number'
+                  placeholder='Vault Id'
+                  value={searchInputValue || ''}
+                  plain
+                  onChange={(event:any) => setSearchInputValue(event.target.value)}
+                />
+                <Close onClick={()=>{setSearchInputValue(undefined); setSearchOpen(false);}} />
+              </InsetBox>       
+            </Collapsible>
+          </Box>}
         </Box>
-        {/* <Box direction='row' gap='small'>
-          <Info /> 
-          <Text size='xxsmall'> You can now easily move debt and/or collateral from Maker into the Yield protocol </Text> 
-        </Box> */}
 
-        {/* <Box>
-          <RaisedButton 
-            label={ 
-              <Box pad='small'>
-                <Text size='small'>Import the entire <MakerMark /> vault</Text>
-              </Box>
-          }
-            onClick={()=>console.log('vault migrated')}
-          />
-        </Box> */}
+        <InsetBox background={makerBackColor} direction='row' justify='between'>   
+          <Box onClick={()=>selectVault('prev')} justify='center' align='center' hoverIndicator={modColor(makerBackColor, -25)}>
+            <ChevronLeft size='30px' color={selectedVaultIndex===0?makerBackColor:makerTextColor} />
+          </Box>
+          { 
+            filteredMakerVaults.length>0 ?         
+              filteredMakerVaults.map( (x:any, i:number) => {
+                if (selectedVaultIndex === i) {
+                  return (
+                    <Box animation='fadeIn' key={x.vaultId} gap='small' pad='medium' fill>
+                      <Box direction='row-responsive' justify='between' align='center' fill='horizontal'> 
+                        <Box pad={{ horizontal:'medium' }} direction='row' gap='small'>
+                          <MakerMark />
+                          <Text color='text' size='small' weight='bold'> ETH-A Vault</Text>
+                          <Text size='small'> #{x.vaultId}</Text>
+                        </Box>
+                        <RaisedButton 
+                          onClick={()=>importAllProcedure(x.vaultId)}
+                          background={makerBackColor}
+                          label={ 
+                            <Box pad='small'>
+                              <Text size='xxsmall'> 1-Click <MakerMark /> vault import </Text>
+                            </Box>
+                        }
+                        />
+                      </Box>
+                      <Box pad='medium' border background='#ffffff' fill='horizontal'>
+                        <Box pad='small' border='bottom' justify='between' direction='row'> 
+                          <Text size='small' color={makerTextColor}>Eth Locked</Text> 
+                          <Text size='small' color={makerTextColor}> {x.vaultCollateral_} ETH</Text>            
+                        </Box>
+                        <Box pad='small' justify='between' direction='row'> 
+                          <Text size='small' color={makerTextColor}>Outstanding Dai debt</Text> 
+                          <Text size='small' color={makerTextColor}> {x.vaultMakerDebt_} DAI</Text>            
+                        </Box>
+                      </Box>
+                    </Box>
+                  );
+                }
+              })
+              : 
+              <Box pad='large'>No matching vault ids found</Box>
+            }
+
+          <Box onClick={()=>selectVault('next')} justify='center' align='center' hoverIndicator={modColor(makerBackColor, -25)}>
+            <ChevronRight size='30px' color={selectedVaultIndex===filteredMakerVaults.length-1?makerBackColor:makerTextColor} />
+          </Box>
+        </InsetBox>
 
         <Box direction='row'>
           <Box basis='50%' justify='center'>
@@ -221,7 +322,7 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
             />
             <FlatButton
               label='max debt'
-              onClick={()=>maxWithdraw && setCollInputValue(cleanValue(maxWithdraw))}
+              onClick={()=>selectedVault && setDebtInputValue(cleanValue(selectedVault.vaultMakerDebt_))}
             />
           </InputWrap>
         </Box>
@@ -259,7 +360,7 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
                 visible: !!debtInputValue,
                 active: true,
                 loading: false, 
-                value: 'x.xx%',
+                value: APR?`${APR.toFixed(2)}%`: `${activeSeries? activeSeries.yieldAPR_: ''}%`,
                 valuePrefix: null,
                 valueExtra: null, 
               },
@@ -278,8 +379,8 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
         </Box>
 
         <ActionButton
-          onClick={() => importAllProcedure()}
-          label={`Withdraw ${collInputValue || ''} Eth`}
+          onClick={() => importProcedure()}
+          label='Migrate Maker Vault'
           disabled={importDisabled}
           hasPoolDelegatedProxy={true}
           clearInput={()=>setCollInputValue(undefined)}
@@ -292,7 +393,7 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
               label={
                 <Box direction='row' gap='medium' align='center'>
                   <ArrowLeft color='text-weak' />
-                  <Text size='small' color='text-weak'> cancel, and go back. </Text>
+                  <Text size='xsmall' color='text-weak'> cancel, and go back. </Text>
                 </Box>
                 }
             />
