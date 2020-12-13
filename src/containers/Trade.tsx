@@ -177,6 +177,18 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
         }
       }
     }
+    if (!inputFromQuantity) {
+      if (fromToken === "Dai") {
+        setToQuantity( inputValue );
+        setTradeType( "buyFyDai" );
+        if (inputValue > 0) {
+          setFromQuantity( 55.55 );
+        } else {
+          setFromQuantity(0);
+        }
+      }
+    }
+
     console.log("inputFromQuantity: ", inputFromQuantity)
     console.log("inputValue: ", inputValue)
     console.log("tradeType: ", tradeType)
@@ -291,9 +303,9 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
                 <Text alignSelf='start' size='large' color='text' weight='bold'>From</Text>
                 <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
                     <TextInput
-                      ref={(el:any) => {el && !CloseDaiOpen && !mobile && el.focus(); setInputRef(el);}}
+                      /* ref={(el:any) => {el && !CloseDaiOpen && !mobile && el.focus(); setInputRef(el);}} */
                       type="number"
-                      placeholder={!mobile ? '0.0': '0.0'}
+                      placeholder={!mobile ? '0': '0'}
                       value={fromQuantity || ''}
                       plain
                       onChange={(event:any) => 
@@ -324,11 +336,16 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
                 <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
                   <TextInput
                         type="number"
-                        value={toQuantity}
+                        value={toQuantity || ''}
                         plain
-                        placeholder={!mobile ? '0.0': '0.0'}
-                        onChange={(event:any) => setInputValue( cleanValue(event.target.value, 6) )}
-                    />
+                        placeholder={!mobile ? '0': '0'}
+                        onChange={(event:any) => 
+                          { 
+                            setInputValue( cleanValue(event.target.value, 6) );
+                            setInputFromQuantity(false);
+                          }
+                        }
+                      />
                   <Select
                     options={['DAI', 'fyDAI']}
                     placeholder='fyDAI'
