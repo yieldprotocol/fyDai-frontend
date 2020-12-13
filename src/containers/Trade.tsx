@@ -164,27 +164,17 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
     }
   }, [ debouncedInput, daiBalance ]);
 
+  /* */
   useEffect(() => {
     if (inputFromQuantity) {
       if (fromToken === "Dai") {
         setFromQuantity( inputValue );
         setTradeType( "sellDai" );
-      } if (inputValue > 0) {
-        setToQuantity( Math.round((minFYDaiOut + Number.EPSILON) * 100) / 100 );
-        
-      } else {
-        setToQuantity(0);
-      }
-      if (fromToken === "fyDai") {
-      setTradeType("sellFyDai");
-      setFromQuantity( inputValue );
-      }
-    } else {
-      if (fromToken === "Dai") {
-        setTradeType("buyFyDai")
-      }
-      if (fromToken === "fyDai") {
-        setTradeType("buyDai")
+        if (inputValue > 0) {
+          setToQuantity( Math.round((minFYDaiOut + Number.EPSILON) * 100) / 100 );
+        } else {
+          setToQuantity(0);
+        }
       }
     }
     console.log("inputFromQuantity: ", inputFromQuantity)
