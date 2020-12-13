@@ -94,6 +94,9 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
   const [ toQuantity, setToQuantity ] = useState<number>(0);
   const [ inputFromQuantity, setInputFromQuantity ] = useState<boolean>(true);
 
+  const [tradeType, setTradeType] = useState<string>();
+
+
   /* Lend execution flow */
   const lendProcedure = async () => {
     if (inputValue && !lendDisabled ) {
@@ -162,22 +165,36 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
   }, [ debouncedInput, daiBalance ]);
 
   useEffect(() => {
-  })
-
-  useEffect(() => {
     if (inputFromQuantity) {
-      setFromQuantity( inputValue );
-      setToQuantity(minFYDaiOut);
+      if (fromToken === "Dai") {
+        setFromQuantity( inputValue );
+        setTradeType( "sellDai" );
+      } if (inputValue > 0) {
+        setToQuantity( Math.round((minFYDaiOut + Number.EPSILON) * 100) / 100 );
+        
+      } else {
+        setToQuantity(0);
       }
+      if (fromToken === "fyDai") {
+      setTradeType("sellFyDai");
+      setFromQuantity( inputValue );
+      }
+    } else {
+      if (fromToken === "Dai") {
+        setTradeType("buyFyDai")
+      }
+      if (fromToken === "fyDai") {
+        setTradeType("buyDai")
+      }
+    }
     console.log("inputFromQuantity: ", inputFromQuantity)
     console.log("inputValue: ", inputValue)
+    console.log("tradeType: ", tradeType)
     console.log("fromToken: ", fromToken)
     console.log("toToken: ", toToken)
     console.log("fromQuantity: ", fromQuantity)
     console.log("toQuantity: ", toQuantity)
-  })
-
-
+    })
 
   return (
     <RaisedBox>
@@ -286,7 +303,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
                     <TextInput
                       ref={(el:any) => {el && !CloseDaiOpen && !mobile && el.focus(); setInputRef(el);}}
                       type="number"
-                      placeholder={!mobile ? '0.00': '0.00'}
+                      placeholder={!mobile ? '0.0': '0.0'}
                       value={fromQuantity || ''}
                       plain
                       onChange={(event:any) => 
@@ -317,8 +334,9 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
                 <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
                   <TextInput
                         type="number"
-                        value={minFYDaiOut.toFixed(2)}
+                        value={toQuantity}
                         plain
+                        placeholder={!mobile ? '0.0': '0.0'}
                         onChange={(event:any) => setInputValue( cleanValue(event.target.value, 6) )}
                     />
                   <Select
