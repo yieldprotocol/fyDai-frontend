@@ -117,17 +117,73 @@ export const useMaker = () => {
   };
 
 
-  const debtToDai = async(
+  const makerDebtToDai = async (
     amount:number|BigNumber,
+    collateralType: string = 'ETH-A',
   ) => {
-    // const parsedAmount  = 
-    // const rate = feedData.ilks.rate();
+    const parsedAmount= BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(amount.toString());
+    const collType = ethers.utils.formatBytes32String(collateralType);
+    let rate;
+    try {
+      [,rate,,,] = await vatContract(collType).ilks;
+    }  catch (e) {
+      // eslint-disable-next-line no-console
+      console.log(e);
+      rate = 0;
+    }
+    return  utils.mulRay(parsedAmount, rate);
   };
 
+  const daiToMakerDebt = async (
+    amount:number|BigNumber,
+    collateralType: string = 'ETH-A',
+  ) => {
+    const parsedAmount= BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(amount.toString());
+    const collType = ethers.utils.formatBytes32String(collateralType);
+    let rate;
+    try {
+      [,rate,,,] = await vatContract(collType).ilks;
+    }  catch (e) {
+      // eslint-disable-next-line no-console
+      console.log(e);
+      return BigNumber.from('0');
+    }
+    return  utils.divRay(parsedAmount, rate);
+  };
 
+  /* minimumm weth collateral required for amount (Dia / fyDai)  */ 
+  const minWethForAmount = async (
+    amount:number|BigNumber,
+    collateralType: string = 'ETH-A',
+  ) => {
+    const parsedAmount= BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(amount.toString());
+    const collType = ethers.utils.formatBytes32String(collateralType);
+    let spot;
+    try {
+      [,, spot,,] = await vatContract(collType).ilks;
+    }  catch (e) {
+      // eslint-disable-next-line no-console
+      console.log(e);
+      return BigNumber.from('0');
+    }
+    return  utils.divRay(parsedAmount, spot);
+  };
+
+  const fyDaiForDai = async () =>{
+    return null;
+  }
+
+
+  const DaiForFyDai =async () => {
+    return null;
+  }
 
   return {
     getCDPList,
     getCDPData,
+    makerDebtToDai,
+    daiToMakerDebt,
+    minWethForAmount,
+
   } as const;
 };
