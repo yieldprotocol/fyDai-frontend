@@ -10,6 +10,8 @@ import Vat from '../contracts/Vat.json';
 import { useSignerAccount } from './connectionHooks';
 import { useTxHelpers } from './txHooks';
 import { useDsProxy } from './dsProxyHook';
+import { usePool } from './poolHook';
+import { IYieldSeries } from '../types';
 
 /**
  * Hook for interacting with the yield 'CRONTROLLER' Contract
@@ -38,6 +40,8 @@ export const useMaker = () => {
 
   const { handleTx, handleTxRejectError } = useTxHelpers();
   const { proxyExecute } = useDsProxy();
+  const { previewPoolTx } = usePool();
+
 
   useMemo(()=>{
     try {
@@ -116,7 +120,14 @@ export const useMaker = () => {
     return res;
   };
 
-
+  /**
+   * @dev Convert from MakerDAO debt to Dai
+   * @param {string|BigNumber} daiAmount debt amount
+   * @param {string} collateralType collateral type to filter by (default. ETH-A)
+   * 
+   * @returns {Promise<BigNumber>} dai amount
+   * @note call function
+   */
   const makerDebtToDai = async (
     amount:number|BigNumber,
     collateralType: string = 'ETH-A',
@@ -133,6 +144,15 @@ export const useMaker = () => {
     }
     return  utils.mulRay(parsedAmount, rate);
   };
+
+  /**
+   * @dev Convert from Dai to MakerDAO debt
+   * @param {string|BigNumber} daiAmount debt amount
+   * @param {string} collateralType collateral type to filter by (default. ETH-A)
+
+   * @returns {Promise<BigNumber>} dai amount
+   * @note call function
+   */
 
   const daiToMakerDebt = async (
     amount:number|BigNumber,
@@ -151,7 +171,14 @@ export const useMaker = () => {
     return  utils.divRay(parsedAmount, rate);
   };
 
-  /* minimumm weth collateral required for amount (Dia / fyDai)  */ 
+
+  /**
+   * @dev Minimum weth needed to collateralize an amount of dai OR FyDai in MakerDAO
+   * @param {string|BigNumber} amount of or Dai / FyDai debt amount
+   * @param {string} collateralType collateral type to filter by (default. ETH-A)
+   * @returns {Promise<BigNumber>} dai amount
+   * @note call function
+   */
   const minWethForAmount = async (
     amount:number|BigNumber,
     collateralType: string = 'ETH-A',
@@ -169,14 +196,53 @@ export const useMaker = () => {
     return  utils.divRay(parsedAmount, spot);
   };
 
-  const fyDaiForDai = async () =>{
-    return null;
-  }
+  /**
+   * @dev Amount of fyDai debt that will result from migrating Dai debt from MakerDAO to Yield
+   * @param {IYieldSeries} series series to act on.
+   * @param {string|BigNumber} fyDaiAmount debt amount
+   * @returns {Promise<BigNumber>} weth amount 
+   * @note call function
+   */
+  const fyDaiForDai = async (
+    series: IYieldSeries,
+    amount:number|BigNumber,
+  ) =>{
+    /* Processing and/or sanitizing input */
+    const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(amount.toString());
+    let preview:BigNumber|Error;
+    try {
+      preview = await previewPoolTx('buydai', series, parsedAmount);
+    }  catch (e) {
+      // eslint-disable-next-line no-console
+      console.log(e);
+      return BigNumber.from('0');
+    }
+    return preview;
+  };
 
-
-  const DaiForFyDai =async () => {
-    return null;
-  }
+  /**
+   * @dev Amount of dai debt that will result from migrating fyDai debt from Yield to MakerDAO
+   * @param {string|BigNumber} fyDaiAmount debt amount
+   * @param {IYieldSeries} series series to act on.
+   * @returns {Promise<BigNumber>} weth amount 
+   * @note call function
+   */
+  const daiForFyDai =async (
+    series: IYieldSeries,
+    amount:number|BigNumber,
+  ) => {
+    /* Processing and/or sanitizing input */
+    const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(amount.toString());
+    let preview:BigNumber|Error;
+    try {
+      preview = await previewPoolTx('buyFydai', series, parsedAmount);
+    }  catch (e) {
+      // eslint-disable-next-line no-console
+      console.log(e);
+      return BigNumber.from('0');
+    }
+    return preview;
+  };
 
   return {
     getCDPList,
@@ -184,6 +250,7 @@ export const useMaker = () => {
     makerDebtToDai,
     daiToMakerDebt,
     minWethForAmount,
-
+    fyDaiForDai,
+    daiForFyDai
   } as const;
 };
