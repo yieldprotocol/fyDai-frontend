@@ -87,6 +87,8 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
   const [ APR, setAPR ] = useState<number>();
   const [ fyDaiValue, setFYDaiValue ] = useState<number>(0);
   const [ minFYDaiOut, setMinFYDaiOut ] = useState<number>(0);
+  const [ maxFYDaiIn, setMaxFYDaiIn ] = useState<number>(0);
+  const [ minDaiOut, setMinDaiOut ] = useState<number>(0);
   const [ currentValue, setCurrentValue ] = useState<string>();
   const [ fromToken, setFromToken ] = useState<string>("Dai");
   const [ toToken, setToToken ] = useState<string>("fyDai");
@@ -122,6 +124,8 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
       if (!(preview instanceof Error)) {
         setFYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
         setMinFYDaiOut(parseFloat(ethers.utils.formatEther(preview)));
+        setMaxFYDaiIn(parseFloat(ethers.utils.formatEther(preview)));
+        setMinDaiOut(parseFloat(ethers.utils.formatEther(preview)));
         setAPR( calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) );      
       } else {
         /* if the market doesnt have liquidity just estimate from rate */
@@ -175,20 +179,36 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
         } else {
           setToQuantity(0);
         }
+      } else {
+        setFromQuantity( inputValue );
+        setTradeType( "sellFyDai" );
+        if (inputValue > 0) {
+          // should be minimum dai received
+          setToQuantity( Math.round((minDaiOut + Number.EPSILON) * 100) / 100 );
+        } else {
+          setToQuantity(0);
+        }        
       }
-    }
-    if (!inputFromQuantity) {
+    } else {
+      /* this option not working because I don't believe a method exists */
       if (fromToken === "Dai") {
         setToQuantity( inputValue );
         setTradeType( "buyFyDai" );
         if (inputValue > 0) {
-          setFromQuantity( 55.55 );
+          setFromQuantity( 12.34 );
+        } else {
+          setFromQuantity(0);
+        }
+      } else {
+        setToQuantity( inputValue );
+        setTradeType( "buyDai" );
+        if (inputValue > 0) {
+          setFromQuantity( Math.round((maxFYDaiIn + Number.EPSILON) * 100) / 100 );
         } else {
           setFromQuantity(0);
         }
       }
     }
-
     console.log("inputFromQuantity: ", inputFromQuantity)
     console.log("inputValue: ", inputValue)
     console.log("tradeType: ", tradeType)
