@@ -17,6 +17,7 @@ import { useSignerAccount } from './connectionHooks';
 import { useSigning } from './signingHook';
 import { useDsProxy } from './dsProxyHook';
 import { useController } from './controllerHook';
+import { usePool } from './poolHook';
 import { genTxCode } from '../utils';
 
 /**
@@ -40,6 +41,7 @@ export const useImportProxy = () => {
   const { addControllerDelegate, checkControllerDelegate } = useController();
   const { proxyExecute } = useDsProxy();
   const { delegationSignature, handleSignList } = useSigning();
+  const { previewPoolTx } = usePool();
 
   const { abi: importCdpProxyAbi } = ImportCdpProxy;
   const { abi: importProxyAbi } = ImportProxy;
@@ -106,7 +108,20 @@ export const useImportProxy = () => {
     // const checkSigs = await proxyContract.importPositionCheck(poolAddr);
     // console.log(checkSigs);
 
-    const maxDaiPrice = utils.toRay(2);
+    /* calculate expected max safety values  */  
+    let maxDaiPrice:BigNumber;         
+    const preview = await previewPoolTx('buydai', series, ethers.utils.parseEther('1'));   
+    if ( !(preview instanceof Error) ) {  
+      const one = utils.toRay(1);
+      const onePointOne = utils.toRay(1.1);
+      const rayPrice = preview.mul(BigNumber.from('1000000000'));
+      maxDaiPrice = one.add( utils.mulRay(onePointOne, rayPrice.sub(one) ));
+      console.log(maxDaiPrice.toString());
+    } else {
+      throw(preview);
+    }
+    /* for testing only - remove for prod */ 
+    maxDaiPrice = utils.toRay(2);
 
     /* build and use signature if required , else '0x' */
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
@@ -178,7 +193,21 @@ export const useImportProxy = () => {
       value: ethers.utils.parseEther('0')
     };
 
-    const maxDaiPrice = utils.toRay(2);
+    
+    /* calculate expected max safety values  */  
+    let maxDaiPrice:BigNumber;         
+    const preview = await previewPoolTx('buydai', series, ethers.utils.parseEther('1'));   
+    if ( !(preview instanceof Error) ) {  
+      const one = utils.toRay(1);
+      const onePointOne = utils.toRay(1.1);
+      const rayPrice = preview.mul(BigNumber.from('1000000000'));
+      maxDaiPrice = one.add( utils.mulRay(onePointOne, rayPrice.sub(one) ));
+      console.log(maxDaiPrice.toString());
+    }  else {
+      throw(preview);
+    }
+    /* for testing only - remove for prod */ 
+    maxDaiPrice = utils.toRay(2);
 
     /* build and use signature if required , else '0x' */
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
@@ -222,167 +251,11 @@ export const useImportProxy = () => {
     );
   };
 
-
-  /**
-   * @dev Convert from MakerDAO debt to Dai
-   * @param {string|BigNumber} daiAmount debt amount
-   * @returns {Promise<BigNumber>} dai amount
-   * @note call function
-   */
-  const debtToDai = async (
-    diaAmount:string|BigNumber,
-  ): Promise<BigNumber> => {
-    const parsedAmount= BigNumber.isBigNumber(diaAmount)? 
-      diaAmount : 
-      ethers.utils.parseEther(utils.cleanValue(diaAmount));
-    let res;
-    try {
-      res = await proxyContract.debtToDai(parsedAmount);
-    }  catch (e) {
-      // eslint-disable-next-line no-console
-      console.log(e);
-      res = false;
-    }
-    return res;
-  };
-
-  /**
-   * @dev Convert from Dai to MakerDAO debt
-   * @param {string|BigNumber} daiAmount debt amount
-   * @returns {Promise<BigNumber>} dai amount
-   * @note call function
-   */
-  const daiToDebt = async (
-    diaAmount:string|BigNumber,
-  ): Promise<BigNumber> => {
-    const parsedAmount= BigNumber.isBigNumber(diaAmount)? 
-      diaAmount : 
-      ethers.utils.parseEther(utils.cleanValue(diaAmount));
-    let res;
-    try {
-      res = await proxyContract.daiToDebt(parsedAmount);
-    }  catch (e) {
-      // eslint-disable-next-line no-console
-      console.log(e);
-      res = false;
-    }
-    return res;
-  };
-
-
-  /**
-   * @dev Minimum weth needed to collateralize an amount of dai in MakerDAO
-   * @param {string|BigNumber} daiAmount debt amount
-   * @returns {Promise<BigNumber>} dai amount
-   * @note call function
-   */
-  const wethForDai = async (
-    diaAmount:string|BigNumber,
-  ): Promise<BigNumber> => {
-    const parsedAmount= BigNumber.isBigNumber(diaAmount)? 
-      diaAmount : 
-      ethers.utils.parseEther(utils.cleanValue(diaAmount));
-    let res;
-    try {
-      res = await proxyContract.wethForDai(parsedAmount);
-    }  catch (e) {
-      // eslint-disable-next-line no-console
-      console.log(e);
-      res = false;
-    }
-    return res;
-  };
-
-  /**
-   * @dev Minimum weth needed to collateralize an amount of fyDai in Yield.
-   * @param {string|BigNumber} fyDaiAmount debt amount
-   * @returns {Promise<BigNumber>} weth amount 
-   * @note call function
-   */
-  const wethForFYDai = async (
-    fyDaiAmount:string|BigNumber,
-  ): Promise<BigNumber> => {
-    const parsedAmount= BigNumber.isBigNumber(fyDaiAmount)? 
-      fyDaiAmount : 
-      ethers.utils.parseEther(utils.cleanValue(fyDaiAmount));
-    let res;
-    try {
-      res = await proxyContract.wethForFYDai(parsedAmount);
-    }  catch (e) {
-      // eslint-disable-next-line no-console
-      console.log(e);
-      res = false;
-    }
-    return res;
-  };
-
-  /**
-   * @dev Amount of fyDai debt that will result from migrating Dai debt from MakerDAO to Yield
-   * @param {string|BigNumber} fyDaiAmount debt amount
-   * @param {IYieldSeries} series series to act on.
-   * @returns {Promise<BigNumber>} weth amount 
-   * @note call function
-   */
-  const fyDaiForDai = async (
-    series:IYieldSeries,
-    fyDaiAmount:string|BigNumber,
-  ): Promise<BigNumber> => {
-    const poolAddr = ethers.utils.getAddress(series.poolAddress);
-    const parsedAmount= BigNumber.isBigNumber(fyDaiAmount)? 
-      fyDaiAmount : 
-      ethers.utils.parseEther(utils.cleanValue(fyDaiAmount));
-    let res;
-    try {
-      res = await proxyContract.fyDaiForDai(poolAddr, parsedAmount);
-    }  catch (e) {
-      // eslint-disable-next-line no-console
-      console.log(e);
-      res = false;
-    }
-    return res;
-  };
-
-  /**
-   * @dev Amount of dai debt that will result from migrating fyDai debt from Yield to MakerDAO
-   * @param {string|BigNumber} fyDaiAmount debt amount
-   * @param {IYieldSeries} series series to act on.
-   * @returns {Promise<BigNumber>} weth amount 
-   * @note call function
-   */
-  const daiForFYDai = async (
-    series:IYieldSeries,
-    fyDaiAmount:string|BigNumber,
-  ): Promise<BigNumber> => {
-    const poolAddr = ethers.utils.getAddress(series.poolAddress);
-    const parsedAmount= BigNumber.isBigNumber(fyDaiAmount)? 
-      fyDaiAmount : 
-      ethers.utils.parseEther(utils.cleanValue(fyDaiAmount));
-    let res;
-    try {
-      res = await proxyContract.daiForFYDai(poolAddr, parsedAmount);
-    }  catch (e) {
-      // eslint-disable-next-line no-console
-      console.log(e);
-      res = false;
-    }
-    return res;
-  };
-
   return {
 
     /* exported import Proxy fns */
     importPosition,
     importVault,
-
-    /* call fns */ 
-    daiToDebt,
-    debtToDai,
-
-    wethForDai,
-    wethForFYDai,
-
-    fyDaiForDai,
-    daiForFYDai,
 
   } as const;
 };
