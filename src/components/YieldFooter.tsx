@@ -13,6 +13,7 @@ import { CgSleep as Moodlight } from 'react-icons/cg';
 import { logEvent } from '../utils/analytics';
 
 import { UserContext } from '../contexts/UserContext';
+import { useMaker } from '../hooks/makerHook';
 
 const handleExternal = (destination: string) => {
   logEvent({
@@ -44,7 +45,9 @@ const YieldFooter = (props: any) => {
 
   const [ showDisclaimer, setShowDisclaimer] = useState<boolean>(false);
 
-  const { state: { preferences }, actions: { updatePreferences } } = useContext(UserContext);
+  const { state: { preferences, authorization }, actions: { updatePreferences } } = useContext(UserContext);
+
+  const { genVault } = useMaker();
 
   const IconSize = '1.15rem';
   const IconGap = 'small';
@@ -92,16 +95,11 @@ const YieldFooter = (props: any) => {
           top: '2px',
         }}
       >
-
-
-
-
         <Box>
           <Text size='xxsmall' color='grey'>
             Current theme: 
           </Text>
         </Box>
-
         <Anchor
           onClick={()=>updatePreferences({ ...preferences, themeMode: cycleOptions(themeMode) })}
         >
@@ -109,7 +107,6 @@ const YieldFooter = (props: any) => {
           { themeMode === 'light'  && <Box align='center' direction='row' gap='xsmall'><Sun /> <Text size='xxsmall'>Light</Text></Box> }
           { themeMode === 'auto'  && <Box align='center' direction='row' gap='xsmall'><Clock /> <Text size='xxsmall'>Auto</Text></Box> }         
         </Anchor>
-
         {
           themeMode === 'light' && 
           false &&
@@ -120,8 +117,8 @@ const YieldFooter = (props: any) => {
             <Moodlight />
           </Anchor>
         }
-        
       </Box>
+      {/* <Box onClick={()=>genVault(authorization.dsProxyAddress)}> Gen vault </Box> */}
     </Footer>
   );
 };

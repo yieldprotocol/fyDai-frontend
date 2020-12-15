@@ -6,11 +6,14 @@ import * as utils from '../utils';
 import { YieldContext } from '../contexts/YieldContext';
 
 import Vat from '../contracts/Vat.json';
+import DssCdpManager from '../contracts/DssCdpManager.json';
 
 import { useSignerAccount } from './connectionHooks';
 import { useTxHelpers } from './txHooks';
 import { useDsProxy } from './dsProxyHook';
 import { usePool } from './poolHook';
+
+import { useSendTx } from './chainHooks';
 import { IYieldSeries } from '../types';
 
 /**
@@ -31,7 +34,7 @@ export const useMaker = () => {
   
   const getCdpsAbi = [{ 'constant':true, 'inputs':[{ 'internalType':'address', 'name':'manager', 'type':'address' }, { 'internalType':'address', 'name':'guy', 'type':'address' }], 'name':'getCdpsAsc', 'outputs':[{ 'internalType':'uint256[]', 'name':'ids', 'type':'uint256[]' }, { 'internalType':'address[]', 'name':'urns', 'type':'address[]' }, { 'internalType':'bytes32[]', 'name':'ilks', 'type':'bytes32[]' }], 'payable':false, 'stateMutability':'view', 'type':'function' }, { 'constant':true, 'inputs':[{ 'internalType':'address', 'name':'manager', 'type':'address' }, { 'internalType':'address', 'name':'guy', 'type':'address' }], 'name':'getCdpsDesc', 'outputs':[{ 'internalType':'uint256[]', 'name':'ids', 'type':'uint256[]' }, { 'internalType':'address[]', 'name':'urns', 'type':'address[]' }, { 'internalType':'bytes32[]', 'name':'ilks', 'type':'bytes32[]' }], 'payable':false, 'stateMutability':'view', 'type':'function' }];
 
-  const { fallbackProvider, account } = useSignerAccount();
+  const { fallbackProvider, account, signer } = useSignerAccount();
   const { state : { deployedContracts } } = useContext<any>(YieldContext);
 
   /* controller contract for txs */
@@ -42,19 +45,18 @@ export const useMaker = () => {
   const { proxyExecute } = useDsProxy();
   const { previewPoolTx } = usePool();
 
-
   useMemo(()=>{
     try {
       deployedContracts.Vat && fallbackProvider &&
       setVatContract( new ethers.Contract( 
         ethers.utils.getAddress(deployedContracts.Vat), 
         vatAbi,
-        fallbackProvider
+        fallbackProvider,
       ));
 
-      deployedContracts.getCdps && fallbackProvider &&
+      deployedContracts.GetCdps && fallbackProvider &&
       setGetCdpsContract( new ethers.Contract( 
-        ethers.utils.getAddress(deployedContracts.getCdps), 
+        ethers.utils.getAddress(deployedContracts.GetCdps), 
         getCdpsAbi,
         fallbackProvider
       ));
@@ -81,7 +83,7 @@ export const useMaker = () => {
     try {
       /* check for cdps registered to the dsProxy address in the manager and also directly in vat */ 
       [cdpList, cdpSingle] = await Promise.all([
-        getCdpsContract.getCdpsDesc(deployedContracts.dssCdpManager, dsProxyAddress),
+        getCdpsContract.getCdpsDesc(deployedContracts.DssCdpManager, dsProxyAddress),
         vatContract.urns(collateralBytes || ethers.utils.formatBytes32String('ETH-A'), dsProxyAddress)
       ]);
     }  catch (e) {
@@ -187,7 +189,7 @@ export const useMaker = () => {
     const collType = ethers.utils.formatBytes32String(collateralType);
     let spot;
     try {
-      [,, spot,,] = await vatContract(collType).ilks;
+      [,,spot,,] = await vatContract.ilks(collType);
     }  catch (e) {
       // eslint-disable-next-line no-console
       console.log(e);
@@ -244,6 +246,41 @@ export const useMaker = () => {
     return preview;
   };
 
+  /* using dai in account */
+
+  const genVault =async (
+    dsProxyAddress: string,
+    // amount:number|BigNumber,
+  ) => {
+    
+    /* Processing and/or sanitizing input */
+    // const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(amount.toString());
+    const cdpMgr = new ethers.Contract( 
+      ethers.utils.getAddress('0xbaE800e9C26eE50DfEBB40ef808812D54Da3b791'), 
+      DssCdpManager.abi,
+      signer
+    );
+
+    try {
+      
+      // await cdpMgr.open(ethers.utils.formatBytes32String('ETH-A'), dsProxyAddress).wait();
+      const cdp = await cdpMgr.last(dsProxyAddress);
+      const urn = await cdpMgr.urns(cdp);
+      const owns = await cdpMgr.owns(cdp);
+      console.log(cdp, urn, owns);
+
+      // await vatContract.hope(cdpMgr.address).wait();
+      // await cdpMgr.enter(dsProxyAddress, cdp).wait();
+      // await vatContract.move(dsProxyAddress, urn, ethers.utils.parseEther('100') ).wait();
+
+    }  catch (e) {
+      // eslint-disable-next-line no-console
+      console.log(e);
+      return BigNumber.from('0');
+    }
+    // return preview;
+  };
+
   return {
     getCDPList,
     getCDPData,
@@ -251,6 +288,7 @@ export const useMaker = () => {
     daiToMakerDebt,
     minWethForAmount,
     fyDaiForDai,
-    daiForFyDai
+    daiForFyDai,
+    genVault,
   } as const;
 };
