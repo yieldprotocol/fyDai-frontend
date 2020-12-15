@@ -139,12 +139,12 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                         fill="horizontal"
                         icon={
                           <Box
-                            height="1rem"
-                            width="1rem"
-                            style={{
-                              position: 'absolute',
-                              left: '1rem',
-                            }}
+                            height="1.5rem"
+                            width="1.5rem"
+                            // style={{
+                            //   position: 'absolute',
+                            //   left: '1rem',
+                            // }}
                           >
                             <Image src={x.image} fit="contain" />
                           </Box>

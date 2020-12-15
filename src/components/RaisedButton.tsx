@@ -48,9 +48,11 @@ function RaisedButton({ selected=true, ...props }:any ) {
       plain
       pad={{ horizontal:'large', vertical:'none' }}
       label={null}
+      icon={null}
     >
-      <Box pad={{ horizontal:'small' }} animation='zoomIn'>
-        <Text size='xxsmall'>
+      <Box pad={{ horizontal:'small' }} animation='zoomIn' direction='row' gap='medium' align='center' justify='center'>
+        {props.icon}
+        <Text size='small'>
           {props.label}
         </Text>
       </Box>
