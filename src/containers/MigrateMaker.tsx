@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import { NavLink } from 'react-router-dom';
 import { Box, Keyboard, TextInput, Text, ResponsiveContext, Collapsible } from 'grommet';
 import styled, { css } from 'styled-components';
@@ -24,6 +24,7 @@ import { useTxActive } from '../hooks/txHooks';
 import { usePool } from '../hooks/poolHook';
 import { useExportProxy } from '../hooks/exportProxyHook';
 import { useImportProxy } from '../hooks/importProxyHook';
+import { useMaker } from '../hooks/makerHook';
 
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
@@ -39,10 +40,6 @@ import AprBadge from '../components/AprBadge';
 import SeriesDescriptor from '../components/SeriesDescriptor';
 import Loading from '../components/Loading';
 import MakerMark from '../components/logos/MakerMark';
-
-
-
-
 
 interface IMigrateMakerProps {
   close?: any;
@@ -88,7 +85,8 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
   const activeSeries = seriesData.get(activeSeriesId);
 
   const { previewPoolTx }  = usePool();
-  const { importPosition, importVault } = useImportProxy();
+  const { importPosition, importVault,  } = useImportProxy();
+  const { minWethForAmount } = useMaker();
   const { exportPosition } = useExportProxy();
   const { estCollRatio: estimateRatio, calcAPR } = useMath();
   const [ txActive ] = useTxActive(['WITHDRAW']);
@@ -112,12 +110,13 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
   const [debtInputRef, setDebtInputRef] = useState<any>(null);
   const [ inputDirty, setInputDirty ] = useState<boolean>(false);
 
-
   /* token balances and calculated values */
   const [ fyDaiValue, setFYDaiValue ] = useState<number>(0);
   const [ APR, setAPR ] = useState<number>();
   const [ estRatio, setEstRatio ] = useState<number>(0);
-  const [ maxWithdraw, setMaxWithdraw ] = useState<string>();
+
+  const [ minCollateral, setMinCollateral ] = useState<string>();
+  const [ sugCollateral, setSugCollateral ] = useState<string>();
 
   const [ importDisabled, setImportDisabled ] = useState<boolean>(true);
   const [ exportDisabled, setExportDisabled ] = useState<boolean>(true);
@@ -130,15 +129,29 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
 
   const importProcedure = async () => {
     if (collInputValue || debtInputValue && !importDisabled) {
-      await importPosition(activeSeries, collInputValue, debtInputValue, selectedVault.vaultId);
+      await importPosition(
+        activeSeries, 
+        debouncedCollInput, 
+        debouncedDebtInput, 
+        selectedVault.vaultId);
       setCollInputValue(undefined);
       setDebtInputValue(undefined);
     }
   };
-
+  
   const importAllProcedure = async (id:number) => {
-    if (!collInputValue || !debtInputValue && !importDisabled) {
+    if (!debouncedCollInput || !debouncedDebtInput && !importDisabled) {
       await importVault(activeSeries, id);
+    }
+  };
+
+  const exportProcedure = async () => {
+    if (true) {
+      await exportPosition(
+        activeSeries,
+        '1', 
+        '1',
+        selectedVault.vaultId);
     }
   };
 
@@ -148,29 +161,20 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
   };
 
   /*
-  * Handle input (debounced debt input) changes:
+  * Handle  debt Input (debounced debt input) changes:
   * 1. dai to fyDai conversion and get APR (fyDai needed to compare with the approved allowance)
   * 2. calcalute yield APR
   * 3. calculate estimated collateralization ratio
   */
-
   useEffect(()=>{
-    // (collInputValue || debtInputValue) && setInputDirty(true);
-
-    // account && position && position.debtValue && debouncedInput>0 && ( async () => {
-    //   const newRatio = estimateRatio(
-    //     position.ethPosted, 
-    //     ( position.debtValue.add(ethers.utils.parseEther(debouncedInput)) )
-    //   ); 
-    //   newRatio && setEstRatio(parseFloat(newRatio.toString()));
-    // })();
-
     activeSeries && debouncedDebtInput>0 && ( async () => {
-      const preview = await previewPoolTx('buyDai', activeSeries, debouncedDebtInput);
-      
+      setCollInputValue('');
+      setMinCollateral(ethers.utils.formatEther(await minWethForAmount(debouncedDebtInput)));
+
+      const preview = await previewPoolTx('buyDai', activeSeries, debouncedDebtInput);     
       if (!(preview instanceof Error)) {
         setFYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
-        setAPR(calcAPR( ethers.utils.parseEther(debouncedDebtInput.toString()), preview, activeSeries.maturity ) );      
+        setAPR(calcAPR( ethers.utils.parseEther(debouncedDebtInput.toString()), preview, activeSeries.maturity ) );
       } else {
         /* if the market doesnt have liquidity just estimate from rate */
         const rate = await previewPoolTx('buyDai', activeSeries, 1);
@@ -180,9 +184,34 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
         setErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
       }
     })();
+    setImportDisabled(false);
+  }, [debouncedDebtInput, activeSeries]);
+
+  /*
+  * Handle collateral Input (debounced debt input) changes:
+  * 1. dai to fyDai conversion and get APR (fyDai needed to compare with the approved allowance)
+  * 2. calcalute yield APR
+  * 3. calculate estimated collateralization ratio
+  */
+  useEffect(()=>{
+    activeSeries && debouncedCollInput>0 && ( async () => { 
+      // const preview = await previewPoolTx('buyDai', activeSeries, debouncedDebtInput);     
+      // if (!(preview instanceof Error)) {
+      //   setFYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
+      //   setAPR(calcAPR( ethers.utils.parseEther(debouncedDebtInput.toString()), preview, activeSeries.maturity ) );      
+      // } else {
+      // /* if the market doesnt have liquidity just estimate from rate */
+      //   const rate = await previewPoolTx('buyDai', activeSeries, 1);
+      //   !(rate instanceof Error) && setFYDaiValue(debouncedDebtInput*parseFloat((ethers.utils.formatEther(rate))));
+      //   (rate instanceof Error) && setFYDaiValue(0);
+      //   setImportDisabled(true);
+      //   setErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
+      // }
+    })();
 
     setImportDisabled(false);
-  }, [debouncedCollInput, debouncedDebtInput, activeSeries]);
+
+  }, [debouncedCollInput, activeSeries]);
 
   /* Filter vaults and set selected */ 
   useEffect(()=>{
@@ -204,8 +233,9 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
 
   return (
     <Keyboard 
-      onEsc={() => { 
+      onEsc={() => {
         if (collInputValue || debtInputValue) {
+          console.log('escapde');
           document.activeElement === collInputRef && setCollInputValue(undefined);
           document.activeElement === debtInputRef && setDebtInputValue(undefined);
         } else close();
@@ -311,8 +341,7 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
           </Box>
           <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
             <TextInput
-              // ref={(el1:any) => {el1 && !mobile && el1.focus(); setDebtInputRef(el1);}} 
-              ref={debtInputRef}
+              ref={(el1:any) => setDebtInputRef(el1)} 
               type='number'
               placeholder='DAI'
               value={debtInputValue || ''}
@@ -333,8 +362,8 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
           </Box>
           <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
             <TextInput
-              // ref={(el1:any) => {el1 && !mobile && el1.focus(); setCollInputRef(el1);}} 
-              ref={collInputRef}
+              ref={(el2:any)=>setCollInputRef(el2)} 
+              // ref={collInputRef}
               type='number'
               placeholder='ETH'
               value={collInputValue || ''}
@@ -343,12 +372,23 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
               icon={isCollLol ? <span role='img' aria-label='lol'>😂</span> : <EthMark />}
             />
             { 
-            debtInputValue && 
+            // debtInputValue && 
+            minCollateral &&
+            collInputValue !== cleanValue(minCollateral, 6) &&
             <FlatButton 
               label='use suggested collateral'
-              onClick={()=>maxWithdraw && setCollInputValue(cleanValue(maxWithdraw))}
+              onClick={() => setCollInputValue(cleanValue(minCollateral, 6))}
             />
-            }
+            } 
+            { 
+              // debtInputValue &&
+              minCollateral &&
+              collInputValue === cleanValue(minCollateral, 6) &&
+              <FlatButton 
+                label='clear'
+                onClick={() => setCollInputValue('')}
+              />
+              }
           </InputWrap>
         </Box>
 
@@ -357,6 +397,7 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
             <InfoGrid entries={[
               {
                 label: 'Fixed Rate',
+                labelExtra: 'based on the amount of Dai debt',
                 visible: !!debtInputValue,
                 active: true,
                 loading: false, 
@@ -365,12 +406,13 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
                 valueExtra: null, 
               },
               {
-                label: 'Suggested Collateral',
+                label: 'Mimimal Collateral',
+                labelExtra: `required for ${debouncedDebtInput} debt`,
                 visible: !!debtInputValue,
                 active: true,
                 loading: false,           
-                value: ' x Eth',
-                valuePrefix: '~',
+                value: minCollateral ? `${minCollateral && cleanValue(minCollateral, 4)} Eth` : '',
+                valuePrefix: null,
                 valueExtra: null,
               },
             ]}
@@ -413,7 +455,7 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
                     </Box>
                     : 
                     <FlatButton 
-                      onClick={()=>console.log('Exporting Yield to Maker')}
+                      onClick={()=>exportProcedure()}
                       label={
                         <Box direction='row' gap='small' align='center'>
                           <Text size='xsmall' color='text-weak'>
@@ -425,8 +467,7 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
                   }
           </Box>
         }
-        </Box>
-                    
+        </Box>       
       </Box>}
 
       {mobile && 
