@@ -32,16 +32,6 @@ export const useDsProxy = () => {
   /* Preset the dsProxy contract for the user to be used with all fns */
   const { abi: DsProxyAbi } = DSProxy;
 
-  // const [ dsProxyContract, setDsProxyContract] = useState<any>();
-  // useEffect(()=>{
-  //     authorization?.dsProxyAddress && signer &&
-  //     setDsProxyContract( new ethers.Contract(
-  //       ethers.utils.getAddress(authorization?.dsProxyAddress),
-  //       DsProxyAbi,
-  //       signer
-  //     ));
-  // }, [signer, authorization, DsProxyAbi]);
-
   const proxyExecute = async (
     contractAddress: string,
     calldata: any,

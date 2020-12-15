@@ -82,10 +82,9 @@ const TxProvider = ({ children }:any) => {
           setPendingCache([]);
         })
         );
-
         // eslint-disable-next-line no-console
         console.log('cache txs processed');
-        setPendingCache( state.pendingTxs );
+        // setPendingCache( state.pendingTxs );
         setHasReadCache(true);
       }
     })();
