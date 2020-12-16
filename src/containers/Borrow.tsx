@@ -39,8 +39,6 @@ import Loading from '../components/Loading';
 
 import { logEvent } from '../utils/analytics';
 
-
-
 interface IBorrowProps {
   borrowAmount?:number|null;
   openConnectLayer:any;
@@ -49,8 +47,7 @@ interface IBorrowProps {
 const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
 
   const navHistory = useHistory();
-
-  const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
+  const { state: { activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
   const activeSeries = seriesData.get(activeSeriesId);
 
   /* check if the user sent in any requested amount in the url */ 
@@ -340,7 +337,6 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
                 valuePrefix: null,
                 valueExtra: null,
               },
-
               {
                 label: 'Total Debt',
                 labelExtra: 'across all yield series',

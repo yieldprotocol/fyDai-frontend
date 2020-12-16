@@ -250,25 +250,20 @@ export const useMaker = () => {
 
   const genVault =async (
     dsProxyAddress: string,
-    // amount:number|BigNumber,
-  ) => {
-    
-    /* Processing and/or sanitizing input */
-    // const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(amount.toString());
+  ) => { 
+
     const cdpMgr = new ethers.Contract( 
-      ethers.utils.getAddress('0xbaE800e9C26eE50DfEBB40ef808812D54Da3b791'), 
+      ethers.utils.getAddress('0x1476483dD8C35F25e568113C5f70249D3976ba21'), 
       DssCdpManager.abi,
       signer
     );
 
-    try {
-      
+    try {  
       // await cdpMgr.open(ethers.utils.formatBytes32String('ETH-A'), dsProxyAddress).wait();
       const cdp = await cdpMgr.last(dsProxyAddress);
       const urn = await cdpMgr.urns(cdp);
       const owns = await cdpMgr.owns(cdp);
-      console.log(cdp, urn, owns);
-
+      console.log(cdp.toString(), urn, owns);
       // await vatContract.hope(cdpMgr.address).wait();
       // await cdpMgr.enter(dsProxyAddress, cdp).wait();
       // await vatContract.move(dsProxyAddress, urn, ethers.utils.parseEther('100') ).wait();
@@ -276,9 +271,7 @@ export const useMaker = () => {
     }  catch (e) {
       // eslint-disable-next-line no-console
       console.log(e);
-      return BigNumber.from('0');
     }
-    // return preview;
   };
 
   return {

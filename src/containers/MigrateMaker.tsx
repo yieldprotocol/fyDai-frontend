@@ -116,13 +116,14 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
   const [ estRatio, setEstRatio ] = useState<number>(0);
 
   const [ minCollateral, setMinCollateral ] = useState<string>();
-  const [ sugCollateral, setSugCollateral ] = useState<string>();
+  const [ minSafeCollateral, setMinSafeCollateral ] = useState<string>();
 
   const [ importDisabled, setImportDisabled ] = useState<boolean>(true);
   const [ exportDisabled, setExportDisabled ] = useState<boolean>(true);
 
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
-  const [ errorMsg, setErrorMsg] = useState<string|null>(null);
+  const [ collErrorMsg, setCollErrorMsg] = useState<string|null>(null);
+  const [ debtErrorMsg, setDebtErrorMsg] = useState<string|null>(null);
 
   const isCollLol = useIsLol(collInputValue);
   const isDebtLol = useIsLol(debtInputValue);
@@ -146,11 +147,11 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
   };
 
   const exportProcedure = async () => {
-    if (true) {
+    if ( true ) {
       await exportPosition(
         activeSeries,
-        '1', 
-        '1',
+        activeSeries.fyDaiBalance,
+        await minWethForAmount(activeSeries.fyDaiBalance),
         selectedVault.vaultId);
     }
   };
@@ -168,9 +169,12 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
   */
   useEffect(()=>{
     activeSeries && debouncedDebtInput>0 && ( async () => {
+      if ( debouncedDebtInput > parseFloat(selectedVault.vaultMakerDebt_) ) {
+        setDebtErrorMsg('Amount exceeds the debt in the maker vault');
+      } else (setDebtErrorMsg(''));
+
       setCollInputValue('');
       setMinCollateral(ethers.utils.formatEther(await minWethForAmount(debouncedDebtInput)));
-
       const preview = await previewPoolTx('buyDai', activeSeries, debouncedDebtInput);     
       if (!(preview instanceof Error)) {
         setFYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
@@ -181,10 +185,10 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
         !(rate instanceof Error) && setFYDaiValue(debouncedDebtInput*parseFloat((ethers.utils.formatEther(rate))));
         (rate instanceof Error) && setFYDaiValue(0);
         setImportDisabled(true);
-        setErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
+        setDebtErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
       }
     })();
-    setImportDisabled(false);
+    
   }, [debouncedDebtInput, activeSeries]);
 
   /*
@@ -194,7 +198,16 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
   * 3. calculate estimated collateralization ratio
   */
   useEffect(()=>{
+
+    if ( selectedVault && debouncedCollInput > parseFloat(selectedVault.vaultCollateral_) ) {
+      setCollErrorMsg('Not enough collateral in the maker vault');
+    } else (setCollErrorMsg(''));
+
     activeSeries && debouncedCollInput>0 && ( async () => { 
+      if (minCollateral && (debouncedCollInput < parseFloat(minCollateral)) ) {
+        setCollErrorMsg('That is not enough collateral to cover the debt you wish to migrate');
+      }
+          
       // const preview = await previewPoolTx('buyDai', activeSeries, debouncedDebtInput);     
       // if (!(preview instanceof Error)) {
       //   setFYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
@@ -208,8 +221,6 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
       //   setErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
       // }
     })();
-
-    setImportDisabled(false);
 
   }, [debouncedCollInput, activeSeries]);
 
@@ -230,6 +241,18 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
   useEffect(()=>{
     filteredMakerVaults.length>0 && setSelectedVaultIndex(0);
   }, [filteredMakerVaults]);
+
+  /* Handle minSafe calc */
+  useEffect(()=>{
+    minCollateral && 
+    setMinSafeCollateral( ((parseFloat(minCollateral)/3)*5).toString() );
+  }, [ minCollateral ]);
+
+  /* Handle import/export disabling deposits */
+  useEffect(()=>{
+    (debtInputValue > 0  && collInputValue > 0)
+      ? setImportDisabled(false): setImportDisabled(true);
+  }, [ collInputValue, debtInputValue ]);
 
   return (
     <Keyboard 
@@ -336,10 +359,10 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
         </InsetBox>
 
         <Box direction='row'>
-          <Box basis='50%' justify='center'>
-            Debt to Import: 
+          <Box basis='50%' direction='row' align='center' gap='small' justify='start' >
+            <MakerMark /> Debt to Import: 
           </Box>
-          <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
+          <InputWrap errorMsg={debtErrorMsg} warningMsg={warningMsg}>
             <TextInput
               ref={(el1:any) => setDebtInputRef(el1)} 
               type='number'
@@ -360,7 +383,7 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
           <Box basis='50%' justify='center'>
             Collateral to Import: 
           </Box>
-          <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
+          <InputWrap errorMsg={collErrorMsg} warningMsg={warningMsg}>
             <TextInput
               ref={(el2:any)=>setCollInputRef(el2)} 
               // ref={collInputRef}
@@ -373,17 +396,17 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
             />
             { 
             // debtInputValue && 
-            minCollateral &&
-            collInputValue !== cleanValue(minCollateral, 6) &&
+            minSafeCollateral &&
+            collInputValue !== cleanValue(minSafeCollateral, 6) &&
             <FlatButton 
               label='use suggested collateral'
-              onClick={() => setCollInputValue(cleanValue(minCollateral, 6))}
+              onClick={() => setCollInputValue( cleanValue(minSafeCollateral, 6))}
             />
             } 
             { 
               // debtInputValue &&
-              minCollateral &&
-              collInputValue === cleanValue(minCollateral, 6) &&
+              minSafeCollateral &&
+              collInputValue === cleanValue(minSafeCollateral, 6) &&
               <FlatButton 
                 label='clear'
                 onClick={() => setCollInputValue('')}
@@ -397,7 +420,7 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
             <InfoGrid entries={[
               {
                 label: 'Fixed Rate',
-                labelExtra: 'based on the amount of Dai debt',
+                labelExtra: `if migrating ${debouncedDebtInput} debt`,
                 visible: !!debtInputValue,
                 active: true,
                 loading: false, 
@@ -415,6 +438,16 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
                 valuePrefix: null,
                 valueExtra: null,
               },
+              {
+                label: 'Suggested Collateral',
+                labelExtra: 'ratio of ~250%',
+                visible: !!debtInputValue,
+                active: true,
+                loading: false,           
+                value: minSafeCollateral ? `${minSafeCollateral && cleanValue(minSafeCollateral, 4)} Eth` : '',
+                valuePrefix: null,
+                valueExtra: null,
+              },
             ]}
             />
           </Collapsible>
@@ -425,7 +458,7 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
           label='Migrate Maker Vault'
           disabled={importDisabled}
           hasPoolDelegatedProxy={true}
-          clearInput={()=>setCollInputValue(undefined)}
+          clearInput={()=>{setCollInputValue(undefined); setDebtInputValue(undefined);}}
         />
 
         <Box direction='row' fill justify='between'>
@@ -456,10 +489,11 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
                     : 
                     <FlatButton 
                       onClick={()=>exportProcedure()}
+                      disabled={!importDisabled}
                       label={
                         <Box direction='row' gap='small' align='center'>
                           <Text size='xsmall' color='text-weak'>
-                            <Text weight='bold' color={activeSeries?.seriesColor}>Export</Text> Yield series debt to Maker
+                            <Text weight='bold' color={activeSeries?.seriesColor}>Export</Text> Yield series debt ( <Text size='xxsmall'><DaiMark /> {activeSeries.ethDebtDai_} </Text> ) to Maker
                           </Text>
                         </Box>
                     }
