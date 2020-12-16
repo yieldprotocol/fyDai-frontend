@@ -314,7 +314,7 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
           <Box onClick={()=>selectVault('prev')} justify='center' align='center' hoverIndicator={modColor(makerBackColor, -25)}>
             <ChevronLeft size='30px' color={selectedVaultIndex===0?makerBackColor:makerTextColor} />
           </Box>
-          { 
+          {
             filteredMakerVaults.length>0 ?         
               filteredMakerVaults.map( (x:any, i:number) => {
                 if (selectedVaultIndex === i) {
@@ -331,7 +331,7 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
                           background={makerBackColor}
                           label={ 
                             <Box pad='small'>
-                              <Text size='xxsmall'> 1-Click <MakerMark /> import all </Text>
+                              <Text size='xxsmall'> 1-Click <MakerMark /> import entire vault </Text>
                             </Box>
                         }
                         />
