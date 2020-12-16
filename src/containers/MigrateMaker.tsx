@@ -330,7 +330,7 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
                           background={makerBackColor}
                           label={ 
                             <Box pad='small'>
-                              <Text size='xxsmall'> 1-Click <MakerMark /> vault import </Text>
+                              <Text size='xxsmall'> 1-Click <MakerMark /> import all </Text>
                             </Box>
                         }
                         />
