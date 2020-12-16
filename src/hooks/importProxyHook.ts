@@ -90,7 +90,7 @@ export const useImportProxy = () => {
     wethAmount:string|BigNumber,
     debtAmount:string|BigNumber,
     cdpId:number,
-    viaCdpMan:boolean=false, /* default to using cdpManager */
+    viaCdpMan:boolean=true, /* default to using cdpManager */
   ) => {
 
     /* Processing and sanitizing input */
@@ -185,7 +185,7 @@ export const useImportProxy = () => {
   const importVault= async (
     series:IYieldSeries,
     cdpId:number,
-    viaCdpMan:boolean=false, /* default to using cdpManager */
+    viaCdpMan:boolean=true, /* default to using cdpManager */
   ) => {
 
     /* Processing and sanitizing input */

@@ -159,6 +159,7 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
   const selectVault = (prevOrNext:'next'|'prev') => {
     prevOrNext === 'prev' && selectedVaultIndex > 0 && setSelectedVaultIndex( selectedVaultIndex-1 );
     prevOrNext === 'next' && selectedVaultIndex < filteredMakerVaults.length-1 && setSelectedVaultIndex( selectedVaultIndex+1 );
+    setDebtInputValue(undefined);
   };
 
   /*
