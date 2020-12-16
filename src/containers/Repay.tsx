@@ -121,7 +121,7 @@ function Repay({ close }:IRepayProps) {
       }}
       target='document'
     >
-      <SeriesDescriptor activeView='borrow' minimized />
+      {!activeSeries?.isMature() && !mobile && <SeriesDescriptor activeView='borrow' minimized />}
       
       { !txActive &&
         <Box
