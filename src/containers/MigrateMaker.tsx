@@ -17,6 +17,7 @@ import { cleanValue, modColor } from '../utils';
 
 import { UserContext } from '../contexts/UserContext';
 import { SeriesContext } from '../contexts/SeriesContext';
+import { YieldContext } from '../contexts/YieldContext';
 
 import { useDebounce, useIsLol } from '../hooks/appHooks';
 import { useMath } from '../hooks/mathHooks';
@@ -473,9 +474,9 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
                 </Box>
                 }
             />
-          </Box>  
-
-          { 
+          </Box>
+          
+          {/* { 
           !mobile &&
           <Box alignSelf='end' margin={{ top:'medium' }}>
             {
@@ -501,7 +502,7 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
                     />                
                   }
           </Box>
-        }
+        } */ }
         </Box>       
       </Box>}
 
