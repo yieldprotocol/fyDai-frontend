@@ -143,7 +143,7 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
       }}
       target='document'
     >
-      <SeriesDescriptor activeView='pool' minimized />
+      {!activeSeries?.isMature() && !mobile && <SeriesDescriptor activeView='pool' minimized />}
       
       {!txActive &&  
       <Box 

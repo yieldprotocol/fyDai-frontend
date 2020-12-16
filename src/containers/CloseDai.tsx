@@ -121,7 +121,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
       }}
       target='document'
     >
-      <SeriesDescriptor activeView='lend' minimized />
+      {!activeSeries?.isMature() && !mobile && <SeriesDescriptor activeView='lend' minimized />}
 
       <Box    
         width={!mobile?{ min:'620px', max:'620px' }: undefined}
