@@ -1,7 +1,7 @@
 import React, { useEffect, useContext, createContext, useReducer } from 'react';
 import { ethers } from 'ethers';
 
-import { cleanValue } from '../utils';
+import { cleanValue, mulRay } from '../utils';
 
 import { YieldContext } from './YieldContext';
 
@@ -12,13 +12,14 @@ import { useController } from '../hooks/controllerHook';
 import { useEvents } from '../hooks/eventHooks';
 import { useSignerAccount } from '../hooks/connectionHooks';
 import { useDsRegistry } from '../hooks/dsRegistryHook';
+import { useMaker } from '../hooks/makerHook';
+
 
 const UserContext = createContext<any>({});
 
 // reducer
 function reducer(state: any, action: any) {
   switch (action.type) {
-
     case 'updatePreferences':
       return {
         ...state,
@@ -38,6 +39,11 @@ function reducer(state: any, action: any) {
       return {
         ...state,
         txHistory: action.payload,
+      };
+    case 'updateMakerVaults':
+      return {
+        ...state,
+        makerVaults: action.payload,
       };
     case 'isLoading':
       return {
@@ -63,7 +69,7 @@ const initState = {
     showDisclaimer: true,
     themeMode:'auto',
   },
-  makerData:{},
+  makerVaults:[],
 };
 
 const UserProvider = ({ children }: any) => {
@@ -80,6 +86,8 @@ const UserProvider = ({ children }: any) => {
   /* hook declarations */
   const { getEventHistory, parseEventList } = useEvents();
   const { getBalance } = useToken();
+
+  const { getCDPList, getCDPData } = useMaker();
 
   const { getDsProxyAddress } = useDsRegistry();
   const { 
@@ -382,24 +390,60 @@ const UserProvider = ({ children }: any) => {
     return { allPrefs };
   };
 
+  /**
+   * @dev Gets maker vault data.
+   */
+  const _getMakerVaults = async (
+    dsProxyAddress:string,
+  ) => {
+    let cdpList: any = [];
+    if (dsProxyAddress && dsProxyAddress !== '0x0000000000000000000000000000000000000000') {
+      cdpList = await getCDPList(dsProxyAddress, 'ETH-A');
+    }
+    const _cdpData:any = await Promise.all(cdpList[1].map((x:string) => getCDPData(x, 'ETH-A') ) );
+    const _makerData = cdpList[0].map((x:any, i:number) => {
+      const { rate } = yieldState.feedData.ilks;
+      return {
+        'vaultId': x.toString(),
+        'vaultCollateralType': ethers.utils.parseBytes32String(cdpList[2][i]),
+        'vaultAddress': cdpList[1][i],
+        'vaultDisplayName': `${ethers.utils.parseBytes32String(cdpList[2][i])} Vault #${x.toString()}`,
+        'vaultCollateral': _cdpData[i][0],
+        'vaultCollateral_': cleanValue(ethers.utils.formatEther(_cdpData[i][0]), 2), 
+        'vaultMakerDebt': _cdpData[i][1],
+        'vaultMakerDebt_': cleanValue(ethers.utils.formatEther(_cdpData[i][1]), 2),
+        'vaultDaiDebt': mulRay(_cdpData[i][1], rate),
+        'vaultDaiDebt_': _cdpData[i][1].mul(rate).toString(),   
+      };
+    });
+    dispatch( { 'type': 'updateMakerVaults', 'payload':  _makerData });
+    console.log(_makerData);
+  };
+
   /* initiate the user */
   const initUser = async () => {
     /* Init start */
     dispatch({ type: 'isLoading', payload: true });
     try {
-      await Promise.all([
+      const [ ,auths] = await Promise.all([
         _getPosition(),
         _getAuthorizations(),
-        _getTxHistory(false),
         _updatePreferences(null),
       ]);
-      console.log('User data updated');
+      console.log('User basics data updated');
+      /* Then get maker data if available */ 
+      await _getMakerVaults(auths?.dsProxyAddress);
+      await _getTxHistory(false);
+      console.log('User extra data updated');
+      
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log(e);
     }
+
     /* Init end */
     dispatch({ type: 'isLoading', payload: false });
+
   };
 
   useEffect(()=>{
@@ -407,7 +451,6 @@ const UserProvider = ({ children }: any) => {
     !yieldState?.yieldLoading && account && initUser();
     // If user has changed, rebuild and re-cache the history
     !yieldState?.yieldLoading && account && !(txHistory?.account === account) && _getTxHistory(true);
-
     // re-update preferences 
     !yieldState?.yieldLoading && _updatePreferences(null);
 

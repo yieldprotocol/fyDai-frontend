@@ -200,7 +200,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
             label={
               <Box direction='row' gap='medium' align='center'>
                 <ArrowLeft color='text-weak' />
-                <Text size='small' color='text-weak'> go back </Text>
+                <Text size='xsmall' color='text-weak'> go back </Text>
               </Box>
             }
           />

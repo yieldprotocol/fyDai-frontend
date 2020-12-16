@@ -217,7 +217,7 @@ export const usePoolProxy = () => {
         const one = utils.toRay(1);
         const pointNine = utils.toRay(0.9);
         const rayPrice = preview.mul(BigNumber.from('1000000000'));
-        minFYDaiPrice = one.add(pointNine.mul( rayPrice.sub(one) ));
+        minFYDaiPrice = one.add( utils.mulRay(pointNine, rayPrice.sub(one) ));
 
         console.log(minFYDaiPrice.toString());
         // minFYDaiPrice = utils.divRay( preview.mul(BigNumber.from('1000000000')), utils.toRay(1.1)); // 1+ 0.9*(price - 1)

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { ethers } from 'ethers';
 import { useParams, useHistory, NavLink } from 'react-router-dom';
-import { Keyboard, Box, TextInput, Text, ThemeContext, ResponsiveContext, Collapsible, Layer } from 'grommet';
+import { Keyboard, Box, TextInput, Text, ThemeContext, ResponsiveContext, Collapsible, Layer, Anchor } from 'grommet';
 import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 import { VscHistory as History } from 'react-icons/vsc';
 
@@ -19,8 +19,10 @@ import { usePool } from '../hooks/poolHook';
 import { useBorrowProxy } from '../hooks/borrowProxyHook';
 
 import Repay from './Repay';
+import MigrateMaker from './MigrateMaker';
 
 import DaiMark from '../components/logos/DaiMark';
+import MakerMark from '../components/logos/MakerMark';
 import SeriesDescriptor from '../components/SeriesDescriptor';
 import InputWrap from '../components/InputWrap';
 import TxStatus from '../components/TxStatus';
@@ -45,15 +47,14 @@ interface IBorrowProps {
 const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
 
   const navHistory = useHistory();
-
-  const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
+  const { state: { activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
   const activeSeries = seriesData.get(activeSeriesId);
 
   /* check if the user sent in any requested amount in the url */ 
   const { amnt }:any = useParams();
 
   const { state: userState, actions: userActions } = useContext(UserContext);
-  const { position } = userState;
+  const { position, makerVaults, userLoading } = userState;
   const { 
     ethPosted,
     ethPosted_,
@@ -79,6 +80,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
 
   /* flags */
   const [ repayOpen, setRepayOpen ] = useState<boolean>(false);
+  const [ migrateOpen, setMigrateOpen ] = useState<boolean>(false);
   const [ histOpen, setHistOpen ] = useState<boolean>(false);
 
   const [showTxPending, setShowTxPending] = useState<boolean>(false);
@@ -94,7 +96,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
   /* internal component state */
   const [ borrowDisabled, setBorrowDisabled ] = useState<boolean>(true);
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
-  const [ errorMsg, setErrorMsg] = useState<string|null>(null);
+  const [ errorMsg, setErrorMsg] = useState<string|any>(null);
   const isLol = useIsLol(inputValue);
 
   const [inputRef, setInputRef] = useState<any>(null);
@@ -176,7 +178,15 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
       !(ethPosted.isZero())
     ) {
       setWarningMsg(null);
-      setErrorMsg('That amount exceeds the amount of Dai you can borrow based on your collateral'); 
+      setErrorMsg(
+        <Box direction='row-responsive' gap='small'>
+          <Text size='xsmall'>That amount exceeds the amount of Dai you can borrow based on your collateral.</Text>
+          <RaisedButton 
+            label={<Box pad={{ horizontal:'small' }}><Text size='xsmall'>Manage Collateral</Text></Box>}
+            onClick={()=>navHistory.push('/post/')}
+          />
+        </Box>
+      ); 
     } else if (
       debouncedInput && 
         ( debouncedInput > Math.round(maxDaiAvailable_- maxDaiAvailable_*0.05 ) &&
@@ -211,6 +221,10 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
           <Repay close={()=>setRepayOpen(false)} />      
         </Layer>}
 
+        { migrateOpen && makerVaults.length>0 &&
+          <Layer onClickOutside={()=>setMigrateOpen(false)} responsive={true}>
+            <MigrateMaker close={()=>setMigrateOpen(false)} />
+          </Layer>}
 
         { histOpen && 
         <HistoryWrap closeLayer={()=>setHistOpen(false)}>
@@ -220,7 +234,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
           />
         </HistoryWrap>}
 
-        <SeriesDescriptor activeView='borrow'>
+        <SeriesDescriptor activeView='borrow' greyedOut={repayOpen || migrateOpen || histOpen}>
           <InfoGrid
             alt
             entries={[
@@ -323,7 +337,6 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
                 valuePrefix: null,
                 valueExtra: null,
               },
-
               {
                 label: 'Total Debt',
                 labelExtra: 'across all yield series',
@@ -373,16 +386,33 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
           round='small'
           pad="large"
           gap='small'
-        >       
+        > 
           <Box gap='small' align='center' fill='horizontal'>
-            
+                     
             { !activeSeries?.isMature() && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
             <Box gap='medium' align='center' fill='horizontal'>
-              <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to borrow</Text>
+
+              <Box direction='row' justify='between' fill>
+                <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to borrow</Text>
+                { 
+                  !mobile &&  !userLoading &&
+                  <RaisedButton
+                    animation='slideRight'
+                    disabled={!!inputValue || makerVaults.length===0}
+                    label={
+                      <Box pad='xsmall' gap='small' direction='row' align='center'>
+                        <Box><MakerMark /></Box>
+                        <Text size='xsmall'>Migrate a Maker vault</Text>
+                      </Box>
+                    }
+                    onClick={()=>setMigrateOpen(true)}
+                  />
+                }
+              </Box>
 
               <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
                 <TextInput
-                  ref={(el:any) => {el && !repayOpen && !mobile && el.focus(); setInputRef(el);}} 
+                  ref={(el:any) => {el && !repayOpen && !migrateOpen && !mobile && el.focus(); setInputRef(el);}} 
                   type="number"
                   placeholder={!mobile ? 'Enter the amount of Dai to borrow': 'DAI'} 
                   value={inputValue || ''}

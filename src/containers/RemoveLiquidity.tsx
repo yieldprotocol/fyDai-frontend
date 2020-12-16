@@ -26,6 +26,7 @@ import YieldMark from '../components/logos/YieldMark';
 import YieldMobileNav from '../components/YieldMobileNav';
 
 import { logEvent } from '../utils/analytics';
+import SeriesDescriptor from '../components/SeriesDescriptor';
 
 interface IRemoveLiquidityProps {
   openConnectLayer?:any
@@ -142,6 +143,8 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
       }}
       target='document'
     >
+      <SeriesDescriptor activeView='pool' minimized />
+      
       {!txActive &&  
       <Box 
         width={!mobile?{ min:'600px', max:'600px' }: undefined}
@@ -163,7 +166,7 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
             onChange={(event:any) => setInputValue(( cleanValue(event.target.value, 6)))}
             icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <YieldMark />}
           />
-          <RaisedButton 
+          <FlatButton 
             label='Maximum'
             onClick={()=>setInputValue( cleanValue(ethers.utils.formatEther(activeSeries?.poolTokens), 6) )}
           />
@@ -226,7 +229,7 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
             label={
               <Box direction='row' gap='medium' align='center'>
                 <ArrowLeft color='text-weak' />
-                <Text size='small' color='text-weak'> go back </Text>
+                <Text size='xsmall' color='text-weak'> go back </Text>
               </Box>
                 }
           />
