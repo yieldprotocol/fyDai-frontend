@@ -31,7 +31,7 @@ export const useExportProxy = () => {
 
   /* contexts */
   const  { state: { deployedContracts } }  = useContext<any>(YieldContext);
-  const  { state: { authorization: { hasDelegatedDsProxy } } }  = useContext<any>(UserContext);
+  const  { state: { authorization: { dsProxyAddress } } }  = useContext<any>(UserContext);
 
   /* hooks */ 
   const { account, signer } = useSignerAccount();
@@ -96,8 +96,8 @@ export const useExportProxy = () => {
     };
 
     /* Check the signature requirements */
-    const checkSigs = await proxyContract.exportPositionCheck();
-    console.log(checkSigs);
+    const checkSigs = await cdpProxyContract.exportCdpPositionCheck(cdpId);
+    console.log('check', checkSigs);
 
     const maxFyDaiPrice = BigNumber.from('1');
 
@@ -131,11 +131,13 @@ export const useExportProxy = () => {
 
     
     console.log(poolAddr, cdpId, parsedWeth, parsedFyDai, maxFyDaiPrice, signedSigs.get('controllerSig'));
+
     /* 
     contract fn used: 
     exportPositionWithSignature(IPool pool, uint256 wethAmount, uint256 fyDaiAmount, uint256 maxFYDaiPrice, bytes memory controllerSig)
     exportCdpPositionWithSignature(IPool pool, uint256 cdp, uint256 wethAmount, uint256 fyDaiAmount, uint256 maxFYDaiPrice, bytes memory controllerSig)
     */
+
     const calldata = viaCdpMan ? 
       cdpProxyContract.interface.encodeFunctionData(
         'exportCdpPositionWithSignature', 
@@ -148,10 +150,10 @@ export const useExportProxy = () => {
 
     /* send to the proxy for execution */
     await proxyExecute( 
-      viaCdpMan? cdpProxyContract.address : proxyContract.address, 
+      viaCdpMan ? cdpProxyContract.address : proxyContract.address, 
       calldata,
       overrides,
-      { tx:null, msg: `Exporting Yield Vault of ${parsedFyDai} Debt to MakerDao`, type:'EXPORT_POSITION', series  }
+      { tx:null, msg: `Exporting Yield debt from ${series.displayName} to MakerDao`, type:'EXPORT_POSITION', series  }
     );
   };
 
