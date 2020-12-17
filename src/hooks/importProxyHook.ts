@@ -212,7 +212,7 @@ export const useImportProxy = () => {
       value: ethers.utils.parseEther('0')
     };
  
-    /* calculate expected max safety values  */  
+    /* calculate expected max safety values */  
     let maxDaiPrice:BigNumber; 
     const preview = await previewPoolTx('buydai', series, ethers.utils.parseEther('1'));   
     if ( !(preview instanceof Error) ) {  

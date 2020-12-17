@@ -169,6 +169,7 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
     (async () => {
 
       if (
+        debtInputValue &&
         parseFloat(debouncedDebtInput) > 0 &&
         parseFloat(debouncedDebtInput) < parseFloat(selectedVault.vaultMakerDebt_) &&    
         parseFloat(debouncedDebtInput) !== parseFloat(selectedVault.vaultMakerDebt_) &&
@@ -176,6 +177,7 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
       ) {
         setDebtErrorMsg(`You cannot leave a vault with less Dai than the current Maker CDP minimum limit (${ daiDust && ethers.utils.formatEther(daiDust)} Dai). However, you can remove it ALL with max`);
       } else if (
+        debtInputValue &&
         parseFloat(debouncedDebtInput) > parseFloat(selectedVault.vaultMakerDebt_)
       ) {
         setDebtErrorMsg('Amount exceeds the debt in the maker vault');
