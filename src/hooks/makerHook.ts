@@ -9,11 +9,8 @@ import Vat from '../contracts/Vat.json';
 import DssCdpManager from '../contracts/DssCdpManager.json';
 
 import { useSignerAccount } from './connectionHooks';
-import { useTxHelpers } from './txHooks';
-import { useDsProxy } from './dsProxyHook';
 import { usePool } from './poolHook';
 
-import { useSendTx } from './chainHooks';
 import { IYieldSeries } from '../types';
 
 /**
@@ -40,9 +37,6 @@ export const useMaker = () => {
   /* controller contract for txs */
   const [vatContract, setVatContract] = useState<any>();
   const [getCdpsContract, setGetCdpsContract] = useState<any>();
-
-  const { handleTx, handleTxRejectError } = useTxHelpers();
-  const { proxyExecute } = useDsProxy();
   const { previewPoolTx } = usePool();
 
   useMemo(()=>{
@@ -78,14 +72,23 @@ export const useMaker = () => {
     collateralType:string|null = null
   ): Promise<any> => {
     let cdpList;
-    let cdpSingle;
+    let managedCdpList;
+    let accountCdp;
     const collateralBytes = collateralType? ethers.utils.formatBytes32String(collateralType): null;
     try {
       /* check for cdps registered to the dsProxy address in the manager and also directly in vat */ 
-      [cdpList, cdpSingle] = await Promise.all([
+      [managedCdpList, accountCdp] = await Promise.all([
         getCdpsContract.getCdpsDesc(deployedContracts.DssCdpManager, dsProxyAddress),
-        vatContract.urns(collateralBytes || ethers.utils.formatBytes32String('ETH-A'), dsProxyAddress)
+        getCdpsContract.getCdpsDesc(deployedContracts.DssCdpManager, account),
+        // vatContract.urns(collateralBytes || ethers.utils.formatBytes32String('ETH-A'), dsProxyAddress)
       ]);
+
+      // cdpList = [ cdpManList.map((x:any)=> x 'managed':true } )]
+      // console.log(cdpSingle);
+      // cdpList = cdpManList.concat(cdpSingle);
+      cdpList = managedCdpList;
+      console.log(cdpList);
+
     }  catch (e) {
       // eslint-disable-next-line no-console
       console.log(e);
@@ -126,7 +129,6 @@ export const useMaker = () => {
    * @dev Convert from MakerDAO debt to Dai
    * @param {string|BigNumber} daiAmount debt amount
    * @param {string} collateralType collateral type to filter by (default. ETH-A)
-   * 
    * @returns {Promise<BigNumber>} dai amount
    * @note call function
    */
@@ -138,7 +140,7 @@ export const useMaker = () => {
     const collType = ethers.utils.formatBytes32String(collateralType);
     let rate;
     try {
-      [,rate,,,] = await vatContract(collType).ilks;
+      [,rate,,,] = await vatContract.ilks(collType);
     }  catch (e) {
       // eslint-disable-next-line no-console
       console.log(e);
@@ -164,7 +166,7 @@ export const useMaker = () => {
     const collType = ethers.utils.formatBytes32String(collateralType);
     let rate;
     try {
-      [,rate,,,] = await vatContract(collType).ilks;
+      [,rate,,,] = await vatContract.ilks(collType);
     }  catch (e) {
       // eslint-disable-next-line no-console
       console.log(e);
@@ -172,7 +174,6 @@ export const useMaker = () => {
     }
     return  utils.divRay(parsedAmount, rate);
   };
-
 
   /**
    * @dev Minimum weth needed to collateralize an amount of dai OR FyDai in MakerDAO
@@ -251,13 +252,11 @@ export const useMaker = () => {
   const genVault =async (
     dsProxyAddress: string,
   ) => { 
-
     const cdpMgr = new ethers.Contract( 
       ethers.utils.getAddress('0x1476483dD8C35F25e568113C5f70249D3976ba21'), 
       DssCdpManager.abi,
       signer
     );
-
     try {  
       // await cdpMgr.open(ethers.utils.formatBytes32String('ETH-A'), dsProxyAddress).wait();
       const cdp = await cdpMgr.last(dsProxyAddress);
@@ -267,7 +266,6 @@ export const useMaker = () => {
       // await vatContract.hope(cdpMgr.address).wait();
       // await cdpMgr.enter(dsProxyAddress, cdp).wait();
       // await vatContract.move(dsProxyAddress, urn, ethers.utils.parseEther('100') ).wait();
-
     }  catch (e) {
       // eslint-disable-next-line no-console
       console.log(e);

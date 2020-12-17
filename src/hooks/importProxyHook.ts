@@ -10,6 +10,8 @@ import ImportCdpProxy from '../contracts/ImportCdpProxy.json';
 
 import Controller from '../contracts/Controller.json';
 
+import Vat from '../contracts/Vat.json';
+
 import { YieldContext } from '../contexts/YieldContext';
 import { UserContext } from '../contexts/UserContext';
 
@@ -18,6 +20,8 @@ import { useSigning } from './signingHook';
 import { useDsProxy } from './dsProxyHook';
 import { useController } from './controllerHook';
 import { usePool } from './poolHook';
+import { useMaker } from './makerHook';
+
 import { genTxCode } from '../utils';
 
 /**
@@ -37,11 +41,13 @@ export const useImportProxy = () => {
   const  { state: { authorization: { hasDelegatedDsProxy } } }  = useContext<any>(UserContext);
 
   /* hooks */
-  const { account, signer } = useSignerAccount();
+  const { account, signer, fallbackProvider } = useSignerAccount();
   const { addControllerDelegate, checkControllerDelegate } = useController();
   const { proxyExecute } = useDsProxy();
   const { delegationSignature, handleSignList } = useSigning();
   const { previewPoolTx } = usePool();
+
+  const { daiToMakerDebt, minWethForAmount } = useMaker();
 
   const { abi: importCdpProxyAbi } = ImportCdpProxy;
   const { abi: importProxyAbi } = ImportProxy;
@@ -88,15 +94,15 @@ export const useImportProxy = () => {
   const importPosition = async (
     series:IYieldSeries,
     wethAmount:string|BigNumber,
-    debtAmount:string|BigNumber,
+    daiDebtAmount:string|BigNumber,
     cdpId:number,
     viaCdpMan:boolean=true, /* default to using cdpManager */
   ) => {
 
     /* Processing and sanitizing input */
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
-    const parsedWeth = BigNumber.isBigNumber(wethAmount)? wethAmount : ethers.utils.parseEther(utils.cleanValue(wethAmount));
-    const parsedDebt = BigNumber.isBigNumber(debtAmount)? debtAmount : ethers.utils.parseEther(utils.cleanValue(debtAmount));
+    let parsedWeth = BigNumber.isBigNumber(wethAmount)? wethAmount : ethers.utils.parseEther(wethAmount);
+    let parsedDaiDebt = BigNumber.isBigNumber(daiDebtAmount)? daiDebtAmount : ethers.utils.parseEther(daiDebtAmount);
     const userAddr = account && ethers.utils.getAddress(account);
 
     const overrides = {
@@ -104,9 +110,7 @@ export const useImportProxy = () => {
       value: ethers.utils.parseEther('0')
     };
 
-    // /* Check the signature requirements */
-    // const checkSigs = await proxyContract.importPositionCheck(poolAddr);
-    // console.log(checkSigs);
+    // const makerDebt = await daiToMakerDebt(parsedDaiDebt);
 
     /* calculate expected max safety values  */  
     let maxDaiPrice:BigNumber;         
@@ -120,8 +124,22 @@ export const useImportProxy = () => {
     } else {
       throw(preview);
     }
-    /* for testing only - remove for prod */ 
+
+    /* below for testing only - remove for prod */
+
+    const vat = new ethers.Contract( 
+      ethers.utils.getAddress(deployedContracts.Vat), 
+      Vat.abi,
+      fallbackProvider,
+    );
+    // parsedWeth = ((await vat.urns(ethers.utils.formatBytes32String('ETH-A'), '0x6BAC65a4CA5C1AfcfcDdafd63b1E7C5F51C905eA')).ink) .div(BigNumber.from('6'));
+    // parsedDaiDebt = ((await vat.urns(ethers.utils.formatBytes32String('ETH-A'), '0x6BAC65a4CA5C1AfcfcDdafd63b1E7C5F51C905eA')).art) .div(BigNumber.from('6'));
+    
+    console.log(parsedDaiDebt, ethers.utils.formatEther(parsedDaiDebt));
+    console.log(parsedWeth, ethers.utils.formatEther(parsedWeth));
+
     maxDaiPrice = utils.toRay(2);
+    /* above for testing */
 
     /* build and use signature if required , else '0x' */
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
@@ -150,20 +168,18 @@ export const useImportProxy = () => {
     const signedSigs = await handleSignList(requestedSigs, genTxCode('IMPORT_POSITION', series));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
-
     
-    console.log(poolAddr, cdpId, parsedWeth, parsedDebt, maxDaiPrice, signedSigs.get('controllerSig'));
     /* contract fns used:
       importPositionWithSignature(IPool pool, address user, uint256 wethAmount, uint256 debtAmount, uint256 maxDaiPrice, bytes memory controllerSig)
       importCdpPositionWithSignature(IPool pool, uint256 cdp, uint256 wethAmount, uint256 debtAmount, uint256 maxDaiPrice, bytes memory controllerSig) */
     const calldata = viaCdpMan ? 
       cdpProxyContract.interface.encodeFunctionData(
         'importCdpPositionWithSignature', 
-        [ poolAddr, cdpId.toString(), parsedWeth, parsedDebt, maxDaiPrice, signedSigs.get('controllerSig') ]
+        [ poolAddr, cdpId.toString(), parsedWeth, parsedDaiDebt, maxDaiPrice, signedSigs.get('controllerSig') ]
       ) :
       proxyContract.interface.encodeFunctionData(
-        'importPositionWithSignature', 
-        [ poolAddr, userAddr, parsedWeth, parsedDebt, maxDaiPrice, signedSigs.get('controllerSig') ]
+        'importPositionWithSignature',
+        [ poolAddr, userAddr, parsedWeth, parsedDaiDebt, maxDaiPrice, signedSigs.get('controllerSig') ]
       );
 
     /* send to the proxy for execution */
@@ -171,7 +187,7 @@ export const useImportProxy = () => {
       viaCdpMan ? cdpProxyContract.address: proxyContract.address, 
       calldata,
       overrides,
-      { tx:null, msg: `Migrating ${parsedWeth} collateral and/or ${parsedDebt} Debt to ${series.displayNameMobile}`, type:'IMPORT_POSITION', series  }
+      { tx:null, msg: `Migrating ${utils.cleanValue(daiDebtAmount.toString(), 2)} Debt and ${utils.cleanValue(wethAmount.toString(), 4)} Eth Collateral to ${series.displayNameMobile}`, type:'IMPORT_POSITION', series  }
     );
   };
 

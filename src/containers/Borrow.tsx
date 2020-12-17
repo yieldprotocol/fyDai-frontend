@@ -402,7 +402,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
                     label={
                       <Box pad='xsmall' gap='small' direction='row' align='center'>
                         <Box><MakerMark /></Box>
-                        <Text size='xsmall'>Migrate a Maker vault</Text>
+                        <Text size='xsmall'>Import a Maker vault</Text>
                       </Box>
                     }
                     onClick={()=>setMigrateOpen(true)}
