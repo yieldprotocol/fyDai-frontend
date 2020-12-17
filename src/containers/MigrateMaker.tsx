@@ -132,12 +132,20 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
         selectedVault.vaultId);
       setCollInputValue(undefined);
       setDebtInputValue(undefined);
+      await Promise.all([
+        userActions.updateUser(),
+        seriesActions.updateSeries([activeSeries]),
+      ]);
     }
   };
   
   const importAllProcedure = async (id:number) => {
     if (!debouncedCollInput || !debouncedDebtInput && !importDisabled) {
       await importVault(activeSeries, id);
+      await Promise.all([
+        userActions.updateUser(),
+        seriesActions.updateSeries([activeSeries]),
+      ]);
     }
   };
 
@@ -434,7 +442,6 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
           </Box>
           <RaisedButton 
             onClick={()=>importAllProcedure(selectedVault.vaultId)}
-            background={makerBackColor}
             label={ 
               <Box pad='small'>
                 <Text size='xxsmall'> 1-Click <MakerMark /> import entire vault </Text>
