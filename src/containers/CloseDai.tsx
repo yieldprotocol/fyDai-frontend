@@ -1,12 +1,11 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-
 import { ethers } from 'ethers';
 import { Box, TextInput, Text, Keyboard, ResponsiveContext } from 'grommet';
-
 import { FiArrowLeft as ArrowLeft } from 'react-icons/fi';
 
 import { cleanValue } from '../utils';
+import { logEvent } from '../utils/analytics';
 
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
@@ -20,13 +19,10 @@ import { useBorrowProxy } from '../hooks/borrowProxyHook';
 
 import InputWrap from '../components/InputWrap';
 import TxStatus from '../components/TxStatus';
-import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
-
 import DaiMark from '../components/logos/DaiMark';
 import YieldMobileNav from '../components/YieldMobileNav';
-import { logEvent } from '../utils/analytics';
 import SeriesDescriptor from '../components/SeriesDescriptor';
 
 interface ICloseDaiProps {
@@ -37,29 +33,27 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
-  const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
+  const { actions: userActions } = useContext(UserContext);
+  const { state: { activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
   const activeSeries = seriesData.get(activeSeriesId);
 
-  const [ txActive ] = useTxActive(['BUY_DAI', 'AUTH']);
-
-  const { actions: userActions } = useContext(UserContext);
+  const [ closeDisabled, setCloseDisabled ] = useState<boolean>(true);
 
   const { previewPoolTx }  = usePool();
   const { buyDai }  = useBorrowProxy();
   const { account, fallbackProvider } = useSignerAccount();
+  const [ txActive ] = useTxActive(['BUY_DAI', 'AUTH']);
 
   const [ inputValue, setInputValue ] = useState<any>();
   const debouncedInput = useDebounce(inputValue, 500);
   const [inputRef, setInputRef] = useState<any>(null);
+  const isLol = useIsLol(inputValue);
 
   const [ maxWithdraw, setMaxWithdraw ] = useState<string>();
   
-  const [ closeDisabled, setCloseDisabled ] = useState<boolean>(true);
-
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
-  const isLol = useIsLol(inputValue);
-
+  
   const withdrawProcedure = async () => {
     if ( !closeDisabled ) {
 
@@ -121,7 +115,11 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
       }}
       target='document'
     >
-      {!activeSeries?.isMature() && !mobile && <SeriesDescriptor activeView='lend' minimized />}
+      {
+      !activeSeries?.isMature() && 
+      !mobile && 
+      <SeriesDescriptor activeView='lend' minimized />
+      }
 
       <Box    
         width={!mobile?{ min:'620px', max:'620px' }: undefined}
@@ -132,7 +130,8 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
         pad='large'
         gap='medium'
       >
-        { !txActive && 
+        { 
+        !txActive && 
         <Box gap='medium'>
           <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to close</Text>
           <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
@@ -159,7 +158,8 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
             clearInput={()=>setInputValue(undefined)}
           />
           
-          {!mobile &&
+          {
+          !mobile &&
           <Box alignSelf='start' margin={{ top:'medium' }}>
             <FlatButton 
               onClick={()=>close()}
@@ -170,21 +170,13 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
                 </Box>
                 }
             />
-          </Box>}
-        </Box>}
+          </Box>
+          }
+        </Box>
+        }
         
-        {/* 
-        { CloseDaiPending && 
-          !txActive && 
-          buyApprovalActive && 
-          <Text weight='bold'> An authorization transaction is required before closing your position. Please check your wallet or provider.</Text>}
-
-        { CloseDaiPending && 
-          !txActive && 
-          !buyApprovalActive && 
-          <ApprovalPending />} */}
-
-        { txActive?.type === 'BUY_DAI' &&
+        { 
+        txActive?.type === 'BUY_DAI' &&
         <>
           <TxStatus tx={txActive} />
           <Box alignSelf='start'>
@@ -201,20 +193,23 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
               </Box>
             </Box>
           </Box>
-        </>}
+        </>
+        }
 
-        {mobile && 
-          <YieldMobileNav noMenu={true}>
-            <NavLink 
-              to={`/lend/${activeSeries?.maturity}`}
-              style={{ textDecoration: 'none' }}
-            >
-              <Box direction='row' gap='small'>
-                <Text size='xxsmall' color='text-weak'><ArrowLeft /></Text>
-                <Text size='xxsmall' color='text-weak'>back to lend</Text>
-              </Box>
-            </NavLink>
-          </YieldMobileNav>}
+        {
+        mobile && 
+        <YieldMobileNav noMenu={true}>
+          <NavLink 
+            to={`/lend/${activeSeries?.maturity}`}
+            style={{ textDecoration: 'none' }}
+          >
+            <Box direction='row' gap='small'>
+              <Text size='xxsmall' color='text-weak'><ArrowLeft /></Text>
+              <Text size='xxsmall' color='text-weak'>back to lend</Text>
+            </Box>
+          </NavLink>
+        </YieldMobileNav>
+        }
       </Box>
     </Keyboard>
   );
