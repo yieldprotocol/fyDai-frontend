@@ -57,6 +57,10 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
 
   const { previewPoolTx } = usePool();
   const { sellDai } = useBorrowProxy();
+  const { buyDai } = useBorrowProxy();
+  // const { sellFYDai } = useBorrowProxy();
+  // const { buyFYDai } = useBorrowProxy(); 
+
   const { calcAPR } = useMath();
   const { account, fallbackProvider } = useSignerAccount();
   const [ txActive ] = useTxActive(['SELL_DAI']);
@@ -96,18 +100,70 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
   const [ toQuantity, setToQuantity ] = useState<number>(0);
   const [ inputFromQuantity, setInputFromQuantity ] = useState<boolean>(true);
 
-  const [tradeType, setTradeType] = useState<string>();
+  const [tradeType, setTradeType] = useState<string>("");
 
-
+    /* Set up type of transaction */
+    useEffect(() => {
+      if (inputFromQuantity) {
+        if (fromToken === "Dai") {
+          setFromQuantity( inputValue );
+          setTradeType( "sellDai" );
+          if (inputValue > 0) {
+            setToQuantity( Math.round((minFYDaiOut + Number.EPSILON) * 100) / 100 );
+          } else {
+            setToQuantity(0);
+          }
+        } else {
+          setFromQuantity( inputValue );
+          setTradeType( "sellFYDai" );
+          if (inputValue > 0) {
+            // should be minimum dai received
+            setToQuantity( Math.round((minDaiOut + Number.EPSILON) * 100) / 100 );
+          } else {
+            setToQuantity(0);
+          }        
+        }
+      } else {
+        /* this option not working because I don't believe a method exists */
+        if (fromToken === "Dai") {
+          setToQuantity( inputValue );
+          setTradeType( "buyFYDai" );
+          if (inputValue > 0) {
+            setFromQuantity( 12.34 );
+          } else {
+            setFromQuantity(0);
+          }
+        } else {
+          setToQuantity( inputValue );
+          setTradeType( "buyDai" );
+          if (inputValue > 0) {
+            setFromQuantity( Math.round((maxFYDaiIn + Number.EPSILON) * 100) / 100 );
+          } else {
+            setFromQuantity(0);
+          }
+        }
+      }
+      console.log("inputFromQuantity: ", inputFromQuantity)
+      console.log("inputValue: ", inputValue)
+      console.log("tradeType: ", tradeType)
+      console.log("fromToken: ", fromToken)
+      console.log("toToken: ", toToken)
+      console.log("fromQuantity: ", fromQuantity)
+      console.log("toQuantity: ", toQuantity)
+      })
+  
   /* Lend execution flow */
   const lendProcedure = async () => {
     if (inputValue && !lendDisabled ) {
-      await sellDai( activeSeries, inputValue);
-      logEvent({
-        category: 'Lend',
-        action: inputValue,
-        label: activeSeries.displayName || activeSeries.poolAddress,
-      });
+      switch(tradeType) {
+        case "sellDai":
+        await sellDai( activeSeries, inputValue);
+        break;
+        case "buyDai":
+        await buyDai( activeSeries, inputValue);
+        break;
+      }
+      // Should we create a trade event to log here?
       /* clean up and refresh */ 
       setInputValue(undefined);
       await Promise.all([
@@ -120,12 +176,23 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
   /* Handle input (debounce input) changes */
   useEffect(() => {
     activeSeries && !(activeSeries?.isMature()) && !!debouncedInput && ( async () => {
-      const preview = await previewPoolTx('sellDai', activeSeries, debouncedInput);
+      const preview = await previewPoolTx(tradeType, activeSeries, debouncedInput);
       if (!(preview instanceof Error)) {
-        setFYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
-        setMinFYDaiOut(parseFloat(ethers.utils.formatEther(preview)));
-        setMaxFYDaiIn(parseFloat(ethers.utils.formatEther(preview)));
-        setMinDaiOut(parseFloat(ethers.utils.formatEther(preview)));
+        switch(tradeType) {
+          case "sellDai":
+            setFYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
+            console.log("setFYDaiValue: ", setFYDaiValue)
+            setMinFYDaiOut(parseFloat(ethers.utils.formatEther(preview)));
+            console.log("setMinFYDaiOut: ", setMinFYDaiOut)
+            setAPR( calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) );      
+            break;
+          case "buyDai":
+            setFYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
+            setMaxFYDaiIn(parseFloat(ethers.utils.formatEther(preview)));
+            console.log("setMaxFYDaiIn: ", setMaxFYDaiIn)
+            setAPR( calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) );      
+            break;
+          }  
         setAPR( calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) );      
       } else {
         /* if the market doesnt have liquidity just estimate from rate */
@@ -167,56 +234,6 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
       setErrorMsg(null);
     }
   }, [ debouncedInput, daiBalance ]);
-
-  /* */
-  useEffect(() => {
-    if (inputFromQuantity) {
-      if (fromToken === "Dai") {
-        setFromQuantity( inputValue );
-        setTradeType( "sellDai" );
-        if (inputValue > 0) {
-          setToQuantity( Math.round((minFYDaiOut + Number.EPSILON) * 100) / 100 );
-        } else {
-          setToQuantity(0);
-        }
-      } else {
-        setFromQuantity( inputValue );
-        setTradeType( "sellFyDai" );
-        if (inputValue > 0) {
-          // should be minimum dai received
-          setToQuantity( Math.round((minDaiOut + Number.EPSILON) * 100) / 100 );
-        } else {
-          setToQuantity(0);
-        }        
-      }
-    } else {
-      /* this option not working because I don't believe a method exists */
-      if (fromToken === "Dai") {
-        setToQuantity( inputValue );
-        setTradeType( "buyFyDai" );
-        if (inputValue > 0) {
-          setFromQuantity( 12.34 );
-        } else {
-          setFromQuantity(0);
-        }
-      } else {
-        setToQuantity( inputValue );
-        setTradeType( "buyDai" );
-        if (inputValue > 0) {
-          setFromQuantity( Math.round((maxFYDaiIn + Number.EPSILON) * 100) / 100 );
-        } else {
-          setFromQuantity(0);
-        }
-      }
-    }
-    console.log("inputFromQuantity: ", inputFromQuantity)
-    console.log("inputValue: ", inputValue)
-    console.log("tradeType: ", tradeType)
-    console.log("fromToken: ", fromToken)
-    console.log("toToken: ", toToken)
-    console.log("fromQuantity: ", fromQuantity)
-    console.log("toQuantity: ", toQuantity)
-    })
 
   return (
     <RaisedBox>
