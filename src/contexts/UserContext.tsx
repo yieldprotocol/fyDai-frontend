@@ -413,7 +413,7 @@ const UserProvider = ({ children }: any) => {
         'vaultMakerDebt': _cdpData[i][1],
         'vaultMakerDebt_': cleanValue(ethers.utils.formatEther(_cdpData[i][1]), 2),
         'vaultDaiDebt': mulRay(_cdpData[i][1], rate),
-        'vaultDaiDebt_': _cdpData[i][1].mul(rate).toString(),   
+        'vaultDaiDebt_': cleanValue(ethers.utils.formatEther(mulRay(_cdpData[i][1], rate)), 2)
       };
     });
     dispatch( { 'type': 'updateMakerVaults', 'payload':  _makerData });

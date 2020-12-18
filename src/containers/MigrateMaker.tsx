@@ -110,9 +110,9 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
         /* if there is no dai, but there is collateral left, the collateral value needs to be exact */ 
         parseFloat(selectedVault.vaultMakerDebt_)===0 ? selectedVault.vaultCollateral : debouncedCollInput,
         /* if the value approximates the max value OR there appears to be no Dai, use the EXACT value of the MakerDebt */
-        ( parseFloat(debouncedDebtInput) === parseFloat(selectedVault.vaultMakerDebt_ ) || 
-        parseFloat(selectedVault.vaultMakerDebt_)===0 ) ? 
-          selectedVault.vaultMakerDebt : 
+        ( parseFloat(debouncedDebtInput) === parseFloat(selectedVault.vaultDaiDebt_ ) || 
+        parseFloat(selectedVault.vaultDaiDebt_)===0 ) ? 
+          selectedVault.vaultDaiDebt :
           debouncedDebtInput,
 
         selectedVault.vaultId);
@@ -164,14 +164,14 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
       if (
         debtInputValue &&
         parseFloat(debouncedDebtInput) > 0 &&
-        parseFloat(debouncedDebtInput) < parseFloat(selectedVault.vaultMakerDebt_) &&    
-        parseFloat(debouncedDebtInput) !== parseFloat(selectedVault.vaultMakerDebt_) &&
+        parseFloat(debouncedDebtInput) < parseFloat(selectedVault.vaultDaiDebt_) &&    
+        parseFloat(debouncedDebtInput) !== parseFloat(selectedVault.vaultDaiDebt_) &&
         selectedVault.vaultDaiDebt.sub(ethers.utils.parseEther(debouncedDebtInput)).lt(daiDust)
       ) {
         setDebtErrorMsg(`You cannot leave a vault with less Dai than the current Maker CDP minimum limit (${ daiDust && ethers.utils.formatEther(daiDust)} Dai). However, you can remove it ALL with max`);
       } else if (
         debtInputValue &&
-        parseFloat(debouncedDebtInput) > parseFloat(selectedVault.vaultMakerDebt_)
+        parseFloat(debouncedDebtInput) > parseFloat(selectedVault.vaultDaiDebt_)
       ) {
         setDebtErrorMsg('Amount exceeds the debt in the maker vault');
       } else (setDebtErrorMsg(null));
@@ -361,7 +361,7 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
               />
               <FlatButton
                 label='max debt'
-                onClick={()=>selectedVault && setDebtInputValue(cleanValue(selectedVault.vaultMakerDebt_))}
+                onClick={()=>selectedVault && setDebtInputValue(cleanValue(selectedVault.vaultDaiDebt_))}
               />
             </InputWrap>
           </Box>
