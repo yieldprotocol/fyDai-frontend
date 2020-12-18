@@ -67,7 +67,7 @@
         "BorrowProxy":    "0x69Ccffb482D020f36e5C0F4D31e8fc875a7f9C93",
         "PoolProxy":      "0x9cAc57C33755d324013D3e12DfA5636309b705F9",
         "ImportProxy":    "0x6D51dF0885073A125a0b24Ca390c476478a0eb74",
-        "ImportCdpProxy": "0xbCCb7d9B14eA49F7c0b1af84dC609f5111d8674d",
+        "ImportCdpProxy": "0x54BA2d1D755Ca94c0B5dBB7c2b5480c4Ce9Cf90D",
         "ExportProxy":    "0x0D9042B7F3E1Cf675b9854868104F963a9F68a88",
         "ExportCdpProxy": "0xd670bc0919f73bE421cCA8664d3F46e528cc2bf3",
         "GetCdps":        "0x592301a23d37c591C5856f28726AF820AF8e7014",
