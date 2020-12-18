@@ -114,7 +114,7 @@ const YieldFooter = (props: any) => {
           </Anchor>
         }
       </Box>
-      <Box onClick={()=>genVault(authorization.dsProxyAddress)}>test</Box>
+      {/* <Box onClick={()=>genVault(authorization.dsProxyAddress)}>test</Box> */}
     </Footer>
   );
 };
