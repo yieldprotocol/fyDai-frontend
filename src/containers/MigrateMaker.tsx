@@ -122,13 +122,18 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
   const isDebtLol = useIsLol(debtInputValue);
 
   const importProcedure = async () => {
-  
+    
     if (collInputValue || debtInputValue && !importDisabled) {
       await importPosition(
         activeSeries,
-        debouncedCollInput,
-        /* if the  value approximates the max value, use the EXACT max value as per the contract */
-        ( parseFloat(debouncedDebtInput) === parseFloat(selectedVault.vaultMakerDebt_ ) ) ? selectedVault.vaultMakerDebt : debouncedDebtInput,
+        /* if there is no dai, but there is collateral left, the collateral value needs to be exact */ 
+        parseFloat(selectedVault.vaultMakerDebt_)===0 ? selectedVault.vaultCollateral : debouncedCollInput,
+
+        /* if the value approximates the max value OR there appears to be no Dai, use the EXACT value of the MakerDebt */
+        (parseFloat(debouncedDebtInput) === parseFloat(selectedVault.vaultMakerDebt_ ) || parseFloat(selectedVault.vaultMakerDebt_)===0 ) ? 
+          selectedVault.vaultMakerDebt : 
+          debouncedDebtInput,
+
         selectedVault.vaultId);
       setCollInputValue(undefined);
       setDebtInputValue(undefined);
