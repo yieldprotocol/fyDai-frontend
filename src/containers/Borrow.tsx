@@ -545,8 +545,8 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
                   onClick={()=>setHistOpen(true)}
                   label={
                     <Box direction='row' gap='small' align='center'>
-                      <Text size='xsmall' color='text-xweak'><History /></Text>                
-                      <Text size='xsmall' color='text-xweak'>
+                      <Text size='xsmall' color='text-weak'><History /></Text>                
+                      <Text size='xsmall' color='text-weak'>
                         Series Borrow History
                       </Text>              
                     </Box>
@@ -595,7 +595,6 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
         showTxPending && 
         <TxStatus tx={txActive} />
         }
-
       </Keyboard>
 
       {
