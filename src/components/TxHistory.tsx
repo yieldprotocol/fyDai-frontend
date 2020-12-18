@@ -65,17 +65,21 @@ const TxHistory = ( { filterTerms, series }: HistoryProps) => {
         pad='small' 
         fill='horizontal'    
       > 
-        { (item.event === 'Borrowed') && 
+        { 
+        (item.event === 'Borrowed') && 
         <Box fill>
           <Text size='xxsmall'>Amount owed @ maturity</Text>
           <Text size='xsmall'>{Math.abs(item.fyDai_).toFixed(2)} Dai</Text>
-        </Box> }
+        </Box> 
+        }
         
-        { (item.event === 'Lent' ) && 
+        { 
+        (item.event === 'Lent' ) && 
         <Box fill>
           <Text size='xxsmall'>Amount redeemable @ maturity</Text>
           <Text size='xsmall'>{Math.abs(item.fyDai_).toFixed(2)} Dai</Text>
-        </Box> }
+        </Box>
+        }
 
         <Box fill>
           <Box alignSelf='end' direction='row' gap='small'>
@@ -93,13 +97,14 @@ const TxHistory = ( { filterTerms, series }: HistoryProps) => {
     let seriesFilteredHist;
     const _txHist = state.txHistory.items;
     const filteredHist = _txHist.filter((x:any) => filterTerms.includes(x.event));
+    
     if ( series ) {
       seriesFilteredHist = filteredHist.filter((x:any) => (x.maturity === series.maturity) || (x.maturity === null) );
     } else {
       seriesFilteredHist = filteredHist;
     }
+
     const sortedList = seriesFilteredHist.sort( (a:any, b:any) => b.date - a.date ); 
-    
     setTxHistory(sortedList);
 
   }, [ state.txHistory, series, filterTerms ]);

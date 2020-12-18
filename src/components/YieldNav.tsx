@@ -34,9 +34,8 @@ const YieldNav = (props: any) => {
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   
-  const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
+  const { state: { activeSeriesId, seriesData } } = useContext(SeriesContext);
   const activeSeries = seriesData.get(activeSeriesId);
-
   const theme = useContext<any>(ThemeContext);
   const textColor = theme.dark? theme.global.colors.text.dark : theme.global.colors.text.light;
 

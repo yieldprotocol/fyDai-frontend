@@ -38,12 +38,9 @@ const resetApp = () => {
 const YieldFooter = (props: any) => {
   const {
     themeMode,
-    cycleThemeMode,
     moodLight, 
     toggleMoodLight,
   } = props;
-
-  const [ showDisclaimer, setShowDisclaimer] = useState<boolean>(false);
 
   const { state: { preferences, authorization }, actions: { updatePreferences } } = useContext(UserContext);
 
@@ -83,7 +80,6 @@ const YieldFooter = (props: any) => {
             This software is in BETA v0.3.1
           </Text>
           <Text size='xxsmall' color='grey'> Having issues? Try an app <Anchor onClick={()=>resetApp()}>RESET</Anchor>, or get hold of us via <Anchor href='https://discord.gg/JAFfDj5' target="_blank" onClick={() => handleExternal('Discord')}>discord</Anchor>. </Text>
-          {/* {showDisclaimer && <YieldDisclaimer forceShow={true} />} */}
         </Box>
 
       </Box>

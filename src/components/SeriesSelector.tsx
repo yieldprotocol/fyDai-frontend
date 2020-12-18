@@ -170,9 +170,12 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
                     </Box>                 
                   </Box>
 
-                  { !mobile && 
+                  { 
+                  !mobile && 
                   <Box basis='25%' direction='row' justify='end'>
-                    { activeSeries && activeSeries.maturity === x.maturity ?                     
+                    { 
+                    activeSeries && 
+                    activeSeries.maturity === x.maturity ?                     
                       <Button 
                         primary
                         color={activeSeries.seriesColor}
@@ -185,15 +188,18 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
                         background={activeSeries.maturity === x.maturity ? modColor(defaultBackground, -10):undefined}
                         secondary
                         label={<Text size='small'>Select</Text>}
-                      />}
-                  </Box>}
+                      />
+                    }
+                  </Box>
+                  }
                 </Box>
               );     
             })}
           </Loading>        
         </InsetBox>
 
-        {!mobile &&
+        {
+        !mobile &&
         <Box alignSelf='start' margin={{ top:'medium' }}>
           <FlatButton 
             onClick={()=>close()}
@@ -204,16 +210,19 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
               </Box>
             }
           />
-        </Box>}
+        </Box>
+        }
       </Box>
 
-      {mobile && 
+      {
+      mobile && 
         <YieldMobileNav noMenu={true}>
           <Box direction='row' gap='small' onClick={()=>close()}>
             <Text size='xxsmall' color='text-weak'><ArrowLeft /></Text>
             <Text size='xxsmall' color='text-weak'> go back </Text>
           </Box>
-        </YieldMobileNav>}
+        </YieldMobileNav>
+      }
     </Layer>
   );
 };

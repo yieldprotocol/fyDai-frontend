@@ -4,7 +4,6 @@ import { UserContext } from '../contexts/UserContext';
 import { TxContext } from '../contexts/TxContext';
 import RaisedButton from './RaisedButton';
 import EtherscanButton from './EtherscanButton';
-import Loading from './Loading';
 import HashWrap from './HashWrap';
 import { abbreviateHash } from '../utils';
 import FlatButton from './FlatButton';
@@ -13,7 +12,6 @@ const TxRecent = ({ setView }: any) => {
 
   const { state: { lastCompletedTx, pendingTxs }, dispatch } = useContext(TxContext);
   const { state: { txHistory } } = useContext(UserContext);
-
   const [ lastTx, setLastTx] = useState<any>(null);
   
   useEffect(()=>{
@@ -34,7 +32,8 @@ const TxRecent = ({ setView }: any) => {
       </Box> 
 
       <Box gap='xsmall'>
-        {lastTx &&
+        {
+        lastTx &&
         <Box 
           direction='row'
           justify='between'
@@ -48,9 +47,11 @@ const TxRecent = ({ setView }: any) => {
               <EtherscanButton txHash={lastTx?.transactionHash} /> 
             </Box> 
           </HashWrap> 
-        </Box>}
+        </Box>
+        }
     
-        {lastCompletedTx &&
+        {
+        lastCompletedTx &&
         <Box
           gap='small'
           align='center'
@@ -64,9 +65,11 @@ const TxRecent = ({ setView }: any) => {
               <EtherscanButton txHash={lastCompletedTx?.transactionHash} /> 
             </Box> 
           </HashWrap> 
-        </Box>}
+        </Box>
+        }
 
-        { pendingTxs.length>0 && 
+        { 
+        pendingTxs.length>0 && 
         <Box gap='small'>
           <Text size='xsmall'>Pending Transactions: </Text>
           <Box
@@ -75,7 +78,8 @@ const TxRecent = ({ setView }: any) => {
             pad='xsmall'
           >
           
-            { pendingTxs.map((x:any)=>(        
+            { 
+            pendingTxs.map((x:any)=>(        
               <Box
                 gap='small'
                 align='center'
@@ -95,18 +99,24 @@ const TxRecent = ({ setView }: any) => {
                 />
                
               </Box>
-            ))}
+            ))
+            }
           </Box>
-        </Box>}
+        </Box>
+        }
 
-        { !lastTx && !lastCompletedTx && !pendingTxs &&
+        { 
+        !lastTx && 
+        !lastCompletedTx && 
+        !pendingTxs &&
         <Box
           pad={{ vertical:'small' }}
           gap='small'
           align='start'
         >
           <Text size='xsmall'>There are transactions to show. </Text>
-        </Box>}
+        </Box>
+        }
 
       </Box>
     </Box>

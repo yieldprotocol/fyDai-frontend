@@ -5,16 +5,13 @@ import { Box, Keyboard, TextInput, Text, ResponsiveContext, Collapsible } from '
 import styled, { css } from 'styled-components';
 import { 
   FiArrowLeft as ArrowLeft,
-  FiInfo as Info,
   FiChevronLeft as ChevronLeft, 
   FiChevronRight as ChevronRight,
   FiSearch as Search,
   FiX as Close,
 } from 'react-icons/fi';
 
-import * as utils from '../utils';
-
-import { cleanValue, modColor } from '../utils';
+import { cleanValue, modColor, BN_RAY } from '../utils';
 
 import { UserContext } from '../contexts/UserContext';
 import { SeriesContext } from '../contexts/SeriesContext';
@@ -34,7 +31,6 @@ import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
 import EthMark from '../components/logos/EthMark';
 import YieldMobileNav from '../components/YieldMobileNav';
-
 import DaiMark from '../components/logos/DaiMark';
 import SeriesDescriptor from '../components/SeriesDescriptor';
 import MakerMark from '../components/logos/MakerMark';
@@ -58,26 +54,19 @@ const makerBackColor = '#f6f8f9';
 const MigrateMaker = ({ close }:IMigrateMakerProps) => {
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
-  const { state: { position, makerVaults }, actions: userActions } = useContext(UserContext);
-  const {
-    ethPosted,
-    ethLocked,
-    collateralPercent_,
-    debtValue,
-    debtValue_,
-  } = position;
 
-  const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
+  /* context imports */
+  const { state: { makerVaults }, actions: userActions } = useContext(UserContext);
+  const { state: { activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
   const activeSeries = seriesData.get(activeSeriesId);
-
   const { state:{ feedData } } = useContext(YieldContext);
   const { ilks:{ dust } } = feedData;
 
+  /* hooks */
   const { previewPoolTx }  = usePool();
   const { importPosition, importVault,  } = useImportProxy();
-  const { minWethForAmount, daiToMakerDebt } = useMaker();
-  // const { exportPosition } = useExportProxy();
-  const { estCollRatio: estimateRatio, calcAPR } = useMath();
+  const { minWethForAmount } = useMaker();
+  const { calcAPR } = useMath();
   const [ txActive ] = useTxActive(['WITHDRAW']);
 
   /* vaults and selected vaults variables */
@@ -87,8 +76,9 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
   
   /* component flags */ 
   const [ searchOpen, setSearchOpen ] = useState<boolean>(false);
+  const [ importDisabled, setImportDisabled ] = useState<boolean>(true);
 
-  /* component input variables */
+  /* input variables and aux hooks */
   const [ collInputValue, setCollInputValue ] = useState<any>();
   const [ debtInputValue, setDebtInputValue ] = useState<any>();
   const [ searchInputValue, setSearchInputValue ] = useState<any>();
@@ -97,38 +87,34 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
   const debouncedSearchInput = useDebounce(searchInputValue, 1000);
   const [collInputRef, setCollInputRef] = useState<any>(null);
   const [debtInputRef, setDebtInputRef] = useState<any>(null);
-
-  const [ collInputBn, setCollInputBn] = useState<BigNumber>();
-  const [ debtInputBn, setDebtInputBn] = useState<BigNumber>();
+  const isCollLol = useIsLol(collInputValue);
+  const isDebtLol = useIsLol(debtInputValue);
 
   /* token balances and calculated values */
   const [ fyDaiValue, setFYDaiValue ] = useState<number>(0);
   const [ APR, setAPR ] = useState<number>();
-
   const [ minCollateral, setMinCollateral ] = useState<string>();
   const [ minSafeCollateral, setMinSafeCollateral ] = useState<string>();
-
   const [ daiDust, setDaiDust ] = useState<BigNumber>();
-  const [ isBelowDust, setIsBelowDust ] = useState<Boolean>(false);
 
-  const [ importDisabled, setImportDisabled ] = useState<boolean>(true);
-  // const [ exportDisabled, setExportDisabled ] = useState<boolean>(true);
-
+  /* warning and error variables */
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ collErrorMsg, setCollErrorMsg] = useState<string|null>(null);
   const [ debtErrorMsg, setDebtErrorMsg] = useState<string|null>(null);
 
-  const isCollLol = useIsLol(collInputValue);
-  const isDebtLol = useIsLol(debtInputValue);
-
+  /* action prcedures */ 
   const importProcedure = async () => {
-  
     if (collInputValue || debtInputValue && !importDisabled) {
       await importPosition(
         activeSeries,
-        debouncedCollInput,
-        /* if the  value approximates the max value, use the EXACT max value as per the contract */
-        ( parseFloat(debouncedDebtInput) === parseFloat(selectedVault.vaultMakerDebt_ ) ) ? selectedVault.vaultMakerDebt : debouncedDebtInput,
+        /* if there is no dai, but there is collateral left, the collateral value needs to be exact */ 
+        parseFloat(selectedVault.vaultMakerDebt_)===0 ? selectedVault.vaultCollateral : debouncedCollInput,
+        /* if the value approximates the max value OR there appears to be no Dai, use the EXACT value of the MakerDebt */
+        ( parseFloat(debouncedDebtInput) === parseFloat(selectedVault.vaultMakerDebt_ ) || 
+        parseFloat(selectedVault.vaultMakerDebt_)===0 ) ? 
+          selectedVault.vaultMakerDebt : 
+          debouncedDebtInput,
+
         selectedVault.vaultId);
       setCollInputValue(undefined);
       setDebtInputValue(undefined);
@@ -171,7 +157,6 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
   * Handle  debt Input (debounced debt input) changes:
   */
   useEffect(()=>{
-  
     activeSeries && 
     debouncedDebtInput>0 && 
     (async () => {
@@ -213,25 +198,12 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
   */
   useEffect(()=>{
     if ( selectedVault && debouncedCollInput > parseFloat(selectedVault.vaultCollateral_) ) {
-      setCollInputBn(ethers.utils.parseEther(debouncedCollInput));
       setCollErrorMsg('Not enough collateral in the maker vault');
     } else (setCollErrorMsg(''));
     activeSeries && debouncedCollInput>0 && ( async () => { 
       if (minCollateral && (debouncedCollInput < parseFloat(minCollateral)) ) {
         setCollErrorMsg('That is not enough collateral to cover the debt you wish to migrate');
       }
-      // const preview = await previewPoolTx('buyDai', activeSeries, debouncedDebtInput);     
-      // if (!(preview instanceof Error)) {
-      //   setFYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
-      //   setAPR(calcAPR( ethers.utils.parseEther(debouncedDebtInput.toString()), preview, activeSeries.maturity ) );      
-      // } else {
-      // /* if the market doesnt have liquidity just estimate from rate */
-      //   const rate = await previewPoolTx('buyDai', activeSeries, 1);
-      //   !(rate instanceof Error) && setFYDaiValue(debouncedDebtInput*parseFloat((ethers.utils.formatEther(rate))));
-      //   (rate instanceof Error) && setFYDaiValue(0);
-      //   setImportDisabled(true);
-      //   setErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
-      // }
     })();
 
   }, [debouncedCollInput, activeSeries]);
@@ -262,7 +234,7 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
   
   /* Handle dust watch */
   useEffect(()=>{
-    dust && setDaiDust(dust.div(utils.BN_RAY));
+    dust && setDaiDust(dust.div(BN_RAY));
   }, [ dust ]);
   
   /* Handle import/export disabling deposits */
@@ -275,17 +247,11 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
     <Keyboard 
       onEsc={() => {
         if (collInputValue || debtInputValue) {
-          console.log('escapde');
           document.activeElement === collInputRef && setCollInputValue(undefined);
           document.activeElement === debtInputRef && setDebtInputValue(undefined);
         } else close();
       }}
       onEnter={()=> importProcedure()}
-      // onBackspace={()=> {
-      //   collInputValue &&
-      //   (document.activeElement !== collInputRef) && 
-      //   setCollInputValue(debouncedCollInput.toString().slice(0, -1));
-      // }}
       target='document'
     >
       <SeriesDescriptor activeView='borrow' minimized />
@@ -395,7 +361,6 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
               />
               <FlatButton
                 label='max debt'
-                // onClick={()=>selectedVault && setDebtInputValue(selectedVault.vaultMakerDebt)}
                 onClick={()=>selectedVault && setDebtInputValue(cleanValue(selectedVault.vaultMakerDebt_))}
               />
             </InputWrap>
@@ -408,7 +373,6 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
             <InputWrap errorMsg={collErrorMsg} warningMsg={warningMsg}>
               <TextInput
                 ref={(el2:any)=>setCollInputRef(el2)} 
-                  // ref={collInputRef}
                 type='number'
                 placeholder='ETH'
                 value={collInputValue || ''}
@@ -509,33 +473,6 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
                 }
             />
           </Box>       
-          {/* { 
-          !mobile &&
-          <Box alignSelf='end' margin={{ top:'medium' }}>
-            {
-                  // exportTxActive ?
-                  false ?
-                    <Box direction='row' gap='small'>
-                      <Text size='xsmall' color='text-weak'>
-                        <Text weight='bold' color={activeSeries?.seriesColor}>repay</Text> pending
-                      </Text>
-                      <Loading condition={true} size='xxsmall'>.</Loading>
-                    </Box>
-                    : 
-                    <FlatButton 
-                      onClick={()=>exportProcedure()}
-                      disabled={!importDisabled}
-                      label={
-                        <Box direction='row' gap='small' align='center'>
-                          <Text size='xsmall' color='text-weak'>
-                            <Text weight='bold' color={activeSeries?.seriesColor}>Export</Text> Yield series debt ( <Text size='xxsmall'><DaiMark /> {activeSeries.ethDebtDai_} </Text> ) to Maker
-                          </Text>
-                        </Box>
-                    }
-                    />                
-                  }
-          </Box>
-        } */ }
         </Box>       
       </Box>}
 
