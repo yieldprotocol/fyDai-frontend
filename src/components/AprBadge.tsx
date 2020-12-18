@@ -17,6 +17,7 @@ interface IAprBadgeProps {
 }
 
 function AprBadge({ activeView, series, animate }:IAprBadgeProps) {
+  
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   const [ seriesApr, setSeriesApr ] = useState<string>(`${series.yieldAPR_} %`);
   const [ seriesMature, setSeriesMature ] = useState<boolean>(series.isMature());
@@ -30,7 +31,8 @@ function AprBadge({ activeView, series, animate }:IAprBadgeProps) {
 
   return (
     <>
-      { seriesMature === true &&    
+      { 
+      seriesMature === true &&    
         <Box>
           <Box 
             background={series.seriesColor}
@@ -46,45 +48,50 @@ function AprBadge({ activeView, series, animate }:IAprBadgeProps) {
               <Text size='xxsmall' color={series?.seriesTextColor}> {!mobile &&  <Clock />} Mature </Text>   
             </Loading>
           </Box>
-        </Box>}
+        </Box>
+      }
 
-      { seriesMature === false && 
-        series.poolState?.active === true && 
-        <Box>
-          <Box 
-            height={{ min:'1em' }}
-            background={series.seriesColor}
-            round='large'  
-            align='center'
-            justify='center'
-            animation={animate ? { type:'zoomIn', duration:1000, size:'xlarge' } : undefined}
-            pad={{ horizontal:'small', vertical:'xsmall' }}
-            direction='row'
-          >
-            <Loading condition={!seriesApr} size='xsmall'>
-              <Text size={mobile?'xxsmall':'xsmall'} color={series?.seriesTextColor}> { activeView==='pool'? moment.utc(series?.maturity_).format('MMM \'YY') : seriesApr } </Text> 
-            </Loading>
-          </Box>
-        </Box>}
+      { 
+      seriesMature === false && 
+      series.poolState?.active === true && 
+      <Box>
+        <Box 
+          height={{ min:'1em' }}
+          background={series.seriesColor}
+          round='large'  
+          align='center'
+          justify='center'
+          animation={animate ? { type:'zoomIn', duration:1000, size:'xlarge' } : undefined}
+          pad={{ horizontal:'small', vertical:'xsmall' }}
+          direction='row'
+        >
+          <Loading condition={!seriesApr} size='xsmall'>
+            <Text size={mobile?'xxsmall':'xsmall'} color={series?.seriesTextColor}> { activeView==='pool'? moment.utc(series?.maturity_).format('MMM \'YY') : seriesApr } </Text> 
+          </Loading>
+        </Box>
+      </Box>
+      }
 
-      { seriesMature === false &&
-        series.poolState?.active === false &&
-          <Box>
-            <Box 
-              round
-              border='all'
-              direction='row'
-              pad={{ horizontal:'xsmall', vertical:'none' }}
-              align='center'
-              background='orange'
-              gap='xsmall'
-            >
-              <Warning />       
-              <Text size='xxsmall' color={series?.seriesTextColor}>
-                {series.poolState.reason} 
-              </Text>
-            </Box>
-          </Box>}
+      { 
+      seriesMature === false &&
+      series.poolState?.active === false &&
+      <Box>
+        <Box 
+          round
+          border='all'
+          direction='row'
+          pad={{ horizontal:'xsmall', vertical:'none' }}
+          align='center'
+          background='orange'
+          gap='xsmall'
+        >
+          <Warning />       
+          <Text size='xxsmall' color={series?.seriesTextColor}>
+            {series.poolState.reason} 
+          </Text>
+        </Box>
+      </Box>
+      }
     </>
   );
 }
