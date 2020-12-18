@@ -1,13 +1,14 @@
 import React, { useContext } from 'react';
 import { Box, Text, ResponsiveContext, ThemeContext } from 'grommet';
-import { FiCopy as Copy } from 'react-icons/fi';
 import { ScaleLoader } from 'react-spinners';
+
+import { abbreviateHash } from '../utils';
+
+import { ITx } from '../types';
 
 import { TxContext } from '../contexts/TxContext';
 import EtherscanButton from './EtherscanButton';
-import { abbreviateHash } from '../utils';
 import HashWrap from './HashWrap';
-import { ITx } from '../types';
 
 interface TxStatusProps {
   tx: ITx;
@@ -26,7 +27,8 @@ const TxStatus= ({ tx }:TxStatusProps) => {
 
   return (
     <>
-      { pendingTxs && pendingTxs.length > 0 &&
+      {
+      pendingTxs?.length > 0 &&
         <Box
           alignSelf="center"
           fill
@@ -43,9 +45,12 @@ const TxStatus= ({ tx }:TxStatusProps) => {
             <HashWrap hash={tx.tx.hash}> <Text size='xsmall' ref={txRef}> { abbreviateHash(tx.tx.hash) } </Text></HashWrap>  
           </Box>
           <EtherscanButton txHash={tx.tx.hash} />
-        </Box>}
+        </Box>
+      }
 
-      { pendingTxs.length === 0 && lastCompletedTx &&
+      { 
+      pendingTxs.length === 0 && 
+      lastCompletedTx &&
       <Box
         alignSelf="center"
         fill
@@ -61,7 +66,8 @@ const TxStatus= ({ tx }:TxStatusProps) => {
           <Text size='xsmall' ref={txRef}> <HashWrap hash={lastCompletedTx?.transactionHash}>{ abbreviateHash(lastCompletedTx?.transactionHash) }</HashWrap> </Text>
         </Box>
         <EtherscanButton txHash={lastCompletedTx.transactionHash} />
-      </Box>}
+      </Box>
+      }
     </>
   );
 };

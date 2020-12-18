@@ -234,7 +234,8 @@ export const useImportProxy = () => {
       requestedSigs.set('controllerSig',
         { id: genTxCode('AUTH_CONTROLLER', null),
           desc: 'Allow your proxy to interact with your collateralized positions',
-          conditional: await checkControllerDelegate(cdpProxyContract.address), // skip if any are true
+          // conditional: await checkControllerDelegate(cdpProxyContract.address), // skip if any are true
+          conditional: false,
           signFn: () => delegationSignature(controllerContract, cdpProxyContract.address),    
           fallbackFn: () => addControllerDelegate(cdpProxyContract.address),
         });
@@ -244,7 +245,8 @@ export const useImportProxy = () => {
       requestedSigs.set('controllerSig',
         { id: genTxCode('AUTH_CONTROLLER', null),
           desc: 'Allow your proxy to interact with your collateralized positions',
-          conditional: await checkControllerDelegate(proxyContract.address), // skip if any are true
+          // conditional: await checkControllerDelegate(proxyContract.address), // skip if any are true
+          conditional: false,
           signFn: () => delegationSignature(controllerContract, proxyContract.address),    
           fallbackFn: () => addControllerDelegate(proxyContract.address),
         });

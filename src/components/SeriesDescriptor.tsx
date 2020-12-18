@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { Box, Text, ResponsiveContext, Collapsible } from 'grommet';
+import React, { useState, useContext } from 'react';
+import { Box, Text, ResponsiveContext } from 'grommet';
 import { FiLayers as ChangeSeries } from 'react-icons/fi';
 
 import { modColor } from '../utils';
@@ -15,15 +15,14 @@ interface ISeriesDescriptorProps {
   activeView: string;
   children?:any;
   minimized?:boolean;
-  greyedOut?:boolean;
 }
 
 function SeriesDescriptor( props: ISeriesDescriptorProps ) {
 
-  const { activeView, children, minimized, greyedOut } = props;
+  const { activeView, children, minimized } = props;
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
-  const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
+  const { state: { activeSeriesId, seriesData } } = useContext(SeriesContext);
   const activeSeries = seriesData.get(activeSeriesId);
 
   const [ selectorOpen, setSelectorOpen ] = useState<boolean>(false);
@@ -124,16 +123,13 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
                   onClick={()=>setSelectorOpen(true)}
                 />} 
 
-
               </Box>
             </Box>
 
             <Box
               pad={{ horizontal:'medium' }}
             >
-              {/* <Collapsible open={!seriesLoading}> */}
               { children }
-              {/* </Collapsible> */}
             </Box>
           </Box>     
         </Box>}
@@ -141,6 +137,6 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
   );
 }
 
-SeriesDescriptor.defaultProps={ children:null, minimized:false, greyedOut:false };
+SeriesDescriptor.defaultProps={ children:null, minimized:false };
 
 export default SeriesDescriptor; 

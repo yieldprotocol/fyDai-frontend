@@ -234,7 +234,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
           />
         </HistoryWrap>}
 
-        <SeriesDescriptor activeView='borrow' greyedOut={repayOpen || migrateOpen || histOpen}>
+        <SeriesDescriptor activeView='borrow'>
           <InfoGrid
             alt
             entries={[

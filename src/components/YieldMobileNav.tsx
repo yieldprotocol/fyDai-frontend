@@ -10,7 +10,7 @@ import logoLight from '../assets/images/logo_light.svg';
 const YieldMobileNav = ({ noMenu=false, children }:any) =>  {
 
   const theme = useContext<any>(ThemeContext);
-  const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
+  const { state: { activeSeriesId, seriesData } } = useContext(SeriesContext);
   const activeSeries = seriesData.get(activeSeriesId);
   
   const [showSidebar, setShowSidebar] = useState<boolean>(false);
@@ -39,7 +39,8 @@ const YieldMobileNav = ({ noMenu=false, children }:any) =>  {
         </Nav>
       </Layer>
 
-      {showSidebar && (  
+      {
+      showSidebar && 
       <Layer
         animation='slide'
         position='left'
@@ -97,7 +98,7 @@ const YieldMobileNav = ({ noMenu=false, children }:any) =>  {
           </Box>
         </Box>
       </Layer>
-      )}
+    }
 
     </Box>
   );

@@ -22,7 +22,7 @@ const YieldDisclaimer = ({ forceShow=false, closeCallback }:any) =>  {
   return (
     <> 
       {
-        ( showDisclaimer || forceShow) &&
+      (showDisclaimer || forceShow) &&
         <Layer
           modal={true}
           onEsc={()=>{ 
@@ -70,7 +70,7 @@ const YieldDisclaimer = ({ forceShow=false, closeCallback }:any) =>  {
 
           </Box>
         </Layer>
-}
+      }
     </>
   );
 }; 

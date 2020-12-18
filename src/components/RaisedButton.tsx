@@ -15,7 +15,6 @@ ${(props:any) => props.disabled && css`
     transition: transform 0.3s ease, box-shadow 0.3s ease-out;
 `}
 
-
 ${(props:any) => props.background && css`
     background: ${ props.background };
     box-shadow:  6px 6px 11px ${modColor(props.background, -20)}, -6px -6px 11px ${modColor(props.background, 10)};
