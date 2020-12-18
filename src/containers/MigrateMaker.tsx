@@ -112,7 +112,7 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
         /* if the value approximates the max value OR there appears to be no Dai, use the EXACT value of the MakerDebt */
         ( parseFloat(debouncedDebtInput) === parseFloat(selectedVault.vaultDaiDebt_ ) || 
         parseFloat(selectedVault.vaultDaiDebt_)===0 ) ? 
-          selectedVault.vaultDaiDebt :
+          selectedVault.vaultMakerDebt :
           debouncedDebtInput,
 
         selectedVault.vaultId);
