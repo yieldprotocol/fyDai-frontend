@@ -325,7 +325,7 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
                         </Box>
                         <Box pad='small' justify='between' direction='row'> 
                           <Text size='small' color={makerTextColor}>Outstanding Dai debt</Text> 
-                          <Text size='small' color={makerTextColor}> {x.vaultMakerDebt_} DAI</Text>            
+                          <Text size='small' color={makerTextColor}> {x.vaultDaiDebt_} DAI</Text>            
                         </Box>
                       </Box>
                     </Box>

@@ -245,7 +245,6 @@ export const useImportProxy = () => {
         { id: genTxCode('AUTH_CONTROLLER', null),
           desc: 'Allow your proxy to interact with your collateralized positions',
           conditional: await checkControllerDelegate(proxyContract.address), // skip if any are true
-          conditional: false,
           signFn: () => delegationSignature(controllerContract, proxyContract.address),    
           fallbackFn: () => addControllerDelegate(proxyContract.address),
         });
