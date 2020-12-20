@@ -58,9 +58,6 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
   const { previewPoolTx } = usePool();
   const { sellDai } = useBorrowProxy();
   const { buyDai } = useBorrowProxy();
-  // const { sellFYDai } = useBorrowProxy();
-  // const { buyFYDai } = useBorrowProxy(); 
-
   const { calcAPR } = useMath();
   const { account, fallbackProvider } = useSignerAccount();
   const [ txActive ] = useTxActive(['SELL_DAI']);
@@ -152,6 +149,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
           }
         }
       }
+      console.log("daiBalance: ", daiBalance_)
       console.log("inputFromQuantity: ", inputFromQuantity)
       console.log("fromToken: ", fromToken)
       console.log("toToken: ", toToken)
@@ -276,24 +274,34 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
             alt 
             entries={[
               {
-                label: 'fyDai Portfolio Value',
-                labelExtra: 'at maturity',
+                label: 'Dai Balance',
+                labelExtra: 'in your wallet',
+                visible: true,
+                active: true,
+                loading: false,            
+                value: daiBalance_?`${daiBalance_} DAI`: '0 DAI',
+                valuePrefix: null,
+                valueExtra: null,
+              },
+              {
+                label: 'fyDai Balance',
+                labelExtra: 'current series',
+                visible: !!account && !activeSeries?.isMature(),
+                active: true,
+                loading: false || !currentValue,           
+                value: currentValue?`${cleanValue(currentValue, 2)} DAI`: '- Dai',
+                valuePrefix: null,
+                valueExtra: null,
+              },
+              {
+                label: 'fyDai Value at Maturity',
+                labelExtra: 'current series',
                 visible: 
                   (!!account && !activeSeries?.isMature()) || 
                   ( activeSeries?.isMature() && activeSeries?.fyDaiBalance_>0),
                 active: true,
                 loading: false,  
                 value: activeSeries? `${activeSeries?.fyDaiBalance_} DAI` : '-',
-                valuePrefix: null,
-                valueExtra: null,
-              },
-              {
-                label: 'fyDai Current Value',
-                labelExtra: 'if closing your position now',
-                visible: !!account && !activeSeries?.isMature(),
-                active: true,
-                loading: false || !currentValue,           
-                value: currentValue?`${cleanValue(currentValue, 2)} DAI`: '- Dai',
                 valuePrefix: null,
                 valueExtra: null,
               },
@@ -315,15 +323,6 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
                 active: true,
                 loading: false,           
                 value: null,
-                valuePrefix: null,
-                valueExtra: null,
-              },
-              {
-                label: 'Dai Balance',
-                visible: false,
-                active: true,
-                loading: false,            
-                value: daiBalance_?`${daiBalance_} DAI`: '0 DAI',
                 valuePrefix: null,
                 valueExtra: null,
               },
@@ -431,7 +430,6 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
                     <InfoGrid entries={[
                       {
                         label: 'Estimated APR',
-                        labelExtra: `if lending ${inputValue && cleanValue(inputValue, 2)} Dai`,
                         visible: true,
                         active: inputValue,
                         loading: false,     
@@ -440,30 +438,22 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
                         valueExtra: null, 
                       },
                      {
-                        label: 'Dai received',
-                        labelExtra: 'at maturity',
+                        label: 'Price Impact',
                         visible: true,
                         active: inputValue,
                         loading: false,           
-                        value: `${fyDaiValue.toFixed(2)} DAI`,
+                        value: `0%`,
                          valuePrefix: null,
                         valueExtra: null,
                       },
                       {
-                        label: 'Like what you see?',
-                        visible: !account && inputValue>0,
+                        label: 'Liquidity Provider Fee',
+                        visible: true,
                         active: inputValue,
                         loading: false,            
-                        value: '',
+                        value: `${0} Dai`,
                         valuePrefix: null,
-                        valueExtra: () => (
-                          <Box pad={{ top:'small' }}>
-                            <RaisedButton
-                              label={<Box pad='xsmall'><Text size='xsmall'>Connect a wallet</Text></Box>}
-                              onClick={() => openConnectLayer()}
-                            /> 
-                          </Box>
-                        )
+                        valueExtra: null,
                       },
                     ]}
                     />
@@ -491,28 +481,6 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
             activeSeries?.fyDaiBalance?.gt(ethers.constants.Zero) && 
             <Redeem />}
 
-            <Box direction='row' fill justify='between'>
-              { 
-                // activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) && 
-                // !mobile &&
-                !activeSeries?.isMature() && 
-                activeSeries?.fyDaiBalance_ > 0 &&
-                !mobile &&
-                <Box alignSelf='start' margin={{ top:'medium' }}>
-                  <FlatButton 
-                    onClick={()=>setHistOpen(true)}
-                    label={
-                      <Box direction='row' gap='small' align='center'>
-                        <Text size='xsmall' color='text-xweak'><History /></Text>                
-                        <Text size='xsmall' color='text-xweak'>
-                          Series Swap History
-                        </Text>              
-                      </Box>
-                    }
-                  />
-                </Box>
-              }
-            </Box>
 
           </Box>
         </Box>}
