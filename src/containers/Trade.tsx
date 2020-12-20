@@ -94,8 +94,8 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
   const [ maxFYDaiIn, setMaxFYDaiIn ] = useState<number>(0);
   const [ minDaiOut, setMinDaiOut ] = useState<number>(0);
   const [ currentValue, setCurrentValue ] = useState<string>();
-  const [ fromToken, setFromToken ] = useState<string>("Dai");
-  const [ toToken, setToToken ] = useState<string>("fyDai");
+  const [ fromToken, setFromToken ] = useState<string>("DAI");
+  const [ toToken, setToToken ] = useState<string>("fyDAI");
   const [ fromQuantity, setFromQuantity ] = useState<number>(0);
   const [ toQuantity, setToQuantity ] = useState<number>(0);
   const [ inputFromQuantity, setInputFromQuantity ] = useState<boolean>(true);
@@ -104,12 +104,21 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
 
     /* Set up type of transaction */
     useEffect(() => {
+
+
+      function roundTo(num: number, precision: number) {
+        var factor = Math.pow(10, precision);
+        var tempNumber = num * factor;
+        var roundedTempNumber = Math.round(tempNumber);
+        return roundedTempNumber / factor;
+    };
+    
       if (inputFromQuantity) {
-        if (fromToken === "Dai") {
+        if (fromToken === "DAI") {
           setFromQuantity( inputValue );
           setTradeType( "sellDai" );
           if (inputValue > 0) {
-            setToQuantity( Math.round((minFYDaiOut + Number.EPSILON) * 100) / 100 );
+            setToQuantity( roundTo(minFYDaiOut, 3) );
           } else {
             setToQuantity(0);
           }
@@ -118,14 +127,14 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
           setTradeType( "sellFYDai" );
           if (inputValue > 0) {
             // should be minimum dai received
-            setToQuantity( Math.round((minDaiOut + Number.EPSILON) * 100) / 100 );
+            setToQuantity( roundTo(minDaiOut, 3) );
           } else {
             setToQuantity(0);
           }        
         }
       } else {
         /* this option not working because I don't believe a method exists */
-        if (fromToken === "Dai") {
+        if (fromToken === "DAI") {
           setToQuantity( inputValue );
           setTradeType( "buyFYDai" );
           if (inputValue > 0) {
@@ -137,17 +146,17 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
           setToQuantity( inputValue );
           setTradeType( "buyDai" );
           if (inputValue > 0) {
-            setFromQuantity( Math.round((maxFYDaiIn + Number.EPSILON) * 100) / 100 );
-          } else {
+            setFromQuantity( roundTo(maxFYDaiIn, 3) );
+           } else {
             setFromQuantity(0);
           }
         }
       }
       console.log("inputFromQuantity: ", inputFromQuantity)
-      console.log("inputValue: ", inputValue)
-      console.log("tradeType: ", tradeType)
       console.log("fromToken: ", fromToken)
       console.log("toToken: ", toToken)
+      console.log("inputValue: ", inputValue)
+      console.log("tradeType: ", tradeType)
       console.log("fromQuantity: ", fromQuantity)
       console.log("toQuantity: ", toQuantity)
       })
@@ -234,6 +243,8 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
       setErrorMsg(null);
     }
   }, [ debouncedInput, daiBalance ]);
+
+  
 
   return (
     <RaisedBox>
@@ -361,10 +372,16 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
                           if (option === "DAI") {
                             setFromToken("DAI");
                             setToToken("fyDAI");
-                          } if (option === "fyDAI") {
+                            setInputValue(0);
+                            setFromQuantity(0);
+                            setToQuantity(0);
+                            } if (option === "fyDAI") {
                             setFromToken("fyDAI");
                             setToToken("DAI");
-                          }
+                            setInputValue(0);
+                            setFromQuantity(0);
+                            setToQuantity(0);
+                            }
                         }
                       }                      
                     />
@@ -392,10 +409,16 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
                         if (option === "DAI") {
                           setFromToken("fyDAI");
                           setToToken("DAI");
+                          setInputValue(0);
+                          setFromQuantity(0);
+                          setToQuantity(0);
                         } if (option === "fyDAI") {
                           setFromToken("DAI");
                           setToToken("fyDAI");
-                        }
+                          setInputValue(0);
+                          setFromQuantity(0);
+                          setToQuantity(0);
+                      }
                       }
                     }
                   />
