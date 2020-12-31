@@ -7,11 +7,15 @@ import Controller from '../contracts/Controller.json';
 import Dai from '../contracts/Dai.json';
 import Pool from '../contracts/Pool.json';
 import Vat from '../contracts/Vat.json';
+import ImportCdpProxy from '../contracts/ImportCdpProxy.json';
+import ImportProxy from '../contracts/ImportProxy.json';
 
 // TODO abstract this out to a higher level
 const contractMap = new Map<string, any>([
   ['FYDai', FYDai.abi],
   ['Controller', Controller.abi],
+  ['ImportCdpProxy', ImportCdpProxy.abi ],
+  ['ImportProxy', ImportProxy.abi ],
   ['Dai', Dai.abi],
   ['Pool', Pool.abi],
   ['Vat', Vat.abi], 
@@ -66,6 +70,7 @@ export const useEvents = () => {
     return logs;
   };
 
+  /* adds a parsed layer onto the returned values  (format dates, numbers to strings, */ 
   const parseEventList = async (eventList:any) => {
     const parsedList = Promise.all( eventList.map(async (x:any)=>{
       const { timestamp } = await provider.getBlock(x.blockNumber);

@@ -243,7 +243,7 @@ const UserProvider = ({ children }: any) => {
           };
         });     
       });
-
+    
     /* get the trades history from the pool */
     const tradeHistory = await deployedSeries.reduce( async ( accP: any, cur:any) => {
       const acc = await accP; 
@@ -351,6 +351,61 @@ const UserProvider = ({ children }: any) => {
         });
       return [...acc, ..._seriesHist];
     }, Promise.resolve([]) );
+
+    /* get the migration hisotry from the controller */
+    const [ cdpMigrationHistory, migrationHistory]  = await Promise.all([  
+      /* migration events from cdps in vat */  
+      getEventHistory(
+        deployedContracts.ImportCdpProxy,
+        'ImportCdpProxy',
+        'ImportedFromMaker',
+        [ null, null, account, null, null],
+        lastCheckedBlock+1
+      )
+        .then((res: any) => parseEventList(res))        /* then parse returned values */
+        .then((parsedList: any) => {                    /* then add extra info and calculated values */
+          return parsedList.map((x:any) => {
+            return {
+              ...x,
+              event: 'Imported_cdpMan',
+              type: 'maker_imported',
+              maturity: x.args_[0],
+              cdpAddr: x.args_[1],
+              collateral: x.args[3],
+              collateral_: ethers.utils.formatEther(x.args_[3]),
+              daiDebt: x.args[4],
+              daiDebt_: ethers.utils.formatEther(x.args_[4]),
+            };
+          });     
+        }),
+
+      /* migration events from cdps held in maker cdpManager */
+      getEventHistory(
+        deployedContracts.ImportCdpProxy,
+        'ImportProxy',
+        'ImportedFromMaker',
+        [ null, null, account, null, null],
+        lastCheckedBlock+1
+      )
+        .then((res: any) => parseEventList(res))        /* then parse returned values */
+        .then((parsedList: any) => {                    /* then add extra info and calculated values */
+          return parsedList.map((x:any) => {
+            return {
+              ...x,
+              event: 'Imported_direct',
+              type: 'maker_imported',
+              maturity: x.args_[0],
+              cdpAddr: x.args_[1],
+              collateral: x.args[3],
+              collateral_: ethers.utils.formatEther(x.args_[3]),
+              daiDebt: x.args[4],
+              daiDebt_: ethers.utils.formatEther(x.args_[4]),
+            };
+          });     
+        }),
+    ]);
+
+    console.log(cdpMigrationHistory);
      
     const updatedHistory = [
       ...collateralHistory,
