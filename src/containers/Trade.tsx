@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { ethers } from 'ethers';
+import { ethers, BigNumber } from 'ethers';
 import { Box, Keyboard, TextInput, Select, Text, ResponsiveContext, Collapsible, Layer } from 'grommet';
 import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 import { VscHistory as History } from 'react-icons/vsc';
@@ -86,6 +86,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
   const isLol = useIsLol(inputValue);
 
   const [ APR, setAPR ] = useState<number>();
+  const [ spotAPR, setSpotAPR ] = useState<number>();  
   const [ fyDaiValue, setFYDaiValue ] = useState<number>(0);
   const [ minFYDaiOut, setMinFYDaiOut ] = useState<number>(0);
   const [ maxFYDaiIn, setMaxFYDaiIn ] = useState<number>(0);
@@ -184,14 +185,22 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
   useEffect(() => {
     activeSeries && !(activeSeries?.isMature()) && !!debouncedInput && ( async () => {
       const preview = await previewPoolTx(tradeType, activeSeries, debouncedInput);
-      if (!(preview instanceof Error)) {
+      const spotPreview = await previewPoolTx(tradeType, activeSeries, 0.01);
+      if (!(preview instanceof Error) && !(spotPreview instanceof Error)) {
         switch(tradeType) {
           case "sellDai":
             setFYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
             console.log("setFYDaiValue: ", setFYDaiValue)
             setMinFYDaiOut(parseFloat(ethers.utils.formatEther(preview)));
             console.log("setMinFYDaiOut: ", setMinFYDaiOut)
-            setAPR( calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) );      
+            setAPR( calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) );                  
+            setSpotAPR( calcAPR( ethers.utils.parseEther("0.01"), spotPreview, activeSeries?.maturity ) );   
+            console.log("preview: ", preview);
+            console.log("spotPreview: ", spotPreview);
+            console.log("debouncedInput: ", debouncedInput);
+            console.log("debouncedInput.toString(): ", debouncedInput.toString());
+            console.log("APR: ", APR);
+            console.log("spotAPR: ", spotAPR);
             break;
           case "buyDai":
             setFYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
