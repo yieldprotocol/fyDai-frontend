@@ -85,8 +85,8 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
   const isLol = useIsLol(inputValue);
 
-  const [ APR, setAPR ] = useState<number>();
-  const [ spotAPR, setSpotAPR ] = useState<number>();  
+  const [ APR, setAPR ] = useState<number>(0);
+  const [ spotAPR, setSpotAPR ] = useState<number>(0);  
   const [ fyDaiValue, setFYDaiValue ] = useState<number>(0);
   const [ minFYDaiOut, setMinFYDaiOut ] = useState<number>(0);
   const [ maxFYDaiIn, setMaxFYDaiIn ] = useState<number>(0);
@@ -97,6 +97,16 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
   const [ fromQuantity, setFromQuantity ] = useState<number>(0);
   const [ toQuantity, setToQuantity ] = useState<number>(0);
   const [ inputFromQuantity, setInputFromQuantity ] = useState<boolean>(true);
+  const [ priceImpact, setPriceImpact ] = useState<string>("");
+
+  function roundTo(num: number, precision: number) {
+    var factor = Math.pow(10, precision);
+    var tempNumber = num * factor;
+    var roundedTempNumber = Math.round(tempNumber);
+    return roundedTempNumber / factor;
+};
+
+
 
   const [tradeType, setTradeType] = useState<string>("");
 
@@ -104,13 +114,6 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
     useEffect(() => {
 
 
-      function roundTo(num: number, precision: number) {
-        var factor = Math.pow(10, precision);
-        var tempNumber = num * factor;
-        var roundedTempNumber = Math.round(tempNumber);
-        return roundedTempNumber / factor;
-    };
-    
       if (inputFromQuantity) {
         if (fromToken === "DAI") {
           setFromQuantity( inputValue );
@@ -194,7 +197,8 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
             setMinFYDaiOut(parseFloat(ethers.utils.formatEther(preview)));
             console.log("setMinFYDaiOut: ", setMinFYDaiOut)
             setAPR( calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) );                  
-            setSpotAPR( calcAPR( ethers.utils.parseEther("0.01"), spotPreview, activeSeries?.maturity ) );   
+            setSpotAPR( calcAPR( ethers.utils.parseEther("0.01"), spotPreview, activeSeries?.maturity ) ); 
+            setPriceImpact( roundTo(spotAPR - APR, 3).toString() )  
             console.log("preview: ", preview);
             console.log("spotPreview: ", spotPreview);
             console.log("debouncedInput: ", debouncedInput);
@@ -451,7 +455,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
                         visible: true,
                         active: inputValue,
                         loading: false,           
-                        value: `0%`,
+                        value: priceImpact,
                          valuePrefix: null,
                         valueExtra: null,
                       },
