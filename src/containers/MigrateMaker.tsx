@@ -91,7 +91,8 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
   const isDebtLol = useIsLol(debtInputValue);
 
   /* token balances and calculated values */
-  const [ fyDaiValue, setFYDaiValue ] = useState<number>(0);
+
+  // const [ fyDaiValue, setFYDaiValue ] = useState<number>(0);
   const [ APR, setAPR ] = useState<number>();
 
   const [ maxAPR, setMaxAPR ] = useState<number>();
@@ -107,14 +108,16 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
 
   /* action prcedures */ 
   const importProcedure = async () => {
-    if (collInputValue || debtInputValue && !importDisabled) {
+    if ( collInputValue || debtInputValue && !importDisabled ) {
+
       await importPosition(
         activeSeries,
-        /* if there is no dai, but there is collateral left, the collateral value needs to be exact */ 
-        parseFloat(selectedVault.vaultMakerDebt_)===0 ? selectedVault.vaultCollateral : debouncedCollInput,
+        /* if  or, there is no dai, but there is collateral left, the collateral value needs to be exact */ 
+        ( collInputValue >= selectedVault.vaultCollateral_ ) || parseFloat(selectedVault.vaultMakerDebt_)===0  ?
+          selectedVault.vaultCollateral : 
+          debouncedCollInput,
         /* if the value approximates the max value OR there appears to be no Dai, use the EXACT value of the MakerDebt */
-        ( parseFloat(debouncedDebtInput) === parseFloat(selectedVault.vaultDaiDebt_ ) || 
-        parseFloat(selectedVault.vaultDaiDebt_)===0 ) ? 
+        ( parseFloat(debouncedDebtInput) === parseFloat(selectedVault.vaultDaiDebt_ ) || parseFloat(selectedVault.vaultDaiDebt_)===0 ) ? 
           selectedVault.vaultMakerDebt :
           debouncedDebtInput,
 
@@ -137,16 +140,6 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
       ]);
     }
   };
-
-  // const exportProcedure = async () => {
-  //   if ( true ) {
-  //     await exportPosition(
-  //       activeSeries,
-  //       activeSeries.fyDaiBalance,
-  //       await minWethForAmount(activeSeries.fyDaiBalance),
-  //       selectedVault.vaultId);
-  //   }
-  // };
 
   const selectVault = (prevOrNext:'next'|'prev') => {
     prevOrNext === 'prev' && selectedVaultIndex > 0 && setSelectedVaultIndex( selectedVaultIndex-1 );
@@ -184,13 +177,13 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
 
       const preview = await previewPoolTx('buyDai', activeSeries, debouncedDebtInput);     
       if (!(preview instanceof Error)) {
-        setFYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
+        // setFYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
         setAPR(calcAPR( ethers.utils.parseEther(debouncedDebtInput.toString()), preview, activeSeries.maturity ) );
       } else {
         /* if the market doesnt have liquidity just estimate from rate */
-        const rate = await previewPoolTx('buyDai', activeSeries, 1);
-        !(rate instanceof Error) && setFYDaiValue(debouncedDebtInput*parseFloat((ethers.utils.formatEther(rate))));
-        (rate instanceof Error) && setFYDaiValue(0);
+        // const rate = await previewPoolTx('buyDai', activeSeries, 1);
+        // !(rate instanceof Error) && setFYDaiValue(debouncedDebtInput*parseFloat((ethers.utils.formatEther(rate))));
+        // (rate instanceof Error) && setFYDaiValue(0);
         setImportDisabled(true);
         setDebtErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
       }
@@ -410,7 +403,9 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
                 collInputValue !== cleanValue(minSafeCollateral||'', 6) ? 
                   <FlatButton
                     label='use suggested collateral'
-                    onClick={() => setCollInputValue( cleanValue(minSafeCollateral||'', 6))}
+                    onClick={() => minSafeCollateral >= selectedVault.vaultCollateral_ ? 
+                      setCollInputValue( cleanValue(selectedVault.vaultCollateral_||'', 6) ) :
+                      setCollInputValue( cleanValue(minSafeCollateral||'', 6))}
                   /> :
                   <FlatButton 
                     label='clear'
