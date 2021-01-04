@@ -85,7 +85,7 @@ function Repay({ close }:IRepayProps) {
   };
 
   useEffect(()=>{
-    activeSeries?.ethDebtDai && daiBalance?.gt(activeSeries?.ethDebtDai) && setMaxRepay(activeSeries.ethDebtDai);
+    activeSeries?.ethDebtDai && daiBalance?.gt(activeSeries?.ethDebtDai) && setMaxRepay(activeSeries.ethDebtDai.add(ethers.BigNumber.from('1000000000000') )); 
     activeSeries?.ethDebtDai && daiBalance?.lt(activeSeries?.ethDebtDai) && setMaxRepay(daiBalance);
   }, [daiBalance, activeSeries]);
 
