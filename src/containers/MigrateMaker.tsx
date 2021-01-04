@@ -93,6 +93,9 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
   /* token balances and calculated values */
   const [ fyDaiValue, setFYDaiValue ] = useState<number>(0);
   const [ APR, setAPR ] = useState<number>();
+
+  const [ maxAPR, setMaxAPR ] = useState<number>();
+
   const [ minCollateral, setMinCollateral ] = useState<string>();
   const [ minSafeCollateral, setMinSafeCollateral ] = useState<string>();
   const [ daiDust, setDaiDust ] = useState<BigNumber>();
@@ -178,6 +181,7 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
 
       setCollInputValue('');
       setMinCollateral(ethers.utils.formatEther(await minWethForAmount(debouncedDebtInput)));
+
       const preview = await previewPoolTx('buyDai', activeSeries, debouncedDebtInput);     
       if (!(preview instanceof Error)) {
         setFYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
@@ -236,6 +240,21 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
   useEffect(()=>{
     dust && setDaiDust(dust.div(BN_RAY));
   }, [ dust ]);
+
+
+  useEffect(()=>{
+
+    selectedVault?.vaultDaiDebt_ && (async ()=>{
+      const preview = await previewPoolTx('buyDai', activeSeries, selectedVault.vaultDaiDebt_);
+      console.log(preview);
+      
+      if (!(preview instanceof Error)) {
+        setMaxAPR( calcAPR( ethers.utils.parseEther(selectedVault?.vaultDaiDebt_), preview, activeSeries.maturity) );
+      } else {
+        setMaxAPR(undefined);
+      }
+    })();
+  }, [selectedVault]);
   
   /* Handle import/export disabling deposits */
   useEffect(()=>{
@@ -308,15 +327,20 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
                           <Text color='text' size='small' weight='bold'> ETH-A Vault</Text>
                           <Text size='small'> #{x.vaultId}</Text>
                         </Box>
+
+                        { 
+                        maxAPR &&
                         <RaisedButton 
                           onClick={()=>importAllProcedure(x.vaultId)}
                           background={makerBackColor}
                           label={ 
                             <Box pad='small'>
-                              <Text size='xxsmall'> 1-Click <MakerMark /> import entire vault </Text>
+                              <Text size='xxsmall'> 1-Click RateLock {`@ ${maxAPR.toFixed(2)}%`}</Text>
                             </Box>
-                        }
+                            }
                         />
+                        }
+                
                       </Box>
                       <Box pad='medium' border background='#ffffff' fill='horizontal'>
                         <Box pad='small' border='bottom' justify='between' direction='row'> 
@@ -343,6 +367,7 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
 
         { 
         /* Show only if current vault dai is greater than the current dust level */
+        daiDust &&
         selectedVault?.vaultMakerDebt.gt(daiDust) && 
         <Box gap='medium'>
           <Box direction='row'>
@@ -404,14 +429,18 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
           <Box>
             <Text size='xsmall'> Due to a minimum size limit imposed on Maker vaults, we can't split your vault any further. However, you can still migrate your entire vault to Yield.</Text>
           </Box>
-          <RaisedButton 
-            onClick={()=>importAllProcedure(selectedVault.vaultId)}
-            label={ 
-              <Box pad='small'>
-                <Text size='xxsmall'> 1-Click <MakerMark /> import entire vault </Text>
-              </Box>
+          {
+            maxAPR &&
+            <RaisedButton 
+              onClick={()=>importAllProcedure(selectedVault.vaultId)}
+              label={ 
+                <Box pad='small'>
+                  <Text size='xxsmall'> RateLock vault {`@ ${maxAPR.toFixed(2)}%`} APR </Text>
+                </Box>
+              }
+            />
           }
-          />
+
         </Box>
         }
 
@@ -455,7 +484,7 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
 
         <ActionButton
           onClick={() => importProcedure()}
-          label='Migrate Maker Vault'
+          label={`RateLock ${debouncedDebtInput} Dai @ ${APR && APR.toFixed(2)} %`}
           disabled={importDisabled}
           hasPoolDelegatedProxy={true}
           clearInput={()=>{setCollInputValue(undefined); setDebtInputValue(undefined);}}
@@ -468,12 +497,12 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
               label={
                 <Box direction='row' gap='medium' align='center'>
                   <ArrowLeft color='text-weak' />
-                  <Text size='xsmall' color='text-weak'> cancel, and go back. </Text>
+                  <Text size='xsmall' color='text-weak'> go back </Text>
                 </Box>
                 }
             />
           </Box>       
-        </Box>       
+        </Box>
       </Box>}
 
       {mobile && 

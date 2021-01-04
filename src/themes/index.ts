@@ -481,7 +481,7 @@ export const yieldTheme = {
       maxWidth: '220px',
     },
     xxsmall: {
-      size: '12px',
+      size: '10px',
       height: '15px',
       maxWidth: '243px',
     },
