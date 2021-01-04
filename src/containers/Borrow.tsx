@@ -189,7 +189,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
       ); 
     } else if (
       debouncedInput && 
-        ( debouncedInput > Math.round(maxDaiAvailable_- maxDaiAvailable_*0.05 ) &&
+        ( debouncedInput > Math.round(maxDaiAvailable_- maxDaiAvailable_*0.05 ) && 
         !(ethPosted.isZero())
         ) ) {
       setErrorMsg(null);

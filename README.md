@@ -40,4 +40,4 @@ Chain id: 31337 )
 
 5. Setup a few proxies and a basic single market:
 `truffle exec ./scripts/setup_market_dev.js`  
-Output: 'Market Initiated' on success. 
+Output: 'Market Initiated' on success.
