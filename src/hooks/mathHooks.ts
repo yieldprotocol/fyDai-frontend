@@ -200,7 +200,7 @@ export const useMath = () => {
     _rate: BigNumber,
     _amount: BigNumber,
     _maturity:number,
-    _fromDate:number= (Math.round(new Date().getTime() / 1000)), // if not provided, defaults to current time.
+    _fromDate:number = (Math.round(new Date().getTime() / 1000)), // if not provided, defaults to current time.
   )=> {
 
     if (
