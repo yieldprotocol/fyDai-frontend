@@ -97,7 +97,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
   const [ fromQuantity, setFromQuantity ] = useState<number>(0);
   const [ toQuantity, setToQuantity ] = useState<number>(0);
   const [ inputFromQuantity, setInputFromQuantity ] = useState<boolean>(true);
-  const [ priceImpact, setPriceImpact ] = useState<string>("");
+  const [ priceImpact, setPriceImpact ] = useState<number>(0);
 
   function roundTo(num: number, precision: number) {
     var factor = Math.pow(10, precision);
@@ -198,7 +198,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
             console.log("setMinFYDaiOut: ", setMinFYDaiOut)
             setAPR( calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) );                  
             setSpotAPR( calcAPR( ethers.utils.parseEther("0.01"), spotPreview, activeSeries?.maturity ) ); 
-            setPriceImpact( roundTo(spotAPR - APR, 3).toString() )  
+            setPriceImpact( spotAPR - APR )  
             console.log("preview: ", preview);
             console.log("spotPreview: ", spotPreview);
             console.log("debouncedInput: ", debouncedInput);
@@ -455,7 +455,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
                         visible: true,
                         active: inputValue,
                         loading: false,           
-                        value: priceImpact,
+                        value: `${priceImpact.toFixed(3)}%`,
                          valuePrefix: null,
                         valueExtra: null,
                       },
