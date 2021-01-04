@@ -106,7 +106,7 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
   const [ collErrorMsg, setCollErrorMsg] = useState<string|null>(null);
   const [ debtErrorMsg, setDebtErrorMsg] = useState<string|null>(null);
 
-  /* action prcedures */ 
+  /* action prcedures */
   const importProcedure = async () => {
     if ( collInputValue || debtInputValue && !importDisabled ) {
 
@@ -267,7 +267,6 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
       target='document'
     >
       <SeriesDescriptor activeView='borrow' minimized />
-
       { !txActive &&
       <Box 
         width={!mobile?{ min:'620px', max:'620px' }: undefined}
@@ -280,7 +279,7 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
         justify='between'
       > 
         <Box direction='row' gap='small' align='center' justify='between'>
-          <Text size='large' color='text' weight='bold'> Import Maker vault </Text>
+          <Text size='large' color='text' weight='bold'> Lock in a fixed rate </Text>
           { !mobile && 
           <Box direction='row' align='center' gap='small'> 
             <Search onClick={()=>{if(!searchOpen){setSearchOpen(true);} else {setSearchInputValue(undefined); setSearchOpen(false);}}} />
@@ -361,7 +360,7 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
         { 
         /* Show only if current vault dai is greater than the current dust level */
         daiDust &&
-        selectedVault?.vaultMakerDebt.gt(daiDust) && 
+        selectedVault?.vaultDaiDebt.gt(daiDust) &&
         <Box gap='medium'>
           <Box direction='row'>
             <Box basis='50%' direction='row' align='center' gap='small' justify='start'>
@@ -419,7 +418,10 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
 
         { 
         /* Show if current vault collateral is less than the current dust level */
-        selectedVault?.vaultMakerDebt.lt(daiDust) &&
+        (selectedVault?.vaultDaiDebt.gt(ethers.constants.Zero) || 
+          selectedVault?.vaultCollateral.gt(ethers.constants.Zero)) &&
+        selectedVault?.vaultDaiDebt.lt(daiDust) &&
+
         <Box gap='medium'>
           <Box>
             <Text size='xsmall'> Due to a minimum size limit imposed on Maker vaults, we can't split your vault any further. However, you can still migrate your entire vault to Yield.</Text>
