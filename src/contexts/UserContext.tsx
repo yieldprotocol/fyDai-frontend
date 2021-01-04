@@ -136,7 +136,7 @@ const UserProvider = ({ children }: any) => {
     const collateralValue = collValue(ethPosted);
     const collateralRatio = collRatio(collateralValue, ethTotalDebtDai);
     const collateralPercent = collPercent(collateralRatio); 
-    const maxDaiAvailable = daiAvailable( collateralValue, ethTotalDebtDai, 2); // 2===200%
+    const maxDaiAvailable = daiAvailable( collateralValue, ethTotalDebtDai, 1.5); // 1.5===150%
 
     const values = {
       ethBalance, 

@@ -46,9 +46,7 @@ import YieldMobileNav from '../components/YieldMobileNav';
 import Loading from '../components/Loading';
 
 import { logEvent } from '../utils/analytics';
-import ExperimentWrap from '../components/ExperimentWrap';
 import MakerMark from '../components/logos/MakerMark';
-import MakerLogo from '../components/logos/MakerLogo';
 
 interface DepositProps {
   /* deposit amount prop is for quick linking into component */
@@ -121,12 +119,16 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
   };
 
   useEffect(()=>{
-    /* Roughly estimate the nmaximum borrowing power based on ETH balance */
-    const newPower = (ethBalance_*ethPrice_)/2;
-    if (maxDaiAvailable_) {
+    /* Roughly estimate the maximum borrowing power based on ETH balance */
+    const newPower = (ethBalance_*ethPrice_)/1.5;
+
+    if (parseFloat(maxDaiAvailable_)>0) {
       const pl = parseFloat(maxDaiAvailable_) + newPower;
       setMaxPower(pl.toFixed(2));
+    } else {
+      setMaxPower(newPower.toFixed(2));
     }
+
   }, [ethBalance_, ethPrice_, maxDaiAvailable_]);
 
   /* Handle debounced input value changes */
@@ -139,7 +141,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
     /* 2. Roughly estimate the new borrowing power */
     if (debouncedInput) {
       const val = collValue(ethers.utils.parseEther(debouncedInput));
-      const newPower = parseFloat(ethers.utils.formatEther(val))/2;
+      const newPower = parseFloat(ethers.utils.formatEther(val))/1.5;
       if (parseFloat(maxDaiAvailable_) > 0) {
         const pl = parseFloat(maxDaiAvailable_) + newPower;
         setEstPower(pl.toFixed(2));
@@ -171,7 +173,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
       setErrorMsg(null);
       setWarningMsg('If you deposit all your ETH you may not be able to make any further transactions!');
     } else if (debouncedInput && debouncedInput<0.05) {
-      setErrorMsg('Initial collateral balance must be larger than 0.05 ETH.');
+      setErrorMsg('Collateral deposits must be larger than 0.05 ETH.');
       setWarningMsg(null);
     } else {
       setWarningMsg(null);

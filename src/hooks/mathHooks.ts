@@ -111,26 +111,6 @@ export const useMath = () => {
   };
 
   /**
-   *  Calculates the liquidation price
-   *
-   * @param {BigNumber} _collateralAmount
-   * @param {BigNumber} _debtValue
-   * @param {number} _liquidationRatio eg. 150
-   * @returns
-   */
-  const liquidationPrice = (
-    _collateralAmount:BigNumber,
-    _debtValue:BigNumber,
-    _liquidationRatio:number
-  ) => {
-    if (_collateralAmount.eq(0)) {
-      // handle this case better
-      return BigNumber.from(0);
-    }
-    return _debtValue.mul(_liquidationRatio).div(_collateralAmount);
-  };
-
-  /**
    * Max amount of Dai that can be borrowed
    *
    * @param {BigNumber} _collateralValue in wei wad precision
@@ -244,7 +224,6 @@ export const useMath = () => {
     calcTokensMinted,
     poolPercent,
     splitDaiLiquidity,
-    liquidationPrice,
     collValue,
     collPrice,
     debtValAdj,
