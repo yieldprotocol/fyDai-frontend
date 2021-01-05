@@ -351,7 +351,7 @@ const UserProvider = ({ children }: any) => {
         });
       return [...acc, ..._seriesHist];
     }, Promise.resolve([]) );
-
+ 
     /* get the migration hisotry from the controller */
     const [ cdpMigrationHistory, migrationHistory]  = await Promise.all([  
       /* migration events from cdps in vat */  
@@ -367,21 +367,22 @@ const UserProvider = ({ children }: any) => {
           return parsedList.map((x:any) => {
             return {
               ...x,
-              event: 'Imported_cdpMan',
-              type: 'maker_imported',
-              maturity: x.args_[0],
+              event: 'Imported',
+              type: 'imported_maker',
+              maturity: parseInt(x.args_[0], 10),
               cdpAddr: x.args_[1],
               collateral: x.args[3],
               collateral_: ethers.utils.formatEther(x.args_[3]),
               daiDebt: x.args[4],
               daiDebt_: ethers.utils.formatEther(x.args_[4]),
+              amount: Math.abs( parseFloat(ethers.utils.formatEther( x.args_[4] )) ),
             };
           });     
         }),
 
       /* migration events from cdps held in maker cdpManager */
       getEventHistory(
-        deployedContracts.ImportCdpProxy,
+        deployedContracts.ImportProxy,
         'ImportProxy',
         'ImportedFromMaker',
         [ null, null, account, null, null],
@@ -392,20 +393,19 @@ const UserProvider = ({ children }: any) => {
           return parsedList.map((x:any) => {
             return {
               ...x,
-              event: 'Imported_direct',
-              type: 'maker_imported',
-              maturity: x.args_[0],
+              event: 'Imported',
+              type: 'imported_maker',
+              maturity: parseInt(x.args_[0], 10),
               cdpAddr: x.args_[1],
               collateral: x.args[3],
               collateral_: ethers.utils.formatEther(x.args_[3]),
               daiDebt: x.args[4],
               daiDebt_: ethers.utils.formatEther(x.args_[4]),
+              amount: Math.abs( parseFloat(ethers.utils.formatEther( x.args_[4] )) ),
             };
           });     
         }),
     ]);
-
-    console.log(cdpMigrationHistory);
      
     const updatedHistory = [
       ...collateralHistory,
@@ -413,7 +413,11 @@ const UserProvider = ({ children }: any) => {
       ...tradeHistory,
       ...addLiquidityHistory,
       ...removeLiquidityHistory,
+      ...cdpMigrationHistory,
+      ...migrationHistory
     ];
+
+    console.log(updatedHistory);
 
     const _payload = {
       account,
