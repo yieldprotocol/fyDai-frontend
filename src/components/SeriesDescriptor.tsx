@@ -36,7 +36,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
           fill
           round='small'
           gap='small'
-          pad={minimized? undefined: { bottom:'large' }}
+          pad={minimized? { bottom:'medium' }: { bottom:'large' }}
           background={
               `linear-gradient(to bottom right, 
               ${modColor( '#add8e6', -40)}, 
@@ -54,7 +54,8 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
           margin={{ bottom:'-18px' }}
         >
           <Box
-            pad={minimized? { bottom:'small', horizontal:'small' }: 'small'}
+            // pad={minimized? { bottom:'small', horizontal:'small' }: 'small'}
+            pad='small'
           >
             <Box
               direction='row-responsive'
@@ -85,7 +86,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
                   </Text>
                 </Box>}
 
-                {!minimized && <RaisedButton
+                <RaisedButton
                   background={modColor( activeSeries?.seriesColor, 50)}
                   label={(!mobile ) ?        
                     <Box align='center' direction='row' gap='small' pad='xsmall'>
@@ -102,9 +103,9 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
                       </Text>
                     </Box>}
                   onClick={()=>setSelectorOpen(true)}
-                />}
+                />
 
-                {minimized && <FlatButton
+                {/* {minimized && <FlatButton
                   background={modColor( activeSeries?.seriesColor, 50)}
                   label={(!mobile ) ?        
                     <Box align='center' direction='row' gap='small'>
@@ -121,7 +122,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
                       </Text>
                     </Box>}
                   onClick={()=>setSelectorOpen(true)}
-                />} 
+                />}  */}
 
               </Box>
             </Box>

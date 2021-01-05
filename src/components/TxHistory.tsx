@@ -45,8 +45,9 @@ const TxHistory = ( { filterTerms, series }: HistoryProps) => {
           <Text size='xsmall' color={series?.seriesColor || 'text-weak'}>{item.event}</Text>
           <Text size='xxsmall'> 
             { (item.event === 'Deposited' || item.event === 'Withdrew') && `${item.collateral} collateral`}
-            { (item.event === 'Added' || item.event === 'Removed') && 'liquidity Tokens '}
-            { item.maturity && moment.unix(item.maturity).format('MMMM YYYY') } 
+            { (item.event === 'Added' || item.event === 'Removed') && 'liquidity Tokens '} 
+            { item.event === 'Imported' && ' Maker debt to ' }
+            { item.maturity && moment.unix(item.maturity).format('MMMM YYYY') }
             { item.APR && `@ ${item.APR.toFixed(2)}%` }
           </Text>
         </Box>
@@ -65,7 +66,7 @@ const TxHistory = ( { filterTerms, series }: HistoryProps) => {
         pad='small' 
         fill='horizontal'    
       > 
-        { 
+        {
         (item.event === 'Borrowed') && 
         <Box fill>
           <Text size='xxsmall'>Amount owed @ maturity</Text>
@@ -78,6 +79,17 @@ const TxHistory = ( { filterTerms, series }: HistoryProps) => {
         <Box fill>
           <Text size='xxsmall'>Amount redeemable @ maturity</Text>
           <Text size='xsmall'>{Math.abs(item.fyDai_).toFixed(2)} Dai</Text>
+        </Box>
+        }
+
+        { 
+        (item.event === 'Imported' ) && 
+        <Box fill>
+          <Text size='xxsmall'>Collateralized with</Text>
+          <Box direction='row'>
+            <Text size='xsmall'>{Math.abs(item.collateral_).toFixed(2)} ETH-A </Text>
+            <Text size='xxsmall'>(see transaction above)</Text>
+          </Box>
         </Box>
         }
 
