@@ -262,50 +262,50 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
       onEnter={()=> importProcedure()}
       target='document'
     >
-      <SeriesDescriptor activeView='borrow' minimized />
-      
-      { 
-        !txActive &&
-        <Box 
-          width={!mobile?{ min:'620px', max:'620px' }: undefined}
-          alignSelf='center'
-          fill
-          background='background'
-          round='small'
-          pad='large'
-          gap='medium'
-          justify='between'
-        > 
-          <Box direction='row' gap='small' align='center' justify='between'>
-            <Text size='large' color='text' weight='bold'> RateLock: Lock in a fixed rate  </Text>
-            { !mobile && 
-            <Box direction='row' align='center' gap='small'> 
-              <Search onClick={()=>{if(!searchOpen){setSearchOpen(true);} else {setSearchInputValue(undefined); setSearchOpen(false);}}} />
-              <Collapsible open={searchOpen} direction='horizontal'>
-                <InsetBox
-                  background={makerBackColor}
-                  justify='between'
-                  direction='row'
-                  align='center'
-                >
-                  <TextInput
-                    type='number'
-                    placeholder='Vault Id'
-                    value={searchInputValue || ''}
-                    plain
-                    onChange={(event:any) => setSearchInputValue(event.target.value)}
-                  />
-                  <Close onClick={()=>{setSearchInputValue(undefined); setSearchOpen(false);}} />
-                </InsetBox>       
-              </Collapsible>
-            </Box>}
-          </Box>
+      <SeriesDescriptor activeView='borrow' />
 
-          <InsetBox background={makerBackColor} direction='row' justify='between'>   
-            <Box onClick={()=>selectVault('prev')} justify='center' align='center' hoverIndicator={modColor(makerBackColor, -25)}>
-              <ChevronLeft size='30px' color={selectedVaultIndex===0?makerBackColor:makerTextColor} />
-            </Box>
-            {
+      { !txActive &&
+      <Box 
+        width={!mobile?{ min:'620px', max:'620px' }: undefined}
+        alignSelf='center'
+        fill
+        background='background'
+        round='small'
+        pad='large'
+        gap='medium'
+        justify='between'
+        margin={{ top:'-18px' }}
+      > 
+        <Box direction='row' gap='small' align='center' justify='between'>
+          <Text size='large' color='text' weight='bold'> RateLock: Lock in a fixed rate </Text>
+          { !mobile && 
+          <Box direction='row' align='center' gap='small'> 
+            <Search onClick={()=>{if(!searchOpen){setSearchOpen(true);} else {setSearchInputValue(undefined); setSearchOpen(false);}}} />
+            <Collapsible open={searchOpen} direction='horizontal'>
+              <InsetBox
+                background={makerBackColor}
+                justify='between'
+                direction='row'
+                align='center'
+              >
+                <TextInput
+                  type='number'
+                  placeholder='Vault Id'
+                  value={searchInputValue || ''}
+                  plain
+                  onChange={(event:any) => setSearchInputValue(event.target.value)}
+                />
+                <Close onClick={()=>{setSearchInputValue(undefined); setSearchOpen(false);}} />
+              </InsetBox>       
+            </Collapsible>
+          </Box>}
+        </Box>
+
+        <InsetBox background={makerBackColor} direction='row' justify='between'>   
+          <Box onClick={()=>selectVault('prev')} justify='center' align='center' hoverIndicator={modColor(makerBackColor, -25)}>
+            <ChevronLeft size='30px' color={selectedVaultIndex===0?makerBackColor:makerTextColor} />
+          </Box>
+          {
             filteredMakerVaults.length>0 ?         
               filteredMakerVaults.map( (x:any, i:number) => {
                 if (selectedVaultIndex === i) {
@@ -318,7 +318,7 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
                           <Text size='small'> #{x.vaultId}</Text>
                         </Box>
 
-                        {/* { 
+                        { 
                         maxAPR &&
                         <RaisedButton 
                           onClick={()=>importAllProcedure(x.vaultId)}
@@ -329,7 +329,7 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
                             </Box>
                             }
                         />
-                        } */}
+                        }
                 
                       </Box>
                       <Box pad='medium' border background='#ffffff' fill='horizontal'>
@@ -350,42 +350,19 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
               <Box pad='large'>No matching vault ids found</Box>
             }
 
-            <Box onClick={()=>selectVault('next')} justify='center' align='center' hoverIndicator={modColor(makerBackColor, -25)}>
-              <ChevronRight size='30px' color={selectedVaultIndex===filteredMakerVaults.length-1?makerBackColor:makerTextColor} />
-            </Box>
-          </InsetBox>
+          <Box onClick={()=>selectVault('next')} justify='center' align='center' hoverIndicator={modColor(makerBackColor, -25)}>
+            <ChevronRight size='30px' color={selectedVaultIndex===filteredMakerVaults.length-1?makerBackColor:makerTextColor} />
+          </Box>
+        </InsetBox>
 
-          {
-              maxAPR &&
-              <Box
-                gap='small'
-                direction='row'
-                justify='between'
-                align='center'
-              >
-                <Text size='xsmall'>Either, migrate the entire Maker vault:</Text>
-                <RaisedButton 
-                  onClick={()=>importAllProcedure(selectedVault.vaultId)}
-                  disabled={!!debtInputValue || !!collInputValue}
-                  label={ 
-                    <Box pad='small'>
-                      <Text size='small'> 1-Click RateLock {`@ ${maxAPR.toFixed(2)}%`} </Text>
-                    </Box>
-                }
-                />
-              </Box>
-          }
-   
-          { 
+        { 
         /* Show only if current vault dai is greater than the current dust level */
         daiDust &&
         selectedVault?.vaultDaiDebt.gt(daiDust) &&
         <Box gap='medium'>
-          <Text alignSelf='start' size='xsmall' color='text'>Or, choose the amount of debt and collateral to import: </Text>
           <Box direction='row'>
             <Box basis='50%' direction='row' align='center' gap='small' justify='start'>
-              <MakerMark /> 
-              <Text size='small'>Debt </Text>
+              <MakerMark /> Debt to Import: 
             </Box>
             <InputWrap errorMsg={debtErrorMsg} warningMsg={warningMsg}>
               <TextInput
@@ -406,7 +383,7 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
         
           <Box direction='row'>
             <Box basis='50%' justify='center'>
-              <Text size='small'>Collateral</Text>
+              Collateral to Import: 
             </Box>
             <InputWrap errorMsg={collErrorMsg} warningMsg={warningMsg}>
               <TextInput
@@ -436,18 +413,18 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
           </Box>
         </Box>
         }
-          
-          { 
+
+        { 
         /* Show if current vault collateral is less than the current dust level */
         (selectedVault?.vaultDaiDebt.gt(ethers.constants.Zero) || 
-        selectedVault?.vaultCollateral.gt(ethers.constants.Zero)) &&
+          selectedVault?.vaultCollateral.gt(ethers.constants.Zero)) &&
         selectedVault?.vaultDaiDebt.lt(daiDust) &&
 
-          <Box gap='medium'>
-            <Box>
-              <Text size='xsmall'> Due to a minimum size limit imposed on Maker vaults, we can't split your vault any further. However, you can still migrate your entire vault to Yield.</Text>
-            </Box>
-            {
+        <Box gap='medium'>
+          <Box>
+            <Text size='xsmall'> Due to a minimum size limit imposed on Maker vaults, we can't split your vault any further. However, you can still migrate your entire vault to Yield.</Text>
+          </Box>
+          {
             maxAPR &&
             <RaisedButton 
               onClick={()=>importAllProcedure(selectedVault.vaultId)}
@@ -459,72 +436,69 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
             />
           }
 
-          </Box>
+        </Box>
         }
 
-          <Box fill>
-            <Collapsible open={!!debtInputValue&&debtInputValue>0}>
-              <InfoGrid entries={[
-                {
-                  label: 'Fixed Rate',
-                  labelExtra: `if migrating ${debouncedDebtInput} debt`,
-                  visible: !!debtInputValue,
-                  active: true,
-                  loading: false, 
-                  value: APR?`${APR.toFixed(2)}%`: `${activeSeries? activeSeries.yieldAPR_: ''}%`,
-                  valuePrefix: null,
-                  valueExtra: null, 
-                },
-                {
-                  label: 'Mimimal Collateral',
-                  labelExtra: `required for ${debouncedDebtInput} debt`,
-                  visible: !!debtInputValue,
-                  active: true,
-                  loading: false,           
-                  value: minCollateral ? `${minCollateral && cleanValue(minCollateral, 4)} Eth` : '',
-                  valuePrefix: null,
-                  valueExtra: null,
-                },
-                {
-                  label: 'Suggested Collateral',
-                  labelExtra: 'ratio of ~250%',
-                  visible: !!debtInputValue,
-                  active: true,
-                  loading: false,           
-                  value: minSafeCollateral ? `${minSafeCollateral && cleanValue(minSafeCollateral, 4)} Eth` : '',
-                  valuePrefix: null,
-                  valueExtra: null,
-                },
-              ]}
-              />
-            </Collapsible>
-          </Box>
-
-           
-          <ActionButton
-            onClick={() => importProcedure()}
-            label={`RateLock ${debouncedDebtInput} Dai @ ${APR && APR.toFixed(2)} %`}
-            disabled={importDisabled}
-            hasPoolDelegatedProxy={true}
-            clearInput={()=>{setCollInputValue(undefined); setDebtInputValue(undefined);}}
-          />
-
-          <Box direction='row' fill justify='between'>
-            <Box alignSelf='start' margin={{ top:'medium' }}>
-              <FlatButton 
-                onClick={()=>close()}
-                label={
-                  <Box direction='row' gap='medium' align='center'>
-                    <ArrowLeft color='text-weak' />
-                    <Text size='xsmall' color='text-weak'> go back </Text>
-                  </Box>
-                }
-              />
-            </Box>       
-          </Box>
+        <Box fill>
+          <Collapsible open={!!debtInputValue&&debtInputValue>0}>
+            <InfoGrid entries={[
+              {
+                label: 'Fixed Rate',
+                labelExtra: `if migrating ${debouncedDebtInput} debt`,
+                visible: !!debtInputValue,
+                active: true,
+                loading: false, 
+                value: APR?`${APR.toFixed(2)}%`: `${activeSeries? activeSeries.yieldAPR_: ''}%`,
+                valuePrefix: null,
+                valueExtra: null, 
+              },
+              {
+                label: 'Mimimal Collateral',
+                labelExtra: `required for ${debouncedDebtInput} debt`,
+                visible: !!debtInputValue,
+                active: true,
+                loading: false,           
+                value: minCollateral ? `${minCollateral && cleanValue(minCollateral, 4)} Eth` : '',
+                valuePrefix: null,
+                valueExtra: null,
+              },
+              {
+                label: 'Suggested Collateral',
+                labelExtra: 'ratio of ~250%',
+                visible: !!debtInputValue,
+                active: true,
+                loading: false,           
+                value: minSafeCollateral ? `${minSafeCollateral && cleanValue(minSafeCollateral, 4)} Eth` : '',
+                valuePrefix: null,
+                valueExtra: null,
+              },
+            ]}
+            />
+          </Collapsible>
         </Box>
 
-      }
+        <ActionButton
+          onClick={() => importProcedure()}
+          label={`RateLock ${debouncedDebtInput} Dai @ ${APR && APR.toFixed(2)} %`}
+          disabled={importDisabled}
+          hasPoolDelegatedProxy={true}
+          clearInput={()=>{setCollInputValue(undefined); setDebtInputValue(undefined);}}
+        />
+
+        <Box direction='row' fill justify='between'>
+          <Box alignSelf='start' margin={{ top:'medium' }}>
+            <FlatButton 
+              onClick={()=>close()}
+              label={
+                <Box direction='row' gap='medium' align='center'>
+                  <ArrowLeft color='text-weak' />
+                  <Text size='xsmall' color='text-weak'> go back </Text>
+                </Box>
+                }
+            />
+          </Box>       
+        </Box>
+      </Box>}
 
       {mobile && 
         <YieldMobileNav noMenu={true}>

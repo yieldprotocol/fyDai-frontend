@@ -30,7 +30,7 @@ import { useTxActive } from '../hooks/txHooks';
 import { useBorrowProxy } from '../hooks/borrowProxyHook';
 
 import WithdrawEth from './WithdrawEth';
-import MigrateMaker from './MigrateMaker';
+import MigrateMaker from './MigrateMaker_1';
 
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
