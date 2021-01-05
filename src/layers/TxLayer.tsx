@@ -45,8 +45,7 @@ const TxLayer = () => {
     'REDEEM', 
     'ADD_LIQUIDITY', 
     'REMOVE_LIQUIDITY', 
-    'IMPORT_POSITION',
-    'IMPORT_VAULT',
+    'IMPORT',
     'EXPORT_POSITION',
   ]);
 

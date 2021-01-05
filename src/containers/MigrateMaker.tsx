@@ -34,6 +34,7 @@ import YieldMobileNav from '../components/YieldMobileNav';
 import DaiMark from '../components/logos/DaiMark';
 import SeriesDescriptor from '../components/SeriesDescriptor';
 import MakerMark from '../components/logos/MakerMark';
+import TxStatus from '../components/TxStatus';
 
 interface IMigrateMakerProps {
   close?: any;
@@ -67,7 +68,7 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
   const { importPosition, importVault,  } = useImportProxy();
   const { minWethForAmount } = useMaker();
   const { calcAPR } = useMath();
-  const [ txActive ] = useTxActive(['WITHDRAW']);
+  const [ txActive ] = useTxActive(['IMPORT']);
 
   /* vaults and selected vaults variables */
   const [ selectedVaultIndex, setSelectedVaultIndex ] = useState<number>(0);
@@ -109,7 +110,6 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
   /* action prcedures */
   const importProcedure = async () => {
     if ( collInputValue || debtInputValue && !importDisabled ) {
-
       await importPosition(
         activeSeries,
         /* if  or, there is no dai, but there is collateral left, the collateral value needs to be exact */ 
@@ -124,16 +124,18 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
         selectedVault.vaultId);
       setCollInputValue(undefined);
       setDebtInputValue(undefined);
+      close();
       await Promise.all([
         userActions.updateUser(),
         seriesActions.updateSeries([activeSeries]),
-      ]);
+      ]);   
     }
   };
   
   const importAllProcedure = async (id:number) => {
     if (!debouncedCollInput || !debouncedDebtInput && !importDisabled) {
       await importVault(activeSeries, id);
+      close();
       await Promise.all([
         userActions.updateUser(),
         seriesActions.updateSeries([activeSeries]),
@@ -263,49 +265,56 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
       target='document'
     >
       <SeriesDescriptor activeView='borrow' minimized />
-      
-      { 
-        !txActive &&
-        <Box 
-          width={!mobile?{ min:'620px', max:'620px' }: undefined}
-          alignSelf='center'
-          fill
-          background='background'
-          round='small'
-          pad='large'
-          gap='medium'
-          justify='between'
-        > 
-          <Box direction='row' gap='small' align='center' justify='between'>
-            <Text size='large' color='text' weight='bold'> RateLock: Lock in a fixed rate  </Text>
-            { !mobile && 
-            <Box direction='row' align='center' gap='small'> 
-              <Search onClick={()=>{if(!searchOpen){setSearchOpen(true);} else {setSearchInputValue(undefined); setSearchOpen(false);}}} />
-              <Collapsible open={searchOpen} direction='horizontal'>
-                <InsetBox
-                  background={makerBackColor}
-                  justify='between'
-                  direction='row'
-                  align='center'
-                >
-                  <TextInput
-                    type='number'
-                    placeholder='Vault Id'
-                    value={searchInputValue || ''}
-                    plain
-                    onChange={(event:any) => setSearchInputValue(event.target.value)}
-                  />
-                  <Close onClick={()=>{setSearchInputValue(undefined); setSearchOpen(false);}} />
-                </InsetBox>       
-              </Collapsible>
-            </Box>}
-          </Box>
 
-          <InsetBox background={makerBackColor} direction='row' justify='between'>   
-            <Box onClick={()=>selectVault('prev')} justify='center' align='center' hoverIndicator={modColor(makerBackColor, -25)}>
-              <ChevronLeft size='30px' color={selectedVaultIndex===0?makerBackColor:makerTextColor} />
+      <Box 
+        width={!mobile?{ min:'620px', max:'620px' }: undefined}
+        alignSelf='center'
+        fill
+        background='background'
+        round='small'
+        pad='large'
+        gap='medium'
+        justify='between'
+      > 
+
+        { 
+          txActive && 
+          <TxStatus tx={txActive} />
+        }
+
+        { 
+        !txActive &&
+          <>
+            <Box direction='row' gap='small' align='center' justify='between'>
+              <Text size='large' color='text' weight='bold'> RateLock: Lock in a fixed rate  </Text>
+              { !mobile && 
+              <Box direction='row' align='center' gap='small'> 
+                <Search onClick={()=>{if(!searchOpen){setSearchOpen(true);} else {setSearchInputValue(undefined); setSearchOpen(false);}}} />
+                <Collapsible open={searchOpen} direction='horizontal'>
+                  <InsetBox
+                    background={makerBackColor}
+                    justify='between'
+                    direction='row'
+                    align='center'
+                  >
+                    <TextInput
+                      type='number'
+                      placeholder='Vault Id'
+                      value={searchInputValue || ''}
+                      plain
+                      onChange={(event:any) => setSearchInputValue(event.target.value)}
+                    />
+                    <Close onClick={()=>{setSearchInputValue(undefined); setSearchOpen(false);}} />
+                  </InsetBox>       
+                </Collapsible>
+              </Box>}
             </Box>
-            {
+
+            <InsetBox background={makerBackColor} direction='row' justify='between'>   
+              <Box onClick={()=>selectVault('prev')} justify='center' align='center' hoverIndicator={modColor(makerBackColor, -25)}>
+                <ChevronLeft size='30px' color={selectedVaultIndex===0?makerBackColor:makerTextColor} />
+              </Box>
+              {
             filteredMakerVaults.length>0 ?         
               filteredMakerVaults.map( (x:any, i:number) => {
                 if (selectedVaultIndex === i) {
@@ -350,12 +359,12 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
               <Box pad='large'>No matching vault ids found</Box>
             }
 
-            <Box onClick={()=>selectVault('next')} justify='center' align='center' hoverIndicator={modColor(makerBackColor, -25)}>
-              <ChevronRight size='30px' color={selectedVaultIndex===filteredMakerVaults.length-1?makerBackColor:makerTextColor} />
-            </Box>
-          </InsetBox>
+              <Box onClick={()=>selectVault('next')} justify='center' align='center' hoverIndicator={modColor(makerBackColor, -25)}>
+                <ChevronRight size='30px' color={selectedVaultIndex===filteredMakerVaults.length-1?makerBackColor:makerTextColor} />
+              </Box>
+            </InsetBox>
 
-          {
+            {
               maxAPR &&
               <Box
                 gap='small'
@@ -375,8 +384,8 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
                 />
               </Box>
           }
-   
-          { 
+
+            { 
         /* Show only if current vault dai is greater than the current dust level */
         daiDust &&
         selectedVault?.vaultDaiDebt.gt(daiDust) &&
@@ -437,7 +446,7 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
         </Box>
         }
           
-          { 
+            { 
         /* Show if current vault collateral is less than the current dust level */
         (selectedVault?.vaultDaiDebt.gt(ethers.constants.Zero) || 
         selectedVault?.vaultCollateral.gt(ethers.constants.Zero)) &&
@@ -462,69 +471,70 @@ const MigrateMaker = ({ close }:IMigrateMakerProps) => {
           </Box>
         }
 
-          <Box fill>
-            <Collapsible open={!!debtInputValue&&debtInputValue>0}>
-              <InfoGrid entries={[
-                {
-                  label: 'Fixed Rate',
-                  labelExtra: `if migrating ${debouncedDebtInput} debt`,
-                  visible: !!debtInputValue,
-                  active: true,
-                  loading: false, 
-                  value: APR?`${APR.toFixed(2)}%`: `${activeSeries? activeSeries.yieldAPR_: ''}%`,
-                  valuePrefix: null,
-                  valueExtra: null, 
-                },
-                {
-                  label: 'Mimimal Collateral',
-                  labelExtra: `required for ${debouncedDebtInput} debt`,
-                  visible: !!debtInputValue,
-                  active: true,
-                  loading: false,           
-                  value: minCollateral ? `${minCollateral && cleanValue(minCollateral, 4)} Eth` : '',
-                  valuePrefix: null,
-                  valueExtra: null,
-                },
-                {
-                  label: 'Suggested Collateral',
-                  labelExtra: 'ratio of ~250%',
-                  visible: !!debtInputValue,
-                  active: true,
-                  loading: false,           
-                  value: minSafeCollateral ? `${minSafeCollateral && cleanValue(minSafeCollateral, 4)} Eth` : '',
-                  valuePrefix: null,
-                  valueExtra: null,
-                },
-              ]}
-              />
-            </Collapsible>
-          </Box>
+            <Box fill>
+              <Collapsible open={!!debtInputValue&&debtInputValue>0}>
+                <InfoGrid entries={[
+                  {
+                    label: 'Fixed Rate',
+                    labelExtra: `if migrating ${debouncedDebtInput} debt`,
+                    visible: !!debtInputValue,
+                    active: true,
+                    loading: false, 
+                    value: APR?`${APR.toFixed(2)}%`: `${activeSeries? activeSeries.yieldAPR_: ''}%`,
+                    valuePrefix: null,
+                    valueExtra: null, 
+                  },
+                  {
+                    label: 'Mimimal Collateral',
+                    labelExtra: `required for ${debouncedDebtInput} debt`,
+                    visible: !!debtInputValue,
+                    active: true,
+                    loading: false,           
+                    value: minCollateral ? `${minCollateral && cleanValue(minCollateral, 4)} Eth` : '',
+                    valuePrefix: null,
+                    valueExtra: null,
+                  },
+                  {
+                    label: 'Suggested Collateral',
+                    labelExtra: 'ratio of ~250%',
+                    visible: !!debtInputValue,
+                    active: true,
+                    loading: false,           
+                    value: minSafeCollateral ? `${minSafeCollateral && cleanValue(minSafeCollateral, 4)} Eth` : '',
+                    valuePrefix: null,
+                    valueExtra: null,
+                  },
+                ]}
+                />
+              </Collapsible>
+            </Box>
 
            
-          <ActionButton
-            onClick={() => importProcedure()}
-            label={`RateLock ${debouncedDebtInput} Dai @ ${APR && APR.toFixed(2)} %`}
-            disabled={importDisabled}
-            hasPoolDelegatedProxy={true}
-            clearInput={()=>{setCollInputValue(undefined); setDebtInputValue(undefined);}}
-          />
+            <ActionButton
+              onClick={() => importProcedure()}
+              label={`RateLock ${debouncedDebtInput} Dai @ ${APR && APR.toFixed(2)} %`}
+              disabled={importDisabled}
+              hasPoolDelegatedProxy={true}
+              clearInput={()=>{setCollInputValue(undefined); setDebtInputValue(undefined);}}
+            />
+          </>
+          }
 
-          <Box direction='row' fill justify='between'>
-            <Box alignSelf='start' margin={{ top:'medium' }}>
-              <FlatButton 
-                onClick={()=>close()}
-                label={
-                  <Box direction='row' gap='medium' align='center'>
-                    <ArrowLeft color='text-weak' />
-                    <Text size='xsmall' color='text-weak'> go back </Text>
-                  </Box>
+        <Box direction='row' fill justify='between'>
+          <Box alignSelf='start' margin={{ top:'medium' }}>
+            <FlatButton 
+              onClick={()=>close()}
+              label={
+                <Box direction='row' gap='medium' align='center'>
+                  <ArrowLeft color='text-weak' />
+                  <Text size='xsmall' color='text-weak'> go back </Text>
+                </Box>
                 }
-              />
-            </Box>       
-          </Box>
+            />
+          </Box>       
         </Box>
-
-      }
+            
+      </Box>
 
       {mobile && 
         <YieldMobileNav noMenu={true}>
