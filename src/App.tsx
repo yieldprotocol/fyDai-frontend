@@ -56,7 +56,7 @@ const App = (props:any) => {
     /* Remember the following last visited routes: */
     ['borrow', 'lend', 'pool'].includes(location.pathname.split('/')[1]) &&
     /* but, ignore these other routes */
-    !['withdraw', 'repay', 'removeLiquidity', 'close'].includes(location.pathname.split('/')[1]) &&
+    !['withdraw', 'repay', 'removeLiquidity', 'close', 'post'].includes(location.pathname.split('/')[1]) &&
     setCachedLastVisit(`/${location.pathname.split('/')[1]}/${activeSeries?.maturity}` );
   }, [location]);
 

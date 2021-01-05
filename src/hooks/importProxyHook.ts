@@ -101,8 +101,8 @@ export const useImportProxy = () => {
 
     /* Processing and sanitizing input */
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
-    let parsedWeth = BigNumber.isBigNumber(wethAmount)? wethAmount : ethers.utils.parseEther(wethAmount);
-    let parsedDaiDebt = BigNumber.isBigNumber(daiDebtAmount)? daiDebtAmount : ethers.utils.parseEther(daiDebtAmount);
+    const parsedWeth = BigNumber.isBigNumber(wethAmount)? wethAmount : ethers.utils.parseEther(wethAmount);
+    const parsedDaiDebt = BigNumber.isBigNumber(daiDebtAmount)? daiDebtAmount : ethers.utils.parseEther(daiDebtAmount);
     const userAddr = account && ethers.utils.getAddress(account);
 
     const overrides = {
@@ -124,16 +124,6 @@ export const useImportProxy = () => {
     } else {
       throw(preview);
     }
-
-    /* below for testing only - remove for prod */
-
-    const vat = new ethers.Contract( 
-      ethers.utils.getAddress(deployedContracts.Vat), 
-      Vat.abi,
-      fallbackProvider,
-    );
-    // parsedWeth = ((await vat.urns(ethers.utils.formatBytes32String('ETH-A'), '0x6BAC65a4CA5C1AfcfcDdafd63b1E7C5F51C905eA')).ink) .div(BigNumber.from('6'));
-    // parsedDaiDebt = ((await vat.urns(ethers.utils.formatBytes32String('ETH-A'), '0x6BAC65a4CA5C1AfcfcDdafd63b1E7C5F51C905eA')).art) .div(BigNumber.from('6'));
     
     console.log(parsedDaiDebt, ethers.utils.formatEther(parsedDaiDebt));
     console.log(parsedWeth, ethers.utils.formatEther(parsedWeth));
@@ -165,7 +155,7 @@ export const useImportProxy = () => {
     }
 
     /* Send the required signatures out for signing, or approval tx if fallback is required */
-    const signedSigs = await handleSignList(requestedSigs, genTxCode('IMPORT_POSITION', series));
+    const signedSigs = await handleSignList(requestedSigs, genTxCode('IMPORT', series));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
     
@@ -187,7 +177,7 @@ export const useImportProxy = () => {
       viaCdpMan ? cdpProxyContract.address: proxyContract.address, 
       calldata,
       overrides,
-      { tx:null, msg: `Migrating ${utils.cleanValue(daiDebtAmount.toString(), 2)} Debt and ${utils.cleanValue(wethAmount.toString(), 4)} Eth Collateral to ${series.displayNameMobile}`, type:'IMPORT_POSITION', series  }
+      { tx:null, msg: `Migrating ${utils.cleanValue(daiDebtAmount.toString(), 2)} Debt and ${utils.cleanValue(wethAmount.toString(), 4)} Eth Collateral to ${series.displayNameMobile}`, type:'IMPORT', series  }
     );
   };
 
@@ -251,7 +241,7 @@ export const useImportProxy = () => {
     }
 
     /* Send the required signatures out for signing, or approval tx if fallback is required */
-    const signedSigs = await handleSignList(requestedSigs, genTxCode('IMPORT_VAULT', series));
+    const signedSigs = await handleSignList(requestedSigs, genTxCode('IMPORT', series));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
 
@@ -271,7 +261,7 @@ export const useImportProxy = () => {
       viaCdpMan ? cdpProxyContract.address: proxyContract.address, 
       calldata,
       overrides,
-      { tx:null, msg: `Migrating a MakerVault to Yield series: ${series.displayNameMobile}`, type:'IMPORT_VAULT', series  }
+      { tx:null, msg: `Migrating a MakerVault to Yield series: ${series.displayNameMobile}`, type:'IMPORT', series  }
     );
   };
 
