@@ -385,46 +385,13 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
                 }
               />
             </Box>
-      
+                
             {
-        /* Show only if current vault dai is greater than the current dust level */
-        daiDust &&
-        selectedVault?.vaultDaiDebt.gt(daiDust) &&
-        <Box gap='medium'>
-          {/* // null */}
-        </Box>
-        }
-          
-            { 
-          /* Show if current vault collateral is less than the current dust level */
-          (selectedVault?.vaultDaiDebt.gt(ethers.constants.Zero) || 
-        selectedVault?.vaultCollateral.gt(ethers.constants.Zero)) &&
-        selectedVault?.vaultDaiDebt.lt(daiDust) &&
-          <Box gap='medium'>
-            <Box>
-              <Text size='xsmall'> Due to a minimum size limit imposed on Maker vaults, we can't split your vault any further. However, you can still migrate your entire vault to Yield.</Text>
-            </Box>
-            {
-            maxAPR &&
-            <RaisedButton 
-              onClick={()=>importAllProcedure(selectedVault.vaultId)}
-              label={ 
-                <Box pad='small'>
-                  <Text size='xxsmall'> RateLock vault {`@ ${maxAPR.toFixed(2)}%`} APR </Text>
-                </Box>
-              }
-            />
-          }
-          </Box>
-        }
-
-            {
-              !advancedOpen &&
+            !advancedOpen &&
               <Box
                 gap='small'
                 fill='horizontal'
               >
-                {/* <Text size='xsmall' color='text'> Lock in your fixed rate: </Text> */}
                 <Box fill>
                   <RaisedButton 
                     onClick={()=>importAllProcedure(selectedVault.vaultId)}
@@ -437,57 +404,85 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
                         <Text size='small' weight='bold'> 1-Click RateLock</Text>
                         <Text size='small'>{ maxAPR? `@ ${maxAPR.toFixed(2)}%`: ''}</Text>
                       </Box>
-                }
+                    }
                   />
                 </Box>
               </Box>
-          }
+            }
 
-            <Box fill>
-              <Collapsible open={advancedOpen}>
+            <Collapsible open={advancedOpen}>
+              { 
+                /* Show if current vault collateral is less than the current dust level */
+                selectedVault?.vaultMakerDebt.lt(daiDust) &&
                 <Box gap='medium'>
-                  <Text size='xsmall' color='text'> Fix a rate for a specific amount of debt and collateral: </Text> 
-                  <Box direction='row'>
-                    <Box basis='50%' direction='row' align='center' gap='small' justify='start'>
-                      <MakerMark /> 
-                      <Text size='small'>Debt</Text>
-                    </Box>
-                    <InputWrap errorMsg={debtErrorMsg} warningMsg={warningMsg}>
-                      <TextInput
-                        ref={(el1:any) => setDebtInputRef(el1)} 
-                        type='number'
-                        placeholder='DAI'
-                        value={debtInputValue || ''}
-                        disabled={selectedVault?.vaultDaiDebt.lte(ethers.constants.Zero)}
-                        plain
-                        onChange={(event:any) => setDebtInputValue(cleanValue(event.target.value))}
-                        icon={isDebtLol ? <span role='img' aria-label='lol'>😂</span> : <DaiMark />}
-                      />
-                      <FlatButton
-                        label='max debt'
-                        onClick={()=>selectedVault && setDebtInputValue(cleanValue(selectedVault.vaultDaiDebt_))}
-                        disabled={selectedVault?.vaultDaiDebt.lte(ethers.constants.Zero)}
-
-                      />
-                    </InputWrap>
+                  <Box>
+                    <Text size='xsmall'> Due to a minimum size limit imposed on Maker vaults, we can't split your vault any further. However, you can still migrate your entire vault to Yield.</Text>
                   </Box>
+                  <RaisedButton 
+                    onClick={()=>importAllProcedure(selectedVault.vaultId)}
+                    disabled={
+                          (parseFloat(selectedVault?.vaultDaiDebt_) === 0 && parseFloat(selectedVault?.vaultCollateral_) === 0 )
+                        }
+                    label={
+                      <Box pad='small' direction='row' gap='small'>
+                        <Text size='small' weight='bold'> 1-Click RateLock</Text>
+                        <Text size='small'>{ maxAPR? `@ ${maxAPR.toFixed(2)}%`: ''}</Text>
+                      </Box>
+                    }
+                  />
+                </Box>
+                }
 
-                  <Box direction='row'>
-                    <Box basis='50%' justify='center'>
-                      <Text size='small'>collateral</Text>
-                    </Box>
-                    <InputWrap errorMsg={collErrorMsg} warningMsg={warningMsg}>
-                      <TextInput
-                        ref={(el2:any)=>setCollInputRef(el2)} 
-                        type='number'
-                        placeholder='ETH'
-                        value={collInputValue || ''}
-                        plain
-                        disabled={selectedVault?.vaultCollateral.lte(ethers.constants.Zero)}
-                        onChange={(event:any) => setCollInputValue(cleanValue(event.target.value))}
-                        icon={isCollLol ? <span role='img' aria-label='lol'>😂</span> : <EthMark />}
-                      />
-                      {
+              {
+              /* Show if current vault collateral is more than the current dust level */
+              selectedVault?.vaultMakerDebt.gt(daiDust) &&                      
+              <Box gap='medium'>
+                <Box gap='small'>
+                  <Text size='small' color='text' weight='bold'> Advanced Options: </Text> 
+                  <Text size='xxsmall' color='text-weak'> Set an amount of debt and collateral to lock in a fixed rate</Text> 
+                </Box>
+
+                <Box direction='row'>
+                  <Box basis='50%' direction='row' align='center' gap='small' justify='start'>
+                    <MakerMark /> 
+                    <Text size='small'>Dai Debt</Text>
+                  </Box>
+                  <InputWrap errorMsg={debtErrorMsg} warningMsg={warningMsg}>
+                    <TextInput
+                      ref={(el1:any) => setDebtInputRef(el1)} 
+                      type='number'
+                      placeholder='DAI'
+                      value={debtInputValue || ''}
+                      disabled={selectedVault?.vaultDaiDebt.lte(ethers.constants.Zero)}
+                      plain
+                      onChange={(event:any) => setDebtInputValue(cleanValue(event.target.value))}
+                      icon={isDebtLol ? <span role='img' aria-label='lol'>😂</span> : <DaiMark />}
+                    />
+                    <FlatButton
+                      label='max debt'
+                      onClick={()=>selectedVault && setDebtInputValue(cleanValue(selectedVault.vaultDaiDebt_))}
+                      disabled={selectedVault?.vaultDaiDebt.lte(ethers.constants.Zero)}
+                    />
+                  </InputWrap>
+                </Box>
+
+
+                <Box direction='row'>
+                  <Box basis='50%' justify='center'>
+                    <Text size='small'>Collateral</Text>
+                  </Box>
+                  <InputWrap errorMsg={collErrorMsg} warningMsg={warningMsg}>
+                    <TextInput
+                      ref={(el2:any)=>setCollInputRef(el2)} 
+                      type='number'
+                      placeholder='ETH'
+                      value={collInputValue || ''}
+                      plain
+                      disabled={selectedVault?.vaultCollateral.lte(ethers.constants.Zero)}
+                      onChange={(event:any) => setCollInputValue(cleanValue(event.target.value))}
+                      icon={isCollLol ? <span role='img' aria-label='lol'>😂</span> : <EthMark />}
+                    />
+                    {
                 minSafeCollateral && 
                 collInputValue !== cleanValue(minSafeCollateral||'', 6) ? 
                   <FlatButton
@@ -503,62 +498,61 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
                     onClick={() => setCollInputValue('')}
                   />
                 } 
-                    </InputWrap>
-                  </Box>
+                  </InputWrap>
+                </Box>
 
-                  <InfoGrid entries={[
-                    {
-                      label: 'Fixed Rate',
-                      labelExtra: `if migrating ${debouncedDebtInput} debt`,
-                      visible: !!debtInputValue,
-                      active: true,
-                      loading: false, 
-                      value: APR?`${APR.toFixed(2)}%`: `${activeSeries? activeSeries.yieldAPR_: ''}%`,
-                      valuePrefix: null,
-                      valueExtra: null, 
-                    },
-                    {
-                      label: 'Mimimal Collateral',
-                      labelExtra: `required for ${debouncedDebtInput} debt`,
-                      visible: !!debtInputValue,
-                      active: true,
-                      loading: false,           
-                      value: minCollateral ? `${minCollateral && cleanValue(minCollateral, 4)} Eth` : '',
-                      valuePrefix: null,
-                      valueExtra: null,
-                    },
-                    {
-                      label: 'Suggested Collateral',
-                      labelExtra: 'ratio of ~250%',
-                      visible: !!debtInputValue,
-                      active: true,
-                      loading: false,           
-                      value: minSafeCollateral ? `${minSafeCollateral && cleanValue(minSafeCollateral, 4)} Eth` : '',
-                      valuePrefix: null,
-                      valueExtra: null,
-                    },
-                  ]}
-                  />
+                <InfoGrid entries={[
+                  {
+                    label: 'Fixed Rate',
+                    labelExtra: `if migrating ${debouncedDebtInput} debt`,
+                    visible: !!debtInputValue,
+                    active: true,
+                    loading: false, 
+                    value: APR?`${APR.toFixed(2)}%`: `${activeSeries? activeSeries.yieldAPR_: ''}%`,
+                    valuePrefix: null,
+                    valueExtra: null, 
+                  },
+                  {
+                    label: 'Mimimal Collateral',
+                    labelExtra: `required for ${debouncedDebtInput} debt`,
+                    visible: !!debtInputValue,
+                    active: true,
+                    loading: false,           
+                    value: minCollateral ? `${minCollateral && cleanValue(minCollateral, 4)} Eth` : '',
+                    valuePrefix: null,
+                    valueExtra: null,
+                  },
+                  {
+                    label: 'Suggested Collateral',
+                    labelExtra: 'ratio of ~250%',
+                    visible: !!debtInputValue,
+                    active: true,
+                    loading: false,           
+                    value: minSafeCollateral ? `${minSafeCollateral && cleanValue(minSafeCollateral, 4)} Eth` : '',
+                    valuePrefix: null,
+                    valueExtra: null,
+                  },
+                ]}
+                />
 
-                  <ActionButton
-                    onClick={() => importProcedure()}
-                    label={                  
-                      <Box direction='row' gap='small'>
-                        <Text size='small'>RateLock</Text>
-                        <Text size='small' weight='normal'>{debouncedDebtInput} Dai @ {APR && APR.toFixed(2)}% </Text>
-                      </Box>             
+                <ActionButton
+                  onClick={() => importProcedure()}
+                  label={                  
+                    <Box direction='row' gap='small'>
+                      <Text size='small'>RateLock</Text>
+                      <Text size='small' weight='normal'>{debouncedDebtInput} Dai @ {APR && APR.toFixed(2)}% </Text>
+                    </Box>             
                     }
-                    disabled={
+                  disabled={
                       importDisabled || 
                       (parseFloat(selectedVault?.vaultDaiDebt_) === 0 && parseFloat(selectedVault?.vaultCollateral_) === 0 )               
                     }
-                    hasPoolDelegatedProxy={true}
-                    clearInput={()=>{setCollInputValue(undefined); setDebtInputValue(undefined);}}
-                  />
-
-                </Box>
-              </Collapsible>
-            </Box>
+                  hasPoolDelegatedProxy={true}
+                  clearInput={()=>{setCollInputValue(undefined); setDebtInputValue(undefined);}}
+                />
+              </Box>
+              }   
+            </Collapsible>
           </Box>
           }
 
@@ -574,7 +568,8 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
                 }
             />
           </Box>
-
+          {
+          !txActive &&
           <Box alignSelf='end' margin={{ top:'medium' }}>
             <FlatButton 
               onClick={()=>setAdvancedOpen(!advancedOpen)}
@@ -584,7 +579,8 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
                 </Box>
                 }
             />
-          </Box>  
+          </Box> 
+          } 
         </Box>
       
       </Box>
