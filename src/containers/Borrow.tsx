@@ -81,7 +81,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
 
   /* flags */
   const [ repayOpen, setRepayOpen ] = useState<boolean>(false);
-  const [ rateLockOpen, setMigrateOpen ] = useState<boolean>(true);
+  const [ rateLockOpen, setMigrateOpen ] = useState<boolean>(false);
   const [ histOpen, setHistOpen ] = useState<boolean>(false);
   const [ borrowDisabled, setBorrowDisabled ] = useState<boolean>(true);
 
