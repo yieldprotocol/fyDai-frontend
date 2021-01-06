@@ -160,6 +160,7 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
     setCollInputValue(undefined);
     setDebtErrorMsg(null);
     setCollErrorMsg(null);
+    setAdvancedOpen(false);
   };
 
   /*
@@ -416,7 +417,7 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
                 selectedVault?.vaultMakerDebt.lt(daiDust) &&
                 <Box gap='medium'>
                   <Box>
-                    <Text size='xsmall'> Due to a minimum size limit imposed on Maker vaults, we can't split your vault any further. However, you can still migrate your entire vault to Yield.</Text>
+                    <Text size='xsmall'> Due to a minimum size limit imposed on Maker vaults, it's not practical to split your vault any further. However, you can still migrate your entire vault to Yield with the 1-Click RateLock.</Text>
                   </Box>
                   <RaisedButton 
                     onClick={()=>importAllProcedure(selectedVault.vaultId)}
