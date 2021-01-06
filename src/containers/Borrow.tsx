@@ -22,7 +22,7 @@ import { useBorrowProxy } from '../hooks/borrowProxyHook';
 
 /* other containers */
 import Repay from './Repay';
-import MigrateMaker from './MigrateMaker';
+import RateLock from './RateLock';
 
 /* components */
 import DaiMark from '../components/logos/DaiMark';
@@ -81,7 +81,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
 
   /* flags */
   const [ repayOpen, setRepayOpen ] = useState<boolean>(false);
-  const [ migrateOpen, setMigrateOpen ] = useState<boolean>(false);
+  const [ rateLockOpen, setMigrateOpen ] = useState<boolean>(true);
   const [ histOpen, setHistOpen ] = useState<boolean>(false);
   const [ borrowDisabled, setBorrowDisabled ] = useState<boolean>(true);
 
@@ -223,10 +223,10 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
         }
 
         { 
-        migrateOpen && 
+        rateLockOpen && 
         makerVaults.length>0 &&
           <Layer onClickOutside={()=>setMigrateOpen(false)} responsive={true}>
-            <MigrateMaker close={()=>setMigrateOpen(false)} />
+            <RateLock close={()=>setMigrateOpen(false)} />
           </Layer>
         }
 
@@ -420,7 +420,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
 
               <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
                 <TextInput
-                  ref={(el:any) => {el && !repayOpen && !migrateOpen && !mobile && el.focus(); setInputRef(el);}} 
+                  ref={(el:any) => {el && !repayOpen && !rateLockOpen && !mobile && el.focus(); setInputRef(el);}} 
                   type="number"
                   placeholder={!mobile ? 'Enter the amount of Dai to borrow': 'DAI'} 
                   value={inputValue || ''}

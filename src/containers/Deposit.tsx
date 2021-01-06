@@ -30,7 +30,7 @@ import { useTxActive } from '../hooks/txHooks';
 import { useBorrowProxy } from '../hooks/borrowProxyHook';
 
 import WithdrawEth from './WithdrawEth';
-import MigrateMaker from './MigrateMaker_1';
+import RateLock from './RateLock';
 
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
@@ -92,7 +92,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
   const [ maxPower, setMaxPower ] = useState<any>(0);
 
   const [ withdrawOpen, setWithdrawOpen ] = useState<boolean>(false);
-  const [ migrateOpen, setMigrateOpen ] = useState<boolean>(false);
+  const [ rateLockOpen, setMigrateOpen ] = useState<boolean>(false);
 
   const [ depositPending, setDepositPending ] = useState<boolean>(false);
   const [ depositDisabled, setDepositDisabled ] = useState<boolean>(true);
@@ -267,10 +267,10 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
             <WithdrawEth close={()=>setWithdrawOpen(false)} />
           </Layer>}
 
-        { migrateOpen && makerVaults.length>0 &&
+        {/* { rateLockOpen && makerVaults.length>0 &&
           <Layer onClickOutside={()=>setMigrateOpen(false)}>
-            <MigrateMaker close={()=>setMigrateOpen(false)} />
-          </Layer>}
+            <RateLock close={()=>setMigrateOpen(false)} />
+          </Layer>} */}
       
         { (!txActive || txActive?.type === 'WITHDRAW') &&
         <Box
@@ -301,7 +301,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
 
           <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
             <TextInput
-              ref={(el:any) => {el && !withdrawOpen && !migrateOpen && !mobile && el.focus(); setInputRef(el);}} 
+              ref={(el:any) => {el && !withdrawOpen && !rateLockOpen && !mobile && el.focus(); setInputRef(el);}} 
               type='number'
               placeholder={(!mobile && !modalView) ? 'Enter the ETH amount to deposit': 'ETH'}
               value={inputValue || ''}
