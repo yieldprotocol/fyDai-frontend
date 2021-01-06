@@ -403,7 +403,7 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
                     label={
                       <Box pad='small' direction='row' gap='small'>
                         <Text size='small' weight='bold'> 1-Click RateLock</Text>
-                        <Text size='small'>{ maxAPR? `@ ${maxAPR.toFixed(2)}%`: ''}</Text>
+                        <Text size='small'>{selectedVault?.vaultDaiDebt_} Dai { maxAPR? ` @ ${maxAPR.toFixed(2)}%`: ''}</Text>
                       </Box>
                     }
                   />
@@ -427,7 +427,7 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
                     label={
                       <Box pad='small' direction='row' gap='small'>
                         <Text size='small' weight='bold'> 1-Click RateLock</Text>
-                        <Text size='small'>{ maxAPR? `@ ${maxAPR.toFixed(2)}%`: ''}</Text>
+                        <Text size='small'>{selectedVault?.vaultDaiDebt_} Dai { maxAPR? `@ ${maxAPR.toFixed(2)}%`: ''}</Text>
                       </Box>
                     }
                   />
