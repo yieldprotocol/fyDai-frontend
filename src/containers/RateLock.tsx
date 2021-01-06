@@ -157,6 +157,7 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
     prevOrNext === 'prev' && selectedVaultIndex > 0 && setSelectedVaultIndex( selectedVaultIndex-1 );
     prevOrNext === 'next' && selectedVaultIndex < filteredMakerVaults.length-1 && setSelectedVaultIndex( selectedVaultIndex+1 );
     setDebtInputValue(undefined);
+    setCollInputValue(undefined);
     setDebtErrorMsg(null);
     setCollErrorMsg(null);
   };
@@ -229,7 +230,7 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
     filteredMakerVaults.length>0 && setSelectedVaultIndex( (startIndex>=0) ? startIndex : 0 );
   }, [filteredMakerVaults]);
 
-  /* Handle minSafe calc */
+  /* Handle minSafe collateral calculations */
   useEffect(()=>{
     minCollateral && 
     setMinSafeCollateral( ((parseFloat(minCollateral)/3)*5).toString() );
@@ -240,6 +241,7 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
     dust && setDaiDust(dust.div(BN_RAY));
   }, [ dust ]);
 
+  /* Get the  Max APR for the selected Vault */
   useEffect(()=>{
     selectedVault?.vaultDaiDebt_>0 && (async ()=>{
       const preview = await previewPoolTx('buyDai', activeSeries, selectedVault.vaultDaiDebt_);
@@ -251,7 +253,7 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
     })();
   }, [selectedVault, activeSeries]);
   
-  /* Handle import/export disabling deposits */
+  /* Handle ratelock disabling deposits */
   useEffect(()=>{
     (debtInputValue > 0  && collInputValue > 0)
       ? setImportDisabled(false): setImportDisabled(true);
@@ -280,11 +282,10 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
         justify='between'
       > 
         <Box direction='row' align='center' gap='small'>
-          <Box width='50px'>
+          <Box width='60px'>
             <Image src={theme.dark ? logoLight : logoDark} fit="contain" />
           </Box>
           <Text size='xxlarge' color='text' weight='bold'>RateLock</Text>
-          {/* <Text size='small' color='text'> Lock in a fixed rate</Text> */}
         </Box>
         
         { 
@@ -376,7 +377,7 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
                     fill
                   >
                     <AprBadge activeView='Borrow' series={activeSeries} animate />
-                    <Text size='small' weight='bold' color={activeSeries?.seriesTextColor}>            
+                    <Text size='small' color={activeSeries?.seriesTextColor}>            
                       { mobile? activeSeries?.displayNameMobile : activeSeries?.displayName }
                     </Text>
                     <ChangeSeries />
@@ -427,10 +428,14 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
                 <Box fill>
                   <RaisedButton 
                     onClick={()=>importAllProcedure(selectedVault.vaultId)}
-                    disabled={advancedOpen}
+                    disabled={
+                      advancedOpen || 
+                      (parseFloat(selectedVault?.vaultDaiDebt_) === 0 && parseFloat(selectedVault?.vaultCollateral_) === 0 )
+                    }
                     label={
-                      <Box pad='small'>
-                        <Text size='small'> 1-Click RateLock {maxAPR && `@ ${maxAPR.toFixed(2)}%`} </Text>
+                      <Box pad='small' direction='row' gap='small'>
+                        <Text size='small' weight='bold'> 1-Click RateLock</Text>
+                        <Text size='small'>{ maxAPR? `@ ${maxAPR.toFixed(2)}%`: ''}</Text>
                       </Box>
                 }
                   />
@@ -441,9 +446,7 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
             <Box fill>
               <Collapsible open={advancedOpen}>
                 <Box gap='medium'>
-
-                  <Text size='xsmall' color='text'> Fix a rate for a specific amount of debt and collateral: </Text>
-                  
+                  <Text size='xsmall' color='text'> Fix a rate for a specific amount of debt and collateral: </Text> 
                   <Box direction='row'>
                     <Box basis='50%' direction='row' align='center' gap='small' justify='start'>
                       <MakerMark /> 
@@ -455,6 +458,7 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
                         type='number'
                         placeholder='DAI'
                         value={debtInputValue || ''}
+                        disabled={selectedVault?.vaultDaiDebt.lte(ethers.constants.Zero)}
                         plain
                         onChange={(event:any) => setDebtInputValue(cleanValue(event.target.value))}
                         icon={isDebtLol ? <span role='img' aria-label='lol'>😂</span> : <DaiMark />}
@@ -462,6 +466,8 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
                       <FlatButton
                         label='max debt'
                         onClick={()=>selectedVault && setDebtInputValue(cleanValue(selectedVault.vaultDaiDebt_))}
+                        disabled={selectedVault?.vaultDaiDebt.lte(ethers.constants.Zero)}
+
                       />
                     </InputWrap>
                   </Box>
@@ -477,6 +483,7 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
                         placeholder='ETH'
                         value={collInputValue || ''}
                         plain
+                        disabled={selectedVault?.vaultCollateral.lte(ethers.constants.Zero)}
                         onChange={(event:any) => setCollInputValue(cleanValue(event.target.value))}
                         icon={isCollLol ? <span role='img' aria-label='lol'>😂</span> : <EthMark />}
                       />
@@ -485,12 +492,14 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
                 collInputValue !== cleanValue(minSafeCollateral||'', 6) ? 
                   <FlatButton
                     label='use suggested collateral'
+                    disabled={selectedVault?.vaultCollateral.lte(ethers.constants.Zero)}
                     onClick={() => minSafeCollateral >= selectedVault.vaultCollateral_ ? 
                       setCollInputValue( cleanValue(selectedVault.vaultCollateral_||'', 6) ) :
-                      setCollInputValue( cleanValue(minSafeCollateral||'', 6))}
+                      setCollInputValue( cleanValue(minSafeCollateral||'', 6))}                   
                   /> :
                   <FlatButton 
                     label='clear'
+                    disabled={selectedVault?.vaultCollateral.lte(ethers.constants.Zero)}
                     onClick={() => setCollInputValue('')}
                   />
                 } 
@@ -533,8 +542,16 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
 
                   <ActionButton
                     onClick={() => importProcedure()}
-                    label={`RateLock ${debouncedDebtInput} Dai @ ${APR && APR.toFixed(2)} %`}
-                    disabled={importDisabled}
+                    label={                  
+                      <Box direction='row' gap='small'>
+                        <Text size='small'>RateLock</Text>
+                        <Text size='small' weight='normal'>{debouncedDebtInput} Dai @ {APR && APR.toFixed(2)}% </Text>
+                      </Box>             
+                    }
+                    disabled={
+                      importDisabled || 
+                      (parseFloat(selectedVault?.vaultDaiDebt_) === 0 && parseFloat(selectedVault?.vaultCollateral_) === 0 )               
+                    }
                     hasPoolDelegatedProxy={true}
                     clearInput={()=>{setCollInputValue(undefined); setDebtInputValue(undefined);}}
                   />
