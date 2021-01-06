@@ -281,8 +281,6 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
 
   }, [ activeSeries, selectedVault, collInputValue, debtInputValue ]);
 
-
-
   return (
     <Keyboard 
       onEsc={() => {
@@ -302,14 +300,16 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
         background='background'
         round='small'
         pad='large'
-        gap='medium'
         justify='between'
       > 
-        <Box direction='row' align='center' gap='small'>
-          <Box width='60px'>
-            <Image src={theme.dark ? logoLight : logoDark} fit="contain" />
-          </Box>
-          <Text size='xxlarge' color='text' weight='bold'>RateLock</Text>
+        <Box direction='row' align='center' gap='small'>    
+          { 
+            !mobile && 
+            <Box width='13%'>
+              <Image src={theme.dark ? logoLight : logoDark} fit='contain' />
+            </Box>
+          }
+          <Text size={mobile?'small':'xxlarge'} weight='bold'>RateLock</Text>   
         </Box>
         
         { 
@@ -320,10 +320,9 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
         { 
         !txActive &&
           <Box gap='medium'>
-
             <Box gap='small'> 
-              <Box direction='row' gap='small' align='center' justify='between'>
-                <Text size='xsmall' color='text'> Available vaults: </Text>
+              <Box direction='row' gap='small' align='center' justify='end'>
+                {/* <Text size='xsmall' color='text'> Connected vaults: </Text> */}           
                 { !mobile &&
                 <Box direction='row' align='center' gap='small'> 
                   <Search onClick={()=>{if(!searchOpen){setSearchOpen(true);} else {setSearchInputValue(undefined); setSearchOpen(false);}}} />
@@ -333,10 +332,11 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
                       justify='between'
                       direction='row'
                       align='center'
+                      pad='xxsmall'
                     >
                       <TextInput
                         type='number'
-                        placeholder='Vault Id'
+                        placeholder='Search vault #'
                         value={searchInputValue || ''}
                         plain
                         onChange={(event:any) => setSearchInputValue(event.target.value)}
@@ -387,8 +387,10 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
                 </Box>
               </InsetBox>
             </Box>
+
             
-            <Box direction='row' justify='between' align='center'>
+            {/* <InsetBox background={makerBackColor} direction='row' justify='between' align='center' pad={{ horizontal:'xlarge', vertical:'medium' }}> */}
+            <Box direction='row' justify='between' align='center' pad='small'>
               <Text size='xsmall' color='text'> Selected Yield Series: </Text>
               <RaisedButton 
                 onClick={()=>setSelectorOpen(true)}
@@ -401,7 +403,7 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
                     fill
                   >
                     <AprBadge activeView='Borrow' series={activeSeries} animate />
-                    <Text size='small' color={activeSeries?.seriesTextColor}>            
+                    <Text size='small'>            
                       { mobile? activeSeries?.displayNameMobile : activeSeries?.displayName }
                     </Text>
                     <ChangeSeries />
@@ -409,6 +411,7 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
                 }
               />
             </Box>
+            {/* </InsetBox> */}
                 
             {
             !advancedOpen &&
