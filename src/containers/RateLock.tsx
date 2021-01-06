@@ -87,7 +87,8 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
   const [ selectorOpen, setSelectorOpen ] = useState<boolean>(false);
   const [ advancedOpen, setAdvancedOpen ] = useState<boolean>(false);
 
-  const [ importDisabled, setImportDisabled ] = useState<boolean>(true);
+  const [ advancedDisabled, setAdvancedDisabled ] = useState<boolean>(true);
+  const [ allDisabled, setAllDisabled ] = useState<boolean>(true);
 
   /* input variables and aux hooks */
   const [ collInputValue, setCollInputValue ] = useState<any>();
@@ -119,7 +120,7 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
 
   /* action prcedures */
   const importProcedure = async () => {
-    if ( collInputValue || debtInputValue && !importDisabled ) {
+    if ( collInputValue || debtInputValue && !advancedDisabled ) {
       await importPosition(
         activeSeries,
         /* if  or, there is no dai, but there is collateral left, the collateral value needs to be exact */ 
@@ -143,7 +144,7 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
   };
   
   const importAllProcedure = async (id:number) => {
-    if (!debouncedCollInput || !debouncedDebtInput && !importDisabled) {
+    if (!debouncedCollInput || !debouncedDebtInput && !allDisabled) {
       await importVault(activeSeries, id);
       close();
       await Promise.all([
@@ -191,7 +192,7 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
       if (!(preview instanceof Error)) {
         setAPR(calcAPR( ethers.utils.parseEther(debouncedDebtInput.toString()), preview, activeSeries.maturity ) );
       } else {
-        setImportDisabled(true);
+        setAllDisabled(true);
         setDebtErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
       }
     })();
@@ -244,7 +245,7 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
 
   /* Get the  Max APR for the selected Vault */
   useEffect(()=>{
-    selectedVault?.vaultDaiDebt_>0 && (async ()=>{
+    selectedVault?.vaultDaiDebt_> 0 && (async ()=>{
       const preview = await previewPoolTx('buyDai', activeSeries, selectedVault.vaultDaiDebt_);
       if (!(preview instanceof Error)) {
         setMaxAPR( calcAPR( ethers.utils.parseEther(selectedVault?.vaultDaiDebt_), preview, activeSeries.maturity) );
@@ -253,12 +254,34 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
       }
     })();
   }, [selectedVault, activeSeries]);
-  
-  /* Handle ratelock disabling deposits */
+
+  /* Get the  Max APR for the selected Vault */
   useEffect(()=>{
-    (debtInputValue > 0  && collInputValue > 0)
-      ? setImportDisabled(false): setImportDisabled(true);
-  }, [ collInputValue, debtInputValue ]);
+      selectedVault?.vaultDaiDebt_> 0 && (async ()=>{
+      const preview = await previewPoolTx('buyDai', activeSeries, selectedVault.vaultDaiDebt_);
+      if (!(preview instanceof Error)) {
+        setMaxAPR( calcAPR( ethers.utils.parseEther(selectedVault?.vaultDaiDebt_), preview, activeSeries.maturity) );
+      } else {
+        setMaxAPR(undefined);
+      }
+    })();
+
+  }, [selectedVault, activeSeries]);
+    
+  
+  /* Handle ratelock disabling */
+  useEffect(()=>{
+
+    (debtInputValue > 0  && collInputValue > 0) ? setAdvancedDisabled(false): setAdvancedDisabled(true);
+
+    (parseFloat(selectedVault?.vaultDaiDebt_) === 0 && parseFloat(selectedVault?.vaultCollateral_) === 0 ) ||
+    activeSeries?.isMature() ?
+      setAllDisabled(true)
+      : setAllDisabled(false);
+
+  }, [ activeSeries, selectedVault, collInputValue, debtInputValue ]);
+
+
 
   return (
     <Keyboard 
@@ -397,8 +420,7 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
                   <RaisedButton 
                     onClick={()=>importAllProcedure(selectedVault.vaultId)}
                     disabled={
-                      advancedOpen || 
-                      (parseFloat(selectedVault?.vaultDaiDebt_) === 0 && parseFloat(selectedVault?.vaultCollateral_) === 0 )
+                      advancedOpen || allDisabled
                     }
                     label={
                       <Box pad='small' direction='row' gap='small'>
@@ -421,9 +443,7 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
                   </Box>
                   <RaisedButton 
                     onClick={()=>importAllProcedure(selectedVault.vaultId)}
-                    disabled={
-                          (parseFloat(selectedVault?.vaultDaiDebt_) === 0 && parseFloat(selectedVault?.vaultCollateral_) === 0 )
-                        }
+                    disabled={allDisabled}
                     label={
                       <Box pad='small' direction='row' gap='small'>
                         <Text size='small' weight='bold'> 1-Click RateLock</Text>
@@ -544,10 +564,7 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
                       <Text size='small' weight='normal'>{debouncedDebtInput} Dai @ {APR && APR.toFixed(2)}% </Text>
                     </Box>             
                     }
-                  disabled={
-                      importDisabled || 
-                      (parseFloat(selectedVault?.vaultDaiDebt_) === 0 && parseFloat(selectedVault?.vaultCollateral_) === 0 )               
-                    }
+                  disabled={advancedDisabled}
                   hasPoolDelegatedProxy={true}
                   clearInput={()=>{setCollInputValue(undefined); setDebtInputValue(undefined);}}
                 />
