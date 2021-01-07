@@ -171,6 +171,7 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
     activeSeries && 
     debouncedDebtInput>0 && 
     (async () => {
+      console.log(debtInputValue);
       if (
         debtInputValue &&
         parseFloat(debouncedDebtInput) > 0 &&
@@ -196,6 +197,7 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
         setDebtErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
       }
     })();
+    !debouncedDebtInput && setDebtErrorMsg(null);
   }, [debouncedDebtInput, activeSeries]);
 
   /*
@@ -211,6 +213,7 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
         setCollErrorMsg('That is not enough collateral to cover the debt you wish to migrate');
       }
     })();
+    !debouncedCollInput && setCollErrorMsg(null);
   }, [debouncedCollInput, activeSeries]);
 
   /* Filter vaults and set selected */ 
@@ -269,10 +272,8 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
 
   }, [selectedVault, activeSeries]);
     
-  
   /* Handle ratelock disabling */
-  useEffect(()=>{
-
+  useEffect(()=>{ 
     !collErrorMsg &&
     !debtErrorMsg &&
     (debtInputValue > 0  && collInputValue > 0) ? 
@@ -282,7 +283,6 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
     activeSeries?.isMature() ?
       setAllDisabled(true)
       : setAllDisabled(false);
-
   }, [ activeSeries, selectedVault, collInputValue, debtInputValue, collErrorMsg, debtErrorMsg ]);
 
   return (
