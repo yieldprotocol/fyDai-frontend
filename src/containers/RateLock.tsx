@@ -205,6 +205,7 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
     if ( selectedVault && debouncedCollInput > parseFloat(selectedVault.vaultCollateral_) ) {
       setCollErrorMsg('Not enough collateral in the maker vault');
     } else (setCollErrorMsg(''));
+
     activeSeries && debouncedCollInput>0 && ( async () => { 
       if (minCollateral && (debouncedCollInput < parseFloat(minCollateral)) ) {
         setCollErrorMsg('That is not enough collateral to cover the debt you wish to migrate');
@@ -271,14 +272,18 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
   
   /* Handle ratelock disabling */
   useEffect(()=>{
-    (debtInputValue > 0  && collInputValue > 0) ? setAdvancedDisabled(false): setAdvancedDisabled(true);
+
+    !collErrorMsg &&
+    !debtErrorMsg &&
+    (debtInputValue > 0  && collInputValue > 0) ? 
+      setAdvancedDisabled(false): setAdvancedDisabled(true);
 
     (parseFloat(selectedVault?.vaultDaiDebt_) === 0 && parseFloat(selectedVault?.vaultCollateral_) === 0 ) ||
     activeSeries?.isMature() ?
       setAllDisabled(true)
       : setAllDisabled(false);
 
-  }, [ activeSeries, selectedVault, collInputValue, debtInputValue ]);
+  }, [ activeSeries, selectedVault, collInputValue, debtInputValue, collErrorMsg, debtErrorMsg ]);
 
   return (
     <Keyboard 
@@ -566,7 +571,7 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
                       <Text size='small' weight='normal'>{debouncedDebtInput} Dai @ {APR && APR.toFixed(2)}% </Text>
                     </Box>             
                     }
-                  disabled={advancedDisabled}
+                  disabled={advancedDisabled || allDisabled}
                   hasPoolDelegatedProxy={true}
                   clearInput={()=>{setCollInputValue(undefined); setDebtInputValue(undefined);}}
                 />
