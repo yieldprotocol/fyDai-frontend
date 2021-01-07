@@ -144,7 +144,7 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
   };
   
   const importAllProcedure = async (id:number) => {
-    if (!debouncedCollInput || !debouncedDebtInput && !allDisabled) {
+    if (!allDisabled) {
       await importVault(activeSeries, id);
       close();
       await Promise.all([
@@ -271,7 +271,6 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
   
   /* Handle ratelock disabling */
   useEffect(()=>{
-
     (debtInputValue > 0  && collInputValue > 0) ? setAdvancedDisabled(false): setAdvancedDisabled(true);
 
     (parseFloat(selectedVault?.vaultDaiDebt_) === 0 && parseFloat(selectedVault?.vaultCollateral_) === 0 ) ||
