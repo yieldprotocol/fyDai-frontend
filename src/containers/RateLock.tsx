@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { BigNumber, ethers } from 'ethers';
-import { NavLink } from 'react-router-dom';
-import { Box, Image, Keyboard, TextInput, Text, ResponsiveContext, Collapsible, ThemeContext, Select } from 'grommet';
+import { NavLink, useHistory, useParams } from 'react-router-dom';
+import { Box, Image, Keyboard, TextInput, Text, ResponsiveContext, Collapsible, ThemeContext, Layer } from 'grommet';
 import styled, { css } from 'styled-components';
 import { 
   FiArrowLeft as ArrowLeft,
@@ -61,6 +61,8 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   const theme = useContext<any>(ThemeContext);
+  const history = useHistory();
+  const { vault : vaultParam }:any = useParams();
 
   /* context imports */
   const { state: { makerVaults }, actions: userActions } = useContext(UserContext);
@@ -231,9 +233,19 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
   }, [ makerVaults, debouncedSearchInput, selectedVaultIndex ]);
 
   useEffect(()=>{
-    /* set the initially shown vault as first one with debt */
-    const startIndex = filteredMakerVaults.findIndex((x:any)=>x.vaultDaiDebt_>0);
+    /* set the initially shown vault as first one with debt OR from url vault param */
+    let startIndex;
+
+    console.log(vaultParam);
+
+    if (vaultParam) {
+      startIndex = filteredMakerVaults.findIndex((x:any)=>x.vaultId===vaultParam);
+    } else {
+      startIndex = filteredMakerVaults.findIndex((x:any)=>x.vaultDaiDebt_>0);
+    }
     filteredMakerVaults.length>0 && setSelectedVaultIndex( (startIndex>=0) ? startIndex : 0 );
+
+
   }, [filteredMakerVaults]);
 
   /* Handle minSafe collateral calculations */
@@ -286,42 +298,44 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
   }, [ activeSeries, selectedVault, collInputValue, debtInputValue, collErrorMsg, debtErrorMsg ]);
 
   return (
-    <Keyboard 
-      onEsc={() => {
-        if (collInputValue || debtInputValue) {
-          document.activeElement === collInputRef && setCollInputValue(undefined);
-          document.activeElement === debtInputRef && setDebtInputValue(undefined);
-        } else close();
-      }}
-      onEnter={()=> importProcedure()}
-      target='document'
-    >
-      {selectorOpen && <SeriesSelector activeView="Borrow" close={()=>setSelectorOpen(false)} /> }
-      <Box 
-        width={!mobile?{ min:'620px', max:'620px' }: undefined}
-        alignSelf='center'
-        fill
-        background='background'
-        round='small'
-        pad='large'
-        justify='between'
-      > 
-        <Box direction='row' align='center' gap='small'>    
-          { 
+
+    <Layer onClickOutside={close? ()=>close(): ()=>history.push('/borrow')} responsive={true}>
+      <Keyboard 
+        onEsc={() => {
+          if (collInputValue || debtInputValue) {
+            document.activeElement === collInputRef && setCollInputValue(undefined);
+            document.activeElement === debtInputRef && setDebtInputValue(undefined);
+          } else close();
+        }}
+        onEnter={()=> importProcedure()}
+        target='document'
+      >
+        {selectorOpen && <SeriesSelector activeView="Borrow" close={()=>setSelectorOpen(false)} /> }
+        <Box 
+          width={!mobile?{ min:'620px', max:'620px' }: undefined}
+          alignSelf='center'
+          fill
+          background='background'
+          round='small'
+          pad='large'
+          justify='between'
+        > 
+          <Box direction='row' align='center' gap='small'>    
+            { 
             !mobile && 
             <Box width='13%'>
               <Image src={theme.dark ? logoLight : logoDark} fit='contain' />
             </Box>
           }
-          <Text size={mobile?'small':'xxlarge'} weight='bold'>RateLock</Text>   
-        </Box>
+            <Text size={mobile?'small':'xxlarge'} weight='bold'>RateLock</Text>   
+          </Box>
         
-        { 
+          { 
           txActive && 
           <TxStatus tx={txActive} />
         }
 
-        { 
+          { 
         !txActive &&
           <Box gap='medium'>
             <Box gap='small'> 
@@ -406,7 +420,7 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
                     pad='xsmall'
                     fill
                   >
-                    <AprBadge activeView='Borrow' series={activeSeries} animate />
+                    {activeSeries && <AprBadge activeView='Borrow' series={activeSeries} animate />}
                     <Text size='small'>            
                       { mobile? activeSeries?.displayNameMobile : activeSeries?.displayName }
                     </Text>
@@ -581,19 +595,19 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
           </Box>
           }
 
-        <Box direction='row' fill justify='between'>
-          <Box alignSelf='start' margin={{ top:'medium' }}>
-            <FlatButton 
-              onClick={()=>close()}
-              label={
-                <Box direction='row' gap='medium' align='center'>
-                  <ArrowLeft color='text-weak' />
-                  <Text size='xsmall' color='text-weak'> go back </Text>
-                </Box>
+          <Box direction='row' fill justify='between'>
+            <Box alignSelf='start' margin={{ top:'medium' }}>
+              <FlatButton 
+                onClick={close? ()=>close(): ()=>history.push('/borrow')}
+                label={
+                  <Box direction='row' gap='medium' align='center'>
+                    <ArrowLeft color='text-weak' />
+                    <Text size='xsmall' color='text-weak'> {close? 'go back': 'go to Yield Borrow'} </Text>
+                  </Box>
                 }
-            />
-          </Box>
-          {
+              />
+            </Box>
+            {
           !txActive &&
           <Box alignSelf='end' margin={{ top:'medium' }}>
             <FlatButton 
@@ -606,11 +620,11 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
             />
           </Box> 
           } 
-        </Box>
+          </Box>
       
-      </Box>
+        </Box>
 
-      {mobile && 
+        {mobile && 
         <YieldMobileNav noMenu={true}>
           <NavLink 
             to="/borrow"
@@ -623,7 +637,8 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
           </NavLink>
         </YieldMobileNav>}
 
-    </Keyboard>
+      </Keyboard>
+    </Layer>
   );
 };
 

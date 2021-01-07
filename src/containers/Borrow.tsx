@@ -81,7 +81,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
 
   /* flags */
   const [ repayOpen, setRepayOpen ] = useState<boolean>(false);
-  const [ rateLockOpen, setMigrateOpen ] = useState<boolean>(false);
+  const [ rateLockOpen, setRateLockOpen ] = useState<boolean>(false);
   const [ histOpen, setHistOpen ] = useState<boolean>(false);
   const [ borrowDisabled, setBorrowDisabled ] = useState<boolean>(true);
 
@@ -225,9 +225,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
         { 
         rateLockOpen && 
         makerVaults.length>0 &&
-          <Layer onClickOutside={()=>setMigrateOpen(false)} responsive={true}>
-            <RateLock close={()=>setMigrateOpen(false)} />
-          </Layer>
+        <RateLock close={()=>setRateLockOpen(false)} />
         }
 
         { 
@@ -413,7 +411,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
                         <Text size='xsmall'>Import a Maker vault</Text>
                       </Box>
                     }
-                    onClick={()=>setMigrateOpen(true)}
+                    onClick={()=>setRateLockOpen(true)}
                   />
                 }
               </Box>

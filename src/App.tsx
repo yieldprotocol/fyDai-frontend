@@ -26,6 +26,7 @@ import CloseDai from './containers/CloseDai';
 import WithdrawEth from './containers/WithdrawEth';
 import Repay from './containers/Repay';
 import RemoveLiquidity from './containers/RemoveLiquidity';
+import RateLock from './containers/RateLock';
 
 import YieldHeader from './components/YieldHeader';
 import YieldFooter from './components/YieldFooter';
@@ -164,16 +165,17 @@ const App = (props:any) => {
         pad={{ vertical:'medium' }}
         align='center'
         flex
-      >     
+      >
         <Switch>
           <Route path="/post/:amnt?"> <Deposit openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route>
-          <Route path="/withdraw/:amnt?"> <WithdrawEth /> </Route>
-          <Route path="/borrow/:series?/:amnt?"> <Borrow openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route> 
-          <Route path="/repay/:series/:amnt?"> <Repay /> </Route>
+          <Route path="/borrow/:series?/:amnt?"> <Borrow openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route>      
           <Route path="/lend/:series?/:amnt?"> <Lend openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route>
-          <Route path="/close/:series/:amnt?"> <CloseDai close={()=>null} /> </Route>
           <Route path="/pool/:series?/:amnt?"> <Pool openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route>
-          <Route path="/removeLiquidity/:series/:amnt?"> <RemoveLiquidity /> </Route>           
+          <Route path="/ratelock/:vault?"> <RateLock /> </Route>    
+          {/* <Route path="/withdraw/:amnt?"> <WithdrawEth /> </Route> 
+          <Route path="/repay/:series/:amnt?"> <Repay /> </Route> 
+          <Route path="/close/:series/:amnt?"> <CloseDai close={()=>null} /> </Route> 
+          <Route path="/removeLiquidity/:series/:amnt?"> <RemoveLiquidity /> </Route> */}         
           <Route exact path="/"> <Redirect to={`${cachedLastVisit || '/borrow/'}`} /> </Route>
           <Route path="/*"> 404 </Route>
         </Switch>              
