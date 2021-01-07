@@ -235,16 +235,12 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
   useEffect(()=>{
     /* set the initially shown vault as first one with debt OR from url vault param */
     let startIndex;
-
-    console.log(vaultParam);
-
     if (vaultParam) {
       startIndex = filteredMakerVaults.findIndex((x:any)=>x.vaultId===vaultParam);
     } else {
       startIndex = filteredMakerVaults.findIndex((x:any)=>x.vaultDaiDebt_>0);
     }
     filteredMakerVaults.length>0 && setSelectedVaultIndex( (startIndex>=0) ? startIndex : 0 );
-
 
   }, [filteredMakerVaults]);
 
@@ -370,7 +366,7 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
                   <ChevronLeft size='30px' color={selectedVaultIndex===0?makerBackColor:makerTextColor} />
                 </Box>
                 {
-                filteredMakerVaults.length>0 ?         
+                filteredMakerVaults.length>0 ?        
                   filteredMakerVaults.map( (x:any, i:number) => {
                     if (selectedVaultIndex === i) {
                       return (
@@ -397,7 +393,9 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
                     }
                   })
                   : 
-                  <Box pad='large'>No matching vault ids found</Box>
+                  <Box pad='large'>
+                    { null }
+                  </Box>
               }
 
                 <Box onClick={()=>selectVault('next')} justify='center' align='center' hoverIndicator={modColor(makerBackColor, -25)}>
