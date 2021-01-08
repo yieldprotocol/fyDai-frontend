@@ -31,13 +31,12 @@
         "BorrowProxy": "0xf30B142F50E2b59c4C7ca15eB2bd8427907B7Dca",
         "PoolProxy": "0x1BA14edD2fDaFe4F145283cA01cF0Cb2235Bce13",
 
-        "DetCdps": "0x36a724Bd100c39f0Ea4D3A20F7097eE01A8Ff573",
+        "GetCdps": "0x36a724Bd100c39f0Ea4D3A20F7097eE01A8Ff573",
 
         "DssCdpManager": "0x1476483dD8C35F25e568113C5f70249D3976ba21",
-        "ImportProxy": "0xa2A74D724AAEF894C129379Df7C637CE5Ba2D431",
-        "ImportCdpProxy": "0xd01572b988ed66900861f5b4430369b857F7EBb3",
-        "ExportProxy": "0x10aBdBE1D97503BD1755c3bF2D38D496EDfE527B",
-        "ExportCdpProxy": "0x6BCE7AEDC559f861734EBC9Dd37EA4f054505B95"
+        "ImportProxy": "0x5f41BC6f4D0d1F76622cb664a235b9C1Fbb1Ef6F",
+        "ImportCdpProxy": "0xdB452FD3C3A7B688a90538Cef89d23F0d65AfC66",
+  
     },
 
     "42": {
@@ -68,8 +67,6 @@
         "PoolProxy":      "0x9cAc57C33755d324013D3e12DfA5636309b705F9",
         "ImportProxy":    "0x95e7dd89Ce79074480E3faCdcf7a9b5659593556",
         "ImportCdpProxy": "0xbAe8134A286Ce92789E1D08779E0c52705FfbA7a",
-        "ExportProxy":    "0x0D9042B7F3E1Cf675b9854868104F963a9F68a88",
-        "ExportCdpProxy": "0xd670bc0919f73bE421cCA8664d3F46e528cc2bf3",
         "GetCdps":        "0x592301a23d37c591C5856f28726AF820AF8e7014",
         "DssCdpManager":  "0x1476483dD8C35F25e568113C5f70249D3976ba21",
         "ProxyFactory":   "0xe11E3b391F7E8bC47247866aF32AF67Dd58Dc800",
