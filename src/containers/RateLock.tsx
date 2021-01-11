@@ -324,8 +324,9 @@ const RateLock = ({ openConnectLayer, close }:IRateLockProps) => {
             <Box
               width='xsmall'
               pad={{ horizontal:'small', vertical:'2px' }} 
-              background={activeSeries?.seriesColor } // 'text-xweak'
+              background={activeSeries?.seriesColor} // 'text-xweak'
               // border={{ color: !theme.dark? 'text':'white' }}
+              onClick={()=>setSelectorOpen(true)}
               round
             >
               <Image src={!theme.dark ? logoDark : logoLight} fit='contain' />
