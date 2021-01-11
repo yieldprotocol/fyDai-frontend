@@ -320,16 +320,19 @@ const RateLock = ({ openConnectLayer, close }:IRateLockProps) => {
           justify='between'
           
         > 
-          <Box direction='row' align='center' gap='small'>    
-            { 
-            !mobile && 
-            <Box width='13%'>
-              <Image src={theme.dark ? logoLight : logoDark} fit='contain' />
+          <Box direction='row' align='center' gap='small' justify='start'>  
+            <Box
+              width='xsmall'
+              pad={{ horizontal:'small', vertical:'2px' }} 
+              // background='text-xweak'
+              border={{ color: !theme.dark? 'text':'white' }}
+              round
+            >
+              <Image src={!theme.dark ? logoDark : logoLight} fit='contain' />
             </Box>
-          }
-            <Text size={mobile?'small':'xxlarge'} weight='bold'>RateLock</Text>   
+            <Text size={mobile?'large':'xxlarge'} weight='bold'>RateLock</Text>   
           </Box>
-        
+
           { 
           txActive && 
           <TxStatus tx={txActive} />
