@@ -600,18 +600,22 @@ const RateLock = ({ openConnectLayer, close }:IRateLockProps) => {
           </Box>
           }
 
-          <Box direction='row' fill justify='between'>
-            <Box alignSelf='start' margin={{ top:'medium' }}>
-              <FlatButton 
-                onClick={close? ()=>close(): ()=>history.push('/borrow')}
-                label={
-                  <Box direction='row' gap='medium' align='center'>
-                    <ArrowLeft color='text-weak' />
-                    <Text size='xsmall' color='text-weak'> {close? 'go back': 'go to Yield Borrow'} </Text>
-                  </Box>
+
+          <Box direction='row' fill justify={close?'between':'end'}>
+            { 
+              close && 
+              <Box alignSelf='start' margin={{ top:'medium' }}>
+                <FlatButton 
+                  onClick={close? ()=>close(): ()=>history.push('/borrow')}
+                  label={
+                    <Box direction='row' gap='medium' align='center'>
+                      <ArrowLeft color='text-weak' />
+                      <Text size='xsmall' color='text-weak'> go back </Text>
+                    </Box>
                 }
-              />
-            </Box>
+                />
+              </Box>
+          }
             {
           !txActive &&
           <Box alignSelf='end' margin={{ top:'medium' }}>
