@@ -140,7 +140,7 @@ const RateLock = ({ openConnectLayer, close }:IRateLockProps) => {
         selectedVault.vaultId);
       setCollInputValue(undefined);
       setDebtInputValue(undefined);
-      close();
+      close && close();
       await Promise.all([
         userActions.updateUser(),
         seriesActions.updateSeries([activeSeries]),
@@ -151,7 +151,7 @@ const RateLock = ({ openConnectLayer, close }:IRateLockProps) => {
   const importAllProcedure = async (id:number) => {
     if (!allDisabled) {
       await importVault(activeSeries, id);
-      close();
+      close && close();
       await Promise.all([
         userActions.updateUser(),
         seriesActions.updateSeries([activeSeries]),
@@ -323,7 +323,7 @@ const RateLock = ({ openConnectLayer, close }:IRateLockProps) => {
           <Box direction='row' align='center' gap='small' justify='start'>  
             <Box
               width='xsmall'
-              pad={{ horizontal:'small', vertical:'2px' }} 
+              pad={{ horizontal:'small', vertical:'xsmall' }} 
               background={activeSeries?.seriesColor} // 'text-xweak'
               // border={{ color: !theme.dark? 'text':'white' }}
               onClick={()=>setSelectorOpen(true)}
@@ -400,19 +400,17 @@ const RateLock = ({ openConnectLayer, close }:IRateLockProps) => {
                       );
                     }
                   })
-                  : 
+                  :
                   <Box pad='large'>
                     { null }
                   </Box>
               }
-
                 <Box onClick={()=>selectVault('next')} justify='center' align='center' hoverIndicator={modColor(makerBackColor, -25)}>
                   <ChevronRight size='30px' color={selectedVaultIndex===filteredMakerVaults.length-1?makerBackColor:makerTextColor} />
                 </Box>
               </InsetBox>
             </Box>
-
-            
+           
             {/* <InsetBox background={makerBackColor} direction='row' justify='between' align='center' pad={{ horizontal:'xlarge', vertical:'medium' }}> */}
             <Box direction='row' justify='between' align='center' pad='small'>
               <Text size='xsmall' color='text'> Selected Yield Series: </Text>
