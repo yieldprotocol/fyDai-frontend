@@ -225,7 +225,12 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
         { 
         rateLockOpen && 
         makerVaults.length>0 &&
-        <RateLock close={()=>setRateLockOpen(false)} />
+        <Layer 
+          onClickOutside={()=>setRateLockOpen(false)}
+          responsive={true}       
+        >
+          <RateLock close={()=>setRateLockOpen(false)} />
+        </Layer>
         }
 
         { 
@@ -263,7 +268,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
                         onClick={()=>navHistory.push('/post/')}
                         label={<Text size='xsmall' color='#DDDDDD'> Manage Collateral</Text>}
                         background='#55555580'
-                      />            
+                      />
                     </Box>
                     <Box
                       background='#555555FA'
@@ -623,8 +628,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
           }
       </YieldMobileNav>
       }
-
-    </RaisedBox>   
+    </RaisedBox>
   );
 };
 

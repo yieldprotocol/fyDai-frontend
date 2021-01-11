@@ -23,6 +23,7 @@ import DaiMark from './logos/DaiMark';
 import Loading from './Loading';
 import TxStatus from './TxStatus';
 import EthMark from './logos/EthMark';
+import RaisedButton from './RaisedButton';
 
 const AccountButton = (props: any) => {
   
@@ -182,7 +183,7 @@ const AccountButton = (props: any) => {
           onClick={() => {
             openConnectLayer('CONNECT');
           }}
-          label={<Text size='small'>Connect a wallet</Text>}
+          label={<Box pad='xsmall'><Text size='small'>Connect a wallet</Text></Box>}
         />
     }
     </Box>
