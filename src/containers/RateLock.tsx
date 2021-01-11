@@ -40,9 +40,12 @@ import logoDark from '../assets/images/logo.svg';
 import logoLight from '../assets/images/logo_light.svg';
 import AprBadge from '../components/AprBadge';
 import SeriesSelector from '../components/SeriesSelector';
+import RaisedBox from '../components/RaisedBox';
+import SeriesDescriptor from '../components/SeriesDescriptor';
 
-interface IMigrateMakerProps {
+interface IRateLockProps {
   close?: any;
+  openConnectLayer?:any;
 }
 
 const InsetBox = styled(Box)`
@@ -57,7 +60,7 @@ ${(props:any) => props.background && css`
 const makerTextColor = '#48495f';
 const makerBackColor = '#f6f8f9';
 
-const RateLock = ({ close }:IMigrateMakerProps) => {
+const RateLock = ({ openConnectLayer, close }:IRateLockProps) => {
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   const theme = useContext<any>(ThemeContext);
@@ -294,8 +297,7 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
   }, [ activeSeries, selectedVault, collInputValue, debtInputValue, collErrorMsg, debtErrorMsg ]);
 
   return (
-
-    <Layer onClickOutside={close? ()=>close(): ()=>history.push('/borrow')} responsive={true}>
+    <>
       <Keyboard 
         onEsc={() => {
           if (collInputValue || debtInputValue) {
@@ -306,15 +308,17 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
         onEnter={()=> importProcedure()}
         target='document'
       >
+
         {selectorOpen && <SeriesSelector activeView="Borrow" close={()=>setSelectorOpen(false)} /> }
         <Box 
-          width={!mobile?{ min:'620px', max:'620px' }: undefined}
+          width={!mobile?{ min:'600px', max:'600px' }: undefined}
           alignSelf='center'
           fill
           background='background'
           round='small'
           pad='large'
           justify='between'
+          
         > 
           <Box direction='row' align='center' gap='small'>    
             { 
@@ -618,11 +622,12 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
             />
           </Box> 
           } 
-          </Box>
-      
+          </Box>  
         </Box>
 
-        {mobile && 
+      </Keyboard>
+
+      {mobile && 
         <YieldMobileNav noMenu={true}>
           <NavLink 
             to="/borrow"
@@ -634,12 +639,11 @@ const RateLock = ({ close }:IMigrateMakerProps) => {
             </Box>
           </NavLink>
         </YieldMobileNav>}
+    </>
 
-      </Keyboard>
-    </Layer>
   );
 };
 
-RateLock.defaultProps={ close:null };
+RateLock.defaultProps={ close:null, openConnectLayer:null };
 
 export default RateLock;

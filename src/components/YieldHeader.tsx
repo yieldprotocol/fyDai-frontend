@@ -25,16 +25,16 @@ const YieldHeader = (props: any) => {
   return (
     <>
       <Box
-        direction='row'
+        direction='row-responsive'
         pad={mobile?{ horizontal:'small', vertical:'large' }:{ horizontal:'small', vertical:'large' }}
         justify='between'
         fill
       >
         {
-        !mobile &&
-        <Box width={mobile? '20%':undefined}>
-          <Image src={theme.dark ? logoLight : logoDark} fit="contain" />
-        </Box>
+          !mobile &&
+          <Box width={mobile? '20%':undefined}>
+            <Image src={theme.dark ? logoLight : logoDark} fit="contain" />
+          </Box>
         }
 
         { 
@@ -50,8 +50,7 @@ const YieldHeader = (props: any) => {
         <Box direction='row' gap='medium' align='center'>
           <Box onClick={()=>history.push('/borrow/')}><ArrowLeft /></Box>
           <Text weight='bold' size='medium' style={{ textTransform:'capitalize' }}> {location.pathname.split('/')[1]} Collateral</Text>
-        </Box>
-        }
+        </Box>}
         
         { 
         mobile && 
@@ -79,12 +78,10 @@ const YieldHeader = (props: any) => {
           <Text weight='bold' size='medium'>Remove Liquidity</Text>
         </Box>
         }
+      </Box>
 
-        <Box direction='row' gap='small'>
-          <Box direction="row" align="center" gap="small">
-            <AccountButton {...props} />
-          </Box>
-        </Box>
+      <Box direction='row' gap='small' alignSelf={mobile?'center':undefined} fill justify='end'>
+        <AccountButton {...props} />
       </Box>
     </>
   );

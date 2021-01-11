@@ -35,6 +35,7 @@ import ErrorBoundary from './components/ErrorBoundry';
 import YieldNav from './components/YieldNav';
 
 import { initGA, logPageView } from './utils/analytics';
+import RaisedBox from './components/RaisedBox';
 
 declare global {
   interface Window {
@@ -171,9 +172,9 @@ const App = (props:any) => {
           <Route path="/borrow/:series?/:amnt?"> <Borrow openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route>      
           <Route path="/lend/:series?/:amnt?"> <Lend openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route>
           <Route path="/pool/:series?/:amnt?"> <Pool openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route>
-          <Route path="/ratelock/:vault?"> <RateLock /> </Route>    
+          <Route path="/ratelock/:vault?/:series?"> <RaisedBox><RateLock openConnectLayer={() => setShowConnectLayer('CONNECT')} /></RaisedBox> </Route>
           {/* <Route path="/withdraw/:amnt?"> <WithdrawEth /> </Route> 
-          <Route path="/repay/:series/:amnt?"> <Repay /> </Route> 
+          <Route path="/repay/:series/:amnt?"> <Repay /> </Route>
           <Route path="/close/:series/:amnt?"> <CloseDai close={()=>null} /> </Route> 
           <Route path="/removeLiquidity/:series/:amnt?"> <RemoveLiquidity /> </Route> */}         
           <Route exact path="/"> <Redirect to={`${cachedLastVisit || '/borrow/'}`} /> </Route>
