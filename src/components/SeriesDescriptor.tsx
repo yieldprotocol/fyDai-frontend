@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import { Box, Text, ResponsiveContext } from 'grommet';
 import { FiLayers as ChangeSeries } from 'react-icons/fi';
 
-import { modColor } from '../utils';
+import { modColor, buildGradient } from '../utils';
 
 import { SeriesContext } from '../contexts/SeriesContext';
 
@@ -24,7 +24,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
 
   const { state: { activeSeriesId, seriesData } } = useContext(SeriesContext);
   const activeSeries = seriesData.get(activeSeriesId);
-
+  
   const [ selectorOpen, setSelectorOpen ] = useState<boolean>(false);
 
   return (
@@ -37,20 +37,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
           round='small'
           gap='small'
           pad={minimized? { bottom:'medium' }: { bottom:'large' }}
-          background={
-              `linear-gradient(to bottom right, 
-              ${modColor( '#add8e6', -40)}, 
-              ${modColor( '#add8e6', -20)},
-              ${modColor( '#add8e6', 10)},
-              ${modColor( '#add8e6', 0)},
-              ${modColor( activeSeries?.seriesColor, 50)}, 
-              ${modColor( activeSeries?.seriesColor, 50)}, 
-              ${modColor( activeSeries?.seriesColor, 50)}, 
-              ${modColor( activeSeries?.seriesColor, 50)},
-              ${modColor( activeSeries?.seriesColor, 50)}, 
-              ${modColor( activeSeries?.seriesColor, 0)}, 
-              ${modColor( activeSeries?.seriesColor, 0)})`
-          }
+          background={ buildGradient( '#add8e6', activeSeries?.seriesColor)}
           margin={{ bottom:'-18px' }}
         >
           <Box
