@@ -42,6 +42,7 @@ import AprBadge from '../components/AprBadge';
 import SeriesSelector from '../components/SeriesSelector';
 import RaisedBox from '../components/RaisedBox';
 import SeriesDescriptor from '../components/SeriesDescriptor';
+import { useSignerAccount } from '../hooks/connectionHooks';
 
 interface IRateLockProps {
   close?: any; // close is also used as a indicator used as a layer (only a layer should have a closed)
@@ -77,6 +78,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
   const { ilks:{ dust } } = feedData;
 
   /* hooks */
+  const { account } = useSignerAccount();
   const { previewPoolTx }  = usePool();
   const { importPosition, importVault,  } = useImportProxy();
   const { minWethForAmount } = useMaker();
@@ -321,7 +323,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
             <Box
               width='xsmall'
               pad={{ horizontal:'small', vertical:'xsmall' }} 
-              background={activeSeries && asLayer? buildGradient( activeSeries?.seriesFromColor, activeSeries?.seriesColor): activeSeries?.seriesColor } 
+              background={activeSeries && asLayer? buildGradient( activeSeries?.seriesFromColor, activeSeries?.seriesColor): activeSeries?.seriesColor} 
               // background={activeSeries?.seriesColor}
               // border={{ color: !theme.dark? 'text':'white' }}
               onClick={()=>setSelectorOpen(true)}
@@ -385,7 +387,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
 
               <InsetBox background={makerBackColor} direction='row' justify='between'>   
                 <Box onClick={()=>selectVault('prev')} justify='center' align='center' hoverIndicator={modColor(makerBackColor, -25)}>
-                  <ChevronLeft size='30px' color={selectedVaultIndex===0?makerBackColor:makerTextColor} />
+                  {account && <ChevronLeft size='30px' color={selectedVaultIndex===0?makerBackColor:makerTextColor} />}
                 </Box>
                 {
                 filteredMakerVaults.length>0 ?        
@@ -416,11 +418,17 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
                   })
                   :
                   <Box pad='large'>
-                    { null }
+                    { 
+                      !account &&
+                      <RaisedButton
+                        label={<Box pad='small'><Text size='small'>Connect a wallet</Text></Box>}
+                        onClick={() => openConnectLayer()}
+                      />
+                    }
                   </Box>
               }
                 <Box onClick={()=>selectVault('next')} justify='center' align='center' hoverIndicator={modColor(makerBackColor, -25)}>
-                  <ChevronRight size='30px' color={selectedVaultIndex===filteredMakerVaults.length-1?makerBackColor:makerTextColor} />
+                  {account && <ChevronRight size='30px' color={selectedVaultIndex===filteredMakerVaults.length-1?makerBackColor:makerTextColor} />}
                 </Box>
               </InsetBox>
             </Box>
@@ -459,7 +467,9 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
                   <RaisedButton 
                     onClick={()=>importAllProcedure(selectedVault.vaultId)}
                     disabled={
-                      advancedOpen || allDisabled
+                      advancedOpen || 
+                      allDisabled ||
+                      !account
                     }
                     label={
                       <Box pad='small' direction='row' gap='small'>
@@ -634,6 +644,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
           <Box alignSelf='end' margin={{ top:'medium' }}>
             <FlatButton 
               onClick={()=>setAdvancedOpen(!advancedOpen)}
+              disabled={!account}
               label={
                 <Box direction='row' gap='medium' align='center'>
                   <Text size='xsmall' color='text-weak'> { advancedOpen ? 'Use 1-Click RateLock':'Use advanced RateLock' }</Text>
