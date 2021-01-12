@@ -47,8 +47,8 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
 
   const { amnt }:any = useParams();
   
-  const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
-  const { activeSeries } = seriesState;
+  const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
+  const activeSeries = seriesData.get(activeSeriesId);
 
   const { state: userState, actions: userActions } = useContext(UserContext);
   const { daiBalance, daiBalance_ } = userState.position;
@@ -101,7 +101,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
       setInputValue(undefined);
       await Promise.all([
         userActions.updateUser(),
-        seriesActions.updateActiveSeries()
+        seriesActions.updateSeries([activeSeries]),
       ]);
     }  
   };
@@ -187,8 +187,8 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
                 label: 'Portfolio Value',
                 labelExtra: 'at maturity',
                 visible: 
-                  (!!account && !activeSeries?.isMature()) || 
-                  ( activeSeries?.isMature() && activeSeries?.fyDaiBalance_>0),
+                  ( activeSeries?.isMature() && activeSeries?.fyDaiBalance_>0) ||
+                  (!!account && !activeSeries?.isMature()),
                 active: true,
                 loading: false,  
                 value: activeSeries? `${activeSeries?.fyDaiBalance_} DAI` : '-',
@@ -256,7 +256,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
                     icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <DaiMark />}
                   />
                   {account &&
-                  <RaisedButton 
+                  <FlatButton
                     label={!mobile ? 'Lend Maximum': 'Maximum'}
                     onClick={()=>setInputValue( cleanValue(ethers.utils.formatEther(daiBalance), 6) )}
                   />}
@@ -324,7 +324,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
             { !txActive && 
             !!account && 
             activeSeries?.isMature() && 
-            activeSeries?.fyDaiBalance?.gt(ethers.constants.Zero) && 
+            activeSeries?.fyDaiBalance?.gt(ethers.constants.Zero) &&
             <Redeem />}
 
             <Box direction='row' fill justify='between'>
@@ -339,8 +339,8 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
                     onClick={()=>setHistOpen(true)}
                     label={
                       <Box direction='row' gap='small' align='center'>
-                        <Text size='xsmall' color='text-xweak'><History /></Text>                
-                        <Text size='xsmall' color='text-xweak'>
+                        <Text size='xsmall' color='text-weak'><History /></Text>                
+                        <Text size='xsmall' color='text-weak'>
                           Series Lend History
                         </Text>              
                       </Box>

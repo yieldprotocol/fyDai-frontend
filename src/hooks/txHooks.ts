@@ -20,12 +20,12 @@ export const useTxActive = (typeList:string[]) => {
 export const useTxHelpers = () => { 
   const  { dispatch: notify }  = useContext(NotifyContext);
   const  { state, dispatch  }  = useContext(TxContext);
-  const [ , setPendingCache ] = useCachedState('txPending', []);
+  const [ pendingCache, setPendingCache ] = useCachedState('txPending', []);
 
   /* Notification Helpers */
-  const txComplete = (receipt:any, txCode:string|null=null) => {
+  const txComplete = (receipt:any, txCode:string|null=null) => {  
     dispatch({ type: 'txComplete', payload: { receipt, txCode } } );
-    setPendingCache( state.pendingTxs.filter((x:any) => x.tx.hash !== ( receipt.transactionHash || receipt.hash)));
+    setPendingCache(pendingCache.filter( (x:any)=> x.tx.hash === receipt.hash ));
   };
 
   const handleTxRejectError = (error:any) => {
@@ -59,6 +59,7 @@ export const useTxHelpers = () => {
       payload:{ message: msg, type:'error' } 
     });
     txComplete(receipt);
+    setPendingCache([]);
   };
   
   const handleTx = async ( tx:ITx ) => {
@@ -67,8 +68,8 @@ export const useTxHelpers = () => {
     /* add the tx to txContent */
     dispatch({ type: 'txPending', payload: { ...tx, txCode } });
     /* add the tx to the cache, for picking up on reload */
-    setPendingCache([...state.pendingTxs, { ...tx, txCode } ]);
-    
+    setPendingCache([{ ...tx, txCode }]);
+
     await tx.tx.wait()
       .then((receipt:any) => {
         txComplete(receipt, txCode);

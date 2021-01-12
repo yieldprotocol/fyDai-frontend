@@ -27,6 +27,8 @@ import WithdrawEth from './containers/WithdrawEth';
 import Repay from './containers/Repay';
 import RemoveLiquidity from './containers/RemoveLiquidity';
 import Trade from './containers/Trade';
+import RateLock from './containers/RateLock';
+
 
 import YieldHeader from './components/YieldHeader';
 import YieldFooter from './components/YieldFooter';
@@ -35,6 +37,7 @@ import ErrorBoundary from './components/ErrorBoundry';
 import YieldNav from './components/YieldNav';
 
 import { initGA, logPageView } from './utils/analytics';
+import RaisedBox from './components/RaisedBox';
 
 declare global {
   interface Window {
@@ -44,7 +47,9 @@ declare global {
 
 const App = (props:any) => {
 
-  const { state: { seriesLoading, activeSeries }, actions: seriesActions } = useContext(SeriesContext);
+  const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
+  const activeSeries = seriesData.get(activeSeriesId);
+
   const { actions: userActions } = useContext(UserContext);
   const { dispatch } = useContext(NotifyContext);
   const [ cachedLastVisit, setCachedLastVisit ] = useCachedState('lastVisit', null);
@@ -55,40 +60,57 @@ const App = (props:any) => {
     /* Remember the following last visited routes: */
     ['borrow', 'lend', 'pool'].includes(location.pathname.split('/')[1]) &&
     /* but, ignore these other routes */
-    !['withdraw', 'repay', 'removeLiquidity', 'close'].includes(location.pathname.split('/')[1]) &&
+    !['withdraw', 'repay', 'removeLiquidity', 'close', 'post'].includes(location.pathname.split('/')[1]) &&
     setCachedLastVisit(`/${location.pathname.split('/')[1]}/${activeSeries?.maturity}` );
   }, [location]);
 
-  /* Serivce Worker registraion and handle app updates and user confirmations */
+  /* Service Worker registraion and handle app updates and user confirmations */
   useEffect(()=>{
-    // serviceWorker.register({ 
-    //   onUpdate: (registration:any)=> {
-    //     // eslint-disable-next-line no-console
-    //     console.log( 'A new version of the app is available' );
-    //     dispatch({ 
-    //       type: 'updateAvailable',
-    //       payload: { 
-    //         updateAvailable:true,
-    //         updateAccept: ()=> { 
-    //           registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-    //           /* Clear the cache (except user Preferences) on update - in future, save user preferences */
-    //           localStorage.removeItem('deployedContracts');
-    //           localStorage.removeItem('lastFeed');
-    //           localStorage.removeItem('deployedSeries');
-    //           localStorage.removeItem('cache_chainId');
-    //           localStorage.removeItem('txHistory');
-    //           window.location.reload();
-    //         },    
-    //       },
-    //     });
-    //   } 
-    // });
-    serviceWorker.unregister();
+    const cachesToClear = ['txPending', 'lastFeed', 'lastVisit', 'deployedSeries', 'cache_chainId', 'txHistory' ];
+    
+    serviceWorker.register({ 
+      onUpdate: (registration:any) => {
+        // eslint-disable-next-line no-console
+        console.log( 'A new version of the app is available!' );
+        dispatch({ 
+          type: 'updateAvailable',
+          payload: {
+            updateAvailable: true,
+            updateAccept: ()=> {         
+              registration.waiting && registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+              /* clear the cache (except user Preferences) on update - in future, save user preferences */
+              for (const cache of cachesToClear) {
+                localStorage.removeItem(cache);
+              }
+              window.location.reload();
+            },
+          },
+        });
+      },
+      onWaiting: (registration:any) => { 
+        // eslint-disable-next-line no-console
+        console.log( 'A new version of the app is still available.' );
+        dispatch({ 
+          type: 'updateAvailable',
+          payload: {
+            updateAvailable: true,
+            updateAccept: ()=> {
+              registration.waiting && registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+              /* Clear the cache (except user Preferences) on update - in future, save user preferences */
+              for (const cache of cachesToClear) {
+                localStorage.removeItem(cache);
+              }
+              window.location.reload();
+            },  
+          },
+        });
+      }
+    });
   }, []);
 
   useEffect(()=>{
     window.addEventListener('offline', () => {
-      console.log('I am offline.');
+      console.log('App is offline.');
       dispatch({ type:'notify', payload:{ message:'No Network', type:'error' } });
     });
 
@@ -146,17 +168,18 @@ const App = (props:any) => {
         pad={{ vertical:'medium' }}
         align='center'
         flex
-      >     
+      >
         <Switch>
           <Route path="/post/:amnt?"> <Deposit openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route>
-          <Route path="/withdraw/:amnt?"> <WithdrawEth /> </Route>
-          <Route path="/borrow/:series?/:amnt?"> <Borrow openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route> 
-          <Route path="/repay/:series/:amnt?"> <Repay /> </Route>
+          <Route path="/borrow/:series?/:amnt?"> <Borrow openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route>      
           <Route path="/lend/:series?/:amnt?"> <Lend openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route>
-          <Route path="/close/:series/:amnt?"> <CloseDai close={()=>null} /> </Route>
           <Route path="/pool/:series?/:amnt?"> <Pool openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route>
-          <Route path="/removeLiquidity/:series/:amnt?"> <RemoveLiquidity /> </Route>           
           <Route path="/trade/:series?/:amnt?"> <Trade openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route> 
+          <Route path="/ratelock/:vault?/:series?"> <RaisedBox><RateLock openConnectLayer={() => setShowConnectLayer('CONNECT')} /></RaisedBox> </Route>
+          {/* <Route path="/withdraw/:amnt?"> <WithdrawEth /> </Route> 
+          <Route path="/repay/:series/:amnt?"> <Repay /> </Route>
+          <Route path="/close/:series/:amnt?"> <CloseDai close={()=>null} /> </Route> 
+          <Route path="/removeLiquidity/:series/:amnt?"> <RemoveLiquidity /> </Route> */}         
           <Route exact path="/"> <Redirect to={`${cachedLastVisit || '/borrow/'}`} /> </Route>
           <Route path="/*"> 404 </Route>
         </Switch>              
@@ -165,10 +188,8 @@ const App = (props:any) => {
       <Footer margin={mobile? undefined: { horizontal:'xlarge' }}>
         {!mobile &&
         <YieldFooter
-          darkMode={props.darkMode}
-          setDarkMode={props.setDarkMode}
+          themeMode={props.themeMode}
           moodLight={props.moodLight}
-          toggleMoodLight={props.toggleMoodLight}
           openConnectLayer={() => setShowConnectLayer('CONNECT')}
         />}                  
       </Footer>
@@ -177,20 +198,33 @@ const App = (props:any) => {
 };
 
 const WrappedApp = () => {
-  const [ userPreferences, setUserPreferences ] = useCachedState('userPreferences', { moodLight:true, darkMode:true });
+ 
+  const [ colorScheme, setColorScheme ] = useState<'light'|'dark'>('light');
+  const { state: { preferences: userPreferences } } = useContext(UserContext);
+
+  useEffect(()=>{
+    if (userPreferences.themeMode === 'auto') {
+      (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? setColorScheme('dark') : setColorScheme('light');
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+        const newColorScheme = e.matches ? 'dark' : 'light';
+        userPreferences.themeMode === 'auto' && setColorScheme(newColorScheme);
+      });
+    } else {
+      setColorScheme( userPreferences.themeMode );
+    }
+  }, [userPreferences]);
+
   return (
     <Suspense fallback={null}>
       <Grommet
         theme={deepMerge(base, yieldTheme)}
-        themeMode={userPreferences?.darkMode ? 'dark' : 'light' || 'light'}
+        themeMode={colorScheme === 'dark'? 'dark':'light' || 'light'}
         full
       >
         <ErrorBoundary>
-          <App 
-            darkMode={userPreferences?.darkMode}
-            setDarkMode={()=>setUserPreferences({ ...userPreferences, darkMode: !userPreferences?.darkMode })}
-            moodLight={userPreferences?.darkMode? false: userPreferences?.moodLight}
-            toggleMoodLight={()=>setUserPreferences({ ...userPreferences, moodLight: !userPreferences?.moodLight })}
+          <App
+            themeMode={userPreferences.themeMode}
+            moodLight={colorScheme==='dark'? false: userPreferences.moodLight}
           />
         </ErrorBoundary>
       </Grommet>

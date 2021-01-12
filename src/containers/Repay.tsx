@@ -29,6 +29,7 @@ import DaiMark from '../components/logos/DaiMark';
 import YieldMobileNav from '../components/YieldMobileNav';
 
 import { logEvent } from '../utils/analytics';
+import SeriesDescriptor from '../components/SeriesDescriptor';
 
 interface IRepayProps {
   close?:any;
@@ -36,8 +37,8 @@ interface IRepayProps {
 
 function Repay({ close }:IRepayProps) {
 
-  const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
-  const { activeSeries } = seriesState;
+  const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
+  const activeSeries = seriesData.get(activeSeriesId);
   const { state: userState, actions: userActions } = useContext(UserContext);
   const { daiBalance } = userState.position;
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
@@ -74,17 +75,17 @@ function Repay({ close }:IRepayProps) {
       if (activeSeries?.isMature()) {
         await Promise.all([
           userActions.updateUser(),
-          seriesActions.updateActiveSeries()
+          seriesActions.updateSeries([activeSeries]),
         ]);
       } else {
         userActions.updateUser();
-        seriesActions.updateActiveSeries();
+        seriesActions.updateSeries([activeSeries]);
       }      
     }
   };
 
   useEffect(()=>{
-    activeSeries?.ethDebtDai && daiBalance?.gt(activeSeries?.ethDebtDai) && setMaxRepay(activeSeries.ethDebtDai);
+    activeSeries?.ethDebtDai && daiBalance?.gt(activeSeries?.ethDebtDai) && setMaxRepay(activeSeries.ethDebtDai.add(ethers.BigNumber.from('1000000000000') )); 
     activeSeries?.ethDebtDai && daiBalance?.lt(activeSeries?.ethDebtDai) && setMaxRepay(daiBalance);
   }, [daiBalance, activeSeries]);
 
@@ -120,6 +121,8 @@ function Repay({ close }:IRepayProps) {
       }}
       target='document'
     >
+      {!activeSeries?.isMature() && !mobile && <SeriesDescriptor activeView='borrow' minimized />}
+      
       { !txActive &&
         <Box
           width={!mobile?{ min: activeSeries.isMature()?'600px':'620px', max: activeSeries.isMature()?'600px':'620px' } : undefined}
@@ -147,7 +150,7 @@ function Repay({ close }:IRepayProps) {
                       onChange={(event:any) => setInputValue(( cleanValue(event.target.value, 6) ))}
                       icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <DaiMark />}
                     />
-                    <RaisedButton 
+                    <FlatButton 
                       label={!mobile ? 'Repay Maximum': 'Maximum'}
                       onClick={()=>setInputValue( cleanValue(ethers.utils.formatEther(maxRepay), 6) )}
                     />

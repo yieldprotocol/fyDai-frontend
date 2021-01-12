@@ -19,8 +19,6 @@ import { useDsRegistry } from '../hooks/dsRegistryHook';
 
 import RaisedButton from '../components/RaisedButton';
 import FlatButton from '../components/FlatButton';
-import EtherscanButton from '../components/EtherscanButton';
-import { abbreviateHash, genTxCode } from '../utils';
 import TxStatus from '../components/TxStatus';
 import Loading from '../components/Loading';
 
@@ -35,8 +33,21 @@ const TxLayer = () => {
   const { account } = useSignerAccount();
   const { buildDsProxy } = useDsRegistry();
 
+  /* Monitor All possible tx's */ 
   const [ authActive ] = useTxActive([ 'AUTH_TOKEN', 'AUTH_CONTROLLER', 'AUTH_POOL', 'CREATE_PROXY' ]);
-  const [ txActive ] = useTxActive(['POST', 'WITHDRAW', 'BORROW', 'REPAY', 'SELL_DAI', 'BUY_DAI', 'REDEEM', 'ADD_LIQUIDITY', 'REMOVE_LIQUIDITY' ]);
+  const [ txActive ] = useTxActive([
+    'POST', 
+    'WITHDRAW', 
+    'BORROW', 
+    'REPAY',
+    'SELL_DAI', 
+    'BUY_DAI', 
+    'REDEEM', 
+    'ADD_LIQUIDITY', 
+    'REMOVE_LIQUIDITY', 
+    'IMPORT',
+    'EXPORT_POSITION',
+  ]);
 
   // flags
   const [ allSigned, setAllSigned ] = useState<boolean>(false); // tracking signatures
@@ -47,8 +58,8 @@ const TxLayer = () => {
   const buildProxyProcedure = async () => {
     await buildDsProxy();
     await Promise.all([
-      userActions.updateAuthorizations(),
-      seriesActions.updateActiveSeries()
+      userActions.updateUser(),
+      seriesActions.updateAllSeries()
     ]);
   };
 
@@ -62,7 +73,7 @@ const TxLayer = () => {
   /* set layer open if a txs is in process - but bypassable with closeAuth() */
   useEffect(()=>{
     !!txProcessActive && setLayerOpen(true);
-  }, [txProcessActive, ]);
+  }, [txProcessActive]);
 
   /* set Sigs status ( All previously complete or all been signed ) */
   useEffect(()=>{
@@ -92,39 +103,36 @@ const TxLayer = () => {
         <Box
           fill='horizontal'
           pad={mobile?{ horizontal:'medium', top:'medium', bottom:'large' }:{ horizontal:'xlarge', vertical:'medium' }}
-          direction='row-responsive'
-          gap='medium'
           background='#555555'
           justify='between'
           margin={mobile?{ bottom:'-10px' }:undefined}
         >
-
           { 
           !pendingTxs.some((x:any) => x.type === 'CREATE_PROXY')?
-            <>
+            <Box gap='medium' direction='row-responsive' justify='between'>
               <Box>
-                <Text size={mobile?'xsmall': undefined}>Feel free to look around and play. However, before you make any transactions you will need connect a proxy account </Text>
+                <Text size={mobile?'xsmall': undefined}>Feel free to look around and play. However, before you make any transactions you will need build a proxy account </Text>
               </Box>  
               <RaisedButton 
                 background='#555555'
                 label={<Box pad={{ horizontal:'small', vertical:'xsmall' }} align='center'><Text size='small' color='#DDDDDD'><Unlock /> Create Proxy</Text></Box>}
                 onClick={()=>buildProxyProcedure()}
               />
-            </>
+            </Box>
             :
-            <>
+            <Box gap='medium' direction='row-responsive' justify='between'>
               <Box>
                 <Text size={mobile?'xsmall': undefined}>Building your Yield proxy. </Text>
               </Box> 
-
               <Box pad={{ horizontal:'small', vertical:'xsmall' }} align='center'><Text size='small' color='#DDDDDD'><Unlock />Pending...</Text></Box>
-            </>
+            </Box>
           }
         </Box>
       }
   
       { //  This following section is the 'layer' section. It is only shown when there is a transaction in progress or signature required
-        txProcessActive && layerOpen &&
+        txProcessActive && 
+        layerOpen &&
         <Layer
           modal={true}
           responsive={mobile?false: undefined}
@@ -192,8 +200,7 @@ const TxLayer = () => {
             { // the fallback authentication method is being used (either by choice, or signing error fallback): 
             fallbackActive &&
             !allComplete && 
-            requestedSigs.length>0 && 
-
+            requestedSigs.length>0 &&
             <Box gap='medium'> 
               {
                 preferences?.useTxApproval ?
@@ -286,7 +293,7 @@ const TxLayer = () => {
                   label={
                     <Box direction='row' gap='medium' align='center'>
                       <ArrowLeft color='text-weak' />
-                      <Text size='small' color='text-weak'>go back</Text>
+                      <Text size='xsmall' color='text-weak'>go back</Text>
                     </Box>
                   }
                 />
@@ -300,7 +307,7 @@ const TxLayer = () => {
               !processIsCurrentTx &&
               <Box gap='medium'>
                 <Text weight='bold'>Confirmation required</Text>
-                <Text> 
+                <Text>
                   Please check your wallet or provider to approve the transaction.
                 </Text>
               </Box>
@@ -316,7 +323,7 @@ const TxLayer = () => {
                     label={
                       <Box direction='row' gap='medium' align='center'>
                         <ArrowLeft color='text-weak' />
-                        <Text size='small' color='text-weak'>go back</Text>
+                        <Text size='xsmall' color='text-weak'>go back</Text>
                       </Box>
                   }
                   />

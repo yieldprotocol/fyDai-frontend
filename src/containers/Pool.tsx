@@ -51,8 +51,9 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
   const { amnt }:any = useParams();
 
   const { state: { deployedContracts } } = useContext(YieldContext);
-  const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
-  const { activeSeries } = seriesState;
+  const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
+  const activeSeries = seriesData.get(activeSeriesId);
+
   const { state: userState, actions: userActions } = useContext(UserContext);
   const { daiBalance } = userState.position;
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
@@ -98,7 +99,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
       setInputValue(undefined);
       await Promise.all([
         userActions.updateUser(),
-        seriesActions.updateActiveSeries()
+        seriesActions.updateSeries([activeSeries]),
       ]);
 
     }   
@@ -184,10 +185,10 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                   (!!account && !activeSeries?.isMature()) || 
                   (activeSeries?.isMature() && activeSeries?.poolTokens_>0 ),
                 active: true,
-                loading: false,     
+                loading: !activeSeries?.poolTokens_,     
                 value: activeSeries?.poolTokens_,
                 valuePrefix: null,
-                valueExtra: null, 
+                valueExtra: null,
               },
               {
                 label: 'Your Pool share',
@@ -197,8 +198,8 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                     (!!account && !activeSeries?.isMature()) || 
                     (activeSeries?.isMature() && activeSeries?.poolTokens_>0 ),
                 active: true,
-                loading: false,           
-                value: activeSeries?` ${activeSeries?.poolPercent}%`: '',
+                loading: !activeSeries?.poolPercent,           
+                value: activeSeries?.poolPercent ?` ${activeSeries.poolPercent}%`: '',
                 valuePrefix: null,
                 valueExtra: null,
               },
@@ -207,8 +208,8 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                 labelExtra: ' staked in this series',
                 visible: !activeSeries?.isMature(),
                 active: true,
-                loading: false,           
-                value: activeSeries?` ${nFormatter(activeSeries?.totalSupply_, 2)} tokens`: '',
+                loading: !activeSeries?.totalSupply_,   
+                value: activeSeries?.totalSupply_ ?` ${nFormatter(activeSeries?.totalSupply_, 2)} tokens`: '',
                 valuePrefix: null,
                 valueExtra: null,
               },
@@ -244,7 +245,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                   />
                   
                   {account &&
-                  <RaisedButton 
+                  <FlatButton 
                     label={!mobile ? 'Add Maximum': 'Maximum'}
                     onClick={()=>setInputValue(cleanValue(ethers.utils.formatEther(daiBalance), 6))}
                   />}
@@ -255,7 +256,8 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
 
                     <InfoGrid entries={[
                       {
-                        label: 'Share of the Pool after adding liquidity',
+                        label: 'Share of the Pool',
+                        labelExtra: 'after adding liquidity',
                         visible: inputValue>0,
                         active: debouncedInput,
                         loading: calculating,           
@@ -314,8 +316,8 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                     onClick={()=>setHistOpen(true)}
                     label={
                       <Box direction='row' gap='small' align='center'>
-                        <Text size='xsmall' color='text-xweak'><History /></Text>                
-                        <Text size='xsmall' color='text-xweak'>
+                        <Text size='xsmall' color='text-weak'><History /></Text>                
+                        <Text size='xsmall' color='text-weak'>
                           Series Pool History
                         </Text>              
                       </Box>

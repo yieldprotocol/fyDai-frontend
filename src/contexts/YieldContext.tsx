@@ -52,6 +52,12 @@ const contractList = [
   'BorrowProxy',
   'ProxyRegistry',
   'ProxyFactory',
+  'GetCdps',
+  'DssCdpManager',
+  'ImportProxy',
+  'ImportCdpProxy',
+  'ExportProxy',
+  'ExportCdpProxy', 
 ];
 
 // reducer
@@ -108,7 +114,6 @@ const YieldProvider = ({ children }: any) => {
   let { chainId } = useWeb3React();
 
   /* cache|localStorage declarations */
-  const [cachedContracts, setCachedContracts] = useCachedState('deployedContracts', null );
   const [cachedSeries, setCachedSeries] = useCachedState('deployedSeries', null);
   const [cachedFeed, setCachedFeed] = useCachedState('lastFeed', null);
 
@@ -130,8 +135,6 @@ const YieldProvider = ({ children }: any) => {
 
     /* Load/Read yield core contract addresses */
     const _deployedContracts = getAddresses(contractList, chainId!);
-    window.localStorage.removeItem('deployedContracts');
-    setCachedContracts(_deployedContracts);
     // eslint-disable-next-line no-console
     console.log('Yield contract addresses:', _deployedContracts);
 
@@ -142,6 +145,8 @@ const YieldProvider = ({ children }: any) => {
       const _poolList = getAddresses(fyDaiList.map((x:any)=> `fyDaiLP${x.slice(5)}`), chainId!);
       const _seriesList = Array.from(Object.values(_list));
 
+      // eslint-disable-next-line no-console
+      console.log('Updating Series information...');
       await Promise.all(
         _seriesList.map(async (x: any, i: number) => {
           const symbol = await callTx(x, 'FYDai', 'symbol', []);
@@ -165,7 +170,7 @@ const YieldProvider = ({ children }: any) => {
       window.localStorage.removeItem('deployedSeries');
       setCachedSeries(_deployedSeries);
       // eslint-disable-next-line no-console
-      console.log('Series contract addresses updated', _deployedSeries);
+      console.log('Series information updated:', _deployedSeries);
     } else {
       _deployedSeries.push(...cachedSeries);
     }
@@ -225,7 +230,6 @@ const YieldProvider = ({ children }: any) => {
       const [deployedSeries, deployedContracts] = await _getProtocolAddrs(false);
       dispatch({ type: 'updateDeployedContracts', payload: deployedContracts });
       dispatch({ type: 'updateDeployedSeries', payload: deployedSeries });
-
       if (deployedSeries && deployedContracts) {
         /* 2. Fetch feed/stream data (from cache initially if available) and init event listeners */
         dispatch({
@@ -243,6 +247,7 @@ const YieldProvider = ({ children }: any) => {
         type: 'notify',
         payload: { message: 'Error Accessing the Yield Protocol: Network issues' },
       });
+      
       // eslint-disable-next-line no-console
       console.log(e);
       return;

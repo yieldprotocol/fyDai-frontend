@@ -5,8 +5,10 @@ import { Keyboard, Box, TextInput, Text, ThemeContext, ResponsiveContext, Collap
 import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 import { VscHistory as History } from 'react-icons/vsc';
 
+import { logEvent } from '../utils/analytics';
 import { abbreviateHash, cleanValue, genTxCode } from '../utils';
 
+/* contexts */
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
 
@@ -18,9 +20,13 @@ import { useTxActive } from '../hooks/txHooks';
 import { usePool } from '../hooks/poolHook';
 import { useBorrowProxy } from '../hooks/borrowProxyHook';
 
+/* other containers */
 import Repay from './Repay';
+import RateLock from './RateLock';
 
+/* components */
 import DaiMark from '../components/logos/DaiMark';
+import MakerMark from '../components/logos/MakerMark';
 import SeriesDescriptor from '../components/SeriesDescriptor';
 import InputWrap from '../components/InputWrap';
 import TxStatus from '../components/TxStatus';
@@ -35,8 +41,6 @@ import RaisedBox from '../components/RaisedBox';
 import YieldMobileNav from '../components/YieldMobileNav';
 import Loading from '../components/Loading';
 
-import { logEvent } from '../utils/analytics';
-
 interface IBorrowProps {
   borrowAmount?:number|null;
   openConnectLayer:any;
@@ -45,13 +49,11 @@ interface IBorrowProps {
 const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
 
   const navHistory = useHistory();
-  const { state: { activeSeries }, actions: seriesActions } = useContext(SeriesContext);
-
-  /* check if the user sent in any requested amount in the url */ 
-  const { amnt }:any = useParams();
+  const { state: { activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
+  const activeSeries = seriesData.get(activeSeriesId);
 
   const { state: userState, actions: userActions } = useContext(UserContext);
-  const { position } = userState;
+  const { position, makerVaults, userLoading } = userState;
   const { 
     ethPosted,
     ethPosted_,
@@ -67,36 +69,37 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
   const theme = useContext<any>(ThemeContext);
 
   /* hooks init */
+
   const { previewPoolTx }  = usePool();
   const { borrowDai } = useBorrowProxy();
   const { calcAPR, estCollRatio: estimateRatio } = useMath();
   const { account } = useSignerAccount();
-
-  const [ txActive ] = useTxActive(['BORROW']);
-  const [ repayTxActive ] = useTxActive(['REPAY']);
+  const { amnt }:any = useParams(); /* check if the user sent in any requested amount in the url (deep-linking) */ 
+  
+  const [ txActive ] = useTxActive(['BORROW']); /* txs to watch for */
+  const [ repayTxActive ] = useTxActive(['REPAY']); /* txs to watch for */
 
   /* flags */
   const [ repayOpen, setRepayOpen ] = useState<boolean>(false);
+  const [ rateLockOpen, setRateLockOpen ] = useState<boolean>(false);
   const [ histOpen, setHistOpen ] = useState<boolean>(false);
+  const [ borrowDisabled, setBorrowDisabled ] = useState<boolean>(true);
 
   const [showTxPending, setShowTxPending] = useState<boolean>(false);
   useEffect(()=>{
     setShowTxPending( txActive?.txCode === genTxCode('BORROW', activeSeries));
   }, [txActive, activeSeries]);
 
-
   /* input values */
   const [ inputValue, setInputValue ] = useState<any|undefined>(amnt || undefined);
   const debouncedInput = useDebounce(inputValue, 500);
-
-  /* internal component state */
-  const [ borrowDisabled, setBorrowDisabled ] = useState<boolean>(true);
-  const [ warningMsg, setWarningMsg] = useState<string|null>(null);
-  const [ errorMsg, setErrorMsg] = useState<string|null>(null);
+  const [inputRef, setInputRef] = useState<any>(null);
   const isLol = useIsLol(inputValue);
 
-  const [inputRef, setInputRef] = useState<any>(null);
-
+  /* warnings and errors */
+  const [ warningMsg, setWarningMsg] = useState<string|null>(null);
+  const [ errorMsg, setErrorMsg] = useState<string|any>(null);
+  
   /* token balances and calculated values */
   const [ fyDaiValue, setFYDaiValue ] = useState<number>(0);
   const [ APR, setAPR ] = useState<number>();
@@ -104,9 +107,10 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
 
   /* Borrow execution flow */
   const borrowProcedure = async () => {
-    if (inputValue && !borrowDisabled) {
 
+    if (inputValue && !borrowDisabled) {
       await borrowDai(activeSeries, 'ETH-A', inputValue);
+
       logEvent({
         category: 'Borrow',
         action: inputValue,
@@ -117,7 +121,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
       setInputValue(undefined);
       await Promise.all([
         userActions.updateUser(),
-        seriesActions.updateSeries([activeSeries])
+        seriesActions.updateSeries([activeSeries]),
       ]);
     }
   };
@@ -174,10 +178,18 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
       !(ethPosted.isZero())
     ) {
       setWarningMsg(null);
-      setErrorMsg('That amount exceeds the amount of Dai you can borrow based on your collateral'); 
+      setErrorMsg(
+        <Box direction='row-responsive' gap='small'>
+          <Text size='xsmall'>That amount exceeds the amount of Dai you can borrow based on your collateral.</Text>
+          <RaisedButton 
+            label={<Box pad={{ horizontal:'small' }}><Text size='xsmall'>Manage Collateral</Text></Box>}
+            onClick={()=>navHistory.push('/post/')}
+          />
+        </Box>
+      ); 
     } else if (
       debouncedInput && 
-        ( debouncedInput > Math.round(maxDaiAvailable_- maxDaiAvailable_*0.05 ) &&
+        ( debouncedInput > Math.round(maxDaiAvailable_- maxDaiAvailable_*0.05 ) && 
         !(ethPosted.isZero())
         ) ) {
       setErrorMsg(null);
@@ -200,23 +212,36 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
         }}
         target='document'
       >
-
-        { repayOpen && 
+        { 
+        repayOpen && 
         <Layer
           onClickOutside={()=>setRepayOpen(false)}
           responsive={true}
         >
           <Repay close={()=>setRepayOpen(false)} />      
-        </Layer>}
+        </Layer>
+        }
 
+        { 
+        rateLockOpen && 
+        makerVaults.length>0 &&
+        <Layer 
+          onClickOutside={()=>setRateLockOpen(false)}
+          responsive={true}       
+        >
+          <RateLock close={()=>setRateLockOpen(false)} />
+        </Layer>
+        }
 
-        { histOpen && 
+        { 
+        histOpen && 
         <HistoryWrap closeLayer={()=>setHistOpen(false)}>
           <TxHistory 
-            filterTerms={['Borrowed', 'Deposited', 'Withdrew', 'Repaid' ]}
+            filterTerms={['Borrowed', 'Deposited', 'Withdrew', 'Repaid', 'Imported' ]}
             series={activeSeries}
           />
-        </HistoryWrap>}
+        </HistoryWrap>
+        }
 
         <SeriesDescriptor activeView='borrow'>
           <InfoGrid
@@ -243,7 +268,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
                         onClick={()=>navHistory.push('/post/')}
                         label={<Text size='xsmall' color='#DDDDDD'> Manage Collateral</Text>}
                         background='#55555580'
-                      />            
+                      />
                     </Box>
                     <Box
                       background='#555555FA'
@@ -299,7 +324,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
                 labelExtra: 'owed at maturity',
                 visible:
                   !!account &&
-                  (!activeSeries?.isMature() && !txActive)  || 
+                  !activeSeries?.isMature() || 
                   (activeSeries?.isMature() && activeSeries?.ethDebtDai_ > 0 ),
                 active: true,
                 loading: false,    
@@ -321,7 +346,6 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
                 valuePrefix: null,
                 valueExtra: null,
               },
-
               {
                 label: 'Total Debt',
                 labelExtra: 'across all yield series',
@@ -362,7 +386,8 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
           />
         </SeriesDescriptor>
    
-        { !showTxPending && 
+        { 
+        !showTxPending && 
         <Box
           width={{ max: '600px' }}
           alignSelf="center"
@@ -371,16 +396,34 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
           round='small'
           pad="large"
           gap='small'
-        >       
-          <Box gap='small' align='center' fill='horizontal'>
-            
-            { !activeSeries?.isMature() && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
+        > 
+          <Box gap='small' align='center' fill='horizontal'>             
+            { 
+            !activeSeries?.isMature() && 
+            Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
+
             <Box gap='medium' align='center' fill='horizontal'>
-              <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to borrow</Text>
+              <Box direction='row' justify='between' fill>
+                <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to borrow</Text>
+                { 
+                  !mobile &&  !userLoading &&
+                  <RaisedButton
+                    animation='slideRight'
+                    disabled={!!inputValue || makerVaults.length===0}
+                    label={
+                      <Box pad='xsmall' gap='small' direction='row' align='center'>
+                        <Box><MakerMark /></Box>
+                        <Text size='xsmall'>Import a Maker vault</Text>
+                      </Box>
+                    }
+                    onClick={()=>setRateLockOpen(true)}
+                  />
+                }
+              </Box>
 
               <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
                 <TextInput
-                  ref={(el:any) => {el && !repayOpen && !mobile && el.focus(); setInputRef(el);}} 
+                  ref={(el:any) => {el && !repayOpen && !rateLockOpen && !mobile && el.focus(); setInputRef(el);}} 
                   type="number"
                   placeholder={!mobile ? 'Enter the amount of Dai to borrow': 'DAI'} 
                   value={inputValue || ''}
@@ -470,46 +513,56 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
                 </Collapsible>
               </Box>
 
-              { account &&  
+              { 
+              account &&  
               <ActionButton
                 onClick={()=>borrowProcedure()}
                 label={`Borrow ${inputValue || ''} DAI`}
                 disabled={borrowDisabled}
                 hasPoolDelegatedProxy={activeSeries.hasPoolDelegatedProxy}
                 clearInput={()=>setInputValue(undefined)}
-              />}
-            </Box>}
+              />
+              }
+            </Box>
+            }
 
-            { activeSeries?.isMature() &&
-            <SeriesMatureBox />}
+            { 
+            activeSeries?.isMature() &&
+            <SeriesMatureBox />
+            }
             
-            { !txActive && 
+            { 
+            !txActive && 
             !!account && 
             activeSeries?.isMature() &&
             activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) &&
-            <Repay />}
+            <Repay />
+            }
 
             <Box direction='row' fill justify='between'>
-              { activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) && !mobile &&
+              { 
+              activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) && 
+              !mobile &&
               <Box alignSelf='start' margin={{ top:'medium' }}>
                 <FlatButton 
                   onClick={()=>setHistOpen(true)}
                   label={
                     <Box direction='row' gap='small' align='center'>
-                      <Text size='xsmall' color='text-xweak'><History /></Text>                
-                      <Text size='xsmall' color='text-xweak'>
+                      <Text size='xsmall' color='text-weak'><History /></Text>                
+                      <Text size='xsmall' color='text-weak'>
                         Series Borrow History
                       </Text>              
                     </Box>
                 }
                 />
-              </Box>}
+              </Box>
+              }
             
               { 
-                !activeSeries?.isMature() &&
-                activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) &&
-                !mobile &&
-                <Box alignSelf='end' margin={{ top:'medium' }}>
+              !activeSeries?.isMature() &&
+              activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) &&
+              !mobile &&
+              <Box alignSelf='end' margin={{ top:'medium' }}>
                   {
                   repayTxActive ?
                     <Box direction='row' gap='small'>
@@ -533,44 +586,49 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
                     }
                     />                
                   }
-                </Box>
+              </Box>
               }
             </Box>
 
           </Box>
-        </Box>}
+        </Box>
+        }
 
-        { showTxPending && <TxStatus tx={txActive} />}
-
+        { 
+        showTxPending && 
+        <TxStatus tx={txActive} />
+        }
       </Keyboard>
 
-      {mobile && 
-        <YieldMobileNav>
+      {
+      mobile && 
+      <YieldMobileNav>
+        <NavLink 
+          to='/post/'
+          activeStyle={{ transform: 'scale(1.1)', fontWeight: 'bold', color: `${theme?.global.colors.active}` }}
+          style={{ textDecoration: 'none' }}
+        >
+          <Box>
+            <Text size='xxsmall' color='text-weak'>Manage Collateral</Text>
+          </Box>
+        </NavLink>
+
+          {
+          !activeSeries?.isMature() &&
+          activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) &&
           <NavLink 
-            to='/post/'
-            activeStyle={{ transform: 'scale(1.1)', fontWeight: 'bold', color: `${theme?.global.colors.active}` }}
+            to={`/repay/${activeSeries?.maturity}`}
             style={{ textDecoration: 'none' }}
           >
-            <Box>
-              <Text size='xxsmall' color='text-weak'>Manage Collateral</Text>
+            <Box direction='row' gap='small' align='center'>
+              <Text size='xxsmall' color='text-weak'> <Text weight='bold' size='xsmall' color={activeSeries?.seriesColor}>repay </Text> debt </Text>
+              <ArrowRight color={activeSeries?.seriesColor} />
             </Box>
           </NavLink>
-
-          {!activeSeries?.isMature() &&
-            activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) &&
-            <NavLink 
-              to={`/repay/${activeSeries?.maturity}`}
-              style={{ textDecoration: 'none' }}
-            >
-              <Box direction='row' gap='small' align='center'>
-                <Text size='xxsmall' color='text-weak'> <Text weight='bold' size='xsmall' color={activeSeries?.seriesColor}>repay </Text> debt </Text>
-                <ArrowRight color={activeSeries?.seriesColor} />
-              </Box>
-            </NavLink>}
-        </YieldMobileNav>}
-
+          }
+      </YieldMobileNav>
+      }
     </RaisedBox>
-    
   );
 };
 

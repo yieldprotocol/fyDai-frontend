@@ -1,18 +1,36 @@
 # fyDai-frontend
-Front end for fyDai 
+Front-End for fyDai 
+
+Refernce FyDai version: 
+https://github.com/yieldprotocol/fyDai.git  (working commit: c8c7f06e873e2dad4068926d2b74b84587cf3613)
+
+### Run the frontend on a development server:
+1. Clone this repository  
+`git clone https://github.com/yieldprotocol/fyDai-frontend.git`
+
+2. In a new console, Install and launch the development server:  
+`yarn && yarn start`  
+*possibly required* : Setting the migration contract (when using custom mnemonic to start ganache check migration address on startup):  
 
 
-### Start a new locally served blockchain instance to test the frontend UI:  
+### Supported networks:
+1. Builder node --default  
+Chain id: 31337 
 
-1. Clone the fyDai repositiory: https://github.com/yieldprotocol/fyDai.git  (working commit: 4ee6d9756b027e9d378b2b35ad56ddc9fec2c163):  
+1. Kovan
+2. Mainnet
+( 3. Builder node --default  
+Chain id: 31337 ) 
+
+### OPTIONAL and experimanetal: To Start a new locally served blockchain instance to test the frontend UI:  
+1. Clone the fyDai repositiory: https://github.com/yieldprotocol/fyDai.git  (working commit: c8c7f06e873e2dad4068926d2b74b84587cf3613):  
 `git clone https://github.com/yieldprotocol/fyDai.git`  
-`git reset --hard 4ee6d9756b027e9d378b2b35ad56ddc9fec2c163`    
+`git reset --hard c8c7f06e873e2dad4068926d2b74b84587cf3613`    
 ( if you want to revert to the latest fyDai, simply: `git pull` )
 
 2. Prepare necessary files ( in fyDai root folder ):
  - `.secret` should contain a wallet mnemonic. You will reuse this mnemonic in the next step if starting ganache.
  - `.infuraKey` should contain an infuraKey. This is used only for public network deploys but is currently expected to run the frontend. 
-
 
 3. Run a buidler node  
 `npx buidler node`
@@ -22,40 +40,4 @@ Front end for fyDai
 
 5. Setup a few proxies and a basic single market:
 `truffle exec ./scripts/setup_market_dev.js`  
-Output: 'Market Initiated' on success. 
-
-
-### Run the frontend on a development server: 
-
-1. Clone this repository  
-`git clone https://github.com/yieldprotocol/fyDai-frontend.git`
-
-2. In a new console, Install and launch the development server:  
-`yarn && yarn start`  
-*possibly required* : Setting the migration contract (when using custom mnemonic to start ganache check migration address on startup):  
-
-`REACT_APP_MIGRATION_31337 = '0xsomemigrationcontractaddress' && yarn start`  - if using linux/mac  
-`($env:REACT_APP_MIGRATION_31337 = '0xsomemigrationcontractaddress') -and (yarn start)`  - if using windows powershell  
- 
-*for optimised build* :  
-`REACT_APP_MIGRATION_31337 = '0xsomemigrationcontractaddress' && yarn build`  - if using linux/mac  
-`($env:REACT_APP_MIGRATION_31337 = '0xsomemigrationcontractaddress') -and (yarn build)`  - if using windows powershell  
-
-`set "REACT_APP_NOT_SECRET_CODE=abcdef" && yarn build` - if using windows cmd.exe
-
-*NB: if you have issues, try editing  the .env file manually with the migrations addresses before running yarn start*
-
-### Supported networks:
-
-1. Builder node --default  
-Chain id: 31337  
-
-**NB. Change/override .env variable `REACT_APP_MIGRATION_31337` and/or `REACT_APP_MIGRATION_DEFAULT` with the migration address**
-
-<!-- 2. Rinkeby
-Chain ID: 4  
-Migrations contract address: '0x08475B228575eFCb2e5d71E1B737deCeEdf21Db' -->
-
-### Known Gotchas
-1. Make sure you reset your metamask on every reload of the blockchain.  
-*metamask > advanced settings > reset*
+Output: 'Market Initiated' on success.

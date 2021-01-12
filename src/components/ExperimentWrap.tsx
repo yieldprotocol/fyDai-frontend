@@ -10,9 +10,8 @@ function ExperimentWrap( { children }:any) {
       >
         {children}
         <Box margin={{ top:'-8px', right:'8px' }}>
-          <Text size='xxsmall' color='red'> Experimental</Text>
+          <Text size='xxsmall' color='red'>Experimental</Text>
         </Box>
-        
       </Stack>
     </>
   );

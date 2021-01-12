@@ -239,10 +239,11 @@ export const yieldTheme = {
       `,
   },
   collapsible: {
-    minSpeed: '300',
+    minSpeed: '500',
   },
   meter: {},
   anchor: {
+    color: 'text',
     hover: {
       extend: {
         opacity: '0.5',
@@ -264,7 +265,9 @@ export const yieldTheme = {
       `
   },
   checkBox: {
+    color: 'text',
     check: {
+      color: 'text',
       radius: '24px',
     },
     toggle: {
@@ -526,6 +529,9 @@ export const yieldTheme = {
     overlay: {
       background: '#000000B3', // 60%
     },
+    // @ts-ignore
+    extend: () => css`backdrop-filter: blur(3px);`,
+
   },
 
   table: {

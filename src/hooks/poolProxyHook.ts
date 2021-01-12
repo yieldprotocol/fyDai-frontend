@@ -97,7 +97,7 @@ export const usePoolProxy = () => {
     const parsedDaiUsed = BigNumber.isBigNumber(daiUsed)? daiUsed : ethers.utils.parseEther(daiUsed.toString());
 
     const overrides = {
-      gasLimit: BigNumber.from('750000'),
+      gasLimit: BigNumber.from('800000'),
       value: ethers.utils.parseEther('0')
     };
 
@@ -116,7 +116,7 @@ export const usePoolProxy = () => {
     
     requestedSigs.set('controllerSig',
       { id: genTxCode('AUTH_CONTROLLER', null),
-        desc: 'Authorise Yield Protocol contract',
+        desc: 'Allow your proxy to interact with your collateralized positions',
         conditional: hasDelegatedDsProxy,
         signFn: () => delegationSignature(controllerContract, dsProxyAddress),    
         fallbackFn: () => addControllerDelegate(dsProxyAddress),
@@ -125,7 +125,7 @@ export const usePoolProxy = () => {
     // dsProxy must be spender
     requestedSigs.set('daiSig',
       { id: genTxCode('AUTH_TOKEN', series),
-        desc: 'Authorise Yield with Dai',
+        desc: 'Allow transfers of Dai to your Proxy',
         conditional: (await getTokenAllowance(deployedContracts.Dai, 'Dai', dsProxyAddress)) > 0,
         signFn: () => daiPermitSignature(deployedContracts.Dai, dsProxyAddress), 
         fallbackFn: () => approveToken(deployedContracts.Dai, dsProxyAddress, utils.MAX_INT, series), // executed as user!
@@ -186,7 +186,7 @@ export const usePoolProxy = () => {
 
     requestedSigs.set('controllerSig',
       { id: genTxCode('AUTH_CONTROLLER', null),
-        desc: 'Authorise Yield Protocol contract',
+        desc: 'Allow your proxy to interact with your collateralized positions',
         conditional: hasDelegatedDsProxy,
         signFn: () => delegationSignature(controllerContract, dsProxyAddress),    
         fallbackFn: () => addControllerDelegate(dsProxyAddress),
@@ -194,7 +194,7 @@ export const usePoolProxy = () => {
         
     requestedSigs.set('poolSig',
       { id: genTxCode('AUTH_POOL', series),
-        desc: 'Authorise your proxy contract to interact with the series/pool',
+        desc: `Allow your proxy to interact with the ${series.displayName} pool`,
         conditional: await checkPoolDelegate(poolAddr, dsProxyAddress),
         signFn: () => delegationSignature(poolContract, dsProxyAddress),    
         fallbackFn: () => addPoolDelegate(series, dsProxyAddress), 
@@ -208,14 +208,16 @@ export const usePoolProxy = () => {
     /* Build the call data based, function dependant on series maturity */ 
     let calldata:any;
 
-    console.log(signedSigs.get('controllerSig'), signedSigs.get('poolSig'));
-
     if (!series.isMature()) {
       /* calculate expected trade values  */  
-      let minFYDai:BigNumber;    
-      const preview = await previewPoolTx('buydai', series, ethers.utils.parseEther('1'));   
+      let minFYDaiPrice:BigNumber;    
+      const preview = await previewPoolTx('sellfydai', series, ethers.utils.parseEther('1'));
+
       if ( !(preview instanceof Error) ) {
-        minFYDai = utils.divRay( preview.mul(BigNumber.from('1000000000')), utils.toRay(1.1));
+        const one = utils.toRay(1);
+        const onePointOne = utils.toRay(1.1);
+        const rayPrice = preview.mul(BigNumber.from('1000000000'));
+        minFYDaiPrice = one.sub( utils.mulRay(one.sub(rayPrice), onePointOne) );
       } else {
         throw(preview);
       }
@@ -223,7 +225,7 @@ export const usePoolProxy = () => {
       // contract fn used: removeLiquidityEarlyDaiFixedWithSignature(IPool pool,uint256 poolTokens,uint256 minimumFYDaiPrice,bytes memory controllerSig,bytes memory poolSig)
       calldata = proxyContract.interface.encodeFunctionData( 
         'removeLiquidityEarlyDaiFixedWithSignature', 
-        [ poolAddr, parsedTokens, minFYDai, signedSigs.get('controllerSig'), signedSigs.get('poolSig') ]
+        [ poolAddr, parsedTokens, minFYDaiPrice, signedSigs.get('controllerSig'), signedSigs.get('poolSig') ]
       );
     } else {
       // contract fn used: removeLiquidityMatureWithSignature(IPool pool,uint256 poolTokens,bytes memory controllerSig,bytes memory poolSig)
@@ -238,7 +240,7 @@ export const usePoolProxy = () => {
       proxyContract.address, 
       calldata,
       overrides,
-      { tx:null, msg: `Removing ${tokens} DAI liquidity from ${series.displayNameMobile}`, type:'REMOVE_LIQUIDITY', series  }
+      { tx:null, msg: `Removing ${tokens} liquidity tokens from ${series.displayNameMobile}`, type:'REMOVE_LIQUIDITY', series  }
     );
 
   };

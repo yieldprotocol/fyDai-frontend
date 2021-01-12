@@ -39,9 +39,10 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
   const theme:any = React.useContext(ThemeContext);
   const themeBackground = theme.global.colors.background;
   const defaultBackground = theme.dark === true ? themeBackground.dark: themeBackground.light;
+  
+  const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
+  const activeSeries = seriesData.get(activeSeriesId);
 
-  const { state: seriesState, actions: seriesActions } = useContext( SeriesContext );
-  const { seriesLoading, activeSeries, seriesData } = seriesState; 
   const { setActiveSeries } = seriesActions;
 
   const [sortedList, setSortedList] = useState<any>(seriesData);
@@ -121,7 +122,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
                 <Text size={mobile? 'xsmall':'small'} color='text-weak' weight='bold'>{mobile? 'SERIES' : 'SERIES MATURITY'}</Text>
               </Box>
               <Box fill align={mobile?'end':undefined}>
-                <Text size={mobile? 'xsmall':'small'} color='text-weak' weight='bold' >
+                <Text size={mobile? 'xsmall':'small'} color='text-weak' weight='bold'>
                   { viewMap.get(activeView.toUpperCase())?.head }         
                 </Text>
               </Box>
@@ -169,9 +170,12 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
                     </Box>                 
                   </Box>
 
-                  { !mobile && 
+                  { 
+                  !mobile && 
                   <Box basis='25%' direction='row' justify='end'>
-                    { activeSeries && activeSeries.maturity === x.maturity ?                     
+                    { 
+                    activeSeries && 
+                    activeSeries.maturity === x.maturity ?                     
                       <Button 
                         primary
                         color={activeSeries.seriesColor}
@@ -184,35 +188,41 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
                         background={activeSeries.maturity === x.maturity ? modColor(defaultBackground, -10):undefined}
                         secondary
                         label={<Text size='small'>Select</Text>}
-                      />}
-                  </Box>}
+                      />
+                    }
+                  </Box>
+                  }
                 </Box>
               );     
             })}
           </Loading>        
         </InsetBox>
 
-        {!mobile &&
+        {
+        !mobile &&
         <Box alignSelf='start' margin={{ top:'medium' }}>
           <FlatButton 
             onClick={()=>close()}
             label={
               <Box direction='row' gap='medium' align='center'>
                 <ArrowLeft color='text-weak' />
-                <Text size='small' color='text-weak'> go back </Text>
+                <Text size='xsmall' color='text-weak'> go back </Text>
               </Box>
             }
           />
-        </Box>}
+        </Box>
+        }
       </Box>
 
-      {mobile && 
+      {
+      mobile && 
         <YieldMobileNav noMenu={true}>
           <Box direction='row' gap='small' onClick={()=>close()}>
             <Text size='xxsmall' color='text-weak'><ArrowLeft /></Text>
             <Text size='xxsmall' color='text-weak'> go back </Text>
           </Box>
-        </YieldMobileNav>}
+        </YieldMobileNav>
+      }
     </Layer>
   );
 };

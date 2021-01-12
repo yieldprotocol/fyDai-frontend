@@ -1,20 +1,19 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useWeb3React } from '@web3-react/core';
-
 import {
   Text,
   Box,
   ResponsiveContext,
   Layer,
   Collapsible,
-  ThemeContext,
 } from 'grommet';
-
 import { 
   FiSettings as Gear,
   FiCheckCircle as Check,
   FiArrowLeft as ArrowLeft,
 } from 'react-icons/fi';
+
+import { abbreviateHash } from '../utils';
 
 import { TxContext } from '../contexts/TxContext';
 import { UserContext } from '../contexts/UserContext';
@@ -23,9 +22,8 @@ import FlatButton from './FlatButton';
 import DaiMark from './logos/DaiMark';
 import Loading from './Loading';
 import TxStatus from './TxStatus';
-import { abbreviateHash, modColor } from '../utils';
 import EthMark from './logos/EthMark';
-
+import RaisedButton from './RaisedButton';
 
 const AccountButton = (props: any) => {
   
@@ -38,9 +36,6 @@ const AccountButton = (props: any) => {
   const { state: { position } } = useContext(UserContext);
   const { state: { pendingTxs, lastCompletedTx } } = useContext(TxContext);
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
-
-  const theme:any = useContext(ThemeContext);
-  const background = theme.dark ? modColor(theme.global.colors.background.dark, -10): modColor(theme.global.colors.background.light, -10);
 
   // flags
   const [txStatusOpen, setTxStatusOpen] = useState(false);
@@ -62,16 +57,17 @@ const AccountButton = (props: any) => {
       round
       direction='row'
       align='center'
-      background={account?background:undefined}
+      background='background'
     > 
-      {txStatusOpen && 
+      {
+      txStatusOpen && 
       <Layer 
         onClickOutside={()=>setTxStatusOpen(false)}
         onEsc={()=>setTxStatusOpen(false)}
       >
         <Box 
           fill
-          background={background}
+          background='background'
           round='small'
           pad="none"
           align='center'
@@ -91,9 +87,14 @@ const AccountButton = (props: any) => {
             />
           </Box>
         </Box>
-      </Layer>}
+      </Layer>
+      }
 
-      { !mobile && pendingTxs.length===0 && !txCompleteOpen && account &&
+      { 
+      account &&
+      !mobile && 
+      pendingTxs.length===0 && 
+      !txCompleteOpen && 
       <Box 
         pad={{ left:'small', right:'large' }} 
         direction='row' 
@@ -104,8 +105,6 @@ const AccountButton = (props: any) => {
         onFocus={() => setDetailsOpen(true)}
         onBlur={() => setDetailsOpen(false)}
       >
-
-        
         <Collapsible open={detailsOpen} direction='horizontal'>
           { detailsOpen && 
           <Box overflow='scroll' gap='xsmall' direction='row' animation='slideLeft'>    
@@ -121,24 +120,27 @@ const AccountButton = (props: any) => {
             <Text size='xsmall' weight='bold'>{position?.daiBalance_} DAI </Text>
           </Loading>
         </Box>
+      </Box>
+      }
+      
+      {
+      pendingTxs.length>0 && 
+      !txCompleteOpen &&
+        <Box
+          ref={pendingRef}
+          direction='row'
+          margin={{ right:'-20px' }}
+          pad={{ vertical: 'xsmall', left:'small', right:'25px' }}
+          round
+          animation='slideLeft'
+          onClick={()=>setTxStatusOpen(true)}
+        >
+          <Text size='xsmall'> Transaction pending ... </Text>  
+        </Box>
+      }
 
-      </Box>}
-
-        
-      {pendingTxs.length>0 &&  
-      <Box
-        ref={pendingRef}
-        direction='row'
-        margin={{ right:'-20px' }}
-        pad={{ vertical: 'xsmall', left:'small', right:'25px' }}
-        round
-        animation='slideLeft'
-        onClick={()=>setTxStatusOpen(true)}
-      >
-        <Text size='xsmall'> Transaction pending ... </Text>   
-      </Box>}
-
-      {txCompleteOpen &&
+      {
+      txCompleteOpen && 
       <>
         <Box
           ref={completeRef}
@@ -152,16 +154,19 @@ const AccountButton = (props: any) => {
           {lastCompletedTx?.status === 1 &&
           <Box direction='row' gap='xsmall'> 
             <Text color='green' textAlign='center' size='xsmall'><Check /></Text>
-            <Text color='green' textAlign='center' size='xsmall'>Transaction Complete</Text>
+            { pendingTxs.length===0 && <Text color='green' textAlign='center' size='xsmall'>Transaction Complete</Text>}
           </Box>}
           {lastCompletedTx?.status !== 1 &&
-          <Text color='red' textAlign='center' size='xsmall'>  Transaction failed  </Text>}
+          <Box direction='row' gap='xsmall'>
+            <Text color='red' textAlign='center' size='xsmall'>Transaction failed</Text>
+          </Box>}
         </Box> 
-      </>}
+      </>
+      }
 
-      { account ?
+      { 
+      account ?
         <>{!mobile && <FlatButton
-          background={background}
           onClick={()=>openConnectLayer('ACCOUNT')}
           label={
             <Box gap='small' direction='row' align='center'>
@@ -178,9 +183,9 @@ const AccountButton = (props: any) => {
           onClick={() => {
             openConnectLayer('CONNECT');
           }}
-          label={<Text size='small'>Connect a wallet</Text>}
-        />}
-
+          label={<Box pad='xsmall'><Text size='small'>Connect a wallet</Text></Box>}
+        />
+    }
     </Box>
   );
 };
