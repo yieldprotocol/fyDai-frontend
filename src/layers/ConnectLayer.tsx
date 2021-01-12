@@ -119,9 +119,9 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                     /> 
 
                   </Box>
-                  <Text size='xxsmall'>App Version: Beta 0.4.0</Text>
+                  <Text size='xxsmall'>App Version: 0.4.0</Text>
                   <Text size='xxsmall'>Connected Network: { provider?.network?.name }</Text>
-                  <Text size='xxsmall'>Yield protocol ref contract: {process.env[`REACT_APP_MIGRATION_${chainId}`]} </Text>       
+                  <Text size='xxsmall'>Yield protocol Ref contract: {process.env[`REACT_APP_MIGRATION_${chainId}`]} </Text>       
                 </Box>
               </Box> }
 

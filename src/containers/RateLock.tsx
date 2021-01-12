@@ -12,7 +12,7 @@ import {
   FiLayers as ChangeSeries
 } from 'react-icons/fi';
 
-import { cleanValue, modColor, BN_RAY } from '../utils';
+import { cleanValue, modColor, BN_RAY, buildGradient } from '../utils';
 
 import { UserContext } from '../contexts/UserContext';
 import { SeriesContext } from '../contexts/SeriesContext';
@@ -44,8 +44,9 @@ import RaisedBox from '../components/RaisedBox';
 import SeriesDescriptor from '../components/SeriesDescriptor';
 
 interface IRateLockProps {
-  close?: any;
+  close?: any; // close is also used as a indicator used as a layer (only a layer should have a closed)
   openConnectLayer?:any;
+  asLayer?:boolean;
 }
 
 const InsetBox = styled(Box)`
@@ -60,7 +61,7 @@ ${(props:any) => props.background && css`
 const makerTextColor = '#48495f';
 const makerBackColor = '#f6f8f9';
 
-const RateLock = ({ openConnectLayer, close }:IRateLockProps) => {
+const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   const theme = useContext<any>(ThemeContext);
@@ -140,7 +141,7 @@ const RateLock = ({ openConnectLayer, close }:IRateLockProps) => {
         selectedVault.vaultId);
       setCollInputValue(undefined);
       setDebtInputValue(undefined);
-      close();
+      close && close();
       await Promise.all([
         userActions.updateUser(),
         seriesActions.updateSeries([activeSeries]),
@@ -151,7 +152,7 @@ const RateLock = ({ openConnectLayer, close }:IRateLockProps) => {
   const importAllProcedure = async (id:number) => {
     if (!allDisabled) {
       await importVault(activeSeries, id);
-      close();
+      close && close();
       await Promise.all([
         userActions.updateUser(),
         seriesActions.updateSeries([activeSeries]),
@@ -303,11 +304,38 @@ const RateLock = ({ openConnectLayer, close }:IRateLockProps) => {
           if (collInputValue || debtInputValue) {
             document.activeElement === collInputRef && setCollInputValue(undefined);
             document.activeElement === debtInputRef && setDebtInputValue(undefined);
-          } else close();
+          } else {close && close();}
         }}
         onEnter={()=> importProcedure()}
         target='document'
       >
+
+        <Box
+          round
+          background={asLayer ? 'background' : activeSeries && buildGradient(activeSeries?.seriesFromColor, activeSeries?.seriesColor)}
+          margin={{ bottom:'-24px' }}
+          pad={asLayer? 'large' : { horizontal:'large', bottom:'large', top:'medium' }}
+        > 
+
+          <Box direction='row' align='center' gap='small' justify='start'>  
+            <Box
+              width='xsmall'
+              pad={{ horizontal:'small', vertical:'xsmall' }} 
+              background={activeSeries && asLayer? buildGradient( activeSeries?.seriesFromColor, activeSeries?.seriesColor): activeSeries?.seriesColor } 
+              // background={activeSeries?.seriesColor}
+              // border={{ color: !theme.dark? 'text':'white' }}
+              onClick={()=>setSelectorOpen(true)}
+              round
+            >
+              <Image src={!theme.dark ? logoDark : logoLight} fit='contain' />
+            </Box>
+            <Text size={mobile?'large':'xxlarge'} weight='bold'>RateLock</Text>   
+          </Box>
+
+        </Box>
+
+
+
 
         {selectorOpen && <SeriesSelector activeView="Borrow" close={()=>setSelectorOpen(false)} /> }
         <Box 
@@ -317,22 +345,8 @@ const RateLock = ({ openConnectLayer, close }:IRateLockProps) => {
           background='background'
           round='small'
           pad='large'
-          justify='between'
-          
+          justify='between'  
         > 
-          <Box direction='row' align='center' gap='small' justify='start'>  
-            <Box
-              width='xsmall'
-              pad={{ horizontal:'small', vertical:'2px' }} 
-              background={activeSeries?.seriesColor} // 'text-xweak'
-              // border={{ color: !theme.dark? 'text':'white' }}
-              onClick={()=>setSelectorOpen(true)}
-              round
-            >
-              <Image src={!theme.dark ? logoDark : logoLight} fit='contain' />
-            </Box>
-            <Text size={mobile?'large':'xxlarge'} weight='bold'>RateLock</Text>   
-          </Box>
 
           { 
           txActive && 
@@ -400,19 +414,17 @@ const RateLock = ({ openConnectLayer, close }:IRateLockProps) => {
                       );
                     }
                   })
-                  : 
+                  :
                   <Box pad='large'>
                     { null }
                   </Box>
               }
-
                 <Box onClick={()=>selectVault('next')} justify='center' align='center' hoverIndicator={modColor(makerBackColor, -25)}>
                   <ChevronRight size='30px' color={selectedVaultIndex===filteredMakerVaults.length-1?makerBackColor:makerTextColor} />
                 </Box>
               </InsetBox>
             </Box>
-
-            
+           
             {/* <InsetBox background={makerBackColor} direction='row' justify='between' align='center' pad={{ horizontal:'xlarge', vertical:'medium' }}> */}
             <Box direction='row' justify='between' align='center' pad='small'>
               <Text size='xsmall' color='text'> Selected Yield Series: </Text>
@@ -604,7 +616,7 @@ const RateLock = ({ openConnectLayer, close }:IRateLockProps) => {
 
           <Box direction='row' fill justify={close?'between':'end'}>
             { 
-              close && 
+              asLayer && 
               <Box alignSelf='start' margin={{ top:'medium' }}>
                 <FlatButton 
                   onClick={close? ()=>close(): ()=>history.push('/borrow')}
@@ -652,6 +664,6 @@ const RateLock = ({ openConnectLayer, close }:IRateLockProps) => {
   );
 };
 
-RateLock.defaultProps={ close:null, openConnectLayer:null };
+RateLock.defaultProps={ close:null, openConnectLayer:null, asLayer:false };
 
 export default RateLock;
