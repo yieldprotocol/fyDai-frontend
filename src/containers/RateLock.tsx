@@ -317,6 +317,8 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
           background={asLayer ? 'background' : activeSeries && buildGradient(activeSeries?.seriesFromColor, activeSeries?.seriesColor)}
           margin={{ bottom:'-24px' }}
           pad={asLayer? 'large' : { horizontal:'large', bottom:'large', top:'medium' }}
+          justify='between'
+          direction='row'
         > 
 
           <Box direction='row' align='center' gap='small' justify='start'>  
@@ -334,10 +336,30 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
             <Text size={mobile?'large':'xxlarge'} weight='bold'>RateLock</Text>   
           </Box>
 
+          { !mobile &&
+          <Box direction='row' align='center' gap='small'> 
+            <Search onClick={()=>{if(!searchOpen){setSearchOpen(true);} else {setSearchInputValue(undefined); setSearchOpen(false);}}} />
+            <Collapsible open={searchOpen} direction='horizontal'>
+              <InsetBox
+                background={asLayer? makerBackColor : activeSeries && modColor(activeSeries?.seriesColor, 50)}
+                justify='between'
+                direction='row'
+                align='center'
+                pad='xxsmall'
+              >
+                <TextInput
+                  type='number'
+                  placeholder='Search vault #'
+                  value={searchInputValue || ''}
+                  plain
+                  onChange={(event:any) => setSearchInputValue(event.target.value)}
+                />
+                <Close onClick={()=>{setSearchInputValue(undefined); setSearchOpen(false);}} />
+              </InsetBox>       
+            </Collapsible>
+          </Box>}
+
         </Box>
-
-
-
 
         {selectorOpen && <SeriesSelector activeView="Borrow" close={()=>setSelectorOpen(false)} /> }
         <Box 
@@ -360,29 +382,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
           <Box gap='medium'>
             <Box gap='small'> 
               <Box direction='row' gap='small' align='center' justify='end'>
-                {/* <Text size='xsmall' color='text'> Connected vaults: </Text> */}           
-                { !mobile &&
-                <Box direction='row' align='center' gap='small'> 
-                  <Search onClick={()=>{if(!searchOpen){setSearchOpen(true);} else {setSearchInputValue(undefined); setSearchOpen(false);}}} />
-                  <Collapsible open={searchOpen} direction='horizontal'>
-                    <InsetBox
-                      background={makerBackColor}
-                      justify='between'
-                      direction='row'
-                      align='center'
-                      pad='xxsmall'
-                    >
-                      <TextInput
-                        type='number'
-                        placeholder='Search vault #'
-                        value={searchInputValue || ''}
-                        plain
-                        onChange={(event:any) => setSearchInputValue(event.target.value)}
-                      />
-                      <Close onClick={()=>{setSearchInputValue(undefined); setSearchOpen(false);}} />
-                    </InsetBox>       
-                  </Collapsible>
-                </Box>}
+                {/* <Text size='xsmall' color='text'> Connected vaults: </Text> */} 
               </Box>
 
               <InsetBox background={makerBackColor} direction='row' justify='between'>   
