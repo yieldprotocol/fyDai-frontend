@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { ethers } from 'ethers';
-import { Box, TextInput, Text, Keyboard, ResponsiveContext } from 'grommet';
+import { Box, TextInput, Text, Keyboard, ResponsiveContext, Collapsible } from 'grommet';
 import { FiArrowLeft as ArrowLeft } from 'react-icons/fi';
 
 import { cleanValue } from '../utils';
@@ -24,6 +24,7 @@ import FlatButton from '../components/FlatButton';
 import DaiMark from '../components/logos/DaiMark';
 import YieldMobileNav from '../components/YieldMobileNav';
 import SeriesDescriptor from '../components/SeriesDescriptor';
+import InfoGrid from '../components/InfoGrid';
 
 interface ICloseDaiProps {
   close: any;
@@ -50,6 +51,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
   const isLol = useIsLol(inputValue);
 
   const [ maxWithdraw, setMaxWithdraw ] = useState<string>();
+
   
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
@@ -82,26 +84,41 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
         setMaxWithdraw(cleanValue(ethers.utils.formatEther(preview), 6));
       }
     })();
+
   }, [account, activeSeries.fyDaiBalance, fallbackProvider]);
+
+
+  // useEffect(()=> {
+  //   inputValue && activeSeries.fyDaiBalance && (async () => {
+  //     const preview = await previewPoolTx('sellFYDai', activeSeries, ethers.utils.parseEther(inputValue) );
+  //     if (!(preview instanceof Error)) {
+  //       // setMaxWithdraw(cleanValue(ethers.utils.formatEther(preview), 6));
+  //       console.log(cleanValue(ethers.utils.formatEther(preview), 6));
+  //     }
+  //   })();
+
+  // }, [inputValue, activeSeries.fyDaiBalance]);
 
   /* Withdraw DAi button disabling logic */
   useEffect(()=>{
     (
       !account ||
-      !inputValue || 
+      !inputValue ||
       parseFloat(inputValue) <= 0
     ) ? setCloseDisabled(true): setCloseDisabled(false);
   }, [ inputValue ]);
 
   /* show warnings and errors with collateralization ratio levels and inputs */
   useEffect(()=>{
-    if ( debouncedInput && maxWithdraw && (debouncedInput > maxWithdraw) ) {
+
+    if (maxWithdraw &&  debouncedInput > parseFloat(maxWithdraw) ) {
       setWarningMsg(null);
       setErrorMsg('You are not allowed to reclaim more than you have lent'); 
-    } else {   
+    } else {
       setWarningMsg(null);
       setErrorMsg(null);
     }
+
   }, [ debouncedInput ]);
 
   return (
@@ -149,6 +166,32 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
               onClick={()=> setInputValue(maxWithdraw)}
             />
           </InputWrap>
+
+          <Box fill>
+            <InfoGrid entries={[
+              {
+                label: 'Max amount redeemable',
+                labelExtra: 'if closing the entire position now',
+                visible: true,
+                active: true,
+                loading: false,
+                value: maxWithdraw,
+                valuePrefix: null,
+                valueExtra: null,
+              },
+              // {
+              //   label: 'Interest earned',
+              //   labelExtra: 'at maturity',
+              //   visible: true,
+              //   active: !!inputValue&&inputValue>0,
+              //   loading: false,        
+              //   value: activeSeries && ethers.utils.formatEther(activeSeries?.fyDaiBalance),
+              //   valuePrefix: '',
+              //   valueExtra: null,
+              // },
+            ]}
+            />
+          </Box>
 
           <ActionButton
             onClick={()=> withdrawProcedure()}
