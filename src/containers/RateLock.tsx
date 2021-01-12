@@ -40,8 +40,6 @@ import logoDark from '../assets/images/logo.svg';
 import logoLight from '../assets/images/logo_light.svg';
 import AprBadge from '../components/AprBadge';
 import SeriesSelector from '../components/SeriesSelector';
-import RaisedBox from '../components/RaisedBox';
-import SeriesDescriptor from '../components/SeriesDescriptor';
 import { useSignerAccount } from '../hooks/connectionHooks';
 
 interface IRateLockProps {
@@ -70,7 +68,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
   const { vault : vaultParam }:any = useParams();
 
   /* context imports */
-  const { state: { makerVaults }, actions: userActions } = useContext(UserContext);
+  const { state: { makerVaults, userLoading }, actions: userActions } = useContext(UserContext);
   const { state: { activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
   const activeSeries = seriesData.get(activeSeriesId);
 
@@ -288,11 +286,16 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
     
   /* Handle ratelock disabling */
   useEffect(()=>{ 
+ 
+    account && 
+    filteredMakerVaults.length>0 && 
     !collErrorMsg &&
     !debtErrorMsg &&
     (debtInputValue > 0  && collInputValue > 0) ? 
       setAdvancedDisabled(false): setAdvancedDisabled(true);
 
+    !account ||
+    filteredMakerVaults.length<=0 ||
     (parseFloat(selectedVault?.vaultDaiDebt_) === 0 && parseFloat(selectedVault?.vaultCollateral_) === 0 ) ||
     activeSeries?.isMature() ?
       setAllDisabled(true)
@@ -313,7 +316,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
       >
 
         <Box
-          round
+          round='small'
           background={asLayer ? 'background' : activeSeries && buildGradient(activeSeries?.seriesFromColor, activeSeries?.seriesColor)}
           margin={{ bottom:'-24px' }}
           pad={asLayer? 'large' : { horizontal:'large', bottom:'large', top:'medium' }}
@@ -387,7 +390,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
 
               <InsetBox background={makerBackColor} direction='row' justify='between'>   
                 <Box onClick={()=>selectVault('prev')} justify='center' align='center' hoverIndicator={modColor(makerBackColor, -25)}>
-                  {account && <ChevronLeft size='30px' color={selectedVaultIndex===0?makerBackColor:makerTextColor} />}
+                  {account && !userLoading && <ChevronLeft size='30px' color={selectedVaultIndex===0?makerBackColor:makerTextColor} />}
                 </Box>
                 {
                 filteredMakerVaults.length>0 ?        
@@ -418,6 +421,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
                   })
                   :
                   <Box pad='large'>
+                    { account && userLoading ? 'Searching for Maker Vaults...' : 'No Maker Vaults found for this account.'}
                     { 
                       !account &&
                       <RaisedButton
@@ -428,7 +432,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
                   </Box>
               }
                 <Box onClick={()=>selectVault('next')} justify='center' align='center' hoverIndicator={modColor(makerBackColor, -25)}>
-                  {account && <ChevronRight size='30px' color={selectedVaultIndex===filteredMakerVaults.length-1?makerBackColor:makerTextColor} />}
+                  {filteredMakerVaults.length>0 && <ChevronRight size='30px' color={selectedVaultIndex===filteredMakerVaults.length-1?makerBackColor:makerTextColor} />}
                 </Box>
               </InsetBox>
             </Box>
@@ -468,8 +472,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
                     onClick={()=>importAllProcedure(selectedVault.vaultId)}
                     disabled={
                       advancedOpen || 
-                      allDisabled ||
-                      !account
+                      allDisabled
                     }
                     label={
                       <Box pad='small' direction='row' gap='small'>
