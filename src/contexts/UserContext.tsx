@@ -68,6 +68,7 @@ const initState = {
     useTxApproval: false,
     showDisclaimer: true,
     themeMode:'auto',
+    moodLight: true,
   },
   makerVaults:[],
 };

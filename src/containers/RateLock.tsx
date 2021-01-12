@@ -12,7 +12,7 @@ import {
   FiLayers as ChangeSeries
 } from 'react-icons/fi';
 
-import { cleanValue, modColor, BN_RAY } from '../utils';
+import { cleanValue, modColor, BN_RAY, buildGradient } from '../utils';
 
 import { UserContext } from '../contexts/UserContext';
 import { SeriesContext } from '../contexts/SeriesContext';
@@ -324,7 +324,8 @@ const RateLock = ({ openConnectLayer, close }:IRateLockProps) => {
             <Box
               width='xsmall'
               pad={{ horizontal:'small', vertical:'xsmall' }} 
-              background={activeSeries?.seriesColor} // 'text-xweak'
+              background={ activeSeries && buildGradient( activeSeries?.seriesFromColor, activeSeries?.seriesColor)} 
+              // background={activeSeries?.seriesColor}
               // border={{ color: !theme.dark? 'text':'white' }}
               onClick={()=>setSelectorOpen(true)}
               round

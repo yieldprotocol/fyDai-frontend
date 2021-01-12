@@ -42,7 +42,10 @@ const getFyDaiNames = (chainId: number): string[] => {
   return Object.keys(addrs).filter((x) => x.startsWith('fyDai') && x.indexOf('LP') === -1);
 };
 
-const seriesColors = ['#ff86c8', '#82d4bb', '#6ab6f1', '#cb90c9', '#aed175', '#f0817f', '#ffbf81', '#95a4db', '#ffdc5c'];
+const seriesColors = ['#aed175', '#f0817f', '#ffbf81', '#95a4db', '#ffdc5c', '#ff86c8', '#82d4bb', '#6ab6f1', '#cb90c9', ];
+// const fromColors= ['#95a4db', '#ffdc5c', '#ff86c8', '#82d4bb', '#6ab6f1', '#cb90c9', '#aed175', '#f0817f', '#ffbf81',  ];
+const fromColors= ['#add8e6', '#add8e6', '#add8e6', '#add8e6', '#add8e6', '#add8e6', '#add8e6', '#add8e6', '#add8e6',  ];
+
 const contractList = [
   'Controller',
   'Treasury',
@@ -57,7 +60,7 @@ const contractList = [
   'ImportProxy',
   'ImportCdpProxy',
   'ExportProxy',
-  'ExportCdpProxy', 
+  'ExportCdpProxy',
 ];
 
 // reducer
@@ -164,6 +167,8 @@ const YieldProvider = ({ children }: any) => {
             seriesTextColor: '#333333',
             seriesLightColor: utils.modColor(seriesColors[i], 50),
             seriesDarkColor: utils.modColor(seriesColors[i], -50),
+            seriesFromColor: fromColors[i] || seriesColors[i],
+            seriesToColor: seriesColors[i]
           };
         })
       ).then((res: any) => _deployedSeries.push(...res));

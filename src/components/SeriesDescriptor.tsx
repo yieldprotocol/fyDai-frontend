@@ -37,7 +37,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
           round='small'
           gap='small'
           pad={minimized? { bottom:'medium' }: { bottom:'large' }}
-          background={ buildGradient( '#add8e6', activeSeries?.seriesColor)}
+          background={ buildGradient( activeSeries?.seriesFromColor, activeSeries?.seriesToColor)}
           margin={{ bottom:'-18px' }}
         >
           <Box
@@ -68,7 +68,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
                   align='center'
                 >         
                   <AprBadge activeView={activeView} series={activeSeries} animate />
-                  <Text size='large' weight='bold' color={activeSeries?.seriesTextColor}>            
+                  <Text size='xlarge' weight='bold' color={activeSeries?.seriesTextColor}>            
                     { mobile? activeSeries?.displayNameMobile : activeSeries?.displayName }
                   </Text>
                 </Box>}
