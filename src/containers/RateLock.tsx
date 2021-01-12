@@ -647,7 +647,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
           <Box alignSelf='end' margin={{ top:'medium' }}>
             <FlatButton 
               onClick={()=>setAdvancedOpen(!advancedOpen)}
-              disabled={!account}
+              disabled={allDisabled}
               label={
                 <Box direction='row' gap='medium' align='center'>
                   <Text size='xsmall' color='text-weak'> { advancedOpen ? 'Use 1-Click RateLock':'Use advanced RateLock' }</Text>
