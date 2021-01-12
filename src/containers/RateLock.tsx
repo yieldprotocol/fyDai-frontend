@@ -177,7 +177,6 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
     activeSeries && 
     debouncedDebtInput>0 && 
     (async () => {
-      console.log(debtInputValue);
       if (
         debtInputValue &&
         parseFloat(debouncedDebtInput) > 0 &&
@@ -219,6 +218,13 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
         setCollErrorMsg('That is not enough collateral to cover the debt you wish to migrate');
       }
     })();
+
+    activeSeries && debouncedCollInput>0 && ( async () => { 
+      if (debouncedCollInput <= 0.05) {
+        setCollErrorMsg('Collateral amount to migrate should be GREATER than 0.05Eth');
+      }
+    })();
+
     !debouncedCollInput && setCollErrorMsg(null);
   }, [debouncedCollInput, activeSeries]);
 
@@ -248,10 +254,10 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
 
   }, [filteredMakerVaults]);
 
-  /* Handle minSafe collateral calculations */
+  /* Handle minSafe collateral calculations minSafe must be > 0.05ETH */
   useEffect(()=>{
     minCollateral && 
-    setMinSafeCollateral( ((parseFloat(minCollateral)/3)*5).toString() );
+    setMinSafeCollateral((parseFloat(minCollateral)/3)*5 > 0.05 ? ((parseFloat(minCollateral)/3)*5).toString(): '0.051' );
   }, [ minCollateral ]);
   
   /* Handle dust watch */
@@ -297,6 +303,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
     !account ||
     filteredMakerVaults.length<=0 ||
     (parseFloat(selectedVault?.vaultDaiDebt_) === 0 && parseFloat(selectedVault?.vaultCollateral_) === 0 ) ||
+    selectedVault?.vaultCollateral.lt(ethers.utils.parseEther('0.050')) ||
     activeSeries?.isMature() ?
       setAllDisabled(true)
       : setAllDisabled(false);
@@ -597,7 +604,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
                   },
                   {
                     label: 'Suggested Collateral',
-                    labelExtra: 'ratio of ~250%',
+                    labelExtra: 'ratio of ~250% (min 0.051ETH)',
                     visible: !!debtInputValue,
                     active: true,
                     loading: false,           
@@ -625,7 +632,6 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
             </Collapsible>
           </Box>
           }
-
 
           <Box direction='row' fill justify={close?'between':'end'}>
             { 
