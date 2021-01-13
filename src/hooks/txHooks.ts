@@ -24,10 +24,8 @@ export const useTxHelpers = () => {
 
   /* Notification Helpers */
   const txComplete = (receipt:any, txCode:string|null=null) => {  
-
     dispatch({ type: 'txComplete', payload: { receipt, txCode } } );
-    setPendingCache(pendingCache.filter( (x:any)=> x.tx.hash === receipt.hash )); 
-
+    setPendingCache(pendingCache.filter( (x:any)=> x.tx.hash === receipt.hash ));
   };
 
   const handleTxRejectError = (error:any) => {
@@ -61,6 +59,7 @@ export const useTxHelpers = () => {
       payload:{ message: msg, type:'error' } 
     });
     txComplete(receipt);
+    setPendingCache([]);
   };
   
   const handleTx = async ( tx:ITx ) => {

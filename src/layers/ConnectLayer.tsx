@@ -119,9 +119,9 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                     /> 
 
                   </Box>
-                  <Text size='xxsmall'>App Version: Beta 0.3.0</Text>
+                  <Text size='xxsmall'>App Version: 0.4.0</Text>
                   <Text size='xxsmall'>Connected Network: { provider?.network?.name }</Text>
-                  <Text size='xxsmall'>Yield protocol ref contract: {process.env[`REACT_APP_MIGRATION_${chainId}`]} </Text>       
+                  <Text size='xxsmall'>Yield protocol Ref contract: {process.env[`REACT_APP_MIGRATION_${chainId}`]} </Text>       
                 </Box>
               </Box> }
 
@@ -139,12 +139,12 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                         fill="horizontal"
                         icon={
                           <Box
-                            height="1rem"
-                            width="1rem"
-                            style={{
-                              position: 'absolute',
-                              left: '1rem',
-                            }}
+                            height="1.5rem"
+                            width="1.5rem"
+                            // style={{
+                            //   position: 'absolute',
+                            //   left: '1rem',
+                            // }}
                           >
                             <Image src={x.image} fit="contain" />
                           </Box>
@@ -197,7 +197,7 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                 </Box>
 
                 <Box>
-                  {histOpen === 'BORROW' && <TxHistory filterTerms={['Borrowed', 'Repaid', 'Deposited', 'Withdrew']} series={null} />}
+                  {histOpen === 'BORROW' && <TxHistory filterTerms={['Borrowed', 'Repaid', 'Deposited', 'Withdrew', 'Imported']} series={null} />}
                   {histOpen === 'LEND' && <TxHistory filterTerms={['Closed', 'Lent' ]} series={null} />}
                   {histOpen === 'POOL' && <TxHistory filterTerms={['Added', 'Removed' ]} series={null} />}
                 </Box>

@@ -1,4 +1,4 @@
-import { ethers, BigNumber } from 'ethers';
+import { ethers, BigNumber, BigNumberish } from 'ethers';
 import { IYieldSeries } from '../types';
 
 /* constants */
@@ -21,6 +21,12 @@ export const toRay = (value:number) => {
 
 export const toWei = (value:string|number) => {
   return ethers.utils.parseEther(value.toString()); 
+};
+
+/// @dev Converts a BigNumberish to WAD precision, for BigNumberish up to 10 decimal places
+export const toWad = (value: BigNumberish) => {
+  const exponent = BigNumber.from(10).pow(BigNumber.from(8));
+  return BigNumber.from((value as any) * 10 ** 10).mul(exponent);
 };
 
 // / @dev Multiplies a number in any precision by a number in RAY precision, with the output in the first parameter's precision.
@@ -108,6 +114,19 @@ export const invertColor = (hex:any) => {
   const b = (255 - parseInt(hex_.slice(4, 6), 16)).toString(16);
   // pad each with zeros and return
   return `#${  padZero(r)  }${padZero(g)  }${padZero(b)}`;
+};
+
+export const buildGradient = (colorFrom:string, colorTo:string  ) => {
+  return `linear-gradient(to bottom right,
+    ${modColor( colorFrom || '#add8e6', -50) }, 
+    ${modColor( colorFrom || '#add8e6', 0) },
+    ${modColor( colorFrom || '#add8e6', 0) },
+    ${modColor( colorTo, 50)}, 
+    ${modColor( colorTo, 50)}, 
+    ${modColor( colorTo, 50)},
+    ${modColor( colorTo, 25)}, 
+    ${modColor( colorTo, 0)}, 
+    ${modColor( colorTo, 0)})`;
 };
 
 /**

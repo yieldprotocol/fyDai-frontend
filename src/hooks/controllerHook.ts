@@ -30,11 +30,6 @@ export const useController = () => {
   const { state : { deployedContracts } } = useContext<any>(YieldContext);
   const { actions: userActions } = useContext(UserContext);
 
-  const [ postActive, setPostActive ] = useState<boolean>(false);
-  const [ withdrawActive, setWithdrawActive ] = useState<boolean>(false);
-  const [ borrowActive, setBorrowActive ] = useState<boolean>(false);
-  const [ repayActive, setRepayActive ] = useState<boolean>(false);
-
   /* controller contract for txs */
   const [controllerContract, setControllerContract] = useState<any>();
   /* controller contract for reading, calls */

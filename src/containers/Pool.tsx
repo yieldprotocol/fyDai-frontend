@@ -245,7 +245,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                   />
                   
                   {account &&
-                  <RaisedButton 
+                  <FlatButton 
                     label={!mobile ? 'Add Maximum': 'Maximum'}
                     onClick={()=>setInputValue(cleanValue(ethers.utils.formatEther(daiBalance), 6))}
                   />}
@@ -256,7 +256,8 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
 
                     <InfoGrid entries={[
                       {
-                        label: 'Share of the Pool after adding liquidity',
+                        label: 'Share of the Pool',
+                        labelExtra: 'after adding liquidity',
                         visible: inputValue>0,
                         active: debouncedInput,
                         loading: calculating,           
@@ -315,8 +316,8 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                     onClick={()=>setHistOpen(true)}
                     label={
                       <Box direction='row' gap='small' align='center'>
-                        <Text size='xsmall' color='text-xweak'><History /></Text>                
-                        <Text size='xsmall' color='text-xweak'>
+                        <Text size='xsmall' color='text-weak'><History /></Text>                
+                        <Text size='xsmall' color='text-weak'>
                           Series Pool History
                         </Text>              
                       </Box>

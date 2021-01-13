@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import {
   Text,
@@ -8,6 +8,7 @@ import {
   ResponsiveContext,
 } from 'grommet';
 
+import { buildGradient } from '../utils';
 import { SeriesContext } from '../contexts/SeriesContext';
 
 const StyledLink = styled(NavLink)`
@@ -33,10 +34,10 @@ const StyledLink = styled(NavLink)`
 const YieldNav = (props: any) => {
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
+  const loc = useLocation();
   
-  const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
+  const { state: { activeSeriesId, seriesData } } = useContext(SeriesContext);
   const activeSeries = seriesData.get(activeSeriesId);
-
   const theme = useContext<any>(ThemeContext);
   const textColor = theme.dark? theme.global.colors.text.dark : theme.global.colors.text.light;
 
@@ -45,6 +46,7 @@ const YieldNav = (props: any) => {
       <Box
         direction='row'
         gap={mobile? 'medium':'large'}
+        align='center'
       >
         <StyledLink 
           to={`/borrow/${activeSeries?.maturity}`}
@@ -80,7 +82,25 @@ const YieldNav = (props: any) => {
             size={mobile? 'small':'xxlarge'} 
           >Pool
           </Text>
+        </StyledLink>
+
+        <StyledLink 
+          to='/ratelock'
+          activeStyle={{ transform: 'scale(1.1)', fontWeight: 'normal', color: `${textColor}` }}
+        >
+          <Box 
+            pad={{ horizontal:'small', vertical:'xxsmall' }} 
+            background={loc.pathname.includes('ratelock')? 'text-weak' : 'text-xweak'} 
+            round
+          > 
+            <Text 
+              weight='bold' 
+              size={mobile? 'small':'xlarge'}
+            >RateLock
+            </Text>
+          </Box>   
         </StyledLink> 
+
       </Box>
     </>
   );

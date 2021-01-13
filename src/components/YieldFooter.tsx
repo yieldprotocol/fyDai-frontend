@@ -13,6 +13,7 @@ import { CgSleep as Moodlight } from 'react-icons/cg';
 import { logEvent } from '../utils/analytics';
 
 import { UserContext } from '../contexts/UserContext';
+import { useMaker } from '../hooks/makerHook';
 
 const handleExternal = (destination: string) => {
   logEvent({
@@ -37,14 +38,13 @@ const resetApp = () => {
 const YieldFooter = (props: any) => {
   const {
     themeMode,
-    cycleThemeMode,
     moodLight, 
     toggleMoodLight,
   } = props;
 
-  const [ showDisclaimer, setShowDisclaimer] = useState<boolean>(false);
+  const { state: { preferences, authorization }, actions: { updatePreferences } } = useContext(UserContext);
 
-  const { state: { preferences }, actions: { updatePreferences } } = useContext(UserContext);
+  const { genVault } = useMaker();
 
   const IconSize = '1.15rem';
   const IconGap = 'small';
@@ -77,10 +77,9 @@ const YieldFooter = (props: any) => {
 
         <Box margin={{ left:'small' }}>
           <Text size='xxsmall' color='grey'>
-            This software is in BETA v0.3.0
+            This software is v0.4.0
           </Text>
           <Text size='xxsmall' color='grey'> Having issues? Try an app <Anchor onClick={()=>resetApp()}>RESET</Anchor>, or get hold of us via <Anchor href='https://discord.gg/JAFfDj5' target="_blank" onClick={() => handleExternal('Discord')}>discord</Anchor>. </Text>
-          {/* {showDisclaimer && <YieldDisclaimer forceShow={true} />} */}
         </Box>
 
       </Box>
@@ -92,16 +91,11 @@ const YieldFooter = (props: any) => {
           top: '2px',
         }}
       >
-
-
-
-
         <Box>
           <Text size='xxsmall' color='grey'>
             Current theme: 
           </Text>
         </Box>
-
         <Anchor
           onClick={()=>updatePreferences({ ...preferences, themeMode: cycleOptions(themeMode) })}
         >
@@ -109,7 +103,6 @@ const YieldFooter = (props: any) => {
           { themeMode === 'light'  && <Box align='center' direction='row' gap='xsmall'><Sun /> <Text size='xxsmall'>Light</Text></Box> }
           { themeMode === 'auto'  && <Box align='center' direction='row' gap='xsmall'><Clock /> <Text size='xxsmall'>Auto</Text></Box> }         
         </Anchor>
-
         {
           themeMode === 'light' && 
           false &&
@@ -120,8 +113,8 @@ const YieldFooter = (props: any) => {
             <Moodlight />
           </Anchor>
         }
-        
       </Box>
+      {/* <Box onClick={()=>genVault(authorization.dsProxyAddress)}>test</Box> */}
     </Footer>
   );
 };

@@ -26,6 +26,7 @@ import CloseDai from './containers/CloseDai';
 import WithdrawEth from './containers/WithdrawEth';
 import Repay from './containers/Repay';
 import RemoveLiquidity from './containers/RemoveLiquidity';
+import RateLock from './containers/RateLock';
 
 import YieldHeader from './components/YieldHeader';
 import YieldFooter from './components/YieldFooter';
@@ -34,6 +35,7 @@ import ErrorBoundary from './components/ErrorBoundry';
 import YieldNav from './components/YieldNav';
 
 import { initGA, logPageView } from './utils/analytics';
+import RaisedBox from './components/RaisedBox';
 
 declare global {
   interface Window {
@@ -56,7 +58,7 @@ const App = (props:any) => {
     /* Remember the following last visited routes: */
     ['borrow', 'lend', 'pool'].includes(location.pathname.split('/')[1]) &&
     /* but, ignore these other routes */
-    !['withdraw', 'repay', 'removeLiquidity', 'close'].includes(location.pathname.split('/')[1]) &&
+    !['withdraw', 'repay', 'removeLiquidity', 'close', 'post'].includes(location.pathname.split('/')[1]) &&
     setCachedLastVisit(`/${location.pathname.split('/')[1]}/${activeSeries?.maturity}` );
   }, [location]);
 
@@ -164,16 +166,17 @@ const App = (props:any) => {
         pad={{ vertical:'medium' }}
         align='center'
         flex
-      >     
+      >
         <Switch>
           <Route path="/post/:amnt?"> <Deposit openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route>
-          <Route path="/withdraw/:amnt?"> <WithdrawEth /> </Route>
-          <Route path="/borrow/:series?/:amnt?"> <Borrow openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route> 
-          <Route path="/repay/:series/:amnt?"> <Repay /> </Route>
+          <Route path="/borrow/:series?/:amnt?"> <Borrow openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route>      
           <Route path="/lend/:series?/:amnt?"> <Lend openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route>
-          <Route path="/close/:series/:amnt?"> <CloseDai close={()=>null} /> </Route>
           <Route path="/pool/:series?/:amnt?"> <Pool openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route>
-          <Route path="/removeLiquidity/:series/:amnt?"> <RemoveLiquidity /> </Route>           
+          <Route path="/ratelock/:vault?/:series?"> <RaisedBox><RateLock openConnectLayer={() => setShowConnectLayer('CONNECT')} /></RaisedBox> </Route>
+          {/* <Route path="/withdraw/:amnt?"> <WithdrawEth /> </Route> 
+          <Route path="/repay/:series/:amnt?"> <Repay /> </Route>
+          <Route path="/close/:series/:amnt?"> <CloseDai close={()=>null} /> </Route> 
+          <Route path="/removeLiquidity/:series/:amnt?"> <RemoveLiquidity /> </Route> */}         
           <Route exact path="/"> <Redirect to={`${cachedLastVisit || '/borrow/'}`} /> </Route>
           <Route path="/*"> 404 </Route>
         </Switch>              

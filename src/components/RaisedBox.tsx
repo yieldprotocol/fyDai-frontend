@@ -10,13 +10,14 @@ border-radius: 8px;
 
 ${(props:any) => props.background && css`
      background: ${ props.background };
-     box-shadow:  8px 8px 11px ${modColor(props.background, -10)}, 
-             -8px -8px 11px ${modColor(props.background, 10)};
+     box-shadow:  8px 8px 11px 2px ${modColor(props.background, -10)}, 
+             -8px -8px 11px 2px ${modColor(props.background, 10)};
 }
 `}
 `;
 
 function RaisedBox({ children }:any ) {
+  
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   const theme:any = React.useContext(ThemeContext);
   const themeBackground = theme.global.colors.background;

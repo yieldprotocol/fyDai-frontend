@@ -50,14 +50,12 @@ function ActionButton({ ...props }:any ) {
   const themeBackground = theme.global.colors.background;
   const defaultBackground = theme.dark === true ? themeBackground.dark: themeBackground.light;
 
-  const { state: { pendingTxs }, dispatch } = useContext(TxContext);
-
+  const { state: { authorization:{ hasDsProxy } }, actions: userActions } = useContext(UserContext);
+  const { state: { pendingTxs } } = useContext(TxContext);
   const { state: seriesState, actions: seriesActions } = useContext(SeriesContext);
-
   const { activeSeriesId, seriesData } = seriesState;
   const activeSeries = seriesData.get(activeSeriesId);
 
-  const { state: { authorization:{ hasDsProxy } }, actions: userActions } = useContext(UserContext);
   const { buildDsProxy } = useDsRegistry();
 
   const [proxyLabel, setProxyLabel] = useState<any>('First, create a Yield proxy'); 
@@ -77,8 +75,9 @@ function ActionButton({ ...props }:any ) {
 
   return (
     <>
-      { !props.disabled &&
-       ( !mobile ? 
+      { 
+      !props.disabled &&
+       (!mobile ? 
          <StyledBox 
            {...props}
            onClick={hasDsProxy ? props.onClick : ()=> buildProxyProcedure()}
@@ -121,15 +120,19 @@ function ActionButton({ ...props }:any ) {
              </Box>     
            </Box>
          </Layer>
-       )}
+       )
+      }
 
-      { !mobile && props.disabled && 
+      { 
+      !mobile && 
+      props.disabled && 
         <Box 
           fill='horizontal'
           align='center'
           pad='medium'
           background={defaultBackground}
-        />}
+        />
+      }
     </>
   );
 }

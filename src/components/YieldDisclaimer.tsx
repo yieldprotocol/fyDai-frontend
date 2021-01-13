@@ -22,7 +22,7 @@ const YieldDisclaimer = ({ forceShow=false, closeCallback }:any) =>  {
   return (
     <> 
       {
-        ( showDisclaimer || forceShow) &&
+      (showDisclaimer || forceShow) &&
         <Layer
           modal={true}
           onEsc={()=>{ 
@@ -43,7 +43,6 @@ const YieldDisclaimer = ({ forceShow=false, closeCallback }:any) =>  {
           >
             <Text size='large' weight='bold'> Disclaimer </Text>
             <Text size='xxsmall'>
-              This is a beta version of Yield’s smart contracts which are still undergoing additional testing and changes before official release. 
               The Yield app and the underlying smart contracts are provided on an “as is” and “as available” basis as described in the open source licenses on the <Anchor href='https://github.com/yieldprotocol' target='_blank' rel='noreferrer'>Yield Github</Anchor>. 
               While these smart contracts have been audited, Yield introduces a new primitive that may allow for unexpected behavior, 
               and you should only experiment with capital you are willing to lose completely.
@@ -70,7 +69,7 @@ const YieldDisclaimer = ({ forceShow=false, closeCallback }:any) =>  {
 
           </Box>
         </Layer>
-}
+      }
     </>
   );
 }; 

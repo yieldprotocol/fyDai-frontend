@@ -30,6 +30,7 @@ import { useTxActive } from '../hooks/txHooks';
 import { useBorrowProxy } from '../hooks/borrowProxyHook';
 
 import WithdrawEth from './WithdrawEth';
+import RateLock from './RateLock';
 
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
@@ -45,6 +46,7 @@ import YieldMobileNav from '../components/YieldMobileNav';
 import Loading from '../components/Loading';
 
 import { logEvent } from '../utils/analytics';
+import MakerMark from '../components/logos/MakerMark';
 
 interface DepositProps {
   /* deposit amount prop is for quick linking into component */
@@ -55,6 +57,7 @@ interface DepositProps {
 const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
   const history = useHistory();
   const { state: userState, actions: userActions } = useContext(UserContext);
+  const { position, makerVaults, userLoading } = userState;
   const {
     ethBalance,
     ethBalance_,
@@ -63,7 +66,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
     maxDaiAvailable_,
     collateralPercent_,
     debtValue,
-  } = userState.position;
+  } = position;
 
   const { state: yieldState } = useContext(YieldContext);
   const { ethPrice_ } = yieldState.feedData;
@@ -89,6 +92,8 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
   const [ maxPower, setMaxPower ] = useState<any>(0);
 
   const [ withdrawOpen, setWithdrawOpen ] = useState<boolean>(false);
+  const [ rateLockOpen, setMigrateOpen ] = useState<boolean>(false);
+
   const [ depositPending, setDepositPending ] = useState<boolean>(false);
   const [ depositDisabled, setDepositDisabled ] = useState<boolean>(true);
 
@@ -114,12 +119,16 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
   };
 
   useEffect(()=>{
-    /* Roughly estimate the nmaximum borrowing power based on ETH balance */
-    const newPower = (ethBalance_*ethPrice_)/2;
-    if (maxDaiAvailable_) {
+    /* Roughly estimate the maximum borrowing power based on ETH balance */
+    const newPower = (ethBalance_*ethPrice_)/1.5;
+
+    if (parseFloat(maxDaiAvailable_)>0) {
       const pl = parseFloat(maxDaiAvailable_) + newPower;
       setMaxPower(pl.toFixed(2));
+    } else {
+      setMaxPower(newPower.toFixed(2));
     }
+
   }, [ethBalance_, ethPrice_, maxDaiAvailable_]);
 
   /* Handle debounced input value changes */
@@ -132,7 +141,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
     /* 2. Roughly estimate the new borrowing power */
     if (debouncedInput) {
       const val = collValue(ethers.utils.parseEther(debouncedInput));
-      const newPower = parseFloat(ethers.utils.formatEther(val))/2;
+      const newPower = parseFloat(ethers.utils.formatEther(val))/1.5;
       if (parseFloat(maxDaiAvailable_) > 0) {
         const pl = parseFloat(maxDaiAvailable_) + newPower;
         setEstPower(pl.toFixed(2));
@@ -164,7 +173,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
       setErrorMsg(null);
       setWarningMsg('If you deposit all your ETH you may not be able to make any further transactions!');
     } else if (debouncedInput && debouncedInput<0.05) {
-      setErrorMsg('Initial collateral balance must be larger than 0.05 ETH.');
+      setErrorMsg('Collateral deposits must be larger than 0.05 ETH.');
       setWarningMsg(null);
     } else {
       setWarningMsg(null);
@@ -257,6 +266,11 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
           <Layer onClickOutside={()=>setWithdrawOpen(false)}>
             <WithdrawEth close={()=>setWithdrawOpen(false)} />
           </Layer>}
+
+        {/* { rateLockOpen && makerVaults.length>0 &&
+          <Layer onClickOutside={()=>setMigrateOpen(false)}>
+            <RateLock close={()=>setMigrateOpen(false)} />
+          </Layer>} */}
       
         { (!txActive || txActive?.type === 'WITHDRAW') &&
         <Box
@@ -267,11 +281,27 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
           pad='large'
           gap='medium'
         >
-          <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to deposit</Text>
+
+          <Box direction='row-responsive' justify='between'>
+            <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to deposit</Text>
+            {
+            !mobile && !userLoading &&
+            <RaisedButton
+              disabled={!!inputValue || makerVaults.length===0}
+              label={
+                <Box pad='xsmall' gap='small' direction='row' align='center'>
+                  <Box><MakerMark /></Box>
+                  <Text size='xsmall'>Migrate a Maker vault</Text>
+                </Box>
+              }
+              onClick={()=>setMigrateOpen(true)}
+            />
+            }
+          </Box>
 
           <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
             <TextInput
-              ref={(el:any) => {el && !withdrawOpen && !mobile && el.focus(); setInputRef(el);}} 
+              ref={(el:any) => {el && !withdrawOpen && !rateLockOpen && !mobile && el.focus(); setInputRef(el);}} 
               type='number'
               placeholder={(!mobile && !modalView) ? 'Enter the ETH amount to deposit': 'ETH'}
               value={inputValue || ''}
@@ -280,7 +310,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
               onChange={(event:any) => setInputValue( cleanValue(event.target.value) )}
               icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <EthMark />}
             />
-            <RaisedButton
+            <FlatButton
               label={(!mobile && !modalView) ? 'Deposit Maximum': 'Max'}
               onClick={()=>account && setInputValue(ethers.utils.formatEther(ethBalance))}
             />

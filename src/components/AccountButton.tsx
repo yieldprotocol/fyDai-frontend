@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useWeb3React } from '@web3-react/core';
-
 import {
   Text,
   Box,
@@ -8,12 +7,13 @@ import {
   Layer,
   Collapsible,
 } from 'grommet';
-
 import { 
   FiSettings as Gear,
   FiCheckCircle as Check,
   FiArrowLeft as ArrowLeft,
 } from 'react-icons/fi';
+
+import { abbreviateHash } from '../utils';
 
 import { TxContext } from '../contexts/TxContext';
 import { UserContext } from '../contexts/UserContext';
@@ -22,9 +22,8 @@ import FlatButton from './FlatButton';
 import DaiMark from './logos/DaiMark';
 import Loading from './Loading';
 import TxStatus from './TxStatus';
-import { abbreviateHash } from '../utils';
 import EthMark from './logos/EthMark';
-
+import RaisedButton from './RaisedButton';
 
 const AccountButton = (props: any) => {
   
@@ -60,7 +59,8 @@ const AccountButton = (props: any) => {
       align='center'
       background='background'
     > 
-      {txStatusOpen && 
+      {
+      txStatusOpen && 
       <Layer 
         onClickOutside={()=>setTxStatusOpen(false)}
         onEsc={()=>setTxStatusOpen(false)}
@@ -87,9 +87,14 @@ const AccountButton = (props: any) => {
             />
           </Box>
         </Box>
-      </Layer>}
+      </Layer>
+      }
 
-      { !mobile && pendingTxs.length===0 && !txCompleteOpen && account &&
+      { 
+      account &&
+      !mobile && 
+      pendingTxs.length===0 && 
+      !txCompleteOpen && 
       <Box 
         pad={{ left:'small', right:'large' }} 
         direction='row' 
@@ -100,7 +105,6 @@ const AccountButton = (props: any) => {
         onFocus={() => setDetailsOpen(true)}
         onBlur={() => setDetailsOpen(false)}
       >
-       
         <Collapsible open={detailsOpen} direction='horizontal'>
           { detailsOpen && 
           <Box overflow='scroll' gap='xsmall' direction='row' animation='slideLeft'>    
@@ -116,24 +120,27 @@ const AccountButton = (props: any) => {
             <Text size='xsmall' weight='bold'>{position?.daiBalance_} DAI </Text>
           </Loading>
         </Box>
+      </Box>
+      }
+      
+      {
+      pendingTxs.length>0 && 
+      !txCompleteOpen &&
+        <Box
+          ref={pendingRef}
+          direction='row'
+          margin={{ right:'-20px' }}
+          pad={{ vertical: 'xsmall', left:'small', right:'25px' }}
+          round
+          animation='slideLeft'
+          onClick={()=>setTxStatusOpen(true)}
+        >
+          <Text size='xsmall'> Transaction pending ... </Text>  
+        </Box>
+      }
 
-      </Box>}
-
-        
-      {pendingTxs.length>0 && !txCompleteOpen &&
-      <Box
-        ref={pendingRef}
-        direction='row'
-        margin={{ right:'-20px' }}
-        pad={{ vertical: 'xsmall', left:'small', right:'25px' }}
-        round
-        animation='slideLeft'
-        onClick={()=>setTxStatusOpen(true)}
-      >
-        <Text size='xsmall'> Transaction pending ... </Text>  
-      </Box>}
-
-      {txCompleteOpen && 
+      {
+      txCompleteOpen && 
       <>
         <Box
           ref={completeRef}
@@ -154,9 +161,11 @@ const AccountButton = (props: any) => {
             <Text color='red' textAlign='center' size='xsmall'>Transaction failed</Text>
           </Box>}
         </Box> 
-      </>}
+      </>
+      }
 
-      { account ?
+      { 
+      account ?
         <>{!mobile && <FlatButton
           onClick={()=>openConnectLayer('ACCOUNT')}
           label={
@@ -174,9 +183,9 @@ const AccountButton = (props: any) => {
           onClick={() => {
             openConnectLayer('CONNECT');
           }}
-          label={<Text size='small'>Connect a wallet</Text>}
-        />}
-
+          label={<Box pad='xsmall'><Text size='small'>Connect a wallet</Text></Box>}
+        />
+    }
     </Box>
   );
 };

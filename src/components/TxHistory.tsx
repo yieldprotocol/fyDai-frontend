@@ -45,8 +45,9 @@ const TxHistory = ( { filterTerms, series }: HistoryProps) => {
           <Text size='xsmall' color={series?.seriesColor || 'text-weak'}>{item.event}</Text>
           <Text size='xxsmall'> 
             { (item.event === 'Deposited' || item.event === 'Withdrew') && `${item.collateral} collateral`}
-            { (item.event === 'Added' || item.event === 'Removed') && 'liquidity Tokens '}
-            { item.maturity && moment.unix(item.maturity).format('MMMM YYYY') } 
+            { (item.event === 'Added' || item.event === 'Removed') && 'liquidity Tokens '} 
+            { item.event === 'Imported' && ' Maker debt to ' }
+            { item.maturity && moment.unix(item.maturity).format('MMMM YYYY') }
             { item.APR && `@ ${item.APR.toFixed(2)}%` }
           </Text>
         </Box>
@@ -65,17 +66,32 @@ const TxHistory = ( { filterTerms, series }: HistoryProps) => {
         pad='small' 
         fill='horizontal'    
       > 
-        { (item.event === 'Borrowed') && 
+        {
+        (item.event === 'Borrowed') && 
         <Box fill>
           <Text size='xxsmall'>Amount owed @ maturity</Text>
           <Text size='xsmall'>{Math.abs(item.fyDai_).toFixed(2)} Dai</Text>
-        </Box> }
+        </Box> 
+        }
         
-        { (item.event === 'Lent' ) && 
+        { 
+        (item.event === 'Lent' ) && 
         <Box fill>
           <Text size='xxsmall'>Amount redeemable @ maturity</Text>
           <Text size='xsmall'>{Math.abs(item.fyDai_).toFixed(2)} Dai</Text>
-        </Box> }
+        </Box>
+        }
+
+        { 
+        (item.event === 'Imported' ) && 
+        <Box fill>
+          <Text size='xxsmall'>Collateralized with</Text>
+          <Box direction='row'>
+            <Text size='xsmall'>{Math.abs(item.collateral_).toFixed(2)} ETH-A </Text>
+            <Text size='xxsmall'>(see transaction above)</Text>
+          </Box>
+        </Box>
+        }
 
         <Box fill>
           <Box alignSelf='end' direction='row' gap='small'>
@@ -93,13 +109,14 @@ const TxHistory = ( { filterTerms, series }: HistoryProps) => {
     let seriesFilteredHist;
     const _txHist = state.txHistory.items;
     const filteredHist = _txHist.filter((x:any) => filterTerms.includes(x.event));
+    
     if ( series ) {
       seriesFilteredHist = filteredHist.filter((x:any) => (x.maturity === series.maturity) || (x.maturity === null) );
     } else {
       seriesFilteredHist = filteredHist;
     }
+
     const sortedList = seriesFilteredHist.sort( (a:any, b:any) => b.date - a.date ); 
-    
     setTxHistory(sortedList);
 
   }, [ state.txHistory, series, filterTerms ]);
