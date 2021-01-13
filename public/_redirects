@@ -1,0 +1,5 @@
+# redirects 
+# http and https need separate rules if you don’t force_ssl!
+
+http://yield-ratelock-preview.netlify.app/#/ratelock/* https://yield-ratelock-preview.netlify.app/#/borrow/:splat 301!
+https://yield-ratelock-preview.netlify.app/#/ratelock/* https://yield-ratelock-preview.netlify.app/#/borrow/:splat 301!
