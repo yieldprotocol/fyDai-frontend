@@ -428,7 +428,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
                   })
                   :
                   <Box pad='large'>
-                    { account && userLoading ? 'Searching for Maker Vaults...' : 'No Maker Vaults found.'}
+                    { account && ( userLoading ? 'Searching for Maker Vaults...' : 'No Maker Vaults found.') }
                     { 
                       !account &&
                       <RaisedButton
