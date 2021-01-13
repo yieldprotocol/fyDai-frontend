@@ -1,3 +1,4 @@
 # http and https need separate rules if you don’t force_ssl!
-http://ratelock.yield.is/ratelock/* http://app.yield.is/#/ratelock/:splat 301!
-https://ratelock.yield.is/ratelock/*  https://app.yield.is/#/ratelock/:splat 301!
+http://ratelock.yield.is/* http://app.yield.is/#/ratelock/:splat 301!
+https://ratelock.yield.is/*  https://app.yield.is/#/ratelock/:splat 301!
+https://dev-0ae283930d.netlify.app/* https://app.yield.is/#/ratelock/:splat 301!
