@@ -58,6 +58,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
   const { previewPoolTx } = usePool();
   const { sellDai } = useBorrowProxy();
   const { buyDai } = useBorrowProxy();
+  const { sellFYDai } = useBorrowProxy();
   const { calcAPR } = useMath();
   const { account, fallbackProvider } = useSignerAccount();
   const [ txActive ] = useTxActive(['SELL_DAI']);
@@ -173,6 +174,9 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
         case "buyDai":
         await buyDai( activeSeries, inputValue);
         break;
+        case "sellFYDai":
+        await sellFYDai( activeSeries, inputValue);
+        break;
       }
       // Should we create a trade event to log here?
       /* clean up and refresh */ 
@@ -212,7 +216,11 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
             console.log("setMaxFYDaiIn: ", setMaxFYDaiIn)
             setAPR( calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) );      
             break;
-          }  
+          case "sellFYDai":
+            setMinDaiOut(parseFloat(ethers.utils.formatEther(preview)));
+            console.log("setMinFYDaiOut: ", setMinFYDaiOut)
+            }
+              
         setAPR( calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) );      
       } else {
         /* if the market doesnt have liquidity just estimate from rate */
