@@ -32,8 +32,8 @@
         "PoolProxy": "0x1BA14edD2fDaFe4F145283cA01cF0Cb2235Bce13",
         "GetCdps": "0x36a724Bd100c39f0Ea4D3A20F7097eE01A8Ff573",
         "DssCdpManager": "0x5ef30b9986345249bc32d8928B7ee64DE9435E39",
-        "ImportProxy": "0x5f41BC6f4D0d1F76622cb664a235b9C1Fbb1Ef6F",
-        "ImportCdpProxy": "0xdB452FD3C3A7B688a90538Cef89d23F0d65AfC66"
+        "ImportProxy": "0x419f8A3Eae18ecFFd956cDa0782610a749e567c8",
+        "ImportCdpProxy": "0xE09E6F95863fAd23488076096F8E5E36657C00dA"
 
     },
 
