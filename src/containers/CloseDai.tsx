@@ -51,6 +51,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
   const isLol = useIsLol(inputValue);
 
   const [ maxWithdraw, setMaxWithdraw ] = useState<string>();
+  const [ interestEarned, setInterestEarned ] = useState<string>();
 
   
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
@@ -88,16 +89,18 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
   }, [account, activeSeries.fyDaiBalance, fallbackProvider]);
 
 
-  // useEffect(()=> {
-  //   inputValue && activeSeries.fyDaiBalance && (async () => {
-  //     const preview = await previewPoolTx('sellFYDai', activeSeries, ethers.utils.parseEther(inputValue) );
-  //     if (!(preview instanceof Error)) {
-  //       // setMaxWithdraw(cleanValue(ethers.utils.formatEther(preview), 6));
-  //       console.log(cleanValue(ethers.utils.formatEther(preview), 6));
-  //     }
-  //   })();
-
-  // }, [inputValue, activeSeries.fyDaiBalance]);
+  /* caluclate the percentage increase  */
+  useEffect(()=> {
+    inputValue && activeSeries.fyDaiBalance && (async () => {
+      const originalInWei = ethers.utils.parseEther(inputValue);
+      const preview = await previewPoolTx('sellFYDai', activeSeries, originalInWei);
+      if (!(preview instanceof Error)) {
+        const previewEth = parseFloat(ethers.utils.formatEther(preview));
+        const percent = (inputValue - previewEth)/inputValue * 100; 
+        setInterestEarned((percent.toFixed(2)).toString());
+      }
+    })();
+  }, [inputValue, activeSeries.fyDaiBalance]);
 
   /* Withdraw DAi button disabling logic */
   useEffect(()=>{
@@ -171,7 +174,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
             <InfoGrid entries={[
               {
                 label: 'Max amount redeemable',
-                labelExtra: 'if closing the entire position now',
+                labelExtra: 'if closing entire position now',
                 visible: true,
                 active: true,
                 loading: false,
@@ -179,16 +182,16 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
                 valuePrefix: null,
                 valueExtra: null,
               },
-              // {
-              //   label: 'Interest earned',
-              //   labelExtra: 'at maturity',
-              //   visible: true,
-              //   active: !!inputValue&&inputValue>0,
-              //   loading: false,        
-              //   value: activeSeries && ethers.utils.formatEther(activeSeries?.fyDaiBalance),
-              //   valuePrefix: '',
-              //   valueExtra: null,
-              // },
+              {
+                label: 'Interest earned',
+                labelExtra: `when closing ${inputValue} Dai `,
+                visible: !!interestEarned,
+                active: !!inputValue&&inputValue>0,
+                loading: false,        
+                value: interestEarned? `${interestEarned}%` : '',
+                valuePrefix: '',
+                valueExtra: null,
+              },
             ]}
             />
           </Box>
