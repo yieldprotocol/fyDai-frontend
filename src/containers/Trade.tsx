@@ -59,6 +59,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
   const { sellDai } = useBorrowProxy();
   const { buyDai } = useBorrowProxy();
   const { sellFYDai } = useBorrowProxy();
+  const { buyFYDai } = useBorrowProxy();
   const { calcAPR } = useMath();
   const { account, fallbackProvider } = useSignerAccount();
   const [ txActive ] = useTxActive(['SELL_DAI']);
@@ -92,6 +93,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
   const [ minFYDaiOut, setMinFYDaiOut ] = useState<number>(0);
   const [ maxFYDaiIn, setMaxFYDaiIn ] = useState<number>(0);
   const [ minDaiOut, setMinDaiOut ] = useState<number>(0);
+  const [ maxDaiIn, setMaxDaiIn ] = useState<number>(0);
   const [ currentValue, setCurrentValue ] = useState<string>();
   const [ fromToken, setFromToken ] = useState<string>("DAI");
   const [ toToken, setToToken ] = useState<string>("fyDAI");
@@ -135,12 +137,11 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
           }        
         }
       } else {
-        /* this option not working because I don't believe a method exists */
         if (fromToken === "DAI") {
           setToQuantity( inputValue );
           setTradeType( "buyFYDai" );
           if (inputValue > 0) {
-            setFromQuantity( 12.34 );
+            setFromQuantity( maxDaiIn );
           } else {
             setFromQuantity(0);
           }
@@ -177,6 +178,10 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
         case "sellFYDai":
         await sellFYDai( activeSeries, inputValue);
         break;
+        case "buyFYDai":
+          await buyFYDai( activeSeries, inputValue);
+          break;
+  
       }
       // Should we create a trade event to log here?
       /* clean up and refresh */ 
@@ -219,6 +224,9 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
           case "sellFYDai":
             setMinDaiOut(parseFloat(ethers.utils.formatEther(preview)));
             console.log("setMinFYDaiOut: ", setMinFYDaiOut)
+          case "buyFYDai":
+            setMaxDaiIn(parseFloat(ethers.utils.formatEther(preview)));
+            console.log("MaxDaiIn: ", setMaxDaiIn)
             }
               
         setAPR( calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) );      
