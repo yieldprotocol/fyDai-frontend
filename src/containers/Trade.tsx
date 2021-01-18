@@ -166,7 +166,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
       })
   
   /* Lend execution flow */
-  const lendProcedure = async () => {
+  const tradeProcedure = async () => {
     if (inputValue && !lendDisabled ) {
       switch(tradeType) {
         case "sellDai":
@@ -277,7 +277,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
     <RaisedBox>
       <Keyboard 
         onEsc={() => setInputValue(undefined)}
-        onEnter={()=> lendProcedure()}
+        onEnter={()=> tradeProcedure()}
         onBackspace={()=> {
           inputValue && 
           (document.activeElement !== inputRef) && 
@@ -360,7 +360,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
           />
         </SeriesDescriptor>
    
-        {/* If there is no applicable transaction active, show the lending page */}
+        {/* If there is no applicable transaction active, show the trading page */}
         { !showTxPending &&
         <Box
           width={{ max:'600px' }}
@@ -372,7 +372,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
           gap='medium'
         >
           <Box flex='grow' gap='small' align='center' fill='horizontal'>
-            {/* If the series has NOT matured, show the lending input */}
+            {/* If the series has NOT matured, show the trading input */}
             { !activeSeries?.isMature() && Number.isFinite(parseFloat(activeSeries?.yieldAPR_)) &&
             <>
               <Box fill gap='medium'>
@@ -492,7 +492,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
               
               <Box gap='small' fill='horizontal' align='center' pad={{ vertical:'small' }}>
                 <ActionButton
-                  onClick={()=>lendProcedure()}
+                  onClick={()=>tradeProcedure()}
                   label={`Swap`}
                   disabled={lendDisabled}
                   hasPoolDelegatedProxy={activeSeries.hasPoolDelegatedProxy}
