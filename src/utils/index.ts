@@ -116,6 +116,19 @@ export const invertColor = (hex:any) => {
   return `#${  padZero(r)  }${padZero(g)  }${padZero(b)}`;
 };
 
+export const buildGradient = (colorFrom:string, colorTo:string  ) => {
+  return `linear-gradient(to bottom right,
+    ${modColor( colorFrom || '#add8e6', -50) }, 
+    ${modColor( colorFrom || '#add8e6', 0) },
+    ${modColor( colorFrom || '#add8e6', 0) },
+    ${modColor( colorTo, 50)}, 
+    ${modColor( colorTo, 50)}, 
+    ${modColor( colorTo, 50)},
+    ${modColor( colorTo, 25)}, 
+    ${modColor( colorTo, 0)}, 
+    ${modColor( colorTo, 0)})`;
+};
+
 /**
  * number formatting if reqd.
  * */

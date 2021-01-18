@@ -229,7 +229,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
           onClickOutside={()=>setRateLockOpen(false)}
           responsive={true}       
         >
-          <RateLock close={()=>setRateLockOpen(false)} />
+          <RateLock close={()=>setRateLockOpen(false)} asLayer />
         </Layer>
         }
 

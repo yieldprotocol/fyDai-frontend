@@ -8,6 +8,7 @@ import {
   ResponsiveContext,
 } from 'grommet';
 
+import { buildGradient } from '../utils';
 import { SeriesContext } from '../contexts/SeriesContext';
 
 const StyledLink = styled(NavLink)`
@@ -96,16 +97,16 @@ const YieldNav = (props: any) => {
 
         <StyledLink 
           to='/ratelock'
-          activeStyle={{ transform: 'scale(1.1)', fontWeight: 'bold', color: `${textColor}` }}
+          activeStyle={{ transform: 'scale(1.1)', fontWeight: 'normal', color: `${textColor}` }}
         >
           <Box 
-            pad={{ horizontal:'small', vertical:'xsmall' }} 
-            background={loc.pathname.includes('ratelock')? 'text': 'text-xweak'} 
+            pad={{ horizontal:'small', vertical:'xxsmall' }} 
+            background={loc.pathname.includes('ratelock')? 'text-weak' : 'text-xweak'} 
             round
-          >
+          > 
             <Text 
               weight='bold' 
-              size={mobile? 'xsmall':'medium'}
+              size={mobile? 'small':'xlarge'}
             >RateLock
             </Text>
           </Box>   
