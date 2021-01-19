@@ -172,9 +172,7 @@ export function fyDaiForMint(
 
   const daiReserves_ = new Decimal(daiReserves.toString());
   const fyDaiRealReserves_ = new Decimal(fyDaiRealReserves.toString());
-  const fyDaiVirtualReserves_ = new Decimal(fyDaiVirtualReserves.toString());
   const dai_ = new Decimal(dai.toString());
-  const timeTillMaturity_ = new Decimal(timeTillMaturity.toString());
 
   let min = ZERO;
   let max = dai_;
@@ -206,16 +204,20 @@ export function fyDaiForMint(
    * Calculates the collateralization ratio 
    * ETH collat value and Dai debt value (in USD)
    *
-   * @param {BigNumber} _collateralValue (wei/wad precision)
-   * @param {BigNumber} _debtValue (wei/wad precision)
+   * @param {BigNumber} collateralValue (wei/wad precision)
+   * @param {BigNumber} debtValue (wei/wad precision)
    * @returns {BigNumber} in Ray
    */
-export const collRatio = ( _collateralValue:BigNumber, _debtValue:BigNumber ) => {
-  if (_debtValue.eq(0) ) {
+export const collRatio = ( collateralValue:BigNumber, debtValue:BigNumber ) => {
+
+  const collateralValue_ = new Decimal(collateralValue.toString());
+  const debtValue_ = new Decimal(debtValue.toString());
+
+  if (debtValue_.eq(0) ) {
     // handle this case better
     return BigNumber.from(0);
   }
-  return divP64(_collateralValue, _debtValue);
+  return collateralValue_.div(debtValue_);
 };
 
 
