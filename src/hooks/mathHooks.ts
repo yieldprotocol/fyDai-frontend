@@ -41,17 +41,6 @@ export const useMath = () => {
   };
 
   /**
-   * Calculates value of debt (fyDaiDebt at maturity or Dai) at current Dai price
-   * the rate used is the rate and spot price of Dai.
-   * @param {BigNumber} _amount fyDai amount (= amount of Dai at maturity)
-   * @returns 
-   */
-  const debtValAdj = (_amount:BigNumber ) => {
-    // this would require a DAI/USD (ratio fluctuations? ) but maybe just assume it will be 1 at maturity?
-    return _amount;
-  };
-
-  /**
    * Calculates the collateralization ratio 
    * ETH collat value and Dai debt value (in USD)
    *
@@ -166,7 +155,6 @@ export const useMath = () => {
     return (totalSupply).mul(daiOffered).div(daiReserves);
   };
 
-
   /**
    * Split a certain amount of Dai liquidity into its fyDai and Dai componetnts
    * 
@@ -226,7 +214,6 @@ export const useMath = () => {
     splitDaiLiquidity,
     collValue,
     collPrice,
-    debtValAdj,
     collRatio,
     collPercent,
     estCollRatio,

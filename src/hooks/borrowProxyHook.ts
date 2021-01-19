@@ -72,7 +72,7 @@ export const useBorrowProxy = () => {
     return value.add(slippageAmount);
   };
 
-  /* Preset the yieldProxy and contorller contracts to be used with all fns */
+  /* Preset the yieldProxy and controller contracts to be used with all fns */
   const [ proxyContract, setProxyContract] = useState<any>();
   const [ controllerContract, setControllerContract ] = useState<any>();
   useEffect(()=> {

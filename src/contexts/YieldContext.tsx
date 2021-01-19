@@ -43,7 +43,6 @@ const getFyDaiNames = (chainId: number): string[] => {
 };
 
 const seriesColors = ['#aed175', '#f0817f', '#ffbf81', '#95a4db', '#ffdc5c', '#ff86c8', '#82d4bb', '#6ab6f1', '#cb90c9', ];
-// const fromColors= ['#95a4db', '#ffdc5c', '#ff86c8', '#82d4bb', '#6ab6f1', '#cb90c9', '#aed175', '#f0817f', '#ffbf81',  ];
 const fromColors= ['#add8e6', '#add8e6', '#add8e6', '#add8e6', '#add8e6', '#add8e6', '#add8e6', '#add8e6', '#add8e6',  ];
 
 const contractList = [

@@ -291,11 +291,9 @@ export const usePool = () => {
   /**
    * @dev Checks the health/state of a particular pool
    *
-   * 
    * @param {IYieldSeries} series series to check the pool state
    * @returns {active:boolean, reason:string} status of the pool
    * 
-   * @note call function 
    */
   const checkPoolState = (
     series: IYieldSeries,

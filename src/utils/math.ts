@@ -1,5 +1,26 @@
 /* eslint-disable @typescript-eslint/camelcase */
-const { bignumber, add, subtract, multiply, divide, pow, floor } = require('mathjs');
+import { BigNumber } from 'ethers';
+
+import {
+  create,
+  bignumberDependencies,
+  powDependencies, 
+} from 'mathjs';
+
+const { bignumber, add, subtract, multiply, divide, pow, floor }  = require('mathjs');
+// const { bignumber, pow, add, subtract, multiply, divide, floor } = create(bignumberDependencies, powDependencies);
+
+// create(
+//   BigNumberDependencies, 
+//   addDependencies, 
+//   subtractDependencies,
+//   multiplyDependencies,
+//   divideDependencies, 
+//   powDependencies, 
+//   floorDependencies
+//   );
+
+// const { pow } = create(powDependencies); 
 
 // https://www.desmos.com/calculator/mllhtohxfx
 export function mint(daiReserves: any, fyDaiReserves: any, supply: any, dai: any): [any, any] {
@@ -31,9 +52,14 @@ export function sellDai(daiReserves: any, fyDaiReserves: any, dai: any, timeTill
   const Z = bignumber(daiReserves);
   const Y = bignumber(fyDaiReserves);
   const T = bignumber(timeTillMaturity);
+  
   const x = bignumber(dai);
   const k = bignumber(1 / (4 * 365 * 24 * 60 * 60)); // 1 / seconds in four years
   const g = bignumber(950 / 1000);
+
+  console.log(k.toString());
+  console.log(g.toString());
+
   const t = multiply(k, T);
   const a = subtract(1, multiply(g, t));
   const invA = divide(1, a);
