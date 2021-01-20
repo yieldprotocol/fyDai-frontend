@@ -101,6 +101,35 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
   const [ toQuantity, setToQuantity ] = useState<number>(0);
   const [ inputFromQuantity, setInputFromQuantity ] = useState<boolean>(true);
   const [ priceImpact, setPriceImpact ] = useState<number>(0);
+  const [tradeType, setTradeType] = useState<string>("");
+
+  /* Lend execution flow */
+  const tradeProcedure = async () => {
+    if (inputValue && !lendDisabled ) {
+      switch(tradeType) {
+        case "sellDai":
+        await sellDai( activeSeries, inputValue);
+        break;
+        case "buyDai":
+        await buyDai( activeSeries, inputValue);
+        break;
+        case "sellFYDai":
+        await sellFYDai( activeSeries, inputValue);
+        break;
+        case "buyFYDai":
+          await buyFYDai( activeSeries, inputValue);
+          break;
+  
+      }
+      // Should we create a trade event to log here?
+      /* clean up and refresh */ 
+      setInputValue(undefined);
+      await Promise.all([
+        userActions.updateUser(),
+        seriesActions.updateActiveSeries()
+      ]);
+    }  
+  };
 
   function roundTo(num: number, precision: number) {
     var factor = Math.pow(10, precision);
@@ -111,9 +140,8 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
 
 
 
-  const [tradeType, setTradeType] = useState<string>("");
 
-    /* Set up type of transaction */
+    /* Set up type of transaction 
     useEffect(() => {
 
 
@@ -165,37 +193,15 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
       console.log("toQuantity: ", toQuantity)
       })
   
-  /* Lend execution flow */
-  const tradeProcedure = async () => {
-    if (inputValue && !lendDisabled ) {
-      switch(tradeType) {
-        case "sellDai":
-        await sellDai( activeSeries, inputValue);
-        break;
-        case "buyDai":
-        await buyDai( activeSeries, inputValue);
-        break;
-        case "sellFYDai":
-        await sellFYDai( activeSeries, inputValue);
-        break;
-        case "buyFYDai":
-          await buyFYDai( activeSeries, inputValue);
-          break;
-  
-      }
-      // Should we create a trade event to log here?
-      /* clean up and refresh */ 
-      setInputValue(undefined);
-      await Promise.all([
-        userActions.updateUser(),
-        seriesActions.updateActiveSeries()
-      ]);
-    }  
-  };
 
   /* Handle input (debounce input) changes */
   useEffect(() => {
-    activeSeries && !(activeSeries?.isMature()) && !!debouncedInput && ( async () => {
+    setFromQuantity( debouncedInput );
+    if (inputFromQuantity && fromToken === "DAI") {
+        setTradeType( "sellDai" );
+      }
+    
+  activeSeries && !(activeSeries?.isMature()) && !!debouncedInput && ( async () => {
       const preview = await previewPoolTx(tradeType, activeSeries, debouncedInput);
       const spotPreview = await previewPoolTx(tradeType, activeSeries, 0.01);
       if (!(preview instanceof Error) && !(spotPreview instanceof Error)) {
@@ -204,6 +210,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
             setFYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
             console.log("setFYDaiValue: ", setFYDaiValue)
             setMinFYDaiOut(parseFloat(ethers.utils.formatEther(preview)));
+            setToQuantity(parseFloat(ethers.utils.formatEther(preview)));
             console.log("setMinFYDaiOut: ", setMinFYDaiOut)
             setAPR( calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) );                  
             setSpotAPR( calcAPR( ethers.utils.parseEther("0.01"), spotPreview, activeSeries?.maturity ) ); 
@@ -224,12 +231,13 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
           case "sellFYDai":
             setMinDaiOut(parseFloat(ethers.utils.formatEther(preview)));
             console.log("setMinFYDaiOut: ", setMinFYDaiOut)
+            break;
           case "buyFYDai":
             setMaxDaiIn(parseFloat(ethers.utils.formatEther(preview)));
             console.log("MaxDaiIn: ", setMaxDaiIn)
-            }
+            break;
+        }
               
-        setAPR( calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) );      
       } else {
         /* if the market doesnt have liquidity just estimate from rate */
         const rate = await previewPoolTx('sellDai', activeSeries, 1);
