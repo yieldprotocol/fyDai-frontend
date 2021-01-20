@@ -19,16 +19,6 @@ export const toRay = (value:number) => {
   return BigNumber.from(value*10**10).mul(exponent);
 };
 
-export const toWei = (value:string|number) => {
-  return ethers.utils.parseEther(value.toString()); 
-};
-
-/// @dev Converts a BigNumberish to WAD precision, for BigNumberish up to 10 decimal places
-export const toWad = (value: BigNumber) => {
-  const exponent = BigNumber.from(10).pow(BigNumber.from(8));
-  return BigNumber.from((value as any) * 10 ** 10).mul(exponent);
-};
-
 // / @dev Multiplies a number in any precision by a number in RAY precision, with the output in the first parameter's precision.
 // / I.e. mulRay(wad(x), ray(y)) = wad(x*y)
 export const mulRay = (x:BigNumber, ray:BigNumber) => {
@@ -43,11 +33,6 @@ export const divRay = (x:BigNumber, ray:BigNumber) => {
   return unit.mul(BigNumber.from(x)).div(BigNumber.from(ray));
 };
 
-// @dev Takes a bignumber in RAY and converts it to a human understandalble number
-export const rayToHuman = (x:BigNumber) => {
-  // const unit = BigNumber.from('10').pow(BigNumber.from('27'));
-  return divRay(x, RAY).toString();
-};
 
 /* Trunctate a string value to a certain number of 'decimal' point */
 export const cleanValue = (input:string, decimals:number=12) => {

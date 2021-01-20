@@ -135,7 +135,7 @@ const SeriesProvider = ({ children }:any) => {
           poolTokens_: cleanValue(ethers.utils.formatEther(x.poolTokens), 6),
           yieldAPR_: cleanValue(yieldAPR, 2),
           poolRatio_ : cleanValue(poolRatio, 4),
-          poolPercent_: cleanValue(poolPercent, 4),
+          poolPercent: cleanValue(poolPercent, 4),
           yieldAPR,
           poolState,
         }

@@ -14,7 +14,6 @@ import { UserContext } from '../contexts/UserContext';
 
 import { useSignerAccount } from '../hooks/connectionHooks';
 import { useDebounce, useIsLol } from '../hooks/appHooks';
-import { useMath } from '../hooks/mathHooks';
 import { useToken } from '../hooks/tokenHook';
 import { useTxActive } from '../hooks/txHooks';
 import { usePoolProxy } from '../hooks/poolProxyHook';
