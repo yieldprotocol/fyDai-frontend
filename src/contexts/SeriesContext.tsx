@@ -47,13 +47,13 @@ function reducer(state:any, action:any) {
 const SeriesProvider = ({ children }:any) => {
 
   const { account, provider, fallbackProvider, chainId } = useSignerAccount();
-  // const { chainId } = useWeb3React();
   const [ state, dispatch ] = React.useReducer(reducer, initState);
   const { state: yieldState } = useContext(YieldContext);
   const { yieldLoading, deployedContracts } = yieldState;
 
   const { previewPoolTx, checkPoolState } = usePool();
   const { debtDai } = useController();
+  
   const { getBalance } = useToken();
 
   const [ callTx ] = useCallTx();

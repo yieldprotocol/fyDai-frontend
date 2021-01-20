@@ -1,4 +1,4 @@
-import { ethers, BigNumber, BigNumberish } from 'ethers';
+import { ethers, BigNumber } from 'ethers';
 import { IYieldSeries } from '../types';
 
 /* constants */
@@ -24,7 +24,7 @@ export const toWei = (value:string|number) => {
 };
 
 /// @dev Converts a BigNumberish to WAD precision, for BigNumberish up to 10 decimal places
-export const toWad = (value: BigNumberish) => {
+export const toWad = (value: BigNumber) => {
   const exponent = BigNumber.from(10).pow(BigNumber.from(8));
   return BigNumber.from((value as any) * 10 ** 10).mul(exponent);
 };

@@ -1,6 +1,6 @@
 import { BigNumber } from 'ethers';
 
-import * as withEthers from './math';
+import * as withEthers from './yieldMath';
 import * as withMath from './math_mathjs';
 
 const ZERO: BigNumber = BigNumber.from('0');

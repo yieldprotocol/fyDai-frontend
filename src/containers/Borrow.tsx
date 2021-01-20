@@ -8,6 +8,10 @@ import { VscHistory as History } from 'react-icons/vsc';
 import { logEvent } from '../utils/analytics';
 import { abbreviateHash, cleanValue, genTxCode } from '../utils';
 
+import { 
+  calculateAPR 
+} from '../utils/yieldMath';
+
 /* contexts */
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
@@ -186,7 +190,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
             onClick={()=>navHistory.push('/post/')}
           />
         </Box>
-      ); 
+      );
     } else if (
       debouncedInput && 
         ( debouncedInput > Math.round(maxDaiAvailable_- maxDaiAvailable_*0.05 ) && 

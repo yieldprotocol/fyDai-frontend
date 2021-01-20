@@ -253,12 +253,12 @@ export const splitDaiLiquidity =(
    * 
    * @returns { string | undefined } human readable string
    */
-export const calcAPR =(
+export const calculateAPR =(
   _rate: BigNumber,
   _amount: BigNumber,
   _maturity:number,
   _fromDate:number = (Math.round(new Date().getTime() / 1000)), // if not provided, defaults to current time.
-):string | undefined => {
+): string | undefined => {
   const rate_ = new Decimal(_rate.toString());
   const amount_ = new Decimal(_amount.toString());
   if (
@@ -278,124 +278,84 @@ export const calcAPR =(
 };
 
 /**
-   * Percentage holding of the Pool 
-   *
-   * @param { BigNumber } supply  // token supply 
-   * @param { BigNumber } balance // token holdings
-   * 
-   * @returns { string } human readable string as a percent.
-   */
-export const calcPoolPercent =(
-  supply: BigNumber,
-  balance: BigNumber,
-): string => {
-  if (!supply.isZero()) {
-    const supply_ = new Decimal(supply.toString());
-    const balance_ = new Decimal(balance.toString());
-    return ( (balance_.div(supply_)).mul(100) ).toFixed(4); 
-  } 
-  return '0';
-};
-
-
-
-
-/**
-   * Minimum amount of collateral required to stay above liquidation point
-   *
-   * @param {BigNumber} _debtValue (wei/wad precision)
-   * @param {number} _liquidationRatio eg. 1.5
-   * @param { BigNumber } _collateralPrice (in Ray precision)
-   * @returns {BigNumber} (wad/wei precision)
-   */
-const minSafeColl=(_debtValue:BigNumber, _liquidationRatio:number, _collateralPrice:BigNumber)=> {
-  const _s = divRay( toRay(_liquidationRatio), _collateralPrice);
-  const _msc = mulRay(_debtValue, _s);
-  return _msc;
-};
-
-/**
-   * Max amount of Dai that can be borrowed
-   *
-   * @param {BigNumber} _collateralValue in wei wad precision
-   * @param {BigNumber} _debtValue in wei wad precision
-   * @param {number} _liquidationRatio eg. 1.5
-   * @returns {BigNumber} in wei/wad precision
-   */
-const daiAvailable = (
-  _collateralValue:BigNumber, 
-  _debtValue:BigNumber, 
-  _liquidationRatio:number
-) =>{
-  const maxSafeDebtValue = divRay(_collateralValue, toRay(_liquidationRatio));
-  const _max = _debtValue.lt(maxSafeDebtValue) ? maxSafeDebtValue.sub(_debtValue) : BigNumber.from('0');
-  return _max;
-};
-  
-
-  
-/**
    * Calculates the collateralization ratio 
-   * ETH collat value and Dai debt value (in USD)
+   * based on the collat amount and value and debt value.
    *
-   * @param { BigNumber } collateralValue (wei/wad precision)
-   * @param { BigNumber } debtValue (wei/wad precision)
-   * @returns { string }
+   * @param { BigNumber | string } collateralAmount  amount of collateral ( in wei)
+   * @param { BigNumber | string } collateralPrice price of collateral (in USD)
+   * @param { BigNumber | string } debtValue value of dai debt (in USD)
+  
+   * @returns { string | undefined }
    */
-export const collateralizationRatio = ( collateralValue:BigNumber, debtValue:BigNumber ): string => {
-  const collateralValue_ = new Decimal(collateralValue.toString());
-  const debtValue_ = new Decimal(debtValue.toString());
-  if (debtValue_.eq(0) ) {
-    // handle this case better
-    return new Decimal(0).toFixed();
+export const collateralizationRatio = ( 
+  collateralAmount: BigNumber | string, 
+  collateralPrice: BigNumber | string, 
+  debtValue: BigNumber 
+): string => {
+  if (
+    ethers.BigNumber.isBigNumber(debtValue) ? debtValue.isZero(): debtValue === '0' 
+  ) {
+    return 'undefined';
   }
-  return collateralValue_.div(debtValue_).toFixed();
+  const _colVal = mulDecimal(collateralAmount, collateralPrice ); 
+  const _ratio = divDecimal(_colVal, debtValue);
+
+  // return mulDecimal('100', _ratio );
+  return (new Decimal(_ratio)).toFixed();
 };
 
 /**
-   * Calculates the collateralization percentage from a RAY ratio
+   * Calcualtes the amount (Dai, or other variant) that can be borrowed based on 
+   * an amount of collateral (ETH, or other), and collateral price.
    *
-   * @param {BigNumber} _collateralizationRate(Ray precision)
-   * @returns {BigNumber} percentage as a big number
+   * @param {BigNumber | string} collateralAmount amount of collateral
+   * @param {BigNumber | string} collateralPrice price of unit collateral (in currency x)
+   * @param {BigNumber | string} debtValue value of debt (in currency x)
+   * @param {BigNumber | string} liquidationRatio eg. 1.5 for 150%
+   * 
+   * @returns {string}
    */
-export const collPercent = ( _collateralizationRate:BigNumber ) => {
-  return mulRay(BigNumber.from('100'), _collateralizationRate);
+export const borrowingPower = (
+  collateralAmount: BigNumber | string,
+  collateralPrice: BigNumber | string,
+  debtValue:BigNumber | string,
+  liquidationRatio: BigNumber | string
+): string => {
+  const collateralValue = mulDecimal(collateralAmount, collateralPrice );
+  const maxSafeDebtValue_ = new Decimal(divDecimal(collateralValue, liquidationRatio));
+  const debtValue_ = new Decimal(debtValue.toString());
+  const _max = debtValue_.lt(maxSafeDebtValue_) ? maxSafeDebtValue_.sub(debtValue_) : new Decimal('0');
+  return _max.toFixed(0);
 };
 
-// / @dev Converts a number to RAY precision, for number up to 10 decimal places
-export const toRay = (value:number) => {
-  const exponent = BigNumber.from('10').pow(BigNumber.from('17'));
-  return BigNumber.from(value*10**10).mul(exponent);
+// /**
+//    * Percentage holding of the Pool 
+//    *
+//    * @param { BigNumber } supply  // token supply 
+//    * @param { BigNumber } balance // token holdings
+//    * 
+//    * @returns { string } human readable string as a percent.
+//    */
+// export const calcPoolPercent =(
+//   supply: BigNumber,
+//   balance: BigNumber,
+// ): string => {
+//   if (!supply.isZero()) {
+//     const supply_ = new Decimal(supply.toString());
+//     const balance_ = new Decimal(balance.toString());
+//     return ( (balance_.div(supply_)).mul(100) ).toFixed(4); 
+//   } 
+//   return '0';
+// };
+
+export const mulDecimal = (multiplicant:BigNumber | string, multiplier:BigNumber | string): string => {
+  const multiplicant_ = new Decimal(multiplicant.toString());
+  const multiplier_ = new Decimal(multiplier.toString());
+  return multiplicant_.mul(multiplier_).toFixed();
 };
 
-export const toWei = (value:string|number) => {
-  return ethers.utils.parseEther(value.toString()); 
+export const divDecimal = (numerator:BigNumber | string, divisor:BigNumber | string): string => {
+  const numerator_ = new Decimal(numerator.toString());
+  const divisor_ = new Decimal(divisor.toString());
+  return numerator_.div(divisor_).toFixed();
 };
-
-/// @dev Converts a BigNumberish to WAD precision, for BigNumberish up to 10 decimal places
-export const toWad = (value: BigNumberish) => {
-  const exponent = BigNumber.from(10).pow(BigNumber.from(8));
-  return BigNumber.from((value as any) * 10 ** 10).mul(exponent);
-};
-
-// / @dev Multiplies a number in any precision by a number in RAY precision, with the output in the first parameter's precision.
-// / I.e. mulRay(wad(x), ray(y)) = wad(x*y)
-export const mulRay = (x:BigNumber, ray:BigNumber) => {
-  const unit = BigNumber.from('10').pow(BigNumber.from('27'));
-  return BigNumber.from(x).mul(BigNumber.from(ray)).div(unit);
-};
-
-// / @dev Divides a number in any precision by a number in RAY precision, with the output in the first parameter's precision.
-// / I.e. divRay(wad(x), ray(y)) = wad(x/y)
-export const divRay = (x:BigNumber, ray:BigNumber) => {
-  const unit = BigNumber.from('10').pow(BigNumber.from('27'));
-  return unit.mul(BigNumber.from(x)).div(BigNumber.from(ray));
-};
-
-// @dev Takes a bignumber in RAY and converts it to a human understandalble number
-export const rayToHuman = (x:BigNumber) => {
-  // const unit = BigNumber.from('10').pow(BigNumber.from('27'));
-  return divRay(x, RAY).toString();
-};
-
-

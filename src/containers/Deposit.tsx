@@ -20,7 +20,6 @@ import {
 import { cleanValue } from '../utils';
 
 import { UserContext } from '../contexts/UserContext';
-import { YieldContext } from '../contexts/YieldContext';
 
 /* hook pack */
 import { useSignerAccount } from '../hooks/connectionHooks';
@@ -30,7 +29,6 @@ import { useTxActive } from '../hooks/txHooks';
 import { useBorrowProxy } from '../hooks/borrowProxyHook';
 
 import WithdrawEth from './WithdrawEth';
-import RateLock from './RateLock';
 
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
@@ -68,16 +66,13 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
     debtValue,
   } = position;
 
-  const { state: yieldState } = useContext(YieldContext);
-  const { ethPrice_ } = yieldState.feedData;
-
   /* check if the user sent in any requested amount in the url */ 
   const { amnt }:any = useParams();
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
   const { postEth }  = useBorrowProxy();
-  const { estCollRatio: estimateRatio, collValue } = useMath();
+  const { estCollRatio, collateralValue, estBorrowingPower } = useMath();
   const [ txActive ] = useTxActive(['POST', 'WITHDRAW']);
 
   const { account } = useSignerAccount();
@@ -118,38 +113,32 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
     }
   };
 
+  /* Get the maximum borrowing power based on ETH balance and currently posted Eth */
   useEffect(()=>{
-    /* Roughly estimate the maximum borrowing power based on ETH balance */
-    const newPower = (ethBalance_*ethPrice_)/1.5;
-
-    if (parseFloat(maxDaiAvailable_)>0) {
-      const pl = parseFloat(maxDaiAvailable_) + newPower;
-      setMaxPower(pl.toFixed(2));
-    } else {
-      setMaxPower(newPower.toFixed(2));
+    if( ethBalance && debtValue ) {
+      const postedPlusWallet = ethBalance.add(ethPosted);
+      const _maxPower = estBorrowingPower(postedPlusWallet, debtValue);
+      setMaxPower( cleanValue(ethers.utils.formatEther(_maxPower), 2) ); 
     }
-
-  }, [ethBalance_, ethPrice_, maxDaiAvailable_]);
+  }, [ ethBalance, debtValue ]);
 
   /* Handle debounced input value changes */
   useEffect(()=>{
     /* 1. Adjust estimated ratio based on input changes */
-    if (debouncedInput && ethPosted && debtValue) {
-      const newRatio = estimateRatio((ethPosted.add(ethers.utils.parseEther(debouncedInput) )), debtValue); 
+    if (inputValue && ethPosted && debtValue) {
+      const inputInWei = ethers.utils.parseEther(inputValue);
+      const currentPlusNew = ethPosted.add( inputInWei );
+      const newRatio = estCollRatio(currentPlusNew, debtValue); 
       newRatio && setEstRatio(cleanValue(newRatio, 0));
     }
-    /* 2. Roughly estimate the new borrowing power */
-    if (debouncedInput) {
-      const val = collValue(ethers.utils.parseEther(debouncedInput));
-      const newPower = parseFloat(ethers.utils.formatEther(val))/1.5;
-      if (parseFloat(maxDaiAvailable_) > 0) {
-        const pl = parseFloat(maxDaiAvailable_) + newPower;
-        setEstPower(pl.toFixed(2));
-      } else {
-        setEstPower(newPower.toFixed(2));
-      }
+    /* 2. Calculate the new borrowing power */
+    if (inputValue ) {
+      const inputInWei = ethers.utils.parseEther(inputValue );
+      const postedPlusInput = ethPosted.add(inputInWei);
+      const _newPower = estBorrowingPower(postedPlusInput, debtValue);
+      setEstPower( cleanValue(ethers.utils.formatEther(_newPower), 2)  );
     }
-  }, [debouncedInput]);
+  }, [debouncedInput, inputValue ]);
 
   /* Handle deposit disabling deposits */
   useEffect(()=>{

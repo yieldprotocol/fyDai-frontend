@@ -1,8 +1,10 @@
 import { useEffect, useState, useContext } from 'react';
 import { ethers, BigNumber }  from 'ethers';
+
 import * as utils from '../utils';
 
 import { YieldContext } from '../contexts/YieldContext';
+import { divDecimal, mulDecimal, collateralizationRatio, borrowingPower } from '../utils/yieldMath';
 
 /**
  * Hook for Yield maths functions
@@ -16,55 +18,15 @@ import { YieldContext } from '../contexts/YieldContext';
  */
 export const useMath = () => {
   const { state: { feedData } } = useContext(YieldContext);
-  const [ ilks, setIlks ] = useState<any>();
-
-  useEffect(()=>{
-    feedData.ilks && setIlks(feedData.ilks);
-  }, [feedData]);
-
-  /**
-   * Calculates the USD value per unit collateral
-   * @returns {BigNumber} USD in Ray precision
-   */
-  const collPrice = (): BigNumber => {
-    // TODO: Update this to use ETH-A Oracle - not ilks.spot for market price USD
-    return utils.mulRay(utils.toRay(1.5), (ilks.spot));
-  };
-
   /**
    * Calculates the total value of collateral at the current unit price
-   * @returns {BigNumber} USD value (in wad/wei precision)
+   * @returns { string } USD value (in wad/wei precision)
    */
-  const collValue = (collateralPosted:BigNumber): BigNumber => {
-    // console.log('Collateral Value USD:', ethers.utils.formatEther( utils.mulRay(collateralPosted, collPrice()) ) );
-    return utils.mulRay(collateralPosted, feedData.ethPrice);
+  const collateralValue = (collateralAmount:BigNumber | string): string => {
+    return mulDecimal(collateralAmount, feedData.ethPrice );
   };
-
-  /**
-   * Calculates the collateralization ratio 
-   * ETH collat value and Dai debt value (in USD)
-   *
-   * @param {BigNumber} _collateralValue (wei/wad precision)
-   * @param {BigNumber} _debtValue (wei/wad precision)
-   * @returns {BigNumber} in Ray
-   */
-  const collRatio = ( _collateralValue:BigNumber, _debtValue:BigNumber ) => {
-    if (_debtValue.eq(0) ) {
-      // handle this case better
-      return BigNumber.from(0);
-    }
-    return utils.divRay(_collateralValue, _debtValue);
-  };
-
-
-  /**
-   * Calculates the collateralization percentage from a RAY ratio
-   *
-   * @param {BigNumber} _collateralizationRate(Ray precision)
-   * @returns {BigNumber} percentage as a big number
-   */
-  const collPercent = ( _collateralizationRate:BigNumber ) => {
-    return utils.mulRay(BigNumber.from('100'), _collateralizationRate);
+  const estBorrowingPower = (collateralAmount:BigNumber | string, debtValue: BigNumber | string ) => {
+    return borrowingPower( collateralAmount, feedData.ethPrice, debtValue, '1.5'); 
   };
 
   /**
@@ -72,51 +34,49 @@ export const useMath = () => {
    * ETH collat value and DAI debt value (in USD) using 
    * normal numbers
    *
-   * @param {BigNumber} _collateralAmount  amount of collateral (eg. 10ETH)
-   * @param {BigNumber} _debtValue value of dai debt (in USD)
-   * @returns {BigNumber} 
+   * @param {BigNumber | string } collateralAmount  amount of collateral (eg. 10ETH)
+   * @param {BigNumber | string } debtValue value of dai debt (in USD)
+   * @returns { string | undefined }
    */
-  // TODO merge this in to the 'collateralization ratio function' above.
-  const estCollRatio = (_collateralAmount:BigNumber, _debtValue:BigNumber) => {
-    if (!_collateralAmount || _debtValue.isZero() ) {
-      return undefined;
-    }
-    const _colVal = utils.mulRay(_collateralAmount, collPrice());
-    const _ratio = utils.divRay(_colVal, _debtValue);
-    return utils.mulRay(BigNumber.from('100'), _ratio).toString();
+
+  const estCollRatio = ( 
+    collateralAmount:BigNumber |string, 
+    debtValue: BigNumber 
+  ): string => {
+    return collateralizationRatio(collateralAmount, feedData.ethPrice, debtValue) || '0'; 
   };
 
-  /**
-   * Minimum amount of collateral required to stay above liquidation point
-   *
-   * @param {BigNumber} _debtValue (wei/wad precision)
-   * @param {number} _liquidationRatio eg. 1.5
-   * @param { BigNumber } _collateralPrice (in Ray precision)
-   * @returns {BigNumber} (wad/wei precision)
-   */
-  const minSafeColl=(_debtValue:BigNumber, _liquidationRatio:number, _collateralPrice:BigNumber)=> {
-    const _s = utils.divRay( utils.toRay(_liquidationRatio), _collateralPrice);
-    const _msc = utils.mulRay(_debtValue, _s);
-    return _msc;
-  };
+  // /**
+  //  * Minimum amount of collateral required to stay above liquidation point
+  //  *
+  //  * @param {BigNumber} _debtValue (wei/wad precision)
+  //  * @param {number} _liquidationRatio eg. 1.5
+  //  * @param { BigNumber } _collateralPrice (in Ray precision)
+  //  * @returns {BigNumber} (wad/wei precision)
+  //  */
+  // const minSafeColl=(_debtValue:BigNumber, _liquidationRatio:number, _collateralPrice:BigNumber)=> {
+  //   const _s = utils.divRay( utils.toRay(_liquidationRatio), _collateralPrice);
+  //   const _msc = utils.mulRay(_debtValue, _s);
+  //   return _msc;
+  // };
 
-  /**
-   * Max amount of Dai that can be borrowed
-   *
-   * @param {BigNumber} _collateralValue in wei wad precision
-   * @param {BigNumber} _debtValue in wei wad precision
-   * @param {number} _liquidationRatio eg. 1.5
-   * @returns {BigNumber} in wei/wad precision
-   */
-  const daiAvailable = (
-    _collateralValue:BigNumber, 
-    _debtValue:BigNumber, 
-    _liquidationRatio:number
-  ) =>{
-    const maxSafeDebtValue = utils.divRay(_collateralValue, utils.toRay(_liquidationRatio));
-    const _max = _debtValue.lt(maxSafeDebtValue) ? maxSafeDebtValue.sub(_debtValue) : BigNumber.from('0');
-    return _max;
-  };
+  // /**
+  //  * Max amount of Dai that can be borrowed
+  //  *
+  //  * @param {BigNumber} collateralValue in wei wad precision
+  //  * @param {BigNumber} debtValue in wei wad precision
+  //  * @param {number} liquidationRatio eg. 1.5
+  //  * @returns {BigNumber} in wei/wad precision
+  //  */
+  // const daiAvailable = (
+  //   collateralValue:BigNumber | string, 
+  //   debtValue:BigNumber,
+  //   liquidationRatio: BigNumber | string
+  // ) =>{
+  //   const maxSafeDebtValue = new Decimal(divDecimal(collateralValue, liquidationRatio));
+  //   const _max = debtValue.lt(maxSafeDebtValue) ? maxSafeDebtValue.sub(debtValue) : BigNumber.from('0');
+  //   return _max;
+  // };
 
   /**
    * Percentage holding of the Pool 
@@ -213,13 +173,11 @@ export const useMath = () => {
     calcTokensMinted,
     poolPercent,
     splitDaiLiquidity,
-    collValue,
-    collPrice,
-    collRatio,
-    collPercent,
+    collateralValue,
+
     estCollRatio,
-    minSafeColl,
-    daiAvailable
+    estBorrowingPower,
+    // daiAvailable
   } as const;
 
 };
