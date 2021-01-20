@@ -109,43 +109,20 @@ it('Should give the same result for fyDaiForMint()', () => {
   );
 });
 
-it('Should calculate and APR calcApr()', () => {
-  expect( 
-    withEthers.calcAPR(
-      BigNumber.from('1'),
-      BigNumber.from('1'),
-      1, 
-      1,
-    )
-  ).toEqual(
-    undefined
-  );
-});
-
-it('Should calculate poolPercentage calcPoolPercent()', () => {
-  expect( 
-    withEthers.calcPoolPercent(
-      BigNumber.from('2000'),
-      BigNumber.from('220'),
-    )
-  ).toEqual(
-    '11.0000'
-  );
-});
-
-it('Should give the same result for splitDaiLiquity() and mint()', () => {
-  expect( 
-    withEthers.splitDaiLiquidity(
-      BigNumber.from(daiReserves), 
-      BigNumber.from(fyDaiReserves),
-      BigNumber.from(dai),
-    ).map( (x: BigNumber) => x.toString() )
-  ).toEqual(
-    withEthers.mint( 
-      BigNumber.from(daiReserves), 
+it('Should calculate', () => {
+  expect(
+    withEthers.mint(
+      BigNumber.from(daiReserves),
       BigNumber.from(fyDaiReserves),
       BigNumber.from(supply), 
-      BigNumber.from(dai), 
-    ).map( (x: BigNumber) => x.toString() )
+      BigNumber.from(dai),
+    ).toString()
+  ).toEqual(
+    withEthers.calcTokensMinted(
+      BigNumber.from(daiReserves),
+      BigNumber.from(fyDaiReserves),
+      BigNumber.from(supply), 
+      BigNumber.from(dai),
+    ).toString()
   );
 });

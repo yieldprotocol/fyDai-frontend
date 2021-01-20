@@ -58,10 +58,8 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
   const { position, makerVaults, userLoading } = userState;
   const {
     ethBalance,
-    ethBalance_,
     ethPosted,
     ethPosted_,
-    maxDaiAvailable_,
     collateralPercent_,
     debtValue,
   } = position;
@@ -72,7 +70,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
   const { postEth }  = useBorrowProxy();
-  const { estCollRatio, collateralValue, estBorrowingPower } = useMath();
+  const { estCollRatio, estBorrowingPower } = useMath();
   const [ txActive ] = useTxActive(['POST', 'WITHDRAW']);
 
   const { account } = useSignerAccount();
@@ -82,7 +80,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
 
   const [inputRef, setInputRef] = useState<any>(null);
 
-  const [ estRatio, setEstRatio ] = useState<any>(0);
+  const [ estPercent, setEstPercent ] = useState<string|undefined>(undefined);
   const [ estPower, setEstPower ] = useState<any>(0);
   const [ maxPower, setMaxPower ] = useState<any>(0);
 
@@ -128,8 +126,8 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
     if (inputValue && ethPosted && debtValue) {
       const inputInWei = ethers.utils.parseEther(inputValue);
       const currentPlusNew = ethPosted.add( inputInWei );
-      const newRatio = estCollRatio(currentPlusNew, debtValue); 
-      newRatio && setEstRatio(cleanValue(newRatio, 0));
+      const newPercent = estCollRatio(currentPlusNew, debtValue, true); 
+      setEstPercent(cleanValue(newPercent, 2) || undefined);
     }
     /* 2. Calculate the new borrowing power */
     if (inputValue ) {
@@ -325,7 +323,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
                     visible: !!account && collateralPercent_ > 0,
                     active: debouncedInput && collateralPercent_ > 0,
                     loading: !ethPosted_ && depositPending && ethPosted_ !== 0,           
-                    value: (estRatio && estRatio !== 0)? `${estRatio}%`: `${collateralPercent_}%` || '',
+                    value: estPercent ? `${estPercent}%`: `${collateralPercent_}%` || '',
                     valuePrefix: null,
                   // valueExtra: () => (
                   //   <Text color='green' size='medium'> 

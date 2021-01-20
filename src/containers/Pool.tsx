@@ -39,6 +39,7 @@ import YieldMobileNav from '../components/YieldMobileNav';
 import { logEvent } from '../utils/analytics';
 
 import Loading from '../components/Loading';
+import { divDecimal, mulDecimal, calcTokensMinted } from '../utils/yieldMath';
 
 
 interface IPoolProps {
@@ -51,7 +52,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
   const { amnt }:any = useParams();
 
   const { state: { deployedContracts } } = useContext(YieldContext);
-  const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
+  const { state: { activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
   const activeSeries = seriesData.get(activeSeriesId);
 
   const { state: userState, actions: userActions } = useContext(UserContext);
@@ -60,9 +61,8 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
 
   const { addLiquidity } = usePoolProxy();
   const { getBalance } = useToken();
-  const { poolPercent, calcTokensMinted } = useMath();
 
-  const [newShare, setNewShare] = useState<string>();
+  const [newPoolShare, setNewPoolShare] = useState<string>();
   const [calculating, setCalculating] = useState<boolean>(false);
 
   const { account } = useSignerAccount();
@@ -105,26 +105,27 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
     }   
   };
 
-  const calculateNewShare = async () => {
+  const calculateNewPoolShare = async () => {
     setCalculating(true);
     const daiReserves = await getBalance(deployedContracts.Dai, 'Dai', activeSeries.poolAddress);
     const fyDaiReserves = await getBalance(activeSeries.fyDaiAddress, 'FYDai', activeSeries.poolAddress);
-    const newTokens = calcTokensMinted(
+    const _newTokens = calcTokensMinted(
       daiReserves, 
       fyDaiReserves, 
       activeSeries.totalSupply, 
       ethers.utils.parseEther(debouncedInput)
     );
-    const newBalance = newTokens.add(activeSeries.poolTokens);
-    const newTotalSupply = activeSeries.totalSupply.add(newTokens);
-    const percent = poolPercent(newTotalSupply, newBalance); 
-    setNewShare(percent.toFixed(4));
+    const _newBalance = _newTokens.add(activeSeries.poolTokens);
+    const _newTotalSupply = activeSeries.totalSupply.add(_newTokens);
+    const _ratio = divDecimal( _newBalance, _newTotalSupply );
+    const _percent = mulDecimal( _ratio, '100'); 
+    setNewPoolShare(cleanValue(_percent, 4));
     setCalculating(false);
   };
 
   /* handle value calculations based on input changes */
   useEffect(()=>{
-    activeSeries && debouncedInput && calculateNewShare();
+    activeSeries && debouncedInput && calculateNewPoolShare();
   }, [debouncedInput]);
   
   /* Add liquidity disabling logic */
@@ -261,7 +262,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                         visible: inputValue>0,
                         active: debouncedInput,
                         loading: calculating,           
-                        value: newShare? `${newShare}%`: '',
+                        value: newPoolShare? `${newPoolShare}%`: '',
                         valuePrefix: null,
                         valueExtra: null,
                       },

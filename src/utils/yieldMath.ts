@@ -139,7 +139,7 @@ export function buyDai(
 export function buyFYDai(
   daiReserves: BigNumber | string, 
   fyDaiReserves: BigNumber | string, 
-  fyDai: BigNumber | string, 
+  fyDai: BigNumber | string,
   timeTillMaturity: BigNumber | string,
   withNoFee: boolean = false
 ): string {
@@ -170,7 +170,6 @@ export function getFee(
   timeTillMaturity: BigNumber | string,
   fyDai: BigNumber | string
 ): string {
-  
   let fee_: Decimal = ZERO;
   const fyDai_: BigNumber =  BigNumber.isBigNumber(fyDai) ? fyDai : BigNumber.from(fyDai);
 
@@ -227,20 +226,40 @@ export function fyDaiForMint(
 /**
    * Split a certain amount of Dai liquidity into its fyDai and Dai componetnts
    * 
-   * @param {BigNumber} daiAmount // amount dai to split
-   * @param { BigNumber } daiReserves// Dai reserves
-   * @param { BigNumber } fyDaiReserves// fyDai reservers
+   * @param { BigNumber } xReserves// Dai reserves
+   * @param { BigNumber } yReserves// fyDai reservers
+   * @param {BigNumber} xAmount // amount dai to split
    * 
    * @returns  [ BigNumber, BigNumber ] returns an array of [dai, fyDai] 
    */
-export const splitDaiLiquidity =(
-  daiReserves: BigNumber,
-  fyDaiReserves: BigNumber,
-  daiAmount: BigNumber,
+export const splitLiquidity =(
+  xReserves: BigNumber,
+  yReserves: BigNumber,
+  xAmount: BigNumber,
 )=> {
-  const daiPortion = daiAmount.mul(daiReserves).div(fyDaiReserves.add(daiReserves));
-  const fyDaiPortion = daiAmount.sub(daiPortion);
-  return [daiPortion, fyDaiPortion];
+  const xPortion = xAmount.mul(yReserves).div(yReserves.add(xReserves));
+  const yPortion = xAmount.sub(xPortion);
+  return [xPortion, yPortion];
+};
+
+/**
+   * Calculate amount of LP Tokens that will be minted  
+   *
+   * @param { BigNumber } xReserves // eg. dai balance of pool
+   * @param { BigNumber } yReserves// eg. yDai series balance of Pool
+   * @param { BigNumber } totalSupply // total LP tokens
+   * @param { BigNumber } xInput // dai input value by user
+   * 
+   * @returns { BigNumber } number of tokens minted
+   */
+export const calcTokensMinted =(
+  xReserves: BigNumber,
+  yReserves: BigNumber,
+  totalSupply: BigNumber,
+  xInput: BigNumber,
+) => {
+  const daiOffered = (xInput.mul(xReserves)).div(yReserves.add(xReserves) );
+  return (totalSupply).mul(daiOffered).div(xReserves);
 };
 
 /**
@@ -277,6 +296,7 @@ export const calculateAPR =(
   return undefined;
 };
 
+
 /**
    * Calculates the collateralization ratio 
    * based on the collat amount and value and debt value.
@@ -290,19 +310,23 @@ export const calculateAPR =(
 export const collateralizationRatio = ( 
   collateralAmount: BigNumber | string, 
   collateralPrice: BigNumber | string, 
-  debtValue: BigNumber 
-): string => {
+  debtValue: BigNumber | string, 
+  asPercent: boolean = false // Optional flag to return as percentage
+): string | undefined => {
   if (
-    ethers.BigNumber.isBigNumber(debtValue) ? debtValue.isZero(): debtValue === '0' 
+    ethers.BigNumber.isBigNumber(debtValue) ? debtValue.isZero(): debtValue == '0' 
   ) {
-    return 'undefined';
+    return undefined;
   }
-  const _colVal = mulDecimal(collateralAmount, collateralPrice ); 
+  const _colVal = mulDecimal(collateralAmount, collateralPrice); 
   const _ratio = divDecimal(_colVal, debtValue);
 
-  // return mulDecimal('100', _ratio );
-  return (new Decimal(_ratio)).toFixed();
+  if ( asPercent ) {
+    return mulDecimal('100', _ratio);
+  }
+  return _ratio;
 };
+
 
 /**
    * Calcualtes the amount (Dai, or other variant) that can be borrowed based on 
@@ -319,7 +343,7 @@ export const borrowingPower = (
   collateralAmount: BigNumber | string,
   collateralPrice: BigNumber | string,
   debtValue:BigNumber | string,
-  liquidationRatio: BigNumber | string
+  liquidationRatio: BigNumber | string = '1.5' // Optional: 150% as default
 ): string => {
   const collateralValue = mulDecimal(collateralAmount, collateralPrice );
   const maxSafeDebtValue_ = new Decimal(divDecimal(collateralValue, liquidationRatio));

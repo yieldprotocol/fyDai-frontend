@@ -41,14 +41,14 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
   } = position;
   
   const { withdrawEth } = useBorrowProxy();
-  const { estCollRatio: estimateRatio } = useMath();
+  const { estCollRatio } = useMath();
   const [ txActive ] = useTxActive(['WITHDRAW']);
 
   const [ inputValue, setInputValue ] = useState<any>();
   const debouncedInput = useDebounce(inputValue, 500);
   const [inputRef, setInputRef] = useState<any>(null);
 
-  const [ estRatio, setEstRatio ] = useState<any>();
+  const [ estPercent, setEstPercent ] = useState<string| undefined>(undefined);
   const [ maxWithdraw, setMaxWithdraw ] = useState<string>();
 
   const [ withdrawDisabled, setWithdrawDisabled ] = useState<boolean>(true);
@@ -81,36 +81,34 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
   useEffect(()=>{
     const parsedInput = ethers.utils.parseEther(debouncedInput || '0');
     if ( debouncedInput && ethPosted.gt(parsedInput) && debtValue_) {
-      const newRatio = estimateRatio((ethPosted.sub( parsedInput )), debtValue); 
-      // const newRatio = estimateRatio((ethPosted_ - parseFloat(inputValue)).toString(), debtValue_);
-      if (newRatio) {
-        setEstRatio(parseFloat(newRatio.toString()).toFixed(2));
-      }
+      const newPercent = estCollRatio((ethPosted.sub( parsedInput )), debtValue, true); 
+      setEstPercent(cleanValue(newPercent, 10)); 
     }
   }, [ debouncedInput ]);
 
   /* Withdraw disabled logic */
   useEffect(()=>{
-    ( estRatio < 150 ||
+    ( !estPercent ||
+      parseFloat(estPercent) < 150 ||
       txActive ||
       !inputValue ||
       parseFloat(inputValue) <= 0
-    )? setWithdrawDisabled(true) : setWithdrawDisabled(false);
-  }, [ inputValue, estRatio ]);
+    ) ? setWithdrawDisabled(true) : setWithdrawDisabled(false);
+  }, [ inputValue, estPercent ]);
 
   /* show warnings and errors with collateralization ratio levels and inputs */
   useEffect(()=>{
     if ( debouncedInput && maxWithdraw && (debouncedInput > maxWithdraw) ) {
       setWarningMsg(null);
       setErrorMsg('That exceeds the amount of ETH you can withdraw right now.');
-    } else if (estRatio >= 150 && estRatio < 200 ) {
+    } else if ( estPercent && parseFloat(estPercent) >= 150 && parseFloat(estPercent) < 200 ) {
       setErrorMsg(null);
       setWarningMsg('A collateralization ratio of close to 150% will put you at risk of liquidation');
     } else {   
       setWarningMsg(null);
       setErrorMsg(null);
     }
-  }, [ estRatio, debouncedInput ]);
+  }, [ estPercent, debouncedInput ]);
 
   return (
     <Keyboard 
@@ -169,7 +167,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
                 visible: collateralPercent_ > 0,
                 active: !!inputValue,
                 loading: false,           
-                value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
+                value: estPercent ? `${cleanValue(estPercent, 2)}%`: collateralPercent_ || '',
                 valuePrefix: '~',
                 valueExtra: null,
               },

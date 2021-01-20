@@ -121,17 +121,17 @@ const UserProvider = ({ children }: any) => {
     ]);
 
     const [
-      ethLocked, 
+      ethLocked,
       debtValue,
     ]:any[] = await Promise.all([
       collateralLocked('ETH-A'),
       totalDebtDai('ETH-A'),
-      
     ]);
 
     const collateralValue = mulDecimal(ethPosted, feedData.ethPrice); 
-    const collateralRatio = collateralizationRatio(ethPosted, feedData.ethPrice, debtValue);
-    const maxDaiAvailable = borrowingPower( ethPosted, feedData.ethPrice, debtValue, '1.5'); // 1.5===150%
+    const collateralRatio = collateralizationRatio(ethPosted, feedData.ethPrice, debtValue) || '0';
+    const collateralPercent = collateralizationRatio(ethPosted, feedData.ethPrice, debtValue, true) || '0';
+    const maxDaiBorrow = borrowingPower( ethPosted, feedData.ethPrice, debtValue );
 
     const values = {
       ethBalance, 
@@ -141,7 +141,8 @@ const UserProvider = ({ children }: any) => {
       debtValue,
       collateralValue,
       collateralRatio,
-      maxDaiAvailable,
+      collateralPercent,
+      maxDaiBorrow,
     };
 
     /* parse to human usable */
@@ -151,9 +152,10 @@ const UserProvider = ({ children }: any) => {
       ethPosted_ : cleanValue(ethers.utils.formatEther(ethPosted), 6),
       ethLocked_ : cleanValue(ethers.utils.formatEther(ethLocked), 6),
       debtValue_ : cleanValue(ethers.utils.formatEther(debtValue), 2),
-      collateralValue_ : cleanValue( divDecimal(maxDaiAvailable, '1e18'), 2),
+      collateralValue_ : cleanValue( divDecimal(maxDaiBorrow, '1e18'), 2),
       collateralRatio_ : cleanValue( collateralRatio, 2),
-      maxDaiAvailable_ : cleanValue( divDecimal(maxDaiAvailable, '1e18'), 2),
+      collateralPercent_: cleanValue( collateralPercent, 2 ), 
+      maxDaiBorrow_ : cleanValue( divDecimal(maxDaiBorrow, '1e18'), 2),
     };
     
     dispatch( { type: 'updatePosition', payload: { ...values, ...parsedValues } } );

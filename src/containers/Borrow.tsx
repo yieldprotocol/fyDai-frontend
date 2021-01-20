@@ -61,9 +61,9 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
   const { 
     ethPosted,
     ethPosted_,
-    maxDaiAvailable,
-    maxDaiAvailable_,
-    ethTotalDebtDai_,
+    maxDaiBorrow,
+    maxDaiBorrow_,
+    debtValue_,
     collateralPercent_,
     daiBalance_,
   } = position;
@@ -76,7 +76,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
 
   const { previewPoolTx }  = usePool();
   const { borrowDai } = useBorrowProxy();
-  const { calcAPR, estCollRatio: estimateRatio } = useMath();
+  const { calcAPR, estCollRatio } = useMath();
   const { account } = useSignerAccount();
   const { amnt }:any = useParams(); /* check if the user sent in any requested amount in the url (deep-linking) */ 
   
@@ -107,7 +107,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
   /* token balances and calculated values */
   const [ fyDaiValue, setFYDaiValue ] = useState<number>(0);
   const [ APR, setAPR ] = useState<number>();
-  const [ estRatio, setEstRatio ] = useState<number>(0);
+  const [ estPercent, setEstPercent ] = useState<string|undefined>(undefined);
 
   /* Borrow execution flow */
   const borrowProcedure = async () => {
@@ -137,13 +137,14 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
   * 3. calculate estimated collateralization ratio
   */
   useEffect(() => {
-
+    
     account && position && position.debtValue && debouncedInput>0 && ( async () => {
-      const newRatio = estimateRatio(
+      const newPercent = estCollRatio(
         position.ethPosted, 
-        ( position.debtValue.add(ethers.utils.parseEther(debouncedInput)) )
-      ); 
-      newRatio && setEstRatio(parseFloat(newRatio.toString()));
+        ( position.debtValue.add(ethers.utils.parseEther(debouncedInput)) ),
+        true
+      );
+      setEstPercent( cleanValue(newPercent, 2) || undefined );
     })();
 
     activeSeries && debouncedInput>0 && ( async () => {
@@ -166,7 +167,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
   useEffect(()=>{
     (
       (ethPosted && ethPosted.eq(ethers.constants.Zero) ) ||
-      (inputValue && maxDaiAvailable && ethers.utils.parseEther(inputValue).gte(maxDaiAvailable)) ||
+      (inputValue && maxDaiBorrow && ethers.utils.parseEther(inputValue).gte(maxDaiBorrow)) ||
       !account ||
       !inputValue ||
       parseFloat(inputValue) <= 0
@@ -177,8 +178,8 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
   useEffect(() => {
     if ( 
       debouncedInput && 
-      maxDaiAvailable && 
-      ethers.utils.parseEther(debouncedInput).gte(maxDaiAvailable) &&
+      maxDaiBorrow && 
+      ethers.utils.parseEther(debouncedInput).gte(maxDaiBorrow) &&
       !(ethPosted.isZero())
     ) {
       setWarningMsg(null);
@@ -193,7 +194,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
       );
     } else if (
       debouncedInput && 
-        ( debouncedInput > Math.round(maxDaiAvailable_- maxDaiAvailable_*0.05 ) && 
+        ( debouncedInput > Math.round(maxDaiBorrow_- maxDaiBorrow_*0.05 ) && 
         !(ethPosted.isZero())
         ) ) {
       setErrorMsg(null);
@@ -344,9 +345,9 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
                   !activeSeries.isMature() && 
                   !!account && 
                   parseFloat(ethPosted_) > 0,
-                active: maxDaiAvailable_,
+                active: maxDaiBorrow_,
                 loading: false,
-                value: maxDaiAvailable_? `${maxDaiAvailable_} DAI`: '0 DAI',           
+                value: maxDaiBorrow_? `${maxDaiBorrow_} DAI`: '0 DAI',           
                 valuePrefix: null,
                 valueExtra: null,
               },
@@ -356,7 +357,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
                 visible: !txActive && activeSeries && !activeSeries.isMature() && !!account,
                 active: true,
                 loading: false,        
-                value: ethTotalDebtDai_? `${ethTotalDebtDai_} DAI`: '0 DAI', 
+                value: debtValue_? `${debtValue_} DAI`: '0 DAI', 
                 valuePrefix: null,
                 valueExtra: null,
               },
@@ -482,7 +483,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
                       visible: !!inputValue && !!account && position.ethPosted_>0,
                       active: true,
                       loading: false,        
-                      value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
+                      value: estPercent ? `${estPercent}%`: collateralPercent_ || '',
                       valuePrefix: '',
                       valueExtra: () => (
                         <Text color='red' size='small'> 

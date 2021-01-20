@@ -2,14 +2,16 @@ import React, { useEffect, useContext, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ethers, BigNumber } from 'ethers';
 
-import * as utils from '../utils';
+import { cleanValue, ETH,  } from '../utils';
+import { calculateAPR, divDecimal, mulDecimal } from '../utils/yieldMath';
+
 import { IYieldSeries } from '../types';
 
 import { YieldContext } from './YieldContext';
 
 import { useSignerAccount } from '../hooks/connectionHooks';
 import { usePool } from '../hooks/poolHook';
-import { useMath } from '../hooks/mathHooks';
+
 import { useToken } from '../hooks/tokenHook';
 import { useController } from '../hooks/controllerHook';
 import { useCallTx } from '../hooks/chainHooks';
@@ -57,7 +59,8 @@ const SeriesProvider = ({ children }:any) => {
   const { getBalance } = useToken();
 
   const [ callTx ] = useCallTx();
-  const { calcAPR, poolPercent: calcPercent }  = useMath();
+
+  // const { poolPercent: calcPercent }  = useMath();
 
   const { pathname } = useLocation();
   const [ seriesFromUrl, setSeriesFromUrl] = useState<number|null>(null);
@@ -98,7 +101,7 @@ const SeriesProvider = ({ children }:any) => {
         ] =  account && await Promise.all([
           getBalance(_x.poolAddress, 'Pool', account),
           debtDai('ETH-A', _x.maturity ),
-          callTx(deployedContracts.Controller, 'Controller', 'debtFYDai', [utils.ETH, _x.maturity, account]),
+          callTx(deployedContracts.Controller, 'Controller', 'debtFYDai', [ ETH, _x.maturity, account]),
           getBalance(_x.fyDaiAddress, 'FYDai', account),
         ]) || [];
 
@@ -116,23 +119,25 @@ const SeriesProvider = ({ children }:any) => {
 
     /* Parse the data */
     const _parsedSeriesData = _seriesData.reduce((acc: Map<string, any>, x:any) => {
-      const yieldAPR = calcAPR(x.sellFYDaiRate, ethers.utils.parseEther('1'), x.maturity);
-      const poolPercent = calcPercent(x.totalSupply, x.poolTokens);
+      const yieldAPR = calculateAPR(x.sellFYDaiRate, ethers.utils.parseEther('1'), x.maturity) || '0';
+      const poolRatio = divDecimal(x.poolTokens, x.totalSupply) || '0';
+      const poolPercent = mulDecimal( poolRatio, '100');
       const poolState = checkPoolState(x);
       return acc.set(
         x.maturity,
         { ...x,
-          sellFYDaiRate_: utils.cleanValue(ethers.utils.formatEther(x.sellFYDaiRate), 2),
-          totalSupply_: utils.cleanValue(ethers.utils.formatEther(x.totalSupply), 2),
+          sellFYDaiRate_: cleanValue(ethers.utils.formatEther(x.sellFYDaiRate), 2),
+          totalSupply_: cleanValue(ethers.utils.formatEther(x.totalSupply), 2),
           /* formating below for visual consistenciy - 0.00 */
-          fyDaiBalance_: ethers.utils.formatEther(x.fyDaiBalance) === '0.0' ? '0.00' : utils.cleanValue(ethers.utils.formatEther(x.fyDaiBalance), 2),
-          ethDebtFYDai_: ethers.utils.formatEther(x.ethDebtFYDai) === '0.0'  ? '0.00' : utils.cleanValue(ethers.utils.formatEther(x.ethDebtFYDai), 2),
-          ethDebtDai_: utils.cleanValue(ethers.utils.formatEther(x.ethDebtDai), 2),
-          poolTokens_: utils.cleanValue(ethers.utils.formatEther(x.poolTokens), 6),
-          yieldAPR_: yieldAPR.toFixed(2),
+          fyDaiBalance_: ethers.utils.formatEther(x.fyDaiBalance) === '0.0' ? '0.00' : cleanValue(ethers.utils.formatEther(x.fyDaiBalance), 2),
+          ethDebtFYDai_: ethers.utils.formatEther(x.ethDebtFYDai) === '0.0'  ? '0.00' : cleanValue(ethers.utils.formatEther(x.ethDebtFYDai), 2),
+          ethDebtDai_: cleanValue(ethers.utils.formatEther(x.ethDebtDai), 2),
+          poolTokens_: cleanValue(ethers.utils.formatEther(x.poolTokens), 6),
+          yieldAPR_: cleanValue(yieldAPR, 2),
+          poolRatio_ : cleanValue(poolRatio, 4),
+          poolPercent_: cleanValue(poolPercent, 4),
           yieldAPR,
           poolState,
-          poolPercent: poolPercent.toFixed(4),  
         }
       );
     }, state.seriesData);
