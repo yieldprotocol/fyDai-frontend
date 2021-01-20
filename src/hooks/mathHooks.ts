@@ -56,6 +56,7 @@ export const useMath = () => {
     return utils.divRay(_collateralValue, _debtValue);
   };
 
+
   /**
    * Calculates the collateralization percentage from a RAY ratio
    *
@@ -206,7 +207,7 @@ export const useMath = () => {
     }
     return 0;
   };
-
+  
   return {
     calcAPR,
     calcTokensMinted,

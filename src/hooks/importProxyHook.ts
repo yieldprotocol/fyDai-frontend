@@ -41,13 +41,11 @@ export const useImportProxy = () => {
   const  { state: { authorization: { hasDelegatedDsProxy } } }  = useContext<any>(UserContext);
 
   /* hooks */
-  const { account, signer, fallbackProvider } = useSignerAccount();
+  const { account, signer } = useSignerAccount();
   const { addControllerDelegate, checkControllerDelegate } = useController();
   const { proxyExecute } = useDsProxy();
   const { delegationSignature, handleSignList } = useSigning();
   const { previewPoolTx } = usePool();
-
-  const { daiToMakerDebt, minWethForAmount } = useMaker();
 
   const { abi: importCdpProxyAbi } = ImportCdpProxy;
   const { abi: importProxyAbi } = ImportProxy;
