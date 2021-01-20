@@ -1,13 +1,14 @@
 import React, { useEffect, useContext, createContext, useReducer } from 'react';
 import { ethers } from 'ethers';
 
-import { cleanValue, mulRay } from '../utils';
+import { cleanValue } from '../utils';
 
 import {
   calculateAPR,
   borrowingPower, 
   mulDecimal, 
   divDecimal,
+  floorDecimal,
   collateralizationRatio,
 } from '../utils/yieldMath';
 
@@ -453,6 +454,7 @@ const UserProvider = ({ children }: any) => {
     const _cdpData:any = await Promise.all(cdpList[1].map((x:string) => getCDPData(x, 'ETH-A') ) );
     const _makerData = cdpList[0].map((x:any, i:number) => {
       const { rate } = yieldState.feedData.ilks;
+      const vaultDaiDebt = divDecimal( mulDecimal(_cdpData[i][1], rate), '1e27' );
       return {
         'vaultId': x.toString(),
         'vaultCollateralType': ethers.utils.parseBytes32String(cdpList[2][i]),
@@ -461,15 +463,13 @@ const UserProvider = ({ children }: any) => {
         'vaultCollateral': _cdpData[i][0],
         'vaultCollateral_': cleanValue(ethers.utils.formatEther(_cdpData[i][0]), 2), 
         'vaultMakerDebt': _cdpData[i][1],
-        'vaultMakerDebt_': cleanValue(ethers.utils.formatEther(_cdpData[i][1]), 2),
-        'vaultDaiDebt': mulRay(_cdpData[i][1], rate),
-        'vaultDaiDebt_': cleanValue(ethers.utils.formatEther(mulRay(_cdpData[i][1], rate)), 2),
-        
-        'XvaultDaiDebt': mulDecimal(_cdpData[i][1], rate),
-        'XvaultDaiDebt_': cleanValue(ethers.utils.formatEther(mulRay(_cdpData[i][1], rate)), 2),
+        'vaultMakerDebt_': cleanValue(ethers.utils.formatEther(_cdpData[i][1]), 2),    
+        'vaultDaiDebt': ethers.BigNumber.from(floorDecimal(vaultDaiDebt)),
+        'vaultDaiDebt_': cleanValue( divDecimal( vaultDaiDebt, '1e18'), 2),
 
       };
     });
+
     dispatch( { 'type': 'updateMakerVaults', 'payload':  _makerData });
     console.log(_makerData);
   };

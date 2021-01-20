@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect, useReducer } from 'react';
 import { useWeb3React } from '@web3-react/core';
 
 import { useCachedState } from '../hooks/appHooks';
-import { IReducerAction, ITxState, ITx } from '../types';
+import { IReducerAction, ITxState } from '../types';
 
 import { YieldContext } from './YieldContext';
 

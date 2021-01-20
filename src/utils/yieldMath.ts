@@ -1,4 +1,4 @@
-import { ethers, BigNumber, BigNumberish } from 'ethers';
+import { ethers, BigNumber } from 'ethers';
 import { Decimal } from 'decimal.js';
 
 Decimal.set({ precision: 64 });
@@ -382,4 +382,8 @@ export const divDecimal = (numerator:BigNumber | string, divisor:BigNumber | str
   const numerator_ = new Decimal(numerator.toString());
   const divisor_ = new Decimal(divisor.toString());
   return numerator_.div(divisor_).toFixed();
+};
+
+export const floorDecimal = (value:BigNumber | string): string => {
+  return Decimal.floor(value.toString()).toFixed();
 };

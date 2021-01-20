@@ -25,11 +25,9 @@ export const useMath = () => {
     return mulDecimal(collateralAmount, feedData.ethPrice );
   };
 
-
   /**
-   * Calculates an ESTIMATE of the collateralization ratio 
-   * ETH collat value and DAI debt value (in USD) using 
-   * normal numbers
+   * Calculates the collateralization ratio 
+   * ETH collat value, price and DAI debt value (in USD)
    *
    * @param {BigNumber | string } collateralAmount  amount of collateral (eg. 10ETH)
    * @param {BigNumber | string } debtValue value of dai debt (in USD)
@@ -55,24 +53,6 @@ export const useMath = () => {
   const estBorrowingPower = (collateralAmount:BigNumber | string, debtValue: BigNumber | string ) => {
     return borrowingPower( collateralAmount, feedData.ethPrice, debtValue ); 
   };
-
-  // /**
-  //  * Max amount of Dai that can be borrowed
-  //  *
-  //  * @param {BigNumber} collateralValue in wei wad precision
-  //  * @param {BigNumber} debtValue in wei wad precision
-  //  * @param {number} liquidationRatio eg. 1.5
-  //  * @returns {BigNumber} in wei/wad precision
-  //  */
-  // const daiAvailable = (
-  //   collateralValue:BigNumber | string, 
-  //   debtValue:BigNumber,
-  //   liquidationRatio: BigNumber | string
-  // ) =>{
-  //   const maxSafeDebtValue = new Decimal(divDecimal(collateralValue, liquidationRatio));
-  //   const _max = debtValue.lt(maxSafeDebtValue) ? maxSafeDebtValue.sub(debtValue) : BigNumber.from('0');
-  //   return _max;
-  // };
 
 
   /**
@@ -127,11 +107,8 @@ export const useMath = () => {
     return 0;
   };
 
-
-
   return {
     calcAPR,
-
     splitDaiLiquidity,
 
     collateralValue,

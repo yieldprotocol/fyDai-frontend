@@ -73,7 +73,6 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
   const theme = useContext<any>(ThemeContext);
 
   /* hooks init */
-
   const { previewPoolTx }  = usePool();
   const { borrowDai } = useBorrowProxy();
   const { calcAPR, estCollRatio } = useMath();
