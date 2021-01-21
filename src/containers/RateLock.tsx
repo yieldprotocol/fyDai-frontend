@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { BigNumber, ethers } from 'ethers';
 import { NavLink, useHistory, useParams } from 'react-router-dom';
-import { Box, Image, Keyboard, TextInput, Text, ResponsiveContext, Collapsible, ThemeContext, Layer } from 'grommet';
+import { Box, Image, Keyboard, TextInput, Text, ResponsiveContext, Collapsible, ThemeContext } from 'grommet';
 import styled, { css } from 'styled-components';
 import { 
   FiArrowLeft as ArrowLeft,
@@ -80,7 +80,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
   const { previewPoolTx }  = usePool();
   const { importPosition, importVault,  } = useImportProxy();
   const { minWethForAmount } = useMaker();
-  const { calcAPR } = useMath();
+  const { calculateAPR } = useMath();
   const [ txActive ] = useTxActive(['IMPORT']);
 
   /* vaults and selected vaults variables */
@@ -111,9 +111,8 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
   /* token balances and calculated values */
 
   // const [ fyDaiValue, setFYDaiValue ] = useState<number>(0);
-  const [ APR, setAPR ] = useState<number>();
-
-  const [ maxAPR, setMaxAPR ] = useState<number>();
+  const [ APR, setAPR ] = useState<string>();
+  const [ maxAPR, setMaxAPR ] = useState<string>();
 
   const [ minCollateral, setMinCollateral ] = useState<string>();
   const [ minSafeCollateral, setMinSafeCollateral ] = useState<string>();
@@ -196,7 +195,8 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
 
       const preview = await previewPoolTx('buyDai', activeSeries, debouncedDebtInput);     
       if (!(preview instanceof Error)) {
-        setAPR(calcAPR( ethers.utils.parseEther(debouncedDebtInput.toString()), preview, activeSeries.maturity ) );
+        const _apr = calculateAPR( ethers.utils.parseEther(debouncedDebtInput.toString()), preview, activeSeries.maturity );
+        setAPR(cleanValue(_apr, 2) );
       } else {
         setAllDisabled(true);
         setDebtErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
@@ -270,24 +270,12 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
     selectedVault?.vaultDaiDebt_> 0 && (async ()=>{
       const preview = await previewPoolTx('buyDai', activeSeries, selectedVault.vaultDaiDebt_);
       if (!(preview instanceof Error)) {
-        setMaxAPR( calcAPR( ethers.utils.parseEther(selectedVault?.vaultDaiDebt_), preview, activeSeries.maturity) );
+        const _apr = calculateAPR( ethers.utils.parseEther(selectedVault?.vaultDaiDebt_), preview, activeSeries.maturity);
+        setMaxAPR( cleanValue(_apr, 2) );
       } else {
         setMaxAPR(undefined);
       }
     })();
-  }, [selectedVault, activeSeries]);
-
-  /* Get the  Max APR for the selected Vault */
-  useEffect(()=>{
-      selectedVault?.vaultDaiDebt_> 0 && (async ()=>{
-      const preview = await previewPoolTx('buyDai', activeSeries, selectedVault.vaultDaiDebt_);
-      if (!(preview instanceof Error)) {
-        setMaxAPR( calcAPR( ethers.utils.parseEther(selectedVault?.vaultDaiDebt_), preview, activeSeries.maturity) );
-      } else {
-        setMaxAPR(undefined);
-      }
-    })();
-
   }, [selectedVault, activeSeries]);
     
   /* Handle ratelock disabling */
@@ -484,7 +472,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
                     label={
                       <Box pad='small' direction='row' gap='small'>
                         <Text size='small' weight='bold'> 1-Click RateLock</Text>
-                        <Text size='small'>{selectedVault?.vaultDaiDebt_} Dai { maxAPR? ` @ ${maxAPR.toFixed(2)}%`: ''}</Text>
+                        <Text size='small'>{selectedVault?.vaultDaiDebt_} Dai { maxAPR? ` @ ${maxAPR}%`: ''}</Text>
                       </Box>
                     }
                   />
@@ -506,7 +494,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
                     label={
                       <Box pad='small' direction='row' gap='small'>
                         <Text size='small' weight='bold'> 1-Click RateLock</Text>
-                        <Text size='small'>{selectedVault?.vaultDaiDebt_} Dai { maxAPR? `@ ${maxAPR.toFixed(2)}%`: ''}</Text>
+                        <Text size='small'>{selectedVault?.vaultDaiDebt_} Dai { maxAPR? `@ ${ maxAPR }%`: ''}</Text>
                       </Box>
                     }
                   />
@@ -588,7 +576,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
                     visible: !!debtInputValue,
                     active: true,
                     loading: false, 
-                    value: APR?`${APR.toFixed(2)}%`: `${activeSeries? activeSeries.yieldAPR_: ''}%`,
+                    value: APR?`${APR}%`: `${activeSeries? activeSeries.yieldAPR_: ''}%`,
                     valuePrefix: null,
                     valueExtra: null, 
                   },
@@ -620,7 +608,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
                   label={                  
                     <Box direction='row' gap='small'>
                       <Text size='small'>RateLock</Text>
-                      <Text size='small' weight='normal'>{debouncedDebtInput} Dai @ {APR && APR.toFixed(2)}% </Text>
+                      <Text size='small' weight='normal'>{debouncedDebtInput} Dai @ {APR}% </Text>
                     </Box>             
                     }
                   disabled={advancedDisabled || allDisabled}

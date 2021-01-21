@@ -16,7 +16,6 @@ import { useBorrowProxy } from '../hooks/borrowProxyHook';
 
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
-import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
 import EthMark from '../components/logos/EthMark';
@@ -41,7 +40,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
   } = position;
   
   const { withdrawEth } = useBorrowProxy();
-  const { estCollRatio } = useMath();
+  const { estCollateralRatio } = useMath();
   const [ txActive ] = useTxActive(['WITHDRAW']);
 
   const [ inputValue, setInputValue ] = useState<any>();
@@ -81,7 +80,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
   useEffect(()=>{
     const parsedInput = ethers.utils.parseEther(debouncedInput || '0');
     if ( debouncedInput && ethPosted.gt(parsedInput) && debtValue_) {
-      const newPercent = estCollRatio((ethPosted.sub( parsedInput )), debtValue, true); 
+      const newPercent = estCollateralRatio((ethPosted.sub( parsedInput )), debtValue, true); 
       setEstPercent(cleanValue(newPercent, 10)); 
     }
   }, [ debouncedInput ]);

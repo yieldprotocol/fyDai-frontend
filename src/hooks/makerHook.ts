@@ -12,6 +12,7 @@ import { useSignerAccount } from './connectionHooks';
 import { usePool } from './poolHook';
 
 import { IYieldSeries } from '../types';
+import { divDecimal, floorDecimal, mulDecimal } from '../utils/yieldMath';
 
 /**
  * Hook for interacting with the yield 'CRONTROLLER' Contract
@@ -126,56 +127,6 @@ export const useMaker = () => {
   };
 
   /**
-   * @dev Convert from MakerDAO debt to Dai
-   * @param {string|BigNumber} daiAmount debt amount
-   * @param {string} collateralType collateral type to filter by (default. ETH-A)
-   * @returns {Promise<BigNumber>} dai amount
-   * @note call function
-   */
-  const makerDebtToDai = async (
-    amount:number|BigNumber,
-    collateralType: string = 'ETH-A',
-  ) => {
-    const parsedAmount= BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(amount.toString());
-    const collType = ethers.utils.formatBytes32String(collateralType);
-    let rate;
-    try {
-      [,rate,,,] = await vatContract.ilks(collType);
-    }  catch (e) {
-      // eslint-disable-next-line no-console
-      console.log(e);
-      rate = 0;
-    }
-    return  utils.mulRay(parsedAmount, rate);
-  };
-
-  /**
-   * @dev Convert from Dai to MakerDAO debt
-   * @param {string|BigNumber} daiAmount debt amount
-   * @param {string} collateralType collateral type to filter by (default. ETH-A)
-
-   * @returns {Promise<BigNumber>} dai amount
-   * @note call function
-   */
-
-  const daiToMakerDebt = async (
-    amount:number|BigNumber,
-    collateralType: string = 'ETH-A',
-  ) => {
-    const parsedAmount= BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(amount.toString());
-    const collType = ethers.utils.formatBytes32String(collateralType);
-    let rate;
-    try {
-      [,rate,,,] = await vatContract.ilks(collType);
-    }  catch (e) {
-      // eslint-disable-next-line no-console
-      console.log(e);
-      return BigNumber.from('0');
-    }
-    return  utils.divRay(parsedAmount, rate);
-  };
-
-  /**
    * @dev Minimum weth needed to collateralize an amount of dai OR FyDai in MakerDAO
    * @param {string|BigNumber} amount of or Dai / FyDai debt amount
    * @param {string} collateralType collateral type to filter by (default. ETH-A)
@@ -196,7 +147,10 @@ export const useMaker = () => {
       console.log(e);
       return BigNumber.from('0');
     }
-    return  utils.divRay(parsedAmount, spot);
+
+    const minWeth = divDecimal(parsedAmount, spot, '1e-27');
+    return  floorDecimal( minWeth );
+
   };
 
   /**
@@ -275,8 +229,6 @@ export const useMaker = () => {
   return {
     getCDPList,
     getCDPData,
-    makerDebtToDai,
-    daiToMakerDebt,
     minWethForAmount,
     fyDaiForDai,
     daiForFyDai,

@@ -13,27 +13,6 @@ export const CHAI = ethers.utils.formatBytes32String('CHAI');
 
 export const MAX_INT = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
 
-// / @dev Converts a number to RAY precision, for number up to 10 decimal places
-export const toRay = (value:number) => {
-  const exponent = BigNumber.from('10').pow(BigNumber.from('17'));
-  return BigNumber.from(value*10**10).mul(exponent);
-};
-
-// / @dev Multiplies a number in any precision by a number in RAY precision, with the output in the first parameter's precision.
-// / I.e. mulRay(wad(x), ray(y)) = wad(x*y)
-export const mulRay = (x:BigNumber, ray:BigNumber) => {
-  const unit = BigNumber.from('10').pow(BigNumber.from('27'));
-  return BigNumber.from(x).mul(BigNumber.from(ray)).div(unit);
-};
-
-// / @dev Divides a number in any precision by a number in RAY precision, with the output in the first parameter's precision.
-// / I.e. divRay(wad(x), ray(y)) = wad(x/y)
-export const divRay = (x:BigNumber, ray:BigNumber) => {
-  const unit = BigNumber.from('10').pow(BigNumber.from('27'));
-  return unit.mul(BigNumber.from(x)).div(BigNumber.from(ray));
-};
-
-
 /* Trunctate a string value to a certain number of 'decimal' point */
 export const cleanValue = (input:string, decimals:number=12) => {
   const re = new RegExp(`(\\d+\\.\\d{${decimals}})(\\d)`);

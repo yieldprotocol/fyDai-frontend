@@ -23,6 +23,7 @@ import { usePool } from './poolHook';
 import { useMaker } from './makerHook';
 
 import { genTxCode } from '../utils';
+import { floorDecimal, mulDecimal, ONE } from '../utils/yieldMath';
 
 /**
  * Hook for interacting with the ImportProxy Contract.
@@ -108,26 +109,20 @@ export const useImportProxy = () => {
       value: ethers.utils.parseEther('0')
     };
 
-    // const makerDebt = await daiToMakerDebt(parsedDaiDebt);
-
     /* calculate expected max safety values  */  
-    let maxDaiPrice:BigNumber;         
+    let maxDaiPrice:string;         
     const preview = await previewPoolTx('buydai', series, ethers.utils.parseEther('1'));   
-    if ( !(preview instanceof Error) ) {  
-      const one = utils.toRay(1);
-      const onePointOne = utils.toRay(1.1);
-      const rayPrice = preview.mul(BigNumber.from('1000000000'));
-      maxDaiPrice = one.add( utils.mulRay(onePointOne, rayPrice.sub(one) ));
-      console.log(maxDaiPrice.toString());
+    if ( !(preview instanceof Error) ) {
+      
+      // 1 + ( 1.1 * ( price - 1 ) )
+      const _one = ONE.mul('1e18');
+      const diff = preview.sub(_one.toFixed());
+      const adjDiff = mulDecimal( '1.1', diff ); 
+      maxDaiPrice =  floorDecimal( _one.add(adjDiff).toFixed() ) ;
+
     } else {
       throw(preview);
     }
-    
-    console.log(parsedDaiDebt, ethers.utils.formatEther(parsedDaiDebt));
-    console.log(parsedWeth, ethers.utils.formatEther(parsedWeth));
-
-    maxDaiPrice = utils.toRay(2);
-    /* above for testing */
 
     /* build and use signature if required , else '0x' */
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
@@ -201,19 +196,19 @@ export const useImportProxy = () => {
     };
  
     /* calculate expected max safety values */  
-    let maxDaiPrice:BigNumber; 
+    let maxDaiPrice: string; 
     const preview = await previewPoolTx('buydai', series, ethers.utils.parseEther('1'));   
-    if ( !(preview instanceof Error) ) {  
-      const one = utils.toRay(1);
-      const onePointOne = utils.toRay(1.1);
-      const rayPrice = preview.mul(BigNumber.from('1000000000'));
-      maxDaiPrice = one.add( utils.mulRay(onePointOne, rayPrice.sub(one) ));
-      console.log(maxDaiPrice.toString());
+    if ( !(preview instanceof Error) ) { 
+
+      // 1 + ( 1.1 * ( price - 1 ) )
+      const _one = ONE.mul('1e18');
+      const diff = preview.sub(_one.toFixed());
+      const adjDiff = mulDecimal( '1.1', diff ); 
+      maxDaiPrice =  floorDecimal( _one.add(adjDiff).toFixed() ) ;
+
     }  else {
       throw(preview);
     }
-    /* for testing only - remove for prod */ 
-    maxDaiPrice = utils.toRay(2);
 
     /* build and use signature if required , else '0x' */
     const requestedSigs:Map<string, ISignListItem> = new Map([]);

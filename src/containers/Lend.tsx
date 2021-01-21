@@ -57,7 +57,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
 
   const { previewPoolTx } = usePool();
   const { sellDai } = useBorrowProxy();
-  const { calcAPR } = useMath();
+  const { calculateAPR } = useMath();
   const { account, fallbackProvider } = useSignerAccount();
   const [ txActive ] = useTxActive(['SELL_DAI']);
 
@@ -84,7 +84,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
   const isLol = useIsLol(inputValue);
 
-  const [ APR, setAPR ] = useState<number>();
+  const [ APR, setAPR ] = useState<string>();
   const [ fyDaiValue, setFYDaiValue ] = useState<number>(0);
   const [ currentValue, setCurrentValue ] = useState<string>();
   
@@ -112,7 +112,8 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
       const preview = await previewPoolTx('sellDai', activeSeries, debouncedInput);
       if (!(preview instanceof Error)) {
         setFYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
-        setAPR( calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) );      
+        const _apr = calculateAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity )
+        setAPR( cleanValue(_apr, 2) );      
       } else {
         /* if the market doesnt have liquidity just estimate from rate */
         const rate = await previewPoolTx('sellDai', activeSeries, 1);
@@ -271,7 +272,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
                         visible: true,
                         active: inputValue,
                         loading: false,     
-                        value: APR?`${APR.toFixed(2)}%`: `${activeSeries? activeSeries.yieldAPR_: ''}%`,
+                        value: APR?`${APR}%`: `${activeSeries? activeSeries.yieldAPR_: ''}%`,
                         valuePrefix: null,
                         valueExtra: null, 
                       },

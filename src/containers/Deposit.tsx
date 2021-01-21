@@ -70,7 +70,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
   const { postEth }  = useBorrowProxy();
-  const { estCollRatio, estBorrowingPower } = useMath();
+  const { estCollateralRatio, estBorrowingPower } = useMath();
   const [ txActive ] = useTxActive(['POST', 'WITHDRAW']);
 
   const { account } = useSignerAccount();
@@ -126,7 +126,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
     if (inputValue && ethPosted && debtValue) {
       const inputInWei = ethers.utils.parseEther(inputValue);
       const currentPlusNew = ethPosted.add( inputInWei );
-      const newPercent = estCollRatio(currentPlusNew, debtValue, true); 
+      const newPercent = estCollateralRatio(currentPlusNew, debtValue, true); 
       setEstPercent(cleanValue(newPercent, 2) || undefined);
     }
     /* 2. Calculate the new borrowing power */

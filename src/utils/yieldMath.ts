@@ -3,26 +3,26 @@ import { Decimal } from 'decimal.js';
 
 Decimal.set({ precision: 64 });
 
-const ZERO: Decimal = new Decimal(0);
-const ONE: Decimal = new Decimal(1);
-const TWO: Decimal = new Decimal(2);
-const SECONDS_PER_YEAR: number = (4 * 365 * 24 * 60 * 60);
+export const ZERO: Decimal = new Decimal(0);
+export const ONE: Decimal = new Decimal(1);
+export const TWO: Decimal = new Decimal(2);
+export const SECONDS_PER_YEAR: number = (365 * 24 * 60 * 60);
 
-const k = new Decimal(1 / SECONDS_PER_YEAR); // inv of seconds in 4 years
-const g1 = new Decimal(950 / 1000);
-const g2 = new Decimal(1000 / 950);
+export const k = new Decimal(1 / (4 * SECONDS_PER_YEAR) ); // inv of seconds in 4 years
+export const g1 = new Decimal(950 / 1000);
+export const g2 = new Decimal(1000 / 950);
 // const fee = new Decimal(1000000000000);
 
 // https://www.desmos.com/calculator/mllhtohxfx
 export function mint(
   daiReserves: BigNumber | string, 
   fyDaiReserves: BigNumber | string, 
-  supply: BigNumber | string, 
+  totalSupply: BigNumber | string, 
   dai: BigNumber | string
 ) : [any, any] {
   const daiReserves_ = new Decimal(daiReserves.toString());
   const fyDaiReserves_ = new Decimal(fyDaiReserves.toString());
-  const supply_ = new Decimal(supply.toString());
+  const supply_ = new Decimal(totalSupply.toString());
   const dai_ = new Decimal(dai.toString());
 
   const m = (supply_.mul(dai_)).div(daiReserves_);
@@ -35,12 +35,12 @@ export function mint(
 export function burn(
   daiReserves: BigNumber | string, 
   fyDaiReserves: BigNumber | string, 
-  supply: BigNumber | string, 
+  totalSupply: BigNumber | string, 
   lpTokens: BigNumber | string
 ): [any, any] {
   const daiReserves_ = new Decimal(daiReserves.toString());
   const fyDaiReserves_ = new Decimal(fyDaiReserves.toString());
-  const supply_ = new Decimal(supply.toString());
+  const supply_ = new Decimal(totalSupply.toString());
   const lpTokens_ = new Decimal(lpTokens.toString());
 
   const z = (lpTokens_.mul(daiReserves_ )).div(supply_);
@@ -49,13 +49,14 @@ export function burn(
   return [ z, y ];
 }
 
+
 // https://www.desmos.com/calculator/5nf2xuy6yb
 export function sellDai(
   daiReserves: BigNumber | string, 
   fyDaiReserves: BigNumber | string, 
   dai: BigNumber | string, 
   timeTillMaturity: BigNumber | string,
-  withNoFee: boolean = false
+  withNoFee: boolean = false // optional: default === false
 ): any {
   
   const daiReserves_ = new Decimal(daiReserves.toString());
@@ -84,7 +85,7 @@ export function sellFYDai(
   fyDaiReserves: BigNumber | string, 
   fyDai: BigNumber | string, 
   timeTillMaturity: BigNumber | string,
-  withNoFee: boolean = false
+  withNoFee: boolean = false // optional: default === false
 ): any {
   const daiReserves_ = new Decimal(daiReserves.toString());
   const fyDaiReserves_ = new Decimal(fyDaiReserves.toString());
@@ -108,11 +109,11 @@ export function sellFYDai(
 
 // https://www.desmos.com/calculator/0rgnmtckvy
 export function buyDai(
-  daiReserves: BigNumber | string, 
-  fyDaiReserves: BigNumber | string, 
+  daiReserves: BigNumber | string,
+  fyDaiReserves: BigNumber | string,
   dai: BigNumber | string, 
   timeTillMaturity: BigNumber | string,
-  withNoFee: boolean = false
+  withNoFee: boolean = false // optional: default === false
 ): any {
 
   const daiReserves_ = new Decimal(daiReserves.toString());
@@ -141,7 +142,7 @@ export function buyFYDai(
   fyDaiReserves: BigNumber | string, 
   fyDai: BigNumber | string,
   timeTillMaturity: BigNumber | string,
-  withNoFee: boolean = false
+  withNoFee: boolean = false // optional: default === false
 ): string {
 
   const daiReserves_ = new Decimal(daiReserves.toString());
@@ -185,6 +186,7 @@ export function getFee(
   }
   return fee_.toString();
 }
+
 
 export function fyDaiForMint(
   daiReserves: BigNumber,
@@ -233,13 +235,18 @@ export function fyDaiForMint(
    * @returns  [ BigNumber, BigNumber ] returns an array of [dai, fyDai] 
    */
 export const splitLiquidity =(
-  xReserves: BigNumber,
-  yReserves: BigNumber,
-  xAmount: BigNumber,
-)=> {
-  const xPortion = xAmount.mul(yReserves).div(yReserves.add(xReserves));
-  const yPortion = xAmount.sub(xPortion);
-  return [xPortion, yPortion];
+  xReserves: BigNumber | string,
+  yReserves: BigNumber | string,
+  xAmount: BigNumber | string,
+) : [string, string] => {
+
+  const xAmount_ = new Decimal(xAmount.toString());
+  const xReserves_ = new Decimal(xReserves.toString());
+  const yReserves_ = new Decimal(yReserves.toString()); 
+
+  const xPortion = ( xAmount_.mul(yReserves_) ).div( yReserves_.add(xReserves_) );
+  const yPortion = xAmount_.sub(xPortion);
+  return [ xPortion.toFixed(), yPortion.toFixed() ];
 };
 
 /**
@@ -262,6 +269,7 @@ export const calcTokensMinted =(
   return (totalSupply).mul(daiOffered).div(xReserves);
 };
 
+
 /**
    * Calculate Annualised Yield Rate
    *
@@ -275,7 +283,7 @@ export const calcTokensMinted =(
 export const calculateAPR =(
   _rate: BigNumber,
   _amount: BigNumber,
-  _maturity:number,
+  _maturity: number,
   _fromDate:number = (Math.round(new Date().getTime() / 1000)), // if not provided, defaults to current time.
 ): string | undefined => {
   const rate_ = new Decimal(_rate.toString());
@@ -296,7 +304,6 @@ export const calculateAPR =(
   return undefined;
 };
 
-
 /**
    * Calculates the collateralization ratio 
    * based on the collat amount and value and debt value.
@@ -304,6 +311,7 @@ export const calculateAPR =(
    * @param { BigNumber | string } collateralAmount  amount of collateral ( in wei)
    * @param { BigNumber | string } collateralPrice price of collateral (in USD)
    * @param { BigNumber | string } debtValue value of dai debt (in USD)
+   * @param {boolean} asPercent OPTIONAL: flag to return ratio as a percentage
   
    * @returns { string | undefined }
    */
@@ -311,7 +319,7 @@ export const collateralizationRatio = (
   collateralAmount: BigNumber | string, 
   collateralPrice: BigNumber | string, 
   debtValue: BigNumber | string, 
-  asPercent: boolean = false // Optional flag to return as percentage
+  asPercent: boolean = false // OPTIONAL:  flag to return as percentage
 ): string | undefined => {
   if (
     ethers.BigNumber.isBigNumber(debtValue) ? debtValue.isZero(): debtValue == '0' 
@@ -327,7 +335,6 @@ export const collateralizationRatio = (
   return _ratio;
 };
 
-
 /**
    * Calcualtes the amount (Dai, or other variant) that can be borrowed based on 
    * an amount of collateral (ETH, or other), and collateral price.
@@ -335,7 +342,7 @@ export const collateralizationRatio = (
    * @param {BigNumber | string} collateralAmount amount of collateral
    * @param {BigNumber | string} collateralPrice price of unit collateral (in currency x)
    * @param {BigNumber | string} debtValue value of debt (in currency x)
-   * @param {BigNumber | string} liquidationRatio eg. 1.5 for 150%
+   * @param {BigNumber | string} liquidationRatio  OPTIONAL: 1.5 (150%) as default
    * 
    * @returns {string}
    */
@@ -343,7 +350,7 @@ export const borrowingPower = (
   collateralAmount: BigNumber | string,
   collateralPrice: BigNumber | string,
   debtValue:BigNumber | string,
-  liquidationRatio: BigNumber | string = '1.5' // Optional: 150% as default
+  liquidationRatio: BigNumber | string = '1.5' // OPTIONAL: 150% as default
 ): string => {
   const collateralValue = mulDecimal(collateralAmount, collateralPrice );
   const maxSafeDebtValue_ = new Decimal(divDecimal(collateralValue, liquidationRatio));
@@ -352,38 +359,42 @@ export const borrowingPower = (
   return _max.toFixed(0);
 };
 
-// /**
-//    * Percentage holding of the Pool 
-//    *
-//    * @param { BigNumber } supply  // token supply 
-//    * @param { BigNumber } balance // token holdings
-//    * 
-//    * @returns { string } human readable string as a percent.
-//    */
-// export const calcPoolPercent =(
-//   supply: BigNumber,
-//   balance: BigNumber,
-// ): string => {
-//   if (!supply.isZero()) {
-//     const supply_ = new Decimal(supply.toString());
-//     const balance_ = new Decimal(balance.toString());
-//     return ( (balance_.div(supply_)).mul(100) ).toFixed(4); 
-//   } 
-//   return '0';
-// };
-
-export const mulDecimal = (multiplicant:BigNumber | string, multiplier:BigNumber | string): string => {
+/**
+ * 
+ * Math Support fns:
+ * 
+ * */
+export const mulDecimal = (
+  multiplicant: BigNumber | string, 
+  multiplier: BigNumber | string, 
+  precisionDifference: string = '1',  // Difference between multiplicant and mulitplier precision (eg. wei vs ray '1e-27' )
+): string => {
   const multiplicant_ = new Decimal(multiplicant.toString());
   const multiplier_ = new Decimal(multiplier.toString());
-  return multiplicant_.mul(multiplier_).toFixed();
+  const _preDif = new Decimal(precisionDifference.toString());
+  const _normalisedMul =  multiplier_.mul(_preDif); 
+  return multiplicant_.mul(_normalisedMul).toFixed();
 };
 
-export const divDecimal = (numerator:BigNumber | string, divisor:BigNumber | string): string => {
+export const divDecimal = (
+  numerator:BigNumber | string, 
+  divisor:BigNumber | string,
+  precisionDifference: string = '1', // Difference between multiplicant and mulitplier precision (eg. wei vs ray '1e-27' )
+): string => {
   const numerator_ = new Decimal(numerator.toString());
   const divisor_ = new Decimal(divisor.toString());
-  return numerator_.div(divisor_).toFixed();
+  const _preDif = new Decimal(precisionDifference.toString());
+  const _normalisedDiv =  divisor_.mul(_preDif); 
+  return numerator_.div(_normalisedDiv).toFixed();
 };
 
-export const floorDecimal = (value:BigNumber | string): string => {
-  return Decimal.floor(value.toString()).toFixed();
+export const floorDecimal = (val: BigNumber | string): string => {
+  return Decimal.floor(val.toString()).toFixed();
+};
+
+export const secondsToFrom  = (
+  to: BigNumber | string, 
+  from: BigNumber | string = BigNumber.from( Math.round(new Date().getTime() / 1000)), // OPTIONAL: FROM defaults to current time if omitted
+) : string => {
+  return to.sub(from).toString();
 };

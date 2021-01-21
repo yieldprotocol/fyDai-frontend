@@ -21,6 +21,7 @@ import { useDsProxy } from './dsProxyHook';
 
 import { useController } from './controllerHook';
 import { genTxCode } from '../utils';
+import { floorDecimal, mulDecimal } from '../utils/yieldMath';
 
 /**
  * Hook for interacting with the Yield Proxy Contract.
@@ -64,8 +65,7 @@ export const useBorrowProxy = () => {
 
   // TODO: deal with big number rather also, put this out in a hook
   const valueWithSlippage = (value:BigNumber, minimise:boolean=false ) => {
-    const slippageAsRay = utils.toRay(slippage);
-    const slippageAmount = utils.mulRay(value, slippageAsRay);
+    const slippageAmount = floorDecimal( mulDecimal(value, slippage));
     if (minimise) {
       return value.sub(slippageAmount);
     } 

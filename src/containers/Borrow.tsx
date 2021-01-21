@@ -8,10 +8,6 @@ import { VscHistory as History } from 'react-icons/vsc';
 import { logEvent } from '../utils/analytics';
 import { abbreviateHash, cleanValue, genTxCode } from '../utils';
 
-import { 
-  calculateAPR 
-} from '../utils/yieldMath';
-
 /* contexts */
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
@@ -75,7 +71,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
   /* hooks init */
   const { previewPoolTx }  = usePool();
   const { borrowDai } = useBorrowProxy();
-  const { calcAPR, estCollRatio } = useMath();
+  const { calculateAPR, estCollateralRatio } = useMath();
   const { account } = useSignerAccount();
   const { amnt }:any = useParams(); /* check if the user sent in any requested amount in the url (deep-linking) */ 
   
@@ -105,7 +101,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
   
   /* token balances and calculated values */
   const [ fyDaiValue, setFYDaiValue ] = useState<number>(0);
-  const [ APR, setAPR ] = useState<number>();
+  const [ APR, setAPR ] = useState<string>();
   const [ estPercent, setEstPercent ] = useState<string|undefined>(undefined);
 
   /* Borrow execution flow */
@@ -138,7 +134,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
   useEffect(() => {
     
     account && position && position.debtValue && debouncedInput>0 && ( async () => {
-      const newPercent = estCollRatio(
+      const newPercent = estCollateralRatio(
         position.ethPosted, 
         ( position.debtValue.add(ethers.utils.parseEther(debouncedInput)) ),
         true
@@ -150,7 +146,8 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
       const preview = await previewPoolTx('buyDai', activeSeries, debouncedInput);
       if (!(preview instanceof Error)) {
         setFYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
-        setAPR( calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries.maturity ) );      
+        const _apr = calculateAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries.maturity );
+        setAPR(cleanValue(_apr, 2) );
       } else {
         /* if the market doesnt have liquidity just estimate from rate */
         const rate = await previewPoolTx('buyDai', activeSeries, 1);
@@ -446,7 +443,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
                       visible: !!inputValue,
                       active: !!inputValue&&inputValue>0,
                       loading: false,    
-                      value: APR?`${APR.toFixed(2)}%`: `${activeSeries? activeSeries.yieldAPR_: ''}%`,
+                      value: APR?`${APR}%`: `${activeSeries? activeSeries.yieldAPR_: ''}%`,
                       valuePrefix: null,
                       valueExtra: null, 
                     },
