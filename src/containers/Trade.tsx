@@ -222,6 +222,13 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
         onEsc={() => setInputValue(undefined)}
         onEnter={()=> tradeProcedure()}
         onBackspace={()=> {
+          if (inputValue.length === 1) {
+            if(inputFromQuantity) {
+              setToQuantity(0);
+            };
+          } else {
+            setFromQuantity(0);
+          }
           inputValue && 
           (document.activeElement !== inputRef) && 
           setInputValue(debouncedInput.toString().slice(0, -1));
@@ -325,7 +332,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
                       /* ref={(el:any) => {el && !CloseDaiOpen && !mobile && el.focus(); setInputRef(el);}} */
                       type="number"
                       placeholder={!mobile ? '0': '0'}
-                      value={fromQuantity || ''}
+                      value={fromQuantity || ""}
                       plain
                       onChange={(event:any) => 
                         { 
