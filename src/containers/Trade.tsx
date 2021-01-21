@@ -121,8 +121,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
           break;
   
       }
-      // Should we create a trade event to log here?
-      /* clean up and refresh */ 
+
       setInputValue(undefined);
       await Promise.all([
         userActions.updateUser(),
@@ -138,62 +137,6 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
     return roundedTempNumber / factor;
 };
 
-
-
-
-    /* Set up type of transaction 
-    useEffect(() => {
-
-
-      if (inputFromQuantity) {
-        if (fromToken === "DAI") {
-          setFromQuantity( inputValue );
-          setTradeType( "sellDai" );
-          if (inputValue > 0) {
-            setToQuantity( roundTo(minFYDaiOut, 3) );
-          } else {
-            setToQuantity(0);
-          }
-        } else {
-          setFromQuantity( inputValue );
-          setTradeType( "sellFYDai" );
-          if (inputValue > 0) {
-            // should be minimum dai received
-            setToQuantity( roundTo(minDaiOut, 3) );
-          } else {
-            setToQuantity(0);
-          }        
-        }
-      } else {
-        if (fromToken === "DAI") {
-          setToQuantity( inputValue );
-          setTradeType( "buyFYDai" );
-          if (inputValue > 0) {
-            setFromQuantity( maxDaiIn );
-          } else {
-            setFromQuantity(0);
-          }
-        } else {
-          setToQuantity( inputValue );
-          setTradeType( "buyDai" );
-          if (inputValue > 0) {
-            setFromQuantity( roundTo(maxFYDaiIn, 3) );
-           } else {
-            setFromQuantity(0);
-          }
-        }
-      }
-      console.log("daiBalance: ", daiBalance_)
-      console.log("inputFromQuantity: ", inputFromQuantity)
-      console.log("fromToken: ", fromToken)
-      console.log("toToken: ", toToken)
-      console.log("inputValue: ", inputValue)
-      console.log("tradeType: ", tradeType)
-      console.log("fromQuantity: ", fromQuantity)
-      console.log("toQuantity: ", toQuantity)
-      })
-  
-
   /* Handle input (debounce input) changes */
   useEffect(() => {
     setFromQuantity( debouncedInput );
@@ -203,16 +146,16 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
     
   activeSeries && !(activeSeries?.isMature()) && !!debouncedInput && ( async () => {
       const preview = await previewPoolTx(tradeType, activeSeries, debouncedInput);
-      const spotPreview = await previewPoolTx(tradeType, activeSeries, 0.01);
+      const spotPreview = await previewPoolTx(tradeType, activeSeries, 1);
       if (!(preview instanceof Error) && !(spotPreview instanceof Error)) {
         switch(tradeType) {
           case "sellDai":
-            setToQuantity(parseFloat(ethers.utils.formatEther(preview)));
+            setToQuantity(roundTo(parseFloat(ethers.utils.formatEther(preview)), 3))
             console.log("APR: ", calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ))
-            console.log("spotAPR: ", calcAPR( ethers.utils.parseEther("0.01"), spotPreview, activeSeries?.maturity ) )
+            console.log("spotAPR: ", calcAPR( ethers.utils.parseEther("1"), spotPreview, activeSeries?.maturity ) )
             setAPR( calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) );                  
-            setSpotAPR( calcAPR( ethers.utils.parseEther("0.01"), spotPreview, activeSeries?.maturity ) ); 
-            setPriceImpact( (calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity) - (calcAPR( ethers.utils.parseEther("0.01"), spotPreview, activeSeries?.maturity ))) )  
+            setSpotAPR( calcAPR( ethers.utils.parseEther("1"), spotPreview, activeSeries?.maturity ) ); 
+            setPriceImpact(spotAPR - APR)   
             break;
           case "buyDai":
             setFYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
