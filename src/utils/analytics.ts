@@ -14,7 +14,7 @@ export const logPageView = () => {
 
 export const logEvent = (object: IAnalytics ) => {
   if (object) {
-    window?.gtag('send', 'page_view', object);
+    window?.gtag('event', 'sign_up', { 'method': 'email' });
   }
 };
 
