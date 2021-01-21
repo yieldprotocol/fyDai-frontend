@@ -14,7 +14,7 @@ export const logPageView = () => {
 
 export const logEvent = (object: IAnalytics ) => {
   if (object) {
-    ReactGA.event(object);
+    window?.gtag('send', 'page_view', object);
   }
 };
 
