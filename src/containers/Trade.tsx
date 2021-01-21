@@ -207,20 +207,12 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
       if (!(preview instanceof Error) && !(spotPreview instanceof Error)) {
         switch(tradeType) {
           case "sellDai":
-            setFYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
-            console.log("setFYDaiValue: ", setFYDaiValue)
-            setMinFYDaiOut(parseFloat(ethers.utils.formatEther(preview)));
             setToQuantity(parseFloat(ethers.utils.formatEther(preview)));
-            console.log("setMinFYDaiOut: ", setMinFYDaiOut)
+            console.log("APR: ", calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ))
+            console.log("spotAPR: ", calcAPR( ethers.utils.parseEther("0.01"), spotPreview, activeSeries?.maturity ) )
             setAPR( calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) );                  
             setSpotAPR( calcAPR( ethers.utils.parseEther("0.01"), spotPreview, activeSeries?.maturity ) ); 
-            setPriceImpact( spotAPR - APR )  
-            console.log("preview: ", preview);
-            console.log("spotPreview: ", spotPreview);
-            console.log("debouncedInput: ", debouncedInput);
-            console.log("debouncedInput.toString(): ", debouncedInput.toString());
-            console.log("APR: ", APR);
-            console.log("spotAPR: ", spotAPR);
+            setPriceImpact( (calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity) - (calcAPR( ethers.utils.parseEther("0.01"), spotPreview, activeSeries?.maturity ))) )  
             break;
           case "buyDai":
             setFYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
