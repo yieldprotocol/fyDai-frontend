@@ -226,7 +226,7 @@ export function fyDaiForMint(
 }
 
 /**
-   * Split a certain amount of Dai liquidity into its fyDai and Dai componetnts
+   * Split a certain amount of Dai liquidity into its two componetnts (eg. Dai and fyDai) 
    * 
    * @param { BigNumber } xReserves// Dai reserves
    * @param { BigNumber } yReserves// fyDai reservers
@@ -244,7 +244,7 @@ export const splitLiquidity =(
   const xReserves_ = new Decimal(xReserves.toString());
   const yReserves_ = new Decimal(yReserves.toString()); 
 
-  const xPortion = ( xAmount_.mul(yReserves_) ).div( yReserves_.add(xReserves_) );
+  const xPortion = ( xAmount_.mul(xReserves_) ).div( yReserves_.add(xReserves_) );
   const yPortion = xAmount_.sub(xPortion);
   return [ xPortion.toFixed(), yPortion.toFixed() ];
 };
@@ -265,10 +265,9 @@ export const calcTokensMinted =(
   totalSupply: BigNumber,
   xInput: BigNumber,
 ) => {
-  const daiOffered = (xInput.mul(xReserves)).div(yReserves.add(xReserves) );
-  return (totalSupply).mul(daiOffered).div(xReserves);
+  const xOffered = (xInput.mul(xReserves)).div(yReserves.add(xReserves));
+  return (totalSupply).mul(xOffered).div(xReserves);
 };
-
 
 /**
    * Calculate Annualised Yield Rate
@@ -318,7 +317,7 @@ export const calculateAPR =(
 export const collateralizationRatio = ( 
   collateralAmount: BigNumber | string, 
   collateralPrice: BigNumber | string, 
-  debtValue: BigNumber | string, 
+  debtValue: BigNumber | string,
   asPercent: boolean = false // OPTIONAL:  flag to return as percentage
 ): string | undefined => {
   if (
@@ -359,11 +358,13 @@ export const borrowingPower = (
   return _max.toFixed(0);
 };
 
+
 /**
  * 
  * Math Support fns:
  * 
  * */
+
 export const mulDecimal = (
   multiplicant: BigNumber | string, 
   multiplier: BigNumber | string, 

@@ -12,7 +12,7 @@ import {
   FiLayers as ChangeSeries
 } from 'react-icons/fi';
 
-import { cleanValue, modColor, BN_RAY, buildGradient } from '../utils';
+import { cleanValue, modColor, buildGradient } from '../utils';
 
 import { UserContext } from '../contexts/UserContext';
 import { SeriesContext } from '../contexts/SeriesContext';
@@ -262,7 +262,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
   
   /* Handle dust watch */
   useEffect(()=>{
-    dust && setDaiDust(dust.div(BN_RAY));
+    dust && setDaiDust(dust.div(BigNumber.from('1000000000000000000000000000')));
   }, [ dust ]);
 
   /* Get the  Max APR for the selected Vault */

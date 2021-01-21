@@ -454,7 +454,7 @@ const UserProvider = ({ children }: any) => {
     const _cdpData:any = await Promise.all(cdpList[1].map((x:string) => getCDPData(x, 'ETH-A') ) );
     const _makerData = cdpList[0].map((x:any, i:number) => {
       const { rate } = yieldState.feedData.ilks;
-      const vaultDaiDebt = divDecimal( mulDecimal(_cdpData[i][1], rate), '1e27' );
+      const vaultDaiDebt = mulDecimal(_cdpData[i][1], rate, '1e-27' ) ; // use built in precision equalling for wad * ray
       return {
         'vaultId': x.toString(),
         'vaultCollateralType': ethers.utils.parseBytes32String(cdpList[2][i]),

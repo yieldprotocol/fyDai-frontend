@@ -3,15 +3,10 @@ import { IYieldSeries } from '../types';
 
 /* constants */
 export const BN_RAY = BigNumber.from('1000000000000000000000000000');
-export const N_RAY = '1000000000000000000000000000';
-export const WAD = BigNumber.from('1000000000000000000');
-export const RAY = BigNumber.from('1000000000000000000000000000');
-export const RAD = BigNumber.from('10000000000000000000000000000000000000000');
-export const SECONDS_PER_YEAR = 365 * 24 * 60 * 60;
 export const ETH = ethers.utils.formatBytes32String('ETH-A');
 export const CHAI = ethers.utils.formatBytes32String('CHAI');
-
 export const MAX_INT = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+
 
 /* Trunctate a string value to a certain number of 'decimal' point */
 export const cleanValue = (input:string, decimals:number=12) => {
