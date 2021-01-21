@@ -222,16 +222,17 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
         onEsc={() => setInputValue(undefined)}
         onEnter={()=> tradeProcedure()}
         onBackspace={()=> {
-          if (inputValue.length === 1) {
-            if(inputFromQuantity) {
-              setToQuantity(0);
-            };
-          } else {
-            setFromQuantity(0);
-          }
           inputValue && 
           (document.activeElement !== inputRef) && 
           setInputValue(debouncedInput.toString().slice(0, -1));
+          if (inputValue.length === 1) {
+            if(inputFromQuantity) {
+              setToQuantity(0);
+            } else if(!inputFromQuantity) {
+              setFromQuantity(0);
+            }
+          }
+
         }}
         target='document'
       >
