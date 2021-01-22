@@ -6,6 +6,7 @@ import { deepMerge } from 'grommet/utils';
 import * as serviceWorker from './serviceWorker';
 
 import { yieldTheme } from './themes';
+import { logEvent } from './utils/analytics';
 import { modColor } from './utils';
 
 import { SeriesContext } from './contexts/SeriesContext';
@@ -34,7 +35,6 @@ import YieldFooter from './components/YieldFooter';
 import ErrorBoundary from './components/ErrorBoundry';
 import YieldNav from './components/YieldNav';
 
-import { initGA, logPageView } from './utils/analytics';
 import RaisedBox from './components/RaisedBox';
 
 declare global {

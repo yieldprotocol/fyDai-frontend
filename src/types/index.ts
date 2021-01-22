@@ -130,11 +130,9 @@ export interface IDomain {
   verifyingContract: string;
 }
 
-
 export interface IAnalytics {
-  category: string;
-  action: string;
-  label?: string | '';
+  event_name: string;
+  event_parameters: any;
 }
 
 export interface ITxState {
