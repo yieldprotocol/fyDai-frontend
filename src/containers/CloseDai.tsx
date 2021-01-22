@@ -64,6 +64,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
         activeSeries,
         inputValue,
       );
+      
       logEvent('close_position', {
         value: inputValue,
         type: 'DAI',

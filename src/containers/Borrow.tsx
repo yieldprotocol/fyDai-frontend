@@ -111,7 +111,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
     if (inputValue && !borrowDisabled) {
       await borrowDai(activeSeries, 'ETH-A', inputValue);
 
-      logEvent('Borrow', { 
+      logEvent('borrow', { 
         value: inputValue,
         type: 'DAI',
         series: activeSeries.displayName,
