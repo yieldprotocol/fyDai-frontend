@@ -14,7 +14,7 @@ export const logPageView = () => {
 
 export const logEvent = (object: IAnalytics ) => {
   if (object) {
-    ReactGA.event(object);
+    window?.gtag('event', 'sign_up', { 'method': 'email' });
   }
 };
 

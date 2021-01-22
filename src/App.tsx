@@ -41,7 +41,7 @@ import RaisedBox from './components/RaisedBox';
 
 declare global {
   interface Window {
-    GA_INITIALIZED: any;
+    gtag: any;
   }
 }
 
@@ -122,14 +122,14 @@ const App = (props:any) => {
     });
   }, []);
 
-  /* Google Analytics */
-  useEffect(() => {
-    if (!window.GA_INITIALIZED as boolean) {
-      initGA();
-      window.GA_INITIALIZED = true;
-    }
-    logPageView();
-  }, []);
+  // /* Google Analytics */
+  // useEffect(() => {
+  //   if (!window.GA_INITIALIZED as boolean) {
+  //     initGA();
+  //     window.GA_INITIALIZED = true;
+  //   }
+  //   logPageView();
+  // }, []);
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   const leftSideRef = useRef<any>(null);
