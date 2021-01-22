@@ -56,7 +56,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
   const handleSelectSeries = (seriesMaturity: number) => {
     setActiveSeries(seriesMaturity);
     logEvent('change_series', {
-      from: activeSeries.displayName,
+      from: activeSeries.maturity,
       to: seriesMaturity,
     });
     navHistory.push(`/${pathname.split('/')[1]}/${seriesMaturity}`);
