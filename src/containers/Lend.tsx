@@ -94,7 +94,10 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
       await sellDai( activeSeries, inputValue);
       logEvent('lend', {
         value: inputValue,
+        type: 'DAI',
         series: activeSeries.displayName,
+        maturity: activeSeries.maturity,
+        time_to_maturity: (new Date().getTime()/1000) - activeSeries.maturity, 
       });
       /* clean up and refresh */ 
       setInputValue(undefined);

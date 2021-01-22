@@ -112,13 +112,11 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
       await borrowDai(activeSeries, 'ETH-A', inputValue);
 
       logEvent('Borrow', { 
-        amount: inputValue, 
-        series: activeSeries.displayName,    
-      });
-
-      logEvent('purchase', { 
-        value: inputValue, 
-        transaction_id: activeSeries.displayName,    
+        value: inputValue,
+        type: 'DAI',
+        series: activeSeries.displayName,
+        maturity: activeSeries.maturity, 
+        time_to_maturity: (new Date().getTime()/1000) - activeSeries.maturity,    
       });
 
       /* clean up and refresh */               

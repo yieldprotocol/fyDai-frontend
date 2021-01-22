@@ -146,11 +146,14 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
       setCollInputValue(undefined);
       setDebtInputValue(undefined);
 
-      logEvent('importPosition', {
+      logEvent('import_position', {
         value_coll: String(valueColl),
+        type_coll: 'ETH-A',
         value_debt: String(valueDebt),
+        type_debt: 'DAI',
         one_click: false,
         label: activeSeries.displayName,
+        time_to_maturity: (new Date().getTime()/1000) - activeSeries.maturity, 
       });
 
       close && close();
@@ -165,11 +168,16 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
 
     if (!allDisabled) {
       await importVault(activeSeries, id);
-      logEvent('importPosition', {
+      logEvent('import_position', {
         value_coll: String(selectedVault?.vaultCollateral_),
+        type_coll: 'ETH-A',
         value_debt: String(selectedVault?.vaultDaiDebt_),
+        type_debt: 'DAI',
+        source: 'MAKER',
         one_click: true,
         label: activeSeries.displayName,
+        maturity: activeSeries.maturity, 
+        time_to_maturity: (new Date().getTime()/1000) - activeSeries.maturity, 
       });
 
       close && close();

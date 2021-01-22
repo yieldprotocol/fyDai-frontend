@@ -62,9 +62,9 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
     if (inputValue && !withdrawDisabled ) {
       close(); // close immediately, no need to track withdrawPending
       await withdrawEth(inputValue);
-      logEvent('withdraw', {
-        collateral_type: 'ETH-A',
+      logEvent('withdraw_collateral', {
         value: inputValue,
+        type: 'ETH-A',
       });
       /* clean up and refresh */ 
       setInputValue(undefined);

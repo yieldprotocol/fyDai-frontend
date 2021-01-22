@@ -106,8 +106,9 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
     if (inputValue && !depositDisabled ) {
       setDepositPending(true);
       await postEth(inputValue);
-      logEvent('deposit', {
-        value: inputValue
+      logEvent('deposit_collateral', {
+        value: inputValue, 
+        type: 'ETH-A',
       });
       
       /* clean up and refresh */

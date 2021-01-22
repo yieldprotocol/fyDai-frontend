@@ -65,7 +65,10 @@ function Repay({ close }:IRepayProps) {
       await repayDaiDebt(activeSeries, 'ETH-A', value);
       logEvent('repay', {
         value: String(value),
+        type: 'DAI',
         label: activeSeries.displayName,
+        maturity: activeSeries.maturity, 
+        time_to_maturity: (new Date().getTime()/1000) - activeSeries.maturity, 
       });
       
       /* clean up and refresh */ 
