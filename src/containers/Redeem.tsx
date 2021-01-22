@@ -35,10 +35,9 @@ const Redeem  = ({ close }:IRedeemProps)  => {
   const redeemProcedure = async () =>{
     if(!redeemDisabled) {
       await redeem(activeSeries, activeSeries.fyDaiBalance.toString());
-      logEvent({
-        category: 'Redeem',
-        action: String(activeSeries.fyDaiBalance),
-        label: activeSeries.displayName || activeSeries.poolAddress,
+      logEvent('redeem', {
+        value: String(activeSeries.fyDaiBalance),
+        series: activeSeries.displayName,
       });
       /* clean up and refresh */ 
       await Promise.all([

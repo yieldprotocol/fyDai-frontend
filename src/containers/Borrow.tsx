@@ -116,6 +116,11 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
         series: activeSeries.displayName,    
       });
 
+      logEvent('purchase', { 
+        value: inputValue, 
+        transaction_id: activeSeries.displayName,    
+      });
+
       /* clean up and refresh */               
       setInputValue(undefined);
       await Promise.all([

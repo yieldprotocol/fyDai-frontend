@@ -16,8 +16,7 @@ import { UserContext } from '../contexts/UserContext';
 import { useMaker } from '../hooks/makerHook';
 
 const handleExternal = (destination: string) => {
-  logEvent({
-    category: 'External Link',
+  logEvent('external_link', {
     action: destination
   });
 };

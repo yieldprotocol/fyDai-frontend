@@ -89,10 +89,9 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
     if (inputValue && !addLiquidityDisabled ) {
  
       await addLiquidity( activeSeries, inputValue );
-      logEvent({
-        category: 'Pool',
-        action: inputValue,
-        label: activeSeries.displayName || activeSeries.poolAddress,
+      logEvent( 'addLiquidity', {
+        value: inputValue,
+        series: activeSeries.displayName || activeSeries.poolAddress,
       });
       
       /* clean up and refresh */ 

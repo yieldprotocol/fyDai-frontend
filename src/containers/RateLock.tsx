@@ -41,6 +41,7 @@ import logoLight from '../assets/images/logo_light.svg';
 import AprBadge from '../components/AprBadge';
 import SeriesSelector from '../components/SeriesSelector';
 import { useSignerAccount } from '../hooks/connectionHooks';
+import { logEvent } from '../utils/analytics';
 
 interface IRateLockProps {
   close?: any; // close is also used as a indicator used as a layer (only a layer should have a closed)
@@ -127,20 +128,31 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
   /* action prcedures */
   const importProcedure = async () => {
     if ( collInputValue || debtInputValue && !advancedDisabled ) {
+
+      /* if  or, there is no dai, but there is collateral left, the collateral value needs to be exact */ 
+      const valueColl = ( collInputValue >= selectedVault.vaultCollateral_ ) || parseFloat(selectedVault.vaultMakerDebt_)===0  ?
+        selectedVault.vaultCollateral : 
+        debouncedCollInput;
+      /* if the value approximates the max value OR there appears to be no Dai, use the EXACT value of the MakerDebt */
+      const valueDebt =  ( parseFloat(debouncedDebtInput) === parseFloat(selectedVault.vaultDaiDebt_ ) || parseFloat(selectedVault.vaultDaiDebt_)===0 ) ? 
+        selectedVault.vaultMakerDebt :
+        debouncedDebtInput;
+
       await importPosition(
         activeSeries,
-        /* if  or, there is no dai, but there is collateral left, the collateral value needs to be exact */ 
-        ( collInputValue >= selectedVault.vaultCollateral_ ) || parseFloat(selectedVault.vaultMakerDebt_)===0  ?
-          selectedVault.vaultCollateral : 
-          debouncedCollInput,
-        /* if the value approximates the max value OR there appears to be no Dai, use the EXACT value of the MakerDebt */
-        ( parseFloat(debouncedDebtInput) === parseFloat(selectedVault.vaultDaiDebt_ ) || parseFloat(selectedVault.vaultDaiDebt_)===0 ) ? 
-          selectedVault.vaultMakerDebt :
-          debouncedDebtInput,
-
+        valueColl,
+        valueDebt,
         selectedVault.vaultId);
       setCollInputValue(undefined);
       setDebtInputValue(undefined);
+
+      logEvent('importPosition', {
+        value_coll: String(valueColl),
+        value_debt: String(valueDebt),
+        one_click: false,
+        label: activeSeries.displayName,
+      });
+
       close && close();
       await Promise.all([
         userActions.updateUser(),
@@ -150,8 +162,16 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
   };
   
   const importAllProcedure = async (id:number) => {
+
     if (!allDisabled) {
       await importVault(activeSeries, id);
+      logEvent('importPosition', {
+        value_coll: String(selectedVault?.vaultCollateral_),
+        value_debt: String(selectedVault?.vaultDaiDebt_),
+        one_click: true,
+        label: activeSeries.displayName,
+      });
+
       close && close();
       await Promise.all([
         userActions.updateUser(),

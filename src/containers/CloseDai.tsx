@@ -64,10 +64,9 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
         activeSeries,
         inputValue,
       );
-      logEvent({
-        category: 'ClosePosition',
-        action: inputValue,
-        label: activeSeries.displayName || activeSeries.poolAddress,
+      logEvent('ClosePosition', {
+        value: inputValue,
+        series: activeSeries.displayName,
       });
       
       /* clean up and refresh */ 

@@ -106,9 +106,8 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
     if (inputValue && !depositDisabled ) {
       setDepositPending(true);
       await postEth(inputValue);
-      logEvent({
-        category: 'Deposit',
-        action: inputValue
+      logEvent('deposit', {
+        value: inputValue
       });
       
       /* clean up and refresh */

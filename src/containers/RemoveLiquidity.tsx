@@ -67,10 +67,9 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
       await removeLiquidity(activeSeries, value);
       
       /* log event */
-      logEvent({
-        category: 'Remove Liquidity',
-        action: String(value),
-        label: activeSeries.displayName || activeSeries.poolAddress,
+      logEvent('removeLiquidity', {
+        value: String(value),
+        series: activeSeries.displayName,
       });
 
       /* clean up and refresh */ 

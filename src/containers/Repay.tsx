@@ -63,10 +63,9 @@ function Repay({ close }:IRepayProps) {
       !activeSeries?.isMature() && close();
       /* repay using proxy */
       await repayDaiDebt(activeSeries, 'ETH-A', value);
-      logEvent({
-        category: 'Repay',
-        action: String(value),
-        label: activeSeries.displayName || activeSeries.poolAddress,
+      logEvent('repay', {
+        value: String(value),
+        label: activeSeries.displayName,
       });
       
       /* clean up and refresh */ 
