@@ -6,19 +6,24 @@ import {
   Box,
   Text,
   ResponsiveContext,
+  Collapsible,
 } from 'grommet';
 import { 
   FiArrowLeft as ArrowLeft,
   FiRefreshCcw as Refresh,
-
+  FiChevronUp as ArrowUp,
+  FiChevronDown as ArrowDown, 
 } from 'react-icons/fi';
 
-import { useSignerAccount, useConnection } from '../hooks/connectionHooks';
 
+import { UserContext } from '../contexts/UserContext';
+import { YieldContext } from '../contexts/YieldContext';
+
+import { useSignerAccount, useConnection } from '../hooks/connectionHooks';
 import { injected, walletconnect } from '../connectors';
 import metamaskImage from '../assets/images/providers/metamask.png';
 import walletConnectImage from '../assets/images/providers/walletconnect.png';
-import { UserContext } from '../contexts/UserContext';
+
 import RaisedButton from '../components/RaisedButton';
 import FlatButton from '../components/FlatButton';
 import TxHistory from '../components/TxHistory';
@@ -29,15 +34,20 @@ import TxRecent from '../components/TxRecent';
 
 const ConnectLayer = ({ view, target, closeLayer }: any) => {
 
+  const { state: { yieldData } } = useContext(YieldContext);
+
   const { state: { position }, actions } = useContext(UserContext);
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
+
   
   const { handleSelectConnector } = useConnection();
-
   const { account, provider, chainId } = useSignerAccount();
+
   const [ layerView, setLayerView] = useState<string>(view);
   const [ histOpen, setHistOpen] = useState<string>('BORROW');
+  const [ diagnosticsOpen, setDiagnosticsOpen] = useState<boolean>(false);
 
+  
   const connectorList = [
     { name: 'Metamask', image: metamaskImage, connection: injected, trial: false },
     { name: 'Wallet Connect', image: walletConnectImage, connection: walletconnect, trial: true },
@@ -109,20 +119,31 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                 <TxRecent setView={()=>setLayerView('HISTORY')} />
                 <YieldSettings />
 
-                <Box pad="small" gap="small" border='all' round='xsmall'>
-                  <Box direction='row' justify='between'>
-                    <Text alignSelf='start' size='small' weight='bold'>Diagnostics Info</Text> 
-                    <RaisedButton 
-                      label={<Box pad='xsmall'><Text size='xxsmall'>Factory Reset</Text></Box>}
-                    // eslint-disable-next-line no-restricted-globals
-                      onClick={()=>{localStorage.clear(); location.reload();}}
-                    /> 
+                <Box pad={{ horizontal:'small', top:'small', bottom:undefined }} gap="small" border='all' round='xsmall'>
 
+                  <Box direction='row' justify='between' onClick={()=>setDiagnosticsOpen(!diagnosticsOpen)}>
+                    <Text alignSelf='start' size='small' weight='bold'>Diagnostics Info</Text> 
+                    { diagnosticsOpen ? <ArrowUp /> : <ArrowDown /> }
                   </Box>
-                  <Text size='xxsmall'>App Version: 0.4.0</Text>
-                  <Text size='xxsmall'>Connected Network: { provider?.network?.name }</Text>
-                  <Text size='xxsmall'>Yield protocol Ref contract: {process.env[`REACT_APP_MIGRATION_${chainId}`]} </Text>       
+                  <Collapsible open={diagnosticsOpen}>
+                    <Box gap='small' pad={{ bottom:'small' }}>
+                      <Text size='xxsmall'>App Version: { yieldData.appVersion }</Text>
+                      <Text size='xxsmall'>Connected Network: { provider?.network?.name }</Text>
+                      <Text size='xxsmall'>Yield Version: { yieldData.contractsVersion }</Text>
+                      <Text size='xxsmall'>Yield protocol Ref contract: {process.env[`REACT_APP_MIGRATION_${chainId}`]} </Text> 
+
+                      <Box direction='row' justify='between'>
+                        <Box />
+                        <RaisedButton 
+                          label={<Box pad='xsmall'><Text size='xxsmall'>Factory Reset</Text></Box>}
+                          // eslint-disable-next-line no-restricted-globals
+                          onClick={()=>{localStorage.clear(); location.reload();}}
+                        /> 
+                      </Box>
+                    </Box>
+                  </Collapsible>     
                 </Box>
+
               </Box> }
 
               { layerView === 'CONNECT' &&      

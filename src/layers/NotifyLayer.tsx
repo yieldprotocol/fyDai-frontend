@@ -104,7 +104,7 @@ function NotifyLayer(target:any) {
             <Box direction='row' align='center'>
               { notificationTypeMap('null').icon }
               <Box align="center" direction="row" gap="small" pad='small'>
-                <Text size='small' color={notificationTypeMap('null').textColor}>A Yield app update is available.</Text>
+                <Text size='small' color='text'>A Yield app update is available.</Text>
               </Box>
             </Box>
           }
