@@ -218,9 +218,10 @@ const YieldProvider = ({ children }: any) => {
    */
   const _getYieldData = async (_deployedContracts: any, _deployedSeries: IYieldSeries[]): Promise<any> => {
     const _yieldData: any = {};
-    _yieldData.version = await getYieldVersion();
+    _yieldData.contractsVersion = await getYieldVersion();
+    _yieldData.appVersion = process.env.REACT_APP_VERSION;
     // eslint-disable-next-line no-console
-    console.log('Contract Version:', _yieldData.version);
+    console.log('Contract Version:', _yieldData.contractsVersion, 'Contract Version:', _yieldData.appVersion, );
     return {
       ..._yieldData,
     };
