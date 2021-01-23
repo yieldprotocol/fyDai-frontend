@@ -12,7 +12,9 @@ import { CgSleep as Moodlight } from 'react-icons/cg';
 
 import { logEvent } from '../utils/analytics';
 
+import { YieldContext } from '../contexts/YieldContext';
 import { UserContext } from '../contexts/UserContext';
+
 import { useMaker } from '../hooks/makerHook';
 
 const handleExternal = (destination: string) => {
@@ -42,9 +44,8 @@ const YieldFooter = (props: any) => {
     toggleMoodLight,
   } = props;
 
-  const { state: { preferences, authorization }, actions: { updatePreferences } } = useContext(UserContext);
-
-  const { genVault } = useMaker();
+  const { state: { preferences }, actions: { updatePreferences } } = useContext(UserContext);
+  const { state: { yieldData } } = useContext(YieldContext);
 
   const IconSize = '1.15rem';
   const IconGap = 'small';
@@ -77,7 +78,7 @@ const YieldFooter = (props: any) => {
 
         <Box margin={{ left:'small' }}>
           <Text size='xxsmall' color='grey'>
-            This software is v0.4.0
+            This software is v{yieldData.appVersion}
           </Text>
           <Text size='xxsmall' color='grey'> Having issues? Try an app <Anchor onClick={()=>resetApp()}>RESET</Anchor>, or get hold of us via <Anchor href='https://discord.gg/JAFfDj5' target="_blank" onClick={() => handleExternal('Discord')}>discord</Anchor>. </Text>
         </Box>
