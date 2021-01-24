@@ -120,8 +120,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
         case "buyFYDai":
           await buyFYDai( activeSeries, inputValue);
           break;
-  
-      }
+        }
 
       setInputValue(undefined);
       await Promise.all([
@@ -156,6 +155,14 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
         setFromQuantity(0);
       } ;
     }
+    if (inputFromQuantity && fromToken === "fyDAI") {
+      console.log("hit sellFYDai")
+      trade = "sellFYDai";
+      setFromQuantity( debouncedInput );
+      if (!debouncedInput) {
+        setToQuantity(0);
+      } ;
+    }
     setTradeType ( trade );
 
     console.log("fromToken: ", fromToken);
@@ -186,8 +193,12 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
             console.log("priceImpact: ", ( calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) ) - ( calcAPR( ethers.utils.parseEther("1"), spotPreview, activeSeries?.maturity ) )  )
             break;
           case "sellFYDai":
-            setMinDaiOut(parseFloat(ethers.utils.formatEther(preview)));
-            console.log("setMinFYDaiOut: ", setMinFYDaiOut)
+            console.log("preview: ", roundTo(parseFloat(ethers.utils.formatEther(preview)), 3))
+            setToQuantity(roundTo(parseFloat(ethers.utils.formatEther(preview)), 3))
+            setAPR( calcAPR( preview, ethers.utils.parseEther(debouncedInput.toString()), activeSeries?.maturity ) );                  
+            setPriceImpact(( calcAPR( preview, ethers.utils.parseEther(debouncedInput.toString()), activeSeries?.maturity ) ) - ( calcAPR( spotPreview, ethers.utils.parseEther("1"), activeSeries?.maturity ) ))   
+            console.log("APR: ", calcAPR( preview, ethers.utils.parseEther(debouncedInput.toString()), activeSeries?.maturity ))
+            console.log("priceImpact: ", ( calcAPR( preview, ethers.utils.parseEther(debouncedInput.toString()), activeSeries?.maturity ) ) - ( calcAPR( spotPreview, ethers.utils.parseEther("1"), activeSeries?.maturity ) )   )
             break;
           case "buyFYDai":
             setMaxDaiIn(parseFloat(ethers.utils.formatEther(preview)));
