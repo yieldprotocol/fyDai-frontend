@@ -101,7 +101,8 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
   const [ toQuantity, setToQuantity ] = useState<number>(0);
   const [ inputFromQuantity, setInputFromQuantity ] = useState<boolean>(true);
   const [ priceImpact, setPriceImpact ] = useState<number>(0);
-  const [tradeType, setTradeType] = useState<string>("");
+  const [ tradeType, setTradeType ] = useState<string>("");
+  let trade: string = "";
 
   /* Lend execution flow */
   const tradeProcedure = async () => {
@@ -139,29 +140,50 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
 
   /* Handle input (debounce input) changes */
   useEffect(() => {
-    setFromQuantity( debouncedInput );
     if (inputFromQuantity && fromToken === "DAI") {
-        setTradeType( "sellDai" );
-      }
-    
-  activeSeries && !(activeSeries?.isMature()) && !!debouncedInput && ( async () => {
-      const preview = await previewPoolTx(tradeType, activeSeries, debouncedInput);
-      const spotPreview = await previewPoolTx(tradeType, activeSeries, 1);
+      console.log("hit sellDai")
+      trade = "sellDai";
+      setFromQuantity( debouncedInput );
+      if (!debouncedInput) {
+        setToQuantity(0);
+      } ;
+    }
+    if (!inputFromQuantity && toToken === "DAI") {
+      console.log("hit buyDai")
+      trade = "buyDai";
+      setToQuantity( debouncedInput );
+      if (!debouncedInput) {
+        setFromQuantity(0);
+      } ;
+    }
+    setTradeType ( trade );
+
+    console.log("fromToken: ", fromToken);
+    console.log("toToken: ", toToken);
+    console.log("debouncedInput: ", debouncedInput);
+    console.log("inputFromQuantity: ", inputFromQuantity);
+    console.log("trade: ", trade);
+
+    activeSeries && !(activeSeries?.isMature()) &&  !!debouncedInput &&  ( async () => {
+    const preview = await previewPoolTx(trade, activeSeries, debouncedInput);
+    const spotPreview = await previewPoolTx(trade, activeSeries, 1);
       if (!(preview instanceof Error) && !(spotPreview instanceof Error)) {
-        switch(tradeType) {
+        switch(trade) {
           case "sellDai":
+            console.log("preview: ", roundTo(parseFloat(ethers.utils.formatEther(preview)), 3))
             setToQuantity(roundTo(parseFloat(ethers.utils.formatEther(preview)), 3))
-            console.log("APR: ", calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ))
-            console.log("spotAPR: ", calcAPR( ethers.utils.parseEther("1"), spotPreview, activeSeries?.maturity ) )
             setAPR( calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) );                  
-            setSpotAPR( calcAPR( ethers.utils.parseEther("1"), spotPreview, activeSeries?.maturity ) ); 
-            setPriceImpact(spotAPR - APR)   
+            setPriceImpact(( calcAPR( ethers.utils.parseEther("1"), spotPreview, activeSeries?.maturity ) ) - ( calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) ))   
+            console.log("APR: ", calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ))
+            console.log("priceImpact: ", ( calcAPR( ethers.utils.parseEther("1"), spotPreview, activeSeries?.maturity ) ) - ( calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) ) )
             break;
           case "buyDai":
-            setFYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
-            setMaxFYDaiIn(parseFloat(ethers.utils.formatEther(preview)));
-            console.log("setMaxFYDaiIn: ", setMaxFYDaiIn)
-            setAPR( calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) );      
+            console.log("preview: ", roundTo(parseFloat(ethers.utils.formatEther(preview)), 3))
+            setFromQuantity(roundTo(parseFloat(ethers.utils.formatEther(preview)), 3))
+            setAPR( calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) );                  
+            setPriceImpact(( calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) ) - ( calcAPR( ethers.utils.parseEther("1"), spotPreview, activeSeries?.maturity ) ))   
+             console.log("APR: ", calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ))
+            console.log("priceImpact: ", ( calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) ) - ( calcAPR( ethers.utils.parseEther("1"), spotPreview, activeSeries?.maturity ) )  )
             break;
           case "sellFYDai":
             setMinDaiOut(parseFloat(ethers.utils.formatEther(preview)));
@@ -182,7 +204,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
         setErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
       }
     })();
-  }, [activeSeries, debouncedInput]);
+  }, [activeSeries, debouncedInput, inputValue]);
 
   /* handle active series loads and changes */
   useEffect(() => {
@@ -225,14 +247,11 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
           inputValue && 
           (document.activeElement !== inputRef) && 
           setInputValue(debouncedInput.toString().slice(0, -1));
-          if (inputValue.length === 1) {
-            if(inputFromQuantity) {
-              setToQuantity(0);
-            } else if(!inputFromQuantity) {
-              setFromQuantity(0);
-            }
-          }
-
+          if (inputValue.length === 0) {
+            setInputValue(0);
+            setToQuantity(0);
+            setFromQuantity(0);
+          } 
         }}
         target='document'
       >
