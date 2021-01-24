@@ -163,6 +163,16 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
         setToQuantity(0);
       } ;
     }
+
+    if (!inputFromQuantity && toToken === "fyDAI") {
+      console.log("hit buyFYDai")
+      trade = "buyFYDai";
+      setToQuantity( debouncedInput );
+      if (!debouncedInput) {
+        setFromQuantity(0);
+      } ;
+    }
+
     setTradeType ( trade );
 
     console.log("fromToken: ", fromToken);
@@ -185,24 +195,28 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
             console.log("priceImpact: ", ( calcAPR( ethers.utils.parseEther("1"), spotPreview, activeSeries?.maturity ) ) - ( calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) ) )
             break;
           case "buyDai":
-            console.log("preview: ", roundTo(parseFloat(ethers.utils.formatEther(preview)), 3))
             setFromQuantity(roundTo(parseFloat(ethers.utils.formatEther(preview)), 3))
             setAPR( calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) );                  
             setPriceImpact(( calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) ) - ( calcAPR( ethers.utils.parseEther("1"), spotPreview, activeSeries?.maturity ) ))   
-             console.log("APR: ", calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ))
+            console.log("preview: ", roundTo(parseFloat(ethers.utils.formatEther(preview)), 3))
+            console.log("APR: ", calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ))
             console.log("priceImpact: ", ( calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) ) - ( calcAPR( ethers.utils.parseEther("1"), spotPreview, activeSeries?.maturity ) )  )
             break;
           case "sellFYDai":
-            console.log("preview: ", roundTo(parseFloat(ethers.utils.formatEther(preview)), 3))
             setToQuantity(roundTo(parseFloat(ethers.utils.formatEther(preview)), 3))
             setAPR( calcAPR( preview, ethers.utils.parseEther(debouncedInput.toString()), activeSeries?.maturity ) );                  
             setPriceImpact(( calcAPR( preview, ethers.utils.parseEther(debouncedInput.toString()), activeSeries?.maturity ) ) - ( calcAPR( spotPreview, ethers.utils.parseEther("1"), activeSeries?.maturity ) ))   
+            console.log("preview: ", roundTo(parseFloat(ethers.utils.formatEther(preview)), 3))
             console.log("APR: ", calcAPR( preview, ethers.utils.parseEther(debouncedInput.toString()), activeSeries?.maturity ))
             console.log("priceImpact: ", ( calcAPR( preview, ethers.utils.parseEther(debouncedInput.toString()), activeSeries?.maturity ) ) - ( calcAPR( spotPreview, ethers.utils.parseEther("1"), activeSeries?.maturity ) )   )
             break;
           case "buyFYDai":
-            setMaxDaiIn(parseFloat(ethers.utils.formatEther(preview)));
-            console.log("MaxDaiIn: ", setMaxDaiIn)
+            setFromQuantity(roundTo(parseFloat(ethers.utils.formatEther(preview)), 3))
+            setAPR( calcAPR( preview, ethers.utils.parseEther(debouncedInput.toString()), activeSeries?.maturity ) );                  
+            setPriceImpact( ( calcAPR( spotPreview, ethers.utils.parseEther("1"), activeSeries?.maturity ) ) - ( calcAPR( preview, ethers.utils.parseEther(debouncedInput.toString()), activeSeries?.maturity ) ) )   
+            console.log("preview: ", roundTo(parseFloat(ethers.utils.formatEther(preview)), 3))
+            console.log("APR: ", calcAPR( preview, ethers.utils.parseEther(debouncedInput.toString()), activeSeries?.maturity ))
+            console.log("priceImpact: ", ( calcAPR( spotPreview, ethers.utils.parseEther("1"), activeSeries?.maturity ) ) - ( calcAPR( preview, ethers.utils.parseEther(debouncedInput.toString()), activeSeries?.maturity ) )  )
             break;
         }
               
