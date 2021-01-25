@@ -1,7 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { NavLink, useHistory, useParams } from 'react-router-dom';
 import ethers from 'ethers';
-
 import { 
   Box,
   Keyboard,
@@ -17,19 +16,24 @@ import {
   FiArrowLeft as ArrowLeft,
 } from 'react-icons/fi';
 
+/* utils and support */
 import { cleanValue } from '../utils';
+import { logEvent } from '../utils/analytics';
 
+/* contexts */
 import { UserContext } from '../contexts/UserContext';
 
-/* hook pack */
+/* hooks */
 import { useSignerAccount } from '../hooks/connectionHooks';
 import { useDebounce, useIsLol } from '../hooks/appHooks';
 import { useMath } from '../hooks/mathHooks';
 import { useTxActive } from '../hooks/txHooks';
 import { useBorrowProxy } from '../hooks/borrowProxyHook';
 
+/* containers */
 import WithdrawEth from './WithdrawEth';
 
+/* components */
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
 import TxStatus from '../components/TxStatus';
@@ -38,13 +42,9 @@ import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
 import CollateralDescriptor from '../components/CollateralDescriptor';
 import RaisedBox from '../components/RaisedBox';
-
 import EthMark from '../components/logos/EthMark';
 import YieldMobileNav from '../components/YieldMobileNav';
 import Loading from '../components/Loading';
-
-import { logEvent } from '../utils/analytics';
-import MakerMark from '../components/logos/MakerMark';
 
 interface DepositProps {
   /* deposit amount prop is for quick linking into component */
@@ -53,9 +53,14 @@ interface DepositProps {
 }
 
 const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
+
   const history = useHistory();
+  const { amnt }:any = useParams(); /* check if the user sent in any requested amount in the url */ 
+  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
+
+  /* state from context */
   const { state: userState, actions: userActions } = useContext(UserContext);
-  const { position, makerVaults, userLoading } = userState;
+  const { position } = userState;
   const {
     ethBalance,
     ethPosted,
@@ -64,35 +69,26 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
     debtValue,
   } = position;
 
-  /* check if the user sent in any requested amount in the url */ 
-  const { amnt }:any = useParams();
-
-  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
-
-  const { postEth }  = useBorrowProxy();
-  const { estCollateralRatio, estBorrowingPower } = useMath();
-  const [ txActive ] = useTxActive(['POST', 'WITHDRAW']);
-
-  const { account } = useSignerAccount();
-
+  /* local state */
   const [ inputValue, setInputValue ] = useState<any>(amnt || undefined);
-  const debouncedInput = useDebounce(inputValue, 500);
-
   const [inputRef, setInputRef] = useState<any>(null);
-
   const [ estPercent, setEstPercent ] = useState<string|undefined>(undefined);
   const [ estPower, setEstPower ] = useState<any>(0);
   const [ maxPower, setMaxPower ] = useState<any>(0);
-
   const [ withdrawOpen, setWithdrawOpen ] = useState<boolean>(false);
-  const [ rateLockOpen, setMigrateOpen ] = useState<boolean>(false);
-
   const [ depositPending, setDepositPending ] = useState<boolean>(false);
   const [ depositDisabled, setDepositDisabled ] = useState<boolean>(true);
-
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
+
+  /* init hooks */
+  const { postEth }  = useBorrowProxy();
+  const { estCollateralRatio, estBorrowingPower } = useMath();
+  const [ txActive ] = useTxActive(['POST', 'WITHDRAW']);
+  const { account } = useSignerAccount();
+  const debouncedInput = useDebounce(inputValue, 500);
   const isLol = useIsLol(inputValue);
+
 
   /* Steps required to deposit and update values */
   const depositProcedure = async () => {
@@ -253,11 +249,6 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
           <Layer onClickOutside={()=>setWithdrawOpen(false)}>
             <WithdrawEth close={()=>setWithdrawOpen(false)} />
           </Layer>}
-
-        {/* { rateLockOpen && makerVaults.length>0 &&
-          <Layer onClickOutside={()=>setMigrateOpen(false)}>
-            <RateLock close={()=>setMigrateOpen(false)} />
-          </Layer>} */}
       
         { (!txActive || txActive?.type === 'WITHDRAW') &&
         <Box
@@ -271,7 +262,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
 
           <Box direction='row-responsive' justify='between'>
             <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to deposit</Text>
-            {
+            {/* {
             !mobile && !userLoading &&
             <RaisedButton
               disabled={!!inputValue || makerVaults.length===0}
@@ -283,12 +274,12 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
               }
               onClick={()=>setMigrateOpen(true)}
             />
-            }
+            } */}
           </Box>
 
           <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
             <TextInput
-              ref={(el:any) => {el && !withdrawOpen && !rateLockOpen && !mobile && el.focus(); setInputRef(el);}} 
+              ref={(el:any) => {el && !withdrawOpen && !mobile && el.focus(); setInputRef(el);}} 
               type='number'
               placeholder={(!mobile && !modalView) ? 'Enter the ETH amount to deposit': 'ETH'}
               value={inputValue || ''}
@@ -325,11 +316,6 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
                     loading: !ethPosted_ && depositPending && ethPosted_ !== 0,           
                     value: estPercent ? `${estPercent}%`: `${collateralPercent_}%` || '',
                     valuePrefix: null,
-                  // valueExtra: () => (
-                  //   <Text color='green' size='medium'> 
-                  //     {/* { inputValue && collateralPercent_ && ( (estRatio-collateralPercent_) !== 0) && `(+ ${(estRatio-collateralPercent_).toFixed(0)}%)` } */}
-                  //   </Text>
-                  // )
                   },
                   {
                     label: '',

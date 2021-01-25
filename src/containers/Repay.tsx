@@ -21,7 +21,6 @@ import { useBorrowProxy } from '../hooks/borrowProxyHook';
 
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
-import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
 
@@ -37,26 +36,29 @@ interface IRepayProps {
 
 function Repay({ close }:IRepayProps) {
 
-  const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
+  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
+
+  /* state from context */
+  const { state: { activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
   const activeSeries = seriesData.get(activeSeriesId);
   const { state: userState, actions: userActions } = useContext(UserContext);
   const { daiBalance } = userState.position;
-  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
+  /* local state */
+  const [ inputValue, setInputValue ] = useState<any>();
+  const [inputRef, setInputRef] = useState<any>(null);
+  const [maxRepay, setMaxRepay] = useState<any>();
+  const [ repayDisabled, setRepayDisabled ] = useState<boolean>(true);
+  const [ warningMsg, setWarningMsg] = useState<string|null>(null);
+  const [ errorMsg, setErrorMsg] = useState<string|null>(null);
+
+  /* init hooks */
   const { repayDaiDebt } = useBorrowProxy();
   const [ txActive ] = useTxActive(['repay']);
   const { account } = useSignerAccount();
-
-  const [ inputValue, setInputValue ] = useState<any>();
-  const debouncedInput = useDebounce(inputValue, 500);
-  const [inputRef, setInputRef] = useState<any>(null);
-
-  const [maxRepay, setMaxRepay] = useState<any>();
-  const [ repayDisabled, setRepayDisabled ] = useState<boolean>(true);
-
-  const [ warningMsg, setWarningMsg] = useState<string|null>(null);
-  const [ errorMsg, setErrorMsg] = useState<string|null>(null);
   const isLol = useIsLol(inputValue);
+  const debouncedInput = useDebounce(inputValue, 500);
+
 
   const repayProcedure = async (value:number) => {
     if (!repayDisabled) {
@@ -245,9 +247,6 @@ function Repay({ close }:IRepayProps) {
             </Box>
           </Box>
         </Box>}
-
-      {/* { repayActive && !txActive && <ApprovalPending /> }
-      { txActive && <TxStatus tx={txActive} /> } */}
 
       {mobile && 
       !activeSeries?.isMature() &&

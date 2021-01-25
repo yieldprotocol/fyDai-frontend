@@ -2,26 +2,28 @@ import React, { useState, useContext, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Box, Keyboard, TextInput, Text, ResponsiveContext, Collapsible } from 'grommet';
 import ethers from 'ethers';
-
 import { FiArrowLeft as ArrowLeft } from 'react-icons/fi';
 
+/* utils and support */
 import { cleanValue } from '../utils';
+import { logEvent } from '../utils/analytics';
 
+/* contexts */
 import { UserContext } from '../contexts/UserContext';
 
+/* hooks */
 import { useDebounce, useIsLol } from '../hooks/appHooks';
 import { useMath } from '../hooks/mathHooks';
 import { useTxActive } from '../hooks/txHooks';
 import { useBorrowProxy } from '../hooks/borrowProxyHook';
 
+/* components */
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
 import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
 import EthMark from '../components/logos/EthMark';
 import YieldMobileNav from '../components/YieldMobileNav';
-
-import { logEvent } from '../utils/analytics';
 
 interface IWithDrawProps {
   close?: any;
@@ -30,6 +32,8 @@ interface IWithDrawProps {
 const WithdrawEth = ({ close }:IWithDrawProps) => {
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
+
+  /* state from contexts */
   const { state: { position }, actions: userActions } = useContext(UserContext);
   const {
     ethPosted,
@@ -38,25 +42,24 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
     debtValue,
     debtValue_,
   } = position;
-  
-  const { withdrawEth } = useBorrowProxy();
-  const { estCollateralRatio } = useMath();
-  const [ txActive ] = useTxActive(['WITHDRAW']);
 
+  /* local state */ 
   const [ inputValue, setInputValue ] = useState<any>();
-  const debouncedInput = useDebounce(inputValue, 500);
   const [inputRef, setInputRef] = useState<any>(null);
-
   const [ estPercent, setEstPercent ] = useState<string| undefined>(undefined);
   const [ maxWithdraw, setMaxWithdraw ] = useState<string>();
-
   const [ withdrawDisabled, setWithdrawDisabled ] = useState<boolean>(true);
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
 
+  /* init hooks */
+  const { withdrawEth } = useBorrowProxy();
+  const { estCollateralRatio } = useMath();
+  const [ txActive ] = useTxActive(['WITHDRAW']);
+  const debouncedInput = useDebounce(inputValue, 500);
   const isLol = useIsLol(inputValue);
 
-  /* Withdraw execution flow */
+  /* execution procedure */
   const withdrawProcedure = async () => {
     if (inputValue && !withdrawDisabled ) {
       close(); // close immediately, no need to track withdrawPending

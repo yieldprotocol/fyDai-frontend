@@ -5,6 +5,7 @@ import { Keyboard, Box, TextInput, Text, ThemeContext, ResponsiveContext, Collap
 import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 import { VscHistory as History } from 'react-icons/vsc';
 
+/* utils and support */
 import { logEvent } from '../utils/analytics';
 import { abbreviateHash, cleanValue, genTxCode } from '../utils';
 
@@ -20,7 +21,7 @@ import { useTxActive } from '../hooks/txHooks';
 import { usePool } from '../hooks/poolHook';
 import { useBorrowProxy } from '../hooks/borrowProxyHook';
 
-/* other containers */
+/* containers */
 import Repay from './Repay';
 import RateLock from './RateLock';
 
@@ -49,9 +50,13 @@ interface IBorrowProps {
 const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
 
   const navHistory = useHistory();
+  const { amnt }:any = useParams(); /* check if the user sent in any requested amount in the url (deep-linking) */ 
+  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
+  const theme = useContext<any>(ThemeContext);
+
+  /* state from context */
   const { state: { activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
   const activeSeries = seriesData.get(activeSeriesId);
-
   const { state: userState, actions: userActions } = useContext(UserContext);
   const { position, makerVaults, userLoading } = userState;
   const { 
@@ -64,49 +69,33 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
     daiBalance_,
   } = position;
 
-  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
-
-  const theme = useContext<any>(ThemeContext);
-
-  /* hooks init */
-  const { previewPoolTx }  = usePool();
-  const { borrowDai } = useBorrowProxy();
-  const { calculateAPR, estCollateralRatio } = useMath();
-  const { account } = useSignerAccount();
-  const { amnt }:any = useParams(); /* check if the user sent in any requested amount in the url (deep-linking) */ 
-  
-  const [ txActive ] = useTxActive(['BORROW']); /* txs to watch for */
-  const [ repayTxActive ] = useTxActive(['REPAY']); /* txs to watch for */
-
-  /* flags */
+  /* local state */
   const [ repayOpen, setRepayOpen ] = useState<boolean>(false);
   const [ rateLockOpen, setRateLockOpen ] = useState<boolean>(false);
   const [ histOpen, setHistOpen ] = useState<boolean>(false);
   const [ borrowDisabled, setBorrowDisabled ] = useState<boolean>(true);
-
-  const [showTxPending, setShowTxPending] = useState<boolean>(false);
-  useEffect(()=>{
-    setShowTxPending( txActive?.txCode === genTxCode('BORROW', activeSeries));
-  }, [txActive, activeSeries]);
-
-  /* input values */
-  const [ inputValue, setInputValue ] = useState<any|undefined>(amnt || undefined);
-  const debouncedInput = useDebounce(inputValue, 500);
-  const [inputRef, setInputRef] = useState<any>(null);
-  const isLol = useIsLol(inputValue);
-
-  /* warnings and errors */
-  const [ warningMsg, setWarningMsg] = useState<string|null>(null);
-  const [ errorMsg, setErrorMsg] = useState<string|any>(null);
-  
-  /* token balances and calculated values */
   const [ fyDaiValue, setFYDaiValue ] = useState<number>(0);
   const [ APR, setAPR ] = useState<string>();
   const [ estPercent, setEstPercent ] = useState<string|undefined>(undefined);
+  const [ warningMsg, setWarningMsg] = useState<string|null>(null);
+  const [ errorMsg, setErrorMsg] = useState<string|any>(null);
+  const [ inputValue, setInputValue ] = useState<any|undefined>(amnt || undefined);
+  const debouncedInput = useDebounce(inputValue, 500);
+  const [inputRef, setInputRef] = useState<any>(null);
 
-  /* Borrow execution flow */
+  /* init hooks */
+  const { previewPoolTx }  = usePool();
+  const { borrowDai } = useBorrowProxy();
+  const { calculateAPR, estCollateralRatio } = useMath();
+  const { account } = useSignerAccount();
+  const [ txActive ] = useTxActive(['BORROW']); /* txs to watch for */
+  const [ repayTxActive ] = useTxActive(['REPAY']); /* txs to watch for */
+  const isLol = useIsLol(inputValue);
+
+  /* 
+   * execution procedure
+   */
   const borrowProcedure = async () => {
-
     if (inputValue && !borrowDisabled) {
       await borrowDai(activeSeries, 'ETH-A', inputValue);
 
@@ -125,14 +114,15 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
     }
   };
 
-  /*
-  * Handle input (debounced input) changes:
-  * 1. dai to fyDai conversion and get APR (fyDai needed to compare with the approved allowance)
-  * 2. calcalute yield APR
-  * 3. calculate estimated collateralization ratio
-  */
+  /* show txs that are pending (tx matching the current series and borrow) */
+  const [showTxPending, setShowTxPending] = useState<boolean>(false);
+  useEffect(()=>{
+    setShowTxPending( txActive?.txCode === genTxCode('BORROW', activeSeries));
+  }, [txActive, activeSeries]);
+
+  /* Handle input (debounced input) changes: */
   useEffect(() => {
-    
+    /* Calculate expected collateralization ratio based on the input */
     account && position && position.debtValue && debouncedInput>0 && ( async () => {
       const newPercent = estCollateralRatio(
         position.ethPosted, 
@@ -142,6 +132,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
       setEstPercent( cleanValue(newPercent, 2) || undefined );
     })();
 
+    /* Calculate the expected APR based on input */
     activeSeries && debouncedInput>0 && ( async () => {
       const preview = await previewPoolTx('buyDai', activeSeries, debouncedInput);
       if (!(preview instanceof Error)) {
@@ -157,9 +148,10 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
         setErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
       }
     })();
-  }, [debouncedInput, activeSeries ]);
+
+  }, [debouncedInput, activeSeries]);
     
-  /* Handle borrow disabling deposits */
+  /* Handle borrow disabling deposits - disable if any of the conditions are met */
   useEffect(()=>{
     (
       (ethPosted && ethPosted.eq(ethers.constants.Zero) ) ||
@@ -167,10 +159,10 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
       !account ||
       !inputValue ||
       parseFloat(inputValue) <= 0
-    )? setBorrowDisabled(true): setBorrowDisabled(false);
+    ) ? setBorrowDisabled(true): setBorrowDisabled(false);
   }, [ inputValue ]);
 
-  /* Handle input exception logic */
+  /* Handle input exception logic (using debouncedInput to allow for small mistakes/corrections) */
   useEffect(() => {
     if ( 
       debouncedInput && 
@@ -388,6 +380,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
         </SeriesDescriptor>
    
         { 
+        /* If no transaction in progress : */
         !showTxPending && 
         <Box
           width={{ max: '600px' }}
@@ -599,6 +592,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
         showTxPending && 
         <TxStatus tx={txActive} />
         }
+
       </Keyboard>
 
       {

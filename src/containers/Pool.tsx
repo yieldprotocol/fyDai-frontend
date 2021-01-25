@@ -1,25 +1,31 @@
 import React, { useEffect, useState, useContext } from 'react';
+import { NavLink, useParams } from 'react-router-dom';
 import { ethers } from 'ethers';
 import { Box, Keyboard, TextInput, Text, ResponsiveContext, Collapsible, Layer } from 'grommet';
-
 import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 import { VscHistory as History } from 'react-icons/vsc';
 
-import { NavLink, useParams } from 'react-router-dom';
+/* utils and support */
 import { cleanValue, nFormatter } from '../utils';
+import { divDecimal, mulDecimal, calcTokensMinted } from '../utils/yieldMath';
+import { logEvent } from '../utils/analytics';
 
+/* contexts */
 import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
 
+/* hooks */ 
 import { useSignerAccount } from '../hooks/connectionHooks';
 import { useDebounce, useIsLol } from '../hooks/appHooks';
 import { useToken } from '../hooks/tokenHook';
 import { useTxActive } from '../hooks/txHooks';
 import { usePoolProxy } from '../hooks/poolProxyHook';
 
+/* containers */ 
 import RemoveLiquidity from './RemoveLiquidity';
 
+/* components */
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
 import TxStatus from '../components/TxStatus';
@@ -31,15 +37,9 @@ import SeriesMatureBox from '../components/SeriesMatureBox';
 import TxHistory from '../components/TxHistory';
 import HistoryWrap from '../components/HistoryWrap';
 import RaisedBox from '../components/RaisedBox';
-
 import DaiMark from '../components/logos/DaiMark';
 import YieldMobileNav from '../components/YieldMobileNav';
-
-import { logEvent } from '../utils/analytics';
-
 import Loading from '../components/Loading';
-import { divDecimal, mulDecimal, calcTokensMinted } from '../utils/yieldMath';
-
 
 interface IPoolProps {
   openConnectLayer:any;
@@ -47,43 +47,38 @@ interface IPoolProps {
   
 const Pool = ({ openConnectLayer }:IPoolProps) => {
 
-  /* check if the user sent in any requested amount in the url */ 
-  const { amnt }:any = useParams();
+  const { amnt }:any = useParams(); /* check if the user sent in any requested amount in the url */
+  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
+  /* state from contexts */
   const { state: { deployedContracts } } = useContext(YieldContext);
   const { state: { activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
   const activeSeries = seriesData.get(activeSeriesId);
-
   const { state: userState, actions: userActions } = useContext(UserContext);
   const { daiBalance } = userState.position;
-  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
+  /* local state */ 
+  const [ hasDelegated ] = useState<boolean>(true);
+  const [ inputValue, setInputValue ] = useState<any>(amnt || undefined);
+  const [inputRef, setInputRef] = useState<any>(null);
+  const [ removeLiquidityOpen, setRemoveLiquidityOpen ] = useState<boolean>(false);
+  const [ histOpen, setHistOpen ] = useState<boolean>(false);
+  const [ addLiquidityDisabled, setAddLiquidityDisabled ] = useState<boolean>(true);
+  const [ warningMsg, setWarningMsg] = useState<string|null>(null);
+  const [ errorMsg, setErrorMsg] = useState<string|null>(null);
+
+  /* init hooks */
   const { addLiquidity } = usePoolProxy();
   const { getBalance } = useToken();
-
   const [newPoolShare, setNewPoolShare] = useState<string>();
   const [calculating, setCalculating] = useState<boolean>(false);
-
   const { account } = useSignerAccount();
   const [ txActive ] = useTxActive(['ADD_LIQUIDITY', 'REMOVE_LIQUIDITY']);
   const [ removeTxActive ] = useTxActive(['REMOVE_LIQUIDITY']);
-
-  const [ hasDelegated ] = useState<boolean>(true);
-
-  const [ inputValue, setInputValue ] = useState<any>(amnt || undefined);
   const debouncedInput = useDebounce(inputValue, 500);
-  const [inputRef, setInputRef] = useState<any>(null);
-
-  const [ removeLiquidityOpen, setRemoveLiquidityOpen ] = useState<boolean>(false);
-  const [ histOpen, setHistOpen ] = useState<boolean>(false);
-
-  const [ addLiquidityDisabled, setAddLiquidityDisabled ] = useState<boolean>(true);
-
-  const [ warningMsg, setWarningMsg] = useState<string|null>(null);
-  const [ errorMsg, setErrorMsg] = useState<string|null>(null);
   const isLol = useIsLol(inputValue);
   
-  /* Add Liquidity sequence */ 
+  /* execution procedure */ 
   const addLiquidityProcedure = async () => { 
     if (inputValue && !addLiquidityDisabled ) {
  
@@ -104,6 +99,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
     }   
   };
 
+  // TODO move to mathHooks 
   const calculateNewPoolShare = async () => {
     setCalculating(true);
     const daiReserves = await getBalance(deployedContracts.Dai, 'Dai', activeSeries.poolAddress);
