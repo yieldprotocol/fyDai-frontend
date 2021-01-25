@@ -1,17 +1,13 @@
 import { useContext } from 'react';
-import { ethers, BigNumber }  from 'ethers';
-
-import * as utils from '../utils';
+import { BigNumber }  from 'ethers';
 
 import { YieldContext } from '../contexts/YieldContext';
-import { UserContext } from '../contexts/UserContext';
+
 import { 
-  divDecimal, 
   mulDecimal, 
   collateralizationRatio, 
   borrowingPower, 
-  calculateAPR as calcAPR, 
-  floorDecimal 
+  calculateAPR as calcAPR,
 } from '../utils/yieldMath';
 
 /**
@@ -25,7 +21,6 @@ import {
 export const useMath = () => {
 
   const { state: { feedData } } = useContext(YieldContext);
-  const  { state: { preferences: { slippage } } }  = useContext(UserContext);
 
   /**
    * Calculates the total value of collateral at the current unit price
@@ -64,35 +59,6 @@ export const useMath = () => {
     return borrowingPower( collateralAmount, feedData.ethPrice, debtValue ); 
   };
 
-
-  const calculateSlippage = (value:BigNumber, minimise:boolean=false ) => {
-    const slippageAmount = floorDecimal( mulDecimal(value, slippage));
-    if (minimise) {
-      return value.sub(slippageAmount);
-    } 
-    return value.add(slippageAmount);
-  };
-
-
-  // /**
-  //  * Split a certain amount of Dai liquidity into its fyDai and Dai componetnts
-  //  * 
-  //  * @param {BigNumber} daiAmount // amount dai to split
-  //  * @param { BigNumber } _daiReserves// Dai reserves
-  //  * @param { BigNumber } _fyDaiReserves// fyDai reservers
-  //  * 
-  //  * @returns  [ BigNumber, BigNumber ] returns an array of [dai, fyDai] 
-  //  */
-  // const splitDaiLiquidity =(
-  //   _daiAmount: BigNumber,
-  //   _daiReserves: BigNumber,
-  //   _fyDaiReserves: BigNumber,
-  // )=> {
-  //   const daiPortion = _daiAmount.mul(_daiReserves).div(_fyDaiReserves.add(_daiReserves));
-  //   const fyDaiPortion = _daiAmount.sub(daiPortion);
-  //   return [ daiPortion, fyDaiPortion ];
-  // };
-
   /**
    * Annualised Yield Rate
    *
@@ -115,7 +81,6 @@ export const useMath = () => {
 
   return {
     calculateAPR,
-    calculateSlippage,
     estCollateralValue,
     estCollateralRatio,
     estBorrowingPower,
