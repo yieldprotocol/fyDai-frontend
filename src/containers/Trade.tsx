@@ -142,24 +142,24 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
     if (inputFromQuantity && fromToken === "DAI") {
       console.log("hit sellDai")
       trade = "sellDai";
-      setFromQuantity( debouncedInput );
-      if (!debouncedInput) {
+      setFromQuantity( inputValue );
+      if (!inputValue) {
         setToQuantity(0);
       } ;
     }
     if (!inputFromQuantity && toToken === "DAI") {
       console.log("hit buyDai")
       trade = "buyDai";
-      setToQuantity( debouncedInput );
-      if (!debouncedInput) {
+      setToQuantity( inputValue );
+      if (!inputValue) {
         setFromQuantity(0);
       } ;
     }
     if (inputFromQuantity && fromToken === "fyDAI") {
       console.log("hit sellFYDai")
       trade = "sellFYDai";
-      setFromQuantity( debouncedInput );
-      if (!debouncedInput) {
+      setFromQuantity( inputValue );
+      if (!inputValue) {
         setToQuantity(0);
       } ;
     }
@@ -167,8 +167,8 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
     if (!inputFromQuantity && toToken === "fyDAI") {
       console.log("hit buyFYDai")
       trade = "buyFYDai";
-      setToQuantity( debouncedInput );
-      if (!debouncedInput) {
+      setToQuantity( inputValue );
+      if (!inputValue) {
         setFromQuantity(0);
       } ;
     }
@@ -177,7 +177,10 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
 
     console.log("fromToken: ", fromToken);
     console.log("toToken: ", toToken);
+    console.log("inputValue: ", inputValue);
     console.log("debouncedInput: ", debouncedInput);
+    console.log("typeof inputVale", typeof inputValue);
+    console.log("inputValue === '': ", inputValue === "")
     console.log("inputFromQuantity: ", inputFromQuantity);
     console.log("trade: ", trade);
 
@@ -189,6 +192,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
           case "sellDai":
             console.log("preview: ", roundTo(parseFloat(ethers.utils.formatEther(preview)), 3))
             setToQuantity(roundTo(parseFloat(ethers.utils.formatEther(preview)), 3))
+            if(inputValue === "") {setToQuantity(0)};
             setAPR( calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) );                  
             setPriceImpact(( calcAPR( ethers.utils.parseEther("1"), spotPreview, activeSeries?.maturity ) ) - ( calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) ))   
             console.log("APR: ", calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ))
@@ -196,6 +200,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
             break;
           case "buyDai":
             setFromQuantity(roundTo(parseFloat(ethers.utils.formatEther(preview)), 3))
+            if(inputValue === "") {setFromQuantity(0)};
             setAPR( calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) );                  
             setPriceImpact(( calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) ) - ( calcAPR( ethers.utils.parseEther("1"), spotPreview, activeSeries?.maturity ) ))   
             console.log("preview: ", roundTo(parseFloat(ethers.utils.formatEther(preview)), 3))
@@ -204,6 +209,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
             break;
           case "sellFYDai":
             setToQuantity(roundTo(parseFloat(ethers.utils.formatEther(preview)), 3))
+            if(inputValue === "") {setToQuantity(0)};
             setAPR( calcAPR( preview, ethers.utils.parseEther(debouncedInput.toString()), activeSeries?.maturity ) );                  
             setPriceImpact(( calcAPR( preview, ethers.utils.parseEther(debouncedInput.toString()), activeSeries?.maturity ) ) - ( calcAPR( spotPreview, ethers.utils.parseEther("1"), activeSeries?.maturity ) ))   
             console.log("preview: ", roundTo(parseFloat(ethers.utils.formatEther(preview)), 3))
@@ -212,6 +218,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
             break;
           case "buyFYDai":
             setFromQuantity(roundTo(parseFloat(ethers.utils.formatEther(preview)), 3))
+            if(inputValue === "") {setFromQuantity(0)};
             setAPR( calcAPR( preview, ethers.utils.parseEther(debouncedInput.toString()), activeSeries?.maturity ) );                  
             setPriceImpact( ( calcAPR( spotPreview, ethers.utils.parseEther("1"), activeSeries?.maturity ) ) - ( calcAPR( preview, ethers.utils.parseEther(debouncedInput.toString()), activeSeries?.maturity ) ) )   
             console.log("preview: ", roundTo(parseFloat(ethers.utils.formatEther(preview)), 3))
