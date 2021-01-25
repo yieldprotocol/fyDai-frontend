@@ -2,7 +2,7 @@ import React, { useEffect, useContext, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ethers, BigNumber } from 'ethers';
 
-import { cleanValue, ETH,  } from '../utils';
+import { cleanValue } from '../utils';
 import { calculateAPR, divDecimal, mulDecimal } from '../utils/yieldMath';
 
 import { IYieldSeries } from '../types';
@@ -14,7 +14,7 @@ import { usePool } from '../hooks/poolHook';
 
 import { useToken } from '../hooks/tokenHook';
 import { useController } from '../hooks/controllerHook';
-import { useCallTx } from '../hooks/chainHooks';
+
 
 const SeriesContext = React.createContext<any>({});
 
@@ -51,16 +51,12 @@ const SeriesProvider = ({ children }:any) => {
   const { account, provider, fallbackProvider, chainId } = useSignerAccount();
   const [ state, dispatch ] = React.useReducer(reducer, initState);
   const { state: yieldState } = useContext(YieldContext);
-  const { yieldLoading, deployedContracts } = yieldState;
+  const { yieldLoading } = yieldState;
 
-  const { previewPoolTx, checkPoolState } = usePool();
-  const { debtDai } = useController();
+  const { previewPoolTx, checkPoolState, poolTotalSupply } = usePool();
+  const { debtDai, debtFYDai } = useController();
   
   const { getBalance } = useToken();
-
-  const [ callTx ] = useCallTx();
-
-  // const { poolPercent: calcPercent }  = useMath();
 
   const { pathname } = useLocation();
   const [ seriesFromUrl, setSeriesFromUrl] = useState<number|null>(null);
@@ -89,7 +85,9 @@ const SeriesProvider = ({ children }:any) => {
         /* with no user */
         const [ sellFYDaiRate, totalSupply ] = await Promise.all([
           await previewPoolTx('sellFYDai', _x, 1),
-          await callTx(_x.poolAddress, 'Pool', 'totalSupply', []),
+          await poolTotalSupply(_x.poolAddress)
+          // await callTx(_x.poolAddress, 'Pool', 'totalSupply', []),
+
         ]);
 
         /* with user */
@@ -101,7 +99,7 @@ const SeriesProvider = ({ children }:any) => {
         ] =  account && await Promise.all([
           getBalance(_x.poolAddress, 'Pool', account),
           debtDai('ETH-A', _x.maturity ),
-          callTx(deployedContracts.Controller, 'Controller', 'debtFYDai', [ ETH, _x.maturity, account]),
+          debtFYDai('ETH-A', _x.maturity ), 
           getBalance(_x.fyDaiAddress, 'FYDai', account),
         ]) || [];
 
