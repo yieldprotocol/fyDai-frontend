@@ -33,17 +33,6 @@ import { genTxCode } from '../utils';
  * @returns { function } repayDaiDebt
  * @returns { function } buyDai
  * @returns { function } sellDai
- * @returns { function } addDaiLiquidity
- * @returns { function } removfyDaiLiquidity
- * 
- * @returns { boolean } postActive
- * @returns { boolean } withdrawActive
- * @returns { boolean } borrowActive
- * @returns { boolean } repayActive
- * @returns { boolean } addLiquidityActive
- * @returns { boolean } removeLiquidityActive
- * @returns { boolean } buyActive
- * @returns { boolean } sellActive
  * 
  */
 export const useBorrowProxy = () => {

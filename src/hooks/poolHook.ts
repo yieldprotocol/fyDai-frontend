@@ -12,11 +12,10 @@ import { useDsProxy } from './dsProxyHook';
  * Hook for interacting with the yield 'Pool' Contract
  */
 export const usePool = () => {
-  const { fallbackProvider, provider, signer, account } = useSignerAccount();
+
   const { abi: poolAbi } = Pool;
-  const [ sellActive, setSellActive ] = useState<boolean>(false);
-  const [ buyActive, setBuyActive ] = useState<boolean>(false);
-  const [ callActive, setCallActive ] = useState<boolean>(false);
+
+  const { fallbackProvider, provider, signer, account } = useSignerAccount();
 
   const { handleTx, handleTxRejectError } = useTxHelpers();
   const { proxyExecute } = useDsProxy();
@@ -43,17 +42,15 @@ export const usePool = () => {
     };
     
     let tx:any;
-    setSellActive(true);
+
     const contract = new ethers.Contract( marketAddr, poolAbi, signer );
     try {
       tx = await contract.sellFYDai(fromAddr, toAddr, parsedAmount, overrides);
     } catch (e) {
       handleTxRejectError(e);
-      setSellActive(false);
       return;
     }
     await handleTx({ tx, msg: `Sell fyDai ${fyDaiIn} pending...`, type:'SELL', series });
-    setSellActive(false);
   };
 
   /**
@@ -77,17 +74,14 @@ export const usePool = () => {
     };
 
     let tx:any;
-    setSellActive(true);
     const contract = new ethers.Contract( marketAddr, poolAbi, signer );
     try {
       tx = await contract.buyFYDai(fromAddr, toAddr, parsedAmount, overrides);
     } catch (e) {
       handleTxRejectError(e);
-      setSellActive(false);
       return;
     }
     await handleTx({ tx, msg: `Buying fyDai ${fyDaiOut} pending...`, type:'BUY', series });
-    setSellActive(false);
   };
 
   /**
@@ -113,17 +107,14 @@ export const usePool = () => {
     };
 
     let tx:any;
-    setSellActive(true);
     const contract = new ethers.Contract( marketAddr, poolAbi, signer );
     try {
       tx = await contract.sellDai(fromAddr, toAddr, parsedAmount, overrides);
     } catch (e) {
       handleTxRejectError(e);
-      setSellActive(false);
       return;
     }
     await handleTx({ tx, msg: `Selling ${daiIn} DAI pending...`, type:'SELL', series });
-    setSellActive(false);
   };
 
 
@@ -151,17 +142,14 @@ export const usePool = () => {
     };
 
     let tx:any;
-    setBuyActive(true);
     const contract = new ethers.Contract( marketAddr, poolAbi, signer );
     try {
       tx = await contract.buyDai(fromAddr, toAddr, parsedAmount, overrides );
     } catch (e) {
       handleTxRejectError(e);
-      setBuyActive(false);
       return;
     }
     await handleTx({ tx, msg: `Buying ${daiOut} Dai pending...`, type:'BUY', series });
-    setBuyActive(false);
   };
 
   /**
@@ -281,7 +269,6 @@ export const usePool = () => {
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const contract = new ethers.Contract( poolAddr, poolAbi, fallbackProvider);
     let value = BigNumber.from('0');
-    setCallActive(true);
     try {
       if ( series.isMature() === false ) {
         switch (type) {
@@ -296,14 +283,10 @@ export const usePool = () => {
           default: 
             value = await BigNumber.from('0');
         }
-        setCallActive(false);
         return value; 
       }
-      setCallActive(false);
       return value; // assuming that if the series has matured, the rates on whatever trade will be 0. 
     } catch (e) {
-
-      setCallActive(false);
       return e;
     }
   };
@@ -324,13 +307,12 @@ export const usePool = () => {
     return { active:true, reason:'Pool is operational' };
   };
 
-  return {  
+  return { 
+
     sellFYDai,
     buyFYDai,
     sellDai,
-    buyDai, 
-    sellActive, 
-    buyActive,
+    buyDai,
 
     addPoolDelegate,
     checkPoolDelegate,
@@ -338,7 +320,6 @@ export const usePool = () => {
 
     poolTotalSupply,
     previewPoolTx,
-    callActive,
 
   } as const;
 };

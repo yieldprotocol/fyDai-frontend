@@ -170,7 +170,7 @@ export const useController = () => {
    * @returns {Promise<BigNumber>} amount Dai (in Wei)
    * @note call function
    */
-  const fetchBorrowingPower = async (
+  const getBorrowingPower = async (
     collateralType:string
   ): Promise<BigNumber> => {
     const accAddr = account && ethers.utils.getAddress(account);
@@ -265,7 +265,7 @@ export const useController = () => {
     checkControllerDelegate,
     collateralPosted,
     collateralLocked,
-    fetchBorrowingPower,
+    getBorrowingPower,
     totalDebtDai,
     debtDai,
     debtFYDai,
