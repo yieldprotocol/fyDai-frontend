@@ -231,12 +231,12 @@ export const usePool = () => {
     poolAddress:string,
   ): Promise<boolean> => {
     const poolAddr = ethers.utils.getAddress(poolAddress);
-    const contract = new ethers.Contract( poolAddr, poolAbi, provider);
+    const contract = new ethers.Contract( poolAddr, poolAbi, fallbackProvider);
     let res;
     try {
       res = await contract.totalSupply();
     }  catch (e) {
-      res = false;
+      res = '0';
     }
     return res;
   };

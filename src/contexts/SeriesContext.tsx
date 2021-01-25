@@ -82,12 +82,12 @@ const SeriesProvider = ({ children }:any) => {
     const _seriesData = await Promise.all(
       seriesArr.map( async (x:IYieldSeries, i:number) => {
         const _x = { ...x, isMature: ()=>( x.maturity < Math.round(new Date().getTime() / 1000)) };
+        
         /* with no user */
         const [ sellFYDaiRate, totalSupply ] = await Promise.all([
           await previewPoolTx('sellFYDai', _x, 1),
           await poolTotalSupply(_x.poolAddress)
           // await callTx(_x.poolAddress, 'Pool', 'totalSupply', []),
-
         ]);
 
         /* with user */
@@ -101,24 +101,27 @@ const SeriesProvider = ({ children }:any) => {
           debtDai('ETH-A', _x.maturity ),
           debtFYDai('ETH-A', _x.maturity ), 
           getBalance(_x.fyDaiAddress, 'FYDai', account),
-        ]) || [];
+        ]) || new Array(4).fill(BigNumber.from('0'));
 
         return {
           ..._x,
           sellFYDaiRate: !(sellFYDaiRate instanceof Error)? sellFYDaiRate : BigNumber.from('0'),
           totalSupply,
-          poolTokens: poolTokens || BigNumber.from('0'),
-          ethDebtDai: ethDebtDai || BigNumber.from('0'),
-          ethDebtFYDai : ethDebtFYDai || BigNumber.from('0'),
-          fyDaiBalance : fyDaiBalance || BigNumber.from('0'),
+          poolTokens,
+          ethDebtDai,
+          ethDebtFYDai,
+          fyDaiBalance,
         };
       })
     );
 
+
+
     /* Parse the data */
     const _parsedSeriesData = _seriesData.reduce((acc: Map<string, any>, x:any) => {
+
       const yieldAPR = calculateAPR(x.sellFYDaiRate, ethers.utils.parseEther('1'), x.maturity) || '0';
-      const poolRatio = divDecimal(x.poolTokens, x.totalSupply) || '0';
+      const poolRatio = divDecimal(x.poolTokens, x.totalSupply);
       const poolPercent = mulDecimal( poolRatio, '100');
       const poolState = checkPoolState(x);
       return acc.set(
