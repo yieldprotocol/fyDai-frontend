@@ -1,5 +1,3 @@
-import { IYieldSeries } from '../types';
-
 /* Trunctate a string value to a certain number of 'decimal' point */
 export const cleanValue = (input:string, decimals:number=12) => {
   const re = new RegExp(`(\\d+\\.\\d{${decimals}})(\\d)`);
