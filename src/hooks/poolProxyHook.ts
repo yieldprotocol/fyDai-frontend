@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext } from 'react';
 import { ethers, BigNumber }  from 'ethers';
-import * as utils from '../utils';
+import { MAX_INT } from '../utils/constants';
 
 import { floorDecimal, mulDecimal, splitLiquidity, ONE } from '../utils/yieldMath';
 
@@ -115,7 +115,7 @@ export const usePoolProxy = () => {
         desc: 'Allow transfers of Dai to your Proxy',
         conditional: (await getTokenAllowance(deployedContracts.Dai, 'Dai', dsProxyAddress)) > 0,
         signFn: () => daiPermitSignature(deployedContracts.Dai, dsProxyAddress), 
-        fallbackFn: () => approveToken(deployedContracts.Dai, dsProxyAddress, utils.MAX_INT, series), // executed as user!
+        fallbackFn: () => approveToken(deployedContracts.Dai, dsProxyAddress, MAX_INT, series), // executed as user!
       });
   
     /* Send the required signatures out for signing, or approval tx if fallback is required */

@@ -2,6 +2,7 @@ import { useEffect, useState, useContext } from 'react';
 import { ethers, BigNumber }  from 'ethers';
 
 import * as utils from '../utils';
+import { MAX_INT } from '../utils/constants';
 import { calculateSlippage } from '../utils/yieldMath';
 
 import { ISignListItem, IYieldSeries } from '../types';
@@ -257,7 +258,7 @@ export const useBorrowProxy = () => {
         desc: 'Allow Dai transfers to the fyDai Treasury',
         conditional: ( await getTokenAllowance(deployedContracts.Dai, 'Dai', deployedContracts.Treasury) ) > 0,
         signFn: () => daiPermitSignature( deployedContracts.Dai, deployedContracts.Treasury),
-        fallbackFn: () => approveToken(deployedContracts.Dai, deployedContracts.Treasury, utils.MAX_INT, series),
+        fallbackFn: () => approveToken(deployedContracts.Dai, deployedContracts.Treasury, MAX_INT, series),
       });
 
     /* Send the required signatures out for signing, or approval tx if fallback is required */
@@ -329,7 +330,7 @@ export const useBorrowProxy = () => {
         desc: `Allow Dai transfers to the ${series.displayName} pool`,
         conditional: await getTokenAllowance(deployedContracts.Dai, 'Dai', poolAddr) > 0,
         signFn: () => daiPermitSignature(deployedContracts.Dai, poolAddr),
-        fallbackFn: () => approveToken(deployedContracts.Dai, poolAddr, utils.MAX_INT, series), 
+        fallbackFn: () => approveToken(deployedContracts.Dai, poolAddr, MAX_INT, series), 
       });
         
     /* Send the required signatures out for signing, or approval tx if fallback is required */
@@ -400,7 +401,7 @@ export const useBorrowProxy = () => {
         desc: `Allow fyDai transfers to the ${series.displayName} pool`,
         conditional: ( await getTokenAllowance(fyDaiAddr, 'FYDai', poolAddr) ) > 0,
         signFn: () => ERC2612PermitSignature(fyDaiAddr, poolAddr),    
-        fallbackFn: () => approveToken(fyDaiAddr, poolAddr, utils.MAX_INT, series ), 
+        fallbackFn: () => approveToken(fyDaiAddr, poolAddr, MAX_INT, series ), 
       });
           
     /* Send the required signatures out for signing, or approval tx if fallback is required */
