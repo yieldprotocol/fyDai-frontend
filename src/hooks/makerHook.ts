@@ -1,8 +1,6 @@
 import { useMemo, useState, useContext } from 'react';
 import { ethers, BigNumber }  from 'ethers';
 
-import * as utils from '../utils';
-
 import { YieldContext } from '../contexts/YieldContext';
 
 import Vat from '../contracts/Vat.json';
@@ -12,7 +10,7 @@ import { useSignerAccount } from './connectionHooks';
 import { usePool } from './poolHook';
 
 import { IYieldSeries } from '../types';
-import { divDecimal, floorDecimal, mulDecimal } from '../utils/yieldMath';
+import { divDecimal, floorDecimal } from '../utils/yieldMath';
 
 /**
  * Hook for interacting with the yield 'CRONTROLLER' Contract
@@ -78,16 +76,19 @@ export const useMaker = () => {
     const collateralBytes = collateralType? ethers.utils.formatBytes32String(collateralType): null;
     try {
       /* check for cdps registered to the dsProxy address in the manager and also directly in vat */ 
-      [managedCdpList, accountCdp] = await Promise.all([
+      [ managedCdpList, accountCdp ] = await Promise.all([
         getCdpsContract.getCdpsDesc(deployedContracts.DssCdpManager, dsProxyAddress),
         getCdpsContract.getCdpsDesc(deployedContracts.DssCdpManager, account),
-        // vatContract.urns(collateralBytes || ethers.utils.formatBytes32String('ETH-A'), dsProxyAddress)
       ]);
 
-      // cdpList = [ cdpManList.map((x:any)=> x 'managed':true } )]
-      // console.log(cdpSingle);
-      // cdpList = cdpManList.concat(cdpSingle);
+      // TODO: join the two cdp lists 
+      // if (accountCdp.length > 0) { 
+      //   cdpList = managedCdpList.push(accountCdp[0]);
+      // } else {
+      //   cdpList = managedCdpList;
+      // }
       cdpList = managedCdpList;
+      // eslint-disable-next-line no-console
       console.log(cdpList);
 
     }  catch (e) {
@@ -147,7 +148,7 @@ export const useMaker = () => {
       console.log(e);
       return BigNumber.from('0');
     }
-
+    
     const minWeth = divDecimal(parsedAmount, spot, '1e-27');
     return  floorDecimal( minWeth );
 

@@ -23,25 +23,10 @@ import { useController } from './controllerHook';
 import { genTxCode } from '../utils';
 
 /**
- * Hook for interacting with the Yield Proxy Contract.
+ * Hook for interacting with the Yield Pool Proxy Contract.
  * 
- * @returns { function } postEth
- * @returns { function } withdrawEth
- * @returns { function } borrowDai
- * @returns { function } repayDaiDebt
- * @returns { function } buyDai
- * @returns { function } sellDai
- * @returns { function } addDaiLiquidity
- * @returns { function } removfyDaiLiquidity
- * 
- * @returns { boolean } postActive
- * @returns { boolean } withdrawActive
- * @returns { boolean } borrowActive
- * @returns { boolean } repayActive
- * @returns { boolean } addLiquidityActive
- * @returns { boolean } removeLiquidityActive
- * @returns { boolean } buyActive
- * @returns { boolean } sellActive
+ * @returns { function } addLiquidity
+ * @returns { function } removeLiquidity
  * 
  */
 export const usePoolProxy = () => {

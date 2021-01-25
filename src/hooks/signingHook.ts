@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import { useContext } from 'react';
 import { ethers }  from 'ethers';
 import { signDaiPermit, signERC2612Permit } from 'eth-permit';
 
