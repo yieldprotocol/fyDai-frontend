@@ -83,7 +83,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
 
   const [showTxPending, setShowTxPending] = useState<boolean>(false);
   useEffect(()=>{
-    setShowTxPending( txActive?.txCode === genTxCode('SELL_DAI', activeSeries));
+    setShowTxPending( txActive?.txCode === genTxCode('SELL_DAI', activeSeries?.maturity.toString()));
   }, [txActive, activeSeries]);
   
   /* Lend execution flow */

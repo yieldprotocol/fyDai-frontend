@@ -196,7 +196,7 @@ export const useBorrowProxy = () => {
       });
 
     /* Send the required signatures out for signing, or approval tx if fallback is required */
-    const signedSigs = await handleSignList(requestedSigs, genTxCode('BORROW', series));
+    const signedSigs = await handleSignList(requestedSigs, genTxCode('BORROW', series?.maturity.toString()));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
 
@@ -254,7 +254,7 @@ export const useBorrowProxy = () => {
  
     // User to treasury no ds proxy 
     requestedSigs.set('daiSig',
-      { id: genTxCode('AUTH_TOKEN', series),
+      { id: genTxCode('AUTH_TOKEN', series?.maturity.toString()),
         desc: 'Allow Dai transfers to the fyDai Treasury',
         conditional: ( await getTokenAllowance(deployedContracts.Dai, 'Dai', deployedContracts.Treasury) ) > 0,
         signFn: () => daiPermitSignature( deployedContracts.Dai, deployedContracts.Treasury),
@@ -262,7 +262,7 @@ export const useBorrowProxy = () => {
       });
 
     /* Send the required signatures out for signing, or approval tx if fallback is required */
-    const signedSigs = await handleSignList(requestedSigs, genTxCode('REPAY', series));
+    const signedSigs = await handleSignList(requestedSigs, genTxCode('REPAY', series?.maturity.toString()));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
           
@@ -318,7 +318,7 @@ export const useBorrowProxy = () => {
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
 
     requestedSigs.set('poolSig',
-      { id: genTxCode('AUTH_POOL', series),
+      { id: genTxCode('AUTH_POOL', series?.maturity.toString()),
         desc: `Allow your proxy to interact with the ${series.displayName} pool`,
         conditional: await checkPoolDelegate(poolAddr, dsProxyAddress),
         signFn: () => delegationSignature(poolContract, dsProxyAddress),    
@@ -326,7 +326,7 @@ export const useBorrowProxy = () => {
       });
 
     requestedSigs.set('daiSig',
-      { id: genTxCode('AUTH_TOKEN', series),
+      { id: genTxCode('AUTH_TOKEN', series?.maturity.toString()),
         desc: `Allow Dai transfers to the ${series.displayName} pool`,
         conditional: await getTokenAllowance(deployedContracts.Dai, 'Dai', poolAddr) > 0,
         signFn: () => daiPermitSignature(deployedContracts.Dai, poolAddr),
@@ -334,7 +334,7 @@ export const useBorrowProxy = () => {
       });
         
     /* Send the required signatures out for signing, or approval tx if fallback is required */
-    const signedSigs = await handleSignList(requestedSigs, genTxCode('SELL_DAI', series));
+    const signedSigs = await handleSignList(requestedSigs, genTxCode('SELL_DAI', series?.maturity.toString()));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
 
@@ -389,7 +389,7 @@ export const useBorrowProxy = () => {
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
 
     requestedSigs.set('poolSig',
-      { id: genTxCode('AUTH_POOL', series),
+      { id: genTxCode('AUTH_POOL', series?.maturity.toString()),
         desc: `Allow your proxy to interact with the ${series.displayName} pool`,
         conditional: await checkPoolDelegate(poolAddr, dsProxyAddress),
         signFn: () => delegationSignature(poolContract, dsProxyAddress),    
@@ -397,7 +397,7 @@ export const useBorrowProxy = () => {
       });
 
     requestedSigs.set('fyDaiSig',
-      { id: genTxCode('AUTH_TOKEN', series),
+      { id: genTxCode('AUTH_TOKEN', series?.maturity.toString()),
         desc: `Allow fyDai transfers to the ${series.displayName} pool`,
         conditional: ( await getTokenAllowance(fyDaiAddr, 'FYDai', poolAddr) ) > 0,
         signFn: () => ERC2612PermitSignature(fyDaiAddr, poolAddr),    
@@ -405,7 +405,7 @@ export const useBorrowProxy = () => {
       });
           
     /* Send the required signatures out for signing, or approval tx if fallback is required */
-    const signedSigs = await handleSignList(requestedSigs, genTxCode('BUY_DAI', series));
+    const signedSigs = await handleSignList(requestedSigs, genTxCode('BUY_DAI', series?.maturity.toString()));
 
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }

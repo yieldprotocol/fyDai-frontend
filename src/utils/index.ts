@@ -11,8 +11,8 @@ export const cleanValue = (input:string, decimals:number=12) => {
 };
 
 /* creates internal tracking code of a transaction type */
-export const genTxCode = (txType: string, series:IYieldSeries|null) => {
-  return `${txType}${series?.maturity || ''}`; 
+export const genTxCode = (txType: string, series:string|null) => {
+  return `${txType}${series || ''}`; 
 };
 
 /* handle Address/hash shortening */

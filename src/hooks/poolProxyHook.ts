@@ -111,7 +111,7 @@ export const usePoolProxy = () => {
 
     // dsProxy must be spender
     requestedSigs.set('daiSig',
-      { id: genTxCode('AUTH_TOKEN', series),
+      { id: genTxCode('AUTH_TOKEN', series?.maturity.toString()),
         desc: 'Allow transfers of Dai to your Proxy',
         conditional: (await getTokenAllowance(deployedContracts.Dai, 'Dai', dsProxyAddress)) > 0,
         signFn: () => daiPermitSignature(deployedContracts.Dai, dsProxyAddress), 
@@ -119,7 +119,7 @@ export const usePoolProxy = () => {
       });
   
     /* Send the required signatures out for signing, or approval tx if fallback is required */
-    const signedSigs = await handleSignList(requestedSigs, genTxCode('ADD_LIQUIDITY', series));
+    const signedSigs = await handleSignList(requestedSigs, genTxCode('ADD_LIQUIDITY', series?.maturity.toString()));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
 
@@ -179,7 +179,7 @@ export const usePoolProxy = () => {
       });
         
     requestedSigs.set('poolSig',
-      { id: genTxCode('AUTH_POOL', series),
+      { id: genTxCode('AUTH_POOL', series?.maturity.toString()),
         desc: `Allow your proxy to interact with the ${series.displayName} pool`,
         conditional: await checkPoolDelegate(poolAddr, dsProxyAddress),
         signFn: () => delegationSignature(poolContract, dsProxyAddress),    
@@ -187,7 +187,7 @@ export const usePoolProxy = () => {
       });
     
     /* Send the required signatures out for signing, or approval tx if fallback is required */
-    const signedSigs = await handleSignList(requestedSigs, genTxCode('REMOVE_LIQUIDITY', series));
+    const signedSigs = await handleSignList(requestedSigs, genTxCode('REMOVE_LIQUIDITY', series?.maturity.toString()));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
 

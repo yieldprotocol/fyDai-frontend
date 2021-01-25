@@ -117,7 +117,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
   /* show txs that are pending (tx matching the current series and borrow) */
   const [showTxPending, setShowTxPending] = useState<boolean>(false);
   useEffect(()=>{
-    setShowTxPending( txActive?.txCode === genTxCode('BORROW', activeSeries));
+    setShowTxPending( txActive?.txCode === genTxCode('BORROW', activeSeries?.maturity.toString()));
   }, [txActive, activeSeries]);
 
   /* Handle input (debounced input) changes: */

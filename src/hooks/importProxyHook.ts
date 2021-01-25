@@ -142,7 +142,7 @@ export const useImportProxy = () => {
     }
 
     /* Send the required signatures out for signing, or approval tx if fallback is required */
-    const signedSigs = await handleSignList(requestedSigs, genTxCode('IMPORT', series));
+    const signedSigs = await handleSignList(requestedSigs, genTxCode('IMPORT', series?.maturity.toString()));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
     
@@ -230,7 +230,7 @@ export const useImportProxy = () => {
     }
 
     /* Send the required signatures out for signing, or approval tx if fallback is required */
-    const signedSigs = await handleSignList(requestedSigs, genTxCode('IMPORT', series));
+    const signedSigs = await handleSignList(requestedSigs, genTxCode('IMPORT', series?.maturity.toString()));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
 
