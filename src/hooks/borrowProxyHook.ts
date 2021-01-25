@@ -1,6 +1,8 @@
 import { useEffect, useState, useContext } from 'react';
 import { ethers, BigNumber }  from 'ethers';
+
 import * as utils from '../utils';
+import { calculateSlippage } from '../utils/yieldMath';
 
 import { ISignListItem, IYieldSeries } from '../types';
 
@@ -21,7 +23,6 @@ import { useDsProxy } from './dsProxyHook';
 
 import { useController } from './controllerHook';
 import { genTxCode } from '../utils';
-import { floorDecimal, mulDecimal } from '../utils/yieldMath';
 
 /**
  * Hook for interacting with the Yield Proxy Contract.
@@ -48,8 +49,9 @@ import { floorDecimal, mulDecimal } from '../utils/yieldMath';
 export const useBorrowProxy = () => {
 
   /* contexts */
-  const  { state: { deployedContracts } }  = useContext<any>(YieldContext);
-  const  { state: { preferences: { slippage }, authorization: { dsProxyAddress, hasDelegatedDsProxy } } }  = useContext<any>(UserContext);
+  const { state: { deployedContracts } }  = useContext<any>(YieldContext);
+  const { state: userState }  = useContext<any>(UserContext);
+  const { preferences: { slippage }, authorization: { dsProxyAddress, hasDelegatedDsProxy } } = userState; 
 
   /* hooks */ 
   const { signer, provider, account } = useSignerAccount();
@@ -62,15 +64,6 @@ export const useBorrowProxy = () => {
   
   const { abi: borrowProxyAbi } = BorrowProxy;
   const { abi: controllerAbi } = Controller;
-
-  // TODO: deal with big number rather also, put this out in a hook
-  const valueWithSlippage = (value:BigNumber, minimise:boolean=false ) => {
-    const slippageAmount = floorDecimal( mulDecimal(value, slippage));
-    if (minimise) {
-      return value.sub(slippageAmount);
-    } 
-    return value.add(slippageAmount);
-  };
 
   /* Preset the yieldProxy and controller contracts to be used with all fns */
   const [ proxyContract, setProxyContract] = useState<any>();
@@ -135,10 +128,6 @@ export const useBorrowProxy = () => {
     const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(utils.cleanValue(amount));
     const toAddr = account && ethers.utils.getAddress(account);
 
-    /* Check the signature requirements */
-    const checkSigs = await proxyContract.withdrawCheck();
-    console.log(checkSigs);
-
     /* build and use signatures if required */
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
 
@@ -196,15 +185,11 @@ export const useBorrowProxy = () => {
       gasLimit: BigNumber.from('400000')
     };
 
-    /* Check the signature requirements */
-    const checkSigs = await proxyContract.borrowDaiForMaximumFYDaiCheck(poolAddr);
-    console.log(checkSigs);
-
     /* get estimated maxFYDai */
-    let maxFYDai:BigNumber;
+    let maxFYDai:string;
     const preview = await previewPoolTx('buydai', series, daiToBorrow); 
     if ( !(preview instanceof Error) ) {
-      maxFYDai = valueWithSlippage(preview);
+      maxFYDai = calculateSlippage(preview, slippage);
     } else {
       throw(preview);
     }
@@ -265,10 +250,6 @@ export const useBorrowProxy = () => {
       gasLimit: BigNumber.from('350000'),
       value: 0,
     };
-
-    /* Check the signature requirements */
-    const checkSigs = await proxyContract.repayDaiCheck();
-    console.log(checkSigs);
 
     /* build and use signature if required , else '0x' */
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
@@ -334,15 +315,11 @@ export const useBorrowProxy = () => {
       value: 0,
     };
 
-    /* Check the signature requirements */
-    const checkSigs = await proxyContract.sellDaiCheck(poolAddr);
-    console.log(checkSigs);
-
     /* calculate expected trade values and factor in slippage */
-    let minFYDaiOut:BigNumber;
+    let minFYDaiOut:string;
     const preview = await previewPoolTx('selldai', series, daiIn);
     if ( !(preview instanceof Error) ) {
-      minFYDaiOut = valueWithSlippage(preview, true);
+      minFYDaiOut = calculateSlippage(preview, slippage, true);
     } else {
       throw(preview);
     }
@@ -408,16 +385,12 @@ export const useBorrowProxy = () => {
       gasLimit: BigNumber.from('250000'),
       value: 0,
     };
-
-    /* Check the signature requirements */
-    const checkSigs = await proxyContract.buyDaiCheck(poolAddr);
-    console.log(checkSigs); 
   
     /* calculate expected trade values and factor in slippage */
-    let maxFYDaiIn:BigNumber;
+    let maxFYDaiIn:string;
     const preview = await previewPoolTx('buydai', series, daiOut);
     if ( !(preview instanceof Error) ) {
-      maxFYDaiIn = valueWithSlippage(preview);
+      maxFYDaiIn = calculateSlippage(preview, slippage);
     } else {
       throw(preview);
     }

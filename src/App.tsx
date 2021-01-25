@@ -22,10 +22,6 @@ import Borrow from './containers/Borrow';
 import Lend from './containers/Lend';
 import Pool from './containers/Pool';
 import Deposit from './containers/Deposit';
-import CloseDai from './containers/CloseDai';
-import WithdrawEth from './containers/WithdrawEth';
-import Repay from './containers/Repay';
-import RemoveLiquidity from './containers/RemoveLiquidity';
 import RateLock from './containers/RateLock';
 
 import YieldHeader from './components/YieldHeader';
@@ -33,9 +29,10 @@ import YieldFooter from './components/YieldFooter';
 
 import ErrorBoundary from './components/ErrorBoundry';
 import YieldNav from './components/YieldNav';
+import RaisedBox from './components/RaisedBox';
 
 import { initGA, logPageView } from './utils/analytics';
-import RaisedBox from './components/RaisedBox';
+
 
 declare global {
   interface Window {
@@ -60,12 +57,11 @@ const App = (props:any) => {
     /* but, ignore these other routes */
     !['withdraw', 'repay', 'removeLiquidity', 'close', 'post'].includes(location.pathname.split('/')[1]) &&
     setCachedLastVisit(`/${location.pathname.split('/')[1]}/${activeSeries?.maturity}` );
-  }, [location]);
+  }, [ location ]);
 
   /* Service Worker registraion and handle app updates and user confirmations */
   useEffect(()=>{
     const cachesToClear = ['txPending', 'lastFeed', 'lastVisit', 'deployedSeries', 'cache_chainId', 'txHistory' ];
-    
     serviceWorker.register({ 
       onUpdate: (registration:any) => {
         // eslint-disable-next-line no-console
@@ -76,7 +72,7 @@ const App = (props:any) => {
             updateAvailable: true,
             updateAccept: ()=> {         
               registration.waiting && registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-              /* clear the cache (except user Preferences) on update - in future, save user preferences */
+              /* clear the cache (except user Preferences) on update - ie. save user preferences */
               for (const cache of cachesToClear) {
                 localStorage.removeItem(cache);
               }
@@ -108,6 +104,7 @@ const App = (props:any) => {
 
   useEffect(()=>{
     window.addEventListener('offline', () => {
+      // eslint-disable-next-line no-console
       console.log('App is offline.');
       dispatch({ type:'notify', payload:{ message:'No Network', type:'error' } });
     });

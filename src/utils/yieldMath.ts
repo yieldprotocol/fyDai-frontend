@@ -269,6 +269,25 @@ export const calcTokensMinted =(
   return (totalSupply).mul(xOffered).div(xReserves);
 };
 
+
+/**
+   * Calculate Slippage 
+   *
+   * @param { BigNumber } value  
+   * @param { BigNumber } slippage optional: defaults to 0.05 (5%)
+   * @param { number } minimise optional: whether the resutl should be a minimum or maximum (default max)
+   * 
+   * @returns { string } human readable string
+   */
+export const calculateSlippage = (value: BigNumber | string, slippage: BigNumber | string = '0.5', minimise:boolean=false ):string => {
+  const value_ = new Decimal(value.toString()); 
+  const _slippageAmount = floorDecimal( mulDecimal(value, slippage));
+  if (minimise) {
+    return value_.sub(_slippageAmount).toFixed();
+  } 
+  return value_.add(_slippageAmount).toFixed();
+};
+
 /**
    * Calculate Annualised Yield Rate
    *
