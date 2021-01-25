@@ -7,20 +7,15 @@ import { ISignListItem, IYieldSeries } from '../types';
 import ImportProxy from '../contracts/ImportProxy.json';
 import ImportCdpProxy from '../contracts/ImportCdpProxy.json';
 
-
 import Controller from '../contracts/Controller.json';
 
-import Vat from '../contracts/Vat.json';
-
 import { YieldContext } from '../contexts/YieldContext';
-import { UserContext } from '../contexts/UserContext';
 
 import { useSignerAccount } from './connectionHooks';
 import { useSigning } from './signingHook';
 import { useDsProxy } from './dsProxyHook';
 import { useController } from './controllerHook';
 import { usePool } from './poolHook';
-import { useMaker } from './makerHook';
 
 import { genTxCode } from '../utils';
 import { floorDecimal, mulDecimal, ONE } from '../utils/yieldMath';
@@ -39,7 +34,6 @@ export const useImportProxy = () => {
 
   /* contexts */
   const  { state: { deployedContracts } }  = useContext<any>(YieldContext);
-  const  { state: { authorization: { hasDelegatedDsProxy } } }  = useContext<any>(UserContext);
 
   /* hooks */
   const { account, signer } = useSignerAccount();
@@ -152,9 +146,11 @@ export const useImportProxy = () => {
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
     
-    /* contract fns used:
+    /* 
+      contract fns used:
       importPositionWithSignature(IPool pool, address user, uint256 wethAmount, uint256 debtAmount, uint256 maxDaiPrice, bytes memory controllerSig)
-      importCdpPositionWithSignature(IPool pool, uint256 cdp, uint256 wethAmount, uint256 debtAmount, uint256 maxDaiPrice, bytes memory controllerSig) */
+      importCdpPositionWithSignature(IPool pool, uint256 cdp, uint256 wethAmount, uint256 debtAmount, uint256 maxDaiPrice, bytes memory controllerSig) 
+    */
     const calldata = viaCdpMan ? 
       cdpProxyContract.interface.encodeFunctionData(
         'importCdpPositionWithSignature', 
