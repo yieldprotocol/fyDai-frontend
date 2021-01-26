@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { NavLink, useParams } from 'react-router-dom';
 import { ethers } from 'ethers';
-import { Box, Keyboard, TextInput, Text, ResponsiveContext, Collapsible, Layer } from 'grommet';
+import { Box, Keyboard, TextInput, Text, ResponsiveContext, Collapsible, Layer, CheckBox } from 'grommet';
 import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 import { VscHistory as History } from 'react-icons/vsc';
 
@@ -41,9 +41,11 @@ import DaiMark from '../components/logos/DaiMark';
 import YieldMobileNav from '../components/YieldMobileNav';
 import Loading from '../components/Loading';
 
+
 interface IPoolProps {
   openConnectLayer:any;
 }
+
   
 const Pool = ({ openConnectLayer }:IPoolProps) => {
 
@@ -56,6 +58,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
   const activeSeries = seriesData.get(activeSeriesId);
   const { state: userState, actions: userActions } = useContext(UserContext);
   const { daiBalance } = userState.position;
+  const { useBuyToAddLiquidity } = userState.preferences;
 
   /* local state */ 
   const [ hasDelegated ] = useState<boolean>(true);
@@ -260,6 +263,35 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                         value: newPoolShare? `${newPoolShare}%`: '',
                         valuePrefix: null,
                         valueExtra: null,
+                      },
+                      {
+                        label: () => ( 
+                          <Box direction='row' gap='small' align='center'>
+                    
+
+                            <Text size='xsmall'> Use Alternative strategy to add liquidity </Text> 
+                            <CheckBox 
+                              checked={!useBuyToAddLiquidity}
+                              onClick={() => userActions.updatePreferences({ useBuyToAddLiquidity: !useBuyToAddLiquidity })}
+                            />
+                            
+                          </Box>                       
+                        ),
+                        labelExtra: () => ( 
+                          <Box direction='row' gap='small' align='center' justify='between'>
+                            {/* <Box margin={{ horizontal:'small' }} /> */}
+                            <Text size='xxsmall'> { useBuyToAddLiquidity ? 
+                              'Currently using the most gas efficient strategy. It is reccommended for most users.': 
+                              'The alternative strategy is more robust and is not limited by the reserves in the pool.' } 
+                            </Text>
+                          </Box>                       
+                        ),
+                        visible: inputValue>0,
+                        active: debouncedInput,
+                        loading: false,           
+                        value: null,
+                        valuePrefix: null,
+                        valueExtra:null
                       },
                       {
                         label: 'Like what you see?',
