@@ -301,9 +301,10 @@ export const usePool = () => {
   const checkPoolState = (
     series: IYieldSeries,
   ): any => {
+
     if ( series.isMature() ) { return { active: false, reason: 'Series is mature' };}
     if ( series.totalSupply?.isZero() ) { return { active: false, reason: 'Pool not initiated' };}
-    if ( series.yieldAPR && !(Number.isFinite(series.yieldAPR)) ) { return { active: false, reason: 'Limited Liquidity' };}
+    if ( series.yieldAPR && !(Number.isFinite(parseFloat(series.yieldAPR))) ) { return { active: false, reason: 'Limited Liquidity' };}
     return { active:true, reason:'Pool is operational' };
   };
 
