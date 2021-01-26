@@ -120,7 +120,8 @@ const SeriesProvider = ({ children }:any) => {
     /* Parse the data */
     const _parsedSeriesData = _seriesData.reduce((acc: Map<string, any>, x:any) => {
 
-      const yieldAPR = calculateAPR(x.sellFYDaiRate, ethers.utils.parseEther('1'), x.maturity) || '0';
+      const _apr = calculateAPR(x.sellFYDaiRate, ethers.utils.parseEther('1'), x.maturity);
+      const yieldAPR =  _apr || '0';
       const poolRatio = divDecimal(x.poolTokens, x.totalSupply);
       const poolPercent = mulDecimal( poolRatio, '100');
       const poolState = checkPoolState(x);

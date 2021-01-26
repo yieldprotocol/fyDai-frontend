@@ -291,25 +291,25 @@ export const calculateSlippage = (value: BigNumber | string, slippage: BigNumber
 /**
    * Calculate Annualised Yield Rate
    *
-   * @param { BigNumber } _rate // current [Dai] price per unit y[Dai]
-   * @param { BigNumber } _amount // y[Dai] amount at maturity
-   * @param { number } _maturity  // date of maturity
-   * @param { number } _fromDate // ***optional*** start date - defaults to now()
+   * @param { BigNumber } rate // current [Dai] price per unit y[Dai]
+   * @param { BigNumber } amount // y[Dai] amount at maturity
+   * @param { number } maturity  // date of maturity
+   * @param { number } fromDate // ***optional*** start date - defaults to now()
    * 
    * @returns { string | undefined } human readable string
    */
 export const calculateAPR =(
-  _rate: BigNumber,
-  _amount: BigNumber,
-  _maturity: number,
-  _fromDate:number = (Math.round(new Date().getTime() / 1000)), // if not provided, defaults to current time.
+  rate: BigNumber,
+  amount: BigNumber,
+  maturity: number,
+  fromDate:number = (Math.round(new Date().getTime() / 1000)), // if not provided, defaults to current time.
 ): string | undefined => {
-  const rate_ = new Decimal(_rate.toString());
-  const amount_ = new Decimal(_amount.toString());
+  const rate_ = new Decimal(rate.toString());
+  const amount_ = new Decimal(amount.toString());
   if (
-    _maturity > Math.round(new Date().getTime() / 1000)
+    maturity > Math.round(new Date().getTime() / 1000)
   ) {
-    const secsToMaturity = _maturity - _fromDate;
+    const secsToMaturity = maturity - fromDate;
     const propOfYear = new Decimal(secsToMaturity/SECONDS_PER_YEAR);
     const priceRatio = amount_.div(rate_);
     const powRatio = ONE.div(propOfYear);
