@@ -25,12 +25,12 @@ interface IInfoGridProps {
 function InfoGrid({ entries, alt }:IInfoGridProps) {
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
-
   const { state: { activeSeriesId, seriesData } } = useContext(SeriesContext);
   const activeSeries = seriesData.get(activeSeriesId);
 
+
   const [ detailsOpen, setDetailsOpen ] = useState<boolean>();
-  const [visibleEntries, setVisibleEntries] = useState<any[]>([]);
+  const [ visibleEntries, setVisibleEntries ] = useState<any[]>([]);
 
   useEffect(()=>{
     setVisibleEntries((entries.filter((x:any)=>x.visible===true)));
@@ -62,15 +62,15 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
               >
                 <Box>
                   <Text 
-                    // color={alt? 'text-weak': 'text-weak'} 
                     color={alt? activeSeries?.seriesTextColor : 'text-weak'}
                     size='xsmall'
+                    weight='bold'
                   >
                     { (typeof Label === 'function')? <Label />: Label }
                   </Text>
 
-                  <Text 
-                    color={alt? 'text-xweak': 'text-xweak'} 
+                  <Text
+                    color={alt? activeSeries?.seriesTextColor: 'text-weak'} 
                     size='xxsmall'
                   >
                     { (typeof LabelExtra === 'function')? <LabelExtra />: LabelExtra }
@@ -129,12 +129,13 @@ function InfoGrid({ entries, alt }:IInfoGridProps) {
                       <Text 
                         color={alt? activeSeries?.seriesTextColor : 'text-weak'}
                         size='xsmall'
+                        weight='bold'
                       >
                         { (typeof Label === 'function')? <Label />: Label }
                       </Text>
 
                       <Text 
-                        color={alt? 'text-xweak': 'text-xweak'} 
+                        color={alt?  activeSeries?.seriesTextColor: 'text-xweak'} 
                         size='xxsmall'
                       >
                         { x.labelExtra}

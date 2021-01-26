@@ -1,6 +1,8 @@
 import { useEffect, useState, useContext } from 'react';
 import { ethers, BigNumber }  from 'ethers';
-import * as utils from '../utils';
+import { MAX_INT } from '../utils/constants';
+
+import { floorDecimal, mulDecimal, splitLiquidity, ONE } from '../utils/yieldMath';
 
 import { ISignListItem, IYieldSeries } from '../types';
 
@@ -13,7 +15,7 @@ import { UserContext } from '../contexts/UserContext';
 
 import { useSignerAccount } from './connectionHooks';
 import { usePool } from './poolHook';
-import { useMath } from './mathHooks';
+
 import { useToken } from './tokenHook';
 import { useSigning } from './signingHook';
 import { useDsProxy } from './dsProxyHook';
@@ -21,25 +23,10 @@ import { useController } from './controllerHook';
 import { genTxCode } from '../utils';
 
 /**
- * Hook for interacting with the Yield Proxy Contract.
+ * Hook for interacting with the Yield Pool Proxy Contract.
  * 
- * @returns { function } postEth
- * @returns { function } withdrawEth
- * @returns { function } borrowDai
- * @returns { function } repayDaiDebt
- * @returns { function } buyDai
- * @returns { function } sellDai
- * @returns { function } addDaiLiquidity
- * @returns { function } removfyDaiLiquidity
- * 
- * @returns { boolean } postActive
- * @returns { boolean } withdrawActive
- * @returns { boolean } borrowActive
- * @returns { boolean } repayActive
- * @returns { boolean } addLiquidityActive
- * @returns { boolean } removeLiquidityActive
- * @returns { boolean } buyActive
- * @returns { boolean } sellActive
+ * @returns { function } addLiquidity
+ * @returns { function } removeLiquidity
  * 
  */
 export const usePoolProxy = () => {
@@ -51,7 +38,7 @@ export const usePoolProxy = () => {
   /* hooks */ 
   const { signer, provider } = useSignerAccount();
   const { previewPoolTx, checkPoolDelegate, addPoolDelegate } = usePool();
-  const { splitDaiLiquidity } = useMath();
+
   const { getBalance, approveToken, getTokenAllowance } = useToken();
   
   const { addControllerDelegate } = useController();
@@ -108,8 +95,8 @@ export const usePoolProxy = () => {
     /* calculate max expected fyDai value and factor in slippage */
     const daiReserves = await getBalance(deployedContracts.Dai, 'Dai', poolAddr);
     const fyDaiReserves = await getBalance(series.fyDaiAddress, 'FYDai', poolAddr);
-    const [ , fyDaiSplit ] = splitDaiLiquidity( parsedDaiUsed, daiReserves, fyDaiReserves );
-    const maxFYDai = utils.mulRay(fyDaiSplit, utils.toRay(1.1));
+    const [ ,fyDaiSplit ] = splitLiquidity( parsedDaiUsed, daiReserves, fyDaiReserves );
+    const maxFYDai = floorDecimal( mulDecimal(fyDaiSplit, '1.1') );
 
     /* build and use signature if required , else '0x' */
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
@@ -124,15 +111,15 @@ export const usePoolProxy = () => {
 
     // dsProxy must be spender
     requestedSigs.set('daiSig',
-      { id: genTxCode('AUTH_TOKEN', series),
+      { id: genTxCode('AUTH_TOKEN', series?.maturity.toString()),
         desc: 'Allow transfers of Dai to your Proxy',
         conditional: (await getTokenAllowance(deployedContracts.Dai, 'Dai', dsProxyAddress)) > 0,
         signFn: () => daiPermitSignature(deployedContracts.Dai, dsProxyAddress), 
-        fallbackFn: () => approveToken(deployedContracts.Dai, dsProxyAddress, utils.MAX_INT, series), // executed as user!
+        fallbackFn: () => approveToken(deployedContracts.Dai, dsProxyAddress, MAX_INT, series), // executed as user!
       });
   
     /* Send the required signatures out for signing, or approval tx if fallback is required */
-    const signedSigs = await handleSignList(requestedSigs, genTxCode('ADD_LIQUIDITY', series));
+    const signedSigs = await handleSignList(requestedSigs, genTxCode('ADD_LIQUIDITY', series?.maturity.toString()));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
 
@@ -170,7 +157,6 @@ export const usePoolProxy = () => {
     /* Processing and sanitizing input */
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const poolContract = new ethers.Contract( poolAddr, Pool.abi as any, provider);
-
     const parsedTokens = BigNumber.isBigNumber(tokens)? tokens : ethers.utils.parseEther(tokens.toString());
     
     const overrides = { 
@@ -193,7 +179,7 @@ export const usePoolProxy = () => {
       });
         
     requestedSigs.set('poolSig',
-      { id: genTxCode('AUTH_POOL', series),
+      { id: genTxCode('AUTH_POOL', series?.maturity.toString()),
         desc: `Allow your proxy to interact with the ${series.displayName} pool`,
         conditional: await checkPoolDelegate(poolAddr, dsProxyAddress),
         signFn: () => delegationSignature(poolContract, dsProxyAddress),    
@@ -201,7 +187,7 @@ export const usePoolProxy = () => {
       });
     
     /* Send the required signatures out for signing, or approval tx if fallback is required */
-    const signedSigs = await handleSignList(requestedSigs, genTxCode('REMOVE_LIQUIDITY', series));
+    const signedSigs = await handleSignList(requestedSigs, genTxCode('REMOVE_LIQUIDITY', series?.maturity.toString()));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
 
@@ -209,19 +195,17 @@ export const usePoolProxy = () => {
     let calldata:any;
 
     if (!series.isMature()) {
-      /* calculate expected trade values  */  
-      let minFYDaiPrice:BigNumber;    
+      /* calculate expected trade values  */ 
+      let minFYDaiPrice:string | BigNumber;
+
       const preview = await previewPoolTx('sellfydai', series, ethers.utils.parseEther('1'));
 
       if ( !(preview instanceof Error) ) {
-        const one = utils.toRay(1);
-        const onePointOne = utils.toRay(1.1);
-        const rayPrice = preview.mul(BigNumber.from('1000000000'));
-        minFYDaiPrice = one.sub( utils.mulRay(one.sub(rayPrice), onePointOne) );
+        const _oneRay = ONE.mul('1e18');
+        minFYDaiPrice = floorDecimal( ( _oneRay.sub( (_oneRay.sub( preview.toString())).mul('1.1') )).toFixed() );
       } else {
         throw(preview);
       }
-
       // contract fn used: removeLiquidityEarlyDaiFixedWithSignature(IPool pool,uint256 poolTokens,uint256 minimumFYDaiPrice,bytes memory controllerSig,bytes memory poolSig)
       calldata = proxyContract.interface.encodeFunctionData( 
         'removeLiquidityEarlyDaiFixedWithSignature', 
@@ -246,7 +230,6 @@ export const usePoolProxy = () => {
   };
   
   return {
-
     /* exported liquidity pool fns */
     addLiquidity,
     removeLiquidity,

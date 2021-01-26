@@ -3,9 +3,14 @@ import { useWeb3React } from '@web3-react/core';
 
 import { ethers } from 'ethers';
 import moment from 'moment';
+
+
 import * as utils from '../utils';
+import * as fyMath from '../utils/yieldMath';
+
+import yieldEnv from './yieldEnv.json';
+
 import { NotifyContext } from './NotifyContext';
-import Addresses from './YieldAddresses.json';
 
 import { useCachedState, } from '../hooks/appHooks';
 import { useCallTx } from '../hooks/chainHooks';
@@ -14,6 +19,8 @@ import { useMigrations } from '../hooks/migrationHook';
 
 import { IYieldSeries } from '../types';
 import { cleanValue } from '../utils';
+
+const { addresses, contractsList, colors } = yieldEnv;
 
 const YieldContext = createContext<any>({});
 
@@ -26,7 +33,7 @@ const getAddresses = (
   contractNameList: string[],
   chainId: number,
 ): { [name: string]: string; } => {
-  const addrs = (Addresses as any)[chainId];
+  const addrs = (addresses as any)[chainId];
   const res = Object.keys(addrs).reduce((filtered: any, key) => {
     if (contractNameList.indexOf(key) !== -1) {
       // eslint-disable-next-line no-param-reassign
@@ -38,32 +45,11 @@ const getAddresses = (
 };
 
 const getFyDaiNames = (chainId: number): string[] => {
-  const addrs = (Addresses as any)[chainId];
+  const addrs = (addresses as any)[chainId];
   return Object.keys(addrs).filter((x) => x.startsWith('fyDai') && x.indexOf('LP') === -1);
 };
 
-const seriesColors = ['#aed175', '#f0817f', '#ffbf81', '#95a4db', '#ffdc5c', '#ff86c8', '#82d4bb', '#6ab6f1', '#cb90c9', ];
-// const fromColors= ['#95a4db', '#ffdc5c', '#ff86c8', '#82d4bb', '#6ab6f1', '#cb90c9', '#aed175', '#f0817f', '#ffbf81',  ];
-const fromColors= ['#add8e6', '#add8e6', '#add8e6', '#add8e6', '#add8e6', '#add8e6', '#add8e6', '#add8e6', '#add8e6',  ];
-
-const contractList = [
-  'Controller',
-  'Treasury',
-  'Dai',
-  'Vat',
-  'PoolProxy',
-  'BorrowProxy',
-  'ProxyRegistry',
-  'ProxyFactory',
-  'GetCdps',
-  'DssCdpManager',
-  'ImportProxy',
-  'ImportCdpProxy',
-  'ExportProxy',
-  'ExportCdpProxy',
-];
-
-// reducer
+// context reducer
 function reducer(state: any, action: any) {
   switch (action.type) {
     case 'updateDeployedSeries':
@@ -137,7 +123,7 @@ const YieldProvider = ({ children }: any) => {
     }
 
     /* Load/Read yield core contract addresses */
-    const _deployedContracts = getAddresses(contractList, chainId!);
+    const _deployedContracts = getAddresses(contractsList, chainId!);
     // eslint-disable-next-line no-console
     console.log('Yield contract addresses:', _deployedContracts);
 
@@ -163,17 +149,18 @@ const YieldProvider = ({ children }: any) => {
             maturity_: new Date(maturity * 1000),
             displayName: moment.utc(maturity * 1000).format('MMMM YYYY'),
             displayNameMobile: moment.utc(maturity * 1000).format('MMM YYYY'),
-            seriesColor: seriesColors[i],
+            seriesColor: colors.seriesColors[i],
             seriesTextColor: '#333333',
-            seriesLightColor: utils.modColor(seriesColors[i], 50),
-            seriesDarkColor: utils.modColor(seriesColors[i], -50),
-            seriesFromColor: fromColors[i] || seriesColors[i],
-            seriesToColor: seriesColors[i]
+            seriesLightColor: utils.modColor(colors.seriesColors[i], 50),
+            seriesDarkColor: utils.modColor(colors.seriesColors[i], -50),
+            seriesFromColor: colors.fromColors[i] || colors.seriesColors[i],
+            seriesToColor: colors.seriesColors[i]
           };
         })
       ).then((res: any) => _deployedSeries.push(...res));
       window.localStorage.removeItem('deployedSeries');
       setCachedSeries(_deployedSeries);
+
       // eslint-disable-next-line no-console
       console.log('Series information updated:', _deployedSeries);
     } else {
@@ -188,28 +175,32 @@ const YieldProvider = ({ children }: any) => {
     _deployedSeries: IYieldSeries[]
   ): Promise<any> => {
     let _state: any = {};
+
     /* For for initial loading and offline support */
     if (cachedFeed) {
       _state = cachedFeed;
     } else {
       _state = state.feedData;
     }
+
     const _ilks = await callTx(_deployedContracts.Vat, 'Vat', 'ilks', [ethers.utils.formatBytes32String('ETH-A') ]);
-    const ethPrice = utils.mulRay(utils.toRay(1.5), (_ilks.spot));
+    // Ray precision is used for ilks.spot and ilks.rate
+    const ethPriceInRay = fyMath.mulDecimal('1.5', (_ilks.spot).toString()); 
+    const ethPrice = fyMath.divDecimal(ethPriceInRay, '1e27');
+
     /* parse and return feed data if reqd. */
     const _feedData = {
       ..._state,
       ilks: {
         ..._ilks,
-        spot_: utils.rayToHuman(_ilks.spot),
-        rate_: utils.rayToHuman(_ilks.rate),
+        spot_: fyMath.divDecimal(_ilks.spot, '1e27'),
+        rate_: fyMath.divDecimal(_ilks.rate, '1e27'),
       },
       ethPrice,
-      ethPrice_: cleanValue( ethers.utils.formatEther( utils.mulRay(ethers.utils.parseEther('1.5'), (_ilks.spot)).toString()), 4),
+      ethPrice_: cleanValue(ethPrice, 2),
     };
+
     setCachedFeed(_feedData);
-    // eslint-disable-next-line no-console
-    console.log('Eth Price check:', _feedData.ethPrice_);
     return _feedData;
   };
 
@@ -218,9 +209,10 @@ const YieldProvider = ({ children }: any) => {
    */
   const _getYieldData = async (_deployedContracts: any, _deployedSeries: IYieldSeries[]): Promise<any> => {
     const _yieldData: any = {};
-    _yieldData.version = await getYieldVersion();
+    _yieldData.contractsVersion = await getYieldVersion();
+    _yieldData.appVersion = process.env.REACT_APP_VERSION;
     // eslint-disable-next-line no-console
-    console.log('Contract Version:', _yieldData.version);
+    console.log('Contract Version:', _yieldData.contractsVersion, 'Contract Version:', _yieldData.appVersion, );
     return {
       ..._yieldData,
     };
@@ -252,7 +244,6 @@ const YieldProvider = ({ children }: any) => {
         type: 'notify',
         payload: { message: 'Error Accessing the Yield Protocol: Network issues' },
       });
-      
       // eslint-disable-next-line no-console
       console.log(e);
       return;

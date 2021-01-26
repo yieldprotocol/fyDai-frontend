@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import { useContext } from 'react';
 import { ethers }  from 'ethers';
 import { signDaiPermit, signERC2612Permit } from 'eth-permit';
 
@@ -7,7 +7,7 @@ import {
   IDomain,
   ISignListItem,
 } from '../types';
-import { MAX_INT } from '../utils';
+import { MAX_INT } from '../utils/constants';
 
 import { TxContext } from '../contexts/TxContext';
 import { UserContext } from '../contexts/UserContext';

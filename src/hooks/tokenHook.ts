@@ -10,7 +10,7 @@ import Pool from '../contracts/Pool.json';
 import { useTxHelpers } from './txHooks';
 import { useDsProxy } from './dsProxyHook';
 
-
+/* Map of the tokens that will potentially be used */
 const contractMap = new Map<string, any>([
   ['FYDai', FYDai.abi],
   ['Dai', Dai.abi],
@@ -68,7 +68,11 @@ export function useToken() {
     operatorAddress:string,
     fromAddress: string|null = null,
   ) => {
-    const fromAddr = fromAddress ? ethers.utils.getAddress(fromAddress) : ( account && ethers.utils.getAddress(account) ); 
+
+    const fromAddr = fromAddress ? 
+      ethers.utils.getAddress(fromAddress) : 
+      ( account && ethers.utils.getAddress(account) ); 
+
     const tokenAddr = ethers.utils.getAddress(tokenAddress);
     const operatorAddr = ethers.utils.getAddress(operatorAddress);
     const contract = new ethers.Contract( tokenAddr, contractMap.get(tokenName), provider );
