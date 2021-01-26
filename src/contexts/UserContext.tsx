@@ -73,6 +73,7 @@ const initState = {
   preferences:{
     slippage: 0.005, // default === 0.5%
     useTxApproval: false,
+    addLiquidityStrategy: 'BUY',
     showDisclaimer: true,
     themeMode:'auto',
     moodLight: true,

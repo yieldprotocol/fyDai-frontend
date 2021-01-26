@@ -229,7 +229,7 @@ export const usePool = () => {
    */
   const poolTotalSupply = async (
     poolAddress:string,
-  ): Promise<boolean> => {
+  ): Promise<string> => {
     const poolAddr = ethers.utils.getAddress(poolAddress);
     const contract = new ethers.Contract( poolAddr, poolAbi, fallbackProvider);
     let res;
@@ -240,6 +240,27 @@ export const usePool = () => {
     }
     return res;
   };
+
+  /**
+   * @dev gets the fyDai virtual reserves of the pool.
+   * @param {string} poolAddress address of the market in question.
+   * @returns {Promise<boolean>} approved ?
+   * @note call function 
+   */
+  const getFyDaiReserves = async (
+    poolAddress:string,
+  ): Promise<string> => {
+    const poolAddr = ethers.utils.getAddress(poolAddress);
+    const contract = new ethers.Contract( poolAddr, poolAbi, fallbackProvider);
+    let res;
+    try {
+      res = await contract.getFYDaiReserves();
+    }  catch (e) {
+      res = '0';
+    }
+    return res;
+  };
+
 
   /**
    * @dev Preview buy/sell transactions
@@ -314,6 +335,8 @@ export const usePool = () => {
     buyFYDai,
     sellDai,
     buyDai,
+
+    getFyDaiReserves,
 
     addPoolDelegate,
     checkPoolDelegate,

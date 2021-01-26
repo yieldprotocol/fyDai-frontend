@@ -254,7 +254,7 @@ export const useBorrowProxy = () => {
  
     // User to treasury no ds proxy 
     requestedSigs.set('daiSig',
-      { id: genTxCode('AUTH_TOKEN', series?.maturity.toString()),
+      { id: genTxCode('AUTH_DAI', series?.maturity.toString()),
         desc: 'Allow Dai transfers to the fyDai Treasury',
         conditional: ( await getTokenAllowance(deployedContracts.Dai, 'Dai', deployedContracts.Treasury) ) > 0,
         signFn: () => daiPermitSignature( deployedContracts.Dai, deployedContracts.Treasury),
@@ -326,7 +326,7 @@ export const useBorrowProxy = () => {
       });
 
     requestedSigs.set('daiSig',
-      { id: genTxCode('AUTH_TOKEN', series?.maturity.toString()),
+      { id: genTxCode('AUTH_DAI', series?.maturity.toString()),
         desc: `Allow Dai transfers to the ${series.displayName} pool`,
         conditional: await getTokenAllowance(deployedContracts.Dai, 'Dai', poolAddr) > 0,
         signFn: () => daiPermitSignature(deployedContracts.Dai, poolAddr),
@@ -397,7 +397,7 @@ export const useBorrowProxy = () => {
       });
 
     requestedSigs.set('fyDaiSig',
-      { id: genTxCode('AUTH_TOKEN', series?.maturity.toString()),
+      { id: genTxCode('AUTH_FYDAI', series?.maturity.toString()),
         desc: `Allow fyDai transfers to the ${series.displayName} pool`,
         conditional: ( await getTokenAllowance(fyDaiAddr, 'FYDai', poolAddr) ) > 0,
         signFn: () => ERC2612PermitSignature(fyDaiAddr, poolAddr),    

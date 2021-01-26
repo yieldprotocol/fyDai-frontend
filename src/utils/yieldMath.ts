@@ -1,5 +1,6 @@
 import { ethers, BigNumber } from 'ethers';
 import { Decimal } from 'decimal.js';
+import { bignumber } from 'mathjs';
 
 Decimal.set({ precision: 64 });
 
@@ -187,13 +188,12 @@ export function getFee(
   return fee_.toString();
 }
 
-
 export function fyDaiForMint(
-  daiReserves: BigNumber,
-  fyDaiRealReserves: BigNumber,
-  fyDaiVirtualReserves: BigNumber,
-  dai: BigNumber,
-  timeTillMaturity: BigNumber,
+  daiReserves: BigNumber |string,
+  fyDaiRealReserves: BigNumber|string,
+  fyDaiVirtualReserves: BigNumber|string,
+  dai: BigNumber|string,
+  timeTillMaturity: BigNumber|string,
 ): string {
 
   const daiReserves_ = new Decimal(daiReserves.toString());
@@ -416,5 +416,7 @@ export const secondsToFrom  = (
   to: BigNumber | string, 
   from: BigNumber | string = BigNumber.from( Math.round(new Date().getTime() / 1000)), // OPTIONAL: FROM defaults to current time if omitted
 ) : string => {
-  return to.sub(from).toString();
+  const to_ = ethers.BigNumber.isBigNumber(to)? to : BigNumber.from(to);
+  const from_ = ethers.BigNumber.isBigNumber(from)? from : BigNumber.from(from);
+  return to_.sub(from_).toString();
 };
