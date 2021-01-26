@@ -238,7 +238,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
 
         <SeriesDescriptor activeView='borrow'>
           <InfoGrid
-            alt
+            alt={true}
             entries={[
               {
                 label: null,
