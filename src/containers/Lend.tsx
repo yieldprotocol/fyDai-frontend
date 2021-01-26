@@ -1,12 +1,15 @@
 import React, { useEffect, useState, useContext } from 'react';
+import { NavLink, useParams } from 'react-router-dom';
 import { ethers } from 'ethers';
 import { Box, Keyboard, TextInput, Text, ResponsiveContext, Collapsible, Layer } from 'grommet';
 import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 import { VscHistory as History } from 'react-icons/vsc';
 
-import { NavLink, useParams } from 'react-router-dom';
+/* utils and support */
 import { cleanValue, genTxCode } from '../utils';
+import { logEvent } from '../utils/analytics';
 
+/* contexts */
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
   
@@ -18,9 +21,11 @@ import { useTxActive } from '../hooks/txHooks';
 import { usePool } from '../hooks/poolHook';
 import { useBorrowProxy } from '../hooks/borrowProxyHook';
 
+/* containers */
 import CloseDai from './CloseDai';
 import Redeem from './Redeem';
 
+/* components */
 import InputWrap from '../components/InputWrap';
 import InfoGrid from '../components/InfoGrid';
 import TxStatus from '../components/TxStatus';
@@ -31,13 +36,11 @@ import FlatButton from '../components/FlatButton';
 import SeriesMatureBox from '../components/SeriesMatureBox';
 import TxHistory from '../components/TxHistory';
 import HistoryWrap from '../components/HistoryWrap';
-
 import DaiMark from '../components/logos/DaiMark';
 import RaisedBox from '../components/RaisedBox';
 import YieldMobileNav from '../components/YieldMobileNav';
 import Loading from '../components/Loading';
 
-import { logEvent } from '../utils/analytics';
 
 interface ILendProps {
   openConnectLayer:any;
@@ -46,47 +49,42 @@ interface ILendProps {
 const Lend = ({ openConnectLayer }:ILendProps) => {
 
   const { amnt }:any = useParams();
+  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   
-  const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
+  /* state from contexts */
+  const { state: { activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
   const activeSeries = seriesData.get(activeSeriesId);
-
   const { state: userState, actions: userActions } = useContext(UserContext);
   const { daiBalance, daiBalance_ } = userState.position;
 
-  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
-
-  const { previewPoolTx } = usePool();
-  const { sellDai } = useBorrowProxy();
-  const { calcAPR } = useMath();
-  const { account, fallbackProvider } = useSignerAccount();
-  const [ txActive ] = useTxActive(['SELL_DAI']);
-
-  const [ closeTxActive ] = useTxActive(['BUY_DAI']);
-
-
-
-  const [ hasDelegated ] = useState<boolean>(true);
-
+  /* local state */ 
   const [ CloseDaiOpen, setCloseDaiOpen ] = useState<boolean>(false);
   const [ histOpen, setHistOpen ] = useState<boolean>(false);
-  
-  const [showTxPending, setShowTxPending] = useState<boolean>(false);
-  useEffect(()=>{
-    setShowTxPending( txActive?.txCode === genTxCode('SELL_DAI', activeSeries));
-  }, [txActive, activeSeries]);
-  
-  const [ inputValue, setInputValue ] = useState<any>(amnt || undefined);
-  const debouncedInput = useDebounce(inputValue, 500);
-  const [inputRef, setInputRef] = useState<any>(null);
-  
+  const [ inputRef, setInputRef ] = useState<any>(null);
   const [ lendDisabled, setLendDisabled ] = useState<boolean>(true);
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
-  const isLol = useIsLol(inputValue);
+  const [ inputValue, setInputValue ] = useState<any>(amnt || undefined);
 
-  const [ APR, setAPR ] = useState<number>();
+  const [ APR, setAPR ] = useState<string>();
   const [ fyDaiValue, setFYDaiValue ] = useState<number>(0);
   const [ currentValue, setCurrentValue ] = useState<string>();
+  
+  /* init hooks */ 
+  const { previewPoolTx } = usePool();
+  const { sellDai } = useBorrowProxy();
+  const { calculateAPR } = useMath();
+  const { account, fallbackProvider } = useSignerAccount();
+  const [ txActive ] = useTxActive(['SELL_DAI']);
+  const [ closeTxActive ] = useTxActive(['BUY_DAI']);
+  const [ hasDelegated ] = useState<boolean>(true);
+  const debouncedInput = useDebounce(inputValue, 500);
+  const isLol = useIsLol(inputValue);
+
+  const [showTxPending, setShowTxPending] = useState<boolean>(false);
+  useEffect(()=>{
+    setShowTxPending( txActive?.txCode === genTxCode('SELL_DAI', activeSeries?.maturity.toString()));
+  }, [txActive, activeSeries]);
   
   /* Lend execution flow */
   const lendProcedure = async () => {
@@ -112,7 +110,8 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
       const preview = await previewPoolTx('sellDai', activeSeries, debouncedInput);
       if (!(preview instanceof Error)) {
         setFYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
-        setAPR( calcAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) );      
+        const _apr = calculateAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity )
+        setAPR( cleanValue(_apr, 2) );      
       } else {
         /* if the market doesnt have liquidity just estimate from rate */
         const rate = await previewPoolTx('sellDai', activeSeries, 1);
@@ -271,7 +270,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
                         visible: true,
                         active: inputValue,
                         loading: false,     
-                        value: APR?`${APR.toFixed(2)}%`: `${activeSeries? activeSeries.yieldAPR_: ''}%`,
+                        value: APR?`${APR}%`: `${activeSeries? activeSeries.yieldAPR_: ''}%`,
                         valuePrefix: null,
                         valueExtra: null, 
                       },
@@ -329,8 +328,6 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
 
             <Box direction='row' fill justify='between'>
               { 
-                // activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) && 
-                // !mobile &&
                 !activeSeries?.isMature() && 
                 activeSeries?.fyDaiBalance_ > 0 &&
                 !mobile &&

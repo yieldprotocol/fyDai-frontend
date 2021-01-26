@@ -35,7 +35,7 @@ export interface IYieldSeries {
   wethDebtDai_?: number;
   wethDebtFYDai?: BigNumber;
   wethDebtFYDai_?: number;
-  yieldAPR?: number;
+  yieldAPR?: string;
   yieldAPR_?: string;
 }
 
@@ -129,7 +129,6 @@ export interface IDomain {
   chainId: number;
   verifyingContract: string;
 }
-
 
 export interface IAnalytics {
   category: string;

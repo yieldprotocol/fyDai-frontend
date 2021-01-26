@@ -7,22 +7,18 @@ import { ISignListItem, IYieldSeries } from '../types';
 import ImportProxy from '../contracts/ImportProxy.json';
 import ImportCdpProxy from '../contracts/ImportCdpProxy.json';
 
-
 import Controller from '../contracts/Controller.json';
 
-import Vat from '../contracts/Vat.json';
-
 import { YieldContext } from '../contexts/YieldContext';
-import { UserContext } from '../contexts/UserContext';
 
 import { useSignerAccount } from './connectionHooks';
 import { useSigning } from './signingHook';
 import { useDsProxy } from './dsProxyHook';
 import { useController } from './controllerHook';
 import { usePool } from './poolHook';
-import { useMaker } from './makerHook';
 
 import { genTxCode } from '../utils';
+import { floorDecimal, mulDecimal, ONE } from '../utils/yieldMath';
 
 /**
  * Hook for interacting with the ImportProxy Contract.
@@ -38,16 +34,13 @@ export const useImportProxy = () => {
 
   /* contexts */
   const  { state: { deployedContracts } }  = useContext<any>(YieldContext);
-  const  { state: { authorization: { hasDelegatedDsProxy } } }  = useContext<any>(UserContext);
 
   /* hooks */
-  const { account, signer, fallbackProvider } = useSignerAccount();
+  const { account, signer } = useSignerAccount();
   const { addControllerDelegate, checkControllerDelegate } = useController();
   const { proxyExecute } = useDsProxy();
   const { delegationSignature, handleSignList } = useSigning();
   const { previewPoolTx } = usePool();
-
-  const { daiToMakerDebt, minWethForAmount } = useMaker();
 
   const { abi: importCdpProxyAbi } = ImportCdpProxy;
   const { abi: importProxyAbi } = ImportProxy;
@@ -110,26 +103,20 @@ export const useImportProxy = () => {
       value: ethers.utils.parseEther('0')
     };
 
-    // const makerDebt = await daiToMakerDebt(parsedDaiDebt);
-
     /* calculate expected max safety values  */  
-    let maxDaiPrice:BigNumber;         
+    let maxDaiPrice:string;         
     const preview = await previewPoolTx('buydai', series, ethers.utils.parseEther('1'));   
-    if ( !(preview instanceof Error) ) {  
-      const one = utils.toRay(1);
-      const onePointOne = utils.toRay(1.1);
-      const rayPrice = preview.mul(BigNumber.from('1000000000'));
-      maxDaiPrice = one.add( utils.mulRay(onePointOne, rayPrice.sub(one) ));
-      console.log(maxDaiPrice.toString());
+    if ( !(preview instanceof Error) ) {
+      
+      // 1 + ( 1.1 * ( price - 1 ) )
+      const _one = ONE.mul('1e18');
+      const diff = preview.sub(_one.toFixed());
+      const adjDiff = mulDecimal( '1.1', diff ); 
+      maxDaiPrice =  floorDecimal( _one.add(adjDiff).toFixed() ) ;
+
     } else {
       throw(preview);
     }
-    
-    console.log(parsedDaiDebt, ethers.utils.formatEther(parsedDaiDebt));
-    console.log(parsedWeth, ethers.utils.formatEther(parsedWeth));
-
-    maxDaiPrice = utils.toRay(2);
-    /* above for testing */
 
     /* build and use signature if required , else '0x' */
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
@@ -155,13 +142,15 @@ export const useImportProxy = () => {
     }
 
     /* Send the required signatures out for signing, or approval tx if fallback is required */
-    const signedSigs = await handleSignList(requestedSigs, genTxCode('IMPORT', series));
+    const signedSigs = await handleSignList(requestedSigs, genTxCode('IMPORT', series?.maturity.toString()));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
     
-    /* contract fns used:
+    /* 
+      contract fns used:
       importPositionWithSignature(IPool pool, address user, uint256 wethAmount, uint256 debtAmount, uint256 maxDaiPrice, bytes memory controllerSig)
-      importCdpPositionWithSignature(IPool pool, uint256 cdp, uint256 wethAmount, uint256 debtAmount, uint256 maxDaiPrice, bytes memory controllerSig) */
+      importCdpPositionWithSignature(IPool pool, uint256 cdp, uint256 wethAmount, uint256 debtAmount, uint256 maxDaiPrice, bytes memory controllerSig) 
+    */
     const calldata = viaCdpMan ? 
       cdpProxyContract.interface.encodeFunctionData(
         'importCdpPositionWithSignature', 
@@ -203,19 +192,19 @@ export const useImportProxy = () => {
     };
  
     /* calculate expected max safety values */  
-    let maxDaiPrice:BigNumber; 
+    let maxDaiPrice: string; 
     const preview = await previewPoolTx('buydai', series, ethers.utils.parseEther('1'));   
-    if ( !(preview instanceof Error) ) {  
-      const one = utils.toRay(1);
-      const onePointOne = utils.toRay(1.1);
-      const rayPrice = preview.mul(BigNumber.from('1000000000'));
-      maxDaiPrice = one.add( utils.mulRay(onePointOne, rayPrice.sub(one) ));
-      console.log(maxDaiPrice.toString());
+    if ( !(preview instanceof Error) ) { 
+
+      // 1 + ( 1.1 * ( price - 1 ) )
+      const _one = ONE.mul('1e18');
+      const diff = preview.sub(_one.toFixed());
+      const adjDiff = mulDecimal( '1.1', diff ); 
+      maxDaiPrice =  floorDecimal( _one.add(adjDiff).toFixed() ) ;
+
     }  else {
       throw(preview);
     }
-    /* for testing only - remove for prod */ 
-    maxDaiPrice = utils.toRay(2);
 
     /* build and use signature if required , else '0x' */
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
@@ -241,7 +230,7 @@ export const useImportProxy = () => {
     }
 
     /* Send the required signatures out for signing, or approval tx if fallback is required */
-    const signedSigs = await handleSignList(requestedSigs, genTxCode('IMPORT', series));
+    const signedSigs = await handleSignList(requestedSigs, genTxCode('IMPORT', series?.maturity.toString()));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
 

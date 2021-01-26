@@ -1,4 +1,25 @@
-{ 
+{
+  "contractsList" : [
+    "Controller",
+    "Treasury",
+    "Dai",
+    "Vat",
+    "PoolProxy",
+    "BorrowProxy",
+    "ProxyRegistry",
+    "ProxyFactory",
+    "GetCdps",
+    "DssCdpManager",
+    "ImportProxy",
+    "ImportCdpProxy"
+  ],
+
+  "colors" : {
+    "seriesColors" : [ "#aed175", "#f0817f", "#ffbf81", "#95a4db", "#ffdc5c", "#ff86c8", "#82d4bb", "#6ab6f1", "#cb90c9" ],
+    "fromColors" : ["#add8e6", "#add8e6", "#add8e6", "#add8e6", "#add8e6", "#add8e6", "#add8e6", "#add8e6", "#add8e6" ]
+  },
+
+  "addresses" : { 
     "1": {
         "Chai" : "0x06AF07097C9Eeb7fD685c692751D5C66dB49c215",
         "Controller" : "0xB94199866Fe06B535d019C11247D3f921460b91A",
@@ -61,7 +82,7 @@
         "fyDaiLP21Sep30": "0x06e9493BfA938a5630b6Eee116eD01A31Ec7dDA7",
         "fyDaiLP21Dec31": "0xBa51e4Df86333D53Df3c734D12038722EA9Bf559",  
         "BorrowProxy":    "0xcaA9e150Ab7f26Dad0A0c7aE139C15F4E0f58103",
-        "PoolProxy":      "0x9cAc57C33755d324013D3e12DfA5636309b705F9",
+        "PoolProxy":      "0x4A38D30F0d451213C51a332773858712cA1dD6E6",
         "ImportProxy":    "0xe713DA979FaE7470b5216Dca0b287a02BBfe8184",
         "ImportCdpProxy": "0xA5286e1Cb19Bd62a3369f641C8c3F1e2dEa1089d",
         "GetCdps":        "0x592301a23d37c591C5856f28726AF820AF8e7014",
@@ -69,5 +90,5 @@
         "ProxyFactory":   "0xe11E3b391F7E8bC47247866aF32AF67Dd58Dc800",
         "ProxyRegistry":  "0x64A436ae831C1672AE81F674CAb8B6775df3475C"
     }
+  }
 }
-

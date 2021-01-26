@@ -115,6 +115,35 @@
         },
         {
           "internalType": "uint256",
+          "name": "fyDaiBought",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "maxDaiUsed",
+          "type": "uint256"
+        }
+      ],
+      "name": "buyAddLiquidity",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "contract IPool",
+          "name": "pool",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
           "name": "poolTokens",
           "type": "uint256"
         },
@@ -246,6 +275,84 @@
         }
       ],
       "name": "addLiquidityWithSignature",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "contract IPool",
+          "name": "pool",
+          "type": "address"
+        }
+      ],
+      "name": "buyAddLiquidityCheck",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        },
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        },
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        },
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "contract IPool",
+          "name": "pool",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "fyDaiBought",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "maxDaiUsed",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes",
+          "name": "daiSig",
+          "type": "bytes"
+        },
+        {
+          "internalType": "bytes",
+          "name": "fyDaiSig",
+          "type": "bytes"
+        },
+        {
+          "internalType": "bytes",
+          "name": "poolSig",
+          "type": "bytes"
+        }
+      ],
+      "name": "buyAddLiquidityWithSignature",
       "outputs": [
         {
           "internalType": "uint256",

@@ -170,7 +170,7 @@ export const useController = () => {
    * @returns {Promise<BigNumber>} amount Dai (in Wei)
    * @note call function
    */
-  const borrowingPower = async (
+  const getBorrowingPower = async (
     collateralType:string
   ): Promise<BigNumber> => {
     const accAddr = account && ethers.utils.getAddress(account);
@@ -212,6 +212,32 @@ export const useController = () => {
   };
 
   /**
+   * @dev get the FyDai debt of a series
+   * @param {string} collateralType collateral type to check (eg. ETH-A)
+   * @param maturity Maturity of an added series
+   * 
+   * @returns {Promise<BigNumber>} amount Dai (in Wei)
+   * @note call function 
+   */
+  const debtFYDai = async (
+    collateralType:string,
+    maturity:number,
+  ): Promise<BigNumber> => {
+    const accAddr = account && ethers.utils.getAddress(account);
+    const collType = ethers.utils.formatBytes32String(collateralType);
+    let res;
+    try {
+      res = await controllerProvider.debtFYDai(collType,  maturity, accAddr);
+    }  catch (e) {
+      // eslint-disable-next-line no-console
+      console.log(e);
+      res = false;
+    }
+    return res;
+  };
+
+
+  /**
    * @dev Total debt of an user across ALL series, in Dai
    * @param {string} collateralType collateral type to check (eg. ETH-A)
    * @returns {Promise<BigNumber>} amount Dai (in Wei)
@@ -239,9 +265,10 @@ export const useController = () => {
     checkControllerDelegate,
     collateralPosted,
     collateralLocked,
-    borrowingPower,
+    getBorrowingPower,
     totalDebtDai,
     debtDai,
+    debtFYDai,
 
   } as const;
 };
