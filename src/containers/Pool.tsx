@@ -40,6 +40,7 @@ import RaisedBox from '../components/RaisedBox';
 import DaiMark from '../components/logos/DaiMark';
 import YieldMobileNav from '../components/YieldMobileNav';
 import Loading from '../components/Loading';
+import StickyButton from '../components/StickyButton';
 
 
 interface IPoolProps {
@@ -264,35 +265,65 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                         valuePrefix: null,
                         valueExtra: null,
                       },
-                      {
-                        label: () => ( 
-                          <Box direction='row' gap='small' align='center'>
-                    
 
-                            <Text size='xsmall'> Use Alternative strategy to add liquidity </Text> 
-                            <CheckBox 
-                              checked={!useBuyToAddLiquidity}
-                              onClick={() => userActions.updatePreferences({ useBuyToAddLiquidity: !useBuyToAddLiquidity })}
-                            />
-                            
-                          </Box>                       
-                        ),
-                        labelExtra: () => ( 
-                          <Box direction='row' gap='small' align='center' justify='between'>
-                            {/* <Box margin={{ horizontal:'small' }} /> */}
-                            <Text size='xxsmall'> { useBuyToAddLiquidity ? 
-                              'Currently using the most gas efficient strategy. It is reccommended for most users.': 
-                              'The alternative strategy is more robust and is not limited by the reserves in the pool.' } 
-                            </Text>
-                          </Box>                       
-                        ),
+                      {
+                        label: 'Supply strategy:',
+                        labelExtra:null,
                         visible: inputValue>0,
                         active: debouncedInput,
                         loading: false,           
                         value: null,
                         valuePrefix: null,
-                        valueExtra:null
+                        valueExtra: () => ( 
+                          <Box pad={{ top:'xsmall' }} gap='small' align='center' direction='row'>
+                            <StickyButton
+                              onClick={() => userActions.updatePreferences({ useBuyToAddLiquidity: true })}
+                              selected={useBuyToAddLiquidity}
+                              fill
+                            >
+                              <Box pad={{ horizontal:'xxsmall', vertical: 'xsmall' }} alignSelf='center'>
+                                <Text size="xxsmall">
+                                  Buy
+                                </Text>
+                              </Box>
+                            </StickyButton>
+
+                            <StickyButton
+                              onClick={() => userActions.updatePreferences({ useBuyToAddLiquidity: false })}
+                              selected={!useBuyToAddLiquidity}
+                              fill
+                            >
+                              <Box pad={{ horizontal:'xxsmall', vertical: 'xsmall' }} alignSelf='center'>
+                                <Text size="xxsmall">
+                                  Borrow
+                                </Text>
+                              </Box>
+                            </StickyButton>                       
+                          </Box>       
+                        )
                       },
+
+                      {
+                        label: null,
+                        labelExtra: null,
+                        visible: inputValue>0,
+                        active: debouncedInput,
+                        loading: false,           
+                        value: null,
+                        valuePrefix: null,
+                        valueExtra:() => ( 
+                          <>
+                            { useBuyToAddLiquidity ?
+                              <Text size='xxsmall' weight='normal'>
+                                <Text size='xxsmall' weight='bold'> Buy & Pool </Text> is the most gas efficient strategy. (Recommended for most users)
+                              </Text> :
+                              <Text size='xxsmall' weight='normal'> 
+                                <Text size='xxsmall' weight='bold'> Borrow & Pool </Text> strategy is more robust and is not limited by the reserves in the pool.
+                              </Text>}
+                          </>
+                        )
+                      },
+
                       {
                         label: 'Like what you see?',
                         visible: !account && inputValue>0,
