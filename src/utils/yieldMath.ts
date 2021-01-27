@@ -1,6 +1,5 @@
 import { ethers, BigNumber } from 'ethers';
 import { Decimal } from 'decimal.js';
-import { bignumber } from 'mathjs';
 
 Decimal.set({ precision: 64 });
 
