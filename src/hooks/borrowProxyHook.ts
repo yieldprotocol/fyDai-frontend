@@ -603,7 +603,7 @@ export const useBorrowProxy = () => {
     /* construct the calldata. Fn selection Based on current authorization status */
     const calldata = proxyContract.interface.encodeFunctionData( 
       'buyFYDaiWithSignature',
-      [ poolAddr, toAddr, parsedFYDaiOut, maxDaiIn, signedSigs.get('daiSig'), signedSigs.get('poolSig') ]
+      [ poolAddr, toAddr, parsedFYDaiOut, ethers.utils.parseEther('100'), signedSigs.get('daiSig'), signedSigs.get('poolSig') ]
     );
 
     /* send to the proxy for execution */
