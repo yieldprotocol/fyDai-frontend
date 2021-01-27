@@ -8,7 +8,6 @@ import { deepMerge } from 'grommet/utils';
 import * as serviceWorker from './serviceWorker';
 import { yieldTheme } from './themes';
 import { modColor } from './utils';
-import { initGA, logPageView } from './utils/analytics';
 
 /* contexts */
 import { SeriesContext } from './contexts/SeriesContext';
@@ -28,9 +27,10 @@ import Borrow from './containers/Borrow';
 import Lend from './containers/Lend';
 import Pool from './containers/Pool';
 import Deposit from './containers/Deposit';
+import Trade from './containers/Trade';
 import RateLock from './containers/RateLock';
 
-/* components */
+
 import YieldHeader from './components/YieldHeader';
 import YieldFooter from './components/YieldFooter';
 import ErrorBoundary from './components/ErrorBoundry';
@@ -169,7 +169,8 @@ const App = (props:any) => {
           <Route path="/borrow/:series?/:amnt?"> <Borrow openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route>      
           <Route path="/lend/:series?/:amnt?"> <Lend openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route>
           <Route path="/pool/:series?/:amnt?"> <Pool openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route>
-          <Route path="/ratelock/:vault?/:series?"> <RaisedBox><RateLock openConnectLayer={() => setShowConnectLayer('CONNECT')} /></RaisedBox> </Route>     
+          <Route path="/trade/:series?/:amnt?"> <Trade openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route> 
+          <Route path="/ratelock/:vault?/:series?"> <RaisedBox><RateLock openConnectLayer={() => setShowConnectLayer('CONNECT')} /></RaisedBox> </Route>   
           <Route exact path="/"> <Redirect to={`${cachedLastVisit || '/borrow/'}`} /> </Route>
           <Route path="/*"> 404 </Route>
         </Switch>              

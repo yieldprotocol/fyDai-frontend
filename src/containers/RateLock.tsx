@@ -195,7 +195,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
       const preview = await previewPoolTx('buyDai', activeSeries, debouncedDebtInput);     
       if (!(preview instanceof Error)) {
         const _apr = calculateAPR( ethers.utils.parseEther(debouncedDebtInput.toString()), preview, activeSeries.maturity );
-        setAPR(cleanValue(_apr, 2) );
+        setAPR(cleanValue(_apr.toString(), 2) );
       } else {
         setAllDisabled(true);
         setDebtErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
@@ -269,7 +269,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
       const preview = await previewPoolTx('buyDai', activeSeries, selectedVault.vaultDaiDebt_);
       if (!(preview instanceof Error)) {
         const _apr = calculateAPR( ethers.utils.parseEther(selectedVault?.vaultDaiDebt_), preview, activeSeries.maturity);
-        setMaxAPR( cleanValue(_apr, 2) );
+        setMaxAPR( cleanValue(_apr.toString(), 2) );
       } else {
         setMaxAPR(undefined);
       }

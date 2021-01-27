@@ -32,7 +32,6 @@ import { genTxCode } from '../utils';
  * @returns { function } withdrawEth
  * @returns { function } borrowDai
  * @returns { function } repayDaiDebt
- * @returns { function } buyDai
  * @returns { function } sellDai
  * 
  */
@@ -424,6 +423,154 @@ export const useBorrowProxy = () => {
     );
   };
 
+  /**
+   * @dev Sell fyDai for Dai
+   * 
+   * @param {IYieldSeries} series series to act on.
+   * @param fyDaiIn Amount of fyDai being bought (if in BigNumber make sure its in Wei. )
+   * */
+  const sellFYDai = async (  
+    series: IYieldSeries,
+    fyDaiIn: number| BigNumber, 
+  ) => {
+
+    /* Processing and/or sanitizing input */
+    const poolAddr = ethers.utils.getAddress(series.poolAddress);
+    const poolContract = new ethers.Contract( poolAddr, Pool.abi as any, provider);
+
+    const fyDaiAddr = ethers.utils.getAddress(series.fyDaiAddress);
+    const parsedFYDaiIn = BigNumber.isBigNumber(fyDaiIn)? fyDaiIn : ethers.utils.parseEther(fyDaiIn.toString());
+    const toAddr = account && ethers.utils.getAddress(account);
+
+    const overrides = { 
+      gasLimit: BigNumber.from('250000'),
+      value: 0,
+    };
+
+    /* calculate expected trade values and factor in slippage */
+    let minDaiOut:string;
+    const preview = await previewPoolTx('sellfydai', series, fyDaiIn);
+    if ( !(preview instanceof Error) ) {
+      minDaiOut = calculateSlippage(preview, slippage, true);
+    } else {
+      throw(preview);
+    }
+
+    /* build and use signature if required , else '0x' */
+    const requestedSigs:Map<string, ISignListItem> = new Map([]);
+
+    requestedSigs.set('poolSig',
+      { id: genTxCode('AUTH_POOL', series.maturity.toString()),
+        desc: `Allow your proxy to interact with the ${series.displayName} pool`,
+        conditional: await checkPoolDelegate(poolAddr, dsProxyAddress),
+        signFn: () => delegationSignature(poolContract, dsProxyAddress),    
+        fallbackFn: () => addPoolDelegate(series, dsProxyAddress),
+      });
+
+    requestedSigs.set('fyDaiSig',
+      { id: genTxCode('AUTH_TOKEN', series.maturity.toString()),
+        desc: `Allow fyDai transfers to the ${series.displayName} pool`,
+        conditional: ( await getTokenAllowance(fyDaiAddr, 'FYDai', poolAddr) ) > 0,
+        signFn: () => ERC2612PermitSignature(fyDaiAddr, poolAddr),    
+        fallbackFn: () => approveToken(fyDaiAddr, poolAddr, MAX_INT, series ), 
+      });
+        
+    /* Send the required signatures out for signing, or approval tx if fallback is required */
+    const signedSigs = await handleSignList(requestedSigs, genTxCode('SELL_FYDAI', series.maturity.toString()));
+    /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
+    if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
+
+    /* construct the calldata. Fn selection Based on current authorization status */
+    const calldata = proxyContract.interface.encodeFunctionData( 
+      'sellFYDaiWithSignature',
+      [ poolAddr, toAddr, parsedFYDaiIn, minDaiOut, signedSigs.get('fyDaiSig'), signedSigs.get('poolSig') ]
+    );
+
+    /* send to the proxy for execution */
+    await proxyExecute( 
+      proxyContract.address,
+      calldata,
+      overrides,
+      { tx:null, msg: `Selling ${fyDaiIn} FYDAI from ${series.displayNameMobile} `, type:'SELL_FYDAI', series  }
+    );
+
+  };
+
+  /**
+   * @dev Buy fyDai for Dai
+   * 
+   * @param {IYieldSeries} series series to act on.
+   * @param fyDaiOut Amount of fyDai being bought (if in BigNumber make sure its in Wei. )
+   * */
+  const buyFYDai = async (  
+    series: IYieldSeries,
+    fyDaiOut: number| BigNumber, 
+  ) => {
+
+    /* Processing and/or sanitizing input */
+    const poolAddr = ethers.utils.getAddress(series.poolAddress);
+    const poolContract = new ethers.Contract( poolAddr, Pool.abi as any, provider);
+
+    const parsedFYDaiOut = BigNumber.isBigNumber(fyDaiOut)? fyDaiOut : ethers.utils.parseEther(fyDaiOut.toString());
+    const toAddr = account && ethers.utils.getAddress(account);
+
+    const overrides = { 
+      gasLimit: BigNumber.from('250000'),
+      value: 0,
+    };
+
+    /* Check the signature requirements */
+    const checkSigs = await proxyContract.buyFYDaiCheck(poolAddr);
+    console.log(checkSigs);
+
+    /* calculate expected trade values and factor in slippage */
+    let maxDaiIn:string;
+    const preview = await previewPoolTx('buyfydai', series, fyDaiOut);
+    if ( !(preview instanceof Error) ) {
+      maxDaiIn = calculateSlippage(preview, slippage);
+    } else {
+      throw(preview);
+    }
+
+    /* build and use signature if required , else '0x' */
+    const requestedSigs:Map<string, ISignListItem> = new Map([]);
+
+    requestedSigs.set('poolSig',
+      { id: genTxCode('AUTH_POOL', series.maturity.toString()),
+        desc: `Allow your proxy to interact with the ${series.displayName} pool`,
+        conditional: await checkPoolDelegate(poolAddr, dsProxyAddress),
+        signFn: () => delegationSignature(poolContract, dsProxyAddress),    
+        fallbackFn: () => addPoolDelegate(series, dsProxyAddress),
+      });
+
+    requestedSigs.set('daiSig',
+      { id: genTxCode('AUTH_TOKEN', series.maturity.toString()),
+        desc: `Allow Dai transfers to the ${series.displayName} pool`,
+        conditional: await getTokenAllowance(deployedContracts.Dai, 'Dai', poolAddr) > 0,
+        signFn: () => daiPermitSignature(deployedContracts.Dai, poolAddr),
+        fallbackFn: () => approveToken(deployedContracts.Dai, poolAddr, MAX_INT, series), 
+      });
+        
+    /* Send the required signatures out for signing, or approval tx if fallback is required */
+    const signedSigs = await handleSignList(requestedSigs, genTxCode('BUY_FYDAI', series.maturity.toString()));
+    /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
+    if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
+
+    /* construct the calldata. Fn selection Based on current authorization status */
+    const calldata = proxyContract.interface.encodeFunctionData( 
+      'buyFYDaiWithSignature',
+      [ poolAddr, toAddr, parsedFYDaiOut, maxDaiIn, signedSigs.get('daiSig'), signedSigs.get('poolSig') ]
+    );
+
+    /* send to the proxy for execution */
+    await proxyExecute( 
+      proxyContract.address,
+      calldata,
+      overrides,
+      { tx:null, msg: `Buying ${fyDaiOut} FYDAI to ${series.displayNameMobile} `, type:'BUY_FYDAI', series  }
+    );
+
+  };
 
   return {
 
@@ -438,6 +585,10 @@ export const useBorrowProxy = () => {
     /* Trade fns */
     sellDai,
     buyDai,
+    sellFYDai,
+    buyFYDai,
 
   } as const;
 };
+
+

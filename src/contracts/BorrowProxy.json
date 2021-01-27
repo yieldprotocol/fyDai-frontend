@@ -248,6 +248,40 @@
         },
         {
           "internalType": "uint128",
+          "name": "fyDaiOut",
+          "type": "uint128"
+        },
+        {
+          "internalType": "uint128",
+          "name": "maxDaiIn",
+          "type": "uint128"
+        }
+      ],
+      "name": "buyFYDai",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "contract IPool",
+          "name": "pool",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "internalType": "uint128",
           "name": "daiIn",
           "type": "uint128"
         },
@@ -655,6 +689,79 @@
         }
       ],
       "name": "sellFYDaiWithSignature",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "contract IPool",
+          "name": "pool",
+          "type": "address"
+        }
+      ],
+      "name": "buyFYDaiCheck",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        },
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        },
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "contract IPool",
+          "name": "pool",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "internalType": "uint128",
+          "name": "fyDaiOut",
+          "type": "uint128"
+        },
+        {
+          "internalType": "uint128",
+          "name": "maxDaiIn",
+          "type": "uint128"
+        },
+        {
+          "internalType": "bytes",
+          "name": "daiSig",
+          "type": "bytes"
+        },
+        {
+          "internalType": "bytes",
+          "name": "poolSig",
+          "type": "bytes"
+        }
+      ],
+      "name": "buyFYDaiWithSignature",
       "outputs": [
         {
           "internalType": "uint256",

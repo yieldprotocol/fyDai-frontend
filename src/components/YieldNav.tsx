@@ -84,6 +84,17 @@ const YieldNav = (props: any) => {
         </StyledLink>
 
         <StyledLink 
+          to={`/trade/${activeSeries?.maturity}`}
+          activeStyle={{ transform: 'scale(1.1)', fontWeight: 'bold', color: `${textColor}` }}
+        >
+          <Text 
+            weight='bold' 
+            size={mobile? 'small':'xxlarge'} 
+          > Trade
+          </Text>
+        </StyledLink> 
+
+        <StyledLink 
           to='/ratelock'
           activeStyle={{ transform: 'scale(1.1)', fontWeight: 'normal', color: `${textColor}` }}
         >

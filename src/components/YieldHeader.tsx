@@ -39,7 +39,7 @@ const YieldHeader = (props: any) => {
 
         { 
         mobile && 
-        ['borrow', 'lend', 'pool'].includes(location.pathname.split('/')[1]) && 
+        ['borrow', 'lend', 'pool', 'trade'].includes(location.pathname.split('/')[1]) && 
         <Box direction='row' gap='medium' align='center'>
           <YieldNav />
         </Box>
@@ -78,6 +78,16 @@ const YieldHeader = (props: any) => {
           <Text weight='bold' size='medium'>Remove Liquidity</Text>
         </Box>
         }
+
+{ 
+        mobile && 
+        location.pathname.split('/')[1]==='removeLiquidity' &&
+        <Box direction='row' gap='medium' align='center'>
+          <Box onClick={()=>history.push('/pool/')}><ArrowLeft /></Box>
+          <Text weight='bold' size='medium'>Remove Liquidity</Text>
+        </Box>
+        }
+
       </Box>
 
       <Box direction='row' gap='small' alignSelf={mobile?'center':undefined} fill justify='end'>
