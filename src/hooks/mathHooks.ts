@@ -74,10 +74,11 @@ export const useMath = () => {
     amount: BigNumber,
     maturity:number,
     fromDate:number = (Math.round(new Date().getTime() / 1000)), // if not provided, defaults to current time.
-  ): string => {
+  ): number => {
     // Get the rate etc for Dai 
     const res = calcAPR(rate, amount, maturity, fromDate );
-    return res || '0';
+    const resFloat = res && parseFloat(res);
+    return resFloat || 0;
   };
 
   return {
