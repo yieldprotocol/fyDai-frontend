@@ -362,7 +362,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                             >
                               <Box pad={{ horizontal:'small', vertical: 'small' }} alignSelf='center'>
                                 <Text size="xxsmall">
-                                  Borrow and pool
+                                  Borrow and Pool
                                 </Text>
                               </Box>
                             </StickyButton>                       
