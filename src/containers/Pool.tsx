@@ -2,7 +2,11 @@ import React, { useEffect, useState, useContext } from 'react';
 import { NavLink, useParams } from 'react-router-dom';
 import { ethers } from 'ethers';
 import { Box, Keyboard, TextInput, Text, ResponsiveContext, Collapsible, Layer, CheckBox } from 'grommet';
-import { FiArrowRight as ArrowRight } from 'react-icons/fi';
+import { 
+  FiArrowRight as ArrowRight,
+  FiArrowLeft as ArrowLeft,
+  FiInfo as Info,
+} from 'react-icons/fi';
 import { VscHistory as History } from 'react-icons/vsc';
 
 /* utils and support */
@@ -40,6 +44,7 @@ import RaisedBox from '../components/RaisedBox';
 import DaiMark from '../components/logos/DaiMark';
 import YieldMobileNav from '../components/YieldMobileNav';
 import Loading from '../components/Loading';
+import StickyButton from '../components/StickyButton';
 
 
 interface IPoolProps {
@@ -66,6 +71,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
   const [inputRef, setInputRef] = useState<any>(null);
   const [ removeLiquidityOpen, setRemoveLiquidityOpen ] = useState<boolean>(false);
   const [ histOpen, setHistOpen ] = useState<boolean>(false);
+  const [ explainerOpen, setExplainerOpen ] = useState<boolean>(false);
   const [ addLiquidityDisabled, setAddLiquidityDisabled ] = useState<boolean>(true);
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
@@ -163,6 +169,48 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
         { removeLiquidityOpen && 
         <Layer onClickOutside={()=>setRemoveLiquidityOpen(false)}>
           <RemoveLiquidity close={()=>setRemoveLiquidityOpen(false)} openConnectLayer={openConnectLayer} /> 
+        </Layer>}
+
+        { explainerOpen && 
+        <Layer onClickOutside={()=>setExplainerOpen(false)}>
+          <Box 
+            width={!mobile?{ min:'600px', max:'600px' }: undefined}
+            alignSelf='center'
+            fill
+            background='background'
+            round='small'
+            pad='large'
+            gap='medium'
+          >
+
+            <Box gap='small'>
+              <Text weight='bold' size='small'> Buy and Pool (Recommended) </Text>
+              <Text size='small'> This strategy is best for users that are adding smaller amounts of liquidity. 
+                It minimizes gas costs while maximising the amount of pool tokens received. This is the strategy recommended for most users.       
+              </Text>
+              <Text size='xxsmall'>Note: This option may not be available if the liquidity added is larger than the pool can handle.</Text>
+            </Box>
+
+            <Box gap='small'>
+              <Text weight='bold' size='small'>Borrow and Pool</Text>
+              <Text size='small'>This strategy is best for users that are adding significant amounts of liquidity to a pool.
+                Although it may use more gas, this strategy will not impact the current interest rate for the chosen series.
+              </Text>
+            </Box>
+
+
+            <Box alignSelf='start' margin={{ top:'medium' }}>
+              <FlatButton 
+                onClick={()=>setExplainerOpen(false)}
+                label={
+                  <Box direction='row' gap='medium' align='center'>
+                    <ArrowLeft color='text-weak' />
+                    <Text size='xsmall' color='text-weak'> Got it. Take me back. </Text>
+                  </Box>
+                }
+              />
+            </Box>  
+          </Box>
         </Layer>}
 
         { histOpen && 
@@ -264,35 +312,67 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                         valuePrefix: null,
                         valueExtra: null,
                       },
+
                       {
                         label: () => ( 
-                          <Box direction='row' gap='small' align='center'>
-                    
+                          <Box fill='horizontal' justify='between' direction='row' alignSelf='end'>
+                            <Text size='xsmall' weight='bold'>Liquidity supply strategy:</Text>
+                            <Info size='20px' onClick={() => setExplainerOpen(true)} /> 
+                          </Box>),
+                        labelExtra:() => ( 
+                          <Box pad={{ top:'small' }} gap='small' align='center' direction='row' justify='between'>
+                            <StickyButton
+                              onClick={() => userActions.updatePreferences({ useBuyToAddLiquidity: true })}
+                              selected={useBuyToAddLiquidity}
+                            >
+                              <Box pad={{ horizontal:'small', vertical: 'xsmall' }} alignSelf='center'>
+                                <Text size="xxsmall" weight='bold'>
+                                  Buy and Pool 
+                                </Text>
+                              </Box>
+                            </StickyButton>
 
-                            <Text size='xsmall'> Use Alternative strategy to add liquidity </Text> 
-                            <CheckBox 
-                              checked={!useBuyToAddLiquidity}
-                              onClick={() => userActions.updatePreferences({ useBuyToAddLiquidity: !useBuyToAddLiquidity })}
-                            />
-                            
-                          </Box>                       
-                        ),
-                        labelExtra: () => ( 
-                          <Box direction='row' gap='small' align='center' justify='between'>
-                            {/* <Box margin={{ horizontal:'small' }} /> */}
-                            <Text size='xxsmall'> { useBuyToAddLiquidity ? 
-                              'Currently using the most gas efficient strategy. It is reccommended for most users.': 
-                              'The alternative strategy is more robust and is not limited by the reserves in the pool.' } 
-                            </Text>
-                          </Box>                       
+                            <StickyButton
+                              onClick={() => userActions.updatePreferences({ useBuyToAddLiquidity: false })}
+                              selected={!useBuyToAddLiquidity}
+                            >
+                              <Box pad={{ horizontal:'small', vertical: 'xsmall' }} alignSelf='center'>
+                                <Text size="xxsmall" weight='bold'>
+                                  Borrow and pool
+                                </Text>
+                              </Box>
+                            </StickyButton>                       
+                          </Box>       
                         ),
                         visible: inputValue>0,
                         active: debouncedInput,
                         loading: false,           
                         value: null,
                         valuePrefix: null,
-                        valueExtra:null
+                        valueExtra: null
                       },
+
+                      // {
+                      //   label: null,
+                      //   labelExtra: null,
+                      //   visible: inputValue>0,
+                      //   active: debouncedInput,
+                      //   loading: false,           
+                      //   value: null,
+                      //   valuePrefix: null,
+                      //   valueExtra:() => ( 
+                      //     <>
+                      //       { useBuyToAddLiquidity ?
+                      //         <Text size='xxsmall' weight='normal'>
+                      //           <Text size='xxsmall' weight='bold'> Buy & Pool </Text> is the most gas efficient strategy. (Recommended for most users)
+                      //         </Text> :
+                      //         <Text size='xxsmall' weight='normal'> 
+                      //           <Text size='xxsmall' weight='bold'> Borrow & Pool </Text> strategy is best for when adding large amounts of liquidity.
+                      //         </Text>}
+                      //     </>
+                      //   )
+                      // },
+
                       {
                         label: 'Like what you see?',
                         visible: !account && inputValue>0,
