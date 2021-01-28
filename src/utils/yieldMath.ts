@@ -11,7 +11,6 @@ export const SECONDS_PER_YEAR: number = (365 * 24 * 60 * 60);
 export const k = new Decimal(1 / (4 * SECONDS_PER_YEAR) ); // inv of seconds in 4 years
 export const g1 = new Decimal(950 / 1000);
 export const g2 = new Decimal(1000 / 950);
-// const fee = new Decimal(1000000000000);
 
 // https://www.desmos.com/calculator/mllhtohxfx
 export function mint(
@@ -48,7 +47,6 @@ export function burn(
 
   return [ z, y ];
 }
-
 
 // https://www.desmos.com/calculator/5nf2xuy6yb
 export function sellDai(
@@ -298,8 +296,8 @@ export const calculateSlippage = (value: BigNumber | string, slippage: BigNumber
    * @returns { string | undefined } human readable string
    */
 export const calculateAPR =(
-  rate: BigNumber,
-  amount: BigNumber,
+  rate: BigNumber | string,
+  amount: BigNumber | string,
   maturity: number,
   fromDate:number = (Math.round(new Date().getTime() / 1000)), // if not provided, defaults to current time.
 ): string | undefined => {
@@ -313,9 +311,11 @@ export const calculateAPR =(
     const priceRatio = amount_.div(rate_);
     const powRatio = ONE.div(propOfYear);
     const apr = (priceRatio.pow(powRatio)).sub(ONE);
+    console.log(apr.toString());
     if(apr.gt(ZERO) && apr.lt(100)) {
       return apr.mul(100).toFixed();
     }
+
     return undefined;
   }
   return undefined;

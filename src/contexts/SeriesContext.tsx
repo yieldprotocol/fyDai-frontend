@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { ethers, BigNumber } from 'ethers';
 
 import { cleanValue } from '../utils';
-import { calculateAPR, divDecimal, mulDecimal } from '../utils/yieldMath';
+import { calculateAPR, divDecimal, mulDecimal, sellFYDai, secondsToFrom } from '../utils/yieldMath';
 
 import { IYieldSeries } from '../types';
 
@@ -14,6 +14,7 @@ import { usePool } from '../hooks/poolHook';
 
 import { useToken } from '../hooks/tokenHook';
 import { useController } from '../hooks/controllerHook';
+import { CgArrowsExpandDownLeft } from 'react-icons/cg';
 
 
 const SeriesContext = React.createContext<any>({});
@@ -53,7 +54,7 @@ const SeriesProvider = ({ children }:any) => {
   const { state: yieldState } = useContext(YieldContext);
   const { yieldLoading } = yieldState;
 
-  const { previewPoolTx, checkPoolState, poolTotalSupply } = usePool();
+  const { previewPoolTx, checkPoolState, poolTotalSupply, getReserves } = usePool();
   const { debtDai, debtFYDai } = useController();
   
   const { getBalance } = useToken();
@@ -84,9 +85,14 @@ const SeriesProvider = ({ children }:any) => {
         const _x = { ...x, isMature: ()=>( x.maturity < Math.round(new Date().getTime() / 1000)) };
         
         /* with no user */
-        const [ sellFYDaiRate, totalSupply ] = await Promise.all([
+        const [ 
+          sellFYDaiRate,
+          totalSupply, 
+          [ daiReserves, fyDaiReserves, fyDaiVirtualReserves ] 
+        ] = await Promise.all([
           await previewPoolTx('sellFYDai', _x, 1),
-          await poolTotalSupply(_x.poolAddress)
+          await poolTotalSupply(_x.poolAddress),
+          await getReserves(_x)
           // await callTx(_x.poolAddress, 'Pool', 'totalSupply', []),
         ]);
 
@@ -103,11 +109,16 @@ const SeriesProvider = ({ children }:any) => {
           getBalance(_x.fyDaiAddress, 'FYDai', account),
         ]) || new Array(4).fill(BigNumber.from('0'));
 
+        console.log('PPVW: ', (await previewPoolTx('sellFYDai', _x, 1)).toString() );
+
         return {
           ..._x,
           sellFYDaiRate: !(sellFYDaiRate instanceof Error)? sellFYDaiRate : BigNumber.from('0'),
           totalSupply,
           poolTokens,
+          daiReserves, 
+          fyDaiReserves, 
+          fyDaiVirtualReserves,
           ethDebtDai,
           ethDebtFYDai,
           fyDaiBalance,
@@ -116,11 +127,14 @@ const SeriesProvider = ({ children }:any) => {
     );
 
 
-
     /* Parse the data */
     const _parsedSeriesData = _seriesData.reduce((acc: Map<string, any>, x:any) => {
 
-      const _apr = calculateAPR(x.sellFYDaiRate, ethers.utils.parseEther('1'), x.maturity);
+      const _rate = sellFYDai(x.daiReserves, x.fyDaiReserves, ethers.utils.parseEther('1'), secondsToFrom(x.maturity) );
+      console.log( 'SellFYDai:', sellFYDai(x.daiReserves, x.fyDaiReserves, ethers.utils.parseEther('1'), secondsToFrom(x.maturity) ));
+      console.log( calculateAPR( x.sellFYDaiRate, ethers.utils.parseEther('1'), x.maturity) );
+
+      const _apr = calculateAPR( x.sellFYDaiRate, ethers.utils.parseEther('1'), x.maturity);
       const yieldAPR =  _apr || '0';
       const poolRatio = divDecimal(x.poolTokens, x.totalSupply);
       const poolPercent = mulDecimal( poolRatio, '100');
@@ -128,7 +142,7 @@ const SeriesProvider = ({ children }:any) => {
       return acc.set(
         x.maturity,
         { ...x,
-          sellFYDaiRate_: cleanValue(ethers.utils.formatEther(x.sellFYDaiRate), 2),
+          // sellFYDaiRate_: cleanValue(x.sellFYDaiRate, 2),
           totalSupply_: cleanValue(ethers.utils.formatEther(x.totalSupply), 2),
           /* formating below for visual consistenciy - 0.00 */
           fyDaiBalance_: ethers.utils.formatEther(x.fyDaiBalance) === '0.0' ? '0.00' : cleanValue(ethers.utils.formatEther(x.fyDaiBalance), 2),
