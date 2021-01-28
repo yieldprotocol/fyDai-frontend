@@ -1,11 +1,19 @@
 import React, { useEffect, useContext, createContext, useReducer } from 'react';
 import { ethers } from 'ethers';
 
-import { cleanValue, mulRay } from '../utils';
+import { cleanValue } from '../utils';
+
+import {
+  calculateAPR,
+  borrowingPower, 
+  mulDecimal, 
+  divDecimal,
+  floorDecimal,
+  collateralizationRatio,
+} from '../utils/yieldMath';
 
 import { YieldContext } from './YieldContext';
 
-import { useMath } from '../hooks/mathHooks'; 
 import { useToken } from '../hooks/tokenHook';
 import { useCachedState, } from '../hooks/appHooks';
 import { useController } from '../hooks/controllerHook';
@@ -13,7 +21,6 @@ import { useEvents } from '../hooks/eventHooks';
 import { useSignerAccount } from '../hooks/connectionHooks';
 import { useDsRegistry } from '../hooks/dsRegistryHook';
 import { useMaker } from '../hooks/makerHook';
-
 
 const UserContext = createContext<any>({});
 
@@ -66,6 +73,7 @@ const initState = {
   preferences:{
     slippage: 0.005, // default === 0.5%
     useTxApproval: false,
+    useBuyToAddLiquidity: true,
     showDisclaimer: true,
     themeMode:'auto',
     moodLight: true,
@@ -77,7 +85,7 @@ const UserProvider = ({ children }: any) => {
 
   const [ state, dispatch ] = useReducer(reducer, initState);
   const { state: yieldState } = useContext(YieldContext);
-  const { deployedContracts, deployedSeries } = yieldState;
+  const { deployedContracts, deployedSeries, feedData } = yieldState;
   const { account, provider } = useSignerAccount();
 
   /* cache | localStorage declarations */
@@ -95,17 +103,8 @@ const UserProvider = ({ children }: any) => {
     collateralPosted, 
     collateralLocked,
     totalDebtDai,
-    borrowingPower,
     checkControllerDelegate,
   } = useController();
-
-  const {
-    collValue,
-    collRatio,
-    collPercent,
-    calcAPR,
-    daiAvailable,
-  } = useMath();
 
   /**
    * @dev gets and updates yield positions {}
@@ -124,33 +123,28 @@ const UserProvider = ({ children }: any) => {
     ]);
 
     const [
-      ethLocked, 
-      ethBorrowingPower, 
-      ethTotalDebtDai
+      ethLocked,
+      debtValue,
     ]:any[] = await Promise.all([
       collateralLocked('ETH-A'),
-      borrowingPower('ETH-A'),
       totalDebtDai('ETH-A'),
     ]);
 
-    const debtValue = ethTotalDebtDai; 
-    const collateralValue = collValue(ethPosted);
-    const collateralRatio = collRatio(collateralValue, ethTotalDebtDai);
-    const collateralPercent = collPercent(collateralRatio); 
-    const maxDaiAvailable = daiAvailable( collateralValue, ethTotalDebtDai, 1.5); // 1.5===150%
+    const collateralValue = mulDecimal(ethPosted, feedData.ethPrice); 
+    const collateralRatio = collateralizationRatio(ethPosted, feedData.ethPrice, debtValue) || '0';
+    const collateralPercent = collateralizationRatio(ethPosted, feedData.ethPrice, debtValue, true) || '0';
+    const maxDaiBorrow = borrowingPower( ethPosted, feedData.ethPrice, debtValue );
 
     const values = {
       ethBalance, 
       daiBalance, 
       ethPosted,
       ethLocked, 
-      ethBorrowingPower, 
-      ethTotalDebtDai,
       debtValue,
       collateralValue,
       collateralRatio,
       collateralPercent,
-      maxDaiAvailable,
+      maxDaiBorrow,
     };
 
     /* parse to human usable */
@@ -159,13 +153,11 @@ const UserProvider = ({ children }: any) => {
       daiBalance_ : cleanValue(ethers.utils.formatEther(daiBalance), 2),
       ethPosted_ : cleanValue(ethers.utils.formatEther(ethPosted), 6),
       ethLocked_ : cleanValue(ethers.utils.formatEther(ethLocked), 6),
-      ethBorrowingPower_ : cleanValue(ethers.utils.formatEther(ethBorrowingPower), 2),
-      ethTotalDebtDai_ : cleanValue(ethers.utils.formatEther(ethTotalDebtDai), 2),  
-      debtValue_ : cleanValue(ethers.utils.formatEther(ethTotalDebtDai), 2),
-      collateralValue_ : cleanValue(ethers.utils.formatEther(collateralValue), 2),
-      collateralRatio_ : parseFloat(collateralRatio.toString()),
-      collateralPercent_ : parseFloat(collateralPercent.toString()),
-      maxDaiAvailable_ : cleanValue(ethers.utils.formatEther(maxDaiAvailable), 2),
+      debtValue_ : cleanValue(ethers.utils.formatEther(debtValue), 2),
+      collateralValue_ : cleanValue( divDecimal(maxDaiBorrow, '1e18'), 2),
+      collateralRatio_ : cleanValue( collateralRatio, 2),
+      collateralPercent_: cleanValue( collateralPercent, 2 ), 
+      maxDaiBorrow_ : cleanValue( divDecimal(maxDaiBorrow, '1e18'), 2),
     };
     
     dispatch( { type: 'updatePosition', payload: { ...values, ...parsedValues } } );
@@ -276,7 +268,7 @@ const UserProvider = ({ children }: any) => {
               amount: Math.abs( parseFloat(ethers.utils.formatEther( x.args_[3] )) ),
               dai: x.args[3].abs(),
               fyDai: x.args[4].abs(),
-              APR: calcAPR( x.args[3].abs(),  x.args[4].abs(), parseInt(x.args_[0], 10), x.date), 
+              APR: calculateAPR( x.args[3].abs(),  x.args[4].abs(), parseInt(x.args_[0], 10), x.date), 
               dai_: ethers.utils.formatEther( x.args_[3] ),
               fyDai_: ethers.utils.formatEther( x.args_[4] ),
             };
@@ -285,7 +277,7 @@ const UserProvider = ({ children }: any) => {
       return [...acc, ..._seriesHist];
     }, Promise.resolve([]) );
 
-    /* get the add liquidity histrory */ 
+    /* get the add liquidity history */ 
     const addLiquidityHistory = await deployedSeries.reduce( async ( accP: any, cur:any) => {
       const acc = await accP; 
       const _seriesHist = await getEventHistory(
@@ -297,29 +289,31 @@ const UserProvider = ({ children }: any) => {
       )
         .then((res:any) => parseEventList(res))     /* then parse returned values */
         .then((parsedList: any) => {                /* then add extra info and calculated values */
-          return parsedList.map((x:any) => {
-            return {
-              ...x,
-              event: 'Added',
-              type: 'pool_liquidity',
-              from: x.args[1],
-              to:  x.args[2],
-              proxyTraded: x.args[1] !== x.args[2],
-              maturity: parseInt(x.args_[0], 10),
-              amount: Math.abs( parseFloat(ethers.utils.formatEther( x.args_[5] )) ),
-              dai: x.args[3].abs(),
-              fyDai: x.args[4].abs(),
-              poolTokens: x.args[5].abs(),
-              dai_: ethers.utils.formatEther( x.args_[3] ),
-              fyDai_: ethers.utils.formatEther( x.args_[4] ),
-              poolTokens_: ethers.utils.formatEther( x.args_[5] ),
-            };
-          }); 
+          return parsedList
+            .filter((x:any) => x.args[5]>0)
+            .map((x:any) => {
+              return {
+                ...x,
+                event: 'Added',
+                type: 'pool_liquidity',
+                from: x.args[1],
+                to:  x.args[2],
+                proxyTraded: x.args[1] !== x.args[2],
+                maturity: parseInt(x.args_[0], 10),
+                amount: Math.abs( parseFloat(ethers.utils.formatEther( x.args_[5] )) ),
+                dai: x.args[3].abs(),
+                fyDai: x.args[4].abs(),
+                poolTokens: x.args[5].abs(),
+                dai_: ethers.utils.formatEther( x.args_[3] ),
+                fyDai_: ethers.utils.formatEther( x.args_[4] ),
+                poolTokens_: ethers.utils.formatEther( x.args_[5] ),
+              };
+            }); 
         });
       return [...acc, ..._seriesHist];
     }, Promise.resolve([]) );
 
-    /* get the remove liquidity histrory  - I know!! i will combine the two. but filterign is problmeatic */ 
+    // /* get the remove liquidity histrory  - I know!! i will combine the two. but filterign is problmeatic */ 
     const removeLiquidityHistory = await deployedSeries.reduce( async ( accP: any, cur:any) => {
       const acc = await accP; 
       const _seriesHist = await getEventHistory(
@@ -331,24 +325,26 @@ const UserProvider = ({ children }: any) => {
       )
         .then((res:any) => parseEventList(res))     /* then parse returned values */
         .then((parsedList: any) => {                /* then add extra info and calculated values */
-          return parsedList.map((x:any) => {
-            return {
-              ...x,
-              event: 'Removed',
-              type: 'pool_liquidity',
-              from: x.args[1],
-              to:  x.args[2],
-              proxyTraded: x.args[1] !== x.args[2],
-              maturity: parseInt(x.args_[0], 10),
-              amount: Math.abs( parseFloat(ethers.utils.formatEther( x.args_[5] )) ),
-              dai: x.args[3].abs(),
-              fyDai: x.args[4].abs(),
-              poolTokens: x.args[5].abs(),
-              dai_: ethers.utils.formatEther( x.args_[3] ),
-              fyDai_: ethers.utils.formatEther( x.args_[4] ),
-              poolTokens_: ethers.utils.formatEther( x.args_[5] ),
-            };
-          }); 
+          return parsedList
+            .filter((x:any) => x.args[5]<0)
+            .map((x:any) => {
+              return {
+                ...x,
+                event: 'Removed',
+                type: 'pool_liquidity',
+                from: x.args[1],
+                to:  x.args[2],
+                proxyTraded: x.args[1] !== x.args[2],
+                maturity: parseInt(x.args_[0], 10),
+                amount: Math.abs( parseFloat(ethers.utils.formatEther( x.args_[5] )) ),
+                dai: x.args[3].abs(),
+                fyDai: x.args[4].abs(),
+                poolTokens: x.args[5].abs(),
+                dai_: ethers.utils.formatEther( x.args_[3] ),
+                fyDai_: ethers.utils.formatEther( x.args_[4] ),
+                poolTokens_: ethers.utils.formatEther( x.args_[5] ),
+              };
+            }); 
         });
       return [...acc, ..._seriesHist];
     }, Promise.resolve([]) );
@@ -463,6 +459,7 @@ const UserProvider = ({ children }: any) => {
     const _cdpData:any = await Promise.all(cdpList[1].map((x:string) => getCDPData(x, 'ETH-A') ) );
     const _makerData = cdpList[0].map((x:any, i:number) => {
       const { rate } = yieldState.feedData.ilks;
+      const vaultDaiDebt = mulDecimal(_cdpData[i][1], rate, '1e-27' ) ; // use built in precision equalling for wad * ray
       return {
         'vaultId': x.toString(),
         'vaultCollateralType': ethers.utils.parseBytes32String(cdpList[2][i]),
@@ -471,11 +468,13 @@ const UserProvider = ({ children }: any) => {
         'vaultCollateral': _cdpData[i][0],
         'vaultCollateral_': cleanValue(ethers.utils.formatEther(_cdpData[i][0]), 2), 
         'vaultMakerDebt': _cdpData[i][1],
-        'vaultMakerDebt_': cleanValue(ethers.utils.formatEther(_cdpData[i][1]), 2),
-        'vaultDaiDebt': mulRay(_cdpData[i][1], rate),
-        'vaultDaiDebt_': cleanValue(ethers.utils.formatEther(mulRay(_cdpData[i][1], rate)), 2)
+        'vaultMakerDebt_': cleanValue(ethers.utils.formatEther(_cdpData[i][1]), 2),    
+        'vaultDaiDebt': ethers.BigNumber.from(floorDecimal(vaultDaiDebt)),
+        'vaultDaiDebt_': cleanValue( divDecimal( vaultDaiDebt, '1e18'), 2),
+
       };
     });
+
     dispatch( { 'type': 'updateMakerVaults', 'payload':  _makerData });
     console.log(_makerData);
   };
@@ -490,6 +489,7 @@ const UserProvider = ({ children }: any) => {
         _getAuthorizations(),
         _updatePreferences(null),
       ]);
+
       console.log('User basics data updated');
       /* Then get maker data if available */ 
       await _getMakerVaults(auths?.dsProxyAddress);

@@ -1,25 +1,5 @@
-import ReactGA from 'react-ga';
-import { IAnalytics } from '../types';
-
-export const initGA = () => {
-  // console.log('GA init', process.env.GOOGLE_ANALYTICS)
-  ReactGA.initialize(process.env.GOOGLE_ANALYTICS as string);
-};
-
-export const logPageView = () => {
-  // console.log(`Logging pageview for ${window.location.pathname}`)
-  ReactGA.set({ page: window.location.pathname });
-  ReactGA.pageview(window.location.pathname);
-};
-
-export const logEvent = (object: IAnalytics ) => {
-  if (object) {
-    ReactGA.event(object);
-  }
-};
-
-export const logException = (description = '', fatal = false) => {
-  if (description) {
-    ReactGA.exception({ description, fatal });
+export const logEvent = (eventName: string, eventParams: any ) => {
+  if (eventName) {
+    window?.gtag('event', eventName, eventParams);
   }
 };

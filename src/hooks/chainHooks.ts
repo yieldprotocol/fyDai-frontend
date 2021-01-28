@@ -70,9 +70,9 @@ export const useSendTx = () => {
 };
 
 /**
- * Hook for making blockchain calls
+ * Generic Hook for making blockchain calls
  * Does not incur gas charges
- * But only applicable if contract function has a view modifier
+ * Only applicable if contract function has a view modifier
  * Fails ( mostly silently ) on functions that require gas.
  * @returns { function } callTx
  * @returns { boolean } callTxActive
@@ -101,6 +101,7 @@ export const useCallTx = () => {
   };
   return [ callTx, callTxActive ] as const;
 };
+
 
 export const useTimeTravel = () => {
   const { provider } = useSignerAccount();

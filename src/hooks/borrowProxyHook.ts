@@ -1,6 +1,9 @@
 import { useEffect, useState, useContext } from 'react';
 import { ethers, BigNumber }  from 'ethers';
+
 import * as utils from '../utils';
+import { MAX_INT } from '../utils/constants';
+import { calculateSlippage } from '../utils/yieldMath';
 
 import { ISignListItem, IYieldSeries } from '../types';
 
@@ -31,24 +34,14 @@ import { genTxCode } from '../utils';
  * @returns { function } repayDaiDebt
  * @returns { function } buyDai
  * @returns { function } sellDai
- * @returns { function } addDaiLiquidity
- * @returns { function } removfyDaiLiquidity
- * 
- * @returns { boolean } postActive
- * @returns { boolean } withdrawActive
- * @returns { boolean } borrowActive
- * @returns { boolean } repayActive
- * @returns { boolean } addLiquidityActive
- * @returns { boolean } removeLiquidityActive
- * @returns { boolean } buyActive
- * @returns { boolean } sellActive
  * 
  */
 export const useBorrowProxy = () => {
 
   /* contexts */
-  const  { state: { deployedContracts } }  = useContext<any>(YieldContext);
-  const  { state: { preferences: { slippage }, authorization: { dsProxyAddress, hasDelegatedDsProxy } } }  = useContext<any>(UserContext);
+  const { state: { deployedContracts } }  = useContext<any>(YieldContext);
+  const { state: userState }  = useContext<any>(UserContext);
+  const { preferences: { slippage }, authorization: { dsProxyAddress, hasDelegatedDsProxy } } = userState; 
 
   /* hooks */ 
   const { signer, provider, account } = useSignerAccount();
@@ -62,17 +55,7 @@ export const useBorrowProxy = () => {
   const { abi: borrowProxyAbi } = BorrowProxy;
   const { abi: controllerAbi } = Controller;
 
-  // TODO: deal with big number rather also, put this out in a hook
-  const valueWithSlippage = (value:BigNumber, minimise:boolean=false ) => {
-    const slippageAsRay = utils.toRay(slippage);
-    const slippageAmount = utils.mulRay(value, slippageAsRay);
-    if (minimise) {
-      return value.sub(slippageAmount);
-    } 
-    return value.add(slippageAmount);
-  };
-
-  /* Preset the yieldProxy and contorller contracts to be used with all fns */
+  /* Preset the yieldProxy and controller contracts to be used with all fns */
   const [ proxyContract, setProxyContract] = useState<any>();
   const [ controllerContract, setControllerContract ] = useState<any>();
   useEffect(()=> {
@@ -135,10 +118,6 @@ export const useBorrowProxy = () => {
     const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(utils.cleanValue(amount));
     const toAddr = account && ethers.utils.getAddress(account);
 
-    /* Check the signature requirements */
-    const checkSigs = await proxyContract.withdrawCheck();
-    console.log(checkSigs);
-
     /* build and use signatures if required */
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
 
@@ -196,15 +175,11 @@ export const useBorrowProxy = () => {
       gasLimit: BigNumber.from('400000')
     };
 
-    /* Check the signature requirements */
-    const checkSigs = await proxyContract.borrowDaiForMaximumFYDaiCheck(poolAddr);
-    console.log(checkSigs);
-
     /* get estimated maxFYDai */
-    let maxFYDai:BigNumber;
+    let maxFYDai:string;
     const preview = await previewPoolTx('buydai', series, daiToBorrow); 
     if ( !(preview instanceof Error) ) {
-      maxFYDai = valueWithSlippage(preview);
+      maxFYDai = calculateSlippage(preview, slippage);
     } else {
       throw(preview);
     }
@@ -221,7 +196,7 @@ export const useBorrowProxy = () => {
       });
 
     /* Send the required signatures out for signing, or approval tx if fallback is required */
-    const signedSigs = await handleSignList(requestedSigs, genTxCode('BORROW', series));
+    const signedSigs = await handleSignList(requestedSigs, genTxCode('BORROW', series?.maturity.toString()));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
 
@@ -266,10 +241,6 @@ export const useBorrowProxy = () => {
       value: 0,
     };
 
-    /* Check the signature requirements */
-    const checkSigs = await proxyContract.repayDaiCheck();
-    console.log(checkSigs);
-
     /* build and use signature if required , else '0x' */
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
 
@@ -283,15 +254,15 @@ export const useBorrowProxy = () => {
  
     // User to treasury no ds proxy 
     requestedSigs.set('daiSig',
-      { id: genTxCode('AUTH_TOKEN', series),
+      { id: genTxCode('AUTH_DAI', series?.maturity.toString()),
         desc: 'Allow Dai transfers to the fyDai Treasury',
         conditional: ( await getTokenAllowance(deployedContracts.Dai, 'Dai', deployedContracts.Treasury) ) > 0,
         signFn: () => daiPermitSignature( deployedContracts.Dai, deployedContracts.Treasury),
-        fallbackFn: () => approveToken(deployedContracts.Dai, deployedContracts.Treasury, utils.MAX_INT, series),
+        fallbackFn: () => approveToken(deployedContracts.Dai, deployedContracts.Treasury, MAX_INT, series),
       });
 
     /* Send the required signatures out for signing, or approval tx if fallback is required */
-    const signedSigs = await handleSignList(requestedSigs, genTxCode('REPAY', series));
+    const signedSigs = await handleSignList(requestedSigs, genTxCode('REPAY', series?.maturity.toString()));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
           
@@ -334,15 +305,11 @@ export const useBorrowProxy = () => {
       value: 0,
     };
 
-    /* Check the signature requirements */
-    const checkSigs = await proxyContract.sellDaiCheck(poolAddr);
-    console.log(checkSigs);
-
     /* calculate expected trade values and factor in slippage */
-    let minFYDaiOut:BigNumber;
+    let minFYDaiOut:string;
     const preview = await previewPoolTx('selldai', series, daiIn);
     if ( !(preview instanceof Error) ) {
-      minFYDaiOut = valueWithSlippage(preview, true);
+      minFYDaiOut = calculateSlippage(preview, slippage, true);
     } else {
       throw(preview);
     }
@@ -351,7 +318,7 @@ export const useBorrowProxy = () => {
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
 
     requestedSigs.set('poolSig',
-      { id: genTxCode('AUTH_POOL', series),
+      { id: genTxCode('AUTH_POOL', series?.maturity.toString()),
         desc: `Allow your proxy to interact with the ${series.displayName} pool`,
         conditional: await checkPoolDelegate(poolAddr, dsProxyAddress),
         signFn: () => delegationSignature(poolContract, dsProxyAddress),    
@@ -359,15 +326,15 @@ export const useBorrowProxy = () => {
       });
 
     requestedSigs.set('daiSig',
-      { id: genTxCode('AUTH_TOKEN', series),
+      { id: genTxCode('AUTH_DAI', series?.maturity.toString()),
         desc: `Allow Dai transfers to the ${series.displayName} pool`,
         conditional: await getTokenAllowance(deployedContracts.Dai, 'Dai', poolAddr) > 0,
         signFn: () => daiPermitSignature(deployedContracts.Dai, poolAddr),
-        fallbackFn: () => approveToken(deployedContracts.Dai, poolAddr, utils.MAX_INT, series), 
+        fallbackFn: () => approveToken(deployedContracts.Dai, poolAddr, MAX_INT, series), 
       });
         
     /* Send the required signatures out for signing, or approval tx if fallback is required */
-    const signedSigs = await handleSignList(requestedSigs, genTxCode('SELL_DAI', series));
+    const signedSigs = await handleSignList(requestedSigs, genTxCode('SELL_DAI', series?.maturity.toString()));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
 
@@ -408,16 +375,12 @@ export const useBorrowProxy = () => {
       gasLimit: BigNumber.from('250000'),
       value: 0,
     };
-
-    /* Check the signature requirements */
-    const checkSigs = await proxyContract.buyDaiCheck(poolAddr);
-    console.log(checkSigs); 
   
     /* calculate expected trade values and factor in slippage */
-    let maxFYDaiIn:BigNumber;
+    let maxFYDaiIn:string;
     const preview = await previewPoolTx('buydai', series, daiOut);
     if ( !(preview instanceof Error) ) {
-      maxFYDaiIn = valueWithSlippage(preview);
+      maxFYDaiIn = calculateSlippage(preview, slippage);
     } else {
       throw(preview);
     }
@@ -426,7 +389,7 @@ export const useBorrowProxy = () => {
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
 
     requestedSigs.set('poolSig',
-      { id: genTxCode('AUTH_POOL', series),
+      { id: genTxCode('AUTH_POOL', series?.maturity.toString()),
         desc: `Allow your proxy to interact with the ${series.displayName} pool`,
         conditional: await checkPoolDelegate(poolAddr, dsProxyAddress),
         signFn: () => delegationSignature(poolContract, dsProxyAddress),    
@@ -434,15 +397,15 @@ export const useBorrowProxy = () => {
       });
 
     requestedSigs.set('fyDaiSig',
-      { id: genTxCode('AUTH_TOKEN', series),
+      { id: genTxCode('AUTH_FYDAI', series?.maturity.toString()),
         desc: `Allow fyDai transfers to the ${series.displayName} pool`,
         conditional: ( await getTokenAllowance(fyDaiAddr, 'FYDai', poolAddr) ) > 0,
         signFn: () => ERC2612PermitSignature(fyDaiAddr, poolAddr),    
-        fallbackFn: () => approveToken(fyDaiAddr, poolAddr, utils.MAX_INT, series ), 
+        fallbackFn: () => approveToken(fyDaiAddr, poolAddr, MAX_INT, series ), 
       });
           
     /* Send the required signatures out for signing, or approval tx if fallback is required */
-    const signedSigs = await handleSignList(requestedSigs, genTxCode('BUY_DAI', series));
+    const signedSigs = await handleSignList(requestedSigs, genTxCode('BUY_DAI', series?.maturity.toString()));
 
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }

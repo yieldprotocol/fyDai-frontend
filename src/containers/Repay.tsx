@@ -21,7 +21,6 @@ import { useBorrowProxy } from '../hooks/borrowProxyHook';
 
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
-import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
 
@@ -37,36 +36,41 @@ interface IRepayProps {
 
 function Repay({ close }:IRepayProps) {
 
-  const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
+  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
+
+  /* state from context */
+  const { state: { activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
   const activeSeries = seriesData.get(activeSeriesId);
   const { state: userState, actions: userActions } = useContext(UserContext);
   const { daiBalance } = userState.position;
-  const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
+  /* local state */
+  const [ inputValue, setInputValue ] = useState<any>();
+  const [inputRef, setInputRef] = useState<any>(null);
+  const [maxRepay, setMaxRepay] = useState<any>();
+  const [ repayDisabled, setRepayDisabled ] = useState<boolean>(true);
+  const [ warningMsg, setWarningMsg] = useState<string|null>(null);
+  const [ errorMsg, setErrorMsg] = useState<string|null>(null);
+
+  /* init hooks */
   const { repayDaiDebt } = useBorrowProxy();
   const [ txActive ] = useTxActive(['repay']);
   const { account } = useSignerAccount();
-
-  const [ inputValue, setInputValue ] = useState<any>();
-  const debouncedInput = useDebounce(inputValue, 500);
-  const [inputRef, setInputRef] = useState<any>(null);
-
-  const [maxRepay, setMaxRepay] = useState<any>();
-  const [ repayDisabled, setRepayDisabled ] = useState<boolean>(true);
-
-  const [ warningMsg, setWarningMsg] = useState<string|null>(null);
-  const [ errorMsg, setErrorMsg] = useState<string|null>(null);
   const isLol = useIsLol(inputValue);
+  const debouncedInput = useDebounce(inputValue, 500);
+
 
   const repayProcedure = async (value:number) => {
     if (!repayDisabled) {
       !activeSeries?.isMature() && close();
       /* repay using proxy */
       await repayDaiDebt(activeSeries, 'ETH-A', value);
-      logEvent({
-        category: 'Repay',
-        action: String(value),
-        label: activeSeries.displayName || activeSeries.poolAddress,
+      logEvent('repay', {
+        value: String(value),
+        type: 'DAI',
+        label: activeSeries.displayName,
+        maturity: activeSeries.maturity, 
+        time_to_maturity: (new Date().getTime()/1000) - activeSeries.maturity, 
       });
       
       /* clean up and refresh */ 
@@ -125,7 +129,7 @@ function Repay({ close }:IRepayProps) {
       
       { !txActive &&
         <Box
-          width={!mobile?{ min: activeSeries.isMature()?'600px':'620px', max: activeSeries.isMature()?'600px':'620px' } : undefined}
+          width={!mobile?{ min: activeSeries?.isMature()?'600px':'620px', max: activeSeries?.isMature()?'600px':'620px' } : undefined}
           alignSelf="center"
           fill
           background="background" 
@@ -230,24 +234,22 @@ function Repay({ close }:IRepayProps) {
                   round='small'
                   fill='horizontal'
                   border='all'
-                >    
+                >   
+                  { activeSeries &&
                   <Box direction='row' justify='center' fill>          
                     <Box direction='row' gap='small' align='center'>
                       <Box>
                         <Check />
                       </Box>
                       <Box> 
-                        <Text size='small'>You do not have any debt in this series.</Text>         
+                        <Text size='small'>You do not have any debt in this series.</Text>      
                       </Box>
                     </Box>
-                  </Box>             
+                  </Box>}           
                 </Box>}            
             </Box>
           </Box>
         </Box>}
-
-      {/* { repayActive && !txActive && <ApprovalPending /> }
-      { txActive && <TxStatus tx={txActive} /> } */}
 
       {mobile && 
       !activeSeries?.isMature() &&

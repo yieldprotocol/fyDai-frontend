@@ -23,7 +23,6 @@ import DaiMark from './logos/DaiMark';
 import Loading from './Loading';
 import TxStatus from './TxStatus';
 import EthMark from './logos/EthMark';
-import RaisedButton from './RaisedButton';
 
 const AccountButton = (props: any) => {
   

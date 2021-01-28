@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { BigNumber, ethers } from 'ethers';
 import { NavLink, useHistory, useParams } from 'react-router-dom';
-import { Box, Image, Keyboard, TextInput, Text, ResponsiveContext, Collapsible, ThemeContext, Layer } from 'grommet';
+import { BigNumber, ethers } from 'ethers';
+import { Box, Image, Keyboard, TextInput, Text, ResponsiveContext, Collapsible, ThemeContext } from 'grommet';
 import styled, { css } from 'styled-components';
 import { 
   FiArrowLeft as ArrowLeft,
@@ -12,19 +12,25 @@ import {
   FiLayers as ChangeSeries
 } from 'react-icons/fi';
 
-import { cleanValue, modColor, BN_RAY, buildGradient } from '../utils';
+/* utils and support */
+import { cleanValue, modColor, buildGradient } from '../utils';
+import logoDark from '../assets/images/logo.svg';
 
+/* contexts */
 import { UserContext } from '../contexts/UserContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { YieldContext } from '../contexts/YieldContext';
 
+/* hooks */
 import { useDebounce, useIsLol } from '../hooks/appHooks';
 import { useMath } from '../hooks/mathHooks';
 import { useTxActive } from '../hooks/txHooks';
 import { usePool } from '../hooks/poolHook';
 import { useImportProxy } from '../hooks/importProxyHook';
 import { useMaker } from '../hooks/makerHook';
+import { useSignerAccount } from '../hooks/connectionHooks';
 
+/* components */
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
 import RaisedButton from '../components/RaisedButton';
@@ -35,12 +41,9 @@ import YieldMobileNav from '../components/YieldMobileNav';
 import DaiMark from '../components/logos/DaiMark';
 import MakerMark from '../components/logos/MakerMark';
 import TxStatus from '../components/TxStatus';
-
-import logoDark from '../assets/images/logo.svg';
-import logoLight from '../assets/images/logo_light.svg';
 import AprBadge from '../components/AprBadge';
 import SeriesSelector from '../components/SeriesSelector';
-import { useSignerAccount } from '../hooks/connectionHooks';
+import { logEvent } from '../utils/analytics';
 
 interface IRateLockProps {
   close?: any; // close is also used as a indicator used as a layer (only a layer should have a closed)
@@ -67,80 +70,87 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
   const history = useHistory();
   const { vault : vaultParam }:any = useParams();
 
-  /* context imports */
+  /* state from contexts */
   const { state: { makerVaults, userLoading }, actions: userActions } = useContext(UserContext);
   const { state: { activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
   const activeSeries = seriesData.get(activeSeriesId);
-
   const { state:{ feedData } } = useContext(YieldContext);
   const { ilks:{ dust } } = feedData;
+
+  /* local state: vaults and selected vaults variables */
+  const [ selectedVaultIndex, setSelectedVaultIndex ] = useState<number>(0);
+  const [ selectedVault, setSelectedVault ] = useState<any>(null);
+  const [ filteredMakerVaults, setFilteredMakerVaults ] = useState<any>(makerVaults);
+  const [ searchOpen, setSearchOpen ] = useState<boolean>(false);
+  const [ selectorOpen, setSelectorOpen ] = useState<boolean>(false);
+  const [ advancedOpen, setAdvancedOpen ] = useState<boolean>(false);
+  const [ advancedDisabled, setAdvancedDisabled ] = useState<boolean>(true);
+  const [ allDisabled, setAllDisabled ] = useState<boolean>(true);
+  
+  /* local state: input variables and aux hooks */
+  const [ collInputValue, setCollInputValue ] = useState<any>();
+  const [ debtInputValue, setDebtInputValue ] = useState<any>();
+  const [ searchInputValue, setSearchInputValue ] = useState<any>();
+  const [collInputRef, setCollInputRef] = useState<any>(null);
+  const [debtInputRef, setDebtInputRef] = useState<any>(null);
+
+  /* local state: token balances and calculated values */
+  const [ APR, setAPR ] = useState<string>();
+  const [ maxAPR, setMaxAPR ] = useState<string>();
+  const [ minCollateral, setMinCollateral ] = useState<string>();
+  const [ minSafeCollateral, setMinSafeCollateral ] = useState<string>();
+  const [ daiDust, setDaiDust ] = useState<BigNumber>();
+
+  /* local state: warning and error variables */
+  const [ warningMsg, setWarningMsg] = useState<string|null>(null);
+  const [ collErrorMsg, setCollErrorMsg] = useState<string|null>(null);
+  const [ debtErrorMsg, setDebtErrorMsg] = useState<string|null>(null);
+
 
   /* hooks */
   const { account } = useSignerAccount();
   const { previewPoolTx }  = usePool();
   const { importPosition, importVault,  } = useImportProxy();
   const { minWethForAmount } = useMaker();
-  const { calcAPR } = useMath();
+  const { calculateAPR } = useMath();
   const [ txActive ] = useTxActive(['IMPORT']);
-
-  /* vaults and selected vaults variables */
-  const [ selectedVaultIndex, setSelectedVaultIndex ] = useState<number>(0);
-  const [ selectedVault, setSelectedVault ] = useState<any>(null);
-  const [ filteredMakerVaults, setFilteredMakerVaults ] = useState<any>(makerVaults);
-  
-  /* component flags */ 
-  const [ searchOpen, setSearchOpen ] = useState<boolean>(false);
-  const [ selectorOpen, setSelectorOpen ] = useState<boolean>(false);
-  const [ advancedOpen, setAdvancedOpen ] = useState<boolean>(false);
-
-  const [ advancedDisabled, setAdvancedDisabled ] = useState<boolean>(true);
-  const [ allDisabled, setAllDisabled ] = useState<boolean>(true);
-
-  /* input variables and aux hooks */
-  const [ collInputValue, setCollInputValue ] = useState<any>();
-  const [ debtInputValue, setDebtInputValue ] = useState<any>();
-  const [ searchInputValue, setSearchInputValue ] = useState<any>();
   const debouncedCollInput = useDebounce(collInputValue, 500);
   const debouncedDebtInput = useDebounce(debtInputValue, 500);
   const debouncedSearchInput = useDebounce(searchInputValue, 1000);
-  const [collInputRef, setCollInputRef] = useState<any>(null);
-  const [debtInputRef, setDebtInputRef] = useState<any>(null);
   const isCollLol = useIsLol(collInputValue);
   const isDebtLol = useIsLol(debtInputValue);
 
-  /* token balances and calculated values */
-
-  // const [ fyDaiValue, setFYDaiValue ] = useState<number>(0);
-  const [ APR, setAPR ] = useState<number>();
-
-  const [ maxAPR, setMaxAPR ] = useState<number>();
-
-  const [ minCollateral, setMinCollateral ] = useState<string>();
-  const [ minSafeCollateral, setMinSafeCollateral ] = useState<string>();
-  const [ daiDust, setDaiDust ] = useState<BigNumber>();
-
-  /* warning and error variables */
-  const [ warningMsg, setWarningMsg] = useState<string|null>(null);
-  const [ collErrorMsg, setCollErrorMsg] = useState<string|null>(null);
-  const [ debtErrorMsg, setDebtErrorMsg] = useState<string|null>(null);
-
-  /* action prcedures */
+  /* execution procedures */
   const importProcedure = async () => {
     if ( collInputValue || debtInputValue && !advancedDisabled ) {
+
+      /* if  or, there is no dai, but there is collateral left, the collateral value needs to be exact */ 
+      const valueColl = ( collInputValue >= selectedVault.vaultCollateral_ ) || parseFloat(selectedVault.vaultMakerDebt_)===0  ?
+        selectedVault.vaultCollateral : 
+        debouncedCollInput;
+      /* if the value approximates the max value OR there appears to be no Dai, use the EXACT value of the MakerDebt */
+      const valueDebt =  ( parseFloat(debouncedDebtInput) === parseFloat(selectedVault.vaultDaiDebt_ ) || parseFloat(selectedVault.vaultDaiDebt_)===0 ) ? 
+        selectedVault.vaultMakerDebt :
+        debouncedDebtInput;
+
       await importPosition(
         activeSeries,
-        /* if  or, there is no dai, but there is collateral left, the collateral value needs to be exact */ 
-        ( collInputValue >= selectedVault.vaultCollateral_ ) || parseFloat(selectedVault.vaultMakerDebt_)===0  ?
-          selectedVault.vaultCollateral : 
-          debouncedCollInput,
-        /* if the value approximates the max value OR there appears to be no Dai, use the EXACT value of the MakerDebt */
-        ( parseFloat(debouncedDebtInput) === parseFloat(selectedVault.vaultDaiDebt_ ) || parseFloat(selectedVault.vaultDaiDebt_)===0 ) ? 
-          selectedVault.vaultMakerDebt :
-          debouncedDebtInput,
-
+        valueColl,
+        valueDebt,
         selectedVault.vaultId);
       setCollInputValue(undefined);
       setDebtInputValue(undefined);
+
+      logEvent('import_position', {
+        value_coll: String(valueColl),
+        type_coll: 'ETH-A',
+        value_debt: String(valueDebt),
+        type_debt: 'DAI',
+        one_click: false,
+        label: activeSeries.displayName,
+        time_to_maturity: (new Date().getTime()/1000) - activeSeries.maturity, 
+      });
+
       close && close();
       await Promise.all([
         userActions.updateUser(),
@@ -150,8 +160,21 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
   };
   
   const importAllProcedure = async (id:number) => {
+
     if (!allDisabled) {
       await importVault(activeSeries, id);
+      logEvent('import_position', {
+        value_coll: String(selectedVault?.vaultCollateral_),
+        type_coll: 'ETH-A',
+        value_debt: String(selectedVault?.vaultDaiDebt_),
+        type_debt: 'DAI',
+        source: 'MAKER',
+        one_click: true,
+        label: activeSeries.displayName,
+        maturity: activeSeries.maturity, 
+        time_to_maturity: (new Date().getTime()/1000) - activeSeries.maturity, 
+      });
+
       close && close();
       await Promise.all([
         userActions.updateUser(),
@@ -160,6 +183,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
     }
   };
 
+  /* change the selected vault */ 
   const selectVault = (prevOrNext:'next'|'prev') => {
     prevOrNext === 'prev' && selectedVaultIndex > 0 && setSelectedVaultIndex( selectedVaultIndex-1 );
     prevOrNext === 'next' && selectedVaultIndex < filteredMakerVaults.length-1 && setSelectedVaultIndex( selectedVaultIndex+1 );
@@ -196,7 +220,8 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
 
       const preview = await previewPoolTx('buyDai', activeSeries, debouncedDebtInput);     
       if (!(preview instanceof Error)) {
-        setAPR(calcAPR( ethers.utils.parseEther(debouncedDebtInput.toString()), preview, activeSeries.maturity ) );
+        const _apr = calculateAPR( ethers.utils.parseEther(debouncedDebtInput.toString()), preview, activeSeries.maturity );
+        setAPR(cleanValue(_apr.toString(), 2) );
       } else {
         setAllDisabled(true);
         setDebtErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
@@ -206,7 +231,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
   }, [debouncedDebtInput, activeSeries]);
 
   /*
-  * Handle collateral Input (debounced debt input) changes:
+  * Handle collateral Input (debounced coll input) changes:
   */
   useEffect(()=>{
     if ( selectedVault && debouncedCollInput > parseFloat(selectedVault.vaultCollateral_) ) {
@@ -242,8 +267,8 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
     }
   }, [ makerVaults, debouncedSearchInput, selectedVaultIndex ]);
 
+  /* set the initially shown vault as first one with debt OR from url vault param */
   useEffect(()=>{
-    /* set the initially shown vault as first one with debt OR from url vault param */
     let startIndex;
     if (vaultParam) {
       startIndex = filteredMakerVaults.findIndex((x:any)=>x.vaultId===vaultParam);
@@ -251,7 +276,6 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
       startIndex = filteredMakerVaults.findIndex((x:any)=>x.vaultDaiDebt_>0);
     }
     filteredMakerVaults.length>0 && setSelectedVaultIndex( (startIndex>=0) ? startIndex : 0 );
-
   }, [filteredMakerVaults]);
 
   /* Handle minSafe collateral calculations minSafe must be > 0.05ETH */
@@ -262,37 +286,24 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
   
   /* Handle dust watch */
   useEffect(()=>{
-    dust && setDaiDust(dust.div(BN_RAY));
+    dust && setDaiDust(dust.div(BigNumber.from('1000000000000000000000000000')));
   }, [ dust ]);
 
-  /* Get the  Max APR for the selected Vault */
+  /* Get the Max APR for the selected Vault */
   useEffect(()=>{
     selectedVault?.vaultDaiDebt_> 0 && (async ()=>{
       const preview = await previewPoolTx('buyDai', activeSeries, selectedVault.vaultDaiDebt_);
       if (!(preview instanceof Error)) {
-        setMaxAPR( calcAPR( ethers.utils.parseEther(selectedVault?.vaultDaiDebt_), preview, activeSeries.maturity) );
+        const _apr = calculateAPR( ethers.utils.parseEther(selectedVault?.vaultDaiDebt_), preview, activeSeries.maturity);
+        setMaxAPR( cleanValue(_apr.toString(), 2) );
       } else {
         setMaxAPR(undefined);
       }
     })();
-  }, [selectedVault, activeSeries]);
-
-  /* Get the  Max APR for the selected Vault */
-  useEffect(()=>{
-      selectedVault?.vaultDaiDebt_> 0 && (async ()=>{
-      const preview = await previewPoolTx('buyDai', activeSeries, selectedVault.vaultDaiDebt_);
-      if (!(preview instanceof Error)) {
-        setMaxAPR( calcAPR( ethers.utils.parseEther(selectedVault?.vaultDaiDebt_), preview, activeSeries.maturity) );
-      } else {
-        setMaxAPR(undefined);
-      }
-    })();
-
   }, [selectedVault, activeSeries]);
     
   /* Handle ratelock disabling */
   useEffect(()=>{ 
- 
     account && 
     filteredMakerVaults.length>0 && 
     !collErrorMsg &&
@@ -341,14 +352,17 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
               onClick={()=>setSelectorOpen(true)}
               round
             >
-              <Image src={!theme.dark ? logoDark : logoLight} fit='contain' />
+              <Image src={logoDark} fit='contain' />
             </Box>
-            <Text size={mobile?'large':'xxlarge'} weight='bold'>RateLock</Text>   
+            <Text size={mobile?'large':'xxlarge'} weight='bold' color={asLayer? 'text' : activeSeries?.seriesTextColor}>RateLock</Text>   
           </Box>
 
           { !mobile &&
           <Box direction='row' align='center' gap='small'> 
-            <Search onClick={()=>{if(!searchOpen){setSearchOpen(true);} else {setSearchInputValue(undefined); setSearchOpen(false);}}} />
+            <Search 
+              color={asLayer? 'text' : activeSeries?.seriesTextColor} 
+              onClick={()=>{if(!searchOpen){setSearchOpen(true);} else {setSearchInputValue(undefined); setSearchOpen(false);}}} 
+            />
             <Collapsible open={searchOpen} direction='horizontal'>
               <InsetBox
                 background={asLayer? makerBackColor : activeSeries && modColor(activeSeries?.seriesColor, 50)}
@@ -444,7 +458,6 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
               </InsetBox>
             </Box>
            
-            {/* <InsetBox background={makerBackColor} direction='row' justify='between' align='center' pad={{ horizontal:'xlarge', vertical:'medium' }}> */}
             <Box direction='row' justify='between' align='center' pad='small'>
               <Text size='xsmall' color='text'> Selected Yield Series: </Text>
               <RaisedButton 
@@ -466,7 +479,6 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
                 }
               />
             </Box>
-            {/* </InsetBox> */}
                 
             {
             !advancedOpen &&
@@ -484,7 +496,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
                     label={
                       <Box pad='small' direction='row' gap='small'>
                         <Text size='small' weight='bold'> 1-Click RateLock</Text>
-                        <Text size='small'>{selectedVault?.vaultDaiDebt_} Dai { maxAPR? ` @ ${maxAPR.toFixed(2)}%`: ''}</Text>
+                        <Text size='small'>{selectedVault?.vaultDaiDebt_} Dai { maxAPR? ` @ ${maxAPR}%`: ''}</Text>
                       </Box>
                     }
                   />
@@ -506,7 +518,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
                     label={
                       <Box pad='small' direction='row' gap='small'>
                         <Text size='small' weight='bold'> 1-Click RateLock</Text>
-                        <Text size='small'>{selectedVault?.vaultDaiDebt_} Dai { maxAPR? `@ ${maxAPR.toFixed(2)}%`: ''}</Text>
+                        <Text size='small'>{selectedVault?.vaultDaiDebt_} Dai { maxAPR? `@ ${ maxAPR }%`: ''}</Text>
                       </Box>
                     }
                   />
@@ -588,7 +600,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
                     visible: !!debtInputValue,
                     active: true,
                     loading: false, 
-                    value: APR?`${APR.toFixed(2)}%`: `${activeSeries? activeSeries.yieldAPR_: ''}%`,
+                    value: APR?`${APR}%`: `${activeSeries? activeSeries.yieldAPR_: ''}%`,
                     valuePrefix: null,
                     valueExtra: null, 
                   },
@@ -620,7 +632,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
                   label={                  
                     <Box direction='row' gap='small'>
                       <Text size='small'>RateLock</Text>
-                      <Text size='small' weight='normal'>{debouncedDebtInput} Dai @ {APR && APR.toFixed(2)}% </Text>
+                      <Text size='small' weight='normal'>{debouncedDebtInput} Dai @ {APR}% </Text>
                     </Box>             
                     }
                   disabled={advancedDisabled || allDisabled}

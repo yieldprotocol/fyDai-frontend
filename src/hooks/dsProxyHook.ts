@@ -18,19 +18,19 @@ import { useTxHelpers } from './txHooks';
  */
 
 export const useDsProxy = () => {
+  
+  /* Preset the dsProxy contract for the user to be used with all fns */
+  const { abi: DsProxyAbi } = DSProxy;
 
-  /* contexts */
+  /* state from contexts */
   const  { state }  = useContext<any>(UserContext);
+
+  /* local state */
+  const [ executeActive, setExecuteActive ] = useState<boolean>(false);
 
   /* hooks */ 
   const { signer } = useSignerAccount();
   const { handleTx, handleTxRejectError } = useTxHelpers();
-  
-  /* Activity flags */
-  const [ executeActive, setExecuteActive ] = useState<boolean>(false);
-
-  /* Preset the dsProxy contract for the user to be used with all fns */
-  const { abi: DsProxyAbi } = DSProxy;
 
   const proxyExecute = async (
     contractAddress: string,

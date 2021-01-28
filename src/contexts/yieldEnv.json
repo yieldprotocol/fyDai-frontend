@@ -1,4 +1,25 @@
-{ 
+{
+  "contractsList" : [
+    "Controller",
+    "Treasury",
+    "Dai",
+    "Vat",
+    "PoolProxy",
+    "BorrowProxy",
+    "ProxyRegistry",
+    "ProxyFactory",
+    "GetCdps",
+    "DssCdpManager",
+    "ImportProxy",
+    "ImportCdpProxy"
+  ],
+
+  "colors" : {
+    "seriesColors" : [ "#aed175", "#f0817f", "#ffbf81", "#95a4db", "#ffdc5c", "#ff86c8", "#82d4bb", "#6ab6f1", "#cb90c9" ],
+    "fromColors" : ["#add8e6", "#add8e6", "#add8e6", "#add8e6", "#add8e6", "#add8e6", "#add8e6", "#add8e6", "#add8e6" ]
+  },
+
+  "addresses" : { 
     "1": {
         "Chai" : "0x06AF07097C9Eeb7fD685c692751D5C66dB49c215",
         "Controller" : "0xB94199866Fe06B535d019C11247D3f921460b91A",
@@ -69,5 +90,5 @@
         "ProxyFactory":   "0xe11E3b391F7E8bC47247866aF32AF67Dd58Dc800",
         "ProxyRegistry":  "0x64A436ae831C1672AE81F674CAb8B6775df3475C"
     }
+  }
 }
-

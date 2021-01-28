@@ -1,53 +1,9 @@
 import React, { useEffect, useState, useContext } from 'react';
-import styled, { css } from 'styled-components';
 import { Box, Text, ThemeContext } from 'grommet';
 
 import { UserContext } from '../contexts/UserContext';
 import FlatButton from './FlatButton';
-import { modColor } from '../utils';
-
-const StyledBox = styled(Box)`
-  border-radius: 25px;
-  transition: all 0.3s ease-in-out;
-
-  ${(props:any) => !(props.border) && css`
-  background: ${ props.background };
-  border-color: ${ props.background };
-  box-shadow: 0px 0px 0px ${modColor(props.background, -15)}, -0px -0px 0px ${modColor(props.background, 10)};
-  :active:hover {
-    transform: scale(1);
-    box-shadow: inset 6px 6px 11px ${modColor(props.background, -15)}, inset -6px -6px 11px ${modColor(props.background, 10)};
-    }
-  :hover {
-    transform: scale(1.02);
-    box-shadow:  6px 6px 11px ${modColor(props.background, -15)}, -6px -6px 11px ${modColor(props.background, 10)};
-    }
-  `}
-  ${(props:any) => (props.border) && css`
-  background: ${ props.background };
-  border-color: ${ props.background };
-  box-shadow:  inset 6px 6px 11px ${modColor(props.background, -15)},  
-    inset -6px -6px 11px ${modColor(props.background, 10)};
-  :active:hover {
-    box-shadow:  0px 0px 0px ${modColor(props.background, -15)}, 
-        -0px -0px 0px ${modColor(props.background, 10)};
-    }
-  :hover {
-    /* transform: scale(1.01); */
-    }
-  `}
-  ${(props:any) => (props.disabled) && css`
-  box-shadow:  0px 0px 0px ${modColor(props.background, -15)}, 
-    -0px -0px 0px ${modColor(props.background, 10)};
-  :active:hover {
-    box-shadow:  0px 0px 0px ${modColor(props.background, -15)}, 
-        -0px -0px 0px ${modColor(props.background, 10)};
-    }
-  :hover {
-    transform: scale(1);
-    }
-  `}
-`;
+import StickyButton from './StickyButton';
 
 const slippageList = [0.001, 0.005, 0.01];
 
@@ -90,16 +46,17 @@ const YieldSettings = () => {
 
           { slippageList.map( (x:any, i:number) => (
             <Box gap='small' align='center' key={x}>
-              <StyledBox
-                pad={{ horizontal: 'large', vertical: 'xsmall' }}
+              <StickyButton        
                 onClick={() => updatePreferences({ slippage: slippageList[i] })}
-                border={slippageList.indexOf(preferences.slippage)!== i ? undefined : 'all'}
                 background={defaultBackground}
+                selected={slippageList.indexOf(preferences.slippage)!== i ? undefined : 'all'}
               >
-                <Text size="xxsmall">
-                  {x*100} %
-                </Text>
-              </StyledBox>
+                <Box pad={{ horizontal: 'large', vertical: 'xsmall' }}>
+                  <Text size="xxsmall">
+                    {x*100} %
+                  </Text>
+                </Box>
+              </StickyButton>
             </Box>)
           )}   
         </Box> 
@@ -114,29 +71,31 @@ const YieldSettings = () => {
           <Text size='xsmall'>Authorization strategy: </Text>
 
           <Box gap='small' align='center'>
-            <StyledBox
-              pad={{ horizontal: 'large', vertical: 'xsmall' }}
+            <StickyButton
               onClick={() => updatePreferences({ useTxApproval: false })}
-              border={useTxApproval? 'all':undefined}
               background={defaultBackground}
+              selected={useTxApproval? 'all':undefined}
             >
-              <Text size="xxsmall">
-                Sign permits
-              </Text>
-            </StyledBox>
+              <Box pad={{ horizontal: 'large', vertical: 'xsmall' }}>
+                <Text size="xxsmall">
+                  Sign permits
+                </Text>
+              </Box>
+            </StickyButton>
           </Box>
 
           <Box gap='small' align='center'>
-            <StyledBox
-              pad={{ horizontal: 'small', vertical: 'xsmall' }}
+            <StickyButton
               onClick={() => updatePreferences({ useTxApproval: true })}
-              border={useTxApproval?undefined:'all'}
               background={defaultBackground}
+              selected={useTxApproval?undefined:'all'}
             >
-              <Text size="xxsmall">
-                Approval transactions
-              </Text>
-            </StyledBox>
+              <Box pad={{ horizontal: 'large', vertical: 'xsmall' }}>
+                <Text size="xxsmall">
+                  Approval transactions
+                </Text>
+              </Box>
+            </StickyButton>
           </Box>
         </Box>
       </Box>
