@@ -112,11 +112,13 @@ export const useImportProxy = () => {
       const _one = ONE.mul('1e18');
       const diff = preview.sub(_one.toFixed());
       const adjDiff = mulDecimal( '1.1', diff ); 
-      maxDaiPrice =  floorDecimal( _one.add(adjDiff).toFixed() ) ;
+
+      const daiPriceAsRay = (_one.add(adjDiff)).mul('1000000000'); 
+      maxDaiPrice =  floorDecimal( daiPriceAsRay.toFixed() ) ;
 
     } else {
       throw(preview);
-    }
+    } 
 
     /* build and use signature if required , else '0x' */
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
@@ -199,8 +201,9 @@ export const useImportProxy = () => {
       // 1 + ( 1.1 * ( price - 1 ) )
       const _one = ONE.mul('1e18');
       const diff = preview.sub(_one.toFixed());
-      const adjDiff = mulDecimal( '1.1', diff ); 
-      maxDaiPrice =  floorDecimal( _one.add(adjDiff).toFixed() ) ;
+      const adjDiff = mulDecimal( '1.1', diff );
+      const daiPriceAsRay = (_one.add(adjDiff)).mul('1000000000'); 
+      maxDaiPrice =  floorDecimal( daiPriceAsRay.toFixed() ) ;
 
     }  else {
       throw(preview);
