@@ -68,12 +68,14 @@ export const usePoolProxy = () => {
    * 
    * @param {IYieldSeries} series series to act on.
    * @param {number|BigNumber} daiUsed amount of Dai to use to mint liquidity.
+   * @param {boolean} stategy add liquidity strategy ('BUY' or 'BORROW')
    *  
    * @note if BigNumber is used make sure it is in WEI
    */
   const addLiquidity = async (
     series:IYieldSeries,
     daiUsed:number|BigNumber,
+    forceBorrow: boolean = true
   ) => {
     
     let addLiquidityStrategy: string = 'BUY'; // BUY (default) or BORROW
@@ -96,12 +98,13 @@ export const usePoolProxy = () => {
   
     /* calc amount of fydai to mint when using BUY strategy */
     const fyDaiMinted = fyDaiForMint(daiReserves, fyDaiRealReserves, fyDaiVirtualReserves, parsedDaiUsed, timeToMaturity );
+    
     /* calc maxyFYDai when using BORROW strategy */
     const [ ,fyDaiSplit ] = splitLiquidity( parsedDaiUsed, daiReserves, fyDaiRealReserves );
     const maxFYDai = floorDecimal( mulDecimal(fyDaiSplit, '1.1') );
 
     /* check which addLiquidity function to use based on PREFERENCES or POOL LIQUIDITY . defaults to BUY */ 
-    if ( preferences.addLiquidityStrategy === 'BORROW' || parsedDaiUsed.gte(daiReserves) ) { 
+    if ( !preferences.useBuyToAddLiquidity || forceBorrow ) { 
       addLiquidityStrategy = 'BORROW';
     }
 
