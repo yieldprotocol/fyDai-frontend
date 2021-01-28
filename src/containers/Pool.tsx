@@ -326,7 +326,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                               selected={useBuyToAddLiquidity}
                             >
                               <Box pad={{ horizontal:'small', vertical: 'xsmall' }} alignSelf='center'>
-                                <Text size="xxsmall" weight='bold'>
+                                <Text size="xxsmall" >
                                   Buy and Pool 
                                 </Text>
                               </Box>
@@ -337,7 +337,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                               selected={!useBuyToAddLiquidity}
                             >
                               <Box pad={{ horizontal:'small', vertical: 'xsmall' }} alignSelf='center'>
-                                <Text size="xxsmall" weight='bold'>
+                                <Text size="xxsmall" >
                                   Borrow and pool
                                 </Text>
                               </Box>
