@@ -138,7 +138,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
       if (!(preview instanceof Error)) {
         setFYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
         const _apr = calculateAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries.maturity );
-        setAPR(cleanValue(_apr, 2) );
+        setAPR(cleanValue(_apr.toString(), 2) );
       } else {
         /* if the market doesnt have liquidity just estimate from rate */
         const rate = await previewPoolTx('buyDai', activeSeries, 1);
