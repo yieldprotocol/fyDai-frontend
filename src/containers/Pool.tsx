@@ -328,7 +328,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
 
                       {
                         label: () => ( 
-                          <Box fill='horizontal' justify='between' direction='row' alignSelf='end'>
+                          <Box fill='horizontal' justify='between' direction='row' alignSelf='end' onClick={() => setExplainerOpen(true)}>
                             <Text size='xsmall' weight='bold'>Liquidity supply strategy:</Text>
                             <Info size='20px' onClick={() => setExplainerOpen(true)} /> 
                           </Box>),
@@ -337,7 +337,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
 
                             { 
                             forceBorrow ?
-                              <Box pad={{ horizontal:'small', vertical: 'xsmall' }} alignSelf='center'>
+                              <Box pad={{ horizontal:'small', vertical: 'small' }} alignSelf='center'>
                                 <Text size="xxsmall" color='text-xweak'>
                                   Buy and Pool 
                                 </Text>
@@ -348,7 +348,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                                 selected={useBuyToAddLiquidity && !forceBorrow}
                                 disabled={forceBorrow}
                               >
-                                <Box pad={{ horizontal:'small', vertical: 'xsmall' }} alignSelf='center'>
+                                <Box pad={{ horizontal:'small', vertical: 'small' }} alignSelf='center'>
                                   <Text size="xxsmall">
                                     Buy and Pool 
                                   </Text>
@@ -360,7 +360,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                               onClick={() => userActions.updatePreferences({ useBuyToAddLiquidity: false })}
                               selected={!useBuyToAddLiquidity || forceBorrow}
                             >
-                              <Box pad={{ horizontal:'small', vertical: 'xsmall' }} alignSelf='center'>
+                              <Box pad={{ horizontal:'small', vertical: 'small' }} alignSelf='center'>
                                 <Text size="xxsmall">
                                   Borrow and pool
                                 </Text>
@@ -375,27 +375,6 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                         valuePrefix: null,
                         valueExtra: null
                       },
-
-                      // {
-                      //   label: null,
-                      //   labelExtra: null,
-                      //   visible: inputValue>0,
-                      //   active: debouncedInput,
-                      //   loading: false,           
-                      //   value: null,
-                      //   valuePrefix: null,
-                      //   valueExtra:() => ( 
-                      //     <>
-                      //       { useBuyToAddLiquidity ?
-                      //         <Text size='xxsmall' weight='normal'>
-                      //           <Text size='xxsmall' weight='bold'> Buy & Pool </Text> is the most gas efficient strategy. (Recommended for most users)
-                      //         </Text> :
-                      //         <Text size='xxsmall' weight='normal'> 
-                      //           <Text size='xxsmall' weight='bold'> Borrow & Pool </Text> strategy is best for when adding large amounts of liquidity.
-                      //         </Text>}
-                      //     </>
-                      //   )
-                      // },
 
                       {
                         label: 'Like what you see?',
