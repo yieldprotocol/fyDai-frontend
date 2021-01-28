@@ -328,13 +328,13 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
             >
               <Image src={logoDark} fit='contain' />
             </Box>
-            <Text size={mobile?'large':'xxlarge'} weight='bold' color={activeSeries?.seriesTextColor}>RateLock</Text>   
+            <Text size={mobile?'large':'xxlarge'} weight='bold' color={asLayer? 'text' : activeSeries?.seriesTextColor}>RateLock</Text>   
           </Box>
 
           { !mobile &&
           <Box direction='row' align='center' gap='small'> 
             <Search 
-              color={activeSeries?.seriesTextColor} 
+              color={asLayer? 'text' : activeSeries?.seriesTextColor} 
               onClick={()=>{if(!searchOpen){setSearchOpen(true);} else {setSearchInputValue(undefined); setSearchOpen(false);}}} 
             />
             <Collapsible open={searchOpen} direction='horizontal'>
