@@ -7,6 +7,8 @@ import { useSignerAccount } from './connectionHooks';
 import { IYieldSeries } from '../types';
 import { useTxHelpers } from './txHooks';
 import { useDsProxy } from './dsProxyHook';
+import { useToken } from '../hooks/tokenHook';
+
 
 /**
  * Hook for interacting with the yield 'Pool' Contract
@@ -19,6 +21,8 @@ export const usePool = () => {
 
   const { handleTx, handleTxRejectError } = useTxHelpers();
   const { proxyExecute } = useDsProxy();
+  const { getBalance } = useToken();
+  
 
   /**
    * @dev Sell fyDai for Dai ( Chai )
@@ -327,6 +331,35 @@ export const usePool = () => {
     if ( series.totalSupply?.isZero() ) { return { active: false, reason: 'Pool not initiated' };}
     if ( series.yieldAPR && !(Number.isFinite(parseFloat(series.yieldAPR))) ) { return { active: false, reason: 'Limited Liquidity' };}
     return { active:true, reason:'Pool is operational' };
+  };
+
+  /**
+   * @dev gets all the reserves for a pool().
+   * @param {IYieldSeries} series series in question.
+   * @returns {Promise<String[]>}  [daiReserves, fyDaiRealReserves, fyDaiVirtualReserves ] 
+   * @note call function 
+   */
+  const getReserves = async (
+    series: IYieldSeries,
+  ): Promise<string[]> => {
+    const poolAddr = ethers.utils.getAddress(series.poolAddress);
+    const fyDaiAddr = ethers.utils.getAddress(series.fyDaiAddress);
+    const contract = new ethers.Contract( poolAddr, poolAbi, fallbackProvider);
+    let daiRes = '0';
+    let fyDaiReal = '0';
+    let fyDaiVirtual = '0';
+    try {
+      [ daiRes, fyDaiReal, fyDaiVirtual ] = await Promise.all( [
+        contract.getDaiReserves(),
+        getBalance(fyDaiAddr, 'FYDai', poolAddr),
+        contract.getFYDaiReserves(),
+      ]);
+    }  catch (e) {
+      // eslint-disable-next-line no-console
+      console.log(e);
+      return [ daiRes, fyDaiReal, fyDaiVirtual ];
+    }
+    return [ daiRes, fyDaiReal, fyDaiVirtual ];
   };
 
   return { 
