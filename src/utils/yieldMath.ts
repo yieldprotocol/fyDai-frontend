@@ -415,7 +415,9 @@ export const secondsToFrom  = (
   to: BigNumber | string, 
   from: BigNumber | string = BigNumber.from( Math.round(new Date().getTime() / 1000)), // OPTIONAL: FROM defaults to current time if omitted
 ) : string => {
+
   const to_ = ethers.BigNumber.isBigNumber(to)? to : BigNumber.from(to);
   const from_ = ethers.BigNumber.isBigNumber(from)? from : BigNumber.from(from);
+
   return to_.sub(from_).toString();
 };

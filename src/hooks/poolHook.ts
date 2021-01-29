@@ -215,7 +215,13 @@ export const usePool = () => {
         poolAddr,
         calldata,
         { },
-        { tx: null, msg: 'Yield Series Pool authorization', type:'AUTH_POOL', series, value: null  }
+        { 
+          tx: null, 
+          msg: 'Yield Series Pool authorization', 
+          type:'AUTH_POOL', 
+          series, 
+          value: null
+        }
       );
     }
 

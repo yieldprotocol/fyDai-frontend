@@ -10,6 +10,7 @@ import { NotifyContext } from '../contexts/NotifyContext';
 import { useSignerAccount } from './connectionHooks'; 
 
 import { useCachedState } from './appHooks';
+import { secondsToFrom } from '../utils/yieldMath';
 
 
 
@@ -90,7 +91,9 @@ export const useTxHelpers = () => {
             value: tx.value,
             series: tx.series ? tx.series.displayName : null,
             maturity: tx.series ? tx.series.maturity : null, 
-            time_to_maturity: tx.series ? (new Date().getTime()/1000) - tx.series?.maturity : null,    
+            time_to_maturity: tx.series ? secondsToFrom(tx.series.maturity.toString()) : null,
+            account: account?.substring(2),
+            hash: tx.tx.hash.substring(2)
           });
         txComplete(receipt, txCode);
       }, ( error:any ) => {
