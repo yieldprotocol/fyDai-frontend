@@ -5,7 +5,7 @@ import { ISignListItem, IYieldSeries } from '../types';
 
 import { MAX_INT } from '../utils/constants';
 import { genTxCode } from '../utils';
-import { floorDecimal, mulDecimal, splitLiquidity, ONE, fyDaiForMint, secondsToFrom } from '../utils/yieldMath';
+import { floorDecimal, mulDecimal, splitLiquidity, ONE, fyDaiForMint, secondsToFrom, calculateSlippage } from '../utils/yieldMath';
 
 import PoolProxy from '../contracts/PoolProxy.json';
 import Controller from '../contracts/Controller.json';
@@ -97,11 +97,13 @@ export const usePoolProxy = () => {
     const fyDaiVirtualReserves = await getFyDaiReserves(poolAddr);
   
     /* calc amount of fydai to mint when using BUY strategy */
-    const fyDaiMinted = fyDaiForMint(daiReserves, fyDaiRealReserves, fyDaiVirtualReserves, parsedDaiUsed, timeToMaturity );
-    
+    const fyDaiIn = fyDaiForMint(daiReserves, fyDaiRealReserves, fyDaiVirtualReserves, parsedDaiUsed, timeToMaturity );
     /* calc maxyFYDai when using BORROW strategy */
-    const [ ,fyDaiSplit ] = splitLiquidity( parsedDaiUsed, daiReserves, fyDaiRealReserves );
-    const maxFYDai = floorDecimal( mulDecimal(fyDaiSplit, '1.1') );
+    const maxFYDai = floorDecimal( calculateSlippage(fyDaiIn, preferences.slippage) ); 
+
+    console.log('fyDaiIn : ', fyDaiIn.toString());
+    console.log('maxFyDai (fyDaiIn with slippage) : ',  maxFYDai.toString());
+
 
     /* check which addLiquidity function to use based on PREFERENCES or POOL LIQUIDITY . defaults to BUY */ 
     if ( !preferences.useBuyToAddLiquidity || forceBorrow ) { 
@@ -174,7 +176,7 @@ export const usePoolProxy = () => {
       /* contract fn used: buyAddLiquidityWithSignature(IPool pool, uint256 fyDaiBought, uint256 maxDaiUsed, bytes memory daiSig, bytes memory fyDaiSig, bytes memory poolSig ) */
       calldata = proxyContract.interface.encodeFunctionData( 
         'buyAddLiquidityWithSignature', 
-        [ poolAddr, fyDaiMinted, parsedDaiUsed, signedSigs.get('daiSig'), signedSigs.get('fyDaiSig'), signedSigs.get('poolSig') ]
+        [ poolAddr, fyDaiIn, parsedDaiUsed, signedSigs.get('daiSig'), signedSigs.get('fyDaiSig'), signedSigs.get('poolSig') ]
       );
 
     } else {
@@ -250,11 +252,19 @@ export const usePoolProxy = () => {
 
       const preview = await previewPoolTx('sellfydai', series, ethers.utils.parseEther('1'));
       if ( !(preview instanceof Error) ) {
-        const _oneRay = ONE.mul('1e18');
-        minFYDaiPrice = floorDecimal( ( _oneRay.sub( (_oneRay.sub( preview.toString())).mul('1.1') )).toFixed() );
+        // const _one = ONE.mul('1e18');
+        // const amountAboveOne = _one.sub( preview.toString() ).toString();
+        // const withSlippage = calculateSlippage( amountAboveOne, preferences.slippage);    
+        // minFYDaiPrice = floorDecimal( 
+        //   ( _one.sub( withSlippage ) ).toFixed() 
+        // );
+        minFYDaiPrice = calculateSlippage( preview.toString(), preferences.slippage, true);
       } else {
         throw(preview);
       }
+
+      console.log('sellFyDaiPreview: ', preview.toString());
+      console.log('minFyDaiPrice: ',  minFYDaiPrice);
 
       /* contract fn used: removeLiquidityEarlyDaiFixedWithSignature(IPool pool,uint256 poolTokens,uint256 minimumFYDaiPrice,bytes memory controllerSig,bytes memory poolSig) */
       calldata = proxyContract.interface.encodeFunctionData( 

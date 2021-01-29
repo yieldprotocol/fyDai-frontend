@@ -278,7 +278,7 @@ export const calcTokensMinted =(
    * 
    * @returns { string } human readable string
    */
-export const calculateSlippage = (value: BigNumber | string, slippage: BigNumber | string = '0.5', minimise:boolean=false ):string => {
+export const calculateSlippage = (value: BigNumber | string, slippage: BigNumber | string = '0.005', minimise:boolean=false ):string => {
   const value_ = new Decimal(value.toString()); 
   const _slippageAmount = floorDecimal( mulDecimal(value, slippage));
   if (minimise) {
