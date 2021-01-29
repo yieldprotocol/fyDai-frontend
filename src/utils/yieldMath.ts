@@ -197,6 +197,7 @@ export function fyDaiForMint(
 
   const daiReserves_ = new Decimal(daiReserves.toString());
   const fyDaiRealReserves_ = new Decimal(fyDaiRealReserves.toString());
+  const timeTillMaturity_ = new Decimal(timeTillMaturity.toString());
   const dai_ = new Decimal(dai.toString());
 
   let min = ZERO;
@@ -206,7 +207,7 @@ export function fyDaiForMint(
   let i = 0;
   while ( true ) {
 
-    const zIn = new Decimal( buyFYDai(daiReserves, fyDaiVirtualReserves, BigNumber.from(yOut.toFixed(0)), timeTillMaturity) );
+    const zIn = new Decimal( buyFYDai(daiReserves, fyDaiVirtualReserves, BigNumber.from(yOut.toFixed(0)), timeTillMaturity_.toString() ) );
     const Z_1 = daiReserves_.add(zIn); // New dai reserves
     const Y_1 = fyDaiRealReserves_.sub(yOut); // New fyDai reserves
     const pz = (dai_.sub(zIn)).div( (dai_.sub(zIn)).add(yOut) ); // dai proportion in my assets
