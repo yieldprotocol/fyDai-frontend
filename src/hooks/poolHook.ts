@@ -370,6 +370,7 @@ export const usePool = () => {
     buyDai,
 
     getFyDaiReserves,
+    getReserves,
 
     addPoolDelegate,
     checkPoolDelegate,
