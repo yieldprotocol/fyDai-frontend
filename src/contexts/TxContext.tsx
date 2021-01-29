@@ -77,7 +77,9 @@ const TxProvider = ({ children }:any) => {
           dispatch({ type:'txPending', payload: x });
           await library.waitForTransaction(x.tx.hash, 1)
             .then((receipt:any) => {
+
               dispatch({ type: 'txComplete', payload: { receipt, txCode: x.txCode } } );
+              
             });
           setPendingCache([]);
         })

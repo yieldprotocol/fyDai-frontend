@@ -170,7 +170,13 @@ export const useImportProxy = () => {
       viaCdpMan ? cdpProxyContract.address: proxyContract.address, 
       calldata,
       overrides,
-      { tx:null, msg: `Migrating ${utils.cleanValue(daiDebtAmount.toString(), 2)} Debt and ${utils.cleanValue(wethAmount.toString(), 4)} Eth Collateral to ${series.displayNameMobile}`, type:'IMPORT', series  }
+      { 
+        tx:null, 
+        msg: `Migrating ${utils.cleanValue(daiDebtAmount.toString(), 2)} Debt and ${utils.cleanValue(wethAmount.toString(), 4)} Eth Collateral to ${series.displayNameMobile}`, 
+        type:'IMPORT', 
+        series,
+        value: parsedDaiDebt.toString()
+      }
     );
   };
 
@@ -256,7 +262,13 @@ export const useImportProxy = () => {
       viaCdpMan ? cdpProxyContract.address: proxyContract.address, 
       calldata,
       overrides,
-      { tx:null, msg: `Migrating a MakerVault to Yield series: ${series.displayNameMobile}`, type:'IMPORT', series  }
+      { 
+        tx:null, 
+        msg: `Migrating a MakerVault to Yield series: ${series.displayNameMobile}`,
+        type:'IMPORT',
+        series,
+        value: null
+      }
     );
   };
 

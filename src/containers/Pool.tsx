@@ -95,13 +95,6 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
     if (inputValue && !addLiquidityDisabled ) {
  
       await addLiquidity( activeSeries, inputValue, forceBorrow );
-      logEvent( 'add_liquidity', {
-        value: inputValue,
-        type: 'DAI',
-        series: activeSeries.displayName || activeSeries.poolAddress,
-        maturity: activeSeries.maturity, 
-        time_to_maturity: (new Date().getTime()/1000) - activeSeries.maturity, 
-      });
       
       /* clean up and refresh */ 
       setInputValue(undefined);

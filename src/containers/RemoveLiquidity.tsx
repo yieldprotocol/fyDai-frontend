@@ -65,14 +65,6 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
       !activeSeries?.isMature() && close();
       await removeLiquidity(activeSeries, value);
       
-      /* log event */
-      logEvent('remove_liquidity', {
-        value: String(value),
-        type: 'DAI',
-        series: activeSeries.displayName,
-        maturity: activeSeries.maturity, 
-        time_to_maturity: (new Date().getTime()/1000) - activeSeries.maturity, 
-      });
 
       /* clean up and refresh */ 
       setInputValue(undefined);

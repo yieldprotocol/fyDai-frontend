@@ -97,13 +97,15 @@ export const usePoolProxy = () => {
     const fyDaiVirtualReserves = await getFyDaiReserves(poolAddr);
   
     /* calc amount of fydai to mint when using BUY strategy */
-    const fyDaiIn = fyDaiForMint(daiReserves, fyDaiRealReserves, fyDaiVirtualReserves, parsedDaiUsed, timeToMaturity );
+    // const fyDaiIn = fyDaiForMint(daiReserves, fyDaiRealReserves, fyDaiVirtualReserves, parsedDaiUsed, timeToMaturity );
+    const fyDaiIn = '100000';
     /* calc maxyFYDai when using BORROW strategy */
     const maxFYDai = floorDecimal( calculateSlippage(fyDaiIn, preferences.slippage) ); 
 
     console.log('fyDaiIn : ', fyDaiIn.toString());
     console.log('maxFyDai (fyDaiIn with slippage) : ',  maxFYDai.toString());
 
+    
 
     /* check which addLiquidity function to use based on PREFERENCES or POOL LIQUIDITY . defaults to BUY */ 
     if ( !preferences.useBuyToAddLiquidity || forceBorrow ) { 
@@ -192,7 +194,13 @@ export const usePoolProxy = () => {
       proxyContract.address, 
       calldata,
       overrides,
-      { tx:null, msg: `Adding ${daiUsed} DAI liquidity to ${series.displayNameMobile}`, type:'ADD_LIQUIDITY', series  }
+      { 
+        tx:null, 
+        msg: `Adding ${daiUsed} DAI liquidity to ${series.displayNameMobile}`, 
+        type:'ADD_LIQUIDITY', 
+        series, 
+        value: parsedDaiUsed.toString()  
+      }
     );
 
   };
@@ -284,7 +292,13 @@ export const usePoolProxy = () => {
       proxyContract.address, 
       calldata,
       overrides,
-      { tx:null, msg: `Removing ${tokens} liquidity tokens from ${series.displayNameMobile}`, type:'REMOVE_LIQUIDITY', series  }
+      { 
+        tx:null, 
+        msg: `Removing ${tokens} liquidity tokens from ${series.displayNameMobile}`, 
+        type:'REMOVE_LIQUIDITY', 
+        series, 
+        value: parsedTokens.toString()  
+      }
     );
 
   };
