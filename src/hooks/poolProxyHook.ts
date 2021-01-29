@@ -5,7 +5,7 @@ import { ISignListItem, IYieldSeries } from '../types';
 
 import { MAX_INT } from '../utils/constants';
 import { genTxCode } from '../utils';
-import { floorDecimal, mulDecimal, splitLiquidity, ONE, fyDaiForMint, secondsToFrom, calculateSlippage } from '../utils/yieldMath';
+import { floorDecimal, splitLiquidity, fyDaiForMint, secondsToFrom, calculateSlippage } from '../utils/yieldMath';
 
 import PoolProxy from '../contracts/PoolProxy.json';
 import Controller from '../contracts/Controller.json';
@@ -86,10 +86,6 @@ export const usePoolProxy = () => {
     const parsedDaiUsed = BigNumber.isBigNumber(daiUsed)? daiUsed : ethers.utils.parseEther(daiUsed.toString());
     const timeToMaturity = secondsToFrom(series.maturity.toString());
 
-    const overrides = {
-      gasLimit: BigNumber.from('800000'),
-      value: ethers.utils.parseEther('0')
-    };
 
     /* calculate max expected fyDai value and factor in slippage */
     const daiReserves = await getBalance(deployedContracts.Dai, 'Dai', poolAddr);
@@ -97,19 +93,29 @@ export const usePoolProxy = () => {
     const fyDaiVirtualReserves = await getFyDaiReserves(poolAddr);
   
     /* calc amount of fydai to mint when using BUY strategy */
-    const fyDaiIn = fyDaiForMint(daiReserves, fyDaiRealReserves, fyDaiVirtualReserves, parsedDaiUsed, timeToMaturity );
+    const fyDaiIn = fyDaiForMint(
+      daiReserves, 
+      fyDaiRealReserves, 
+      fyDaiVirtualReserves, 
+      calculateSlippage(parsedDaiUsed, '0.03', true), 
+      timeToMaturity 
+    );
+
+    const [, fyDai_] = splitLiquidity(daiReserves, fyDaiRealReserves, parsedDaiUsed );     
 
     /* calc maxyFYDai when using BORROW strategy */
-    const maxFYDai = floorDecimal( calculateSlippage(fyDaiIn, preferences.slippage) ); 
-
-    console.log('fyDaiIn : ', fyDaiIn.toString());
-    console.log('maxFyDai (fyDaiIn with slippage) : ',  maxFYDai.toString());
-
+    const maxFYDai = floorDecimal( calculateSlippage(fyDai_, preferences.slippage) ); 
 
     /* check which addLiquidity function to use based on PREFERENCES or POOL LIQUIDITY . defaults to BUY */ 
     if ( !preferences.useBuyToAddLiquidity || forceBorrow ) { 
       addLiquidityStrategy = 'BORROW';
     }
+
+    /* set override gas estiamtes based on strategy */
+    const overrides = {
+      gasLimit: addLiquidityStrategy === 'BUY'?  BigNumber.from('400000') : BigNumber.from('800000'),
+      value: ethers.utils.parseEther('0')
+    };
 
     /* build and use signature if required , else '0x' */
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
