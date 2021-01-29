@@ -63,10 +63,8 @@ export const useTxHelpers = () => {
   const handleTxError = (msg:string, receipt: any, error:any) => {
     /* clear the requested signatures and tx activity flag */
     dispatch({ type: 'setTxProcessActive', payload:{ txCode:null, sigs:[] }  });
-
     // eslint-disable-next-line no-console
     console.log(error.message);
-
     notify({ 
       type: 'notify', 
       payload:{ message: msg, type:'error' } 
@@ -77,7 +75,6 @@ export const useTxHelpers = () => {
   
   const handleTx = async ( tx:ITx ) => {
 
-    console.log(tx);
     /* assign an internal tracking code for the series and type of tx */
     const txCode = tx.type.concat( tx?.series?.maturity.toString() || '' );
     /* add the tx to txContent */
@@ -98,7 +95,7 @@ export const useTxHelpers = () => {
         txComplete(receipt, txCode);
       }, ( error:any ) => {
         handleTxError('Error: Transaction failed. Please see console', tx.tx, error);
-        logEvent('tx_error', { user: account?.substring(2), hash: tx.tx.hash.substring(2) } );
+        logEvent('TX_ERROR', { user: account?.substring(2), hash: tx.tx.hash.substring(2) } );
       });
   };
 

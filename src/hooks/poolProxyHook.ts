@@ -97,15 +97,14 @@ export const usePoolProxy = () => {
     const fyDaiVirtualReserves = await getFyDaiReserves(poolAddr);
   
     /* calc amount of fydai to mint when using BUY strategy */
-    // const fyDaiIn = fyDaiForMint(daiReserves, fyDaiRealReserves, fyDaiVirtualReserves, parsedDaiUsed, timeToMaturity );
-    const fyDaiIn = '100000';
+    const fyDaiIn = fyDaiForMint(daiReserves, fyDaiRealReserves, fyDaiVirtualReserves, parsedDaiUsed, timeToMaturity );
+
     /* calc maxyFYDai when using BORROW strategy */
     const maxFYDai = floorDecimal( calculateSlippage(fyDaiIn, preferences.slippage) ); 
 
     console.log('fyDaiIn : ', fyDaiIn.toString());
     console.log('maxFyDai (fyDaiIn with slippage) : ',  maxFYDai.toString());
 
-    
 
     /* check which addLiquidity function to use based on PREFERENCES or POOL LIQUIDITY . defaults to BUY */ 
     if ( !preferences.useBuyToAddLiquidity || forceBorrow ) { 

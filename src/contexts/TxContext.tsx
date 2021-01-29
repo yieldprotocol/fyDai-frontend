@@ -1,6 +1,9 @@
 import React, { useState, useContext, useEffect, useReducer } from 'react';
 import { useWeb3React } from '@web3-react/core';
 
+/* utils and support */
+import { logEvent } from '../utils/analytics';
+
 import { useCachedState } from '../hooks/appHooks';
 import { IReducerAction, ITxState } from '../types';
 
@@ -75,8 +78,17 @@ const TxProvider = ({ children }:any) => {
       if (!yieldLoading && library && !hasReadCache) {
         await Promise.all( pendingCache.map(async (x:any) => {
           dispatch({ type:'txPending', payload: x });
-          await library.waitForTransaction(x.tx.hash, 1)
+          await library.waitForTransaction(x.tx.hash, 2)
             .then((receipt:any) => {
+
+              logEvent(
+                x.tx.type, 
+                {
+                  value: x.tx.value,
+                  series: x.tx.series ? x.tx.series.displayName : null,
+                  maturity: x.tx.series ? x.tx.series.maturity : null, 
+                  time_to_maturity: x.tx.series ? (new Date().getTime()/1000) - x.tx.series?.maturity : null,    
+                });
 
               dispatch({ type: 'txComplete', payload: { receipt, txCode: x.txCode } } );
               
