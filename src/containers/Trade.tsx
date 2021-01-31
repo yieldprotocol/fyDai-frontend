@@ -14,6 +14,8 @@ import { UserContext } from '../contexts/UserContext';
 import { useSignerAccount } from '../hooks/connectionHooks';
 import { useDebounce, useIsLol } from '../hooks/appHooks';
 import { useMath } from '../hooks/mathHooks';
+import { getFee } from '../utils/yieldMath';
+
 import { useTxActive } from '../hooks/txHooks';
 import { usePool } from '../hooks/poolHook';
 import { useBorrowProxy } from '../hooks/borrowProxyHook';
@@ -56,6 +58,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
   const { previewPoolTx } = usePool();
+  const { getReserves } = usePool();
   const { sellDai } = useBorrowProxy();
   const { buyDai } = useBorrowProxy();
   const { sellFYDai } = useBorrowProxy();
@@ -186,6 +189,10 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
 
     activeSeries && !(activeSeries?.isMature()) &&  !!debouncedInput &&  ( async () => {
       const preview = await previewPoolTx(trade, activeSeries, debouncedInput);
+      const [daiReserves, fyDaiReservesReal, fyDaiReservesVirtual] = await getReserves(activeSeries);
+      console.log("daiReserves: ", daiReserves);
+      console.log("fyDaiReservesReal: ", fyDaiReservesReal);
+      console.log("fyDaiReservesVirtual: ", fyDaiReservesVirtual);
       const spotPreview = await previewPoolTx(trade, activeSeries, 1);
       if (!(preview instanceof Error) && !(spotPreview instanceof Error)) {
         switch(trade) {
