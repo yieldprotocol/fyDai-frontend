@@ -88,7 +88,10 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
 
   /* caluclate the percentage increase  */
   useEffect(()=> {
-    inputValue && activeSeries.fyDaiBalance && (async () => {
+    inputValue && 
+    inputValue > 0  && 
+    activeSeries.fyDaiBalance && 
+    (async () => {
       const originalInWei = ethers.utils.parseEther(inputValue);
       const preview = await previewPoolTx('sellFYDai', activeSeries, originalInWei);
       if (!(preview instanceof Error)) {
@@ -182,8 +185,8 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
               {
                 label: 'Interest earned',
                 labelExtra: `when closing ${inputValue} Dai `,
-                visible: !!interestEarned,
-                active: !!inputValue&&inputValue>0,
+                visible: false, // !!interestEarned && !!inputValue && inputValue>0,
+                active: false,
                 loading: false,        
                 value: interestEarned? `${interestEarned}%` : '',
                 valuePrefix: '',
