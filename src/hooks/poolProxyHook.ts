@@ -113,7 +113,7 @@ export const usePoolProxy = () => {
 
     /* set override gas estiamtes based on strategy */
     const overrides = {
-      gasLimit: addLiquidityStrategy === 'BUY'?  BigNumber.from('400000') : BigNumber.from('800000'),
+      gasLimit: addLiquidityStrategy === 'BUY'?  BigNumber.from('450000') : BigNumber.from('800000'),
       value: ethers.utils.parseEther('0')
     };
 
