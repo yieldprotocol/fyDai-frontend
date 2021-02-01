@@ -80,7 +80,7 @@ export const useController = () => {
         return;
       }
       /* Transaction reporting & tracking */
-      await handleTx({ tx, msg: 'Once-off Yield authorization', type: 'AUTH_CONTROLLER', series: null });
+      await handleTx({ tx, msg: 'Once-off Yield authorization', type: 'AUTH_CONTROLLER', series: null, value: null });
       userActions.updateAuthorizations();
 
     } else {   
@@ -89,7 +89,7 @@ export const useController = () => {
         controllerContract.address,
         calldata,
         { },
-        { tx:null, msg: 'Once-off Yield authorization', type: 'AUTH_CONTROLLER', series: null  }
+        { tx:null, msg: 'Once-off Yield authorization', type: 'AUTH_CONTROLLER', series: null, value: null  }
       );
       userActions.updateAuthorizations();
     }

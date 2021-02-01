@@ -10,6 +10,7 @@ import ImportCdpProxy from '../contracts/ImportCdpProxy.json';
 import Controller from '../contracts/Controller.json';
 
 import { YieldContext } from '../contexts/YieldContext';
+import { UserContext } from '../contexts/UserContext';
 
 import { useSignerAccount } from './connectionHooks';
 import { useSigning } from './signingHook';
@@ -18,7 +19,7 @@ import { useController } from './controllerHook';
 import { usePool } from './poolHook';
 
 import { genTxCode } from '../utils';
-import { floorDecimal, mulDecimal, ONE } from '../utils/yieldMath';
+import { calculateSlippage, floorDecimal, mulDecimal, ONE } from '../utils/yieldMath';
 
 /**
  * Hook for interacting with the ImportProxy Contract.
@@ -34,6 +35,7 @@ export const useImportProxy = () => {
 
   /* contexts */
   const  { state: { deployedContracts } }  = useContext<any>(YieldContext);
+  const  { state: { preferences } }  = useContext<any>(UserContext);
 
   /* hooks */
   const { account, signer } = useSignerAccount();
@@ -111,12 +113,14 @@ export const useImportProxy = () => {
       // 1 + ( 1.1 * ( price - 1 ) )
       const _one = ONE.mul('1e18');
       const diff = preview.sub(_one.toFixed());
-      const adjDiff = mulDecimal( '1.1', diff ); 
-      maxDaiPrice =  floorDecimal( _one.add(adjDiff).toFixed() ) ;
+      // const adjDiff = mulDecimal( '1.1', diff ); 
+      const adjDiff = calculateSlippage(diff, preferences.slippage );
+      const daiPriceAsRay = (_one.add(adjDiff)).mul('1000000000'); 
+      maxDaiPrice =  floorDecimal( daiPriceAsRay.toFixed() ) ;
 
     } else {
       throw(preview);
-    }
+    } 
 
     /* build and use signature if required , else '0x' */
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
@@ -166,7 +170,13 @@ export const useImportProxy = () => {
       viaCdpMan ? cdpProxyContract.address: proxyContract.address, 
       calldata,
       overrides,
-      { tx:null, msg: `Migrating ${utils.cleanValue(daiDebtAmount.toString(), 2)} Debt and ${utils.cleanValue(wethAmount.toString(), 4)} Eth Collateral to ${series.displayNameMobile}`, type:'IMPORT', series  }
+      { 
+        tx:null, 
+        msg: `Migrating ${utils.cleanValue(daiDebtAmount.toString(), 2)} Debt and ${utils.cleanValue(wethAmount.toString(), 4)} Eth Collateral to ${series.displayNameMobile}`, 
+        type:'IMPORT', 
+        series,
+        value: parsedDaiDebt.toString()
+      }
     );
   };
 
@@ -199,8 +209,10 @@ export const useImportProxy = () => {
       // 1 + ( 1.1 * ( price - 1 ) )
       const _one = ONE.mul('1e18');
       const diff = preview.sub(_one.toFixed());
-      const adjDiff = mulDecimal( '1.1', diff ); 
-      maxDaiPrice =  floorDecimal( _one.add(adjDiff).toFixed() ) ;
+      // const adjDiff = mulDecimal( '1.1', diff );
+      const adjDiff = calculateSlippage(diff, preferences.slippage );
+      const daiPriceAsRay = (_one.add(adjDiff)).mul('1000000000'); 
+      maxDaiPrice =  floorDecimal( daiPriceAsRay.toFixed() ) ;
 
     }  else {
       throw(preview);
@@ -250,7 +262,13 @@ export const useImportProxy = () => {
       viaCdpMan ? cdpProxyContract.address: proxyContract.address, 
       calldata,
       overrides,
-      { tx:null, msg: `Migrating a MakerVault to Yield series: ${series.displayNameMobile}`, type:'IMPORT', series  }
+      { 
+        tx:null, 
+        msg: `Migrating a MakerVault to Yield series: ${series.displayNameMobile}`,
+        type:'IMPORT',
+        series,
+        value: null
+      }
     );
   };
 

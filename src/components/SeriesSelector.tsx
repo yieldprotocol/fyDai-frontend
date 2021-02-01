@@ -55,10 +55,9 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
 
   const handleSelectSeries = (seriesMaturity: number) => {
     setActiveSeries(seriesMaturity);
-    logEvent({
-      category: 'Series',
-      action: 'Select Series',
-      label: activeSeries.displayName,
+    logEvent('change_series', {
+      from: activeSeries.maturity,
+      to: seriesMaturity,
     });
     navHistory.push(`/${pathname.split('/')[1]}/${seriesMaturity}`);
     close();

@@ -27,7 +27,14 @@ import Borrow from './containers/Borrow';
 import Lend from './containers/Lend';
 import Pool from './containers/Pool';
 import Deposit from './containers/Deposit';
+<<<<<<< HEAD
 import Trade from './containers/Trade';
+=======
+import CloseDai from './containers/CloseDai';
+import WithdrawEth from './containers/WithdrawEth';
+import Repay from './containers/Repay';
+import RemoveLiquidity from './containers/RemoveLiquidity';
+>>>>>>> dev
 import RateLock from './containers/RateLock';
 
 
@@ -36,7 +43,6 @@ import YieldFooter from './components/YieldFooter';
 import ErrorBoundary from './components/ErrorBoundry';
 import YieldNav from './components/YieldNav';
 import RaisedBox from './components/RaisedBox';
-
 
 declare global {
   interface Window {
@@ -171,6 +177,11 @@ const App = (props:any) => {
           <Route path="/pool/:series?/:amnt?"> <Pool openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route>
           <Route path="/trade/:series?/:amnt?"> <Trade openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route> 
           <Route path="/ratelock/:vault?/:series?"> <RaisedBox><RateLock openConnectLayer={() => setShowConnectLayer('CONNECT')} /></RaisedBox> </Route>   
+          <Route path="/withdraw/:amnt?"> <WithdrawEth /> </Route> 
+          <Route path="/repay/:series/:amnt?"> <Repay /> </Route>
+          <Route path="/close/:series/:amnt?"> <CloseDai close={()=>null} /> </Route> 
+          <Route path="/removeLiquidity/:series/:amnt?"> <RemoveLiquidity /> </Route>
+
           <Route exact path="/"> <Redirect to={`${cachedLastVisit || '/borrow/'}`} /> </Route>
           <Route path="/*"> 404 </Route>
         </Switch>              

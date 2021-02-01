@@ -6,7 +6,6 @@ import { FiArrowLeft as ArrowLeft } from 'react-icons/fi';
 
 /* utils and support */
 import { cleanValue } from '../utils';
-import { logEvent } from '../utils/analytics';
 
 /* contexts */
 import { SeriesContext } from '../contexts/SeriesContext';
@@ -49,6 +48,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
   const [ maxWithdraw, setMaxWithdraw ] = useState<string>();
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
+  const [ interestEarned, setInterestEarned ] = useState<string>();
 
   /* init hooks */
   const { previewPoolTx }  = usePool();
@@ -57,7 +57,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
   const [ txActive ] = useTxActive(['BUY_DAI', 'AUTH']);
   const debouncedInput = useDebounce(inputValue, 500);
   const isLol = useIsLol(inputValue);
-
+ 
   /* execution procedure */
   const closeProcedure = async () => {
     if ( !closeDisabled ) {
@@ -67,12 +67,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
         activeSeries,
         inputValue,
       );
-      logEvent({
-        category: 'ClosePosition',
-        action: inputValue,
-        label: activeSeries.displayName || activeSeries.poolAddress,
-      });
-      
+          
       /* clean up and refresh */ 
       setInputValue(undefined);
       userActions.updateUser();
@@ -82,15 +77,32 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
 
   /* set maximum available to withdraw */
   useEffect(()=> {
-    fallbackProvider && account && activeSeries.fyDaiBalance && (async () => {
+    fallbackProvider && account && activeSeries?.fyDaiBalance && (async () => {
       const preview = await previewPoolTx('sellFYDai', activeSeries, activeSeries.fyDaiBalance);
       if (!(preview instanceof Error)) {
         setMaxWithdraw(cleanValue(ethers.utils.formatEther(preview), 6));
       }
     })();
 
-  }, [account, activeSeries.fyDaiBalance, fallbackProvider]);
+  }, [account, activeSeries, fallbackProvider]);
 
+  /* caluclate the percentage increase  */
+  useEffect(()=> {
+    inputValue && 
+    inputValue > 0  && 
+    activeSeries.fyDaiBalance && 
+    (async () => {
+      const originalInWei = ethers.utils.parseEther(inputValue);
+      const preview = await previewPoolTx('sellFYDai', activeSeries, originalInWei);
+      if (!(preview instanceof Error)) {
+        const previewEth = parseFloat(ethers.utils.formatEther(preview));
+        const percent = (inputValue - previewEth)/inputValue * 100; 
+        setInterestEarned((percent.toFixed(2)).toString());
+      }
+    })();
+  }, [inputValue, activeSeries.fyDaiBalance]);
+
+  /* Withdraw DAi button disabling logic */
   /* Withdraw disabling logic */
   useEffect(()=>{
     (
@@ -162,7 +174,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
             <InfoGrid entries={[
               {
                 label: 'Max amount redeemable',
-                labelExtra: 'if closing the entire position now',
+                labelExtra: 'if closing entire position now',
                 visible: true,
                 active: true,
                 loading: false,
@@ -170,16 +182,16 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
                 valuePrefix: null,
                 valueExtra: null,
               },
-              // {
-              //   label: 'Interest earned',
-              //   labelExtra: 'at maturity',
-              //   visible: true,
-              //   active: !!inputValue&&inputValue>0,
-              //   loading: false,        
-              //   value: activeSeries && ethers.utils.formatEther(activeSeries?.fyDaiBalance),
-              //   valuePrefix: '',
-              //   valueExtra: null,
-              // },
+              {
+                label: 'Interest earned',
+                labelExtra: `when closing ${inputValue} Dai `,
+                visible: false, // !!interestEarned && !!inputValue && inputValue>0,
+                active: false,
+                loading: false,        
+                value: interestEarned? `${interestEarned}%` : '',
+                valuePrefix: '',
+                valueExtra: null,
+              },
             ]}
             />
           </Box>
@@ -188,7 +200,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
             onClick={()=> closeProcedure()}
             label={`Reclaim ${inputValue || ''} Dai`}
             disabled={closeDisabled}
-            hasPoolDelegatedProxy={activeSeries.hasPoolDelegatedProxy}
+            hasPoolDelegatedProxy={activeSeries?.hasPoolDelegatedProxy}
             clearInput={()=>setInputValue(undefined)}
           />
           

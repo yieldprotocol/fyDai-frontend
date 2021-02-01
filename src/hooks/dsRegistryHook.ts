@@ -54,7 +54,7 @@ export const useDsRegistry = () => {
       return;
     }
     console.log('building dsProxy');
-    await handleTx({ tx, msg:'Building new dsProxy', type:'CREATE_PROXY', series:null });
+    await handleTx({ tx, msg:'Building new dsProxy', type:'CREATE_PROXY', series: null, value: null });
     setBuildActive(false);
   };
 
