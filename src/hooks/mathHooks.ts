@@ -11,11 +11,15 @@ import {
 } from '../utils/yieldMath';
 
 /**
- * Hook for Yield maths functions
+ * Hook for Yieldmaths functions: 
+ * 
+ * yieldMath with batteries ( app context )
  * 
  * @returns { function } collPrice 
- * @returns { function } collateralValue
+ * @returns { function } estCollateralValue
+ * @returns { function } estCollateralRatio
  * @returns { function } estBorrowingPower
+ * @returns { function } calculateApr
  * 
  */
 export const useMath = () => {
@@ -23,7 +27,9 @@ export const useMath = () => {
   const { state: { feedData } } = useContext(YieldContext);
 
   /**
-   * Calculates the total value of collateral at the current unit price
+   * Calculates the VALUE of collateral at the current unit price (from feedData context).
+   * 
+   * @param {BigNumber | string } collateralAmount collateral for estimation (in wad/Wei precision) 
    * @returns { string } USD value (in wad/wei precision)
    */
   const estCollateralValue = (collateralAmount:BigNumber | string): string => {
@@ -31,11 +37,12 @@ export const useMath = () => {
   };
 
   /**
-   * Calculates the collateralization ratio 
-   * ETH collat value, price and DAI debt value (in USD)
+   * 
+   * Calculates the collateralization ratio / percentage (from feedData context)
    *
-   * @param {BigNumber | string } collateralAmount  amount of collateral (eg. 10ETH)
-   * @param {BigNumber | string } debtValue value of dai debt (in USD)
+   * @param { BigNumber | string } collateralAmount  amount of collateral ( in wad/wei precision )
+   * @param { BigNumber | string } debtValue value of dai debt ( in wad/wei precision )
+   * @param { boolean } asPercent return value string sent as a percentage instead of ratio.
    * @returns { string | undefined }
    */
   const estCollateralRatio = ( 
@@ -47,12 +54,12 @@ export const useMath = () => {
   };
   
   /**
-   * Calculates the borrowing power for a certain
-   * ETH collat value and DAI debt value (in USD)
+   * Calculates the borrowing power based on a certain
+   * ETH collateral value and DAI debt value
    * with a min collateralization ration 150% 
    *
-   * @param {BigNumber | string } collateralAmount amount of collateral (in wei)
-   * @param {BigNumber | string } debtValue value of dai debt (in USD)
+   * @param {BigNumber | string } collateralAmount amount of collateral ( in wad/wei precision )
+   * @param {BigNumber | string } debtValue value of dai debt ( in wad/wei precision )
    * @returns { string | undefined }
    */
   const estBorrowingPower = (collateralAmount:BigNumber | string, debtValue: BigNumber | string ) => {

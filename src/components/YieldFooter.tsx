@@ -10,7 +10,7 @@ import {
 } from 'react-icons/fi';
 import { CgSleep as Moodlight } from 'react-icons/cg';
 
-import { logEvent } from '../utils/analytics';
+import { logEvent } from '../utils';
 
 import { YieldContext } from '../contexts/YieldContext';
 import { UserContext } from '../contexts/UserContext';

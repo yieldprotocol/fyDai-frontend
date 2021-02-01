@@ -6,7 +6,7 @@ import {
   FiArrowLeft as ArrowLeft,
   FiCheck as Check,
 } from 'react-icons/fi';
-import { logEvent } from '../utils/analytics';
+import { logEvent } from '../utils';
 
 import { SeriesContext } from '../contexts/SeriesContext';
 

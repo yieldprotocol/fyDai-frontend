@@ -43,7 +43,7 @@ import MakerMark from '../components/logos/MakerMark';
 import TxStatus from '../components/TxStatus';
 import AprBadge from '../components/AprBadge';
 import SeriesSelector from '../components/SeriesSelector';
-import { logEvent } from '../utils/analytics';
+import { logEvent } from '../utils';
 
 interface IRateLockProps {
   close?: any; // close is also used as a indicator used as a layer (only a layer should have a closed)

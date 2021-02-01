@@ -2,7 +2,6 @@ import React, { useEffect, useState, useContext } from 'react';
 import { Box } from 'grommet';
 
 /* utils and support */
-import { logEvent } from '../utils/analytics';
 
 /* contexts */
 import { SeriesContext } from '../contexts/SeriesContext';

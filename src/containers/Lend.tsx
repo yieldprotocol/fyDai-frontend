@@ -7,7 +7,6 @@ import { VscHistory as History } from 'react-icons/vsc';
 
 /* utils and support */
 import { cleanValue, genTxCode } from '../utils';
-import { logEvent } from '../utils/analytics';
 
 /* contexts */
 import { SeriesContext } from '../contexts/SeriesContext';

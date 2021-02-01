@@ -6,7 +6,6 @@ import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 import { VscHistory as History } from 'react-icons/vsc';
 
 /* utils and support */
-import { logEvent } from '../utils/analytics';
 import { abbreviateHash, cleanValue, genTxCode } from '../utils';
 
 /* contexts */

@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect, useReducer } from 'react';
 import { useWeb3React } from '@web3-react/core';
 
 /* utils and support */
-import { logEvent } from '../utils/analytics';
+import { logEvent } from '../utils';
 
 import { useCachedState } from '../hooks/appHooks';
 import { IReducerAction, ITxState } from '../types';

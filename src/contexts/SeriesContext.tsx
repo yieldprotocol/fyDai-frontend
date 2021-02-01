@@ -14,8 +14,6 @@ import { usePool } from '../hooks/poolHook';
 
 import { useToken } from '../hooks/tokenHook';
 import { useController } from '../hooks/controllerHook';
-import { CgArrowsExpandDownLeft } from 'react-icons/cg';
-
 
 const SeriesContext = React.createContext<any>({});
 

@@ -12,7 +12,6 @@ import { VscHistory as History } from 'react-icons/vsc';
 /* utils and support */
 import { cleanValue, nFormatter } from '../utils';
 import { divDecimal, mulDecimal, calcTokensMinted, secondsToFrom, fyDaiForMint } from '../utils/yieldMath';
-import { logEvent } from '../utils/analytics';
 
 /* contexts */
 import { YieldContext } from '../contexts/YieldContext';

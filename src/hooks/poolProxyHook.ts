@@ -5,7 +5,14 @@ import { ISignListItem, IYieldSeries } from '../types';
 
 import { MAX_INT } from '../utils/constants';
 import { genTxCode } from '../utils';
-import { floorDecimal, splitLiquidity, fyDaiForMint, secondsToFrom, calculateSlippage } from '../utils/yieldMath';
+
+import { 
+  floorDecimal, 
+  splitLiquidity, 
+  fyDaiForMint, 
+  secondsToFrom, 
+  calculateSlippage 
+} from '../utils/yieldMath';
 
 import PoolProxy from '../contracts/PoolProxy.json';
 import Controller from '../contracts/Controller.json';

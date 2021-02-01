@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { ethers, BigNumber }  from 'ethers';
 
 import Pool from '../contracts/Pool.json';
@@ -15,9 +14,7 @@ import { useToken } from './tokenHook';
 export const usePool = () => {
 
   const { abi: poolAbi } = Pool;
-
   const { fallbackProvider, provider, signer, account } = useSignerAccount();
-
   const { handleTx, handleTxRejectError } = useTxHelpers();
   const { proxyExecute } = useDsProxy();
   const { getBalance } = useToken();
@@ -26,8 +23,8 @@ export const usePool = () => {
    * @dev Sell fyDai for Dai ( Chai )
    * @note NOT limit pool
    * 
-   * @param {IYieldSeries} series of the fyDai market series
-   * @param {number} fyDaiIn Amount of fyDai being sold that will be taken from the user's wallet (in human numbers)
+   * @param { IYieldSeries } series of the fyDai market series
+   * @param { number } fyDaiIn Amount of fyDai being sold that will be taken from the user's wallet (in human numbers)
    *
    * @return Amount of chai that will be deposited on `to` wallet
    */
@@ -38,14 +35,14 @@ export const usePool = () => {
     const parsedAmount = ethers.utils.parseEther(fyDaiIn.toString());
     const fromAddr = account && ethers.utils.getAddress(account);
     const toAddr = fromAddr;
-    const marketAddr = ethers.utils.getAddress(series.poolAddress);
+    const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const overrides = { 
       gasLimit: BigNumber.from('300000')
     };
     
     let tx:any;
 
-    const contract = new ethers.Contract( marketAddr, poolAbi, signer );
+    const contract = new ethers.Contract( poolAddr, poolAbi, signer );
     try {
       tx = await contract.sellFYDai(fromAddr, toAddr, parsedAmount, overrides);
     } catch (e) {
@@ -77,13 +74,13 @@ export const usePool = () => {
     const parsedAmount = ethers.utils.parseEther(fyDaiOut.toString());
     const fromAddr = ethers.utils.getAddress(series.fyDaiAddress);
     const toAddr = account && ethers.utils.getAddress(account);
-    const marketAddr = ethers.utils.getAddress(series.poolAddress);
+    const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const overrides = { 
       gasLimit: BigNumber.from('250000')
     };
 
     let tx:any;
-    const contract = new ethers.Contract( marketAddr, poolAbi, signer );
+    const contract = new ethers.Contract( poolAddr, poolAbi, signer );
     try {
       tx = await contract.buyFYDai(fromAddr, toAddr, parsedAmount, overrides);
     } catch (e) {
@@ -115,14 +112,14 @@ export const usePool = () => {
     const parsedAmount = ethers.utils.parseEther(daiIn.toString());
     const fromAddr = account && ethers.utils.getAddress(account);
     const toAddr = fromAddr;
-    const marketAddr = ethers.utils.getAddress(series.poolAddress);
+    const poolAddr = ethers.utils.getAddress(series.poolAddress);
 
     const overrides = { 
       gasLimit: BigNumber.from('300000')
     };
 
     let tx:any;
-    const contract = new ethers.Contract( marketAddr, poolAbi, signer );
+    const contract = new ethers.Contract( poolAddr, poolAbi, signer );
     try {
       tx = await contract.sellDai(fromAddr, toAddr, parsedAmount, overrides);
     } catch (e) {
@@ -157,14 +154,14 @@ export const usePool = () => {
     const parsedAmount = ethers.utils.parseEther(daiOut.toString());
     const fromAddr = account && ethers.utils.getAddress(account);
     const toAddr = account && ethers.utils.getAddress(account);
-    const marketAddr = ethers.utils.getAddress(series.poolAddress);
+    const poolAddr = ethers.utils.getAddress(series.poolAddress);
     
     const overrides = { 
       gasLimit: BigNumber.from('300000')
     };
 
     let tx:any;
-    const contract = new ethers.Contract( marketAddr, poolAbi, signer );
+    const contract = new ethers.Contract(poolAddr, poolAbi, signer );
     try {
       tx = await contract.buyDai(fromAddr, toAddr, parsedAmount, overrides );
     } catch (e) {
@@ -213,7 +210,7 @@ export const usePool = () => {
       
     } else { 
       const calldata = contract.interface.encodeFunctionData('addDelegate', [delegatedAddr]);
-      tx = await proxyExecute( 
+      tx = await proxyExecute(
         poolAddr,
         calldata,
         { },
@@ -222,7 +219,7 @@ export const usePool = () => {
           msg: 'Yield Series Pool authorization', 
           type:'AUTH_POOL', 
           series, 
-          value: null
+          value: null 
         }
       );
     }

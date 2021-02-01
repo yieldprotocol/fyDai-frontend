@@ -3,7 +3,7 @@ import { ITx } from '../types';
 
 
 /* utils and support */
-import { logEvent } from '../utils/analytics';
+import { logEvent } from '../utils';
 import { TxContext } from '../contexts/TxContext';
 import { NotifyContext } from '../contexts/NotifyContext';
 

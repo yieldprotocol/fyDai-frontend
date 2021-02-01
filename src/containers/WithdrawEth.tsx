@@ -6,7 +6,6 @@ import { FiArrowLeft as ArrowLeft } from 'react-icons/fi';
 
 /* utils and support */
 import { cleanValue } from '../utils';
-import { logEvent } from '../utils/analytics';
 
 /* contexts */
 import { UserContext } from '../contexts/UserContext';

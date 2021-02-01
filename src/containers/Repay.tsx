@@ -27,7 +27,6 @@ import FlatButton from '../components/FlatButton';
 import DaiMark from '../components/logos/DaiMark';
 import YieldMobileNav from '../components/YieldMobileNav';
 
-import { logEvent } from '../utils/analytics';
 import SeriesDescriptor from '../components/SeriesDescriptor';
 
 interface IRepayProps {
