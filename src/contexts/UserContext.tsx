@@ -289,29 +289,31 @@ const UserProvider = ({ children }: any) => {
       )
         .then((res:any) => parseEventList(res))     /* then parse returned values */
         .then((parsedList: any) => {                /* then add extra info and calculated values */
-          return parsedList.map((x:any) => {
-            return {
-              ...x,
-              event: 'Added',
-              type: 'pool_liquidity',
-              from: x.args[1],
-              to:  x.args[2],
-              proxyTraded: x.args[1] !== x.args[2],
-              maturity: parseInt(x.args_[0], 10),
-              amount: Math.abs( parseFloat(ethers.utils.formatEther( x.args_[5] )) ),
-              dai: x.args[3].abs(),
-              fyDai: x.args[4].abs(),
-              poolTokens: x.args[5].abs(),
-              dai_: ethers.utils.formatEther( x.args_[3] ),
-              fyDai_: ethers.utils.formatEther( x.args_[4] ),
-              poolTokens_: ethers.utils.formatEther( x.args_[5] ),
-            };
-          }); 
+          return parsedList
+            .filter((x:any) => x.args[5]>0)
+            .map((x:any) => {
+              return {
+                ...x,
+                event: 'Added',
+                type: 'pool_liquidity',
+                from: x.args[1],
+                to:  x.args[2],
+                proxyTraded: x.args[1] !== x.args[2],
+                maturity: parseInt(x.args_[0], 10),
+                amount: Math.abs( parseFloat(ethers.utils.formatEther( x.args_[5] )) ),
+                dai: x.args[3].abs(),
+                fyDai: x.args[4].abs(),
+                poolTokens: x.args[5].abs(),
+                dai_: ethers.utils.formatEther( x.args_[3] ),
+                fyDai_: ethers.utils.formatEther( x.args_[4] ),
+                poolTokens_: ethers.utils.formatEther( x.args_[5] ),
+              };
+            }); 
         });
       return [...acc, ..._seriesHist];
     }, Promise.resolve([]) );
 
-    /* get the remove liquidity histrory  - I know!! i will combine the two. but filterign is problmeatic */ 
+    // /* get the remove liquidity histrory  - I know!! i will combine the two. but filterign is problmeatic */ 
     const removeLiquidityHistory = await deployedSeries.reduce( async ( accP: any, cur:any) => {
       const acc = await accP; 
       const _seriesHist = await getEventHistory(
@@ -323,24 +325,26 @@ const UserProvider = ({ children }: any) => {
       )
         .then((res:any) => parseEventList(res))     /* then parse returned values */
         .then((parsedList: any) => {                /* then add extra info and calculated values */
-          return parsedList.map((x:any) => {
-            return {
-              ...x,
-              event: 'Removed',
-              type: 'pool_liquidity',
-              from: x.args[1],
-              to:  x.args[2],
-              proxyTraded: x.args[1] !== x.args[2],
-              maturity: parseInt(x.args_[0], 10),
-              amount: Math.abs( parseFloat(ethers.utils.formatEther( x.args_[5] )) ),
-              dai: x.args[3].abs(),
-              fyDai: x.args[4].abs(),
-              poolTokens: x.args[5].abs(),
-              dai_: ethers.utils.formatEther( x.args_[3] ),
-              fyDai_: ethers.utils.formatEther( x.args_[4] ),
-              poolTokens_: ethers.utils.formatEther( x.args_[5] ),
-            };
-          }); 
+          return parsedList
+            .filter((x:any) => x.args[5]<0)
+            .map((x:any) => {
+              return {
+                ...x,
+                event: 'Removed',
+                type: 'pool_liquidity',
+                from: x.args[1],
+                to:  x.args[2],
+                proxyTraded: x.args[1] !== x.args[2],
+                maturity: parseInt(x.args_[0], 10),
+                amount: Math.abs( parseFloat(ethers.utils.formatEther( x.args_[5] )) ),
+                dai: x.args[3].abs(),
+                fyDai: x.args[4].abs(),
+                poolTokens: x.args[5].abs(),
+                dai_: ethers.utils.formatEther( x.args_[3] ),
+                fyDai_: ethers.utils.formatEther( x.args_[4] ),
+                poolTokens_: ethers.utils.formatEther( x.args_[5] ),
+              };
+            }); 
         });
       return [...acc, ..._seriesHist];
     }, Promise.resolve([]) );

@@ -102,7 +102,13 @@ export const useBorrowProxy = () => {
       proxyContract.address,
       calldata,
       { value: parsedAmount },
-      { tx:null, msg: `Depositing ${amount} ETH`, type:'POST', series: null }
+      { 
+        tx:null, 
+        msg: `Depositing ${amount} ETH`, 
+        type:'POST', 
+        series: null,
+        value: parsedAmount.toString(),  
+      }
     );
   };
 
@@ -145,7 +151,13 @@ export const useBorrowProxy = () => {
       proxyContract.address,
       calldata,
       { },
-      { tx:null, msg: `Withdrawing ${amount} ETH `, type:'WITHDRAW', series: null }
+      { 
+        tx:null, 
+        msg: `Withdrawing ${amount} ETH `, 
+        type:'WITHDRAW', 
+        series: null,
+        value: parsedAmount.toString()
+      }
     );
 
   };
@@ -211,7 +223,13 @@ export const useBorrowProxy = () => {
       proxyContract.address, 
       calldata,
       overrides,
-      { tx:null, msg: `Borrowing ${daiToBorrow} Dai from ${series.displayNameMobile}`, type:'BORROW', series }
+      { 
+        tx:null, 
+        msg: `Borrowing ${daiToBorrow} Dai from ${series.displayNameMobile}`, 
+        type:'BORROW', 
+        series, 
+        value: dai.toString() 
+      }
     );
   };
 
@@ -277,7 +295,13 @@ export const useBorrowProxy = () => {
       proxyContract.address, 
       calldata,
       overrides,
-      { tx:null, msg: `Repaying ${repaymentInDai} Dai to ${series.displayNameMobile}`, type:'REPAY', series  }
+      { 
+        tx:null, 
+        msg: `Repaying ${repaymentInDai} Dai to ${series.displayNameMobile}`, 
+        type:'REPAY', 
+        series,
+        value: dai.toString()
+      }
     );
 
   };
@@ -349,7 +373,13 @@ export const useBorrowProxy = () => {
       proxyContract.address,
       calldata,
       overrides,
-      { tx:null, msg: `Lending ${daiIn} DAI to ${series.displayNameMobile} `, type:'SELL_DAI', series  }
+      { 
+        tx:null, 
+        msg: `Lending ${daiIn} DAI to ${series.displayNameMobile} `, 
+        type:'SELL_DAI', 
+        series, 
+        value: parsedDaiIn.toString()
+      }
     );
 
   };
@@ -420,7 +450,13 @@ export const useBorrowProxy = () => {
       proxyContract.address, 
       calldata,
       overrides,
-      { tx:null, msg: `Closing ${daiOut} DAI from ${series.displayNameMobile}`, type:'BUY_DAI', series  }
+      { 
+        tx:null, 
+        msg: `Closing ${daiOut} DAI from ${series.displayNameMobile}`, 
+        type:'BUY_DAI', 
+        series,
+        value: parsedDaiOut.toString()
+      }
     );
   };
 

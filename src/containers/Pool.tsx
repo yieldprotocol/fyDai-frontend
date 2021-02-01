@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { NavLink, useParams } from 'react-router-dom';
 import { ethers } from 'ethers';
-import { Box, Keyboard, TextInput, Text, ResponsiveContext, Collapsible, Layer, CheckBox } from 'grommet';
+import { Box, Keyboard, TextInput, Text, ResponsiveContext, Collapsible, Layer  } from 'grommet';
 import { 
   FiArrowRight as ArrowRight,
   FiArrowLeft as ArrowLeft,
@@ -11,7 +11,7 @@ import { VscHistory as History } from 'react-icons/vsc';
 
 /* utils and support */
 import { cleanValue, nFormatter } from '../utils';
-import { divDecimal, mulDecimal, calcTokensMinted } from '../utils/yieldMath';
+import { divDecimal, mulDecimal, calcTokensMinted, secondsToFrom, fyDaiForMint } from '../utils/yieldMath';
 import { logEvent } from '../utils/analytics';
 
 /* contexts */
@@ -25,6 +25,7 @@ import { useDebounce, useIsLol } from '../hooks/appHooks';
 import { useToken } from '../hooks/tokenHook';
 import { useTxActive } from '../hooks/txHooks';
 import { usePoolProxy } from '../hooks/poolProxyHook';
+import { usePool } from '../hooks/poolHook';
 
 /* containers */ 
 import RemoveLiquidity from './RemoveLiquidity';
@@ -72,11 +73,13 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
   const [ removeLiquidityOpen, setRemoveLiquidityOpen ] = useState<boolean>(false);
   const [ histOpen, setHistOpen ] = useState<boolean>(false);
   const [ explainerOpen, setExplainerOpen ] = useState<boolean>(false);
+  const [ forceBorrow, setForceBorrow] = useState<boolean>(false);
   const [ addLiquidityDisabled, setAddLiquidityDisabled ] = useState<boolean>(true);
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
 
   /* init hooks */
+  const { getFyDaiReserves } = usePool();
   const { addLiquidity } = usePoolProxy();
   const { getBalance } = useToken();
   const [newPoolShare, setNewPoolShare] = useState<string>();
@@ -91,12 +94,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
   const addLiquidityProcedure = async () => { 
     if (inputValue && !addLiquidityDisabled ) {
  
-      await addLiquidity( activeSeries, inputValue );
-      logEvent({
-        category: 'Pool',
-        action: inputValue,
-        label: activeSeries.displayName || activeSeries.poolAddress,
-      });
+      await addLiquidity( activeSeries, inputValue, forceBorrow );
       
       /* clean up and refresh */ 
       setInputValue(undefined);
@@ -111,11 +109,13 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
   // TODO move to mathHooks 
   const calculateNewPoolShare = async () => {
     setCalculating(true);
-    const daiReserves = await getBalance(deployedContracts.Dai, 'Dai', activeSeries.poolAddress);
-    const fyDaiReserves = await getBalance(activeSeries.fyDaiAddress, 'FYDai', activeSeries.poolAddress);
+    const daiRes = await getBalance(deployedContracts.Dai, 'Dai', activeSeries.poolAddress);
+    const fyDaiRes = await getBalance(activeSeries.fyDaiAddress, 'FYDai', activeSeries.poolAddress);
+    const fyDaiVirtual = await getFyDaiReserves(activeSeries.poolAddress);
+    
     const _newTokens = calcTokensMinted(
-      daiReserves, 
-      fyDaiReserves, 
+      daiRes, 
+      fyDaiRes, 
       activeSeries.totalSupply, 
       ethers.utils.parseEther(debouncedInput)
     );
@@ -124,8 +124,15 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
     const _ratio = divDecimal( _newBalance, _newTotalSupply );
     const _percent = mulDecimal( _ratio, '100'); 
     setNewPoolShare(cleanValue(_percent, 4));
+
+    const fyDaiMinted = fyDaiForMint(daiRes, fyDaiRes, fyDaiVirtual, ethers.utils.parseEther(debouncedInput), secondsToFrom(activeSeries.maturity) );
+    if ( (ethers.BigNumber.from(fyDaiMinted)).gte(fyDaiRes) ) {
+      setForceBorrow(true);
+    }
+    
     setCalculating(false);
   };
+
 
   /* handle value calculations based on input changes */
   useEffect(()=>{
@@ -315,30 +322,41 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
 
                       {
                         label: () => ( 
-                          <Box fill='horizontal' justify='between' direction='row' alignSelf='end'>
+                          <Box fill='horizontal' justify='between' direction='row' alignSelf='end' onClick={() => setExplainerOpen(true)}>
                             <Text size='xsmall' weight='bold'>Liquidity supply strategy:</Text>
                             <Info size='20px' onClick={() => setExplainerOpen(true)} /> 
                           </Box>),
                         labelExtra:() => ( 
                           <Box pad={{ top:'small' }} gap='small' align='center' direction='row' justify='between'>
-                            <StickyButton
-                              onClick={() => userActions.updatePreferences({ useBuyToAddLiquidity: true })}
-                              selected={useBuyToAddLiquidity}
-                            >
-                              <Box pad={{ horizontal:'small', vertical: 'xsmall' }} alignSelf='center'>
-                                <Text size="xxsmall" >
+
+                            { 
+                            forceBorrow ?
+                              <Box pad={{ horizontal:'small', vertical: 'small' }} alignSelf='center'>
+                                <Text size="xxsmall" color='text-xweak'>
                                   Buy and Pool 
                                 </Text>
-                              </Box>
-                            </StickyButton>
+                              </Box> 
+                              :
+                              <StickyButton
+                                onClick={() => userActions.updatePreferences({ useBuyToAddLiquidity: true })}
+                                selected={useBuyToAddLiquidity && !forceBorrow}
+                                disabled={forceBorrow}
+                              >
+                                <Box pad={{ horizontal:'small', vertical: 'small' }} alignSelf='center'>
+                                  <Text size="xxsmall">
+                                    Buy and Pool 
+                                  </Text>
+                                </Box>
+                              </StickyButton>
+                            }
 
                             <StickyButton
                               onClick={() => userActions.updatePreferences({ useBuyToAddLiquidity: false })}
-                              selected={!useBuyToAddLiquidity}
+                              selected={!useBuyToAddLiquidity || forceBorrow}
                             >
-                              <Box pad={{ horizontal:'small', vertical: 'xsmall' }} alignSelf='center'>
-                                <Text size="xxsmall" >
-                                  Borrow and pool
+                              <Box pad={{ horizontal:'small', vertical: 'small' }} alignSelf='center'>
+                                <Text size="xxsmall">
+                                  Borrow and Pool
                                 </Text>
                               </Box>
                             </StickyButton>                       
@@ -351,27 +369,6 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                         valuePrefix: null,
                         valueExtra: null
                       },
-
-                      // {
-                      //   label: null,
-                      //   labelExtra: null,
-                      //   visible: inputValue>0,
-                      //   active: debouncedInput,
-                      //   loading: false,           
-                      //   value: null,
-                      //   valuePrefix: null,
-                      //   valueExtra:() => ( 
-                      //     <>
-                      //       { useBuyToAddLiquidity ?
-                      //         <Text size='xxsmall' weight='normal'>
-                      //           <Text size='xxsmall' weight='bold'> Buy & Pool </Text> is the most gas efficient strategy. (Recommended for most users)
-                      //         </Text> :
-                      //         <Text size='xxsmall' weight='normal'> 
-                      //           <Text size='xxsmall' weight='bold'> Borrow & Pool </Text> strategy is best for when adding large amounts of liquidity.
-                      //         </Text>}
-                      //     </>
-                      //   )
-                      // },
 
                       {
                         label: 'Like what you see?',

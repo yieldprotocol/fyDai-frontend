@@ -67,11 +67,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
         activeSeries,
         inputValue,
       );
-      logEvent({
-        category: 'ClosePosition',
-        action: inputValue,
-        label: activeSeries.displayName || activeSeries.poolAddress,
-      });
+      
       
       /* clean up and refresh */ 
       setInputValue(undefined);
@@ -82,14 +78,14 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
 
   /* set maximum available to withdraw */
   useEffect(()=> {
-    fallbackProvider && account && activeSeries.fyDaiBalance && (async () => {
+    fallbackProvider && account && activeSeries?.fyDaiBalance && (async () => {
       const preview = await previewPoolTx('sellFYDai', activeSeries, activeSeries.fyDaiBalance);
       if (!(preview instanceof Error)) {
         setMaxWithdraw(cleanValue(ethers.utils.formatEther(preview), 6));
       }
     })();
 
-  }, [account, activeSeries.fyDaiBalance, fallbackProvider]);
+  }, [account, activeSeries, fallbackProvider]);
 
   /* Withdraw disabling logic */
   useEffect(()=>{
@@ -188,7 +184,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
             onClick={()=> closeProcedure()}
             label={`Reclaim ${inputValue || ''} Dai`}
             disabled={closeDisabled}
-            hasPoolDelegatedProxy={activeSeries.hasPoolDelegatedProxy}
+            hasPoolDelegatedProxy={activeSeries?.hasPoolDelegatedProxy}
             clearInput={()=>setInputValue(undefined)}
           />
           

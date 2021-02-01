@@ -90,11 +90,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
   const lendProcedure = async () => {
     if (inputValue && !lendDisabled ) {
       await sellDai( activeSeries, inputValue);
-      logEvent({
-        category: 'Lend',
-        action: inputValue,
-        label: activeSeries.displayName || activeSeries.poolAddress,
-      });
+
       /* clean up and refresh */ 
       setInputValue(undefined);
       await Promise.all([

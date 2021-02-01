@@ -5,7 +5,7 @@ import { ISignListItem, IYieldSeries } from '../types';
 
 import { MAX_INT } from '../utils/constants';
 import { genTxCode } from '../utils';
-import { floorDecimal, mulDecimal, splitLiquidity, ONE, fyDaiForMint, secondsToFrom } from '../utils/yieldMath';
+import { floorDecimal, splitLiquidity, fyDaiForMint, secondsToFrom, calculateSlippage } from '../utils/yieldMath';
 
 import PoolProxy from '../contracts/PoolProxy.json';
 import Controller from '../contracts/Controller.json';
@@ -68,12 +68,14 @@ export const usePoolProxy = () => {
    * 
    * @param {IYieldSeries} series series to act on.
    * @param {number|BigNumber} daiUsed amount of Dai to use to mint liquidity.
+   * @param {boolean} stategy add liquidity strategy ('BUY' or 'BORROW')
    *  
    * @note if BigNumber is used make sure it is in WEI
    */
   const addLiquidity = async (
     series:IYieldSeries,
     daiUsed:number|BigNumber,
+    forceBorrow: boolean = true
   ) => {
     
     let addLiquidityStrategy: string = 'BUY'; // BUY (default) or BORROW
@@ -84,10 +86,6 @@ export const usePoolProxy = () => {
     const parsedDaiUsed = BigNumber.isBigNumber(daiUsed)? daiUsed : ethers.utils.parseEther(daiUsed.toString());
     const timeToMaturity = secondsToFrom(series.maturity.toString());
 
-    const overrides = {
-      gasLimit: BigNumber.from('800000'),
-      value: ethers.utils.parseEther('0')
-    };
 
     /* calculate max expected fyDai value and factor in slippage */
     const daiReserves = await getBalance(deployedContracts.Dai, 'Dai', poolAddr);
@@ -95,15 +93,29 @@ export const usePoolProxy = () => {
     const fyDaiVirtualReserves = await getFyDaiReserves(poolAddr);
   
     /* calc amount of fydai to mint when using BUY strategy */
-    const fyDaiMinted = fyDaiForMint(daiReserves, fyDaiRealReserves, fyDaiVirtualReserves, parsedDaiUsed, timeToMaturity );
+    const fyDaiIn = fyDaiForMint(
+      daiReserves, 
+      fyDaiRealReserves, 
+      fyDaiVirtualReserves, 
+      calculateSlippage(parsedDaiUsed, '0.03', true), 
+      timeToMaturity 
+    );
+
+    const [, fyDai_] = splitLiquidity(daiReserves, fyDaiRealReserves, parsedDaiUsed );     
+
     /* calc maxyFYDai when using BORROW strategy */
-    const [ ,fyDaiSplit ] = splitLiquidity( parsedDaiUsed, daiReserves, fyDaiRealReserves );
-    const maxFYDai = floorDecimal( mulDecimal(fyDaiSplit, '1.1') );
+    const maxFYDai = floorDecimal( calculateSlippage(fyDai_, preferences.slippage) ); 
 
     /* check which addLiquidity function to use based on PREFERENCES or POOL LIQUIDITY . defaults to BUY */ 
-    if ( preferences.addLiquidityStrategy === 'BORROW' || parsedDaiUsed.gte(daiReserves) ) { 
+    if ( !preferences.useBuyToAddLiquidity || forceBorrow ) { 
       addLiquidityStrategy = 'BORROW';
     }
+
+    /* set override gas estiamtes based on strategy */
+    const overrides = {
+      gasLimit: addLiquidityStrategy === 'BUY'?  BigNumber.from('400000') : BigNumber.from('800000'),
+      value: ethers.utils.parseEther('0')
+    };
 
     /* build and use signature if required , else '0x' */
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
@@ -171,7 +183,7 @@ export const usePoolProxy = () => {
       /* contract fn used: buyAddLiquidityWithSignature(IPool pool, uint256 fyDaiBought, uint256 maxDaiUsed, bytes memory daiSig, bytes memory fyDaiSig, bytes memory poolSig ) */
       calldata = proxyContract.interface.encodeFunctionData( 
         'buyAddLiquidityWithSignature', 
-        [ poolAddr, fyDaiMinted, parsedDaiUsed, signedSigs.get('daiSig'), signedSigs.get('fyDaiSig'), signedSigs.get('poolSig') ]
+        [ poolAddr, fyDaiIn, parsedDaiUsed, signedSigs.get('daiSig'), signedSigs.get('fyDaiSig'), signedSigs.get('poolSig') ]
       );
 
     } else {
@@ -187,7 +199,13 @@ export const usePoolProxy = () => {
       proxyContract.address, 
       calldata,
       overrides,
-      { tx:null, msg: `Adding ${daiUsed} DAI liquidity to ${series.displayNameMobile}`, type:'ADD_LIQUIDITY', series  }
+      { 
+        tx:null, 
+        msg: `Adding ${daiUsed} DAI liquidity to ${series.displayNameMobile}`, 
+        type:'ADD_LIQUIDITY', 
+        series, 
+        value: parsedDaiUsed.toString()  
+      }
     );
 
   };
@@ -247,11 +265,19 @@ export const usePoolProxy = () => {
 
       const preview = await previewPoolTx('sellfydai', series, ethers.utils.parseEther('1'));
       if ( !(preview instanceof Error) ) {
-        const _oneRay = ONE.mul('1e18');
-        minFYDaiPrice = floorDecimal( ( _oneRay.sub( (_oneRay.sub( preview.toString())).mul('1.1') )).toFixed() );
+        // const _one = ONE.mul('1e18');
+        // const amountAboveOne = _one.sub( preview.toString() ).toString();
+        // const withSlippage = calculateSlippage( amountAboveOne, preferences.slippage);    
+        // minFYDaiPrice = floorDecimal( 
+        //   ( _one.sub( withSlippage ) ).toFixed() 
+        // );
+        minFYDaiPrice = calculateSlippage( preview.toString(), preferences.slippage, true);
       } else {
         throw(preview);
       }
+
+      console.log('sellFyDaiPreview: ', preview.toString());
+      console.log('minFyDaiPrice: ',  minFYDaiPrice);
 
       /* contract fn used: removeLiquidityEarlyDaiFixedWithSignature(IPool pool,uint256 poolTokens,uint256 minimumFYDaiPrice,bytes memory controllerSig,bytes memory poolSig) */
       calldata = proxyContract.interface.encodeFunctionData( 
@@ -271,7 +297,13 @@ export const usePoolProxy = () => {
       proxyContract.address, 
       calldata,
       overrides,
-      { tx:null, msg: `Removing ${tokens} liquidity tokens from ${series.displayNameMobile}`, type:'REMOVE_LIQUIDITY', series  }
+      { 
+        tx:null, 
+        msg: `Removing ${tokens} liquidity tokens from ${series.displayNameMobile}`, 
+        type:'REMOVE_LIQUIDITY', 
+        series, 
+        value: parsedTokens.toString()  
+      }
     );
 
   };

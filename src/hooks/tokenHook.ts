@@ -121,7 +121,7 @@ export function useToken() {
         return handleTxRejectError(e);
       }
       /* Transaction reporting & tracking */
-      await handleTx({ tx, msg: 'Token authorization', type: 'AUTH_TOKEN', series: series||null });
+      await handleTx({ tx, msg: 'Token authorization', type: 'AUTH_TOKEN', series: series||null, value: null });
       
     } else {  
       const calldata = contract.interface.encodeFunctionData('approve', [delegateAddr, parsedAmount]);
@@ -129,7 +129,7 @@ export function useToken() {
         tokenAddr,
         calldata,
         { },
-        { tx:null, msg: 'Token authorization', type: 'AUTH_TOKEN', series: series||null  }
+        { tx:null, msg: 'Token authorization', type: 'AUTH_TOKEN', series: series||null, value : null  }
       );
     }
 

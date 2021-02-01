@@ -99,12 +99,6 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
     if (inputValue && !borrowDisabled) {
       await borrowDai(activeSeries, 'ETH-A', inputValue);
 
-      logEvent({
-        category: 'Borrow',
-        action: inputValue,
-        label: activeSeries.displayName || activeSeries.poolAddress,
-      });
-
       /* clean up and refresh */               
       setInputValue(undefined);
       await Promise.all([

@@ -65,11 +65,6 @@ function Repay({ close }:IRepayProps) {
       !activeSeries?.isMature() && close();
       /* repay using proxy */
       await repayDaiDebt(activeSeries, 'ETH-A', value);
-      logEvent({
-        category: 'Repay',
-        action: String(value),
-        label: activeSeries.displayName || activeSeries.poolAddress,
-      });
       
       /* clean up and refresh */ 
       setInputValue(undefined);
@@ -127,7 +122,7 @@ function Repay({ close }:IRepayProps) {
       
       { !txActive &&
         <Box
-          width={!mobile?{ min: activeSeries.isMature()?'600px':'620px', max: activeSeries.isMature()?'600px':'620px' } : undefined}
+          width={!mobile?{ min: activeSeries?.isMature()?'600px':'620px', max: activeSeries?.isMature()?'600px':'620px' } : undefined}
           alignSelf="center"
           fill
           background="background" 
@@ -232,17 +227,18 @@ function Repay({ close }:IRepayProps) {
                   round='small'
                   fill='horizontal'
                   border='all'
-                >    
+                >   
+                  { activeSeries &&
                   <Box direction='row' justify='center' fill>          
                     <Box direction='row' gap='small' align='center'>
                       <Box>
                         <Check />
                       </Box>
                       <Box> 
-                        <Text size='small'>You do not have any debt in this series.</Text>         
+                        <Text size='small'>You do not have any debt in this series.</Text>      
                       </Box>
                     </Box>
-                  </Box>             
+                  </Box>}           
                 </Box>}            
             </Box>
           </Box>
