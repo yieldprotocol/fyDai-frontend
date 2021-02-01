@@ -296,8 +296,8 @@ export const usePool = () => {
   /**
    * @dev gets all the reserves for a pool().
    * @param {IYieldSeries} series series in question.
-   * @returns {Promise<String[]>}  [daiReserves, fyDaiRealReserves, fyDaiVirtualReserves ] 
-   * @note call function 
+   * @returns {Promise<String[]>}  [ daiReserves, fyDaiRealReserves, fyDaiVirtualReserves, fyDaiCombinedReserves ] 
+   * @note call function
    */
   const getReserves = async (
     series: IYieldSeries,
@@ -307,9 +307,9 @@ export const usePool = () => {
     const fyDaiAddr = ethers.utils.getAddress(series.fyDaiAddress);
     const contract = new ethers.Contract( poolAddr, poolAbi, fallbackProvider);
 
-    let daiRes = '0';
-    let fyDaiReal = '0';
-    let fyDaiVirtual = '0';
+    let daiRes = BigNumber.from('0');
+    let fyDaiReal = BigNumber.from('0');
+    let fyDaiVirtual = BigNumber.from('0');
     
     try {
       [ daiRes, fyDaiReal, fyDaiVirtual ] = await Promise.all( [
@@ -320,9 +320,19 @@ export const usePool = () => {
     }  catch (e) {
       // eslint-disable-next-line no-console
       console.log(e);
-      return [ daiRes, fyDaiReal, fyDaiVirtual ];
+      return [ 
+        daiRes.toString(), 
+        fyDaiReal.toString(), 
+        fyDaiVirtual.toString() 
+      ];
     }
-    return [ daiRes, fyDaiReal, fyDaiVirtual ];
+
+    return [ 
+      daiRes.toString(), 
+      fyDaiReal.toString(), 
+      fyDaiVirtual.toString(),
+      fyDaiReal.add(fyDaiVirtual).toString() 
+    ];
   };
 
   /**
@@ -333,7 +343,7 @@ export const usePool = () => {
    * buyFYDai -> Returns how much Dai would be required to buy x fyDai
    * sellDai -> Returns how much fyDai would be obtained by selling x Dai
    * 
-   * @param {string} txType string represnting transaction type //TODO tyescript it out
+   * @param {string} previewType string represnting transaction type //TODO tyescript it out
    * @param {IYieldSeries} series fyDai series to redeem from.
    * @param {number | BigNumber} amount input to preview
    * 
@@ -344,11 +354,11 @@ export const usePool = () => {
    * @note call function 
    */
   const previewPoolTx = async (
-    txType: string,
+    previewType: string,
     series: IYieldSeries,
     amount: number | BigNumber,
   ): Promise<BigNumber|Error> => {
-    const type=txType.toUpperCase();
+    const type = previewType.toUpperCase();
     const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(amount.toString());
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const contract = new ethers.Contract( poolAddr, poolAbi, fallbackProvider);
