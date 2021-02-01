@@ -166,22 +166,20 @@ export function buyFYDai(
 }
 
 export function getFee(
-  fyDaiReserves: BigNumber | string, 
-  daiReserves: BigNumber | string, 
-  timeTillMaturity: BigNumber | string,
-  fyDai: BigNumber | string
+  daiReserves: BigNumber | string,
+  fyDaiReserves: BigNumber | string,
+  fyDai: BigNumber | string,
+  timeTillMaturity: BigNumber | string
 ): string {
   let fee_: Decimal = ZERO;
   const fyDai_: BigNumber =  BigNumber.isBigNumber(fyDai) ? fyDai : BigNumber.from(fyDai);
-
   if (fyDai_.gte(ethers.constants.Zero)) {
-    const daiWithFee: string = buyFYDai(fyDaiReserves, daiReserves, timeTillMaturity, fyDai);
-    const daiWithoutFee: string = buyFYDai(fyDaiReserves, daiReserves, timeTillMaturity, fyDai, true);
+    const daiWithFee: string = buyFYDai(daiReserves, fyDaiReserves, fyDai, timeTillMaturity);
+    const daiWithoutFee: string = buyFYDai(daiReserves, fyDaiReserves, fyDai, timeTillMaturity, true);
     fee_ = (new Decimal(daiWithFee)).sub(new Decimal(daiWithoutFee)); 
-
   } else {
-    const daiWithFee:string = sellFYDai(fyDaiReserves, daiReserves, timeTillMaturity, fyDai_.mul(BigNumber.from('-1')) );
-    const daiWithoutFee:string = sellFYDai(fyDaiReserves, daiReserves, timeTillMaturity, fyDai_.mul(BigNumber.from('-1')), true);
+    const daiWithFee:string = sellFYDai(daiReserves, fyDaiReserves, fyDai_.mul(BigNumber.from('-1')), timeTillMaturity );
+    const daiWithoutFee:string = sellFYDai(daiReserves, fyDaiReserves, fyDai_.mul(BigNumber.from('-1')), timeTillMaturity, true);
     fee_ = (new Decimal(daiWithoutFee)).sub(new Decimal(daiWithFee));
   }
   return fee_.toString();

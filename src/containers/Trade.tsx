@@ -193,12 +193,10 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
       const preview = await previewPoolTx(trade, activeSeries, debouncedInput);
       const [daiReserves, fyDaiReservesReal, fyDaiReservesVirtual] = await getReserves(activeSeries);
       const spotPreview = await previewPoolTx(trade, activeSeries, 1);
-      const fee1 = getFee("5000", "25000", "20000000", "5");
+      const fee1 = getFee("25000", "5000", "2", "2000000");
       console.log("fee1: ", fee1)
-      const fee2 = getFee(BigNumber.from("5000"), BigNumber.from("25000"), BigNumber.from("20000000"), BigNumber.from("5"));
+      const fee2 = getFee(BigNumber.from("25000"), BigNumber.from("5000"), BigNumber.from("1"), BigNumber.from("31536000"));
       console.log("fee2: ", fee2)
-      const fee3 = getFee(ethers.utils.parseEther("5000"), ethers.utils.parseEther("25000"), ethers.utils.parseEther("20000000"), ethers.utils.parseEther("5"));
-      console.log("fee3: ", fee3)
 
 if (!(preview instanceof Error) && !(spotPreview instanceof Error)) {
         switch(trade) {

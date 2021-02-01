@@ -527,7 +527,13 @@ export const useBorrowProxy = () => {
       proxyContract.address,
       calldata,
       overrides,
-      { tx:null, msg: `Selling ${fyDaiIn} FYDAI from ${series.displayNameMobile} `, type:'SELL_FYDAI', series  }
+      { 
+        tx:null, 
+        msg: `Selling ${fyDaiIn} FYDAI to ${series.displayNameMobile} `, 
+        type:'SELL_FYDAI', 
+        series, 
+        value: parsedFYDaiIn.toString()
+      }
     );
 
   };
@@ -603,7 +609,13 @@ export const useBorrowProxy = () => {
       proxyContract.address,
       calldata,
       overrides,
-      { tx:null, msg: `Buying ${fyDaiOut} FYDAI to ${series.displayNameMobile} `, type:'BUY_FYDAI', series  }
+      { 
+        tx:null, 
+        msg: `Buying ${fyDaiOut} FYDAI to ${series.displayNameMobile} `, 
+        type:'BUY_FYDAI', 
+        series, 
+        value: parsedFYDaiOut.toString()
+      }
     );
 
   };

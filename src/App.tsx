@@ -27,14 +27,11 @@ import Borrow from './containers/Borrow';
 import Lend from './containers/Lend';
 import Pool from './containers/Pool';
 import Deposit from './containers/Deposit';
-<<<<<<< HEAD
 import Trade from './containers/Trade';
-=======
 import CloseDai from './containers/CloseDai';
 import WithdrawEth from './containers/WithdrawEth';
 import Repay from './containers/Repay';
 import RemoveLiquidity from './containers/RemoveLiquidity';
->>>>>>> dev
 import RateLock from './containers/RateLock';
 
 
