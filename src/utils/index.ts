@@ -1,54 +1,3 @@
-import { ethers, BigNumber, BigNumberish } from 'ethers';
-import { IYieldSeries } from '../types';
-
-/* constants */
-export const BN_RAY = BigNumber.from('1000000000000000000000000000');
-export const N_RAY = '1000000000000000000000000000';
-export const WAD = BigNumber.from('1000000000000000000');
-export const RAY = BigNumber.from('1000000000000000000000000000');
-export const RAD = BigNumber.from('10000000000000000000000000000000000000000');
-export const SECONDS_PER_YEAR = 365 * 24 * 60 * 60;
-export const ETH = ethers.utils.formatBytes32String('ETH-A');
-export const CHAI = ethers.utils.formatBytes32String('CHAI');
-
-export const MAX_INT = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
-
-// / @dev Converts a number to RAY precision, for number up to 10 decimal places
-export const toRay = (value:number) => {
-  const exponent = BigNumber.from('10').pow(BigNumber.from('17'));
-  return BigNumber.from(value*10**10).mul(exponent);
-};
-
-export const toWei = (value:string|number) => {
-  return ethers.utils.parseEther(value.toString()); 
-};
-
-/// @dev Converts a BigNumberish to WAD precision, for BigNumberish up to 10 decimal places
-export const toWad = (value: BigNumberish) => {
-  const exponent = BigNumber.from(10).pow(BigNumber.from(8));
-  return BigNumber.from((value as any) * 10 ** 10).mul(exponent);
-};
-
-// / @dev Multiplies a number in any precision by a number in RAY precision, with the output in the first parameter's precision.
-// / I.e. mulRay(wad(x), ray(y)) = wad(x*y)
-export const mulRay = (x:BigNumber, ray:BigNumber) => {
-  const unit = BigNumber.from('10').pow(BigNumber.from('27'));
-  return BigNumber.from(x).mul(BigNumber.from(ray)).div(unit);
-};
-
-// / @dev Divides a number in any precision by a number in RAY precision, with the output in the first parameter's precision.
-// / I.e. divRay(wad(x), ray(y)) = wad(x/y)
-export const divRay = (x:BigNumber, ray:BigNumber) => {
-  const unit = BigNumber.from('10').pow(BigNumber.from('27'));
-  return unit.mul(BigNumber.from(x)).div(BigNumber.from(ray));
-};
-
-// @dev Takes a bignumber in RAY and converts it to a human understandalble number
-export const rayToHuman = (x:BigNumber) => {
-  // const unit = BigNumber.from('10').pow(BigNumber.from('27'));
-  return divRay(x, RAY).toString();
-};
-
 /* Trunctate a string value to a certain number of 'decimal' point */
 export const cleanValue = (input:string, decimals:number=12) => {
   const re = new RegExp(`(\\d+\\.\\d{${decimals}})(\\d)`);
@@ -60,13 +9,45 @@ export const cleanValue = (input:string, decimals:number=12) => {
 };
 
 /* creates internal tracking code of a transaction type */
-export const genTxCode = (txType: string, series:IYieldSeries|null) => {
-  return `${txType}${series?.maturity || ''}`; 
+export const genTxCode = (txType: string, series:string|null) => {
+  return `${txType}${series || ''}`; 
 };
 
 /* handle Address/hash shortening */
 export const abbreviateHash = (addr:string, buffer:number=4) => {
   return `${addr?.substring(0, buffer)}...${addr?.substring(addr.length - buffer)}`; 
+};
+
+/**
+ * number formatting if reqd.
+ * */
+export const nFormatter = (num:number, digits:number) => {
+  const si = [
+    { value: 1, symbol: '' },
+    { value: 1E3, symbol: 'k' },
+    { value: 1E6, symbol: 'M' },
+    { value: 1E9, symbol: 'G' },
+    { value: 1E12, symbol: 'T' },
+    { value: 1E15, symbol: 'P' },
+    { value: 1E18, symbol: 'E' }
+  ];
+  const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
+  let i;
+  for (i = si.length - 1; i > 0; i--) {
+    if (num >= si[i].value) {
+      break;
+    }
+  }
+  return (num / si[i].value).toFixed(digits).replace(rx, '$1') + si[i].symbol;
+};
+
+export const copyToClipboard=(str:string)=> {
+  const el = document.createElement('textarea');
+  el.value = str;
+  document.body.appendChild(el);
+  el.select();
+  document.execCommand('copy');
+  document.body.removeChild(el);
 };
 
 /**
@@ -127,36 +108,4 @@ export const buildGradient = (colorFrom:string, colorTo:string  ) => {
     ${modColor( colorTo, 25)}, 
     ${modColor( colorTo, 0)}, 
     ${modColor( colorTo, 0)})`;
-};
-
-/**
- * number formatting if reqd.
- * */
-export const nFormatter = (num:number, digits:number) => {
-  const si = [
-    { value: 1, symbol: '' },
-    { value: 1E3, symbol: 'k' },
-    { value: 1E6, symbol: 'M' },
-    { value: 1E9, symbol: 'G' },
-    { value: 1E12, symbol: 'T' },
-    { value: 1E15, symbol: 'P' },
-    { value: 1E18, symbol: 'E' }
-  ];
-  const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
-  let i;
-  for (i = si.length - 1; i > 0; i--) {
-    if (num >= si[i].value) {
-      break;
-    }
-  }
-  return (num / si[i].value).toFixed(digits).replace(rx, '$1') + si[i].symbol;
-};
-
-export const copyToClipboard=(str:string)=> {
-  const el = document.createElement('textarea');
-  el.value = str;
-  document.body.appendChild(el);
-  el.select();
-  document.execCommand('copy');
-  document.body.removeChild(el);
 };

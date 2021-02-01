@@ -33,11 +33,17 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
       {activeSeries &&
         <Box
           alignSelf="center"
+          width={{ max:'600px'}}
           fill
           round='small'
           gap='small'
           pad={minimized? { bottom:'medium' }: { bottom:'large' }}
-          background={ buildGradient( activeSeries?.seriesFromColor, activeSeries?.seriesToColor)}
+          background={
+            buildGradient( 
+              activeSeries?.seriesFromColor, 
+              (activeSeries?.seriesToColor || activeSeries?.seriesColor)
+            )
+          }
           margin={{ bottom:'-18px' }}
         >
           <Box

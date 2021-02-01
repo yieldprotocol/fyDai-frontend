@@ -1,6 +1,7 @@
 import { useState, useContext } from 'react';
 import { ethers, BigNumber }  from 'ethers';
 
+import { parse } from 'mathjs';
 import FYDai from '../contracts/FYDai.json';
 
 import { useSignerAccount } from './connectionHooks';
@@ -24,6 +25,7 @@ export const useFYDai = () => {
    * @param {IYieldSeries} series to redeem from.
    * @param {BigNumber} amount in exact fyDai available to burn precision
    */
+  
   // TODO accept series rather than 
   const redeem = async (
     series: IYieldSeries,
@@ -48,7 +50,13 @@ export const useFYDai = () => {
       setRedeemActive(false);
       return;
     }
-    await handleTx({ tx, msg: `Redeeming ${amount} pending...`, type:'REDEEM', series });
+    await handleTx({ 
+      tx, 
+      msg: `Redeeming ${amount} pending...`, 
+      type:'REDEEM', 
+      series, 
+      value: parsedAmount.toString()
+    });
     setRedeemActive(false);
   };
 
@@ -73,7 +81,53 @@ export const useFYDai = () => {
     return res;
   };
 
+  /**
+   * @dev fyDai Series symbol
+   * @param {string} fyDaiAddress address of the fyDai series to check.
+   * @returns {boolean}
+   */
+  const seriesSymbol = async (
+    fyDaiAddress:string,
+  ) => {
+    const fyDaiAddr = ethers.utils.getAddress(fyDaiAddress);
+    const contract = new ethers.Contract( fyDaiAddr, fyDaiAbi, provider );
+    let res;
+    try {
+      res = await contract.symbol();
+    }  catch (e) {
+      // eslint-disable-next-line no-console
+      console.log(e);
+      res = '';
+    }
+    return res;
+  };
+
+  /**
+   * @dev fyDai Series maturity 
+   * @param {string} fyDaiAddress address of the fyDai series to check.
+   * @returns {boolean}
+   */
+  const seriesMaturity = async (
+    fyDaiAddress:string,
+  ) => {
+    const fyDaiAddr = ethers.utils.getAddress(fyDaiAddress);
+    const contract = new ethers.Contract( fyDaiAddr, fyDaiAbi, provider );
+    let res;
+    try {
+      res = await contract.maturity();
+    }  catch (e) {
+      // eslint-disable-next-line no-console
+      console.log(e);
+      res = BigNumber.from('0');
+    }
+    return res;
+  };
+
   return {
-    hasBeenMatured, redeem, redeemActive
+    seriesMaturity,
+    seriesSymbol,
+    hasBeenMatured, 
+    redeem, 
+    redeemActive
   } as const;
 };

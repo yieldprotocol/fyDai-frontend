@@ -10,7 +10,7 @@ import Pool from '../contracts/Pool.json';
 import { useTxHelpers } from './txHooks';
 import { useDsProxy } from './dsProxyHook';
 
-
+/* Map of the tokens that will potentially be used */
 const contractMap = new Map<string, any>([
   ['FYDai', FYDai.abi],
   ['Dai', Dai.abi],
@@ -68,7 +68,11 @@ export function useToken() {
     operatorAddress:string,
     fromAddress: string|null = null,
   ) => {
-    const fromAddr = fromAddress ? ethers.utils.getAddress(fromAddress) : ( account && ethers.utils.getAddress(account) ); 
+
+    const fromAddr = fromAddress ? 
+      ethers.utils.getAddress(fromAddress) : 
+      ( account && ethers.utils.getAddress(account) ); 
+
     const tokenAddr = ethers.utils.getAddress(tokenAddress);
     const operatorAddr = ethers.utils.getAddress(operatorAddress);
     const contract = new ethers.Contract( tokenAddr, contractMap.get(tokenName), provider );
@@ -117,7 +121,7 @@ export function useToken() {
         return handleTxRejectError(e);
       }
       /* Transaction reporting & tracking */
-      await handleTx({ tx, msg: 'Token authorization', type: 'AUTH_TOKEN', series: series||null });
+      await handleTx({ tx, msg: 'Token authorization', type: 'AUTH_TOKEN', series: series||null, value: null });
       
     } else {  
       const calldata = contract.interface.encodeFunctionData('approve', [delegateAddr, parsedAmount]);
@@ -125,7 +129,7 @@ export function useToken() {
         tokenAddr,
         calldata,
         { },
-        { tx:null, msg: 'Token authorization', type: 'AUTH_TOKEN', series: series||null  }
+        { tx:null, msg: 'Token authorization', type: 'AUTH_TOKEN', series: series||null, value : null  }
       );
     }
 

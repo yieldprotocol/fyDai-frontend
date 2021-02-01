@@ -8,7 +8,6 @@ import {
   ResponsiveContext,
 } from 'grommet';
 
-import { buildGradient } from '../utils';
 import { SeriesContext } from '../contexts/SeriesContext';
 
 const StyledLink = styled(NavLink)`

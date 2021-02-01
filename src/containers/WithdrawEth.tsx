@@ -2,27 +2,28 @@ import React, { useState, useContext, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Box, Keyboard, TextInput, Text, ResponsiveContext, Collapsible } from 'grommet';
 import ethers from 'ethers';
-
 import { FiArrowLeft as ArrowLeft } from 'react-icons/fi';
 
+/* utils and support */
 import { cleanValue } from '../utils';
+import { logEvent } from '../utils/analytics';
 
+/* contexts */
 import { UserContext } from '../contexts/UserContext';
 
+/* hooks */
 import { useDebounce, useIsLol } from '../hooks/appHooks';
 import { useMath } from '../hooks/mathHooks';
 import { useTxActive } from '../hooks/txHooks';
 import { useBorrowProxy } from '../hooks/borrowProxyHook';
 
+/* components */
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
-import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
 import EthMark from '../components/logos/EthMark';
 import YieldMobileNav from '../components/YieldMobileNav';
-
-import { logEvent } from '../utils/analytics';
 
 interface IWithDrawProps {
   close?: any;
@@ -31,6 +32,8 @@ interface IWithDrawProps {
 const WithdrawEth = ({ close }:IWithDrawProps) => {
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
+
+  /* state from contexts */
   const { state: { position }, actions: userActions } = useContext(UserContext);
   const {
     ethPosted,
@@ -39,33 +42,29 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
     debtValue,
     debtValue_,
   } = position;
-  
-  const { withdrawEth } = useBorrowProxy();
-  const { estCollRatio: estimateRatio } = useMath();
-  const [ txActive ] = useTxActive(['WITHDRAW']);
 
+  /* local state */ 
   const [ inputValue, setInputValue ] = useState<any>();
-  const debouncedInput = useDebounce(inputValue, 500);
   const [inputRef, setInputRef] = useState<any>(null);
-
-  const [ estRatio, setEstRatio ] = useState<any>();
+  const [ estPercent, setEstPercent ] = useState<string| undefined>(undefined);
   const [ maxWithdraw, setMaxWithdraw ] = useState<string>();
-
   const [ withdrawDisabled, setWithdrawDisabled ] = useState<boolean>(true);
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
 
+  /* init hooks */
+  const { withdrawEth } = useBorrowProxy();
+  const { estCollateralRatio } = useMath();
+  const [ txActive ] = useTxActive(['WITHDRAW']);
+  const debouncedInput = useDebounce(inputValue, 500);
   const isLol = useIsLol(inputValue);
 
-  /* Withdraw execution flow */
+  /* execution procedure */
   const withdrawProcedure = async () => {
     if (inputValue && !withdrawDisabled ) {
       close(); // close immediately, no need to track withdrawPending
       await withdrawEth(inputValue);
-      logEvent({
-        category: 'Withdraw',
-        action: inputValue
-      });
+
       /* clean up and refresh */ 
       setInputValue(undefined);
       userActions.updateUser();
@@ -81,36 +80,34 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
   useEffect(()=>{
     const parsedInput = ethers.utils.parseEther(debouncedInput || '0');
     if ( debouncedInput && ethPosted.gt(parsedInput) && debtValue_) {
-      const newRatio = estimateRatio((ethPosted.sub( parsedInput )), debtValue); 
-      // const newRatio = estimateRatio((ethPosted_ - parseFloat(inputValue)).toString(), debtValue_);
-      if (newRatio) {
-        setEstRatio(parseFloat(newRatio.toString()).toFixed(2));
-      }
+      const newPercent = estCollateralRatio((ethPosted.sub( parsedInput )), debtValue, true); 
+      setEstPercent(cleanValue(newPercent, 10)); 
     }
   }, [ debouncedInput ]);
 
   /* Withdraw disabled logic */
   useEffect(()=>{
-    ( estRatio < 150 ||
+    ( !estPercent ||
+      parseFloat(estPercent) < 150 ||
       txActive ||
       !inputValue ||
       parseFloat(inputValue) <= 0
-    )? setWithdrawDisabled(true) : setWithdrawDisabled(false);
-  }, [ inputValue, estRatio ]);
+    ) ? setWithdrawDisabled(true) : setWithdrawDisabled(false);
+  }, [ inputValue, estPercent ]);
 
   /* show warnings and errors with collateralization ratio levels and inputs */
   useEffect(()=>{
     if ( debouncedInput && maxWithdraw && (debouncedInput > maxWithdraw) ) {
       setWarningMsg(null);
       setErrorMsg('That exceeds the amount of ETH you can withdraw right now.');
-    } else if (estRatio >= 150 && estRatio < 200 ) {
+    } else if ( estPercent && parseFloat(estPercent) >= 150 && parseFloat(estPercent) < 200 ) {
       setErrorMsg(null);
       setWarningMsg('A collateralization ratio of close to 150% will put you at risk of liquidation');
     } else {   
       setWarningMsg(null);
       setErrorMsg(null);
     }
-  }, [ estRatio, debouncedInput ]);
+  }, [ estPercent, debouncedInput ]);
 
   return (
     <Keyboard 
@@ -169,7 +166,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
                 visible: collateralPercent_ > 0,
                 active: !!inputValue,
                 loading: false,           
-                value: (estRatio && estRatio !== 0)? `${estRatio}%`: collateralPercent_ || '',
+                value: estPercent ? `${cleanValue(estPercent, 2)}%`: collateralPercent_ || '',
                 valuePrefix: '~',
                 valueExtra: null,
               },

@@ -1,15 +1,14 @@
 {
   "name": "@yieldprotocol/fydai-ui",
-  "version": "0.4.0",
+  "version": "0.4.2",
   "private": true,
   "dependencies": {
     "@metamask/detect-provider": "^1.1.0",
-    "@types/react-ga": "^2.3.0",
     "@web3-react/core": "^6.0.9",
     "@web3-react/injected-connector": "^6.0.7",
     "@web3-react/network-connector": "^6.0.9",
-    "@web3-react/types": "^6.0.7",
     "@web3-react/walletconnect-connector": "^6.1.6",
+    "decimal.js": "^10.2.1",
     "eth-permit": "^0.1.4",
     "ethers": "^5.0.2",
     "grommet": "^2.13.0",
@@ -23,6 +22,7 @@
     "styled-components": "^5.1.0"
   },
   "scripts": {
+    "analyze": "source-map-explorer 'build/static/js/*.js'",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
@@ -35,11 +35,16 @@
     "extends": "react-app"
   },
   "devDependencies": {
+    "@web3-react/types": "^6.0.7",
+    "@types/react-ga": "^2.3.0",
+    "@types/decimal.js": "^7.4.0",
     "@babel/plugin-syntax-jsx": "^7.10.4",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
+    "@types/big.js": "^6.0.2",
     "@types/jest": "^24.0.0",
+    "@types/mathjs": "^6.0.11",
     "@types/node": "^12.0.0",
     "@types/react": "^16.9.0",
     "@types/react-dom": "^16.9.0",
@@ -61,10 +66,12 @@
     "eslint-plugin-prettier": "^3.1.3",
     "eslint-plugin-react": "^7.19.0",
     "eslint-plugin-react-hooks": "^4.0.0",
+    "mathjs": "^9.0.0",
     "prettier": "^2.0.5",
     "prettier-eslint": "^9.0.1",
     "prettier-eslint-cli": "^5.0.0",
     "react-scripts": "3.4.1",
+    "source-map-explorer": "^2.5.2",
     "typescript": "~3.7.2"
   },
   "browserslist": {

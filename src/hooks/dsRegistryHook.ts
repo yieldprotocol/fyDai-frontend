@@ -16,20 +16,20 @@ import { useTxHelpers } from './txHooks';
  */
 export const useDsRegistry = () => {
 
-  /* contexts */
+  /* Preset the dsProxyRegistry contract to be used */
+  const { abi: ProxyRegistryAbi } = ProxyRegistry;
+  const [ proxyRegistryContract, setProxyRegistryContract] = useState<any>();
+
+  /* state from contexts */
   const  { state: { deployedContracts } }  = useContext<any>(YieldContext);
+
+  /* local state */
+  const [ buildActive, setBuildActive ] = useState<boolean>(false);
 
   /* hooks */ 
   const { signer, account } = useSignerAccount();
   const { handleTx, handleTxRejectError } = useTxHelpers();
-  
-  /* Activity flags */
-  const [ buildActive, setBuildActive ] = useState<boolean>(false);
 
-  /* Preset the dsProxyRegistry contract to be used */
-  const { abi: ProxyRegistryAbi } = ProxyRegistry;
-  const [ proxyRegistryContract, setProxyRegistryContract] = useState<any>();
-  
   useEffect(()=>{
     deployedContracts.ProxyRegistry && signer &&
       setProxyRegistryContract( new ethers.Contract(
@@ -54,7 +54,7 @@ export const useDsRegistry = () => {
       return;
     }
     console.log('building dsProxy');
-    await handleTx({ tx, msg:'Building new dsProxy', type:'CREATE_PROXY', series:null });
+    await handleTx({ tx, msg:'Building new dsProxy', type:'CREATE_PROXY', series: null, value: null });
     setBuildActive(false);
   };
 
@@ -80,5 +80,6 @@ export const useDsRegistry = () => {
     /* dsProxy eq. fns */
     buildDsProxy, buildActive,
     getDsProxyAddress,
+    
   } as const;
 };

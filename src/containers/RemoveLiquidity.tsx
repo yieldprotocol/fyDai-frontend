@@ -4,28 +4,28 @@ import { ethers } from 'ethers';
 import { Box, Button, TextInput, Text, Keyboard, ResponsiveContext, Collapsible } from 'grommet';
 import { FiArrowLeft as ArrowLeft } from 'react-icons/fi';
 
+/* utils and support */
 import { cleanValue } from '../utils';
+import { logEvent } from '../utils/analytics';
 
+/* contexts */
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
 
-/* hook pack */
+/* hooks */
 import { useSignerAccount } from '../hooks/connectionHooks';
 import { useDebounce, useIsLol } from '../hooks/appHooks';
 import { useTxActive } from '../hooks/txHooks';
 import { usePoolProxy } from '../hooks/poolProxyHook';
 
+/* components */
 import InputWrap from '../components/InputWrap';
 import InfoGrid from '../components/InfoGrid';
 import TxStatus from '../components/TxStatus';
-import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
-
 import YieldMark from '../components/logos/YieldMark';
 import YieldMobileNav from '../components/YieldMobileNav';
-
-import { logEvent } from '../utils/analytics';
 import SeriesDescriptor from '../components/SeriesDescriptor';
 
 interface IRemoveLiquidityProps {
@@ -37,41 +37,34 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
-  const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
+  /* state from contexts */
+  const { state: { activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
   const activeSeries = seriesData.get(activeSeriesId);
   const { actions: userActions } = useContext(UserContext);
 
+  /* local state */
+  const [ newShare, setNewShare ] = useState<string>(activeSeries?.poolPercent);
+  const [ calculating, setCalculating ] = useState<boolean>(false);
+  const [ inputValue, setInputValue ] = useState<any>();
+  const [inputRef, setInputRef] = useState<any>(null);
+  const [ removeLiquidityDisabled, setRemoveLiquidityDisabled ] = useState<boolean>(true);
+  const [ warningMsg, setWarningMsg] = useState<string|null>(null);
+  const [ errorMsg, setErrorMsg] = useState<string|null>(null);
+
+  /* init hooks */
   const { account } = useSignerAccount();
   const { removeLiquidity } = usePoolProxy();
   const [ txActive ] = useTxActive(['REMOVE_LIQUIDITY']);
-
-  const [newShare, setNewShare] = useState<string>(activeSeries?.poolPercent);
-  const [calculating, setCalculating] = useState<boolean>(false);
-
-
-  const [ inputValue, setInputValue ] = useState<any>();
   const debouncedInput = useDebounce(inputValue, 500);
-  const [inputRef, setInputRef] = useState<any>(null);
-
-  const [ removeLiquidityDisabled, setRemoveLiquidityDisabled ] = useState<boolean>(true);
-
-  const [ warningMsg, setWarningMsg] = useState<string|null>(null);
-  const [ errorMsg, setErrorMsg] = useState<string|null>(null);
   const isLol = useIsLol(inputValue);
 
-  /* Remove Liquidity sequence */
+  /* execution procedure */
   const removeLiquidityProcedure = async (value:number) => {
     if ( !removeLiquidityDisabled ) {
 
       !activeSeries?.isMature() && close();
       await removeLiquidity(activeSeries, value);
       
-      /* log event */
-      logEvent({
-        category: 'Remove Liquidity',
-        action: String(value),
-        label: activeSeries.displayName || activeSeries.poolAddress,
-      });
 
       /* clean up and refresh */ 
       setInputValue(undefined);
@@ -87,6 +80,7 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
     }
   };
 
+  // TODO move to math
   const calculateNewShare = async () => {
     if (activeSeries) {
       setCalculating(true);

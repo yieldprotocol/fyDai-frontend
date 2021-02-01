@@ -49,10 +49,9 @@ ErrorBoundaryProps
           >
             <Text color='red'><Error /></Text>
             <Box align="center" gap="xsmall">
-              <Text weight='bold'> An unrecognised error has occured <span role='img' aria-label='coldsweat'>😰</span> </Text>
-              <Text> It's our fault, sorry. </Text>
+              <Text weight='bold'> An unexpected error has occured. </Text>
             </Box>
-            <RaisedButton 
+            <RaisedButton
               onClick={()=>window.location.reload()}
               label={<Box pad='small'>Please reload the App</Box>}
             />

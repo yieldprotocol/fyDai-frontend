@@ -1,22 +1,24 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { ethers } from 'ethers';
-import { Box, TextInput, Text, Keyboard, ResponsiveContext, Collapsible } from 'grommet';
+import { Box, TextInput, Text, Keyboard, ResponsiveContext } from 'grommet';
 import { FiArrowLeft as ArrowLeft } from 'react-icons/fi';
 
+/* utils and support */
 import { cleanValue } from '../utils';
-import { logEvent } from '../utils/analytics';
 
+/* contexts */
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
 
-/* hook pack */
+/* hooks */
 import { useSignerAccount } from '../hooks/connectionHooks';
 import { useDebounce, useIsLol } from '../hooks/appHooks';
 import { useTxActive } from '../hooks/txHooks';
 import { usePool } from '../hooks/poolHook';
 import { useBorrowProxy } from '../hooks/borrowProxyHook';
 
+/* components */
 import InputWrap from '../components/InputWrap';
 import TxStatus from '../components/TxStatus';
 import ActionButton from '../components/ActionButton';
@@ -34,30 +36,30 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
+  /* state from context */
   const { actions: userActions } = useContext(UserContext);
   const { state: { activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
   const activeSeries = seriesData.get(activeSeriesId);
 
+  /* local state */ 
+  const [ inputValue, setInputValue ] = useState<any>();
+  const [ inputRef, setInputRef ] = useState<any>(null);
   const [ closeDisabled, setCloseDisabled ] = useState<boolean>(true);
+  const [ maxWithdraw, setMaxWithdraw ] = useState<string>();
+  const [ warningMsg, setWarningMsg] = useState<string|null>(null);
+  const [ errorMsg, setErrorMsg] = useState<string|null>(null);
+  const [ interestEarned, setInterestEarned ] = useState<string>();
 
+  /* init hooks */
   const { previewPoolTx }  = usePool();
   const { buyDai }  = useBorrowProxy();
   const { account, fallbackProvider } = useSignerAccount();
   const [ txActive ] = useTxActive(['BUY_DAI', 'AUTH']);
-
-  const [ inputValue, setInputValue ] = useState<any>();
   const debouncedInput = useDebounce(inputValue, 500);
-  const [inputRef, setInputRef] = useState<any>(null);
   const isLol = useIsLol(inputValue);
-
-  const [ maxWithdraw, setMaxWithdraw ] = useState<string>();
-  const [ interestEarned, setInterestEarned ] = useState<string>();
-
-  
-  const [ warningMsg, setWarningMsg] = useState<string|null>(null);
-  const [ errorMsg, setErrorMsg] = useState<string|null>(null);
-  
-  const withdrawProcedure = async () => {
+ 
+  /* execution procedure */
+  const closeProcedure = async () => {
     if ( !closeDisabled ) {
 
       !activeSeries?.isMature() && close();
@@ -65,12 +67,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
         activeSeries,
         inputValue,
       );
-      logEvent({
-        category: 'ClosePosition',
-        action: inputValue,
-        label: activeSeries.displayName || activeSeries.poolAddress,
-      });
-      
+          
       /* clean up and refresh */ 
       setInputValue(undefined);
       userActions.updateUser();
@@ -78,16 +75,16 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
     }
   };
 
+  /* set maximum available to withdraw */
   useEffect(()=> {
-    fallbackProvider && account && activeSeries.fyDaiBalance && (async () => {
+    fallbackProvider && account && activeSeries?.fyDaiBalance && (async () => {
       const preview = await previewPoolTx('sellFYDai', activeSeries, activeSeries.fyDaiBalance);
       if (!(preview instanceof Error)) {
         setMaxWithdraw(cleanValue(ethers.utils.formatEther(preview), 6));
       }
     })();
 
-  }, [account, activeSeries.fyDaiBalance, fallbackProvider]);
-
+  }, [account, activeSeries, fallbackProvider]);
 
   /* caluclate the percentage increase  */
   useEffect(()=> {
@@ -103,6 +100,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
   }, [inputValue, activeSeries.fyDaiBalance]);
 
   /* Withdraw DAi button disabling logic */
+  /* Withdraw disabling logic */
   useEffect(()=>{
     (
       !account ||
@@ -113,7 +111,6 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
 
   /* show warnings and errors with collateralization ratio levels and inputs */
   useEffect(()=>{
-
     if (maxWithdraw &&  debouncedInput > parseFloat(maxWithdraw) ) {
       setWarningMsg(null);
       setErrorMsg('You are not allowed to reclaim more than you have lent'); 
@@ -127,7 +124,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
   return (
     <Keyboard 
       onEsc={() => { inputValue? setInputValue(undefined): close();}}
-      onEnter={()=> withdrawProcedure()}
+      onEnter={()=> closeProcedure()}
       onBackspace={()=> {
         inputValue && 
         (document.activeElement !== inputRef) && 
@@ -197,10 +194,10 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
           </Box>
 
           <ActionButton
-            onClick={()=> withdrawProcedure()}
+            onClick={()=> closeProcedure()}
             label={`Reclaim ${inputValue || ''} Dai`}
             disabled={closeDisabled}
-            hasPoolDelegatedProxy={activeSeries.hasPoolDelegatedProxy}
+            hasPoolDelegatedProxy={activeSeries?.hasPoolDelegatedProxy}
             clearInput={()=>setInputValue(undefined)}
           />
           

@@ -13,7 +13,7 @@ import EtherscanButton from './EtherscanButton';
 import { IYieldSeries } from '../types';
 import Loading from './Loading';
 import HashWrap from './HashWrap';
-import { modColor } from '../utils';
+import { modColor, cleanValue} from '../utils';
 
 interface HistoryProps {
   filterTerms: string[];
@@ -48,7 +48,7 @@ const TxHistory = ( { filterTerms, series }: HistoryProps) => {
             { (item.event === 'Added' || item.event === 'Removed') && 'liquidity Tokens '} 
             { item.event === 'Imported' && ' Maker debt to ' }
             { item.maturity && moment.unix(item.maturity).format('MMMM YYYY') }
-            { item.APR && `@ ${item.APR.toFixed(2)}%` }
+            { item.APR && `@ ${cleanValue(item.APR, 2)}%` }
           </Text>
         </Box>
       );
