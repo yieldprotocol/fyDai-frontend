@@ -102,7 +102,13 @@ export const useBorrowProxy = () => {
       proxyContract.address,
       calldata,
       { value: parsedAmount },
-      { tx:null, msg: `Depositing ${amount} ETH`, type:'POST', series: null }
+      { 
+        tx:null, 
+        msg: `Depositing ${amount} ETH`, 
+        type:'POST', 
+        series: null,
+        value: parsedAmount.toString(),  
+      }
     );
   };
 
@@ -145,7 +151,13 @@ export const useBorrowProxy = () => {
       proxyContract.address,
       calldata,
       { },
-      { tx:null, msg: `Withdrawing ${amount} ETH `, type:'WITHDRAW', series: null }
+      { 
+        tx:null, 
+        msg: `Withdrawing ${amount} ETH `, 
+        type:'WITHDRAW', 
+        series: null,
+        value: parsedAmount.toString()
+      }
     );
 
   };
@@ -211,7 +223,13 @@ export const useBorrowProxy = () => {
       proxyContract.address, 
       calldata,
       overrides,
-      { tx:null, msg: `Borrowing ${daiToBorrow} Dai from ${series.displayNameMobile}`, type:'BORROW', series }
+      { 
+        tx:null, 
+        msg: `Borrowing ${daiToBorrow} Dai from ${series.displayNameMobile}`, 
+        type:'BORROW', 
+        series, 
+        value: dai.toString() 
+      }
     );
   };
 
@@ -254,7 +272,7 @@ export const useBorrowProxy = () => {
  
     // User to treasury no ds proxy 
     requestedSigs.set('daiSig',
-      { id: genTxCode('AUTH_TOKEN', series?.maturity.toString()),
+      { id: genTxCode('AUTH_DAI', series?.maturity.toString()),
         desc: 'Allow Dai transfers to the fyDai Treasury',
         conditional: ( await getTokenAllowance(deployedContracts.Dai, 'Dai', deployedContracts.Treasury) ) > 0,
         signFn: () => daiPermitSignature( deployedContracts.Dai, deployedContracts.Treasury),
@@ -277,7 +295,13 @@ export const useBorrowProxy = () => {
       proxyContract.address, 
       calldata,
       overrides,
-      { tx:null, msg: `Repaying ${repaymentInDai} Dai to ${series.displayNameMobile}`, type:'REPAY', series  }
+      { 
+        tx:null, 
+        msg: `Repaying ${repaymentInDai} Dai to ${series.displayNameMobile}`, 
+        type:'REPAY', 
+        series,
+        value: dai.toString()
+      }
     );
 
   };
@@ -326,7 +350,7 @@ export const useBorrowProxy = () => {
       });
 
     requestedSigs.set('daiSig',
-      { id: genTxCode('AUTH_TOKEN', series?.maturity.toString()),
+      { id: genTxCode('AUTH_DAI', series?.maturity.toString()),
         desc: `Allow Dai transfers to the ${series.displayName} pool`,
         conditional: await getTokenAllowance(deployedContracts.Dai, 'Dai', poolAddr) > 0,
         signFn: () => daiPermitSignature(deployedContracts.Dai, poolAddr),
@@ -349,7 +373,13 @@ export const useBorrowProxy = () => {
       proxyContract.address,
       calldata,
       overrides,
-      { tx:null, msg: `Lending ${daiIn} DAI to ${series.displayNameMobile} `, type:'SELL_DAI', series  }
+      { 
+        tx:null, 
+        msg: `Lending ${daiIn} DAI to ${series.displayNameMobile} `, 
+        type:'SELL_DAI', 
+        series, 
+        value: parsedDaiIn.toString()
+      }
     );
 
   };
@@ -397,7 +427,7 @@ export const useBorrowProxy = () => {
       });
 
     requestedSigs.set('fyDaiSig',
-      { id: genTxCode('AUTH_TOKEN', series?.maturity.toString()),
+      { id: genTxCode('AUTH_FYDAI', series?.maturity.toString()),
         desc: `Allow fyDai transfers to the ${series.displayName} pool`,
         conditional: ( await getTokenAllowance(fyDaiAddr, 'FYDai', poolAddr) ) > 0,
         signFn: () => ERC2612PermitSignature(fyDaiAddr, poolAddr),    
@@ -420,7 +450,13 @@ export const useBorrowProxy = () => {
       proxyContract.address, 
       calldata,
       overrides,
-      { tx:null, msg: `Closing ${daiOut} DAI from ${series.displayNameMobile}`, type:'BUY_DAI', series  }
+      { 
+        tx:null, 
+        msg: `Closing ${daiOut} DAI from ${series.displayNameMobile}`, 
+        type:'BUY_DAI', 
+        series,
+        value: parsedDaiOut.toString()
+      }
     );
   };
 

@@ -33,6 +33,7 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
       {activeSeries &&
         <Box
           alignSelf="center"
+          width={{ max:'620px'}}
           fill
           round='small'
           gap='small'

@@ -50,7 +50,14 @@ export const usePool = () => {
       handleTxRejectError(e);
       return;
     }
-    await handleTx({ tx, msg: `Sell fyDai ${fyDaiIn} pending...`, type:'SELL', series });
+    await handleTx(
+      { 
+        tx, 
+        msg: `Sell fyDai ${fyDaiIn} pending...`, 
+        type:'SELL', 
+        series,
+        value: parsedAmount.toString() 
+      });
   };
 
   /**
@@ -81,7 +88,13 @@ export const usePool = () => {
       handleTxRejectError(e);
       return;
     }
-    await handleTx({ tx, msg: `Buying fyDai ${fyDaiOut} pending...`, type:'BUY', series });
+    await handleTx({ 
+      tx, 
+      msg: `Buying fyDai ${fyDaiOut} pending...`, 
+      type:'BUY', 
+      series, 
+      value: parsedAmount.toString()
+    });
   };
 
   /**
@@ -114,7 +127,14 @@ export const usePool = () => {
       handleTxRejectError(e);
       return;
     }
-    await handleTx({ tx, msg: `Selling ${daiIn} DAI pending...`, type:'SELL', series });
+    await handleTx(
+      { 
+        tx, 
+        msg: `Selling ${daiIn} DAI pending...`, 
+        type:'SELL', 
+        series, 
+        value: parsedAmount.toString()  
+      });
   };
 
 
@@ -149,7 +169,14 @@ export const usePool = () => {
       handleTxRejectError(e);
       return;
     }
-    await handleTx({ tx, msg: `Buying ${daiOut} Dai pending...`, type:'BUY', series });
+    await handleTx(
+      { 
+        tx, 
+        msg: `Buying ${daiOut} Dai pending...`, 
+        type:'BUY', 
+        series,
+        value: parsedAmount.toString() 
+      });
   };
 
   /**
@@ -180,7 +207,7 @@ export const usePool = () => {
         return handleTxRejectError(e);
       }
       /* Transaction reporting & tracking */
-      await handleTx({ tx, msg: 'Yield Series Pool authorization', type:'AUTH_POOL', series });
+      await handleTx({ tx, msg: 'Yield Series Pool authorization', type:'AUTH_POOL', series, value: null });
       
     } else { 
       const calldata = contract.interface.encodeFunctionData('addDelegate', [delegatedAddr]);
@@ -188,7 +215,13 @@ export const usePool = () => {
         poolAddr,
         calldata,
         { },
-        { tx: null, msg: 'Yield Series Pool authorization', type:'AUTH_POOL', series  }
+        { 
+          tx: null, 
+          msg: 'Yield Series Pool authorization', 
+          type:'AUTH_POOL', 
+          series, 
+          value: null
+        }
       );
     }
 
@@ -229,7 +262,7 @@ export const usePool = () => {
    */
   const poolTotalSupply = async (
     poolAddress:string,
-  ): Promise<boolean> => {
+  ): Promise<string> => {
     const poolAddr = ethers.utils.getAddress(poolAddress);
     const contract = new ethers.Contract( poolAddr, poolAbi, fallbackProvider);
     let res;
@@ -240,6 +273,27 @@ export const usePool = () => {
     }
     return res;
   };
+
+  /**
+   * @dev gets the fyDai virtual reserves of the pool.
+   * @param {string} poolAddress address of the market in question.
+   * @returns {Promise<boolean>} approved ?
+   * @note call function 
+   */
+  const getFyDaiReserves = async (
+    poolAddress:string,
+  ): Promise<string> => {
+    const poolAddr = ethers.utils.getAddress(poolAddress);
+    const contract = new ethers.Contract( poolAddr, poolAbi, fallbackProvider);
+    let res;
+    try {
+      res = await contract.getFYDaiReserves();
+    }  catch (e) {
+      res = '0';
+    }
+    return res;
+  };
+
 
   /**
    * @dev Preview buy/sell transactions
@@ -301,9 +355,10 @@ export const usePool = () => {
   const checkPoolState = (
     series: IYieldSeries,
   ): any => {
+
     if ( series.isMature() ) { return { active: false, reason: 'Series is mature' };}
     if ( series.totalSupply?.isZero() ) { return { active: false, reason: 'Pool not initiated' };}
-    if ( series.yieldAPR && !(Number.isFinite(series.yieldAPR)) ) { return { active: false, reason: 'Limited Liquidity' };}
+    if ( series.yieldAPR && !(Number.isFinite(parseFloat(series.yieldAPR))) ) { return { active: false, reason: 'Limited Liquidity' };}
     return { active:true, reason:'Pool is operational' };
   };
 
@@ -313,6 +368,8 @@ export const usePool = () => {
     buyFYDai,
     sellDai,
     buyDai,
+
+    getFyDaiReserves,
 
     addPoolDelegate,
     checkPoolDelegate,

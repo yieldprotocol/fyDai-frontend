@@ -64,10 +64,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
     if (inputValue && !withdrawDisabled ) {
       close(); // close immediately, no need to track withdrawPending
       await withdrawEth(inputValue);
-      logEvent({
-        category: 'Withdraw',
-        action: inputValue
-      });
+
       /* clean up and refresh */ 
       setInputValue(undefined);
       userActions.updateUser();

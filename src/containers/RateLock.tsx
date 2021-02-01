@@ -15,7 +15,6 @@ import {
 /* utils and support */
 import { cleanValue, modColor, buildGradient } from '../utils';
 import logoDark from '../assets/images/logo.svg';
-import logoLight from '../assets/images/logo_light.svg';
 
 /* contexts */
 import { UserContext } from '../contexts/UserContext';
@@ -44,7 +43,7 @@ import MakerMark from '../components/logos/MakerMark';
 import TxStatus from '../components/TxStatus';
 import AprBadge from '../components/AprBadge';
 import SeriesSelector from '../components/SeriesSelector';
-
+import { logEvent } from '../utils/analytics';
 
 interface IRateLockProps {
   close?: any; // close is also used as a indicator used as a layer (only a layer should have a closed)
@@ -124,20 +123,34 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
   /* execution procedures */
   const importProcedure = async () => {
     if ( collInputValue || debtInputValue && !advancedDisabled ) {
+
+      /* if  or, there is no dai, but there is collateral left, the collateral value needs to be exact */ 
+      const valueColl = ( collInputValue >= selectedVault.vaultCollateral_ ) || parseFloat(selectedVault.vaultMakerDebt_)===0  ?
+        selectedVault.vaultCollateral : 
+        debouncedCollInput;
+      /* if the value approximates the max value OR there appears to be no Dai, use the EXACT value of the MakerDebt */
+      const valueDebt =  ( parseFloat(debouncedDebtInput) === parseFloat(selectedVault.vaultDaiDebt_ ) || parseFloat(selectedVault.vaultDaiDebt_)===0 ) ? 
+        selectedVault.vaultMakerDebt :
+        debouncedDebtInput;
+
       await importPosition(
         activeSeries,
-        /* if  or, there is no dai, but there is collateral left, the collateral value needs to be exact */ 
-        ( collInputValue >= selectedVault.vaultCollateral_ ) || parseFloat(selectedVault.vaultMakerDebt_)===0  ?
-          selectedVault.vaultCollateral : 
-          debouncedCollInput,
-        /* if the value approximates the max value OR there appears to be no Dai, use the EXACT value of the MakerDebt */
-        ( parseFloat(debouncedDebtInput) === parseFloat(selectedVault.vaultDaiDebt_ ) || parseFloat(selectedVault.vaultDaiDebt_)===0 ) ? 
-          selectedVault.vaultMakerDebt :
-          debouncedDebtInput,
-
+        valueColl,
+        valueDebt,
         selectedVault.vaultId);
       setCollInputValue(undefined);
       setDebtInputValue(undefined);
+
+      // logEvent('import_position', {
+      //   value_coll: String(valueColl),
+      //   type_coll: 'ETH-A',
+      //   value_debt: String(valueDebt),
+      //   type_debt: 'DAI',
+      //   one_click: false,
+      //   label: activeSeries.displayName,
+      //   time_to_maturity: (new Date().getTime()/1000) - activeSeries.maturity, 
+      // });
+
       close && close();
       await Promise.all([
         userActions.updateUser(),
@@ -147,8 +160,21 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
   };
   
   const importAllProcedure = async (id:number) => {
+
     if (!allDisabled) {
       await importVault(activeSeries, id);
+      logEvent('import_position', {
+        value_coll: String(selectedVault?.vaultCollateral_),
+        type_coll: 'ETH-A',
+        value_debt: String(selectedVault?.vaultDaiDebt_),
+        type_debt: 'DAI',
+        source: 'MAKER',
+        one_click: true,
+        label: activeSeries.displayName,
+        maturity: activeSeries.maturity, 
+        time_to_maturity: (new Date().getTime()/1000) - activeSeries.maturity, 
+      });
+
       close && close();
       await Promise.all([
         userActions.updateUser(),
@@ -195,7 +221,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
       const preview = await previewPoolTx('buyDai', activeSeries, debouncedDebtInput);     
       if (!(preview instanceof Error)) {
         const _apr = calculateAPR( ethers.utils.parseEther(debouncedDebtInput.toString()), preview, activeSeries.maturity );
-        setAPR(cleanValue(_apr, 2) );
+        setAPR(cleanValue(_apr.toString(), 2) );
       } else {
         setAllDisabled(true);
         setDebtErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
@@ -269,7 +295,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
       const preview = await previewPoolTx('buyDai', activeSeries, selectedVault.vaultDaiDebt_);
       if (!(preview instanceof Error)) {
         const _apr = calculateAPR( ethers.utils.parseEther(selectedVault?.vaultDaiDebt_), preview, activeSeries.maturity);
-        setMaxAPR( cleanValue(_apr, 2) );
+        setMaxAPR( cleanValue(_apr.toString(), 2) );
       } else {
         setMaxAPR(undefined);
       }
@@ -326,14 +352,17 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
               onClick={()=>setSelectorOpen(true)}
               round
             >
-              <Image src={!theme.dark ? logoDark : logoLight} fit='contain' />
+              <Image src={logoDark} fit='contain' />
             </Box>
-            <Text size={mobile?'large':'xxlarge'} weight='bold'>RateLock</Text>   
+            <Text size={mobile?'large':'xxlarge'} weight='bold' color={asLayer? 'text' : activeSeries?.seriesTextColor}>RateLock</Text>   
           </Box>
 
           { !mobile &&
           <Box direction='row' align='center' gap='small'> 
-            <Search onClick={()=>{if(!searchOpen){setSearchOpen(true);} else {setSearchInputValue(undefined); setSearchOpen(false);}}} />
+            <Search 
+              color={asLayer? 'text' : activeSeries?.seriesTextColor} 
+              onClick={()=>{if(!searchOpen){setSearchOpen(true);} else {setSearchInputValue(undefined); setSearchOpen(false);}}} 
+            />
             <Collapsible open={searchOpen} direction='horizontal'>
               <InsetBox
                 background={asLayer? makerBackColor : activeSeries && modColor(activeSeries?.seriesColor, 50)}

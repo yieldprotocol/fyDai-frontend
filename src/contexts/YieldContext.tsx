@@ -150,7 +150,7 @@ const YieldProvider = ({ children }: any) => {
             displayName: moment.utc(maturity * 1000).format('MMMM YYYY'),
             displayNameMobile: moment.utc(maturity * 1000).format('MMM YYYY'),
             seriesColor: colors.seriesColors[i],
-            seriesTextColor: '#333333',
+            seriesTextColor: '#222222',
             seriesLightColor: utils.modColor(colors.seriesColors[i], 50),
             seriesDarkColor: utils.modColor(colors.seriesColors[i], -50),
             seriesFromColor: colors.fromColors[i] || colors.seriesColors[i],

@@ -35,7 +35,7 @@ export interface IYieldSeries {
   wethDebtDai_?: number;
   wethDebtFYDai?: BigNumber;
   wethDebtFYDai_?: number;
-  yieldAPR?: number;
+  yieldAPR?: string;
   yieldAPR_?: string;
 }
 
@@ -89,6 +89,7 @@ export interface ITx {
   msg: string,
   type: string,
   series: IYieldSeries|null,
+  value: string | null,
   code?: string, // internal tracking code
 }
 
@@ -131,9 +132,8 @@ export interface IDomain {
 }
 
 export interface IAnalytics {
-  category: string;
-  action: string;
-  label?: string | '';
+  event_name: string;
+  event_parameters: any;
 }
 
 export interface ITxState {

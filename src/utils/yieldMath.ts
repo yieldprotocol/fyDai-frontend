@@ -187,17 +187,17 @@ export function getFee(
   return fee_.toString();
 }
 
-
 export function fyDaiForMint(
-  daiReserves: BigNumber,
-  fyDaiRealReserves: BigNumber,
-  fyDaiVirtualReserves: BigNumber,
-  dai: BigNumber,
-  timeTillMaturity: BigNumber,
+  daiReserves: BigNumber |string,
+  fyDaiRealReserves: BigNumber|string,
+  fyDaiVirtualReserves: BigNumber|string,
+  dai: BigNumber|string,
+  timeTillMaturity: BigNumber|string,
 ): string {
 
   const daiReserves_ = new Decimal(daiReserves.toString());
   const fyDaiRealReserves_ = new Decimal(fyDaiRealReserves.toString());
+  const timeTillMaturity_ = new Decimal(timeTillMaturity.toString());
   const dai_ = new Decimal(dai.toString());
 
   let min = ZERO;
@@ -206,7 +206,8 @@ export function fyDaiForMint(
 
   let i = 0;
   while ( true ) {
-    const zIn = new Decimal( buyFYDai(daiReserves, fyDaiVirtualReserves, BigNumber.from(yOut.toFixed(0)), timeTillMaturity) );
+
+    const zIn = new Decimal( buyFYDai(daiReserves, fyDaiVirtualReserves, BigNumber.from(yOut.toFixed(0)), timeTillMaturity_.toString() ) );
     const Z_1 = daiReserves_.add(zIn); // New dai reserves
     const Y_1 = fyDaiRealReserves_.sub(yOut); // New fyDai reserves
     const pz = (dai_.sub(zIn)).div( (dai_.sub(zIn)).add(yOut) ); // dai proportion in my assets
@@ -215,11 +216,11 @@ export function fyDaiForMint(
     // The dai proportion in my assets needs to be higher than but very close to the dai proportion in the reserves, to make sure all the fyDai is used.
     if ( PZ.mul(new Decimal(1.000001)) <= pz ) min = yOut;
     yOut = (yOut.add(max)).div(TWO); // bought too little fyDai, buy some more
+    
     if (pz <= PZ) max = yOut;
     yOut = (yOut.add(min)).div(TWO); // bought too much fyDai, buy a bit less
-    // console.log(`y = ${floor(y_out).toFixed()}\n`)
-
     if ( PZ.mul(new Decimal(1.000001)) > pz && pz > PZ) return Decimal.floor(yOut).toFixed(); // Just right
+    
     // eslint-disable-next-line no-plusplus
     if (i++ > 10000) return Decimal.floor(yOut).toFixed();
   }
@@ -274,12 +275,12 @@ export const calcTokensMinted =(
    * Calculate Slippage 
    *
    * @param { BigNumber } value  
-   * @param { BigNumber } slippage optional: defaults to 0.05 (5%)
+   * @param { BigNumber } slippage optional: defaults to 0.005 (0.5%)
    * @param { number } minimise optional: whether the resutl should be a minimum or maximum (default max)
    * 
    * @returns { string } human readable string
    */
-export const calculateSlippage = (value: BigNumber | string, slippage: BigNumber | string = '0.5', minimise:boolean=false ):string => {
+export const calculateSlippage = (value: BigNumber | string, slippage: BigNumber | string = '0.005', minimise:boolean=false ):string => {
   const value_ = new Decimal(value.toString()); 
   const _slippageAmount = floorDecimal( mulDecimal(value, slippage));
   if (minimise) {
@@ -291,25 +292,25 @@ export const calculateSlippage = (value: BigNumber | string, slippage: BigNumber
 /**
    * Calculate Annualised Yield Rate
    *
-   * @param { BigNumber } _rate // current [Dai] price per unit y[Dai]
-   * @param { BigNumber } _amount // y[Dai] amount at maturity
-   * @param { number } _maturity  // date of maturity
-   * @param { number } _fromDate // ***optional*** start date - defaults to now()
+   * @param { BigNumber } rate // current [Dai] price per unit y[Dai]
+   * @param { BigNumber } amount // y[Dai] amount at maturity
+   * @param { number } maturity  // date of maturity
+   * @param { number } fromDate // ***optional*** start date - defaults to now()
    * 
    * @returns { string | undefined } human readable string
    */
 export const calculateAPR =(
-  _rate: BigNumber,
-  _amount: BigNumber,
-  _maturity: number,
-  _fromDate:number = (Math.round(new Date().getTime() / 1000)), // if not provided, defaults to current time.
+  rate: BigNumber,
+  amount: BigNumber,
+  maturity: number,
+  fromDate:number = (Math.round(new Date().getTime() / 1000)), // if not provided, defaults to current time.
 ): string | undefined => {
-  const rate_ = new Decimal(_rate.toString());
-  const amount_ = new Decimal(_amount.toString());
+  const rate_ = new Decimal(rate.toString());
+  const amount_ = new Decimal(amount.toString());
   if (
-    _maturity > Math.round(new Date().getTime() / 1000)
+    maturity > Math.round(new Date().getTime() / 1000)
   ) {
-    const secsToMaturity = _maturity - _fromDate;
+    const secsToMaturity = maturity - fromDate;
     const propOfYear = new Decimal(secsToMaturity/SECONDS_PER_YEAR);
     const priceRatio = amount_.div(rate_);
     const powRatio = ONE.div(propOfYear);
@@ -416,5 +417,9 @@ export const secondsToFrom  = (
   to: BigNumber | string, 
   from: BigNumber | string = BigNumber.from( Math.round(new Date().getTime() / 1000)), // OPTIONAL: FROM defaults to current time if omitted
 ) : string => {
-  return to.sub(from).toString();
+
+  const to_ = ethers.BigNumber.isBigNumber(to)? to : BigNumber.from(to);
+  const from_ = ethers.BigNumber.isBigNumber(from)? from : BigNumber.from(from);
+
+  return to_.sub(from_).toString();
 };

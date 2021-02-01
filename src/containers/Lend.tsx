@@ -90,11 +90,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
   const lendProcedure = async () => {
     if (inputValue && !lendDisabled ) {
       await sellDai( activeSeries, inputValue);
-      logEvent({
-        category: 'Lend',
-        action: inputValue,
-        label: activeSeries.displayName || activeSeries.poolAddress,
-      });
+
       /* clean up and refresh */ 
       setInputValue(undefined);
       await Promise.all([
@@ -110,8 +106,8 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
       const preview = await previewPoolTx('sellDai', activeSeries, debouncedInput);
       if (!(preview instanceof Error)) {
         setFYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
-        const _apr = calculateAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity )
-        setAPR( cleanValue(_apr, 2) );      
+        const _apr = calculateAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity );
+        setAPR( cleanValue(_apr.toString(), 2) );      
       } else {
         /* if the market doesnt have liquidity just estimate from rate */
         const rate = await previewPoolTx('sellDai', activeSeries, 1);
@@ -139,8 +135,8 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
       !hasDelegated ||
       !inputValue || 
       parseFloat(inputValue) <= 0
-    )? setLendDisabled(true): setLendDisabled(false);
-  }, [ inputValue, hasDelegated]);
+    ) ? setLendDisabled(true): setLendDisabled(false);
+  }, [ inputValue, hasDelegated, daiBalance]);
 
   /* handle exceptions, errors and warnings */
   useEffect(() => {
