@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { ethers, BigNumber } from 'ethers';
+import { Decimal } from 'decimal.js';
 import { Box, Keyboard, TextInput, Select, Text, ResponsiveContext, Collapsible, Layer } from 'grommet';
 import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 import { VscHistory as History } from 'react-icons/vsc';
@@ -104,6 +105,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
   const [ toQuantity, setToQuantity ] = useState<number>(0);
   const [ inputFromQuantity, setInputFromQuantity ] = useState<boolean>(true);
   const [ priceImpact, setPriceImpact ] = useState<number>(0);
+  const [ liquidityProviderFee, setLiquidityProviderFee ] = useState<number>(0);
   const [ tradeType, setTradeType ] = useState<string>('');
   let trade: string = '';
 
@@ -190,11 +192,15 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
     activeSeries && !(activeSeries?.isMature()) &&  !!debouncedInput &&  ( async () => {
       const preview = await previewPoolTx(trade, activeSeries, debouncedInput);
       const [daiReserves, fyDaiReservesReal, fyDaiReservesVirtual] = await getReserves(activeSeries);
-      console.log("daiReserves: ", daiReserves);
-      console.log("fyDaiReservesReal: ", fyDaiReservesReal);
-      console.log("fyDaiReservesVirtual: ", fyDaiReservesVirtual);
       const spotPreview = await previewPoolTx(trade, activeSeries, 1);
-      if (!(preview instanceof Error) && !(spotPreview instanceof Error)) {
+      const fee1 = getFee("5000", "25000", "20000000", "5");
+      console.log("fee1: ", fee1)
+      const fee2 = getFee(BigNumber.from("5000"), BigNumber.from("25000"), BigNumber.from("20000000"), BigNumber.from("5"));
+      console.log("fee2: ", fee2)
+      const fee3 = getFee(ethers.utils.parseEther("5000"), ethers.utils.parseEther("25000"), ethers.utils.parseEther("20000000"), ethers.utils.parseEther("5"));
+      console.log("fee3: ", fee3)
+
+if (!(preview instanceof Error) && !(spotPreview instanceof Error)) {
         switch(trade) {
           case 'sellDai':
             console.log('preview: ', roundTo(parseFloat(ethers.utils.formatEther(preview)), 3));
@@ -202,6 +208,11 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
             if(inputValue === '') {setToQuantity(0);}
             setAPR( calculateAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) );                  
             setPriceImpact(( calculateAPR( ethers.utils.parseEther('1'), spotPreview, activeSeries?.maturity ) ) - ( calculateAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) ));   
+            console.log("fyDaiReservesReal: ", ethers.utils.formatEther(fyDaiReservesReal).toString())
+            console.log("fyDaiReservesVirtual: ", ethers.utils.formatEther(fyDaiReservesVirtual).toString())
+            console.log("daiReserves: ", ethers.utils.formatEther(daiReserves).toString())
+            console.log("activeSeries?.maturity: ", activeSeries?.maturity.toString())
+            console.log("preview: ", ethers.utils.formatEther(preview).toString())
             console.log('APR: ', calculateAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ));
             console.log('priceImpact: ', ( calculateAPR( ethers.utils.parseEther('1'), spotPreview, activeSeries?.maturity ) ) - ( calculateAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) ) );
             break;
