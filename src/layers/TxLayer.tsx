@@ -34,7 +34,14 @@ const TxLayer = () => {
   const { buildDsProxy } = useDsRegistry();
 
   /* Monitor All possible tx's */ 
-  const [ authActive ] = useTxActive([ 'AUTH_DAI', 'AUTH_FYDAI', 'AUTH_TOKEN', 'AUTH_CONTROLLER', 'AUTH_POOL', 'CREATE_PROXY' ]);
+  const [ authActive ] = useTxActive([ 
+    'AUTH_DAI', 
+    'AUTH_FYDAI', 
+    'AUTH_TOKEN', 
+    'AUTH_CONTROLLER', 
+    'AUTH_POOL', 
+    'CREATE_PROXY' 
+  ]);
   const [ txActive ] = useTxActive([
     'POST', 
     'WITHDRAW', 

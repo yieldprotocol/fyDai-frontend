@@ -1,3 +1,6 @@
+
+
+
 /* Trunctate a string value to a certain number of 'decimal' point */
 export const cleanValue = (input:string, decimals:number=12) => {
   const re = new RegExp(`(\\d+\\.\\d{${decimals}})(\\d)`);
@@ -110,9 +113,9 @@ export const buildGradient = (colorFrom:string, colorTo:string  ) => {
     ${modColor( colorTo, 0)})`;
 };
 
+/* google analytics log event */
 export const logEvent = (eventName: string, eventParams: any ) => {
   if (eventName) {
-    console.log('event emitted:', eventName);
     window?.gtag('event', eventName, eventParams);
   }
 };

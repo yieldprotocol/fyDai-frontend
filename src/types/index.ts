@@ -7,17 +7,14 @@ export interface IYieldSeries {
   maturity_: Date;
   poolAddress: string;
   fyDaiAddress: string;
-  liquidityProxyAddress: string;
   hasPoolDelegatedProxy: boolean;
-  hasPoolDelegatedAltProxy: boolean;
-  hasPoolDelegatedDsProxy: boolean;
-  hasDaiAuth: boolean;
-  hasFyDaiAuth: boolean;
-  hasCloseAuth: boolean;
-  authComplete: boolean;
   isMature: any; // function typeScript this out
   fyDaiBalance_: number;
   fyDaiBalance: BigNumber;
+  seriesColor: string;
+  seriesDarkColor: string;
+  seriesLightColor: string;
+  seriesTextColor:string;
   totalSupply?: BigNumber;
   totalSupply_?: number;
   poolTokens?:  BigNumber;
@@ -27,10 +24,6 @@ export interface IYieldSeries {
   symbol?: string;
   id?: string;
   currentValue?: any;
-  seriesColor: string;
-  seriesDarkColor: string;
-  seriesLightColor: string;
-  seriesTextColor:string;
   wethDebtDai?: BigNumber;
   wethDebtDai_?: number;
   wethDebtFYDai?: BigNumber;

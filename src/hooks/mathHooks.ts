@@ -77,13 +77,14 @@ export const useMath = () => {
    * @returns { number } human readable number.
    */
   const calculateAPR =(
-    rate: BigNumber,
+    tradeValue: BigNumber,
     amount: BigNumber,
     maturity:number,
     fromDate:number = (Math.round(new Date().getTime() / 1000)), // if not provided, defaults to current time.
   ): number => {
+
     // Get the rate etc for Dai 
-    const res = calcAPR(rate, amount, maturity, fromDate );
+    const res = calcAPR(tradeValue, amount, maturity, fromDate );
     const resFloat = res && parseFloat(res);
     return resFloat || 0;
   };
