@@ -57,7 +57,7 @@ export function sellDai(daiRes: any, fyDaiRes: any, d: any, ttm: any): any {
   const y = subtract(Y, pow(sum, invA));
   const yFee = subtract(y, fee);
 
-  return y.toString();
+  return yFee.toString();
 }
 
 // https://www.desmos.com/calculator/6jlrre7ybt
@@ -79,7 +79,7 @@ export function sellFYDai(daiRes: any, fyDaiRes: any, fyD: any, ttm: any): any {
   const y = subtract(Z, pow(sum, invA));
   const yFee = subtract(y, fee);
 
-  return y.toString();
+  return yFee.toString();
 }
 
 // https://www.desmos.com/calculator/0rgnmtckvy
@@ -101,7 +101,7 @@ export function buyDai(daiRes: any, fyDaiRes: any, d: any, ttm: any): any {
   const y = subtract(pow(sum, invA), Y);
   const yFee = add(y, fee);
 
-  return y.toString();
+  return yFee.toString();
 }
 
 // https://www.desmos.com/calculator/ws5oqj8x5i
@@ -123,7 +123,7 @@ export function buyFYDai(daiRes: any, fyDaiRes: any, fyD: any, ttm: any): any {
   const y = subtract(pow(sum, invA), Z);
   const yFee = add(y, fee);
 
-  return y.toString();
+  return yFee.toString();
 }
 
 export function fyDaiForMint(
