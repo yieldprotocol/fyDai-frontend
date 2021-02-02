@@ -2,16 +2,17 @@ import React, { useEffect, useContext, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ethers, BigNumber } from 'ethers';
 
+/* utils and support */
 import { cleanValue } from '../utils';
-import { calculateAPR, divDecimal, mulDecimal, sellFYDai, secondsToFrom } from '../utils/yieldMath';
-
+import { calculateAPR, divDecimal, mulDecimal, floorDecimal, sellFYDai, buyFYDai, secondsToFrom, getFee } from '../utils/yieldMath';
 import { IYieldSeries } from '../types';
 
+/* contexts */
 import { YieldContext } from './YieldContext';
 
+/* hooks */ 
 import { useSignerAccount } from '../hooks/connectionHooks';
 import { usePool } from '../hooks/poolHook';
-
 import { useToken } from '../hooks/tokenHook';
 import { useController } from '../hooks/controllerHook';
 
@@ -47,23 +48,28 @@ function reducer(state:any, action:any) {
 
 const SeriesProvider = ({ children }:any) => {
 
-  const { account, provider, fallbackProvider, chainId } = useSignerAccount();
+  const { pathname } = useLocation();
+
+  /* state from context */
   const [ state, dispatch ] = React.useReducer(reducer, initState);
   const { state: yieldState } = useContext(YieldContext);
   const { yieldLoading } = yieldState;
 
-  const { previewPoolTx, checkPoolState, poolTotalSupply, getReserves } = usePool();
-  const { debtDai, debtFYDai } = useController();
-  
-  const { getBalance } = useToken();
-
-  const { pathname } = useLocation();
+  /* local state */
   const [ seriesFromUrl, setSeriesFromUrl] = useState<number|null>(null);
 
+  /* hooks init */
+  const { account, provider, fallbackProvider, chainId } = useSignerAccount();
+  const { previewPoolTx, checkPoolState, poolTotalSupply, getReserves } = usePool();
+  const { debtDai, debtFYDai } = useController();
+  const { getBalance } = useToken();
+
+  /* If the url references a series... set that one as active */
   useEffect(()=> {
     pathname && setSeriesFromUrl(parseInt(pathname.split('/')[2], 10));
   }, [ pathname ]);
 
+  /* Populate the series data with the cached/static info */
   const _prePopulateSeriesData = (seriesArr:IYieldSeries[]) => {
     /* preMap is for faster loading - creates an initial map from the cached data */
     const preMap= seriesArr.reduce((acc: Map<string, any>, x:any) => {
@@ -74,15 +80,62 @@ const SeriesProvider = ({ children }:any) => {
     return preMap;
   };
 
-  /* PRIVATE Get the data for a particular series, OR set of series  */
+  const _getReservesData = async (seriesArr:IYieldSeries[]) => {
+
+    /* Get all the reserves data for the series set CONCURRENTLY */
+    const _reservesData = await Promise.all(
+      seriesArr.map( async (x:IYieldSeries, i:number) => {
+        const _x = { ...x, isMature: ()=>( x.maturity < Math.round(new Date().getTime() / 1000)) };
+        /* Get reserves data */
+        const [
+          totalSupply, 
+          [ daiReserves, fyDaiReserves, fyDaiVirtualReserves ] 
+        ] = await Promise.all([
+          await poolTotalSupply(_x.poolAddress),
+          await getReserves(_x)
+        ]);
+    
+        return {
+          ..._x,
+          totalSupply,
+          daiReserves, 
+          fyDaiReserves, 
+          fyDaiVirtualReserves,
+        };
+      })
+    );
+       
+    /* Parse the data */
+    const _parsedReservesData = _reservesData.reduce((acc: Map<string, any>, x:any) => {
+
+      return acc.set(
+        x.maturity,
+        { ...x,
+          // totalSupply_: cleanValue(ethers.utils.formatEther(x.totalSupply), 2),
+          // daiReserves_:  cleanValue(ethers.utils.formatEther(x.daiReserves), 2),
+          // fyDaiReserves_: cleanValue(ethers.utils.formatEther(x.fyDaiReserves), 2), 
+          // fyDaiVirtualReserves_: cleanValue(ethers.utils.formatEther(x.fyDaiVirtualReserves), 2),
+        }
+      );
+    }, state.seriesData);
+    
+    console.log('reserves:', _parsedReservesData);
+    /* Update state and return  */
+    // dispatch( { type:'updateSeries', payload: { ...state.seriesData, _parsedReservesData } });
+    return _parsedReservesData;
+
+  };
+
+
+  /* Get the data for a particular series, OR set of series  (internally callable only) */
   const _getSeriesData = async (seriesArr:IYieldSeries[]) => {
     
-    /* concurrently get all the series data */
+    /* Get all the series data for the series CONCURRENTLY */
     const _seriesData = await Promise.all(
       seriesArr.map( async (x:IYieldSeries, i:number) => {
         const _x = { ...x, isMature: ()=>( x.maturity < Math.round(new Date().getTime() / 1000)) };
-        
-        /* with no user */
+
+        /* Get data not associated with a particular user */
         const [ 
           sellFYDaiRate,
           totalSupply, 
@@ -91,10 +144,9 @@ const SeriesProvider = ({ children }:any) => {
           await previewPoolTx('sellFYDai', _x, 1),
           await poolTotalSupply(_x.poolAddress),
           await getReserves(_x)
-          // await callTx(_x.poolAddress, 'Pool', 'totalSupply', []),
         ]);
 
-        /* with user */
+        /* .. and now, With user */
         const [ 
           poolTokens, 
           ethDebtDai, 
@@ -106,8 +158,6 @@ const SeriesProvider = ({ children }:any) => {
           debtFYDai('ETH-A', _x.maturity ), 
           getBalance(_x.fyDaiAddress, 'FYDai', account),
         ]) || new Array(4).fill(BigNumber.from('0'));
-
-        console.log('PPVW: ', (await previewPoolTx('sellFYDai', _x, 1)).toString() );
 
         return {
           ..._x,
@@ -124,16 +174,26 @@ const SeriesProvider = ({ children }:any) => {
       })
     );
 
-
     /* Parse the data */
     const _parsedSeriesData = _seriesData.reduce((acc: Map<string, any>, x:any) => {
+     
+      // console.log('preview    :',  x.sellFYDaiRate.toString() );
+      // console.log('clientside :', floorDecimal( _rate ) );
+      // console.log(' minus     :', ethers.utils.formatEther( (BigNumber.from(floorDecimal( _rate )).sub(x.sellFYDaiRate)).toString() ) );
+      // console.log('fee        :',  ethers.utils.formatEther(floorDecimal(fee)) );
+      // console.log('apr_ preview', cleanValue( calculateAPR( x.sellFYDaiRate, ethers.utils.parseEther('1'), x.maturity) || '', 3) );
+      // console.log('apr_ clientside', cleanValue( calculateAPR( floorDecimal( _rate ), ethers.utils.parseEther('1'), x.maturity) || '', 3) );
+      // console.log( 'SellFYDai:', sellFYDai(x.daiReserves, x.fyDaiReserves, ethers.utils.parseEther('1'), secondsToFrom(x.maturity) ));
+      // console.log( calculateAPR( x.sellFYDaiRate, ethers.utils.parseEther('1'), x.maturity) );
 
-      const _rate = sellFYDai(x.daiReserves, x.fyDaiReserves, ethers.utils.parseEther('1'), secondsToFrom(x.maturity) );
-      console.log( 'SellFYDai:', sellFYDai(x.daiReserves, x.fyDaiReserves, ethers.utils.parseEther('1'), secondsToFrom(x.maturity) ));
-      console.log( calculateAPR( x.sellFYDaiRate, ethers.utils.parseEther('1'), x.maturity) );
+      const _rate = sellFYDai(
+        x.daiReserves, 
+        x.fyDaiVirtualReserves, 
+        ethers.utils.parseEther('1'), 
+        secondsToFrom(x.maturity).toString()
+      );
+      const yieldAPR = calculateAPR( floorDecimal( _rate ), ethers.utils.parseEther('1'), x.maturity) || '0';
 
-      const _apr = calculateAPR( x.sellFYDaiRate, ethers.utils.parseEther('1'), x.maturity);
-      const yieldAPR =  _apr || '0';
       const poolRatio = divDecimal(x.poolTokens, x.totalSupply);
       const poolPercent = mulDecimal( poolRatio, '100');
       const poolState = checkPoolState(x);
@@ -157,6 +217,7 @@ const SeriesProvider = ({ children }:any) => {
     }, state.seriesData);
 
     console.log(_parsedSeriesData);
+
     /* Update state and return  */
     dispatch( { type:'updateSeries', payload: _parsedSeriesData });
     return _parsedSeriesData;
@@ -182,9 +243,11 @@ const SeriesProvider = ({ children }:any) => {
           dispatch({ type:'setActiveSeriesId', payload: preSelect[0].maturity });
         }
       }
-      
+
       /* Build/Re-build series map with data */ 
-      const seriesMap:any = await _getSeriesData(seriesArr);
+      const seriesMap:Map<any, IYieldSeries> = await _getSeriesData(seriesArr);
+      /* Update state and return  */
+      dispatch( { type:'updateSeries', payload: seriesMap });
 
       /* Set the activeSeries if there isn't one already */
       if (!state.activeSeriesId || seriesArr.length > 1) {
@@ -211,6 +274,7 @@ const SeriesProvider = ({ children }:any) => {
       try {
         await updateSeries(yieldState.deployedSeries, true);
       } catch (e) {
+        // eslint-disable-next-line no-console
         console.log(e);
       }
     })();
@@ -218,6 +282,7 @@ const SeriesProvider = ({ children }:any) => {
 
   /* Actions for updating the series Context */
   const actions = {
+    updateReserves: (series:IYieldSeries[]) => _getReservesData(series),
     updateAllSeries: () => updateSeries(yieldState.deployedSeries, false),
     updateSeries: (series:IYieldSeries[]) => updateSeries(series, false), /* updates one, or any number of series */
     updateActiveSeries: () => updateSeries([state.seriesData.get(state.activeSeriesId)], false), /* updates only the active series */

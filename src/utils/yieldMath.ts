@@ -19,7 +19,7 @@ export function mint(
   fyDaiReserves: BigNumber | string, 
   totalSupply: BigNumber | string, 
   dai: BigNumber | string
-) : [any, any] {
+) : [ any, any ] {
   const daiReserves_ = new Decimal(daiReserves.toString());
   const fyDaiReserves_ = new Decimal(fyDaiReserves.toString());
   const supply_ = new Decimal(totalSupply.toString());
@@ -262,7 +262,6 @@ export const calcTokensMinted =(
   const xOffered = (xInput.mul(xReserves)).div(yReserves.add(xReserves));
   return (totalSupply).mul(xOffered).div(xReserves);
 };
-
 
 /**
    * Calculate Slippage 
