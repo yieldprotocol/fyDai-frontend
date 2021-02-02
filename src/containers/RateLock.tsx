@@ -141,15 +141,15 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
       setCollInputValue(undefined);
       setDebtInputValue(undefined);
 
-      logEvent('import_position', {
-        value_coll: String(valueColl),
-        type_coll: 'ETH-A',
-        value_debt: String(valueDebt),
-        type_debt: 'DAI',
-        one_click: false,
-        label: activeSeries.displayName,
-        time_to_maturity: (new Date().getTime()/1000) - activeSeries.maturity, 
-      });
+      // logEvent('import_position', {
+      //   value_coll: String(valueColl),
+      //   type_coll: 'ETH-A',
+      //   value_debt: String(valueDebt),
+      //   type_debt: 'DAI',
+      //   one_click: false,
+      //   label: activeSeries.displayName,
+      //   time_to_maturity: (new Date().getTime()/1000) - activeSeries.maturity, 
+      // });
 
       close && close();
       await Promise.all([

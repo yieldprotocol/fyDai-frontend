@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { NavLink, useParams } from 'react-router-dom';
 import { ethers } from 'ethers';
-import { Box, Keyboard, TextInput, Text, ResponsiveContext, Collapsible, Layer, CheckBox } from 'grommet';
+import { Box, Keyboard, TextInput, Text, ResponsiveContext, Collapsible, Layer  } from 'grommet';
 import { 
   FiArrowRight as ArrowRight,
   FiArrowLeft as ArrowLeft,
@@ -82,8 +82,8 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
   const { getFyDaiReserves } = usePool();
   const { addLiquidity } = usePoolProxy();
   const { getBalance } = useToken();
-  const [newPoolShare, setNewPoolShare] = useState<string>();
-  const [calculating, setCalculating] = useState<boolean>(false);
+  const [ newPoolShare, setNewPoolShare ] = useState<string>();
+  const [ calculating, setCalculating ] = useState<boolean>(false);
   const { account } = useSignerAccount();
   const [ txActive ] = useTxActive(['ADD_LIQUIDITY', 'REMOVE_LIQUIDITY']);
   const [ removeTxActive ] = useTxActive(['REMOVE_LIQUIDITY']);
@@ -95,13 +95,6 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
     if (inputValue && !addLiquidityDisabled ) {
  
       await addLiquidity( activeSeries, inputValue, forceBorrow );
-      logEvent( 'add_liquidity', {
-        value: inputValue,
-        type: 'DAI',
-        series: activeSeries.displayName || activeSeries.poolAddress,
-        maturity: activeSeries.maturity, 
-        time_to_maturity: (new Date().getTime()/1000) - activeSeries.maturity, 
-      });
       
       /* clean up and refresh */ 
       setInputValue(undefined);
@@ -395,10 +388,18 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                       },
                     ]}
                     />
+                    {
+                      useBuyToAddLiquidity && 
+                      !forceBorrow && 
+                      <Box pad={{ horizontal:'medium' }}>
+                        <Text size='xxsmall'> Note: When adding liquidity using the 'BUY & POOL' strategy, the App may use less Dai than requested to avoid transaction failure. </Text>
+                      </Box>
+                    } 
+
                   </Collapsible>
-                </Box>
+                </Box> 
               </Box> 
-            
+
               <Box gap='small' fill='horizontal' align='center' pad={{ vertical:'small' }}>
                 <ActionButton
                   onClick={()=>addLiquidityProcedure()} 
@@ -409,6 +410,8 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                 />
               </Box>
             </>}
+
+            
 
             { activeSeries?.isMature() &&
             <SeriesMatureBox />}

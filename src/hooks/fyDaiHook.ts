@@ -1,6 +1,7 @@
 import { useState, useContext } from 'react';
 import { ethers, BigNumber }  from 'ethers';
 
+import { parse } from 'mathjs';
 import FYDai from '../contracts/FYDai.json';
 
 import { useSignerAccount } from './connectionHooks';
@@ -49,7 +50,13 @@ export const useFYDai = () => {
       setRedeemActive(false);
       return;
     }
-    await handleTx({ tx, msg: `Redeeming ${amount} pending...`, type:'REDEEM', series });
+    await handleTx({ 
+      tx, 
+      msg: `Redeeming ${amount} pending...`, 
+      type:'REDEEM', 
+      series, 
+      value: parsedAmount.toString()
+    });
     setRedeemActive(false);
   };
 

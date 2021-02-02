@@ -50,7 +50,14 @@ export const usePool = () => {
       handleTxRejectError(e);
       return;
     }
-    await handleTx({ tx, msg: `Sell fyDai ${fyDaiIn} pending...`, type:'SELL', series });
+    await handleTx(
+      { 
+        tx, 
+        msg: `Sell fyDai ${fyDaiIn} pending...`, 
+        type:'SELL', 
+        series,
+        value: parsedAmount.toString() 
+      });
   };
 
   /**
@@ -81,7 +88,13 @@ export const usePool = () => {
       handleTxRejectError(e);
       return;
     }
-    await handleTx({ tx, msg: `Buying fyDai ${fyDaiOut} pending...`, type:'BUY', series });
+    await handleTx({ 
+      tx, 
+      msg: `Buying fyDai ${fyDaiOut} pending...`, 
+      type:'BUY', 
+      series, 
+      value: parsedAmount.toString()
+    });
   };
 
   /**
@@ -114,7 +127,14 @@ export const usePool = () => {
       handleTxRejectError(e);
       return;
     }
-    await handleTx({ tx, msg: `Selling ${daiIn} DAI pending...`, type:'SELL', series });
+    await handleTx(
+      { 
+        tx, 
+        msg: `Selling ${daiIn} DAI pending...`, 
+        type:'SELL', 
+        series, 
+        value: parsedAmount.toString()  
+      });
   };
 
 
@@ -149,7 +169,14 @@ export const usePool = () => {
       handleTxRejectError(e);
       return;
     }
-    await handleTx({ tx, msg: `Buying ${daiOut} Dai pending...`, type:'BUY', series });
+    await handleTx(
+      { 
+        tx, 
+        msg: `Buying ${daiOut} Dai pending...`, 
+        type:'BUY', 
+        series,
+        value: parsedAmount.toString() 
+      });
   };
 
   /**
@@ -180,7 +207,7 @@ export const usePool = () => {
         return handleTxRejectError(e);
       }
       /* Transaction reporting & tracking */
-      await handleTx({ tx, msg: 'Yield Series Pool authorization', type:'AUTH_POOL', series });
+      await handleTx({ tx, msg: 'Yield Series Pool authorization', type:'AUTH_POOL', series, value: null });
       
     } else { 
       const calldata = contract.interface.encodeFunctionData('addDelegate', [delegatedAddr]);
@@ -188,7 +215,13 @@ export const usePool = () => {
         poolAddr,
         calldata,
         { },
-        { tx: null, msg: 'Yield Series Pool authorization', type:'AUTH_POOL', series  }
+        { 
+          tx: null, 
+          msg: 'Yield Series Pool authorization', 
+          type:'AUTH_POOL', 
+          series, 
+          value: null
+        }
       );
     }
 

@@ -89,6 +89,7 @@ export interface ITx {
   msg: string,
   type: string,
   series: IYieldSeries|null,
+  value: string | null,
   code?: string, // internal tracking code
 }
 
