@@ -127,19 +127,21 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
 
     /* Calculate the expected APR based on input */
     activeSeries && debouncedInput>0 && ( async () => {
-      const preview = await previewPoolTx('buyDai', activeSeries, debouncedInput);
+      const preview = await previewPoolTx('buyDai', activeSeries, debouncedInput, true);
+      
       if (!(preview instanceof Error)) {
         setFYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
         const _apr = calculateAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries.maturity );
         setAPR(cleanValue(_apr.toString(), 2) );
       } else {
         /* if the market doesnt have liquidity just estimate from rate */
-        const rate = await previewPoolTx('buyDai', activeSeries, 1);
+        const rate = await previewPoolTx('buyDai', activeSeries, 1, true);
         !(rate instanceof Error) && setFYDaiValue(debouncedInput*parseFloat((ethers.utils.formatEther(rate))));
         (rate instanceof Error) && setFYDaiValue(0);
         setBorrowDisabled(true);
         setErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
       }
+      
     })();
 
   }, [debouncedInput, activeSeries]);

@@ -8,7 +8,14 @@ import {
   collateralizationRatio, 
   borrowingPower, 
   calculateAPR as calcAPR,
+  buyDai,
+  buyFYDai,
+  sellDai,
+  sellFYDai,
+  secondsToFrom,
+  floorDecimal,
 } from '../utils/yieldMath';
+import { IYieldSeries } from '../types';
 
 /**
  * Hook for Yieldmaths functions: 
@@ -89,11 +96,37 @@ export const useMath = () => {
     return resFloat || 0;
   };
 
+
+  const estTrade = (
+    tradeType: string,  
+    amount: any,
+    series: IYieldSeries,
+  ): string  => {
+
+    const { daiReserves, fyDaiVirtualReserves }  = series;
+    const ttm: string = secondsToFrom( series.maturity.toString() ); 
+
+    switch (tradeType) {
+      case 'buyDai':
+        return floorDecimal( buyDai(daiReserves, fyDaiVirtualReserves, amount, ttm) );
+      case 'sellDai': 
+        return floorDecimal( sellDai(daiReserves, fyDaiVirtualReserves, amount, ttm));
+      case 'buyFYDai':
+        return floorDecimal( buyFYDai(daiReserves, fyDaiVirtualReserves, amount, ttm));
+      case 'SellFYDai':
+        return floorDecimal( sellFYDai(daiReserves, fyDaiVirtualReserves, amount, ttm));
+      default: 
+        return '0';
+    }
+  };
+
+
   return {
     calculateAPR,
     estCollateralValue,
     estCollateralRatio,
     estBorrowingPower,
+    estTrade,
   } as const;
 
 };

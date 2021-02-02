@@ -154,54 +154,6 @@ export const useMaker = () => {
 
   };
 
-  /**
-   * @dev Amount of fyDai debt that will result from migrating Dai debt from MakerDAO to Yield
-   * @param {IYieldSeries} series series to act on.
-   * @param {string|BigNumber} fyDaiAmount debt amount
-   * @returns {Promise<BigNumber>} weth amount 
-   * @note call function
-   */
-  const fyDaiForDai = async (
-    series: IYieldSeries,
-    amount:number|BigNumber,
-  ) =>{
-    /* Processing and/or sanitizing input */
-    const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(amount.toString());
-    let preview:BigNumber|Error;
-    try {
-      preview = await previewPoolTx('buydai', series, parsedAmount);
-    }  catch (e) {
-      // eslint-disable-next-line no-console
-      console.log(e);
-      return BigNumber.from('0');
-    }
-    return preview;
-  };
-
-  /**
-   * @dev Amount of dai debt that will result from migrating fyDai debt from Yield to MakerDAO
-   * @param {string|BigNumber} fyDaiAmount debt amount
-   * @param {IYieldSeries} series series to act on.
-   * @returns {Promise<BigNumber>} weth amount 
-   * @note call function
-   */
-  const daiForFyDai =async (
-    series: IYieldSeries,
-    amount:number|BigNumber,
-  ) => {
-    /* Processing and/or sanitizing input */
-    const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(amount.toString());
-    let preview:BigNumber|Error;
-    try {
-      preview = await previewPoolTx('buyFydai', series, parsedAmount);
-    }  catch (e) {
-      // eslint-disable-next-line no-console
-      console.log(e);
-      return BigNumber.from('0');
-    }
-    return preview;
-  };
-
   /* using dai in account */
 
   const genVault =async (
@@ -231,8 +183,6 @@ export const useMaker = () => {
     getCDPList,
     getCDPData,
     minWethForAmount,
-    fyDaiForDai,
-    daiForFyDai,
     genVault,
   } as const;
 };

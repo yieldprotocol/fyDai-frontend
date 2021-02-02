@@ -30,6 +30,11 @@ export interface IYieldSeries {
   wethDebtDai_?: number;
   wethDebtFYDai?: BigNumber;
   wethDebtFYDai_?: number;
+  daiReserves: BigNumber;
+
+  fyDaiReserves: BigNumber;
+  fyDaiVirtualReserves: BigNumber;
+
 }
 
 export interface IConnection {

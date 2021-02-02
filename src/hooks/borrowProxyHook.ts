@@ -189,7 +189,7 @@ export const useBorrowProxy = () => {
 
     /* get estimated maxFYDai */
     let maxFYDai:string;
-    const preview = await previewPoolTx('buydai', series, daiToBorrow); 
+    const preview = await previewPoolTx('buyDai', series, daiToBorrow); 
     if ( !(preview instanceof Error) ) {
       maxFYDai = calculateSlippage(preview, slippage);
     } else {
@@ -331,7 +331,7 @@ export const useBorrowProxy = () => {
 
     /* calculate expected trade values and factor in slippage */
     let minFYDaiOut:string;
-    const preview = await previewPoolTx('selldai', series, daiIn);
+    const preview = await previewPoolTx('sellDai', series, daiIn);
     if ( !(preview instanceof Error) ) {
       minFYDaiOut = calculateSlippage(preview, slippage, true);
     } else {
@@ -408,7 +408,7 @@ export const useBorrowProxy = () => {
   
     /* calculate expected trade values and factor in slippage */
     let maxFYDaiIn:string;
-    const preview = await previewPoolTx('buydai', series, daiOut);
+    const preview = await previewPoolTx('buyDai', series, daiOut);
     if ( !(preview instanceof Error) ) {
       maxFYDaiIn = calculateSlippage(preview, slippage);
     } else {

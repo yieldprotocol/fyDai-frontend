@@ -270,7 +270,7 @@ export const usePoolProxy = () => {
       /* calculate expected trade values  */ 
       let minFYDaiPrice:string | BigNumber;
 
-      const preview = await previewPoolTx('sellfydai', series, ethers.utils.parseEther('1'));
+      const preview = await previewPoolTx('sellFYDai', series, ethers.utils.parseEther('1'));
       if ( !(preview instanceof Error) ) {
         // const _one = ONE.mul('1e18');
         // const amountAboveOne = _one.sub( preview.toString() ).toString();

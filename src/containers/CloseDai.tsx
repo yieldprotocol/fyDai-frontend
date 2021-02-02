@@ -78,7 +78,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
   /* set maximum available to withdraw */
   useEffect(()=> {
     fallbackProvider && account && activeSeries?.fyDaiBalance && (async () => {
-      const preview = await previewPoolTx('sellFYDai', activeSeries, activeSeries.fyDaiBalance);
+      const preview = await previewPoolTx('sellFYDai', activeSeries, activeSeries.fyDaiBalance, true);
       if (!(preview instanceof Error)) {
         setMaxWithdraw(cleanValue(ethers.utils.formatEther(preview), 6));
       }
@@ -93,7 +93,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
     activeSeries.fyDaiBalance && 
     (async () => {
       const originalInWei = ethers.utils.parseEther(inputValue);
-      const preview = await previewPoolTx('sellFYDai', activeSeries, originalInWei);
+      const preview = await previewPoolTx('sellFYDai', activeSeries, originalInWei, true);
       if (!(preview instanceof Error)) {
         const previewEth = parseFloat(ethers.utils.formatEther(preview));
         const percent = (inputValue - previewEth)/inputValue * 100; 

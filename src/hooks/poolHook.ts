@@ -8,6 +8,8 @@ import { useTxHelpers } from './txHooks';
 import { useDsProxy } from './dsProxyHook';
 import { useToken } from './tokenHook';
 
+import { useMath } from './mathHooks';
+
 /**
  * Hook for interacting with the yield 'Pool' Contract
  */
@@ -18,6 +20,7 @@ export const usePool = () => {
   const { handleTx, handleTxRejectError } = useTxHelpers();
   const { proxyExecute } = useDsProxy();
   const { getBalance } = useToken();
+  const { estTrade } = useMath();
 
   /**
    * @dev Sell fyDai for Dai ( Chai )
@@ -346,6 +349,7 @@ export const usePool = () => {
    * @param {string} previewType string represnting transaction type //TODO tyescript it out
    * @param {IYieldSeries} series fyDai series to redeem from.
    * @param {number | BigNumber} amount input to preview
+   * @param {boolean} runLocal run run the simulation locally (no call required)
    * 
    * @note NB NB if in BigNumber must be in wei
    *  
@@ -357,32 +361,41 @@ export const usePool = () => {
     previewType: string,
     series: IYieldSeries,
     amount: number | BigNumber,
+    runLocal: boolean = false,
   ): Promise<BigNumber|Error> => {
-    const type = previewType.toUpperCase();
+    // const type = previewType.toUpperCase();
     const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(amount.toString());
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const contract = new ethers.Contract( poolAddr, poolAbi, fallbackProvider);
     let value = BigNumber.from('0');
+      
     try {
-      if ( series.isMature() === false ) {
-        switch (type) {
-          case 'BUYDAI':
+      if ( series.isMature() === false && !runLocal ) {
+        switch (previewType) {
+          case 'buyDai':
             value = await contract.buyDaiPreview(parsedAmount); break;
-          case 'SELLDAI': 
+          case 'sellDai': 
             value = await contract.sellDaiPreview(parsedAmount); break;
-          case 'BUYFYDAI':
+          case 'buyFYDai':
             value = await contract.buyFYDaiPreview(parsedAmount); break;
-          case 'SELLFYDAI':
+          case 'SellFYDai':
             value = await contract.sellFYDaiPreview(parsedAmount); break;
           default: 
             value = await BigNumber.from('0');
         }
+        console.log(value);
         return value; 
       }
-      return value; // assuming that if the series has matured, the rates on whatever trade will be 0. 
+
+      return BigNumber.from( estTrade( previewType, parsedAmount, series) );
+      
+      // console.log( estTrade( previewType, parsedAmount, series) ); 
+      // return BigNumber.from('0');
+
     } catch (e) {
       return e;
     }
+
   };
 
   /**

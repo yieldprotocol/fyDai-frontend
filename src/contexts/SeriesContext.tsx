@@ -62,7 +62,7 @@ const SeriesProvider = ({ children }:any) => {
 
   /* hooks init */
   const { account, provider, fallbackProvider, chainId } = useSignerAccount();
-  const { previewPoolTx, checkPoolState, poolTotalSupply, getReserves } = usePool();
+  const { checkPoolState, poolTotalSupply, getReserves } = usePool();
   const { debtDai, debtFYDai } = useController();
   const { getBalance } = useToken();
   const { addEventListener } = useEvents();
@@ -209,11 +209,9 @@ const SeriesProvider = ({ children }:any) => {
     const _newData = seriesArr.reduce((acc: Map<string, any>, x:any) => { 
       const _reserves = reservesMap.get(x.maturity);
       const _series = state.seriesData.get(x.maturity);
-      // _reserves?.totalSupply_ && console.log( _reserves.totalSupply_  - _series.totalSupply_ );
-
+      
       const diff = _reserves?.totalSupply_ && (_reserves?.totalSupply_ - _series.totalSupply_);
       const diffpercent = diff && diff/ _series.totalSupply_ *100;
-      
       const _change = { liqChange: diffpercent, liqChangeLast: (new Date().getTime()/1000)  };
 
       return acc.set( x.maturity, { ..._series, ..._reserves, ..._change } );

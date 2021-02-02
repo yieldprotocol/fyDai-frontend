@@ -218,7 +218,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
       setCollInputValue('');
       setMinCollateral(ethers.utils.formatEther(await minWethForAmount(debouncedDebtInput)));
 
-      const preview = await previewPoolTx('buyDai', activeSeries, debouncedDebtInput);     
+      const preview = await previewPoolTx('buyDai', activeSeries, debouncedDebtInput, true);     
       if (!(preview instanceof Error)) {
         const _apr = calculateAPR( ethers.utils.parseEther(debouncedDebtInput.toString()), preview, activeSeries.maturity );
         setAPR(cleanValue(_apr.toString(), 2) );
@@ -292,7 +292,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
   /* Get the Max APR for the selected Vault */
   useEffect(()=>{
     selectedVault?.vaultDaiDebt_> 0 && (async ()=>{
-      const preview = await previewPoolTx('buyDai', activeSeries, selectedVault.vaultDaiDebt_);
+      const preview = await previewPoolTx('buyDai', activeSeries, selectedVault.vaultDaiDebt_, true);
       if (!(preview instanceof Error)) {
         const _apr = calculateAPR( ethers.utils.parseEther(selectedVault?.vaultDaiDebt_), preview, activeSeries.maturity);
         setMaxAPR( cleanValue(_apr.toString(), 2) );
