@@ -209,10 +209,14 @@ const SeriesProvider = ({ children }:any) => {
     const _newData = seriesArr.reduce((acc: Map<string, any>, x:any) => { 
       const _reserves = reservesMap.get(x.maturity);
       const _series = state.seriesData.get(x.maturity);
+      // _reserves?.totalSupply_ && console.log( _reserves.totalSupply_  - _series.totalSupply_ );
 
-      _reserves?.totalSupply_ && console.log( _reserves.totalSupply_  - _series.totalSupply_ );
+      const diff = _reserves?.totalSupply_ && (_reserves?.totalSupply_ - _series.totalSupply_);
+      const diffpercent = diff && diff/ _series.totalSupply_ *100;
+      
+      const _change = { liqChange: diffpercent, liqChangeLast: (new Date().getTime()/1000)  };
 
-      return acc.set( x.maturity, { ..._series, ..._reserves } );
+      return acc.set( x.maturity, { ..._series, ..._reserves, ..._change } );
     }, new Map() );
 
     /* Update state and return  */
@@ -281,7 +285,7 @@ const SeriesProvider = ({ children }:any) => {
             'Liquidity',
             [null, null, null, null, null, null],
             ()=> { 
-              console.log('Reserves being updated'); 
+              console.log(`Reserves being updated: ${x.poolAddress}`); 
               updateReserves([x]);
             } 
           );
