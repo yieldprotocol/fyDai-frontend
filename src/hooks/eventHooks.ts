@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { ethers }  from 'ethers';
 
 import { useSignerAccount } from './connectionHooks';
@@ -29,7 +30,9 @@ const contractMap = new Map<string, any>([
  * @returns { function } getEvents
  */
 export const useEvents = () => {
+
   const { provider } = useSignerAccount();
+  const [ eventCallActive, setEventCallActive] =  useState<boolean>(false);
 
   /**
    * Setup an event listener.
@@ -46,7 +49,7 @@ export const useEvents = () => {
   ) => {
     const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), provider);
     const filter = contract.filters[filterEvent](...filterArgs);
-    contract.on(filter, (x:any) => callback(x));
+    contract.on(filter, (x:any) => callback(x) );
   };
 
   /**

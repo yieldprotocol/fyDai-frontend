@@ -198,5 +198,13 @@ export const useTimeTravel = () => {
     await advanceBlock();
   };
 
-  return { advanceTimeAndBlock, revertToSnapshot, takeSnapshot, snapshotNumber, revertToT0, block, timestamp } as const;
+  return { 
+    advanceTimeAndBlock, 
+    revertToSnapshot, 
+    takeSnapshot, 
+    snapshotNumber, 
+    revertToT0, 
+    block, 
+    timestamp 
+  } as const;
 };

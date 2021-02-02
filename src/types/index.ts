@@ -15,21 +15,21 @@ export interface IYieldSeries {
   seriesDarkColor: string;
   seriesLightColor: string;
   seriesTextColor:string;
-  totalSupply?: BigNumber;
-  totalSupply_?: number;
+  totalSupply: BigNumber;
+  totalSupply_: number;
+  symbol: string;
+  id: string;
+  yieldAPR: string;
+  yieldAPR_: string;
   poolTokens?:  BigNumber;
   poolTokens_?: number;
   poolState?: any;
   poolPercent_?:string;
-  symbol?: string;
-  id?: string;
   currentValue?: any;
   wethDebtDai?: BigNumber;
   wethDebtDai_?: number;
   wethDebtFYDai?: BigNumber;
   wethDebtFYDai_?: number;
-  yieldAPR?: string;
-  yieldAPR_?: string;
 }
 
 export interface IConnection {
