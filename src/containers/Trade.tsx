@@ -191,14 +191,26 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
 
     activeSeries && !(activeSeries?.isMature()) &&  !!debouncedInput &&  ( async () => {
       const preview = await previewPoolTx(trade, activeSeries, debouncedInput);
-      const [daiReserves, fyDaiReservesReal, fyDaiReservesVirtual] = await getReserves(activeSeries);
+      var [daiReserves, fyDaiReservesReal, fyDaiReservesVirtual] = await getReserves(activeSeries);
+      daiReserves = ethers.utils.formatEther(daiReserves);
+      fyDaiReservesVirtual = ethers.utils.formatEther(fyDaiReservesVirtual);
+      const timeTillMaturity = activeSeries?.maturity.toString();
+      console.log("daiReserves", daiReserves);
+      console.log("typeof daiReserves: ", typeof daiReserves)
+      console.log("fyDaiReservesVirtual", fyDaiReservesVirtual);
+      console.log("typeof fyDaiReservesVirtual: ", typeof fyDaiReservesVirtual)
+      console.log("timeTillMaturity: ", timeTillMaturity);
+      console.log("timeTillMaturity: ", typeof timeTillMaturity)
       const spotPreview = await previewPoolTx(trade, activeSeries, 1);
-      const fee1 = getFee("25000", "5000", "2", "2000000");
-      console.log("fee1: ", fee1)
-      const fee2 = getFee(BigNumber.from("25000"), BigNumber.from("5000"), BigNumber.from("1"), BigNumber.from("31536000"));
-      console.log("fee2: ", fee2)
+      var fee1 = getFee("25000000000000000000000", "35429000000000000000000", "1000000000000000000", "2000000");
+      console.log("fee1: ", (parseInt(fee1)).toString());
+      console.log("typeof fee1: ", typeof (parseInt(fee1)).toString());
 
-if (!(preview instanceof Error) && !(spotPreview instanceof Error)) {
+      var test = ethers.utils.formatEther((parseInt(fee1)).toString())
+      console.log("test: ", test);
+      console.log("typeof test: ", typeof test)
+
+      if (!(preview instanceof Error) && !(spotPreview instanceof Error)) {
         switch(trade) {
           case 'sellDai':
             console.log('preview: ', roundTo(parseFloat(ethers.utils.formatEther(preview)), 3));
@@ -206,13 +218,13 @@ if (!(preview instanceof Error) && !(spotPreview instanceof Error)) {
             if(inputValue === '') {setToQuantity(0);}
             setAPR( calculateAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) );                  
             setPriceImpact(( calculateAPR( ethers.utils.parseEther('1'), spotPreview, activeSeries?.maturity ) ) - ( calculateAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) ));   
-            console.log("fyDaiReservesReal: ", ethers.utils.formatEther(fyDaiReservesReal).toString())
-            console.log("fyDaiReservesVirtual: ", ethers.utils.formatEther(fyDaiReservesVirtual).toString())
-            console.log("daiReserves: ", ethers.utils.formatEther(daiReserves).toString())
-            console.log("activeSeries?.maturity: ", activeSeries?.maturity.toString())
-            console.log("preview: ", ethers.utils.formatEther(preview).toString())
+            //const fyDai = BigNumber.from(roundTo(parseFloat(ethers.utils.formatEther(preview)), 3).toString());
+            //console.log("fyDai", fyDai);
+            //console.log("typeof fyDai", typeof fyDai);
+            const fee = getFee(daiReserves, fyDaiReservesVirtual, ethers.utils.parseEther("1"), timeTillMaturity);
             console.log('APR: ', calculateAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ));
             console.log('priceImpact: ', ( calculateAPR( ethers.utils.parseEther('1'), spotPreview, activeSeries?.maturity ) ) - ( calculateAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity ) ) );
+            console.log("fee", fee);
             break;
           case 'buyDai':
             setFromQuantity(roundTo(parseFloat(ethers.utils.formatEther(preview)), 3));
