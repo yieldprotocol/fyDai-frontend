@@ -1,7 +1,6 @@
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 import { ethers, BigNumber }  from 'ethers';
 
-import { parse } from 'mathjs';
 import FYDai from '../contracts/FYDai.json';
 
 import { useSignerAccount } from './connectionHooks';
