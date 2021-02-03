@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import styled, { css } from 'styled-components';
-import { format } from 'date-fns-tz';
+import { format } from 'date-fns';
 import { Box, Text, Collapsible, ThemeContext } from 'grommet';
 
 import {
