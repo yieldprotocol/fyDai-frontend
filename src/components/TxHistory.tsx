@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import styled, { css } from 'styled-components';
-import moment from 'moment';
+import { format } from 'date-fns-tz';
 import { Box, Text, Collapsible, ThemeContext } from 'grommet';
 
 import {
@@ -47,7 +47,7 @@ const TxHistory = ( { filterTerms, series }: HistoryProps) => {
             { (item.event === 'Deposited' || item.event === 'Withdrew') && `${item.collateral} collateral`}
             { (item.event === 'Added' || item.event === 'Removed') && 'liquidity Tokens '} 
             { item.event === 'Imported' && ' Maker debt to ' }
-            { item.maturity && moment.unix(item.maturity).format('MMMM YYYY') }
+            { item.maturity && format( new Date(item.maturity*1000), 'MMMM yyyy') }
             { item.APR && `@ ${cleanValue(item.APR, 2)}%` }
           </Text>
         </Box>
@@ -174,7 +174,7 @@ const TxHistory = ( { filterTerms, series }: HistoryProps) => {
                       </Text>
                     </Box>
                     <Box basis='25%' align='center'><Text size='xsmall'> {x.amount.toFixed(2)} </Text></Box>
-                    <Box basis='25%' align='center'><Text size='xsmall'> {moment(x.date_).format('DD MMM YYYY')} </Text></Box>
+                    <Box basis='25%' align='center'><Text size='xsmall'> { format( new Date(x.date*1000), 'dd MMM yyyy') } </Text></Box>
                     <Box>
                       <Text size='xsmall'> 
                         {itemOpen !== key_ ? <ChevronDown /> : <ChevronUp /> }
