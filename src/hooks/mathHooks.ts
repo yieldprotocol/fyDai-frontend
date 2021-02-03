@@ -101,25 +101,27 @@ export const useMath = () => {
     tradeType: string,  
     amount: any,
     series: IYieldSeries,
-  ): string  => {
-
+  ): string => {
     const { daiReserves, fyDaiVirtualReserves }  = series;
-    const ttm: string = secondsToFrom( series.maturity.toString() ); 
+    const ttm: string = secondsToFrom( series.maturity.toString() );
 
-    switch (tradeType) {
-      case 'buyDai':
-        return floorDecimal( buyDai(daiReserves, fyDaiVirtualReserves, amount, ttm) );
-      case 'sellDai': 
-        return floorDecimal( sellDai(daiReserves, fyDaiVirtualReserves, amount, ttm));
-      case 'buyFYDai':
-        return floorDecimal( buyFYDai(daiReserves, fyDaiVirtualReserves, amount, ttm));
-      case 'SellFYDai':
-        return floorDecimal( sellFYDai(daiReserves, fyDaiVirtualReserves, amount, ttm));
-      default: 
-        return '0';
+    try {
+      switch (tradeType) {
+        case 'buyDai':
+          return floorDecimal( buyDai(daiReserves, fyDaiVirtualReserves, amount, ttm) );
+        case 'sellDai': 
+          return floorDecimal( sellDai(daiReserves, fyDaiVirtualReserves, amount, ttm));
+        case 'buyFYDai':
+          return floorDecimal( buyFYDai(daiReserves, fyDaiVirtualReserves, amount, ttm));
+        case 'sellFYDai':
+          return floorDecimal( sellFYDai(daiReserves, fyDaiVirtualReserves, amount, ttm));
+        default: 
+          return '0';
+      }
+    } catch (e) {
+      return e;
     }
   };
-
 
   return {
     calculateAPR,
