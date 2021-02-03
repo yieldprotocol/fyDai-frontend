@@ -23,10 +23,9 @@ const contractMap = new Map<string, any>([
  * @returns { boolean } getBalance
  */
 export function useToken() {
-  // const { state: { provider, account } } = useContext(ConnectionContext);
+
   const { signer, provider, account, fallbackProvider } = useSignerAccount();
   const { handleTx, handleTxRejectError } = useTxHelpers();
-
   const { proxyExecute } = useDsProxy();
 
   /**
@@ -101,6 +100,7 @@ export function useToken() {
     series:IYieldSeries|null,
     asProxy: boolean = false,  // address of the proxy used
   ) => {
+
     let tx:any;
     /* Processing and sanitizing input */
     const parsedAmount = amount;
@@ -123,13 +123,14 @@ export function useToken() {
       /* Transaction reporting & tracking */
       await handleTx({ tx, msg: 'Token authorization', type: 'AUTH_TOKEN', series: series||null, value: null });
       
-    } else {  
-      const calldata = contract.interface.encodeFunctionData('approve', [delegateAddr, parsedAmount]);
+    } else { 
+
+      const calldata = contract.interface.encodeFunctionData('approve', [delegateAddr, parsedAmount]);   
       tx = await proxyExecute( 
         tokenAddr,
         calldata,
         { },
-        { tx:null, msg: 'Token authorization', type: 'AUTH_TOKEN', series: series||null, value : null  }
+        { tx:null, msg: 'Token authorization', type: 'AUTH_TOKEN', series: series || null, value : null  }
       );
     }
 
