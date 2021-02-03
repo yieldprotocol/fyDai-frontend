@@ -11,7 +11,7 @@ import { VscHistory as History } from 'react-icons/vsc';
 
 /* utils and support */
 import { cleanValue, nFormatter } from '../utils';
-import { divDecimal, mulDecimal, calcTokensMinted, secondsToFrom, fyDaiForMint } from '../utils/yieldMath';
+import { secondsToFrom, fyDaiForMint } from '../utils/yieldMath';
 
 /* contexts */
 import { YieldContext } from '../contexts/YieldContext';
@@ -25,6 +25,7 @@ import { useToken } from '../hooks/tokenHook';
 import { useTxActive } from '../hooks/txHooks';
 import { usePoolProxy } from '../hooks/poolProxyHook';
 import { usePool } from '../hooks/poolHook';
+import { useMath } from '../hooks/mathHooks';
 
 /* containers */ 
 import RemoveLiquidity from './RemoveLiquidity';
@@ -58,7 +59,6 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
   /* state from contexts */
-  const { state: { deployedContracts } } = useContext(YieldContext);
   const { state: { activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
   const activeSeries = seriesData.get(activeSeriesId);
   const { state: userState, actions: userActions } = useContext(UserContext);
@@ -78,11 +78,9 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
 
   /* init hooks */
-  const { getFyDaiReserves } = usePool();
+  const { estPoolShare } = useMath();
   const { addLiquidity } = usePoolProxy();
-  const { getBalance } = useToken();
-  const [newPoolShare, setNewPoolShare] = useState<string>();
-  const [calculating, setCalculating] = useState<boolean>(false);
+  const [ newPoolShare, setNewPoolShare ] = useState<string>();
   const { account } = useSignerAccount();
   const [ txActive ] = useTxActive(['ADD_LIQUIDITY', 'REMOVE_LIQUIDITY']);
   const [ removeTxActive ] = useTxActive(['REMOVE_LIQUIDITY']);
@@ -92,7 +90,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
   /* execution procedure */ 
   const addLiquidityProcedure = async () => { 
     if (inputValue && !addLiquidityDisabled ) {
- 
+
       await addLiquidity( activeSeries, inputValue, forceBorrow );
       
       /* clean up and refresh */ 
@@ -105,37 +103,25 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
     }   
   };
 
-  // TODO move to mathHooks 
-  const calculateNewPoolShare = async () => {
-    setCalculating(true);
-    const daiRes = await getBalance(deployedContracts.Dai, 'Dai', activeSeries.poolAddress);
-    const fyDaiRes = await getBalance(activeSeries.fyDaiAddress, 'FYDai', activeSeries.poolAddress);
-    const fyDaiVirtual = await getFyDaiReserves(activeSeries.poolAddress);
-    
-    const _newTokens = calcTokensMinted(
-      daiRes, 
-      fyDaiRes, 
-      activeSeries.totalSupply, 
-      ethers.utils.parseEther(debouncedInput)
-    );
-    const _newBalance = _newTokens.add(activeSeries.poolTokens);
-    const _newTotalSupply = activeSeries.totalSupply.add(_newTokens);
-    const _ratio = divDecimal( _newBalance, _newTotalSupply );
-    const _percent = mulDecimal( _ratio, '100'); 
-    setNewPoolShare(cleanValue(_percent, 4));
-
-    const fyDaiMinted = fyDaiForMint(daiRes, fyDaiRes, fyDaiVirtual, ethers.utils.parseEther(debouncedInput), secondsToFrom(activeSeries.maturity) );
-    if ( (ethers.BigNumber.from(fyDaiMinted)).gte(fyDaiRes) ) {
-      setForceBorrow(true);
-    }
-    
-    setCalculating(false);
-  };
-
-
   /* handle value calculations based on input changes */
   useEffect(()=>{
-    activeSeries && debouncedInput && calculateNewPoolShare();
+    if (activeSeries && debouncedInput) {
+
+      /* calculate new pool share */
+      const estShare = estPoolShare(activeSeries, debouncedInput);
+      setNewPoolShare(cleanValue(estShare, 4));
+
+      /* check whether to froce 'BORROW and POOL' stratgey */
+      const fyDaiMinted = fyDaiForMint(
+        activeSeries.daiReserves, 
+        activeSeries.fyDaiReserves, 
+        activeSeries.fyDaiVirtualReserves, 
+        ethers.utils.parseEther(debouncedInput), 
+        secondsToFrom(activeSeries.maturity) 
+      );
+      (ethers.BigNumber.from(fyDaiMinted)).gte(activeSeries.fyDaiReserves,) && setForceBorrow(true); 
+    }
+
   }, [debouncedInput]);
   
   /* Add liquidity disabling logic */
@@ -313,7 +299,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                         labelExtra: 'after adding liquidity',
                         visible: inputValue>0,
                         active: debouncedInput,
-                        loading: calculating,           
+                        loading: false,           
                         value: newPoolShare? `${newPoolShare}%`: '',
                         valuePrefix: null,
                         valueExtra: null,

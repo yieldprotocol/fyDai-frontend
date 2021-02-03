@@ -4,7 +4,7 @@ import { ethers, BigNumber } from 'ethers';
 
 /* utils and support */
 import { cleanValue } from '../utils';
-import { calculateAPR, divDecimal, mulDecimal, floorDecimal, sellFYDai, buyFYDai, secondsToFrom, getFee } from '../utils/yieldMath';
+import { calculateAPR, divDecimal, mulDecimal, floorDecimal, sellFYDai, secondsToFrom } from '../utils/yieldMath';
 import { IYieldSeries } from '../types';
 
 /* contexts */
@@ -16,7 +16,6 @@ import { usePool } from '../hooks/poolHook';
 import { useToken } from '../hooks/tokenHook';
 import { useController } from '../hooks/controllerHook';
 import { useEvents } from '../hooks/eventHooks';
-import { CgArrowsExpandDownLeft } from 'react-icons/cg';
 
 const SeriesContext = React.createContext<any>({});
 

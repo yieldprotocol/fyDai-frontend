@@ -246,21 +246,28 @@ export const splitLiquidity =(
 /**
    * Calculate amount of LP Tokens that will be minted  
    *
-   * @param { BigNumber } xReserves // eg. dai balance of pool
-   * @param { BigNumber } yReserves// eg. yDai series balance of Pool
-   * @param { BigNumber } totalSupply // total LP tokens
-   * @param { BigNumber } xInput // dai input value by user
+   * @param { BigNumber | string } xReserves // eg. dai balance of pool
+   * @param { BigNumber  | string} yReserves// eg. yDai series balance of Pool
+   * @param { BigNumber | string  } totalSupply // total LP tokens
+   * @param { BigNumber | string } xInput // dai input value by user
    * 
-   * @returns { BigNumber } number of tokens minted
+   * @returns { string } number of tokens minted
    */
 export const calcTokensMinted =(
-  xReserves: BigNumber,
-  yReserves: BigNumber,
-  totalSupply: BigNumber,
-  xInput: BigNumber,
-) => {
-  const xOffered = (xInput.mul(xReserves)).div(yReserves.add(xReserves));
-  return (totalSupply).mul(xOffered).div(xReserves);
+  xReserves: BigNumber | string,
+  yReserves: BigNumber | string,
+  totalSupply: BigNumber| string,
+  xInput: BigNumber | string,
+) : string => {
+
+  const xReserves_ = new Decimal(xReserves.toString());
+  const yReserves_ = new Decimal(yReserves.toString());
+  const totalSupply_ = new Decimal(totalSupply.toString());
+  const xInput_ = new Decimal(xInput.toString());
+
+  const xOffered = (xInput_.mul(xReserves_)).div(yReserves_.add(xReserves_));
+
+  return (totalSupply_).mul(xOffered).div(xReserves_).toFixed() ;
 };
 
 /**
@@ -272,7 +279,11 @@ export const calcTokensMinted =(
    * 
    * @returns { string } human readable string
    */
-export const calculateSlippage = (value: BigNumber | string, slippage: BigNumber | string = '0.005', minimise:boolean=false ):string => {
+export const calculateSlippage = (
+  value: BigNumber | string, 
+  slippage: BigNumber | string = '0.005', 
+  minimise:boolean=false 
+):string => {
   const value_ = new Decimal(value.toString()); 
   const _slippageAmount = floorDecimal( mulDecimal(value, slippage));
   if (minimise) {
@@ -292,7 +303,6 @@ export const calculateSlippage = (value: BigNumber | string, slippage: BigNumber
    * @returns { string | undefined } human readable string
    */
 export const calculateAPR =(
-
   tradeValue: BigNumber | string,
   amount: BigNumber | string,
   maturity: number,

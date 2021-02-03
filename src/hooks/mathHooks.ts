@@ -4,6 +4,7 @@ import { ethers, BigNumber }  from 'ethers';
 import { YieldContext } from '../contexts/YieldContext';
 
 import { 
+  divDecimal,
   mulDecimal, 
   collateralizationRatio, 
   borrowingPower, 
@@ -14,6 +15,7 @@ import {
   sellFYDai,
   secondsToFrom,
   floorDecimal,
+  calcTokensMinted
 } from '../utils/yieldMath';
 import { IYieldSeries } from '../types';
 
@@ -73,6 +75,39 @@ export const useMath = () => {
     return borrowingPower( collateralAmount, feedData.ethPrice, debtValue ); 
   };
 
+
+  /**
+   * Estimates the pool share given 
+   *
+   * @param {IYieldSeries } series amount of collateral ( in wad/wei precision )
+   * @param {BigNumber | string } tokens extra tokens to factor in (defaults to none 0)
+   * @returns { string | undefined }
+   */
+  const estPoolShare = (
+    series: IYieldSeries,
+    amount: BigNumber | string,
+    asPercentage: boolean = true,
+  ) => {
+
+    const { daiReserves, fyDaiReserves, fyDaiVirtualReserves, totalSupply, poolTokens } = series;
+    const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(amount.toString());
+    
+    const _newTokens = calcTokensMinted(
+      daiReserves, 
+      fyDaiReserves,
+      totalSupply, 
+      parsedAmount
+    );
+    
+    const _newBalance = BigNumber.from( floorDecimal( _newTokens) ).add( poolTokens || 0 );
+    const _newTotalSupply = totalSupply.add( floorDecimal( _newTokens) );
+    const _ratio = divDecimal( _newBalance, _newTotalSupply );
+    const _percent = mulDecimal( _ratio, '100'); 
+
+    return asPercentage? _percent : _ratio; 
+  };
+
+
   /**
    * Annualised Yield Rate
    *
@@ -131,6 +166,7 @@ export const useMath = () => {
     estCollateralRatio,
     estBorrowingPower,
     estTrade,
+    estPoolShare
   } as const;
 
 };
