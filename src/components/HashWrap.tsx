@@ -22,7 +22,6 @@ const HashWrap = ({ children, hash } : any) => {
       ()=> setCopied(false),
       5000
     ))();
-    // return () => setCopied(false);
   }, [copied]);
 
   return (

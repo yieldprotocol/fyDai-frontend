@@ -9,7 +9,6 @@ import { SeriesContext } from '../contexts/SeriesContext';
 import SeriesSelector from './SeriesSelector';
 import AprBadge from './AprBadge';
 import RaisedButton from './RaisedButton';
-import FlatButton from './FlatButton';
 
 interface ISeriesDescriptorProps {
   activeView: string;
@@ -47,7 +46,6 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
           margin={{ bottom:'-18px' }}
         >
           <Box
-            // pad={minimized? { bottom:'small', horizontal:'small' }: 'small'}
             pad='small'
           >
             <Box
@@ -97,25 +95,6 @@ function SeriesDescriptor( props: ISeriesDescriptorProps ) {
                     </Box>}
                   onClick={()=>setSelectorOpen(true)}
                 />
-
-                {/* {minimized && <FlatButton
-                  background={modColor( activeSeries?.seriesColor, 50)}
-                  label={(!mobile ) ?        
-                    <Box align='center' direction='row' gap='small'>
-                      <Text size='xsmall' color={activeSeries?.seriesTextColor}> <ChangeSeries /> </Text>
-                      <Text size='xsmall' color={activeSeries?.seriesTextColor}>
-                        Change Series              
-                      </Text>
-                    </Box>
-                    : 
-                    <Box align='center' direction='row' gap='small'>
-                      <ChangeSeries />
-                      <Text size='xsmall' color={activeSeries?.seriesTextColor}>
-                        Change          
-                      </Text>
-                    </Box>}
-                  onClick={()=>setSelectorOpen(true)}
-                />}  */}
 
               </Box>
             </Box>

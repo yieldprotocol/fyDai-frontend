@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import { Anchor, Footer, Text, Box } from 'grommet';
 import { FaDiscord as Discord } from 'react-icons/fa';
 import {
@@ -112,7 +112,6 @@ const YieldFooter = (props: any) => {
           </Anchor>
         }
       </Box>
-      {/* <Box onClick={()=>genVault(authorization.dsProxyAddress)}>test</Box> */}
     </Footer>
   );
 };

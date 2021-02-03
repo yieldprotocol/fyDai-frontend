@@ -49,8 +49,7 @@ function CollateralDescriptor( { backToBorrow, children }: ICollateralDescriptor
           onClick={()=>backToBorrow()}
         />
       </Box>
-      }
-        
+      }     
       <Box pad={{ horizontal:'small' }}>
         { children }
       </Box>
