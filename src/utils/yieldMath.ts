@@ -54,7 +54,7 @@ export function sellDai(
   dai: BigNumber | string, 
   timeTillMaturity: BigNumber | string,
   withNoFee: boolean = false // optional: default === false
-): any {
+): string {
   
   const daiReserves_ = new Decimal(daiReserves.toString());
   const fyDaiReserves_ = new Decimal(fyDaiReserves.toString());
@@ -82,7 +82,7 @@ export function sellFYDai(
   fyDai: BigNumber | string, 
   timeTillMaturity: BigNumber | string,
   withNoFee: boolean = false // optional: default === false
-): any {
+): string {
   const daiReserves_ = new Decimal(daiReserves.toString());
   const fyDaiReserves_ = new Decimal(fyDaiReserves.toString());
   const timeTillMaturity_ = new Decimal(timeTillMaturity.toString());
@@ -109,7 +109,7 @@ export function buyDai(
   dai: BigNumber | string, 
   timeTillMaturity: BigNumber | string,
   withNoFee: boolean = false // optional: default === false
-): any {
+): string {
 
   const daiReserves_ = new Decimal(daiReserves.toString());
   const fyDaiReserves_ = new Decimal(fyDaiReserves.toString());
@@ -284,8 +284,8 @@ export const calculateSlippage = (value: BigNumber | string, slippage: BigNumber
 /**
    * Calculate Annualised Yield Rate
    *
-   * @param { BigNumber } rate // current [Dai] price per unit y[Dai]
-   * @param { BigNumber } amount // y[Dai] amount at maturity
+   * @param { BigNumber | string } rate // current [Dai] price per unit y[Dai]
+   * @param { BigNumber | string } amount // y[Dai] amount at maturity
    * @param { number } maturity  // date of maturity
    * @param { number } fromDate // ***optional*** start date - defaults to now()
    * 
