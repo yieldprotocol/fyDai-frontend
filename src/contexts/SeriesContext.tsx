@@ -188,9 +188,9 @@ const SeriesProvider = ({ children }:any) => {
           fyDaiBalance_: ethers.utils.formatEther(x.fyDaiBalance) === '0.0' ? '0.00' : cleanValue(ethers.utils.formatEther(x.fyDaiBalance), 2),
           ethDebtFYDai_: ethers.utils.formatEther(x.ethDebtFYDai) === '0.0'  ? '0.00' : cleanValue(ethers.utils.formatEther(x.ethDebtFYDai), 2),
           ethDebtDai_: cleanValue(ethers.utils.formatEther(x.ethDebtDai), 2),
-          poolTokens_: cleanValue(ethers.utils.formatEther(x.poolTokens), 6),
-          poolRatio_ : cleanValue(poolRatio, 4),
-          poolPercent: cleanValue(poolPercent, 4),
+          poolTokens_: cleanValue(ethers.utils.formatEther(x.poolTokens), 4),
+          poolRatio_ : cleanValue(poolRatio, 3),
+          poolPercent: cleanValue(poolPercent, 3),
           poolState,
         }
       );

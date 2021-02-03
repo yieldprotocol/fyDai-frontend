@@ -98,7 +98,7 @@ export const useMath = () => {
       totalSupply, 
       parsedAmount
     );
-    
+
     const _newBalance = BigNumber.from( floorDecimal( _newTokens) ).add( poolTokens || 0 );
     const _newTotalSupply = totalSupply.add( floorDecimal( _newTokens) );
     const _ratio = divDecimal( _newBalance, _newTotalSupply );

@@ -109,7 +109,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
 
       /* calculate new pool share */
       const estShare = estPoolShare(activeSeries, debouncedInput);
-      setNewPoolShare(cleanValue(estShare, 4));
+      setNewPoolShare(cleanValue(estShare, 3));
 
       /* check whether to froce 'BORROW and POOL' stratgey */
       const fyDaiMinted = fyDaiForMint(

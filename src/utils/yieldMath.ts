@@ -266,8 +266,7 @@ export const calcTokensMinted =(
   const xInput_ = new Decimal(xInput.toString());
 
   const xOffered = (xInput_.mul(xReserves_)).div(yReserves_.add(xReserves_));
-
-  return (totalSupply_).mul(xOffered).div(xReserves_).toFixed() ;
+  return (totalSupply_).mul(xOffered).div(xReserves_).toString() ;
 };
 
 /**
