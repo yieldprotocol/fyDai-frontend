@@ -234,11 +234,12 @@ export const splitLiquidity =(
   xAmount: BigNumber | string,
 ) : [string, string] => {
 
-  const xAmount_ = new Decimal(xAmount.toString());
   const xReserves_ = new Decimal(xReserves.toString());
   const yReserves_ = new Decimal(yReserves.toString()); 
+  const xAmount_ = new Decimal(xAmount.toString());
 
   const xPortion = ( xAmount_.mul(xReserves_) ).div( yReserves_.add(xReserves_) );
+  
   const yPortion = xAmount_.sub(xPortion);
   return [ xPortion.toFixed(), yPortion.toFixed() ];
 };
@@ -261,11 +262,13 @@ export const calcTokensMinted =(
 ) : string => {
 
   const xReserves_ = new Decimal(xReserves.toString());
-  const yReserves_ = new Decimal(yReserves.toString());
   const totalSupply_ = new Decimal(totalSupply.toString());
+  const yReserves_ = new Decimal(yReserves.toString());
   const xInput_ = new Decimal(xInput.toString());
 
-  const xOffered = (xInput_.mul(xReserves_)).div(yReserves_.add(xReserves_));
+  const xOffered = (xInput_.mul(xReserves_)).div( yReserves_.add(xReserves_) );   
+  // const [xOffered, ] =  splitLiquidity(xReserves, yReserves, xInput);
+
   return (totalSupply_).mul(xOffered).div(xReserves_).toString() ;
 };
 
