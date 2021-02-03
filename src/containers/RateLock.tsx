@@ -13,7 +13,7 @@ import {
 } from 'react-icons/fi';
 
 /* utils and support */
-import { cleanValue, modColor, buildGradient } from '../utils';
+import { cleanValue, modColor, buildGradient, logEvent } from '../utils';
 import logoDark from '../assets/images/logo.svg';
 
 /* contexts */
@@ -25,7 +25,6 @@ import { YieldContext } from '../contexts/YieldContext';
 import { useDebounce, useIsLol } from '../hooks/appHooks';
 import { useMath } from '../hooks/mathHooks';
 import { useTxActive } from '../hooks/txHooks';
-import { usePool } from '../hooks/poolHook';
 import { useImportProxy } from '../hooks/importProxyHook';
 import { useMaker } from '../hooks/makerHook';
 import { useSignerAccount } from '../hooks/connectionHooks';
@@ -43,7 +42,6 @@ import MakerMark from '../components/logos/MakerMark';
 import TxStatus from '../components/TxStatus';
 import AprBadge from '../components/AprBadge';
 import SeriesSelector from '../components/SeriesSelector';
-import { logEvent } from '../utils';
 
 interface IRateLockProps {
   close?: any; // close is also used as a indicator used as a layer (only a layer should have a closed)
@@ -66,7 +64,6 @@ const makerBackColor = '#f6f8f9';
 const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
-  const theme = useContext<any>(ThemeContext);
   const history = useHistory();
   const { vault : vaultParam }:any = useParams();
 
@@ -109,10 +106,9 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
 
   /* hooks */
   const { account } = useSignerAccount();
-  const { previewPoolTx }  = usePool();
   const { importPosition, importVault,  } = useImportProxy();
   const { minWethForAmount } = useMaker();
-  const { calculateAPR } = useMath();
+  const { calculateAPR, estTrade } = useMath();
   const [ txActive ] = useTxActive(['IMPORT']);
   const debouncedCollInput = useDebounce(collInputValue, 500);
   const debouncedDebtInput = useDebounce(debtInputValue, 500);
@@ -218,7 +214,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
       setCollInputValue('');
       setMinCollateral(ethers.utils.formatEther(await minWethForAmount(debouncedDebtInput)));
 
-      const preview = await previewPoolTx('buyDai', activeSeries, debouncedDebtInput, true);     
+      const preview = estTrade('buyDai', activeSeries, debouncedDebtInput);     
       if (!(preview instanceof Error)) {
         const _apr = calculateAPR( ethers.utils.parseEther(debouncedDebtInput.toString()), preview, activeSeries.maturity );
         setAPR(cleanValue(_apr.toString(), 2) );
@@ -292,7 +288,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
   /* Get the Max APR for the selected Vault */
   useEffect(()=>{
     selectedVault?.vaultDaiDebt_> 0 && (async ()=>{
-      const preview = await previewPoolTx('buyDai', activeSeries, selectedVault.vaultDaiDebt_, true);
+      const preview = estTrade('buyDai', activeSeries, selectedVault.vaultDaiDebt_);
       if (!(preview instanceof Error)) {
         const _apr = calculateAPR( ethers.utils.parseEther(selectedVault?.vaultDaiDebt_), preview, activeSeries.maturity);
         setMaxAPR( cleanValue(_apr.toString(), 2) );

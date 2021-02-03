@@ -68,7 +68,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
   /* local state */ 
   const [ hasDelegated ] = useState<boolean>(true);
   const [ inputValue, setInputValue ] = useState<any>(amnt || undefined);
-  const [inputRef, setInputRef] = useState<any>(null);
+  const [ inputRef, setInputRef ] = useState<any>(null);
   const [ removeLiquidityOpen, setRemoveLiquidityOpen ] = useState<boolean>(false);
   const [ histOpen, setHistOpen ] = useState<boolean>(false);
   const [ explainerOpen, setExplainerOpen ] = useState<boolean>(false);

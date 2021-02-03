@@ -72,7 +72,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
   /* init hooks */ 
   const { previewPoolTx } = usePool();
   const { sellDai } = useBorrowProxy();
-  const { calculateAPR } = useMath();
+  const { calculateAPR, estTrade } = useMath();
   const { account, fallbackProvider } = useSignerAccount();
   const [ txActive ] = useTxActive(['SELL_DAI']);
   const [ closeTxActive ] = useTxActive(['BUY_DAI']);
@@ -102,14 +102,14 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
   /* Handle input (debounce input) changes */
   useEffect(() => {
     activeSeries && !(activeSeries?.isMature()) && !!debouncedInput && ( async () => {
-      const preview = await previewPoolTx('sellDai', activeSeries, debouncedInput, true);
+      const preview = estTrade('sellDai', activeSeries, debouncedInput);
       if (!(preview instanceof Error)) {
         setFYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
         const _apr = calculateAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity );
         setAPR( cleanValue(_apr.toString(), 2) );      
       } else {
         /* if the market doesnt have liquidity just estimate from rate */
-        const rate = await previewPoolTx('sellDai', activeSeries, 1, true);
+        const rate = estTrade('sellDai', activeSeries, 1 );
         !(rate instanceof Error) && setFYDaiValue(debouncedInput*parseFloat((ethers.utils.formatEther(rate))));
         (rate instanceof Error) && setFYDaiValue(0);
         setLendDisabled(true);
@@ -121,7 +121,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
   /* handle active series loads and changes */
   useEffect(() => {
     fallbackProvider && account && activeSeries?.fyDaiBalance_ && !(activeSeries?.isMature()) && ( async () => {
-      const preview = await previewPoolTx('sellFYDai', activeSeries, activeSeries.fyDaiBalance_, true);
+      const preview = estTrade('sellFYDai', activeSeries, activeSeries.fyDaiBalance_);
       !(preview instanceof Error) && setCurrentValue( ethers.utils.formatEther(preview));
     })();
   }, [ activeSeries, account, fallbackProvider ]);

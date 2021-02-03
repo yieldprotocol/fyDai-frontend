@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { BigNumber }  from 'ethers';
+import { ethers, BigNumber }  from 'ethers';
 
 import { YieldContext } from '../contexts/YieldContext';
 
@@ -98,25 +98,27 @@ export const useMath = () => {
 
 
   const estTrade = (
-    tradeType: string,  
-    amount: any,
-    series: IYieldSeries,
-  ): string => {
+    tradeType: string,
+    series: IYieldSeries,  
+    amount: number | BigNumber,
+  ): BigNumber | Error => {
+
+    const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(amount.toString());
     const { daiReserves, fyDaiVirtualReserves }  = series;
     const ttm: string = secondsToFrom( series.maturity.toString() );
 
     try {
       switch (tradeType) {
         case 'buyDai':
-          return floorDecimal( buyDai(daiReserves, fyDaiVirtualReserves, amount, ttm) );
+          return BigNumber.from( floorDecimal( buyDai(daiReserves, fyDaiVirtualReserves, parsedAmount, ttm) ) );
         case 'sellDai': 
-          return floorDecimal( sellDai(daiReserves, fyDaiVirtualReserves, amount, ttm));
+          return BigNumber.from( floorDecimal( sellDai(daiReserves, fyDaiVirtualReserves, parsedAmount, ttm)) );
         case 'buyFYDai':
-          return floorDecimal( buyFYDai(daiReserves, fyDaiVirtualReserves, amount, ttm));
+          return BigNumber.from( floorDecimal( buyFYDai(daiReserves, fyDaiVirtualReserves, parsedAmount, ttm)) );
         case 'sellFYDai':
-          return floorDecimal( sellFYDai(daiReserves, fyDaiVirtualReserves, amount, ttm));
+          return BigNumber.from( floorDecimal( sellFYDai(daiReserves, fyDaiVirtualReserves, parsedAmount, ttm)) );
         default: 
-          return '0';
+          return BigNumber.from('0');
       }
     } catch (e) {
       return e;

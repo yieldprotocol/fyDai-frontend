@@ -386,7 +386,8 @@ export const usePool = () => {
         return value; 
       }
 
-      return BigNumber.from( estTrade( previewType, parsedAmount, series) );
+      /* if runLocal, use the mathHooks estTrade fn. */
+      return estTrade( previewType, series, parsedAmount );
 
     } catch (e) {
       return e;
