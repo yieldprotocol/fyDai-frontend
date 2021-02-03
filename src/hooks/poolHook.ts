@@ -378,19 +378,15 @@ export const usePool = () => {
             value = await contract.sellDaiPreview(parsedAmount); break;
           case 'buyFYDai':
             value = await contract.buyFYDaiPreview(parsedAmount); break;
-          case 'SellFYDai':
+          case 'sellFYDai':
             value = await contract.sellFYDaiPreview(parsedAmount); break;
           default: 
             value = await BigNumber.from('0');
         }
-        console.log(value);
         return value; 
       }
 
       return BigNumber.from( estTrade( previewType, parsedAmount, series) );
-      
-      // console.log( estTrade( previewType, parsedAmount, series) ); 
-      // return BigNumber.from('0');
 
     } catch (e) {
       return e;

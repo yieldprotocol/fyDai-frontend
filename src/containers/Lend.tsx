@@ -121,9 +121,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
   /* handle active series loads and changes */
   useEffect(() => {
     fallbackProvider && account && activeSeries?.fyDaiBalance_ && !(activeSeries?.isMature()) && ( async () => {
-      const preview = await previewPoolTx('sellFYDai', activeSeries, activeSeries.fyDaiBalance_);
-
-      console.log('lend:', activeSeries.fyDaiBalance.toString() , preview.toString() );
+      const preview = await previewPoolTx('sellFYDai', activeSeries, activeSeries.fyDaiBalance_, true);
       !(preview instanceof Error) && setCurrentValue( ethers.utils.formatEther(preview));
     })();
   }, [ activeSeries, account, fallbackProvider ]);
