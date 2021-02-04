@@ -1,9 +1,7 @@
 import React, { useReducer, useEffect, useContext, createContext } from 'react';
 import { useWeb3React } from '@web3-react/core';
-
 import { ethers } from 'ethers';
-import moment from 'moment';
-
+import { format, subDays } from 'date-fns';
 
 import * as utils from '../utils';
 import * as fyMath from '../utils/yieldMath';
@@ -147,8 +145,12 @@ const YieldProvider = ({ children }: any) => {
             maturity: maturity.toNumber(),
             poolAddress,
             maturity_: new Date(maturity * 1000),
-            displayName: moment.utc(maturity * 1000).format('MMMM YYYY'),
-            displayNameMobile: moment.utc(maturity * 1000).format('MMM YYYY'),
+            // displayName: moment.utc(maturity * 1000).format( 'MMMM YYYY'),
+            // displayNameMobile: moment.utc(maturity * 1000).format( 'MMM YYYY'),
+
+            displayName: format( subDays( new Date(maturity*1000), 2), 'MMMM yyyy'  ),
+            displayNameMobile: format( subDays( new Date(maturity*1000), 2 ), 'MMM yyyy' ),
+
             seriesColor: colors.seriesColors[i],
             seriesTextColor: '#222222',
             seriesLightColor: utils.modColor(colors.seriesColors[i], 50),

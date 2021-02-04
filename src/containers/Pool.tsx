@@ -82,8 +82,8 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
   const { getFyDaiReserves } = usePool();
   const { addLiquidity } = usePoolProxy();
   const { getBalance } = useToken();
-  const [newPoolShare, setNewPoolShare] = useState<string>();
-  const [calculating, setCalculating] = useState<boolean>(false);
+  const [ newPoolShare, setNewPoolShare ] = useState<string>();
+  const [ calculating, setCalculating ] = useState<boolean>(false);
   const { account } = useSignerAccount();
   const [ txActive ] = useTxActive(['ADD_LIQUIDITY', 'REMOVE_LIQUIDITY']);
   const [ removeTxActive ] = useTxActive(['REMOVE_LIQUIDITY']);
@@ -388,10 +388,18 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                       },
                     ]}
                     />
+                    {
+                      useBuyToAddLiquidity && 
+                      !forceBorrow && 
+                      <Box pad={{ horizontal:'medium' }}>
+                        <Text size='xxsmall'> Note: When adding liquidity using the 'BUY & POOL' strategy, the App may use less Dai than requested to avoid transaction failure. </Text>
+                      </Box>
+                    } 
+
                   </Collapsible>
-                </Box>
+                </Box> 
               </Box> 
-            
+
               <Box gap='small' fill='horizontal' align='center' pad={{ vertical:'small' }}>
                 <ActionButton
                   onClick={()=>addLiquidityProcedure()} 
@@ -402,6 +410,8 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                 />
               </Box>
             </>}
+
+            
 
             { activeSeries?.isMature() &&
             <SeriesMatureBox />}
