@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
-import moment from 'moment';
+import { format, subDays } from 'date-fns';
 import { Box, ResponsiveContext, Text } from 'grommet';
 
 import {
@@ -25,7 +25,7 @@ function AprBadge({ activeView, series, animate }:IAprBadgeProps) {
   /* Set Series description/display name */
   useEffect(()=>{
     setSeriesMature(series.isMature());
-    setSeriesApr(moment(series.maturity*1000).format('MMM \'YY'));
+    setSeriesApr( format( subDays( new Date(series.maturity), 2), 'MMM \'YY'));
     series.poolState?.active && ( async () => setSeriesApr( `${series.yieldAPR_} %`) )(); 
   }, [ series ]);
 
@@ -66,7 +66,14 @@ function AprBadge({ activeView, series, animate }:IAprBadgeProps) {
           direction='row'
         >
           <Loading condition={!seriesApr} size='xsmall'>
-            <Text size={mobile?'xxsmall':'xsmall'} color={series?.seriesTextColor}> { activeView==='pool'? moment.utc(series?.maturity_).format('MMM \'YY') : seriesApr } </Text> 
+            <Text 
+              size={mobile?'xxsmall':'xsmall'} 
+              color={series?.seriesTextColor}
+            > 
+              { activeView==='pool'? 
+                format( subDays( new Date(series.maturity*1000), 2), 'MMM yy')
+                : seriesApr } 
+            </Text> 
           </Loading>
         </Box>
       </Box>
