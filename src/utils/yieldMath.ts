@@ -11,7 +11,7 @@ export const SECONDS_PER_YEAR: number = (365 * 24 * 60 * 60);
 export const k = new Decimal(1 / (4 * SECONDS_PER_YEAR) ); // inv of seconds in 4 years
 export const g1 = new Decimal(950 / 1000);
 export const g2 = new Decimal(1000 / 950);
-// const fee = new Decimal(1000000000000);
+const precisionFee = new Decimal(1000000000000);
 
 // https://www.desmos.com/calculator/mllhtohxfx
 export function mint(
@@ -74,9 +74,9 @@ export function sellDai(
   const Zxa = (daiReserves_.add(dai_)).pow(a);
   const sum = (Za.add(Ya)).sub(Zxa);
   const y = fyDaiReserves_.sub( sum.pow(invA) ) ; 
-  // const yFee = y.sub(fee);
+  const yFee = y.sub(precisionFee);
 
-  return y.toString();
+  return yFee.toString();
 }
 
 // https://www.desmos.com/calculator/6jlrre7ybt
@@ -102,9 +102,9 @@ export function sellFYDai(
   const Yxa = (fyDaiReserves_.add(fyDai_)).pow(a);
   const sum = Za.add(Ya.sub(Yxa));
   const y = daiReserves_.sub(sum.pow(invA));
-  // const yFee = y.sub(fee);
+  const yFee = y.sub(precisionFee);
 
-  return y.toString();
+  return yFee.toString();
 }
 
 // https://www.desmos.com/calculator/0rgnmtckvy
@@ -131,9 +131,9 @@ export function buyDai(
   const Zxa = (daiReserves_.sub(dai_)).pow(a);
   const sum = (Za.add(Ya)).sub(Zxa);
   const y = (sum.pow(invA)).sub(fyDaiReserves_);
-  // const yFee = y.add(fee);
+  const yFee = y.add(precisionFee);
 
-  return y.toString();
+  return yFee.toString();
 }
 
 // https://www.desmos.com/calculator/ws5oqj8x5i
@@ -160,9 +160,9 @@ export function buyFYDai(
   const Yxa = (fyDaiReserves_.sub(fyDai_)).pow(a);
   const sum = Za.add( Ya.sub(Yxa));
   const y = (sum.pow(invA) ).sub(daiReserves_);
-  // const yFee = y.add(fee);
+  const yFee = y.add(precisionFee);
 
-  return y.toString();
+  return yFee.toString();
 }
 
 export function getFee(
