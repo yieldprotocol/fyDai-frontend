@@ -6,6 +6,7 @@ import { Box, TextInput, Text, ResponsiveContext, Keyboard, Collapsible } from '
 import { 
   FiCheckCircle as Check,
   FiArrowLeft as ArrowLeft,
+  FiLayers as ChangeSeries
 } from 'react-icons/fi';
 
 import { cleanValue } from '../utils';
@@ -18,6 +19,7 @@ import { useSignerAccount } from '../hooks/connectionHooks';
 import { useDebounce, useIsLol } from '../hooks/appHooks';
 import { useTxActive } from '../hooks/txHooks';
 import { useBorrowProxy } from '../hooks/borrowProxyHook';
+import { useRollProxy } from '../hooks/rollProxyHook';
 
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
@@ -27,8 +29,10 @@ import FlatButton from '../components/FlatButton';
 import DaiMark from '../components/logos/DaiMark';
 import YieldMobileNav from '../components/YieldMobileNav';
 
-import { logEvent } from '../utils/analytics';
 import SeriesDescriptor from '../components/SeriesDescriptor';
+import RollSelector from '../components/RollSelector';
+import StickyButton from '../components/StickyButton';
+import { IYieldSeries } from '../types';
 
 interface IRepayProps {
   close?:any;
@@ -51,10 +55,13 @@ function Repay({ close }:IRepayProps) {
   const [ repayDisabled, setRepayDisabled ] = useState<boolean>(true);
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
+  const [ isRollDebt, setIsRollDebt ] = useState<boolean>(true);
+  const [ destinationSeries, setDestinationSeries ] = useState<IYieldSeries>();
 
   /* init hooks */
   const { repayDaiDebt } = useBorrowProxy();
-  const [ txActive ] = useTxActive(['repay']);
+  const { rollDebt } = useRollProxy();
+  const [ txActive ] = useTxActive(['REPAY', 'ROLL_DEBT']);
   const { account } = useSignerAccount();
   const isLol = useIsLol(inputValue);
   const debouncedInput = useDebounce(inputValue, 500);
@@ -77,6 +84,27 @@ function Repay({ close }:IRepayProps) {
       } else {
         userActions.updateUser();
         seriesActions.updateSeries([activeSeries]);
+      }      
+    }
+  };
+
+  const rollDebtProcedure = async (value:number) => {
+    if (!repayDisabled && destinationSeries) {
+      !activeSeries?.isMature() && close();
+      /* roll using proxy */
+      await rollDebt(activeSeries, destinationSeries, value.toString(), 'ETH-A' );
+         
+      /* clean up and refresh */ 
+      setInputValue(undefined);
+
+      if (activeSeries?.isMature()) {
+        await Promise.all([
+          userActions.updateUser(),
+          seriesActions.updateAllSeries(),
+        ]);
+      } else {
+        userActions.updateUser();
+        seriesActions.updateAllSeries();
       }      
     }
   };
@@ -107,6 +135,14 @@ function Repay({ close }:IRepayProps) {
     }
   }, [ debouncedInput, daiBalance ]);
 
+  /* get seriesData into an array and filter out the active series and mature series for  */
+  useEffect(()=>{
+    const arr = [...seriesData].map(([ ,value]) => (value));
+    const filteredArr = arr.filter((x:IYieldSeries) => !x.isMature() && x.maturity !== activeSeries.maturity );
+    // setSeriesArr(filteredArr);
+    setDestinationSeries(filteredArr[0]);
+  }, [ activeSeries ]);
+
   return (
     <Keyboard 
       onEsc={() => setInputValue(undefined)}
@@ -135,48 +171,80 @@ function Repay({ close }:IRepayProps) {
               { (activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero)) ?
              
                 <Box gap='medium' align='center' fill='horizontal'>
-                  <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to Repay</Text>
+                  <Box alignSelf='start' direction='row' justify='between' align='center'>
+                    {/* <Text size='large' color='text' weight='bold'>Amount to:  </Text> */}
+
+                    <Box pad={{ top:'small' }} gap='small' alignSelf='start' direction='row'>
+                      <StickyButton
+                        onClick={() => setIsRollDebt(false)}
+                        selected={!isRollDebt}
+                      >
+                        <Box pad={{ horizontal:'medium', vertical: 'small' }} alignSelf='center'>
+                          <Text size="medium" weight='bold'>
+                            Repay debt
+                          </Text>
+                        </Box>
+                      </StickyButton>   
+
+                      <StickyButton
+                        onClick={() => setIsRollDebt(true)}
+                        selected={isRollDebt}
+                      >
+                        <Box pad={{ horizontal:'medium', vertical: 'small' }} alignSelf='center'>
+                          <Text size="medium" weight='bold'>
+                            Roll debt to another series
+                          </Text>
+                        </Box>
+                      </StickyButton>   
+
+                    </Box>
+                  </Box>
 
                   <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
                     <TextInput
                       ref={(el:any) => {el && !mobile && el.focus(); setInputRef(el);}} 
                       type="number"
-                      placeholder={!mobile ? 'Enter the amount of Dai to Repay': 'DAI'}
+                      placeholder={!mobile ? 'Enter the amount of Dai': 'DAI'}
                       value={inputValue || ''}
                       plain
                       onChange={(event:any) => setInputValue(( cleanValue(event.target.value, 6) ))}
                       icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <DaiMark />}
                     />
                     <FlatButton 
-                      label={!mobile ? 'Repay Maximum': 'Maximum'}
+                      label={!mobile ? `${isRollDebt? 'Roll Maximum': 'Repay Maximum'}`: 'Maximum'}
                       onClick={()=>setInputValue( cleanValue(ethers.utils.formatEther(maxRepay), 6) )}
                     />
                   </InputWrap>
+
+                  { 
+                  isRollDebt &&
+                  <Box pad='small' direction='row' justify='between' fill align='center'>
+                    <Box fill='horizontal'>
+                      <Text size='xsmall'> Select a series to roll debt to: </Text>
+                    </Box>
+                    <RollSelector changeDestination={(x:IYieldSeries) => setDestinationSeries(x)} />
+                  </Box>
+                  } 
 
                   <Box fill>
                     <Collapsible open={true}>
                       <InfoGrid 
                         entries={[
+
                           {
-                            label: 'Total amount owed',
-                            visible: false,
-                            active: true,
-                            loading: false,    
-                            value: activeSeries?.ethDebtFYDai_? `${activeSeries?.ethDebtFYDai_} DAI`: '0 DAI',
-                            valuePrefix: null,
-                            valueExtra: null, 
-                          }, 
-                          {
-                            label: 'Cost to repay all debt now',
-                            visible: true,
+                            label: 'Current Debt',
+                            labelExtra: `Cost to ${ isRollDebt? 'roll':'repay'} all now`,
+                            visible: !isRollDebt? true : !!inputValue&&inputValue>0,
                             active: true,
                             loading: false,    
                             value:  activeSeries?.ethDebtDai_? `${cleanValue(activeSeries?.ethDebtDai_, 2)} DAI`: '0 DAI',
                             valuePrefix: null,
                             valueExtra: null,
                           },
+
                           {
-                            label: `Owed after repayment of ${inputValue && cleanValue(inputValue, 2)} DAI`,
+                            label: 'Remaining debt',
+                            labelExtra: `after ${ isRollDebt? 'rolling':'repaying'} ${inputValue && cleanValue(inputValue, 2)} DAI `,
                             visible: !!inputValue&&inputValue>0,
                             active: !!inputValue&&inputValue>0,
                             loading: false,
@@ -189,6 +257,17 @@ function Repay({ close }:IRepayProps) {
                             valuePrefix: null,
                             valueExtra: null, 
                           },
+                          {
+                            label: `Debt in ${destinationSeries?.displayNameMobile}`,
+                            labelExtra: `after rolling ${inputValue && cleanValue(inputValue, 2)} debt`, 
+                            visible: isRollDebt && !!inputValue&&inputValue>0,
+                            active: !!inputValue&&inputValue>0,
+                            loading: false,    
+                            value: null,
+                            valuePrefix: null,
+                            valueExtra: null, 
+                          },
+
                         ]}
                       />
                     </Collapsible>
@@ -197,14 +276,13 @@ function Repay({ close }:IRepayProps) {
                   {
                    !repayDisabled &&
                    <ActionButton
-                     onClick={()=>repayProcedure(inputValue)}
-                     label={`Repay ${inputValue || ''} DAI`}
+                     onClick={isRollDebt? ()=> rollDebtProcedure(inputValue) : ()=>repayProcedure(inputValue)}
+                     label={isRollDebt? `Roll ${inputValue || ''} Debt to ${destinationSeries?.displayNameMobile}` : `Repay ${inputValue || ''} DAI`}
                      disabled={repayDisabled}
                      hasPoolDelegatedProxy={true}
                      clearInput={()=>setInputValue(undefined)}
                    />                 
                   }
-               
 
                   {!activeSeries?.isMature() && !mobile &&
                   <Box alignSelf='start' margin={{ top:'medium' }}> 
