@@ -6,7 +6,6 @@ import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 import { VscHistory as History } from 'react-icons/vsc';
 
 /* utils and support */
-import { logEvent } from '../utils/analytics';
 import { abbreviateHash, cleanValue, genTxCode } from '../utils';
 
 /* contexts */
@@ -70,7 +69,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
   } = position;
 
   /* local state */
-  const [ repayOpen, setRepayOpen ] = useState<boolean>(false);
+  const [ repayOpen, setRepayOpen ] = useState<boolean>(true);
   const [ rateLockOpen, setRateLockOpen ] = useState<boolean>(false);
   const [ histOpen, setHistOpen ] = useState<boolean>(false);
   const [ borrowDisabled, setBorrowDisabled ] = useState<boolean>(true);
@@ -90,6 +89,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
   const { account } = useSignerAccount();
   const [ txActive ] = useTxActive(['BORROW']); /* txs to watch for */
   const [ repayTxActive ] = useTxActive(['REPAY']); /* txs to watch for */
+  const [ rollDebtTxActive ] = useTxActive(['ROLL_DEBT']); /* txs to watch for */
   const isLol = useIsLol(inputValue);
 
   /* 
@@ -552,10 +552,10 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
               !mobile &&
               <Box alignSelf='end' margin={{ top:'medium' }}>
                   {
-                  repayTxActive ?
+                  repayTxActive || rollDebtTxActive ?
                     <Box direction='row' gap='small'>
                       <Text size='xsmall' color='text-weak'>
-                        <Text weight='bold' color={activeSeries?.seriesColor}>repay</Text> pending
+                        <Text weight='bold' color={activeSeries?.seriesColor}>{ repayTxActive? 'repay': 'roll' }</Text> pending
                       </Text>
                       <Loading condition={true} size='xxsmall'>.</Loading>
                     </Box>
@@ -563,12 +563,11 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
                     <FlatButton 
                       onClick={()=>setRepayOpen(true)}
                       label={
-                        <Box direction='row' gap='small' align='center'>
-                          <Box>
-                            <Text size='xsmall' color='text-weak'>
-                              <Text weight='bold' color={activeSeries?.seriesColor}>repay</Text> series debt
-                            </Text>
-                          </Box>
+                        <Box direction='row' gap='xsmall' align='center'>
+                          <Text weight='bold' size='small' color={activeSeries?.seriesColor}>repay</Text> 
+                          <Text size='xsmall' color='text-weak'>or</Text>
+                          <Text weight='bold' size='small' color={activeSeries?.seriesColor}>roll</Text>
+                          <Text size='xsmall' color='text-weak'>debt</Text>
                           <ArrowRight color='text-weak' />
                         </Box>
                     }
@@ -610,7 +609,12 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
             style={{ textDecoration: 'none' }}
           >
             <Box direction='row' gap='small' align='center'>
-              <Text size='xxsmall' color='text-weak'> <Text weight='bold' size='xsmall' color={activeSeries?.seriesColor}>repay </Text> debt </Text>
+              <Text size='xxsmall' color='text-weak'> 
+                <Text weight='bold' size='xsmall' color={activeSeries?.seriesColor}>repay </Text> 
+                or 
+                <Text weight='bold' size='xsmall' color={activeSeries?.seriesColor}>roll </Text> 
+                debt 
+              </Text>
               <ArrowRight color={activeSeries?.seriesColor} />
             </Box>
           </NavLink>
