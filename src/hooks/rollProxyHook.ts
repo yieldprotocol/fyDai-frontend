@@ -74,6 +74,7 @@ export const useRollProxy = () => {
     ));
   }, [ signer, deployedContracts ]);
 
+
   /**
    * @dev Repay an amount of fyDai debt in Controller using a given amount of Dai exchanged for fyDai at pool rates, with a minimum of fyDai debt required to be paid.
    * Post maturity the user is asked for a signature allowing the treasury access to dai
@@ -161,9 +162,38 @@ export const useRollProxy = () => {
     );
   };
 
+  /**
+   * @dev Dai cost to repay
+   * @param {string} collateralType collateral type to check (eg. ETH-A)
+   * @returns {Promise<BigNumber>} amount Dai (in Wei)
+   * @note call function
+   */
+  const estNewSeriesDebt = async (
+    collateralType:string,
+    seriesFrom: IYieldSeries,
+    amount: BigNumber | string,
+    
+  ): Promise<BigNumber> => {
+
+    const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(cleanValue(amount));
+    const collatType = ethers.utils.formatBytes32String(collateralType);
+    const poolFrom = ethers.utils.getAddress(seriesFrom.poolAddress);
+    
+    let res; 
+    try {
+      res = await await proxyContract.daiCostToRepay(collatType, poolFrom, parsedAmount);
+    }  catch (e) {
+      // eslint-disable-next-line no-console
+      console.log(e);
+      res = false;
+    }
+    return res;
+  };
+
   return {
 
-    rollDebt
+    rollDebt,
+    estNewSeriesDebt,
 
   } as const;
 };
