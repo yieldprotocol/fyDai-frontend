@@ -55,7 +55,7 @@ function Repay({ close }:IRepayProps) {
   const [ repayDisabled, setRepayDisabled ] = useState<boolean>(true);
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
-  const [ isRollDebt, setIsRollDebt ] = useState<boolean>(true);
+  const [ isRollDebt, setIsRollDebt ] = useState<boolean>(false);
   const [ destinationSeries, setDestinationSeries ] = useState<IYieldSeries>();
 
   /* init hooks */
