@@ -126,7 +126,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
       setEstPercent( cleanValue(newPercent, 2) || undefined );
     })();
 
-    /* Calculate the expected APR based on input */
+    /* Calculate the expected APR based on input and set fyDai value */
     activeSeries && debouncedInput>0 && ( async () => {
       const preview = await previewPoolTx('buyDai', activeSeries, debouncedInput);
       if (!(preview instanceof Error)) {

@@ -10,6 +10,7 @@ import {
 } from 'react-icons/fi';
 
 import { cleanValue } from '../utils';
+import { IYieldSeries } from '../types';
 
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
@@ -20,6 +21,7 @@ import { useDebounce, useIsLol } from '../hooks/appHooks';
 import { useTxActive } from '../hooks/txHooks';
 import { useBorrowProxy } from '../hooks/borrowProxyHook';
 import { useRollProxy } from '../hooks/rollProxyHook';
+import { usePool } from '../hooks/poolHook';
 
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
@@ -32,7 +34,9 @@ import YieldMobileNav from '../components/YieldMobileNav';
 import SeriesDescriptor from '../components/SeriesDescriptor';
 import RollSelector from '../components/RollSelector';
 import StickyButton from '../components/StickyButton';
-import { IYieldSeries } from '../types';
+import { useMath } from '../hooks/mathHooks';
+
+
 
 interface IRepayProps {
   close?:any;
@@ -57,10 +61,14 @@ function Repay({ close }:IRepayProps) {
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
   const [ isRollDebt, setIsRollDebt ] = useState<boolean>(false);
   const [ destinationSeries, setDestinationSeries ] = useState<IYieldSeries>();
+  const [ debtInDestinationSeries, setDebtDestinationSeries ] = useState<string>();
+  const [ APR, setAPR ] = useState<string>();
 
   /* init hooks */
   const { repayDaiDebt } = useBorrowProxy();
   const { rollDebt } = useRollProxy();
+  const { calculateAPR } = useMath();
+  const { previewPoolTx }  = usePool();
   const [ txActive ] = useTxActive(['REPAY', 'ROLL_DEBT']);
   const { account } = useSignerAccount();
   const isLol = useIsLol(inputValue);
@@ -114,6 +122,34 @@ function Repay({ close }:IRepayProps) {
     activeSeries?.ethDebtDai && daiBalance?.lt(activeSeries?.ethDebtDai) && setMaxRepay(daiBalance);
   }, [daiBalance, activeSeries]);
 
+
+  /* Handle input (debounced input) changes: */
+  useEffect(() => {
+  
+    /* Calculate the expected APR based on input and set  */
+    isRollDebt && destinationSeries && debouncedInput>0 && ( async () => {
+
+      const parsedInput = ethers.utils.parseEther(debouncedInput).gt(activeSeries?.ethDebtDai) ?  
+        activeSeries?.ethDebtDai :
+        ethers.utils.parseEther(debouncedInput); 
+
+      const destDebt = destinationSeries.ethDebtFYDai || ethers.BigNumber.from('0');
+      const preview = await previewPoolTx('buyDai', destinationSeries, parsedInput);
+
+      if (!(preview instanceof Error)) {
+        setDebtDestinationSeries( cleanValue( ethers.utils.formatEther( preview.add(destDebt) ), 2 ) );
+      } else {
+        /* if the market doesnt have liquidity just estimate from rate */
+        const rate = await previewPoolTx('buyDai', destinationSeries, 1);
+        !(rate instanceof Error) && setDebtDestinationSeries(  ( parseFloat( ethers.utils.formatEther( parsedInput.add(destDebt) )) * parseFloat((ethers.utils.formatEther(rate)))).toString() );
+        (rate instanceof Error) && setDebtDestinationSeries('0');
+        // setRepayDisabled(true);
+        // setErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
+      }
+    })();
+  
+  }, [debouncedInput, destinationSeries, isRollDebt, activeSeries]);
+
   /* Repay disabling logic */
   useEffect(()=>{
     (
@@ -124,16 +160,34 @@ function Repay({ close }:IRepayProps) {
     )? setRepayDisabled(true): setRepayDisabled(false);
   }, [ inputValue ]);
 
-  /* Handle input warnings and errors */ 
+
+  /* Handle input warnings and errors when Rolling Debt */ 
   useEffect(() => {
-    if ( debouncedInput && daiBalance && ( ethers.utils.parseEther(debouncedInput).gt(daiBalance) ) ) {
-      setWarningMsg(null);
-      setErrorMsg('That amount exceeds the amount of Dai in your wallet'); 
-    } else {
-      setWarningMsg(null);
-      setErrorMsg(null);
+    if ( isRollDebt) {
+      if (debouncedInput && ethers.utils.parseEther(debouncedInput).gt(activeSeries?.ethDebtDai) ) {
+        setWarningMsg('That is more than your current debt - only the available debt will be rolled over.');
+        setErrorMsg(null); 
+      } else {
+        setWarningMsg(null);
+        setErrorMsg(null);
+      }
     }
-  }, [ debouncedInput, daiBalance ]);
+  }, [ debouncedInput, isRollDebt, activeSeries ]);
+
+
+  /* Handle input warnings and errors when Repaying */ 
+  useEffect(() => {
+
+    if (!isRollDebt) { 
+      if ( debouncedInput && daiBalance && ( ethers.utils.parseEther(debouncedInput).gt(daiBalance) ) ) {
+        setWarningMsg(null);
+        setErrorMsg('That amount exceeds the amount of Dai in your wallet'); 
+      } else {
+        setWarningMsg(null);
+        setErrorMsg(null);
+      }
+    }
+  }, [ debouncedInput, daiBalance, isRollDebt]);
 
   /* get seriesData into an array and filter out the active series and mature series for  */
   useEffect(()=>{
@@ -204,7 +258,7 @@ function Repay({ close }:IRepayProps) {
                     <TextInput
                       ref={(el:any) => {el && !mobile && el.focus(); setInputRef(el);}} 
                       type="number"
-                      placeholder={!mobile ? 'Enter the amount of Dai': 'DAI'}
+                      placeholder={!mobile ? `Enter the amount of Dai to ${isRollDebt? 'roll': 'repay'}`: `${isRollDebt? 'Dai to roll': 'Dai to repay'}`}
                       value={inputValue || ''}
                       plain
                       onChange={(event:any) => setInputValue(( cleanValue(event.target.value, 6) ))}
@@ -218,7 +272,7 @@ function Repay({ close }:IRepayProps) {
 
                   { 
                   isRollDebt &&
-                  <Box pad='small' direction='row' justify='between' fill align='center'>
+                  <Box pad='medium' direction='row' justify='between' fill align='center'>
                     <Box fill='horizontal'>
                       <Text size='xsmall'> Select a series to roll debt to: </Text>
                     </Box>
@@ -234,7 +288,7 @@ function Repay({ close }:IRepayProps) {
                           {
                             label: 'Current Debt',
                             labelExtra: `Cost to ${ isRollDebt? 'roll':'repay'} all now`,
-                            visible: !isRollDebt? true : !!inputValue&&inputValue>0,
+                            visible: !isRollDebt,
                             active: true,
                             loading: false,    
                             value:  activeSeries?.ethDebtDai_? `${cleanValue(activeSeries?.ethDebtDai_, 2)} DAI`: '0 DAI',
@@ -259,11 +313,11 @@ function Repay({ close }:IRepayProps) {
                           },
                           {
                             label: `Debt in ${destinationSeries?.displayNameMobile}`,
-                            labelExtra: `after rolling ${inputValue && cleanValue(inputValue, 2)} debt`, 
+                            labelExtra: 'owed at maturity after rolling debt', 
                             visible: isRollDebt && !!inputValue&&inputValue>0,
                             active: !!inputValue&&inputValue>0,
                             loading: false,    
-                            value: null,
+                            value: debtInDestinationSeries,
                             valuePrefix: null,
                             valueExtra: null, 
                           },
@@ -277,7 +331,7 @@ function Repay({ close }:IRepayProps) {
                    !repayDisabled &&
                    <ActionButton
                      onClick={isRollDebt? ()=> rollDebtProcedure(inputValue) : ()=>repayProcedure(inputValue)}
-                     label={isRollDebt? `Roll ${inputValue || ''} Debt to ${destinationSeries?.displayNameMobile}` : `Repay ${inputValue || ''} DAI`}
+                     label={isRollDebt? `Roll ${inputValue || ''} DAI to ${destinationSeries?.displayNameMobile}` : `Repay ${inputValue || ''} DAI`}
                      disabled={repayDisabled}
                      hasPoolDelegatedProxy={true}
                      clearInput={()=>setInputValue(undefined)}
