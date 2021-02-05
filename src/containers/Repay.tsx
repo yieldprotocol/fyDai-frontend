@@ -217,7 +217,7 @@ function Repay({ close }:IRepayProps) {
           fill
           background="background" 
           round='small'
-          pad="large"
+          pad={activeSeries?.isMature()? { vertical: undefined, horizontal:'large' } :'large'}
         >
           <Box flex='grow' justify='between'>
             <Box align='center' fill='horizontal'>
