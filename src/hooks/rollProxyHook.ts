@@ -1,8 +1,7 @@
 import { useEffect, useState, useContext } from 'react';
 import { ethers, BigNumber }  from 'ethers';
 
-import * as utils from '../utils';
-import { MAX_INT } from '../utils/constants';
+import { genTxCode, cleanValue } from '../utils';
 import { calculateSlippage } from '../utils/yieldMath';
 
 import { ISignListItem, IYieldSeries } from '../types';
@@ -16,13 +15,14 @@ import { UserContext } from '../contexts/UserContext';
 import { useSignerAccount } from './connectionHooks';
 import { usePool } from './poolHook';
 import { useToken } from './tokenHook';
-
+import { useTxHelpers } from './txHooks';
 import { useSigning } from './signingHook';
-
 import { useDsProxy } from './dsProxyHook';
 
 import { useController } from './controllerHook';
-import { genTxCode } from '../utils';
+
+
+
 
 /**
  * Hook for interacting with the Yield Proxy Contract.
@@ -49,6 +49,9 @@ export const useRollProxy = () => {
   const { addControllerDelegate } = useController();
 
   const { proxyExecute } = useDsProxy();
+
+  const { handleTx, handleTxRejectError } = useTxHelpers();
+  
   const { delegationSignature, daiPermitSignature, ERC2612PermitSignature, handleSignList } = useSigning();
   
   const { abi: controllerAbi } = Controller;
@@ -87,17 +90,18 @@ export const useRollProxy = () => {
     seriesFrom: IYieldSeries,
     seriesTo: IYieldSeries,
     rollAmount: BigNumber | string,
-    collateralType: string = ethers.utils.formatBytes32String('ETH-A'),
+    collateralType: string,
 
   ) => {
 
-    const parsedAmount = BigNumber.isBigNumber(rollAmount)? rollAmount : ethers.utils.parseEther(utils.cleanValue(rollAmount));
+    const parsedAmount = BigNumber.isBigNumber(rollAmount)? rollAmount : ethers.utils.parseEther(cleanValue(rollAmount));
     const collatType = ethers.utils.formatBytes32String(collateralType);
-    const poolFrom = account && ethers.utils.getAddress(seriesFrom.poolAddress);
-    const poolTo = account && ethers.utils.getAddress(seriesTo.poolAddress);
+    const poolFrom = ethers.utils.getAddress(seriesFrom.poolAddress);
+    const poolTo = ethers.utils.getAddress(seriesTo.poolAddress);
+    const acc = account && ethers.utils.getAddress(account);
 
     const overrides = {
-      gasLimit: BigNumber.from('350000'),
+      gasLimit: BigNumber.from('500000'),
       value: 0,
     };
 
@@ -107,22 +111,22 @@ export const useRollProxy = () => {
     requestedSigs.set('controllerSig',
       { id: genTxCode('AUTH_CONTROLLER', null),
         desc: 'Allow your proxy to interact with your collateralized positions',
-        conditional: hasDelegatedDsProxy,
-        signFn: () => delegationSignature(controllerContract, dsProxyAddress),    
-        fallbackFn: () => addControllerDelegate(dsProxyAddress),
+        conditional: await controllerContract.delegated(account, deployedContracts.RollProxy),
+        signFn: () => delegationSignature(controllerContract, deployedContracts.RollProxy),    
+        fallbackFn: () => addControllerDelegate(deployedContracts.RollProxy),
       });
  
     /* Send the required signatures out for signing, or approval tx if fallback is required */
-    const signedSigs = await handleSignList(requestedSigs, genTxCode('ROLL', seriesFrom?.maturity.toString()));
+    const signedSigs = await handleSignList(requestedSigs, genTxCode('ROLL_DEBT', seriesFrom?.maturity.toString()));
     
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
 
-    const daiToBuy = await proxyContract.daiCostToRepay('ETH-A', poolFrom, parsedAmount);
+    const daiToBuy = await proxyContract.daiCostToRepay(collatType, poolFrom, parsedAmount);
 
     /* calculate expected trade values and factor in slippage */
     let maxFYDaiCost:string;
-    const preview = await previewPoolTx('buyDai', seriesTo, daiToBuy.toString());
+    const preview = await previewPoolTx('buyDai', seriesTo, daiToBuy);
     if ( !(preview instanceof Error) ) {
       maxFYDaiCost = calculateSlippage(preview, slippage);
     } else {
@@ -138,27 +142,24 @@ export const useRollProxy = () => {
     //   uint256 maxFYDaiCost,  // Calculate off-chain using pool2.buyDaiPreview(daiDebtToRepay.toUint128()), plus accepted slippage
     //   bytes memory controllerSig
     // )
-    const calldata = proxyContract.interface.encodeFunctionData( 
-      'rollDebtWithSignature', 
-      [ collatType, poolFrom, poolTo, account, daiToBuy, maxFYDaiCost, signedSigs.get('controllerSig')]
-    );
-    
-    /* send to the proxy for execution */
-    await proxyExecute( 
-      proxyContract.address, 
-      calldata,
-      overrides,
+
+    let tx:any;
+    try {
+      tx = await proxyContract.rollDebtWithSignature(collatType, poolFrom, poolTo, acc, daiToBuy, maxFYDaiCost, signedSigs.get('controllerSig'), overrides );
+    } catch (e) {
+      handleTxRejectError(e);
+      return;
+    }
+    await handleTx(
       { 
-        tx:null, 
-        msg: `Rolling ${parsedAmount} Debt from ${poolFrom} to ${poolTo}`, 
-        type:'REPAY', 
-        series: seriesTo,
+        tx, 
+        msg: `Rolling ${rollAmount} Debt from ${seriesFrom.displayNameMobile} to ${seriesTo.displayNameMobile}`, 
+        type:'ROLL_DEBT', 
+        series: seriesFrom,
         value: parsedAmount.toString()
       }
     );
-
   };
-
 
   return {
 
