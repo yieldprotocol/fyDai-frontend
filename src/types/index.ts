@@ -31,10 +31,10 @@ export interface IYieldSeries {
   seriesDarkColor: string;
   seriesLightColor: string;
   seriesTextColor:string;
-  wethDebtDai?: BigNumber;
-  wethDebtDai_?: number;
-  wethDebtFYDai?: BigNumber;
-  wethDebtFYDai_?: number;
+  ethDebtDai?: BigNumber;
+  ethDebtDai_?: number;
+  ethDebtFYDai?: BigNumber;
+  ethDebtFYDai_?: number;
   yieldAPR?: string;
   yieldAPR_?: string;
 }
