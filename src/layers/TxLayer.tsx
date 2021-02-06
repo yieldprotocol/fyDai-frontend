@@ -42,11 +42,12 @@ const TxLayer = () => {
     'REPAY',
     'SELL_DAI', 
     'BUY_DAI', 
-    'REDEEM', 
+    'REDEEM',
     'ADD_LIQUIDITY', 
     'REMOVE_LIQUIDITY', 
     'IMPORT',
     'EXPORT_POSITION',
+    'ROLL_DEBT',
   ]);
 
   // flags
