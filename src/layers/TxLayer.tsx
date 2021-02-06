@@ -49,6 +49,7 @@ const TxLayer = () => {
     'REMOVE_LIQUIDITY', 
     'IMPORT',
     'EXPORT_POSITION',
+    'ROLL_DEBT',
   ]);
 
   // flags
