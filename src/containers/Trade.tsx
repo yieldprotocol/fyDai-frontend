@@ -66,7 +66,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
   const { buyFYDai } = useBorrowProxy();
   const { calculateAPR } = useMath();
   const { account, fallbackProvider } = useSignerAccount();
-  const [ txActive ] = useTxActive(['SELL_DAI']);
+  const [ txActive ] = useTxActive(['SELL_DAI', 'BUY_DAI', 'SELL_FYDAI', 'BUY_FYDAI']);
 
   const [ closeTxActive ] = useTxActive(['BUY_DAI']);
 
@@ -79,7 +79,12 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
   
   const [showTxPending, setShowTxPending] = useState<boolean>(false);
   useEffect(()=>{
-    setShowTxPending( txActive?.txCode === genTxCode('SELL_DAI', activeSeries));
+    setShowTxPending( 
+      txActive?.txCode === genTxCode('SELL_DAI', activeSeries) ||
+      txActive?.txCode === genTxCode('BUY_DAI', activeSeries) ||
+      txActive?.txCode === genTxCode('SELL_FYDAI', activeSeries) ||
+      txActive?.txCode === genTxCode('BUY_FYDAI', activeSeries) 
+      );
   }, [txActive, activeSeries]);
   
   const [ inputValue, setInputValue ] = useState<any>(amnt || undefined);

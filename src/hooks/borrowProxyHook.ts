@@ -296,7 +296,7 @@ export const useBorrowProxy = () => {
       overrides,
       { 
         tx:null, 
-        msg: `Repaying ${repaymentInDai} Dai to ${series.displayNameMobile}`, 
+        msg: `Buying ${repaymentInDai} Dai for ${series.displayNameMobile} fyDai`, 
         type:'REPAY', 
         series,
         value: dai.toString()
@@ -374,7 +374,7 @@ export const useBorrowProxy = () => {
       overrides,
       { 
         tx:null, 
-        msg: `Lending ${daiIn} DAI to ${series.displayNameMobile} `, 
+        msg: `Selling ${daiIn} DAI for ${series.displayNameMobile} fyDai`, 
         type:'SELL_DAI', 
         series, 
         value: parsedDaiIn.toString()
@@ -451,7 +451,7 @@ export const useBorrowProxy = () => {
       overrides,
       { 
         tx:null, 
-        msg: `Closing ${daiOut} DAI from ${series.displayNameMobile}`, 
+        msg: `Buying ${daiOut} Dai for ${series.displayNameMobile} fyDai`, 
         type:'BUY_DAI', 
         series,
         value: parsedDaiOut.toString()
@@ -529,7 +529,7 @@ export const useBorrowProxy = () => {
       overrides,
       { 
         tx:null, 
-        msg: `Selling ${fyDaiIn} FYDAI to ${series.displayNameMobile} `, 
+        msg: `Selling ${fyDaiIn} ${series.displayNameMobile} fyDai for Dai `, 
         type:'SELL_FYDAI', 
         series, 
         value: parsedFYDaiIn.toString()
@@ -611,7 +611,7 @@ export const useBorrowProxy = () => {
       overrides,
       { 
         tx:null, 
-        msg: `Buying ${fyDaiOut} FYDAI to ${series.displayNameMobile} `, 
+        msg: `Buying ${fyDaiOut} ${series.displayNameMobile} fyDai for Dai`, 
         type:'BUY_FYDAI', 
         series, 
         value: parsedFYDaiOut.toString()

@@ -42,6 +42,8 @@ const TxLayer = () => {
     'REPAY',
     'SELL_DAI', 
     'BUY_DAI', 
+    'SELL_FYDAI', 
+    'BUY_FYDAI', 
     'REDEEM', 
     'ADD_LIQUIDITY', 
     'REMOVE_LIQUIDITY', 
