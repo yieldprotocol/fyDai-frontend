@@ -261,14 +261,21 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
 
   /* handle exceptions, errors and warnings */
   useEffect(() => {
-    if ( daiBalance && debouncedInput && ethers.utils.parseEther(debouncedInput).gt(daiBalance)  ) {
+    console.log("currentValue: ", currentValue) 
+    console.log("typeof currentValue: ", typeof currentValue) 
+    console.log("debouncedInput: ", debouncedInput) 
+    console.log("typeof debouncedInput: ", typeof debouncedInput) 
+    if ( daiBalance && debouncedInput && (tradeType === "sellDai" || tradeType === "buyFYDai") && ethers.utils.parseEther(debouncedInput).gt(daiBalance)  ) {
       setWarningMsg(null);
-      setErrorMsg('That amount exceeds the amount of Dai you have'); 
-    } else {
+      setErrorMsg("You don't have enough Dai to make that trade"); 
+    } else if ( daiBalance && debouncedInput && (tradeType === "buyDai" || tradeType === "sellFYDai") && Number(debouncedInput)> Number(currentValue))  {
+      setWarningMsg(null);
+      setErrorMsg("You don't have enough fyDai to make that trade"); 
+    } else  {
       setWarningMsg(null);
       setErrorMsg(null);
     }
-  }, [ debouncedInput, daiBalance ]);
+  }, [ debouncedInput, daiBalance, currentValue ]);
 
   
 
