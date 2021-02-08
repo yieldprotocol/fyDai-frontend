@@ -146,7 +146,7 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
         fill
         background='background'
         round='small'
-        pad='large'
+        pad={activeSeries?.isMature()? { vertical: undefined, horizontal:'large' } :'large'}
         gap='medium'
       >
         <Text alignSelf='start' size='large' color='text' weight='bold'>Remove Liquidity Tokens</Text>

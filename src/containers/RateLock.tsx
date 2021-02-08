@@ -44,6 +44,7 @@ import TxStatus from '../components/TxStatus';
 import AprBadge from '../components/AprBadge';
 import SeriesSelector from '../components/SeriesSelector';
 import { logEvent } from '../utils/analytics';
+import SeriesMatureBox from '../components/SeriesMatureBox';
 
 interface IRateLockProps {
   close?: any; // close is also used as a indicator used as a layer (only a layer should have a closed)
@@ -457,6 +458,11 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
                 </Box>
               </InsetBox>
             </Box>
+
+            {/* { 
+          activeSeries?.isMature() &&
+          <SeriesMatureBox />
+        } */}
            
             <Box direction='row' justify='between' align='center' pad='small'>
               <Text size='xsmall' color='text'> Selected Yield Series: </Text>
