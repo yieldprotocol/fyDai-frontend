@@ -128,7 +128,6 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
   /* Handle input (debounce input) changes */
   useEffect(() => {
     if (inputFromQuantity && fromToken === 'DAI') {
-      console.log('hit sellDai');
       trade = 'sellDai';
       setFromQuantity( inputValue );
       if (!inputValue) {
@@ -136,7 +135,6 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
       } 
     }
     if (!inputFromQuantity && toToken === 'DAI') {
-      console.log('hit buyDai');
       trade = 'buyDai';
       setToQuantity( inputValue );
       if (!inputValue) {
@@ -144,7 +142,6 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
       } 
     }
     if (inputFromQuantity && fromToken === 'fyDAI') {
-      console.log('hit sellFYDai');
       trade = 'sellFYDai';
       setFromQuantity( inputValue );
       if (!inputValue) {
@@ -153,7 +150,6 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
     }
 
     if (!inputFromQuantity && toToken === 'fyDAI') {
-      console.log('hit buyFYDai');
       trade = 'buyFYDai';
       setToQuantity( inputValue );
       if (!inputValue) {
@@ -237,10 +233,6 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
 
   /* handle exceptions, errors and warnings */
   useEffect(() => {
-    console.log("currentValue: ", currentValue) 
-    console.log("typeof currentValue: ", typeof currentValue) 
-    console.log("debouncedInput: ", debouncedInput) 
-    console.log("typeof debouncedInput: ", typeof debouncedInput) 
     if ( daiBalance && debouncedInput && (tradeType === "sellDai" || tradeType === "buyFYDai") && ethers.utils.parseEther(debouncedInput).gt(daiBalance)  ) {
       setWarningMsg(null);
       setErrorMsg("You don't have enough Dai to make that trade"); 
