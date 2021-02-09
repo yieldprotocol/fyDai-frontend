@@ -185,7 +185,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
 
     setTradeType( trade );
 
-    activeSeries && !(activeSeries?.isMature()) &&  !!debouncedInput &&  ( async () => {
+    activeSeries && !(activeSeries?.isMature()) &&  !!debouncedInput && inputValue && ( async () => {
       const preview = await previewPoolTx(trade, activeSeries, debouncedInput);
       var [daiReserves, fyDaiReservesReal, fyDaiReservesVirtual] = await getReserves(activeSeries);
       daiReserves = ethers.utils.formatEther(daiReserves);
@@ -275,9 +275,8 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
       setWarningMsg(null);
       setErrorMsg(null);
     }
-  }, [ debouncedInput, daiBalance, currentValue ]);
 
-  
+  }, [ debouncedInput, daiBalance, currentValue ]);
 
   return (
     <RaisedBox>
