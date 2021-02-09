@@ -1,13 +1,9 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { ethers, BigNumber } from 'ethers';
-import { Decimal } from 'decimal.js';
+import { ethers } from 'ethers';
 import { Box, Keyboard, TextInput, Select, Text, ResponsiveContext, Collapsible, Layer } from 'grommet';
 import { FiArrowRight as ArrowRight } from 'react-icons/fi';
-import { VscHistory as History } from 'react-icons/vsc';
-
 import { NavLink, useParams } from 'react-router-dom';
 import { cleanValue, genTxCode } from '../utils';
-
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
   
@@ -28,19 +24,13 @@ import InputWrap from '../components/InputWrap';
 import InfoGrid from '../components/InfoGrid';
 import TxStatus from '../components/TxStatus';
 import SeriesDescriptor from '../components/SeriesDescriptor';
-import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
-import FlatButton from '../components/FlatButton';
 import SeriesMatureBox from '../components/SeriesMatureBox';
 import TxHistory from '../components/TxHistory';
 import HistoryWrap from '../components/HistoryWrap';
 
-import DaiMark from '../components/logos/DaiMark';
 import RaisedBox from '../components/RaisedBox';
 import YieldMobileNav from '../components/YieldMobileNav';
-import Loading from '../components/Loading';
-
-import { logEvent } from '../utils/analytics';
 
 interface ILendProps {
   openConnectLayer:any;
@@ -50,7 +40,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
 
   const { amnt }:any = useParams();
   
-  const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
+  const { state: { activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
   const activeSeries = seriesData.get(activeSeriesId);
 
   const { state: userState, actions: userActions } = useContext(UserContext);
@@ -67,13 +57,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
   const { calculateAPR } = useMath();
   const { account, fallbackProvider } = useSignerAccount();
   const [ txActive ] = useTxActive(['SELL_DAI', 'BUY_DAI', 'SELL_FYDAI', 'BUY_FYDAI']);
-
-  const [ closeTxActive ] = useTxActive(['BUY_DAI']);
-
-
-
   const [ hasDelegated ] = useState<boolean>(true);
-
   const [ CloseDaiOpen, setCloseDaiOpen ] = useState<boolean>(false);
   const [ histOpen, setHistOpen ] = useState<boolean>(false);
   
@@ -89,7 +73,7 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
   
   const [ inputValue, setInputValue ] = useState<any>(amnt || undefined);
   const debouncedInput = useDebounce(inputValue, 500);
-  const [inputRef, setInputRef] = useState<any>(null);
+  const [inputRef] = useState<any>(null);
   
   const [ lendDisabled, setLendDisabled ] = useState<boolean>(true);
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
@@ -97,12 +81,6 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
   const isLol = useIsLol(inputValue);
 
   const [ APR, setAPR ] = useState<number>(0);
-  const [ spotAPR, setSpotAPR ] = useState<number>(0);  
-  const [ fyDaiValue, setFYDaiValue ] = useState<number>(0);
-  const [ minFYDaiOut, setMinFYDaiOut ] = useState<number>(0);
-  const [ maxFYDaiIn, setMaxFYDaiIn ] = useState<number>(0);
-  const [ minDaiOut, setMinDaiOut ] = useState<number>(0);
-  const [ maxDaiIn, setMaxDaiIn ] = useState<number>(0);
   const [ currentValue, setCurrentValue ] = useState<string>();
   const [ fromToken, setFromToken ] = useState<string>('DAI');
   const [ toToken, setToToken ] = useState<string>('fyDAI');
@@ -232,8 +210,6 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
       } else {
         /* if the market doesnt have liquidity just estimate from rate */
         const rate = await previewPoolTx('sellDai', activeSeries, 1);
-        !(rate instanceof Error) && setFYDaiValue(debouncedInput*parseFloat((ethers.utils.formatEther(rate))));
-        (rate instanceof Error) && setFYDaiValue(0);
         setLendDisabled(true);
         setErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
       }
@@ -344,17 +320,6 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
                 valuePrefix: null,
                 valueExtra: null,
               },
-              {
-                label: 'To fyDai',
-                labelExtra: 'minimum you will receive',
-                visible: true,
-                active: true,
-                loading: false,            
-                value: minFYDaiOut?`${minFYDaiOut.toFixed(2)} `: '0',
-                valuePrefix: null,
-                valueExtra: null,
-              },
-
               {
                 label: null,
                 labelExtra: null,
