@@ -291,8 +291,8 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
                 valueExtra: null,
               },
               {
-                label: 'fyDai Balance',
-                labelExtra: 'current series',
+                label: 'fyDai Current Value',
+                labelExtra: 'if sold now',
                 visible: !!account && !activeSeries?.isMature(),
                 active: true,
                 loading: false || !currentValue,           
@@ -301,8 +301,8 @@ const Trade = ({ openConnectLayer }:ILendProps) => {
                 valueExtra: null,
               },
               {
-                label: 'fyDai Value at Maturity',
-                labelExtra: 'current series',
+                label: 'fyDai Balance',
+                labelExtra: 'value at maturity',
                 visible: 
                   (!!account && !activeSeries?.isMature()) || 
                   ( activeSeries?.isMature() && activeSeries?.fyDaiBalance_>0),
