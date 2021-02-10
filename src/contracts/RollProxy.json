@@ -23,6 +23,43 @@
       "type": "constructor"
     },
     {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "collateral",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "pool1",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "pool2",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "daiDebtRepaid",
+          "type": "uint256"
+        }
+      ],
+      "name": "Rolled",
+      "type": "event"
+    },
+    {
       "inputs": [],
       "name": "WETH",
       "outputs": [
@@ -96,6 +133,32 @@
     {
       "inputs": [
         {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        }
+      ],
+      "name": "validUser",
+      "outputs": [],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "pool",
+          "type": "address"
+        }
+      ],
+      "name": "validPool",
+      "outputs": [],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
           "internalType": "bytes32",
           "name": "collateral",
           "type": "bytes32"
@@ -112,6 +175,35 @@
         }
       ],
       "name": "daiCostToRepay",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "daiCost",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "collateral",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "contract IPool",
+          "name": "pool",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        }
+      ],
+      "name": "daiCostToClose",
       "outputs": [
         {
           "internalType": "uint256",
@@ -155,7 +247,111 @@
           "type": "uint256"
         }
       ],
-      "name": "rollDebt",
+      "name": "rollDebtMature",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "collateral",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "contract IPool",
+          "name": "pool1",
+          "type": "address"
+        },
+        {
+          "internalType": "contract IPool",
+          "name": "pool2",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "daiToBuy",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "maxFYDaiCost",
+          "type": "uint256"
+        }
+      ],
+      "name": "rollDebtEarly",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "collateral",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "contract IPool",
+          "name": "pool1",
+          "type": "address"
+        },
+        {
+          "internalType": "contract IPool",
+          "name": "pool2",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "maxFYDaiCost",
+          "type": "uint256"
+        }
+      ],
+      "name": "rollAllMature",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "collateral",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "contract IPool",
+          "name": "pool1",
+          "type": "address"
+        },
+        {
+          "internalType": "contract IPool",
+          "name": "pool2",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "maxFYDaiCost",
+          "type": "uint256"
+        }
+      ],
+      "name": "rollAllEarly",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -176,19 +372,6 @@
       "name": "executeOnFlashMint",
       "outputs": [],
       "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "rollDebtCheck",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -229,7 +412,126 @@
           "type": "bytes"
         }
       ],
-      "name": "rollDebtWithSignature",
+      "name": "rollDebtMatureWithSignature",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "collateral",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "contract IPool",
+          "name": "pool1",
+          "type": "address"
+        },
+        {
+          "internalType": "contract IPool",
+          "name": "pool2",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "daiToBuy",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "maxFYDaiCost",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes",
+          "name": "controllerSig",
+          "type": "bytes"
+        }
+      ],
+      "name": "rollDebtEarlyWithSignature",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "collateral",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "contract IPool",
+          "name": "pool1",
+          "type": "address"
+        },
+        {
+          "internalType": "contract IPool",
+          "name": "pool2",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "maxFYDaiCost",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes",
+          "name": "controllerSig",
+          "type": "bytes"
+        }
+      ],
+      "name": "rollAllMatureWithSignature",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "collateral",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "contract IPool",
+          "name": "pool1",
+          "type": "address"
+        },
+        {
+          "internalType": "contract IPool",
+          "name": "pool2",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "maxFYDaiCost",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes",
+          "name": "controllerSig",
+          "type": "bytes"
+        }
+      ],
+      "name": "rollAllEarlyWithSignature",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

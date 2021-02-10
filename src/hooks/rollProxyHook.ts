@@ -14,14 +14,10 @@ import { UserContext } from '../contexts/UserContext';
 
 import { useSignerAccount } from './connectionHooks';
 import { usePool } from './poolHook';
-import { useToken } from './tokenHook';
 import { useTxHelpers } from './txHooks';
 import { useSigning } from './signingHook';
-import { useDsProxy } from './dsProxyHook';
 
 import { useController } from './controllerHook';
-
-
 
 
 /**
@@ -40,19 +36,16 @@ export const useRollProxy = () => {
   /* contexts */
   const { state: { deployedContracts } }  = useContext<any>(YieldContext);
   const { state: userState }  = useContext<any>(UserContext);
-  const { preferences: { slippage }, authorization: { dsProxyAddress, hasDelegatedDsProxy } } = userState; 
+  const { preferences: { slippage } } = userState; 
 
   /* hooks */ 
-  const { signer, provider, account } = useSignerAccount();
-  const { previewPoolTx, addPoolDelegate, checkPoolDelegate } = usePool();
-  const { approveToken, getTokenAllowance } = useToken();
+  const { signer, account } = useSignerAccount();
+  const { previewPoolTx } = usePool();
   const { addControllerDelegate } = useController();
-
-  const { proxyExecute } = useDsProxy();
 
   const { handleTx, handleTxRejectError } = useTxHelpers();
   
-  const { delegationSignature, daiPermitSignature, ERC2612PermitSignature, handleSignList } = useSigning();
+  const { delegationSignature, handleSignList } = useSigning();
   
   const { abi: controllerAbi } = Controller;
   const { abi: rollProxyAbi } = RollProxy;
@@ -87,7 +80,7 @@ export const useRollProxy = () => {
    *
    */
   const rollDebt = async (
-    
+
     seriesFrom: IYieldSeries,
     seriesTo: IYieldSeries,
     rollAmount: BigNumber | string,
@@ -100,11 +93,6 @@ export const useRollProxy = () => {
     const poolFrom = ethers.utils.getAddress(seriesFrom.poolAddress);
     const poolTo = ethers.utils.getAddress(seriesTo.poolAddress);
     const acc = account && ethers.utils.getAddress(account);
-
-    const overrides = {
-      gasLimit: BigNumber.from('500000'),
-      value: 0,
-    };
 
     /* build and use signature if required , else '0x' */
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
@@ -122,6 +110,8 @@ export const useRollProxy = () => {
     
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
+    /* is ALL sigs are '0x' set noSigsReqd */
+    const noSigsReqd = Array.from(signedSigs.values()).every(item => item === '0x');
 
     const daiToBuy = await proxyContract.daiCostToRepay(collatType, poolFrom, parsedAmount);
 
@@ -133,24 +123,38 @@ export const useRollProxy = () => {
     } else {
       throw(preview);
     }
-          
-    // function rollDebtWithSignature(
-    //   bytes32 collateral,
-    //   IPool pool1,
-    //   IPool pool2,
-    //   address user,
-    //   uint256 daiToBuy,      // Calculate off-chain using daiCostToRepay(collateral, pool1, daiDebtToRepay) or similar
-    //   uint256 maxFYDaiCost,  // Calculate off-chain using pool2.buyDaiPreview(daiDebtToRepay.toUint128()), plus accepted slippage
-    //   bytes memory controllerSig
-    // )
 
     let tx:any;
+    
+    /* fn select options: signature required?  > fyDaiDebt more than requested? > series is mature? */
     try {
-      tx = await proxyContract.rollDebtWithSignature(collatType, poolFrom, poolTo, acc, daiToBuy, maxFYDaiCost, signedSigs.get('controllerSig'), overrides );
+
+      if ( noSigsReqd && seriesFrom.fyDaiBalance.lte(maxFYDaiCost))  {
+        tx = seriesFrom.isMature() ?
+          await proxyContract.rollAllMature(collatType, poolFrom, poolTo, acc, maxFYDaiCost, { gasLimit: BigNumber.from('500000'), value:0 } ) :
+          await proxyContract.rollAllEarly(collatType, poolFrom, poolTo, acc, maxFYDaiCost, { gasLimit: BigNumber.from('500000'), value:0 } );
+      
+      } else if ( noSigsReqd && seriesFrom.fyDaiBalance.gt(maxFYDaiCost)) {       
+        tx = seriesFrom.isMature() ?
+          await proxyContract.rollDebtMature(collatType, poolFrom, poolTo, acc, daiToBuy, maxFYDaiCost, { gasLimit: BigNumber.from('500000'), value:0 } ) :  
+          await proxyContract.rollDebtEarly(collatType, poolFrom, poolTo, acc, daiToBuy, maxFYDaiCost, { gasLimit: BigNumber.from('500000'), value:0 } );
+      
+      } else if ( !noSigsReqd && seriesFrom.fyDaiBalance.lte(maxFYDaiCost) ) {
+        tx = seriesFrom.isMature() ?
+          await proxyContract.rollAllMatureWithSignature(collatType, poolFrom, poolTo, acc, maxFYDaiCost, signedSigs.get('controllerSig'), { gasLimit: BigNumber.from('500000'), value:0 } ) :
+          await proxyContract.rollAllEarlyWithSignature(collatType, poolFrom, poolTo, acc, maxFYDaiCost, signedSigs.get('controllerSig'), { gasLimit: BigNumber.from('500000'), value:0 } );
+      
+      } else  {
+        tx = seriesFrom.isMature() ?
+          await proxyContract.rollDebtMatureWithSignature(collatType, poolFrom, poolTo, acc, daiToBuy, maxFYDaiCost, signedSigs.get('controllerSig'), { gasLimit: BigNumber.from('500000'), value:0 } ) :  
+          await proxyContract.rollDebtEarlyWithSignature(collatType, poolFrom, poolTo, acc, daiToBuy, maxFYDaiCost, signedSigs.get('controllerSig'), { gasLimit: BigNumber.from('500000'), value:0 } );
+      } 
+
     } catch (e) {
       handleTxRejectError(e);
       return;
     }
+
     await handleTx(
       { 
         tx, 
