@@ -149,6 +149,8 @@ export const useImportProxy = () => {
     const signedSigs = await handleSignList(requestedSigs, genTxCode('IMPORT', series?.maturity.toString()));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
+    /* is ALL sigs are '0x' set noSigsReqd */
+    const noSigsReqd = Array.from(signedSigs.values()).every(item => item === '0x');
     
     /* 
       contract fns used:
@@ -244,6 +246,8 @@ export const useImportProxy = () => {
     const signedSigs = await handleSignList(requestedSigs, genTxCode('IMPORT', series?.maturity.toString()));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
+    /* is ALL sigs are '0x' set noSigsReqd */
+    const noSigsReqd = Array.from(signedSigs.values()).every(item => item === '0x');
 
     /*
       contract fn used: 

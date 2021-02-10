@@ -211,6 +211,8 @@ export const useBorrowProxy = () => {
     const signedSigs = await handleSignList(requestedSigs, genTxCode('BORROW', series?.maturity.toString()));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
+    /* is ALL sigs are '0x' set noSigsReqd */
+    const noSigsReqd = Array.from(signedSigs.values()).every(item => item === '0x');
 
     /* construct the calldata from method and reqd. args */
     const calldata = proxyContract.interface.encodeFunctionData( 
@@ -283,6 +285,8 @@ export const useBorrowProxy = () => {
     const signedSigs = await handleSignList(requestedSigs, genTxCode('REPAY', series?.maturity.toString()));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
+    /* is ALL sigs are '0x' set noSigsReqd */
+    const noSigsReqd = Array.from(signedSigs.values()).every(item => item === '0x');
           
     // repayDaiWithSignature(bytes32 collateral, uint256 maturity, address to, uint256 daiAmount, bytes memory daiSig, bytes memory controllerSig)
     const calldata = proxyContract.interface.encodeFunctionData( 
@@ -361,6 +365,8 @@ export const useBorrowProxy = () => {
     const signedSigs = await handleSignList(requestedSigs, genTxCode('SELL_DAI', series?.maturity.toString()));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
+    /* is ALL sigs are '0x' set noSigsReqd */
+    const noSigsReqd = Array.from(signedSigs.values()).every(item => item === '0x');
 
     /* construct the calldata. Fn selection Based on current authorization status */
     const calldata = proxyContract.interface.encodeFunctionData( 
@@ -439,6 +445,8 @@ export const useBorrowProxy = () => {
 
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
+    /* is ALL sigs are '0x' set noSigsReqd */
+    const noSigsReqd = Array.from(signedSigs.values()).every(item => item === '0x');
 
     /* contract fn: buyDaiWithSignature( IPool pool, address to, uint128 daiOut, uint128 maxFYDaiIn, bytes memory fyDaiSig, bytes memory poolSig ) */
     const calldata = proxyContract.interface.encodeFunctionData( 
