@@ -114,6 +114,7 @@ export const useRollProxy = () => {
     const noSigsReqd = Array.from(signedSigs.values()).every(item => item === '0x');
 
     const daiToBuy = await proxyContract.daiCostToRepay(collatType, poolFrom, parsedAmount);
+    const isRequestMoreThanDebt = seriesFrom.ethDebtDai && parsedAmount.gt(seriesFrom.ethDebtDai); 
 
     /* calculate expected trade values and factor in slippage */
     let maxFYDaiCost:string;
@@ -125,28 +126,28 @@ export const useRollProxy = () => {
     }
 
     let tx:any;
-    
+
     /* fn select options: signature required?  > fyDaiDebt more than requested? > series is mature? */
     try {
 
-      if ( noSigsReqd && seriesFrom.fyDaiBalance.lte(maxFYDaiCost))  {
+      if ( noSigsReqd && isRequestMoreThanDebt)  {
         tx = seriesFrom.isMature() ?
-          await proxyContract.rollAllMature(collatType, poolFrom, poolTo, acc, maxFYDaiCost, { gasLimit: BigNumber.from('500000'), value:0 } ) :
+          await proxyContract.rollAllMature(collatType, poolFrom, poolTo, acc, maxFYDaiCost, { gasLimit: BigNumber.from('600000'), value:0 } ) :
           await proxyContract.rollAllEarly(collatType, poolFrom, poolTo, acc, maxFYDaiCost, { gasLimit: BigNumber.from('500000'), value:0 } );
       
-      } else if ( noSigsReqd && seriesFrom.fyDaiBalance.gt(maxFYDaiCost)) {       
+      } else if ( noSigsReqd && !isRequestMoreThanDebt) {  
         tx = seriesFrom.isMature() ?
-          await proxyContract.rollDebtMature(collatType, poolFrom, poolTo, acc, daiToBuy, maxFYDaiCost, { gasLimit: BigNumber.from('500000'), value:0 } ) :  
+          await proxyContract.rollDebtMature(collatType, poolFrom, poolTo, acc, daiToBuy, maxFYDaiCost, { gasLimit: BigNumber.from('600000'), value:0 } ) :  
           await proxyContract.rollDebtEarly(collatType, poolFrom, poolTo, acc, daiToBuy, maxFYDaiCost, { gasLimit: BigNumber.from('500000'), value:0 } );
       
-      } else if ( !noSigsReqd && seriesFrom.fyDaiBalance.lte(maxFYDaiCost) ) {
+      } else if ( !noSigsReqd && isRequestMoreThanDebt) {
         tx = seriesFrom.isMature() ?
-          await proxyContract.rollAllMatureWithSignature(collatType, poolFrom, poolTo, acc, maxFYDaiCost, signedSigs.get('controllerSig'), { gasLimit: BigNumber.from('500000'), value:0 } ) :
+          await proxyContract.rollAllMatureWithSignature(collatType, poolFrom, poolTo, acc, maxFYDaiCost, signedSigs.get('controllerSig'), { gasLimit: BigNumber.from('600000'), value:0 } ) :
           await proxyContract.rollAllEarlyWithSignature(collatType, poolFrom, poolTo, acc, maxFYDaiCost, signedSigs.get('controllerSig'), { gasLimit: BigNumber.from('500000'), value:0 } );
       
       } else  {
         tx = seriesFrom.isMature() ?
-          await proxyContract.rollDebtMatureWithSignature(collatType, poolFrom, poolTo, acc, daiToBuy, maxFYDaiCost, signedSigs.get('controllerSig'), { gasLimit: BigNumber.from('500000'), value:0 } ) :  
+          await proxyContract.rollDebtMatureWithSignature(collatType, poolFrom, poolTo, acc, daiToBuy, maxFYDaiCost, signedSigs.get('controllerSig'), { gasLimit: BigNumber.from('600000'), value:0 } ) :  
           await proxyContract.rollDebtEarlyWithSignature(collatType, poolFrom, poolTo, acc, daiToBuy, maxFYDaiCost, signedSigs.get('controllerSig'), { gasLimit: BigNumber.from('500000'), value:0 } );
       } 
 
