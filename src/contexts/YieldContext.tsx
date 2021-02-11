@@ -2,10 +2,11 @@ import React, { useReducer, useEffect, useContext, createContext } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import { ethers } from 'ethers';
 
-import { nameFromMaturity, modColor, cleanValue } from '../utils';
+import { nameFromMaturity, modColor } from '../utils';
 import * as fyMath from '../utils/yieldMath';
+import { IYieldSeries } from '../types';
 
-import yieldEnv from './yieldEnv.json';
+import { addresses, contractsList, colors } from './yieldEnv.json';
 
 import { NotifyContext } from './NotifyContext';
 
@@ -13,11 +14,6 @@ import { useCachedState, } from '../hooks/appHooks';
 import { useCallTx } from '../hooks/chainHooks';
 import { useSignerAccount } from '../hooks/connectionHooks';
 import { useMigrations } from '../hooks/migrationHook';
-
-import { IYieldSeries } from '../types';
-
-
-const { addresses, contractsList, colors } = yieldEnv;
 
 const YieldContext = createContext<any>({});
 
@@ -143,7 +139,6 @@ const YieldProvider = ({ children }: any) => {
             symbol,
             maturity: maturity.toNumber(),
             poolAddress,
-            maturity_: new Date(maturity * 1000),
             displayName: nameFromMaturity(maturity),
             displayNameMobile:  nameFromMaturity(maturity, 'MMM yyyy'), 
             seriesColor: colors.seriesColors[i],
@@ -181,20 +176,15 @@ const YieldProvider = ({ children }: any) => {
     }
 
     const _ilks = await callTx(_deployedContracts.Vat, 'Vat', 'ilks', [ethers.utils.formatBytes32String('ETH-A') ]);
-    // Ray precision is used for ilks.spot and ilks.rate
+    // Note: Ray precision is used for Maker ilks.spot and ilks.rate
     const ethPriceInRay = fyMath.mulDecimal('1.5', (_ilks.spot).toString()); 
     const ethPrice = fyMath.divDecimal(ethPriceInRay, '1e27');
 
     /* parse and return feed data if reqd. */
     const _feedData = {
       ..._state,
-      ilks: {
-        ..._ilks,
-        spot_: fyMath.divDecimal(_ilks.spot, '1e27'),
-        rate_: fyMath.divDecimal(_ilks.rate, '1e27'),
-      },
+      ilks: _ilks,
       ethPrice,
-      ethPrice_: cleanValue(ethPrice, 2),
     };
 
     setCachedFeed(_feedData);
