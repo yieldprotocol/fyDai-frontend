@@ -3,7 +3,7 @@ import { NavLink, useParams } from 'react-router-dom';
 import { ethers } from 'ethers';
 import { Box, Keyboard, TextInput, Text, ResponsiveContext, Collapsible, Layer } from 'grommet';
 import { FiArrowRight as ArrowRight } from 'react-icons/fi';
-import { VscHistory as History } from 'react-icons/vsc';
+import { VscHistory as HistoryIcon } from 'react-icons/vsc';
 
 /* utils and support */
 import { cleanValue, genTxCode } from '../utils';
@@ -23,6 +23,7 @@ import { useBorrowProxy } from '../hooks/borrowProxyHook';
 /* containers */
 import CloseDai from './CloseDai';
 import Redeem from './Redeem';
+import History from './History';
 
 /* components */
 import InputWrap from '../components/InputWrap';
@@ -33,7 +34,6 @@ import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
 import SeriesMatureBox from '../components/SeriesMatureBox';
-import TxHistory from '../components/TxHistory';
 import HistoryWrap from '../components/HistoryWrap';
 import DaiMark from '../components/logos/DaiMark';
 import RaisedBox from '../components/RaisedBox';
@@ -167,7 +167,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
 
         { histOpen && 
         <HistoryWrap closeLayer={()=>setHistOpen(false)}>
-          <TxHistory 
+          <History 
             filterTerms={['Lent', 'Closed']}
             series={activeSeries}
           />
@@ -316,9 +316,6 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
                 />       
               </Box>
             </>}
-{/*           
-            { activeSeries?.isMature() &&
-            <SeriesMatureBox />} */}
             
             { !txActive && 
             !!account && 
@@ -336,7 +333,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
                     onClick={()=>setHistOpen(true)}
                     label={
                       <Box direction='row' gap='small' align='center'>
-                        <Text size='xsmall' color='text-weak'><History /></Text>                
+                        <Text size='xsmall' color='text-weak'><HistoryIcon /></Text>                
                         <Text size='xsmall' color='text-weak'>
                           Series Lend History
                         </Text>              

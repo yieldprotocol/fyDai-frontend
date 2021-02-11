@@ -7,7 +7,7 @@ import {
   FiArrowLeft as ArrowLeft,
   FiInfo as Info,
 } from 'react-icons/fi';
-import { VscHistory as History } from 'react-icons/vsc';
+import { VscHistory as HistoryIcon } from 'react-icons/vsc';
 
 /* utils and support */
 import { cleanValue, nFormatter } from '../utils';
@@ -29,6 +29,7 @@ import { useMath } from '../hooks/mathHooks';
 
 /* containers */ 
 import RemoveLiquidity from './RemoveLiquidity';
+import History from './History';
 
 /* components */
 import InfoGrid from '../components/InfoGrid';
@@ -39,14 +40,12 @@ import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
 import SeriesMatureBox from '../components/SeriesMatureBox';
-import TxHistory from '../components/TxHistory';
 import HistoryWrap from '../components/HistoryWrap';
 import RaisedBox from '../components/RaisedBox';
 import DaiMark from '../components/logos/DaiMark';
 import YieldMobileNav from '../components/YieldMobileNav';
 import Loading from '../components/Loading';
 import StickyButton from '../components/StickyButton';
-
 
 interface IPoolProps {
   openConnectLayer:any;
@@ -190,7 +189,6 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
               </Text>
             </Box>
 
-
             <Box alignSelf='start' margin={{ top:'medium' }}>
               <FlatButton 
                 onClick={()=>setExplainerOpen(false)}
@@ -207,7 +205,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
 
         { histOpen && 
         <HistoryWrap closeLayer={()=>setHistOpen(false)}>
-          <TxHistory 
+          <History 
             filterTerms={[ 'Added', 'Removed' ]}
             series={activeSeries}
           />
@@ -231,7 +229,6 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
               },
               {
                 label: 'Your Pool share',
-                // labelExtra: ()=>(<Text size='xxsmall'> of the total <Text size='xxsmall' color='text'>{nFormatter(activeSeries?.totalSupply_, 0)}</Text> tokens </Text>),
                 labelExtra: ()=>(<Text size='xxsmall'> of the total tokens </Text>),
                 visible: 
                     (!!account && !activeSeries?.isMature()) || 
@@ -420,7 +417,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                     onClick={()=>setHistOpen(true)}
                     label={
                       <Box direction='row' gap='small' align='center'>
-                        <Text size='xsmall' color='text-weak'><History /></Text>                
+                        <Text size='xsmall' color='text-weak'><HistoryIcon /></Text>                
                         <Text size='xsmall' color='text-weak'>
                           Series Pool History
                         </Text>              

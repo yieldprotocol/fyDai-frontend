@@ -3,7 +3,7 @@ import { ethers } from 'ethers';
 import { useParams, useHistory, NavLink } from 'react-router-dom';
 import { Keyboard, Box, TextInput, Text, ThemeContext, ResponsiveContext, Collapsible, Layer } from 'grommet';
 import { FiArrowRight as ArrowRight } from 'react-icons/fi';
-import { VscHistory as History } from 'react-icons/vsc';
+import { VscHistory as HistoryIcon } from 'react-icons/vsc';
 
 /* utils and support */
 import { abbreviateHash, cleanValue, genTxCode } from '../utils';
@@ -22,6 +22,7 @@ import { useBorrowProxy } from '../hooks/borrowProxyHook';
 /* containers */
 import Repay from './Repay';
 import RateLock from './RateLock';
+import History from './History';
 
 /* components */
 import DaiMark from '../components/logos/DaiMark';
@@ -34,7 +35,6 @@ import ActionButton from '../components/ActionButton';
 import RaisedButton from '../components/RaisedButton';
 import FlatButton from '../components/FlatButton';
 import SeriesMatureBox from '../components/SeriesMatureBox';
-import TxHistory from '../components/TxHistory';
 import HistoryWrap from '../components/HistoryWrap';
 import RaisedBox from '../components/RaisedBox';
 import YieldMobileNav from '../components/YieldMobileNav';
@@ -222,7 +222,7 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
         { 
         histOpen && 
         <HistoryWrap closeLayer={()=>setHistOpen(false)}>
-          <TxHistory 
+          <History 
             filterTerms={['Borrowed', 'Deposited', 'Withdrew', 'Repaid', 'Imported', 'Rolled' ]}
             series={activeSeries}
           />
@@ -535,7 +535,7 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
                   onClick={()=>setHistOpen(true)}
                   label={
                     <Box direction='row' gap='small' align='center'>
-                      <Text size='xsmall' color='text-weak'><History /></Text>                
+                      <Text size='xsmall' color='text-weak'><HistoryIcon /></Text>                
                       <Text size='xsmall' color='text-weak'>
                         Series Borrow History
                       </Text>              

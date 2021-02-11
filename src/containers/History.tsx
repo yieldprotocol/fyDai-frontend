@@ -9,10 +9,10 @@ import {
 } from 'react-icons/fi';
 
 import { UserContext } from '../contexts/UserContext';
-import EtherscanButton from './EtherscanButton';
+import EtherscanButton from '../components/EtherscanButton';
 import { IYieldSeries } from '../types';
-import Loading from './Loading';
-import HashWrap from './HashWrap';
+import Loading from '../components/Loading';
+import HashWrap from '../components/HashWrap';
 import { modColor, cleanValue, nameFromMaturity } from '../utils';
 
 
@@ -29,7 +29,7 @@ const InsetBox = styled(Box)`
       box-shadow: inset 6px 6px 11px ${modColor(props.background, -20)}, inset -6px -6px 11px ${modColor(props.background, 10)};
   `}`;
 
-const TxHistory = ( { filterTerms, series }: HistoryProps) => {
+const History = ( { filterTerms, series }: HistoryProps) => {
   const { state } = useContext(UserContext);
   const [ txHistory, setTxHistory] = useState<any>([]);
   const [ itemOpen, setItemOpen ] = useState<any>(null);
@@ -45,12 +45,20 @@ const TxHistory = ( { filterTerms, series }: HistoryProps) => {
         <Box direction='row' gap='xsmall' align='center'>
           <Text size='xsmall' color={series?.seriesColor || 'text-weak'}>{item.event}</Text>
           <Text size='xxsmall'> 
+
             { (item.event === 'Deposited' || item.event === 'Withdrew') && `${item.collateral} collateral`}
-            { (item.event === 'Added' || item.event === 'Removed') && 'liquidity Tokens '}           
-            { item.event === 'Imported' && ' Maker debt to ' }    
-            { item.APR && `@ ${ cleanValue(item.APR, 2) }%` }
-            { item.event === 'Rolled' && 'debt to '}
-            { item.maturity && nameFromMaturity(item.maturity) }
+            { item.event === 'Removed' && 'tokens from '}  
+            { item.event === 'Added' && 'liquidity tokens to '}    
+            
+            { item.event === 'Rolled' && `debt from ${ nameFromMaturity(item.maturityFrom, 'MMM yy') } to ` }
+            { item.event === 'Imported' && 'Maker debt to ' }
+            { item.event === 'Repaid' && 'debt from ' }
+
+            { item.event === 'Lent' && 'to ' }
+            { item.event === 'Closed' && 'from ' }
+
+            { item.event === 'Borrowed' && item.APR && ` @ ${ cleanValue(item.APR, 2) }% ` }
+            { item.maturity && nameFromMaturity(item.maturity ) }
           </Text>
         </Box>
       );
@@ -213,4 +221,4 @@ const TxHistory = ( { filterTerms, series }: HistoryProps) => {
   );
 };
 
-export default TxHistory;
+export default History;

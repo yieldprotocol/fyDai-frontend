@@ -24,9 +24,11 @@ import { injected, walletconnect } from '../connectors';
 import metamaskImage from '../assets/images/providers/metamask.png';
 import walletConnectImage from '../assets/images/providers/walletconnect.png';
 
+
+import History from '../containers/History';
+
 import RaisedButton from '../components/RaisedButton';
 import FlatButton from '../components/FlatButton';
-import TxHistory from '../components/TxHistory';
 import YieldSettings from '../components/YieldSettings';
 import ExperimentWrap from '../components/ExperimentWrap';
 import HashWrap from '../components/HashWrap';
@@ -217,9 +219,9 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                 </Box>
 
                 <Box>
-                  {histOpen === 'BORROW' && <TxHistory filterTerms={['Borrowed', 'Repaid', 'Deposited', 'Withdrew', 'Imported', 'Rolled']} series={null} />}
-                  {histOpen === 'LEND' && <TxHistory filterTerms={['Closed', 'Lent' ]} series={null} />}
-                  {histOpen === 'POOL' && <TxHistory filterTerms={['Added', 'Removed' ]} series={null} />}
+                  {histOpen === 'BORROW' && <History filterTerms={['Borrowed', 'Repaid', 'Deposited', 'Withdrew', 'Imported', 'Rolled']} series={null} />}
+                  {histOpen === 'LEND' && <History filterTerms={['Closed', 'Lent' ]} series={null} />}
+                  {histOpen === 'POOL' && <History filterTerms={['Added', 'Removed' ]} series={null} />}
                 </Box>
               </Box> }
 

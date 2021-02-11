@@ -261,14 +261,14 @@ export const calcTokensMinted =(
 ) : string => {
 
   const xReserves_ = new Decimal(xReserves.toString());
-  const totalSupply_ = new Decimal(totalSupply.toString());
-  const yReserves_ = new Decimal(yReserves.toString());
-  const xInput_ = new Decimal(xInput.toString());
+  const _totalSupply = new Decimal(totalSupply.toString());
+  const _yReserves = new Decimal(yReserves.toString());
+  const _xInput = new Decimal(xInput.toString());
 
-  const xOffered = (xInput_.mul(xReserves_)).div( yReserves_.add(xReserves_) );   
+  const xOffered = (_xInput.mul(xReserves_)).div( _yReserves.add(xReserves_) );   
   // const [xOffered, ] =  splitLiquidity(xReserves, yReserves, xInput);
 
-  return (totalSupply_).mul(xOffered).div(xReserves_).toString() ;
+  return (_totalSupply).mul(xOffered).div(xReserves_).toString() ;
 };
 
 /**
