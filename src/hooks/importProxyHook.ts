@@ -19,16 +19,13 @@ import { useController } from './controllerHook';
 import { usePool } from './poolHook';
 
 import { genTxCode } from '../utils';
-import { calculateSlippage, floorDecimal, mulDecimal, ONE } from '../utils/yieldMath';
+import { calculateSlippage, floorDecimal, ONE } from '../utils/yieldMath';
 
 /**
  * Hook for interacting with the ImportProxy Contract.
  * 
  * @returns { function } importPosition
  * @returns { function } importVault
- * 
- * @returns { function } debtToDai
- * @returns { function } daiToDebt
  * 
  */
 export const useImportProxy = () => {

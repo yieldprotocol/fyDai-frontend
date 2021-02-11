@@ -114,17 +114,7 @@ export function useToken() {
       signer
     );
 
-    if (!asProxy) {
-      try {
-        tx = await contract.approve(delegateAddr, parsedAmount);
-      } catch (e) {
-        return handleTxRejectError(e);
-      }
-      /* Transaction reporting & tracking */
-      await handleTx({ tx, msg: 'Token authorization', type: 'AUTH_TOKEN', series: series||null, value: null });
-      
-    } else { 
-
+    if (asProxy) {
       const calldata = contract.interface.encodeFunctionData('approve', [delegateAddr, parsedAmount]);   
       tx = await proxyExecute( 
         tokenAddr,
@@ -132,6 +122,16 @@ export function useToken() {
         { },
         { tx:null, msg: 'Token authorization', type: 'AUTH_TOKEN', series: series || null, value : null  }
       );
+
+    } else { 
+
+      try {
+        tx = await contract.approve(delegateAddr, parsedAmount);
+      } catch (e) {
+        return handleTxRejectError(e);
+      }
+      /* handle transaction reporting & tracking */
+      await handleTx({ tx, msg: 'Token authorization', type: 'AUTH_TOKEN', series: series||null, value: null });
     }
 
   };

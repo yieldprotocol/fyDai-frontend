@@ -11,7 +11,6 @@ import { useTxHelpers } from './txHooks';
  * Hook for interacting with the Yield Proxy Contract.
  * 
  * @returns { function } dsBuild
- * @returns { boolean } buildActive
  * 
  */
 export const useDsRegistry = () => {
@@ -22,9 +21,6 @@ export const useDsRegistry = () => {
 
   /* state from contexts */
   const  { state: { deployedContracts } }  = useContext<any>(YieldContext);
-
-  /* local state */
-  const [ buildActive, setBuildActive ] = useState<boolean>(false);
 
   /* hooks */ 
   const { signer, account } = useSignerAccount();
@@ -45,18 +41,15 @@ export const useDsRegistry = () => {
    * */
   const buildDsProxy = async () => {
     let tx:any;
-    setBuildActive(true);
     try {
       tx = await proxyRegistryContract['build()']();
     } catch (e) {
       handleTxRejectError(e);
-      setBuildActive(false);
       return;
     }
     // eslint-disable-next-line no-console
     console.log('Building dsProxy');
     await handleTx({ tx, msg:'Building new dsProxy', type:'CREATE_PROXY', series: null, value: null });
-    setBuildActive(false);
   };
 
   /**
@@ -79,7 +72,7 @@ export const useDsRegistry = () => {
 
   return {
     /* dsProxy eq. fns */
-    buildDsProxy, buildActive,
+    buildDsProxy,
     getDsProxyAddress,
     
   } as const;

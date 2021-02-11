@@ -54,7 +54,6 @@ export const useDebounce = (value:any, delay:number) => {
   return debouncedValue;
 };
 
-
 export const useIsLol = (value:string|undefined|null) => {
   const [isLol, setIsLol] = useState<any>();
   

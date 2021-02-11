@@ -73,7 +73,7 @@ export const useEvents = () => {
     return logs;
   };
 
-  /* adds a parsed layer onto the returned values  (format dates, numbers to strings, */ 
+  /* Adds a parsed layer onto the returned values (for example, this will format dates, numbers to strings, */ 
   const parseEventList = async (eventList:any) => {
     const parsedList = Promise.all( eventList.map(async (x:any)=>{
       const { timestamp } = await provider.getBlock(x.blockNumber);

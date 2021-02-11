@@ -23,12 +23,8 @@ import { useController } from './controllerHook';
 /**
  * Hook for interacting with the Yield Proxy Contract.
  * 
- * @returns { function } postEth
- * @returns { function } withdrawEth
- * @returns { function } borrowDai
- * @returns { function } repayDaiDebt
- * @returns { function } buyDai
- * @returns { function } sellDai
+ * @returns { function } RollDebt
+ * @returns { function } estNewSeriesDebt
  * 
  */
 export const useRollProxy = () => {

@@ -231,7 +231,6 @@ export const usePool = () => {
     return true;
   };
 
-  
   /**
    * @dev Checks to see if an account (user) has delegated a contract/3rd Party for a particular market. 
    * @param {string} poolAddress address of the market in question.
@@ -349,10 +348,8 @@ export const usePool = () => {
    * @param {string} previewType string represnting transaction type //TODO tyescript it out
    * @param {IYieldSeries} series fyDai series to redeem from.
    * @param {number | BigNumber} amount input to preview
-   * @param {boolean} runLocal run run the simulation locally (no call required)
+   * @param {boolean} runLocal run the simulation locally (no blockchain call required)
    * 
-   * @note NB NB if in BigNumber must be in wei
-   *  
    * @returns {BigNumber| null} BigNumber in WEI/WAD precision - Dai or fyDai (call dependent)
    * 
    * @note call function 

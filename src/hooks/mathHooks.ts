@@ -75,7 +75,6 @@ export const useMath = () => {
     return borrowingPower( collateralAmount, feedData.ethPrice, debtValue ); 
   };
 
-
   /**
    * Estimates the pool share given 
    *
@@ -131,7 +130,17 @@ export const useMath = () => {
     return resFloat || 0;
   };
 
-
+  /**
+   * 
+   * Estimates trade Value  (equivalent to PreviewTx, but clientside)
+   * 
+   * @param {string} tradeType 
+   * @param {IYieldSeries} series 
+   * @param {number| BigNumber} amount 
+   * 
+   * @returns { BigNumber | Error }
+   * 
+   * */
   const estTrade = (
     tradeType: string,
     series: IYieldSeries,  
