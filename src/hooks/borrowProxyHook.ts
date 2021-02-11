@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext } from 'react';
 import { ethers, BigNumber }  from 'ethers';
 
-import { MAX_INT, cleanValue  } from '../utils';
+import { MAX_INT, cleanValue, genTxCode  } from '../utils';
 import { calculateSlippage } from '../utils/yieldMath';
 
 import { ISignListItem, IYieldSeries } from '../types';
@@ -16,13 +16,9 @@ import { UserContext } from '../contexts/UserContext';
 import { useSignerAccount } from './connectionHooks';
 import { usePool } from './poolHook';
 import { useToken } from './tokenHook';
-
 import { useSigning } from './signingHook';
-
 import { useDsProxy } from './dsProxyHook';
-
 import { useController } from './controllerHook';
-import { genTxCode } from '../utils';
 
 /**
  * Hook for interacting with the Yield Proxy Contract.
@@ -87,7 +83,9 @@ export const useBorrowProxy = () => {
     /* NB. postEth is the only function with NO sig requirements - nevertheless, send to empty array to handleSignList() */
     /* build and use signatures if required */
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
+    
     /* NB. fn POSTETH is the only function with NO sig requirements - nevertheless, send to empty Map to handleSignList() */
+
     /* Send the required signatures out for signing, or approval tx if fallback is required */
     const signedSigs = await handleSignList(requestedSigs, genTxCode('POST', null));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
@@ -138,12 +136,19 @@ export const useBorrowProxy = () => {
     const signedSigs = await handleSignList(requestedSigs, genTxCode('WITHDRAW', null));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
+    /* if ALL sigs are '0x' set noSigsReqd */
+    const noSigsReqd = Array.from(signedSigs.values()).every(item => item === '0x');
 
     /* construct the calldata from method and reqd. args and sigs */
-    const calldata = proxyContract.interface.encodeFunctionData( 
-      'withdrawWithSignature', 
-      [ toAddr, parsedAmount, signedSigs.get('controllerSig') ] 
-    );
+    const calldata = noSigsReqd ? 
+      proxyContract.interface.encodeFunctionData( 
+        'withdraw', 
+        [ toAddr, parsedAmount, signedSigs.get('controllerSig') ] 
+      ) :
+      proxyContract.interface.encodeFunctionData( 
+        'withdrawWithSignature', 
+        [ toAddr, parsedAmount, signedSigs.get('controllerSig') ] 
+      );
     
     /* send to the proxy for execution */
     await proxyExecute( 
@@ -177,14 +182,13 @@ export const useBorrowProxy = () => {
     collateralType: string,
     daiToBorrow: number,
   ) => {
+
+    /* Parse/clean the inputs */
     const dai = ethers.utils.parseEther(daiToBorrow.toString());
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const toAddr = account && ethers.utils.getAddress(account);
     const parsedMaturity = series.maturity.toString();
     const collatType = ethers.utils.formatBytes32String(collateralType);
-    const overrides = { 
-      gasLimit: BigNumber.from('400000')
-    };
 
     /* get estimated maxFYDai */
     let maxFYDai:string;
@@ -210,14 +214,22 @@ export const useBorrowProxy = () => {
     const signedSigs = await handleSignList(requestedSigs, genTxCode('BORROW', series?.maturity.toString()));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
-    /* is ALL sigs are '0x' set noSigsReqd */
+    /* if ALL sigs are '0x' set noSigsReqd */
     const noSigsReqd = Array.from(signedSigs.values()).every(item => item === '0x');
 
     /* construct the calldata from method and reqd. args */
-    const calldata = proxyContract.interface.encodeFunctionData( 
-      'borrowDaiForMaximumFYDaiWithSignature', 
-      [ poolAddr, collatType, parsedMaturity, toAddr, dai, maxFYDai, signedSigs.get('controllerSig') ]
-    );
+    const calldata = noSigsReqd ? 
+      proxyContract.interface.encodeFunctionData( 
+        'borrowDaiForMaximumFYDai', 
+        [ poolAddr, collatType, parsedMaturity, toAddr, dai, maxFYDai ]
+      ) :
+      proxyContract.interface.encodeFunctionData( 
+        'borrowDaiForMaximumFYDaiWithSignature', 
+        [ poolAddr, collatType, parsedMaturity, toAddr, dai, maxFYDai, signedSigs.get('controllerSig') ]
+      );
+    
+    /* set the gas limits based on whether sigs are required */
+    const overrides = noSigsReqd ? { gasLimit: BigNumber.from('300000'), value:0 } :{ gasLimit: BigNumber.from('400000'), value:0 };
 
     /* send to the proxy for execution */
     await proxyExecute( 
@@ -255,10 +267,6 @@ export const useBorrowProxy = () => {
     const collatType = ethers.utils.formatBytes32String(collateralType);
     const toAddr = account && ethers.utils.getAddress(account);
     const parsedMaturity = series.maturity.toString();
-    const overrides = {
-      gasLimit: BigNumber.from('350000'),
-      value: 0,
-    };
 
     /* build and use signature if required , else '0x' */
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
@@ -292,7 +300,10 @@ export const useBorrowProxy = () => {
       'repayDaiWithSignature', 
       [ collatType, parsedMaturity, toAddr, dai, signedSigs.get('daiSig'), signedSigs.get('controllerSig')]
     );
-    
+
+    /* set the gas limits based on whether sigs are required */
+    const overrides = noSigsReqd ? { gasLimit: BigNumber.from('350000'), value:0 } :{ gasLimit: BigNumber.from('350000'), value:0 };
+
     /* send to the proxy for execution */
     await proxyExecute( 
       proxyContract.address, 
@@ -323,14 +334,8 @@ export const useBorrowProxy = () => {
     /* Processing and/or sanitizing input */
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const poolContract = new ethers.Contract( poolAddr, Pool.abi as any, provider);
-
     const parsedDaiIn = BigNumber.isBigNumber(daiIn)? daiIn : ethers.utils.parseEther(daiIn.toString());
     const toAddr = account && ethers.utils.getAddress(account);
-
-    const overrides = { 
-      gasLimit: BigNumber.from('250000'),
-      value: 0,
-    };
 
     /* calculate expected trade values and factor in slippage */
     let minFYDaiOut:string;
@@ -364,14 +369,22 @@ export const useBorrowProxy = () => {
     const signedSigs = await handleSignList(requestedSigs, genTxCode('SELL_DAI', series?.maturity.toString()));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
-    /* is ALL sigs are '0x' set noSigsReqd */
+    /* if ALL sigs are '0x' set noSigsReqd */
     const noSigsReqd = Array.from(signedSigs.values()).every(item => item === '0x');
 
     /* construct the calldata. Fn selection Based on current authorization status */
-    const calldata = proxyContract.interface.encodeFunctionData( 
-      'sellDaiWithSignature',
-      [ poolAddr, toAddr, parsedDaiIn, minFYDaiOut, signedSigs.get('daiSig'), signedSigs.get('poolSig') ]
-    );
+    const calldata = noSigsReqd ? 
+      proxyContract.interface.encodeFunctionData( 
+        'sellDai',
+        [ poolAddr, toAddr, parsedDaiIn, minFYDaiOut, signedSigs.get('daiSig') ]
+      ):
+      proxyContract.interface.encodeFunctionData( 
+        'sellDaiWithSignature',
+        [ poolAddr, toAddr, parsedDaiIn, minFYDaiOut, signedSigs.get('daiSig'), signedSigs.get('poolSig') ]
+      );
+    
+    /* set the gas limits based on whether sigs are required */
+    const overrides = noSigsReqd ? { gasLimit: BigNumber.from('150000'), value:0 } :{ gasLimit: BigNumber.from('250000'), value:0 };
 
     /* send to the proxy for execution */
     await proxyExecute( 
@@ -401,15 +414,9 @@ export const useBorrowProxy = () => {
     /* Processing and/or sanitizing input */
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const poolContract = new ethers.Contract( poolAddr, Pool.abi as any, provider);
-
     const fyDaiAddr = ethers.utils.getAddress(series.fyDaiAddress);
     const parsedDaiOut = BigNumber.isBigNumber(daiOut)? daiOut : ethers.utils.parseEther(daiOut.toString());
     const toAddr = account && ethers.utils.getAddress(account);
-
-    const overrides = { 
-      gasLimit: BigNumber.from('250000'),
-      value: 0,
-    };
   
     /* calculate expected trade values and factor in slippage */
     let maxFYDaiIn:string;
@@ -444,15 +451,24 @@ export const useBorrowProxy = () => {
 
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
-    /* is ALL sigs are '0x' set noSigsReqd */
+    /* if ALL sigs are '0x' set noSigsReqd */
     const noSigsReqd = Array.from(signedSigs.values()).every(item => item === '0x');
 
+
     /* contract fn: buyDaiWithSignature( IPool pool, address to, uint128 daiOut, uint128 maxFYDaiIn, bytes memory fyDaiSig, bytes memory poolSig ) */
-    const calldata = proxyContract.interface.encodeFunctionData( 
-      'buyDaiWithSignature',
-      [ poolAddr, toAddr, parsedDaiOut, maxFYDaiIn, signedSigs.get('fyDaiSig'), signedSigs.get('poolSig') ]
-    );
-    
+    const calldata = noSigsReqd ? 
+      proxyContract.interface.encodeFunctionData( 
+        'buyDai',
+        [ poolAddr, toAddr, parsedDaiOut, maxFYDaiIn, signedSigs.get('fyDaiSig') ]
+      ): 
+      proxyContract.interface.encodeFunctionData( 
+        'buyDaiWithSignature',
+        [ poolAddr, toAddr, parsedDaiOut, maxFYDaiIn, signedSigs.get('fyDaiSig'), signedSigs.get('poolSig') ]
+      );
+
+    /* set the gas limits based on whether sigs are required */
+    const overrides = noSigsReqd ? { gasLimit: BigNumber.from('175000'), value:0 } :{ gasLimit: BigNumber.from('250000'), value:0  };
+ 
     await proxyExecute( 
       proxyContract.address, 
       calldata,
