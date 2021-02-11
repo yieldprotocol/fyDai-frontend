@@ -1,3 +1,5 @@
+import { format, subDays } from 'date-fns';
+
 /* Trunctate a string value to a certain number of 'decimal' point */
 export const cleanValue = (input:string, decimals:number=12) => {
   const re = new RegExp(`(\\d+\\.\\d{${decimals}})(\\d)`);
@@ -16,6 +18,19 @@ export const genTxCode = (txType: string, series:string|null) => {
 /* handle Address/hash shortening */
 export const abbreviateHash = (addr:string, buffer:number=4) => {
   return `${addr?.substring(0, buffer)}...${addr?.substring(addr.length - buffer)}`; 
+};
+
+/* get the series name from the maturity number */
+export const nameFromMaturity = ( maturity: number, style:string='MMMM yyyy') => {
+
+  /* 
+      full (defualt) : 'MMMM yyyy'
+      apr badge : 'MMM yy'
+      mobile: 'MMM yyyy'  
+  */ 
+
+  return format( subDays( new Date(maturity*1000), 2), style); 
+ 
 };
 
 /**

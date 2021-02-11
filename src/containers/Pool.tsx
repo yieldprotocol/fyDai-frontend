@@ -269,7 +269,12 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
               },
             ]}
           /> 
-        </SeriesDescriptor>   
+        </SeriesDescriptor>  
+
+        { 
+          activeSeries?.isMature() &&
+          <SeriesMatureBox />
+        } 
 
         { (!txActive || txActive.type === 'REMOVE_LIQUIDITY') &&
         <Box
@@ -412,9 +417,8 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
             </>}
 
             
-
-            { activeSeries?.isMature() &&
-            <SeriesMatureBox />}
+            {/* { activeSeries?.isMature() &&
+            <SeriesMatureBox />} */}
             
             { !txActive && 
             !!account && 
@@ -463,7 +467,6 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                       }
                     />               
                   }
-
                 </Box>}
             </Box>
 

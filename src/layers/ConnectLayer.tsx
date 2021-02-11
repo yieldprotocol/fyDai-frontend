@@ -68,7 +68,6 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
         >
           <Box
             width={!mobile?{ min:'620px', max:'620px' }: undefined}
-            // height={!mobile?{ min:'750px', max:'750px' }: undefined}
             background="background"
             fill="vertical"
             style={{
@@ -218,7 +217,7 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                 </Box>
 
                 <Box>
-                  {histOpen === 'BORROW' && <TxHistory filterTerms={['Borrowed', 'Repaid', 'Deposited', 'Withdrew', 'Imported']} series={null} />}
+                  {histOpen === 'BORROW' && <TxHistory filterTerms={['Borrowed', 'Repaid', 'Deposited', 'Withdrew', 'Imported', 'Rolled']} series={null} />}
                   {histOpen === 'LEND' && <TxHistory filterTerms={['Closed', 'Lent' ]} series={null} />}
                   {histOpen === 'POOL' && <TxHistory filterTerms={['Added', 'Removed' ]} series={null} />}
                 </Box>

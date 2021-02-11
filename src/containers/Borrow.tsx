@@ -5,6 +5,8 @@ import { Keyboard, Box, TextInput, Text, ThemeContext, ResponsiveContext, Collap
 import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 import { VscHistory as History } from 'react-icons/vsc';
 
+import { FiClock as Clock } from 'react-icons/fi';
+
 /* utils and support */
 import { abbreviateHash, cleanValue, genTxCode } from '../utils';
 
@@ -224,7 +226,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
         histOpen && 
         <HistoryWrap closeLayer={()=>setHistOpen(false)}>
           <TxHistory 
-            filterTerms={['Borrowed', 'Deposited', 'Withdrew', 'Repaid', 'Imported' ]}
+            filterTerms={['Borrowed', 'Deposited', 'Withdrew', 'Repaid', 'Imported', 'Rolled' ]}
             series={activeSeries}
           />
         </HistoryWrap>
@@ -372,6 +374,11 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
             ]}
           />
         </SeriesDescriptor>
+
+        { 
+          activeSeries?.isMature() &&
+          <SeriesMatureBox />
+        }
    
         { 
         /* If no transaction in progress : */
@@ -512,11 +519,6 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
               />
               }
             </Box>
-            }
-
-            { 
-            activeSeries?.isMature() &&
-            <SeriesMatureBox />
             }
             
             { 

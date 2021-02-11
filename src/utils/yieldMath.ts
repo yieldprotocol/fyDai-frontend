@@ -206,7 +206,7 @@ export function fyDaiForMint(
 
   let i = 0;
   while ( true ) {
-
+    
     const zIn = new Decimal( buyFYDai(daiReserves, fyDaiVirtualReserves, BigNumber.from(yOut.toFixed(0)), timeTillMaturity_.toString() ) );
     const Z_1 = daiReserves_.add(zIn); // New dai reserves
     const Y_1 = fyDaiRealReserves_.sub(yOut); // New fyDai reserves

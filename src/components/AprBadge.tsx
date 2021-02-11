@@ -1,5 +1,4 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { format, subDays } from 'date-fns';
 import { Box, ResponsiveContext, Text } from 'grommet';
 
 import {
@@ -8,6 +7,8 @@ import {
 } from 'react-icons/fi';
 
 import { IYieldSeries } from '../types';
+
+import { nameFromMaturity } from '../utils';
 import Loading from './Loading';
 
 interface IAprBadgeProps {
@@ -25,7 +26,7 @@ function AprBadge({ activeView, series, animate }:IAprBadgeProps) {
   /* Set Series description/display name */
   useEffect(()=>{
     setSeriesMature(series.isMature());
-    setSeriesApr( format( subDays( new Date(series.maturity), 2), 'MMM \'YY'));
+    setSeriesApr( nameFromMaturity(series.maturity, 'MMM yy') );
     series.poolState?.active && ( async () => setSeriesApr( `${series.yieldAPR_} %`) )(); 
   }, [ series ]);
 
@@ -71,7 +72,7 @@ function AprBadge({ activeView, series, animate }:IAprBadgeProps) {
               color={series?.seriesTextColor}
             > 
               { activeView==='pool'? 
-                format( subDays( new Date(series.maturity*1000), 2), 'MMM yy')
+                nameFromMaturity( series.maturity, 'MMM yy' )
                 : seriesApr } 
             </Text> 
           </Loading>
