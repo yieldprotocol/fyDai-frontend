@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import styled, { css } from 'styled-components';
-import { format } from 'date-fns';
 import { Box, Text, Collapsible, ThemeContext } from 'grommet';
+import { format } from 'date-fns';
 
 import {
   FiChevronDown as ChevronDown,
@@ -13,7 +13,8 @@ import EtherscanButton from './EtherscanButton';
 import { IYieldSeries } from '../types';
 import Loading from './Loading';
 import HashWrap from './HashWrap';
-import { modColor, cleanValue} from '../utils';
+import { modColor, cleanValue, nameFromMaturity } from '../utils';
+
 
 interface HistoryProps {
   filterTerms: string[];
@@ -46,9 +47,14 @@ const TxHistory = ( { filterTerms, series }: HistoryProps) => {
           <Text size='xxsmall'> 
             { (item.event === 'Deposited' || item.event === 'Withdrew') && `${item.collateral} collateral`}
             { (item.event === 'Added' || item.event === 'Removed') && 'liquidity Tokens '} 
-            { item.event === 'Imported' && ' Maker debt to ' }
-            { item.maturity && format( new Date(item.maturity*1000), 'MMMM yyyy') }
-            { item.APR && `@ ${cleanValue(item.APR, 2)}%` }
+            
+            { item.event === 'Imported' && ' Maker debt to ' }    
+
+            { item.APR && `@ ${ cleanValue(item.APR, 2) }%` }
+
+            { item.event === 'Rolled' && 'debt to '}
+
+            { item.maturity && nameFromMaturity(item.maturity) }
           </Text>
         </Box>
       );
@@ -71,6 +77,14 @@ const TxHistory = ( { filterTerms, series }: HistoryProps) => {
         <Box fill>
           <Text size='xxsmall'>Amount owed @ maturity</Text>
           <Text size='xsmall'>{Math.abs(item.fyDai_).toFixed(2)} Dai</Text>
+        </Box> 
+        }
+
+        {
+        (item.event === 'Rolled') && 
+        <Box fill>
+          <Text size='xxsmall'>from </Text>
+          <Text size='xsmall'> { nameFromMaturity(item.maturityFrom) }</Text>
         </Box> 
         }
         
@@ -111,7 +125,9 @@ const TxHistory = ( { filterTerms, series }: HistoryProps) => {
     const filteredHist = _txHist.filter((x:any) => filterTerms.includes(x.event));
     
     if ( series ) {
-      seriesFilteredHist = filteredHist.filter((x:any) => (x.maturity === series.maturity) || (x.maturity === null) );
+      seriesFilteredHist = filteredHist.filter(
+        (x:any) => (x.maturity === series.maturity) || (x.maturity === null)
+      );
     } else {
       seriesFilteredHist = filteredHist;
     }

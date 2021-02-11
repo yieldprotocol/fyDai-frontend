@@ -3,7 +3,7 @@ import { useWeb3React } from '@web3-react/core';
 import { ethers } from 'ethers';
 import { format, subDays } from 'date-fns';
 
-import * as utils from '../utils';
+import { nameFromMaturity, modColor, cleanValue } from '../utils';
 import * as fyMath from '../utils/yieldMath';
 
 import yieldEnv from './yieldEnv.json';
@@ -16,7 +16,7 @@ import { useSignerAccount } from '../hooks/connectionHooks';
 import { useMigrations } from '../hooks/migrationHook';
 
 import { IYieldSeries } from '../types';
-import { cleanValue } from '../utils';
+
 
 const { addresses, contractsList, colors } = yieldEnv;
 
@@ -145,16 +145,13 @@ const YieldProvider = ({ children }: any) => {
             maturity: maturity.toNumber(),
             poolAddress,
             maturity_: new Date(maturity * 1000),
-            // displayName: moment.utc(maturity * 1000).format( 'MMMM YYYY'),
-            // displayNameMobile: moment.utc(maturity * 1000).format( 'MMM YYYY'),
-
-            displayName: format( subDays( new Date(maturity*1000), 2), 'MMMM yyyy'  ),
-            displayNameMobile: format( subDays( new Date(maturity*1000), 2 ), 'MMM yyyy' ),
+            displayName: nameFromMaturity(maturity),
+            displayNameMobile:  nameFromMaturity(maturity, 'MMM yyyy'), 
 
             seriesColor: colors.seriesColors[i],
             seriesTextColor: '#222222',
-            seriesLightColor: utils.modColor(colors.seriesColors[i], 50),
-            seriesDarkColor: utils.modColor(colors.seriesColors[i], -50),
+            seriesLightColor: modColor(colors.seriesColors[i], 50),
+            seriesDarkColor: modColor(colors.seriesColors[i], -50),
             seriesFromColor: colors.fromColors[i] || colors.seriesColors[i],
             seriesToColor: colors.seriesColors[i]
           };

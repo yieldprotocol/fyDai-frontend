@@ -403,6 +403,29 @@ const UserProvider = ({ children }: any) => {
           });     
         }),
     ]);
+
+    /* get the repayment hisotry from the controller */
+    const rolledHistory = await getEventHistory(
+      deployedContracts.RollProxy,
+      'RollProxy',
+      'Rolled',
+      [ ethers.utils.formatBytes32String('ETH-A'), null, null, account, null],
+      lastCheckedBlock+1
+    )
+      .then((res: any) => parseEventList(res))        /* then parse returned values */
+      .then((parsedList: any) => {                    /* then add extra info and calculated values */
+        return parsedList.map((x:any) => {
+          return {
+            ...x,
+            event: 'Rolled',
+            type: 'debt_rolled',
+            collateral: ethers.utils.parseBytes32String(x.args_[0]),
+            maturityFrom: yieldState.deployedSeries.find((y:any)=> y.poolAddress === x.args_[1]).maturity,
+            maturity: yieldState.deployedSeries.find((y:any)=> y.poolAddress === x.args_[2]).maturity,
+            amount: parseFloat(ethers.utils.formatEther(x.args_[4])), 
+          };
+        });     
+      });
      
     const updatedHistory = [
       ...collateralHistory,
@@ -411,7 +434,8 @@ const UserProvider = ({ children }: any) => {
       ...addLiquidityHistory,
       ...removeLiquidityHistory,
       ...cdpMigrationHistory,
-      ...migrationHistory
+      ...migrationHistory,
+      ...rolledHistory
     ];
 
     console.log(updatedHistory);
