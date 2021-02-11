@@ -112,8 +112,10 @@ export const useSigning = () => {
   };
 
   const handleSignList = async ( 
-    requestedSigs:Map<string, 
-    ISignListItem>, txCode:string 
+
+    requestedSigs:Map<string, ISignListItem>, 
+    txCode:string 
+    
   ): Promise<Map<string, string|undefined>> => {
 
     const signedMap: Map<string, string|undefined> = new Map();

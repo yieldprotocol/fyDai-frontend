@@ -221,6 +221,11 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
             ]}
           />
         </SeriesDescriptor>
+
+        { 
+          activeSeries?.isMature() &&
+          <SeriesMatureBox />
+        }
    
         {/* If there is no applicable transaction active, show the lending page */}
         { !showTxPending &&
@@ -311,9 +316,9 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
                 />       
               </Box>
             </>}
-          
+{/*           
             { activeSeries?.isMature() &&
-            <SeriesMatureBox />}
+            <SeriesMatureBox />} */}
             
             { !txActive && 
             !!account && 

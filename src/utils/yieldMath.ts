@@ -11,8 +11,7 @@ export const SECONDS_PER_YEAR: number = (365 * 24 * 60 * 60);
 export const k = new Decimal(1 / 126144000 ); // inv of seconds in 4 years
 export const g1 = new Decimal(950 / 1000);
 export const g2 = new Decimal(1000 / 950);
-
-const precisionFee = '1000000000000';
+const precisionFee = new Decimal(1000000000000);
 
 export function mint(
   daiReserves: BigNumber | string, 
@@ -97,7 +96,7 @@ export function sellFYDai(
   const Ya = fyDaiReserves_.pow(a);
   const Yxa = (fyDaiReserves_.add(fyDai_)).pow(a);
   const sum = Za.add(Ya.sub(Yxa));
-  const y = daiReserves_.sub( sum.pow(invA) );
+  const y = daiReserves_.sub(sum.pow(invA));
   const yFee = y.sub(precisionFee);
 
   return yFee.toString();
@@ -199,7 +198,7 @@ export function fyDaiForMint(
 
   let i = 0;
   while ( true ) {
-
+    
     const zIn = new Decimal( buyFYDai(daiReserves, fyDaiVirtualReserves, BigNumber.from(yOut.toFixed(0)), timeTillMaturity_.toString() ) );
     const Z_1 = daiReserves_.add(zIn); // New dai reserves
     const Y_1 = fyDaiRealReserves_.sub(yOut); // New fyDai reserves

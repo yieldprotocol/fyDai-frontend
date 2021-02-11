@@ -183,6 +183,9 @@ export const usePoolProxy = () => {
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
 
+    /* is ALL sigs are '0x' set noSigsReqd */
+    const noSigsReqd = Array.from(signedSigs.values()).every(item => item === '0x');
+
     let calldata;
 
     /* Determine which addLiquidity function to use based on AVAILABLE LIQUIDITY, and build the call data from that one */ 
@@ -262,6 +265,8 @@ export const usePoolProxy = () => {
     const signedSigs = await handleSignList(requestedSigs, genTxCode('REMOVE_LIQUIDITY', series?.maturity.toString()));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
+    /* is ALL sigs are '0x' set noSigsReqd */
+    const noSigsReqd = Array.from(signedSigs.values()).every(item => item === '0x');
 
      
     let calldata:any;

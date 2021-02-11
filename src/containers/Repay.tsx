@@ -6,9 +6,11 @@ import { Box, TextInput, Text, ResponsiveContext, Keyboard, Collapsible } from '
 import { 
   FiCheckCircle as Check,
   FiArrowLeft as ArrowLeft,
+  FiLayers as ChangeSeries
 } from 'react-icons/fi';
 
 import { cleanValue } from '../utils';
+import { IYieldSeries } from '../types';
 
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
@@ -18,6 +20,8 @@ import { useSignerAccount } from '../hooks/connectionHooks';
 import { useDebounce, useIsLol } from '../hooks/appHooks';
 import { useTxActive } from '../hooks/txHooks';
 import { useBorrowProxy } from '../hooks/borrowProxyHook';
+import { useRollProxy } from '../hooks/rollProxyHook';
+import { usePool } from '../hooks/poolHook';
 
 import InfoGrid from '../components/InfoGrid';
 import InputWrap from '../components/InputWrap';
@@ -28,6 +32,11 @@ import DaiMark from '../components/logos/DaiMark';
 import YieldMobileNav from '../components/YieldMobileNav';
 
 import SeriesDescriptor from '../components/SeriesDescriptor';
+import RollSelector from '../components/RollSelector';
+import StickyButton from '../components/StickyButton';
+import { useMath } from '../hooks/mathHooks';
+
+
 
 interface IRepayProps {
   close?:any;
@@ -50,10 +59,17 @@ function Repay({ close }:IRepayProps) {
   const [ repayDisabled, setRepayDisabled ] = useState<boolean>(true);
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
+  const [ isRollDebt, setIsRollDebt ] = useState<boolean>(false);
+  const [ destinationSeries, setDestinationSeries ] = useState<IYieldSeries>();
+  const [ debtInDestinationSeries, setDebtDestinationSeries ] = useState<string>();
+  const [ APR, setAPR ] = useState<string>();
 
   /* init hooks */
   const { repayDaiDebt } = useBorrowProxy();
-  const [ txActive ] = useTxActive(['repay']);
+  const { rollDebt } = useRollProxy();
+  const { calculateAPR } = useMath();
+  const { previewPoolTx }  = usePool();
+  const [ txActive ] = useTxActive(['REPAY', 'ROLL_DEBT']);
   const { account } = useSignerAccount();
   const isLol = useIsLol(inputValue);
   const debouncedInput = useDebounce(inputValue, 500);
@@ -80,10 +96,59 @@ function Repay({ close }:IRepayProps) {
     }
   };
 
+  const rollDebtProcedure = async (value:number) => {
+    if (!repayDisabled && destinationSeries) {
+      !activeSeries?.isMature() && close();
+      /* roll using proxy */
+      await rollDebt(activeSeries, destinationSeries, value.toString(), 'ETH-A' );
+         
+      /* clean up and refresh */ 
+      setInputValue(undefined);
+
+      if (activeSeries?.isMature()) {
+        await Promise.all([
+          userActions.updateUser(),
+          seriesActions.updateAllSeries(),
+        ]);
+      } else {
+        userActions.updateUser();
+        seriesActions.updateAllSeries();
+      }      
+    }
+  };
+
   useEffect(()=>{
     activeSeries?.ethDebtDai && daiBalance?.gt(activeSeries?.ethDebtDai) && setMaxRepay(activeSeries.ethDebtDai.add(ethers.BigNumber.from('1000000000000') )); 
     activeSeries?.ethDebtDai && daiBalance?.lt(activeSeries?.ethDebtDai) && setMaxRepay(daiBalance);
   }, [daiBalance, activeSeries]);
+
+
+  /* Handle input (debounced input) changes: */
+  useEffect(() => {
+  
+    /* Calculate the expected APR based on input and set  */
+    isRollDebt && destinationSeries && debouncedInput>0 && ( async () => {
+
+      const parsedInput = ethers.utils.parseEther(debouncedInput).gt(activeSeries?.ethDebtDai) ?  
+        activeSeries?.ethDebtDai :
+        ethers.utils.parseEther(debouncedInput); 
+
+      const destDebt = destinationSeries.ethDebtFYDai || ethers.BigNumber.from('0');
+      const preview = await previewPoolTx('buyDai', destinationSeries, parsedInput);
+
+      if (!(preview instanceof Error)) {
+        setDebtDestinationSeries( cleanValue( ethers.utils.formatEther( preview.add(destDebt) ), 2 ) );
+      } else {
+        /* if the market doesnt have liquidity just estimate from rate */
+        const rate = await previewPoolTx('buyDai', destinationSeries, 1);
+        !(rate instanceof Error) && setDebtDestinationSeries(  ( parseFloat( ethers.utils.formatEther( parsedInput.add(destDebt) )) * parseFloat((ethers.utils.formatEther(rate)))).toString() );
+        (rate instanceof Error) && setDebtDestinationSeries('0');
+        // setRepayDisabled(true);
+        // setErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
+      }
+    })();
+  
+  }, [debouncedInput, destinationSeries, isRollDebt, activeSeries]);
 
   /* Repay disabling logic */
   useEffect(()=>{
@@ -95,16 +160,42 @@ function Repay({ close }:IRepayProps) {
     )? setRepayDisabled(true): setRepayDisabled(false);
   }, [ inputValue ]);
 
-  /* Handle input warnings and errors */ 
+
+  /* Handle input warnings and errors when Rolling Debt */ 
   useEffect(() => {
-    if ( debouncedInput && daiBalance && ( ethers.utils.parseEther(debouncedInput).gt(daiBalance) ) ) {
-      setWarningMsg(null);
-      setErrorMsg('That amount exceeds the amount of Dai in your wallet'); 
-    } else {
-      setWarningMsg(null);
-      setErrorMsg(null);
+    if ( isRollDebt) {
+      if (debouncedInput && ethers.utils.parseEther(debouncedInput).gt(activeSeries?.ethDebtDai) ) {
+        setWarningMsg('That is more than your current debt - only the available debt will be rolled over.');
+        setErrorMsg(null); 
+      } else {
+        setWarningMsg(null);
+        setErrorMsg(null);
+      }
     }
-  }, [ debouncedInput, daiBalance ]);
+  }, [ debouncedInput, isRollDebt, activeSeries ]);
+
+
+  /* Handle input warnings and errors when Repaying */ 
+  useEffect(() => {
+
+    if (!isRollDebt) { 
+      if ( debouncedInput && daiBalance && ( ethers.utils.parseEther(debouncedInput).gt(daiBalance) ) ) {
+        setWarningMsg(null);
+        setErrorMsg('That amount exceeds the amount of Dai in your wallet'); 
+      } else {
+        setWarningMsg(null);
+        setErrorMsg(null);
+      }
+    }
+  }, [ debouncedInput, daiBalance, isRollDebt]);
+
+  /* get seriesData into an array and filter out the active series and mature series for  */
+  useEffect(()=>{
+    const arr = [...seriesData].map(([ ,value]) => (value));
+    const filteredArr = arr.filter((x:IYieldSeries) => !x.isMature() && x.maturity !== activeSeries.maturity );
+    // setSeriesArr(filteredArr);
+    setDestinationSeries(filteredArr[0]);
+  }, [ activeSeries ]);
 
   return (
     <Keyboard 
@@ -126,7 +217,7 @@ function Repay({ close }:IRepayProps) {
           fill
           background="background" 
           round='small'
-          pad="large"
+          pad={activeSeries?.isMature()? { vertical: undefined, horizontal:'large' } :'large'}
         >
           <Box flex='grow' justify='between'>
             <Box align='center' fill='horizontal'>
@@ -134,48 +225,80 @@ function Repay({ close }:IRepayProps) {
               { (activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero)) ?
              
                 <Box gap='medium' align='center' fill='horizontal'>
-                  <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to Repay</Text>
+                  <Box alignSelf='start' direction='row' justify='between' align='center'>
+                    {/* <Text size='large' color='text' weight='bold'>Amount to:  </Text> */}
+
+                    <Box pad={{ top:'small' }} gap='small' alignSelf='start' direction='row'>
+                      <StickyButton
+                        onClick={() => setIsRollDebt(false)}
+                        selected={!isRollDebt}
+                      >
+                        <Box pad={{ horizontal:'medium', vertical: 'small' }} alignSelf='center'>
+                          <Text size="medium" weight='bold'>
+                            Repay debt
+                          </Text>
+                        </Box>
+                      </StickyButton>   
+
+                      <StickyButton
+                        onClick={() => setIsRollDebt(true)}
+                        selected={isRollDebt}
+                      >
+                        <Box pad={{ horizontal:'medium', vertical: 'small' }} alignSelf='center'>
+                          <Text size="medium" weight='bold'>
+                            Roll debt to another series
+                          </Text>
+                        </Box>
+                      </StickyButton>   
+
+                    </Box>
+                  </Box>
 
                   <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
                     <TextInput
                       ref={(el:any) => {el && !mobile && el.focus(); setInputRef(el);}} 
                       type="number"
-                      placeholder={!mobile ? 'Enter the amount of Dai to Repay': 'DAI'}
+                      placeholder={!mobile ? `Enter the amount of Dai to ${isRollDebt? 'roll': 'repay'}`: `${isRollDebt? 'Dai to roll': 'Dai to repay'}`}
                       value={inputValue || ''}
                       plain
                       onChange={(event:any) => setInputValue(( cleanValue(event.target.value, 6) ))}
                       icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <DaiMark />}
                     />
                     <FlatButton 
-                      label={!mobile ? 'Repay Maximum': 'Maximum'}
+                      label={!mobile ? `${isRollDebt? 'Roll Maximum': 'Repay Maximum'}`: 'Maximum'}
                       onClick={()=>setInputValue( cleanValue(ethers.utils.formatEther(maxRepay), 6) )}
                     />
                   </InputWrap>
+
+                  { 
+                  isRollDebt &&
+                  <Box pad='medium' direction='row' justify='between' fill align='center'>
+                    <Box fill='horizontal'>
+                      <Text size='xsmall'> Select a series to roll debt to: </Text>
+                    </Box>
+                    <RollSelector changeDestination={(x:IYieldSeries) => setDestinationSeries(x)} />
+                  </Box>
+                  } 
 
                   <Box fill>
                     <Collapsible open={true}>
                       <InfoGrid 
                         entries={[
+
                           {
-                            label: 'Total amount owed',
-                            visible: false,
-                            active: true,
-                            loading: false,    
-                            value: activeSeries?.ethDebtFYDai_? `${activeSeries?.ethDebtFYDai_} DAI`: '0 DAI',
-                            valuePrefix: null,
-                            valueExtra: null, 
-                          }, 
-                          {
-                            label: 'Cost to repay all debt now',
-                            visible: true,
+                            label: 'Current Debt',
+                            labelExtra: `Cost to ${ isRollDebt? 'roll':'repay'} all now`,
+                            visible: !isRollDebt,
                             active: true,
                             loading: false,    
                             value:  activeSeries?.ethDebtDai_? `${cleanValue(activeSeries?.ethDebtDai_, 2)} DAI`: '0 DAI',
                             valuePrefix: null,
                             valueExtra: null,
                           },
+
                           {
-                            label: `Owed after repayment of ${inputValue && cleanValue(inputValue, 2)} DAI`,
+                            label: 'Remaining debt',
+                            labelExtra: `after ${ isRollDebt? 'rolling':'repaying'} ${inputValue && cleanValue(inputValue, 2)} DAI `,
                             visible: !!inputValue&&inputValue>0,
                             active: !!inputValue&&inputValue>0,
                             loading: false,
@@ -188,6 +311,17 @@ function Repay({ close }:IRepayProps) {
                             valuePrefix: null,
                             valueExtra: null, 
                           },
+                          {
+                            label: `Debt in ${destinationSeries?.displayNameMobile}`,
+                            labelExtra: 'owed at maturity after rolling debt', 
+                            visible: isRollDebt && !!inputValue&&inputValue>0,
+                            active: !!inputValue&&inputValue>0,
+                            loading: false,    
+                            value: debtInDestinationSeries,
+                            valuePrefix: null,
+                            valueExtra: null, 
+                          },
+
                         ]}
                       />
                     </Collapsible>
@@ -196,14 +330,13 @@ function Repay({ close }:IRepayProps) {
                   {
                    !repayDisabled &&
                    <ActionButton
-                     onClick={()=>repayProcedure(inputValue)}
-                     label={`Repay ${inputValue || ''} DAI`}
+                     onClick={isRollDebt? ()=> rollDebtProcedure(inputValue) : ()=>repayProcedure(inputValue)}
+                     label={isRollDebt? `Roll ${inputValue || ''} DAI to ${destinationSeries?.displayNameMobile}` : `Repay ${inputValue || ''} DAI`}
                      disabled={repayDisabled}
                      hasPoolDelegatedProxy={true}
                      clearInput={()=>setInputValue(undefined)}
                    />                 
                   }
-               
 
                   {!activeSeries?.isMature() && !mobile &&
                   <Box alignSelf='start' margin={{ top:'medium' }}> 

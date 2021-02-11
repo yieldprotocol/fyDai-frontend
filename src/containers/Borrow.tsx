@@ -87,6 +87,7 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
   const [ txActive ] = useTxActive(['BORROW']); /* txs to watch for */
   const [ repayTxActive ] = useTxActive(['REPAY']); /* txs to watch for */
   const debouncedInput = useDebounce(inputValue, 500);
+  const [ rollDebtTxActive ] = useTxActive(['ROLL_DEBT']); /* txs to watch for */
   const isLol = useIsLol(inputValue);
 
   /* 
@@ -124,7 +125,7 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
       setEstPercent( cleanValue(newPercent, 2) || undefined );
     })();
 
-    /* Calculate the expected APR based on input */
+    /* Calculate the expected APR based on input and set fyDai value */
     activeSeries && debouncedInput>0 && ( async () => {
       const preview = estTrade('buyDai', activeSeries, debouncedInput);
       if (!(preview instanceof Error)) {
@@ -222,7 +223,7 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
         histOpen && 
         <HistoryWrap closeLayer={()=>setHistOpen(false)}>
           <TxHistory 
-            filterTerms={['Borrowed', 'Deposited', 'Withdrew', 'Repaid', 'Imported' ]}
+            filterTerms={['Borrowed', 'Deposited', 'Withdrew', 'Repaid', 'Imported', 'Rolled' ]}
             series={activeSeries}
           />
         </HistoryWrap>
@@ -370,6 +371,11 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
             ]}
           />
         </SeriesDescriptor>
+
+        { 
+          activeSeries?.isMature() &&
+          <SeriesMatureBox />
+        }
    
         { 
         /* If no transaction in progress : */
@@ -511,11 +517,6 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
               }
             </Box>
             }
-
-            { 
-            activeSeries?.isMature() &&
-            <SeriesMatureBox />
-            }
             
             { 
             !txActive && 
@@ -550,10 +551,10 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
               !mobile &&
               <Box alignSelf='end' margin={{ top:'medium' }}>
                   {
-                  repayTxActive ?
+                  repayTxActive || rollDebtTxActive ?
                     <Box direction='row' gap='small'>
                       <Text size='xsmall' color='text-weak'>
-                        <Text weight='bold' color={activeSeries?.seriesColor}>repay</Text> pending
+                        <Text weight='bold' color={activeSeries?.seriesColor}>{ repayTxActive? 'repay': 'roll' }</Text> pending
                       </Text>
                       <Loading condition={true} size='xxsmall'>.</Loading>
                     </Box>
@@ -561,12 +562,11 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
                     <FlatButton 
                       onClick={()=>setRepayOpen(true)}
                       label={
-                        <Box direction='row' gap='small' align='center'>
-                          <Box>
-                            <Text size='xsmall' color='text-weak'>
-                              <Text weight='bold' color={activeSeries?.seriesColor}>repay</Text> series debt
-                            </Text>
-                          </Box>
+                        <Box direction='row' gap='xsmall' align='center'>
+                          <Text weight='bold' size='small' color={activeSeries?.seriesColor}>repay</Text> 
+                          <Text size='xsmall' color='text-weak'>or</Text>
+                          <Text weight='bold' size='small' color={activeSeries?.seriesColor}>roll</Text>
+                          <Text size='xsmall' color='text-weak'>debt</Text>
                           <ArrowRight color='text-weak' />
                         </Box>
                     }
@@ -608,7 +608,12 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
             style={{ textDecoration: 'none' }}
           >
             <Box direction='row' gap='small' align='center'>
-              <Text size='xxsmall' color='text-weak'> <Text weight='bold' size='xsmall' color={activeSeries?.seriesColor}>repay </Text> debt </Text>
+              <Text size='xxsmall' color='text-weak'> 
+                <Text weight='bold' size='xsmall' color={activeSeries?.seriesColor}>repay </Text> 
+                or 
+                <Text weight='bold' size='xsmall' color={activeSeries?.seriesColor}>roll </Text> 
+                debt 
+              </Text>
               <ArrowRight color={activeSeries?.seriesColor} />
             </Box>
           </NavLink>
@@ -618,7 +623,5 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
     </RaisedBox>
   );
 };
-
-Borrow.defaultProps = { borrowAmount: null };
 
 export default Borrow;

@@ -17,11 +17,9 @@ export interface IYieldSeries {
   seriesTextColor:string;
   totalSupply: BigNumber;
   totalSupply_: number;
-  
   daiReserves: BigNumber;
   fyDaiReserves: BigNumber;
   fyDaiVirtualReserves: BigNumber;
-
   symbol: string;
   id: string;
   yieldAPR: string;
@@ -31,12 +29,10 @@ export interface IYieldSeries {
   poolState?: any;
   poolPercent_?:string;
   currentValue?: any;
-  wethDebtDai?: BigNumber;
-  wethDebtDai_?: number;
-  wethDebtFYDai?: BigNumber;
-  wethDebtFYDai_?: number;
-
-
+  ethDebtDai?: BigNumber;
+  ethDebtDai_?: number;
+  ethDebtFYDai?: BigNumber;
+  ethDebtFYDai_?: number;
 }
 
 export interface IConnection {

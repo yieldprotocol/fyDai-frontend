@@ -149,6 +149,8 @@ export const useImportProxy = () => {
     const signedSigs = await handleSignList(requestedSigs, genTxCode('IMPORT', series?.maturity.toString()));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
+    /* is ALL sigs are '0x' set noSigsReqd */
+    const noSigsReqd = Array.from(signedSigs.values()).every(item => item === '0x');
     
     /* 
       contract fns used:
@@ -203,20 +205,19 @@ export const useImportProxy = () => {
  
     /* calculate expected max safety values */  
     let maxDaiPrice: string; 
-    const preview = await previewPoolTx('buyDai', series, ethers.utils.parseEther('1'));   
+    const preview = await previewPoolTx('buydai', series, ethers.utils.parseEther('1'));   
+    
     if ( !(preview instanceof Error) ) { 
-
       // 1 + ( 1.1 * ( price - 1 ) )
-      const _one = ONE.mul('1e18');
-      const diff = preview.sub(_one.toFixed());
-      // const adjDiff = mulDecimal( '1.1', diff );
-      const adjDiff = calculateSlippage(diff, preferences.slippage );
-      const daiPriceAsRay = (_one.add(adjDiff)).mul('1000000000'); 
-      maxDaiPrice =  floorDecimal( daiPriceAsRay.toFixed() ) ;
+      const _zero = ONE.mul('0');   
+      const adjPrev = calculateSlippage(preview, preferences.slippage);
+      const prevAsRay = (_zero.add(adjPrev)).mul('1000000000'); 
+      maxDaiPrice =  prevAsRay.toFixed();
 
     }  else {
       throw(preview);
     }
+   
 
     /* build and use signature if required , else '0x' */
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
@@ -245,6 +246,8 @@ export const useImportProxy = () => {
     const signedSigs = await handleSignList(requestedSigs, genTxCode('IMPORT', series?.maturity.toString()));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
+    /* is ALL sigs are '0x' set noSigsReqd */
+    const noSigsReqd = Array.from(signedSigs.values()).every(item => item === '0x');
 
     /*
       contract fn used: 

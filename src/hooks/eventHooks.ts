@@ -9,6 +9,7 @@ import Pool from '../contracts/Pool.json';
 import Vat from '../contracts/Vat.json';
 import ImportCdpProxy from '../contracts/ImportCdpProxy.json';
 import ImportProxy from '../contracts/ImportProxy.json';
+import RollProxy from '../contracts/RollProxy.json';
 
 // TODO abstract this out to a higher level
 const contractMap = new Map<string, any>([
@@ -16,6 +17,7 @@ const contractMap = new Map<string, any>([
   ['Controller', Controller.abi],
   ['ImportCdpProxy', ImportCdpProxy.abi ],
   ['ImportProxy', ImportProxy.abi ],
+  ['RollProxy', RollProxy.abi ],
   ['Dai', Dai.abi],
   ['Pool', Pool.abi],
   ['Vat', Vat.abi], 

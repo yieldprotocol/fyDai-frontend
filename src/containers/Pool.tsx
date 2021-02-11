@@ -254,7 +254,12 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
               },
             ]}
           /> 
-        </SeriesDescriptor>   
+        </SeriesDescriptor>  
+
+        { 
+          activeSeries?.isMature() &&
+          <SeriesMatureBox />
+        } 
 
         { (!txActive || txActive.type === 'REMOVE_LIQUIDITY') &&
         <Box
@@ -373,10 +378,18 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                       },
                     ]}
                     />
+                    {
+                      useBuyToAddLiquidity && 
+                      !forceBorrow && 
+                      <Box pad={{ horizontal:'medium' }}>
+                        <Text size='xxsmall'> Note: When adding liquidity using the 'BUY & POOL' strategy, the App may use less Dai than requested to avoid transaction failure. </Text>
+                      </Box>
+                    } 
+
                   </Collapsible>
-                </Box>
+                </Box> 
               </Box> 
-            
+
               <Box gap='small' fill='horizontal' align='center' pad={{ vertical:'small' }}>
                 <ActionButton
                   onClick={()=>addLiquidityProcedure()} 
@@ -388,8 +401,9 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
               </Box>
             </>}
 
-            { activeSeries?.isMature() &&
-            <SeriesMatureBox />}
+            
+            {/* { activeSeries?.isMature() &&
+            <SeriesMatureBox />} */}
             
             { !txActive && 
             !!account && 
@@ -438,7 +452,6 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                       }
                     />               
                   }
-
                 </Box>}
             </Box>
 
