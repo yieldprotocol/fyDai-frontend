@@ -83,7 +83,6 @@ const SeriesProvider = ({ children }:any) => {
   };
 
   const _getReservesData = async (seriesArr:IYieldSeries[]) => {
-
     /* Get all the reserves data for the series CONCURRENTLY */
     const _reservesData = await Promise.all(
       seriesArr.map( async (x:IYieldSeries, i:number) => {
@@ -108,8 +107,7 @@ const SeriesProvider = ({ children }:any) => {
     );
        
     /* Parse the data */
-    const _parsedReservesData = _reservesData.reduce((acc: Map<string, any>, x:any) => {
-      
+    const _parsedReservesData = _reservesData.reduce((acc: Map<string, any>, x:any) => {   
       const _rate = sellFYDai(
         x.daiReserves, 
         x.fyDaiVirtualReserves, 
@@ -136,18 +134,16 @@ const SeriesProvider = ({ children }:any) => {
 
   };
 
-
   /* Get the data for a particular series, OR set of series  (internally callable only) */
   const _getSeriesData = async (seriesArr:IYieldSeries[]) => {
 
+    /* Get the reserves data for all the series */
     const reservesData = await _getReservesData(seriesArr);
-    // console.log('reservesData:', reservesData);
     
-    /* Get all the series data for the series CONCURRENTLY */
+    /* Get all the series data for the series */
     const _seriesData = await Promise.all(
-
       seriesArr.map( async (x:IYieldSeries, i:number) => {
-        const _x = { ...x, isMature: ()=>( x.maturity < Math.round(new Date().getTime() / 1000)) };
+        const _x = { ...x, isMature: ()=>( x.maturity < Math.round(new Date().getTime() / 1000)) };     
         /* get all the user specific data */
         const [ 
           poolTokens, 
@@ -174,7 +170,7 @@ const SeriesProvider = ({ children }:any) => {
     /* Parse the data */
     const _parsedSeriesData = _seriesData.reduce((acc: Map<string, any>, x:any) => {
      
-      /* add in the reserves data and reserve data calcs */
+      /* Add in the reserves data and reserve data calcs */
       const _reserves = reservesData.get(x.maturity);
       const poolRatio = divDecimal(x.poolTokens, _reserves.totalSupply);
       const poolPercent = mulDecimal( poolRatio, '100');
@@ -189,7 +185,6 @@ const SeriesProvider = ({ children }:any) => {
           ethDebtFYDai_: ethers.utils.formatEther(x.ethDebtFYDai) === '0.0'  ? '0.00' : cleanValue(ethers.utils.formatEther(x.ethDebtFYDai), 2),
           ethDebtDai_: cleanValue(ethers.utils.formatEther(x.ethDebtDai), 2),
           poolTokens_: cleanValue(ethers.utils.formatEther(x.poolTokens), 4),
-          poolRatio_ : cleanValue(poolRatio, 3),
           poolPercent: cleanValue(poolPercent, 3),
           poolState,
         }
@@ -199,16 +194,15 @@ const SeriesProvider = ({ children }:any) => {
     return _parsedSeriesData;
   };
 
+  /* UPDATE RESERVES from a list of series */
   const updateReserves = async (seriesArr:IYieldSeries[]) => {
 
-    /* Build/Re-build series map with data */
     const reservesMap:Map<any, IYieldSeries> = await _getReservesData(seriesArr);
 
-    /* Combine with exisiting seriesData */
+    /* COMBINE with exisiting seriesData */
     const _newData = seriesArr.reduce((acc: Map<string, any>, x:any) => { 
       const _reserves = reservesMap.get(x.maturity);
       const _series = state.seriesData.get(x.maturity);
-      
       const diff = _reserves?.totalSupply_ && (_reserves?.totalSupply_ - _series.totalSupply_);
       const diffpercent = diff && diff/ _series.totalSupply_ *100;
       const _change = { liqChange: diffpercent, liqChangeLast: (new Date().getTime()/1000)  };
@@ -216,25 +210,26 @@ const SeriesProvider = ({ children }:any) => {
       return acc.set( x.maturity, { ..._series, ..._reserves, ..._change } );
     }, new Map() );
 
-    /* Update state and return  */
+    /* Update state */
     dispatch( { type:'updateSeries', payload: _newData });
 
   };
 
-  /* PUBLIC EXPOSED (via actions) Update series from a list of series */
+  /* UPDATE SERIES from a list of series */
   const updateSeries = async (seriesArr:IYieldSeries[], firstLoad:boolean ) => {
 
     if(!yieldLoading) {
+
       dispatch({ type:'isLoading', payload: true });
 
-      /* Pre-populate info with cached data if available */
+      /* On first load > PRE-POPULATE series data with cached info, if available */
       if (firstLoad) {
         const preMap:any = _prePopulateSeriesData(seriesArr);
         const preSeries: IYieldSeries[] = Array.from(preMap.values());
         const preSelect = preSeries
           .filter((x:IYieldSeries)=>!x.isMature())
           .sort((a:IYieldSeries, b:IYieldSeries)=> a.maturity-b.maturity );
-        /* check if the value in the url is a valid series date, if so, use it */
+        /* Check if the value in the url is a valid series date, if so, use it */
         if (preMap.get(seriesFromUrl)) {
           dispatch({ type:'setActiveSeriesId', seriesFromUrl });
         } else {
@@ -242,12 +237,11 @@ const SeriesProvider = ({ children }:any) => {
         }
       }
 
-      /* Build/Re-build series map with data */ 
+      /* BUILD / RE-BUILD series map with new data and update state */ 
       const seriesMap:Map<any, IYieldSeries> = await _getSeriesData(seriesArr);
-      /* Update state and return  */
       dispatch( { type:'updateSeries', payload: seriesMap });
 
-      /* Set the activeSeries if there isn't one already */
+      /* SET the active series (if there isn't one already)  */
       if (!state.activeSeriesId || seriesArr.length > 1) {
         /* if no active series, set it to non-mature series that is maturing soonest. */
         const unmatureSeries: IYieldSeries[] = Array.from(seriesMap.values());
@@ -255,22 +249,23 @@ const SeriesProvider = ({ children }:any) => {
           .filter((x:IYieldSeries)=>!x.isMature())
           .sort((a:IYieldSeries, b:IYieldSeries)=> a.maturity-b.maturity );
 
-        /* check if the value in the url is a valid series date, if so, use it */
+        /* check if the value in the url is a valid series date, if so, use it as the active series */
         if (seriesMap.get(seriesFromUrl)) {
           dispatch({ type:'setActiveSeriesId', payload: seriesFromUrl });
         } else {
           dispatch({ type:'setActiveSeriesId', payload: toSelect[0].maturity });
         }
       }
+
       dispatch({ type:'isLoading', payload: false });
     }
   };
 
-  /* Init all the series once yieldState is not loading and re-init on any user and/or network change */
+  /* Init all the series (and add in reserves event listner) once yieldState is not loading - and re-init on any user and/or network change */
   useEffect( () => {
 
     (provider || fallbackProvider) && !yieldLoading && ( async () => {
-      try {
+      try {    
         /* update the series' */
         await updateSeries(yieldState.deployedSeries, true);
 
@@ -280,8 +275,9 @@ const SeriesProvider = ({ children }:any) => {
             x.poolAddress,
             'Pool',
             'Liquidity',
-            [null, null, null, null, null, null],
+            [ null, null, null, null, null, null ],
             ()=> { 
+              // eslint-disable-next-line no-console
               console.log(`Reserves being updated: ${x.poolAddress}`); 
               updateReserves([x]);
             } 
@@ -294,9 +290,7 @@ const SeriesProvider = ({ children }:any) => {
       }
     })();
 
-
   }, [ provider, fallbackProvider, chainId, account, yieldLoading ]);
-
 
   /* Actions for updating the series Context */
   const actions = {

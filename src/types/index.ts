@@ -27,8 +27,6 @@ export interface IYieldSeries {
   poolTokens?:  BigNumber;
   poolTokens_?: number;
   poolState?: any;
-  poolPercent_?:string;
-  currentValue?: any;
   ethDebtDai?: BigNumber;
   ethDebtDai_?: number;
   ethDebtFYDai?: BigNumber;
@@ -46,16 +44,7 @@ export interface IConnection {
 }
 
 export interface IYieldUser {
-  appPrefs: any;
-  account?: string;
-  ethBalance?: BigNumber;
-  ethBalance_?: number;
-  ethPosted?: BigNumber;
-  ethPosted_?: number;
-  totalDebtFYDai?: BigNumber;
-  totalDebtFYDai_?: number;
-  ethAvailable?:BigNumber;
-  ethAvailable_?:BigNumber;
+
 }
 
 export interface INotification {
