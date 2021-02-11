@@ -1,8 +1,7 @@
 import { useEffect, useState, useContext } from 'react';
 import { ethers, BigNumber }  from 'ethers';
 
-import * as utils from '../utils';
-import { MAX_INT } from '../utils/constants';
+import { MAX_INT, cleanValue  } from '../utils';
 import { calculateSlippage } from '../utils/yieldMath';
 
 import { ISignListItem, IYieldSeries } from '../types';
@@ -82,7 +81,7 @@ export const useBorrowProxy = () => {
   ) => {
 
     /* Processing and/or sanitizing input */
-    const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(utils.cleanValue(amount));
+    const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(cleanValue(amount));
     const toAddr = account && ethers.utils.getAddress(account); /* 'to' in this case represents the vault to be depositied into within controller */
 
     /* NB. postEth is the only function with NO sig requirements - nevertheless, send to empty array to handleSignList() */
@@ -121,7 +120,7 @@ export const useBorrowProxy = () => {
     amount:string|BigNumber
   ) => {
     /* Processing and sanitizing input */
-    const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(utils.cleanValue(amount));
+    const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(cleanValue(amount));
     const toAddr = account && ethers.utils.getAddress(account);
 
     /* build and use signatures if required */

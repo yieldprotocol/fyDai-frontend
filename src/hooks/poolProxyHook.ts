@@ -3,8 +3,7 @@ import { ethers, BigNumber }  from 'ethers';
 
 import { ISignListItem, IYieldSeries } from '../types';
 
-import { MAX_INT } from '../utils/constants';
-import { genTxCode } from '../utils';
+import { genTxCode , MAX_INT} from '../utils';
 
 import { 
   floorDecimal, 
