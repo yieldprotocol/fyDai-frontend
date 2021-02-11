@@ -226,7 +226,7 @@ const Borrow = ({ openConnectLayer, borrowAmount }:IBorrowProps) => {
         histOpen && 
         <HistoryWrap closeLayer={()=>setHistOpen(false)}>
           <TxHistory 
-            filterTerms={['Borrowed', 'Deposited', 'Withdrew', 'Repaid', 'Imported' ]}
+            filterTerms={['Borrowed', 'Deposited', 'Withdrew', 'Repaid', 'Imported', 'Rolled' ]}
             series={activeSeries}
           />
         </HistoryWrap>
