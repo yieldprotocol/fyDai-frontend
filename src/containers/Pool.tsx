@@ -14,17 +14,15 @@ import { cleanValue, nFormatter } from '../utils';
 import { secondsToFrom, fyDaiForMint } from '../utils/yieldMath';
 
 /* contexts */
-import { YieldContext } from '../contexts/YieldContext';
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
+import { HistoryContext } from '../contexts/HistoryContext';
 
 /* hooks */ 
 import { useSignerAccount } from '../hooks/connectionHooks';
 import { useDebounce, useIsLol } from '../hooks/appHooks';
-import { useToken } from '../hooks/tokenHook';
 import { useTxActive } from '../hooks/txHooks';
 import { usePoolProxy } from '../hooks/poolProxyHook';
-import { usePool } from '../hooks/poolHook';
 import { useMath } from '../hooks/mathHooks';
 
 /* containers */ 
@@ -47,6 +45,7 @@ import YieldMobileNav from '../components/YieldMobileNav';
 import Loading from '../components/Loading';
 import StickyButton from '../components/StickyButton';
 
+
 interface IPoolProps {
   openConnectLayer:any;
 }
@@ -60,6 +59,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
   /* state from contexts */
   const { state: { activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
   const activeSeries = seriesData.get(activeSeriesId);
+  const { state: { historyLoading } } = useContext(HistoryContext);
   const { state: userState, actions: userActions } = useContext(UserContext);
   const { daiBalance } = userState.position;
   const { useBuyToAddLiquidity } = userState.preferences;
@@ -410,11 +410,13 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
 
             
             <Box direction='row' fill justify='between'>
-              { activeSeries?.poolTokens?.gt(ethers.constants.Zero) && 
+              { 
+                activeSeries?.poolTokens?.gt(ethers.constants.Zero) && 
                 !mobile &&
                 <Box alignSelf='start' margin={{ top:'medium' }}>
                   <FlatButton 
                     onClick={()=>setHistOpen(true)}
+                    disabled={historyLoading}
                     label={
                       <Box direction='row' gap='small' align='center'>
                         <Text size='xsmall' color='text-weak'><HistoryIcon /></Text>                
@@ -424,7 +426,8 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                       </Box>
                 }
                   />
-                </Box>}
+                </Box>
+              }
 
               { !activeSeries?.isMature() &&
                 activeSeries?.poolTokens_>0 &&

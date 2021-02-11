@@ -8,7 +8,7 @@ import {
   FiChevronUp as ChevronUp,
 } from 'react-icons/fi';
 
-import { UserContext } from '../contexts/UserContext';
+import { HistoryContext } from '../contexts/HistoryContext';
 import EtherscanButton from '../components/EtherscanButton';
 import { IYieldSeries } from '../types';
 import Loading from '../components/Loading';
@@ -30,7 +30,8 @@ const InsetBox = styled(Box)`
   `}`;
 
 const History = ( { filterTerms, series }: HistoryProps) => {
-  const { state } = useContext(UserContext);
+  const { state } = useContext(HistoryContext);
+  
   const [ txHistory, setTxHistory] = useState<any>([]);
   const [ itemOpen, setItemOpen ] = useState<any>(null);
 
@@ -139,10 +140,10 @@ const History = ( { filterTerms, series }: HistoryProps) => {
     const sortedList = seriesFilteredHist.sort( (a:any, b:any) => b.date - a.date ); 
     setTxHistory(sortedList);
 
-  }, [ state.txHistory, series, filterTerms ]);
+  }, [ state, series, filterTerms ]);
 
   return (
-    <Loading condition={state.userLoading} size='large'>
+    <Loading condition={state.historyLoading} size='large'>
       <InsetBox
         background={defaultBackground}
         fill='horizontal'
@@ -208,7 +209,7 @@ const History = ( { filterTerms, series }: HistoryProps) => {
               );
             }):
             <Box align='center' pad='medium'>
-              <Loading condition={state.userLoading} size='large'>
+              <Loading condition={state.historyLoading} size='large'>
                 <Box pad='xsmall'> 
                   <Text size='xxsmall'> No history yet.</Text>
                 </Box>

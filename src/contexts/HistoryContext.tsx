@@ -340,19 +340,18 @@ const HistoryProvider = ({ children }: any) => {
 
   /* initiate the user */
   const initHistory = async () => {
+    
     /* Init start */
     dispatch({ type: 'isLoading', payload: true });
-
     try {
       await _getTxHistory(false); 
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log(e);
     }
-
     /* Init end */
     dispatch({ type: 'isLoading', payload: false });
-
+    
   };
 
   useEffect(()=>{

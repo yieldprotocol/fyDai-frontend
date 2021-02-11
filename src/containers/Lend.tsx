@@ -11,6 +11,7 @@ import { cleanValue, genTxCode } from '../utils';
 /* contexts */
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
+import { HistoryContext } from '../contexts/HistoryContext';
   
 /* hook pack */
 import { useSignerAccount } from '../hooks/connectionHooks';
@@ -55,6 +56,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
   const activeSeries = seriesData.get(activeSeriesId);
   const { state: userState, actions: userActions } = useContext(UserContext);
   const { daiBalance, daiBalance_ } = userState.position;
+  const { state: { historyLoading } } = useContext(HistoryContext);
 
   /* local state */ 
   const [ CloseDaiOpen, setCloseDaiOpen ] = useState<boolean>(false);
@@ -331,6 +333,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
                 <Box alignSelf='start' margin={{ top:'medium' }}>
                   <FlatButton 
                     onClick={()=>setHistOpen(true)}
+                    disabled={historyLoading}
                     label={
                       <Box direction='row' gap='small' align='center'>
                         <Text size='xsmall' color='text-weak'><HistoryIcon /></Text>                

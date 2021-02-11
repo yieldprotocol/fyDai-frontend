@@ -11,11 +11,11 @@ import {
 } from 'react-icons/fi';
 
 import FlatButton from './FlatButton';
-import { UserContext } from '../contexts/UserContext';
+import { HistoryContext } from '../contexts/HistoryContext';
 
 const HistoryWrap = ({ children, closeLayer, series } : any) => {
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
-  const { actions }= useContext(UserContext);
+  const { actions }= useContext(HistoryContext);
   return (
     <Layer
       onClickOutside={() => closeLayer(true)}

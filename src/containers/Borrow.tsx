@@ -11,6 +11,7 @@ import { abbreviateHash, cleanValue, genTxCode } from '../utils';
 /* contexts */
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
+import { HistoryContext } from '../contexts/HistoryContext';
 
 /* hook pack */
 import { useSignerAccount } from '../hooks/connectionHooks';
@@ -54,6 +55,8 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
   /* state from context */
   const { state: { activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
   const activeSeries = seriesData.get(activeSeriesId);
+
+  const { state: { historyLoading } } = useContext(HistoryContext);
   const { state: userState, actions: userActions } = useContext(UserContext);
   const { position, makerVaults, userLoading } = userState;
   const { 
@@ -533,6 +536,7 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
               <Box alignSelf='start' margin={{ top:'medium' }}>
                 <FlatButton 
                   onClick={()=>setHistOpen(true)}
+                  disabled={historyLoading}
                   label={
                     <Box direction='row' gap='small' align='center'>
                       <Text size='xsmall' color='text-weak'><HistoryIcon /></Text>                

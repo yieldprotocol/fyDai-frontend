@@ -18,6 +18,7 @@ import {
 
 import { UserContext } from '../contexts/UserContext';
 import { YieldContext } from '../contexts/YieldContext';
+import { HistoryContext } from '../contexts/HistoryContext';
 
 import { useSignerAccount, useConnection } from '../hooks/connectionHooks';
 import { injected, walletconnect } from '../connectors';
@@ -37,11 +38,11 @@ import TxRecent from '../components/TxRecent';
 const ConnectLayer = ({ view, target, closeLayer }: any) => {
 
   const { state: { yieldData } } = useContext(YieldContext);
+  const { state: { position } } = useContext(UserContext);
+  const { actions } = useContext(HistoryContext);
 
-  const { state: { position }, actions } = useContext(UserContext);
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
-  
   const { handleSelectConnector } = useConnection();
   const { account, provider, chainId } = useSignerAccount();
 
@@ -49,7 +50,6 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
   const [ histOpen, setHistOpen] = useState<string>('BORROW');
   const [ diagnosticsOpen, setDiagnosticsOpen] = useState<boolean>(false);
 
-  
   const connectorList = [
     { name: 'Metamask', image: metamaskImage, connection: injected, trial: false },
     { name: 'Wallet Connect', image: walletConnectImage, connection: walletconnect, trial: true },
@@ -194,7 +194,10 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                 </Box>
               </Box>}
 
-              { account && layerView === 'HISTORY' &&      
+              { 
+              
+              account && 
+              layerView === 'HISTORY' &&
               <Box pad="medium" gap="large"> 
                 <Box direction='row' justify='evenly'>
                   <FlatButton 
