@@ -157,7 +157,6 @@ export function fyDaiForMint(
     y_out = divide(add(y_out, max), bignumber(2)); // bought too little fyDai, buy some more
     if (pz <= PZ) max = y_out;
     y_out = divide(add(y_out, min), bignumber(2)); // bought too much fyDai, buy a bit less
-    // console.log(`y = ${floor(y_out).toFixed()}\n`)
 
     if (multiply(PZ, bignumber(1.000001)) > pz && pz > PZ) return floor(y_out).toFixed(); // Just right
 

@@ -82,8 +82,6 @@ export const useMaker = () => {
       //   cdpList = managedCdpList;
       // }
       cdpList = managedCdpList;
-      // eslint-disable-next-line no-console
-      console.log(cdpList); console.log(accountCdp);
       
     }  catch (e) {
       // eslint-disable-next-line no-console

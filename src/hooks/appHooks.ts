@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 /* Simple Hook for caching & retrieved data */
 export const useCachedState = (key:string, initialValue:any) => {
   const genKey = key;
-  
   const [storedValue, setStoredValue] = useState(
     () => {
       try {

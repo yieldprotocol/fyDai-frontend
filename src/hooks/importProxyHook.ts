@@ -254,7 +254,6 @@ export const useImportProxy = () => {
       importCdpWithSignature(IPool pool, uint256 cdp, uint256 maxDaiPrice, bytes memory controllerSig)
       importVaultWithSignature(IPool pool, address user, uint256 maxDaiPrice, bytes memory controllerSig) 
     */
-    console.log(poolAddr, cdpId.toString(), maxDaiPrice, signedSigs.get('controllerSig') );
 
     const calldata = viaCdpMan ?
       cdpProxyContract.interface.encodeFunctionData( 'importCdpWithSignature', [ poolAddr, cdpId.toString(), maxDaiPrice, signedSigs.get('controllerSig') ] ) :

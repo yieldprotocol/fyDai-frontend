@@ -278,7 +278,7 @@ const SeriesProvider = ({ children }:any) => {
             [ null, null, null, null, null, null ],
             ()=> { 
               // eslint-disable-next-line no-console
-              console.log(`Reserves being updated: ${x.poolAddress}`); 
+              console.log(`Series' reserves being updated: ${x.poolAddress}`); 
               updateReserves([x]);
             } 
           );

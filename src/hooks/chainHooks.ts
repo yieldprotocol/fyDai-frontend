@@ -46,25 +46,15 @@ export const useSendTx = () => {
    */
   const sendTx = async (contractAddr:string, contractName:string, fn:string, data:any[], value:ethers.BigNumber ) => {
     let tx;
-    // eslint-disable-next-line no-console
-    console.log(contractAddr, contractMap.get(contractName), signer); 
     setSendTxActive(true);
     const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), signer);
     if (!value.isZero()) {
-      // eslint-disable-next-line no-console
-      console.log(`Tx sends ETH: ${value.toString()} `);
       tx = await contract[fn](...data, { value });
     } else {
-      // eslint-disable-next-line no-console
-      console.log('Tx has no ETH associated with it (except gas, obs)');
       tx = await contract[fn](...data);
     }
-    // eslint-disable-next-line no-console
-    console.log(`${tx.hash} pending`);
     await tx.wait();
     setSendTxActive(false);
-    // eslint-disable-next-line no-console
-    console.log(`${tx.hash} send tx complete`);
   };
   return [ sendTx, sendTxActive ] as const;
 };

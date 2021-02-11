@@ -175,7 +175,6 @@ const UserProvider = ({ children }: any) => {
     _auths.hasDsProxy = _auths.dsProxyAddress !== '0x0000000000000000000000000000000000000000';
     _auths.hasDelegatedDsProxy = await checkControllerDelegate(_auths.dsProxyAddress);
     dispatch( { type: 'updateAuthorizations', payload: _auths });
-    console.log(_auths);
     return _auths;
   };
 
@@ -438,8 +437,6 @@ const UserProvider = ({ children }: any) => {
       ...rolledHistory
     ];
 
-    console.log(updatedHistory);
-
     const _payload = {
       account,
       lastBlock: _lastBlock,
@@ -500,7 +497,7 @@ const UserProvider = ({ children }: any) => {
     });
 
     dispatch( { 'type': 'updateMakerVaults', 'payload':  _makerData });
-    console.log(_makerData);
+
   };
 
   /* initiate the user */
@@ -514,11 +511,9 @@ const UserProvider = ({ children }: any) => {
         _updatePreferences(null),
       ]);
 
-      console.log('User basics data updated');
       /* Then get maker data if available */ 
       await _getMakerVaults(auths?.dsProxyAddress);
       await _getTxHistory(false);
-      console.log('User extra data updated');
       
     } catch (e) {
       // eslint-disable-next-line no-console

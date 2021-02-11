@@ -53,7 +53,8 @@ export const useDsRegistry = () => {
       setBuildActive(false);
       return;
     }
-    console.log('building dsProxy');
+    // eslint-disable-next-line no-console
+    console.log('Building dsProxy');
     await handleTx({ tx, msg:'Building new dsProxy', type:'CREATE_PROXY', series: null, value: null });
     setBuildActive(false);
   };

@@ -14,6 +14,7 @@ const initState = {
   fatalMsg: '',
 
   updateAvailable: false,
+  // eslint-disable-next-line no-console
   updateAccept: ()=> console.log('No app update available'),
 };
 

@@ -287,9 +287,6 @@ export const usePoolProxy = () => {
         throw(preview);
       }
 
-      console.log('sellFyDaiPreview: ', preview.toString());
-      console.log('minFyDaiPrice: ',  minFYDaiPrice);
-
       /* contract fn used: removeLiquidityEarlyDaiFixedWithSignature(IPool pool,uint256 poolTokens,uint256 minimumFYDaiPrice,bytes memory controllerSig,bytes memory poolSig) */
       calldata = proxyContract.interface.encodeFunctionData( 
         'removeLiquidityEarlyDaiFixedWithSignature', 
