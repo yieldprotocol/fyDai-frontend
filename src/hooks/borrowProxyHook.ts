@@ -143,7 +143,7 @@ export const useBorrowProxy = () => {
     const calldata = noSigsReqd ? 
       proxyContract.interface.encodeFunctionData( 
         'withdraw', 
-        [ toAddr, parsedAmount, signedSigs.get('controllerSig') ] 
+        [ toAddr, parsedAmount ] 
       ) :
       proxyContract.interface.encodeFunctionData( 
         'withdrawWithSignature', 
@@ -376,7 +376,7 @@ export const useBorrowProxy = () => {
     const calldata = noSigsReqd ? 
       proxyContract.interface.encodeFunctionData( 
         'sellDai',
-        [ poolAddr, toAddr, parsedDaiIn, minFYDaiOut, signedSigs.get('daiSig') ]
+        [ poolAddr, toAddr, parsedDaiIn, minFYDaiOut ]
       ):
       proxyContract.interface.encodeFunctionData( 
         'sellDaiWithSignature',
@@ -459,7 +459,7 @@ export const useBorrowProxy = () => {
     const calldata = noSigsReqd ? 
       proxyContract.interface.encodeFunctionData( 
         'buyDai',
-        [ poolAddr, toAddr, parsedDaiOut, maxFYDaiIn, signedSigs.get('fyDaiSig') ]
+        [ poolAddr, toAddr, parsedDaiOut, maxFYDaiIn ]
       ): 
       proxyContract.interface.encodeFunctionData( 
         'buyDaiWithSignature',

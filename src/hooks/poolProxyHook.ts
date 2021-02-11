@@ -3,7 +3,7 @@ import { ethers, BigNumber }  from 'ethers';
 
 import { ISignListItem, IYieldSeries } from '../types';
 
-import { genTxCode , MAX_INT} from '../utils';
+import { genTxCode, MAX_INT } from '../utils';
 
 import { 
   floorDecimal, 
@@ -117,12 +117,6 @@ export const usePoolProxy = () => {
       addLiquidityStrategy = 'BORROW';
     }
 
-    /* set override gas estiamtes based on strategy */
-    const overrides = {
-      gasLimit: addLiquidityStrategy === 'BUY'?  BigNumber.from('450000') : BigNumber.from('800000'),
-      value: ethers.utils.parseEther('0')
-    };
-
     /* build and use signature if required , else '0x' */
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
     
@@ -186,6 +180,7 @@ export const usePoolProxy = () => {
     const noSigsReqd = Array.from(signedSigs.values()).every(item => item === '0x');
 
     let calldata;
+    let overrides;
 
     /* Determine which addLiquidity function to use based on AVAILABLE LIQUIDITY, and build the call data from that one */ 
     if ( addLiquidityStrategy === 'BUY') { 
@@ -194,13 +189,22 @@ export const usePoolProxy = () => {
         'buyAddLiquidityWithSignature', 
         [ poolAddr, fyDaiIn, parsedDaiUsed, signedSigs.get('daiSig'), signedSigs.get('fyDaiSig'), signedSigs.get('poolSig') ]
       );
+      /* set override gas estiamtes based on strategy */
+      overrides = { gasLimit: BigNumber.from('450000'), value: 0 };
 
     } else {
       /* contract fn used: addLiquidityWithSignature(IPool pool,uint256 daiUsed,uint256 maxFYDai,bytes memory daiSig,bytes memory controllerSig) */
-      calldata = proxyContract.interface.encodeFunctionData( 
-        'addLiquidityWithSignature', 
-        [ poolAddr, parsedDaiUsed, maxFYDai, signedSigs.get('daiSig'), signedSigs.get('controllerSig') ]
-      );
+      calldata = noSigsReqd ? 
+        proxyContract.interface.encodeFunctionData( 
+          'addLiquidity', 
+          [ poolAddr, parsedDaiUsed, maxFYDai ]
+        ):     
+        proxyContract.interface.encodeFunctionData( 
+          'addLiquidityWithSignature', 
+          [ poolAddr, parsedDaiUsed, maxFYDai, signedSigs.get('daiSig'), signedSigs.get('controllerSig') ]
+        );
+      /* set override gas estiamtes based on strategy */
+      overrides = noSigsReqd ?  { gasLimit: BigNumber.from('650000'), value: 0 } : { gasLimit: BigNumber.from('650000'), value: 0 };
     }
 
     /* send to the proxy for execution */
@@ -236,10 +240,6 @@ export const usePoolProxy = () => {
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const poolContract = new ethers.Contract( poolAddr, Pool.abi as any, provider);
     const parsedTokens = BigNumber.isBigNumber(tokens)? tokens : ethers.utils.parseEther(tokens.toString());
-    
-    const overrides = { 
-      gasLimit: BigNumber.from('1000000')
-    };
 
     /* build and use signature if required , else '0x' */
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
@@ -266,38 +266,52 @@ export const usePoolProxy = () => {
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
     /* is ALL sigs are '0x' set noSigsReqd */
     const noSigsReqd = Array.from(signedSigs.values()).every(item => item === '0x');
-
-     
+ 
     let calldata:any;
+    let overrides:any;
+
     /* Build the call data based, removeLiquidity function is  dependant on SERIES MATURITY */
     if (!series.isMature()) {
+
       /* calculate expected trade values  */ 
       let minFYDaiPrice:string | BigNumber;
-
       const preview = await previewPoolTx('sellFYDai', series, ethers.utils.parseEther('1'));
       if ( !(preview instanceof Error) ) {
-        // const _one = ONE.mul('1e18');
-        // const amountAboveOne = _one.sub( preview.toString() ).toString();
-        // const withSlippage = calculateSlippage( amountAboveOne, preferences.slippage);    
-        // minFYDaiPrice = floorDecimal( 
-        //   ( _one.sub( withSlippage ) ).toFixed() 
-        // );
         minFYDaiPrice = calculateSlippage( preview.toString(), preferences.slippage, true);
       } else {
         throw(preview);
       }
 
-      /* contract fn used: removeLiquidityEarlyDaiFixedWithSignature(IPool pool,uint256 poolTokens,uint256 minimumFYDaiPrice,bytes memory controllerSig,bytes memory poolSig) */
-      calldata = proxyContract.interface.encodeFunctionData( 
-        'removeLiquidityEarlyDaiFixedWithSignature', 
-        [ poolAddr, parsedTokens, minFYDaiPrice, signedSigs.get('controllerSig'), signedSigs.get('poolSig') ]
-      );
+      /* construct the calldata. Fn selection Based on current authorization status */
+      calldata = noSigsReqd? 
+        proxyContract.interface.encodeFunctionData(
+          'removeLiquidityEarlyDaiFixed', 
+          [ poolAddr, parsedTokens, minFYDaiPrice ]
+        ) :
+        proxyContract.interface.encodeFunctionData( 
+          'removeLiquidityEarlyDaiFixedWithSignature', 
+          [ poolAddr, parsedTokens, minFYDaiPrice, signedSigs.get('controllerSig'), signedSigs.get('poolSig') ]
+        );
+
+      /* set the gas limits based on whether sigs are required */
+      overrides = noSigsReqd ? { gasLimit: BigNumber.from('600000'), value:0 } :{ gasLimit: BigNumber.from('600000'), value:0 };
+    
     } else {
-      /* contract fn used: removeLiquidityMatureWithSignature(IPool pool,uint256 poolTokens,bytes memory controllerSig,bytes memory poolSig) */
-      calldata = proxyContract.interface.encodeFunctionData( 
-        'removeLiquidityMatureWithSignature', 
-        [ poolAddr, parsedTokens, signedSigs.get('controllerSig'), signedSigs.get('poolSig') ]
-      );
+
+      /* construct the calldata. Fn selection Based on current authorization status */
+      calldata = noSigsReqd ? 
+        proxyContract.interface.encodeFunctionData( 
+          'removeLiquidityMature', 
+          [ poolAddr, parsedTokens ]
+        ) : 
+        proxyContract.interface.encodeFunctionData( 
+          'removeLiquidityMatureWithSignature', 
+          [ poolAddr, parsedTokens, signedSigs.get('controllerSig'), signedSigs.get('poolSig') ]
+        );
+
+      /* set the gas limits based on whether sigs are required */
+      overrides = noSigsReqd ? { gasLimit: BigNumber.from('700000'), value:0 } :{ gasLimit: BigNumber.from('750000'), value:0 };
+
     }
 
     /* send to the proxy for execution */
