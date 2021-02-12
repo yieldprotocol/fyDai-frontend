@@ -63,7 +63,7 @@ const initState = {
     slippage: 0.005, // default === 0.5%
     useTxApproval: false,
     useBuyToAddLiquidity: true,
-    showDisclaimer: true,
+    showDisclaimer: false,
     themeMode:'auto',
     moodLight: true,
   },
