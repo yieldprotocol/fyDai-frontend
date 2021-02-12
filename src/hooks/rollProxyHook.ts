@@ -138,12 +138,12 @@ export const useRollProxy = () => {
       
       } else if ( !noSigsReqd && isRequestMoreThanDebt) {
         tx = seriesFrom.isMature() ?
-          await proxyContract.rollAllMatureWithSignature(collatType, poolFrom, poolTo, acc, maxFYDaiCost, signedSigs.get('controllerSig'), { gasLimit: BigNumber.from('600000'), value:0 } ) :
+          await proxyContract.rollAllMatureWithSignature(collatType, poolFrom, poolTo, acc, maxFYDaiCost, signedSigs.get('controllerSig'), { gasLimit: BigNumber.from('650000'), value:0 } ) :
           await proxyContract.rollAllEarlyWithSignature(collatType, poolFrom, poolTo, acc, maxFYDaiCost, signedSigs.get('controllerSig'), { gasLimit: BigNumber.from('500000'), value:0 } );
       
       } else  {
         tx = seriesFrom.isMature() ?
-          await proxyContract.rollDebtMatureWithSignature(collatType, poolFrom, poolTo, acc, daiToBuy, maxFYDaiCost, signedSigs.get('controllerSig'), { gasLimit: BigNumber.from('600000'), value:0 } ) :  
+          await proxyContract.rollDebtMatureWithSignature(collatType, poolFrom, poolTo, acc, daiToBuy, maxFYDaiCost, signedSigs.get('controllerSig'), { gasLimit: BigNumber.from('650000'), value:0 } ) :  
           await proxyContract.rollDebtEarlyWithSignature(collatType, poolFrom, poolTo, acc, daiToBuy, maxFYDaiCost, signedSigs.get('controllerSig'), { gasLimit: BigNumber.from('500000'), value:0 } );
       } 
 

@@ -454,7 +454,6 @@ export const useBorrowProxy = () => {
     /* if ALL sigs are '0x' set noSigsReqd */
     const noSigsReqd = Array.from(signedSigs.values()).every(item => item === '0x');
 
-
     /* contract fn: buyDaiWithSignature( IPool pool, address to, uint128 daiOut, uint128 maxFYDaiIn, bytes memory fyDaiSig, bytes memory poolSig ) */
     const calldata = noSigsReqd ? 
       proxyContract.interface.encodeFunctionData( 
@@ -482,7 +481,6 @@ export const useBorrowProxy = () => {
       }
     );
   };
-
 
   return {
 
