@@ -90,7 +90,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
   useEffect(()=> {
     inputValue && 
     inputValue > 0  && 
-    activeSeries.fyDaiBalance && 
+    activeSeries?.fyDaiBalance && 
     (async () => {
       const originalInWei = ethers.utils.parseEther(inputValue);
       const preview = estTrade('sellFYDai', activeSeries, originalInWei);
@@ -100,7 +100,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
         setInterestEarned((percent.toFixed(2)).toString());
       }
     })();
-  }, [inputValue, activeSeries.fyDaiBalance]);
+  }, [inputValue, activeSeries]);
 
   /* Withdraw DAi button disabling logic */
   /* Withdraw disabling logic */
