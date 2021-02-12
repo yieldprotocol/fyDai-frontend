@@ -52,7 +52,7 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
 
   const connectorList = [
     { name: 'Metamask', image: metamaskImage, connection: injected, trial: false },
-    { name: 'Wallet Connect', image: walletConnectImage, connection: walletconnect, trial: true },
+    { name: 'Wallet Connect', image: walletConnectImage, connection: walletconnect, trial: false },
   ];
 
   useEffect(()=>{
@@ -185,12 +185,6 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                     } return <ConnectButton key={x.name} />;
                   }
                   )}
-                  {/* <Box align='end'>
-                    <FlatButton 
-                      label={<Text size='xxsmall'>Disconnect current wallet</Text>}
-                      onClick={()=>web3React.deactivate()}
-                    /> 
-                  </Box> */}
                 </Box>
               </Box>}
 
