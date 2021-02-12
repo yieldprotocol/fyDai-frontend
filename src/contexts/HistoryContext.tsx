@@ -67,6 +67,8 @@ const HistoryProvider = ({ children }: any) => {
     const _lastBlock = await provider.getBlockNumber();
     const lastCheckedBlock = (txHistory && forceUpdate)? 11066942: txHistory?.lastBlock || 11066942;
 
+    console.log(deployedContracts.Controller);
+
     /* get the collateral transaction history */
     const collateralHistory = await getEventHistory(
       deployedContracts.Controller,
@@ -356,9 +358,16 @@ const HistoryProvider = ({ children }: any) => {
 
   useEffect(()=>{
     // Init everytime it starts or change of user
-    !yieldState?.yieldLoading && !userState?.userLoading && initHistory();
+    !yieldState?.yieldLoading && 
+    account && 
+    !userState?.userLoading && initHistory();
+    
     // If user has changed, rebuild and re-cache the history
-    !yieldState?.yieldLoading && !userState?.userLoading && !(txHistory?.account === account) && _getTxHistory(true);
+    !yieldState?.yieldLoading && 
+    account && 
+    !userState?.userLoading && 
+    !(txHistory?.account === account) && 
+    _getTxHistory(true);
 
   }, [ account, yieldState.yieldLoading, userState.userLoading ]);
 

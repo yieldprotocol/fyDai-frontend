@@ -67,7 +67,8 @@ export const useEvents = () => {
     filterArgs:any[],
     block:number
   ) => {
-    const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), provider );
+
+    const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), provider || fallbackProvider );
     const filter = contract.filters[filterEvent](...filterArgs);
     const logs = await contract.queryFilter( filter, block, 'latest');
     return logs;

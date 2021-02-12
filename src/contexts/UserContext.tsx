@@ -180,27 +180,33 @@ const UserProvider = ({ children }: any) => {
     dsProxyAddress:string,
   ) => {
     let cdpList: any = [];
+    
     if (dsProxyAddress && dsProxyAddress !== '0x0000000000000000000000000000000000000000') {
       cdpList = await getCDPList(dsProxyAddress, 'ETH-A');
     }
-    const _cdpData:any = await Promise.all(cdpList[1].map((x:string) => getCDPData(x, 'ETH-A') ) );
-    const _makerData = cdpList[0].map((x:any, i:number) => {
-      const { rate } = yieldState.feedData.ilks;
-      const vaultDaiDebt = mulDecimal(_cdpData[i][1], rate, '1e-27' ) ; // use built in precision equalling for wad * ray
-      return {
-        'vaultId': x.toString(),
-        'vaultCollateralType': ethers.utils.parseBytes32String(cdpList[2][i]),
-        'vaultAddress': cdpList[1][i],
-        'vaultDisplayName': `${ethers.utils.parseBytes32String(cdpList[2][i])} Vault #${x.toString()}`,
-        'vaultCollateral': _cdpData[i][0],
-        'vaultCollateral_': cleanValue(ethers.utils.formatEther(_cdpData[i][0]), 2), 
-        'vaultMakerDebt': _cdpData[i][1],
-        'vaultMakerDebt_': cleanValue(ethers.utils.formatEther(_cdpData[i][1]), 2),    
-        'vaultDaiDebt': ethers.BigNumber.from(floorDecimal(vaultDaiDebt)),
-        'vaultDaiDebt_': cleanValue( divDecimal( vaultDaiDebt, '1e18'), 2),
 
-      };
-    });
+    const _cdpData:any = cdpList[1] ? 
+      await Promise.all(cdpList[1].map((x:string) => getCDPData(x, 'ETH-A') ) ) : 
+      [];
+    
+    const _makerData = cdpList.length > 0 ? 
+      cdpList[0].map((x:any, i:number) => {
+        const { rate } = yieldState.feedData.ilks;
+        const vaultDaiDebt = mulDecimal(_cdpData[i][1], rate, '1e-27' ) ; // use built in precision equalling for wad * ray
+        return {
+          'vaultId': x.toString(),
+          'vaultCollateralType': ethers.utils.parseBytes32String(cdpList[2][i]),
+          'vaultAddress': cdpList[1][i],
+          'vaultDisplayName': `${ethers.utils.parseBytes32String(cdpList[2][i])} Vault #${x.toString()}`,
+          'vaultCollateral': _cdpData[i][0],
+          'vaultCollateral_': cleanValue(ethers.utils.formatEther(_cdpData[i][0]), 2), 
+          'vaultMakerDebt': _cdpData[i][1],
+          'vaultMakerDebt_': cleanValue(ethers.utils.formatEther(_cdpData[i][1]), 2),    
+          'vaultDaiDebt': ethers.BigNumber.from(floorDecimal(vaultDaiDebt)),
+          'vaultDaiDebt_': cleanValue( divDecimal( vaultDaiDebt, '1e18'), 2),
+        };
+      }) :
+      [];
 
     dispatch( { 'type': 'updateMakerVaults', 'payload':  _makerData });
 
@@ -217,6 +223,8 @@ const UserProvider = ({ children }: any) => {
         _getAuthorizations(),
         _updatePreferences(null),
       ]);
+
+      console.log(auths?.dsProxyAddress);
 
       /* Then get maker data if available */ 
       await _getMakerVaults(auths?.dsProxyAddress);
