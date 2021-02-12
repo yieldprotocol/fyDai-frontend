@@ -12,7 +12,8 @@
     "BorrowProxy",
     "ImportProxy",
     "ImportCdpProxy", 
-    "RollProxy"
+    "RollProxy", 
+    "USDCProxy"
   ],
 
   "colors" : {
@@ -56,7 +57,8 @@
         "DssCdpManager": "0x5ef30b9986345249bc32d8928B7ee64DE9435E39",
         "ImportProxy": "0x419f8A3Eae18ecFFd956cDa0782610a749e567c8",
         "ImportCdpProxy": "0xE09E6F95863fAd23488076096F8E5E36657C00dA",
-        "RollProxy": "0x9FF558d66Fa807aF34Fc89daA203B96c8587584e"
+        "RollProxy": "0x9FF558d66Fa807aF34Fc89daA203B96c8587584e",
+        "USDCProxy": " "
     },
 
     "42": {
@@ -91,7 +93,8 @@
         "DssCdpManager":  "0x1476483dD8C35F25e568113C5f70249D3976ba21",
         "ProxyFactory":   "0xe11E3b391F7E8bC47247866aF32AF67Dd58Dc800",
         "ProxyRegistry":  "0x64A436ae831C1672AE81F674CAb8B6775df3475C",
-        "RollProxy":      "0xdB2ed810347f0BE4b88c64787fcA8325C57C0d76"
+        "RollProxy":      "0xdB2ed810347f0BE4b88c64787fcA8325C57C0d76",
+        "USDCProxy":      "0x53DFb0D02CB0Bf1a5ABc0fDb9c0566E1E69E2a28"
     }
   }
 }
