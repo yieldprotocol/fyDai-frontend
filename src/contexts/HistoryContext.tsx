@@ -67,8 +67,6 @@ const HistoryProvider = ({ children }: any) => {
     const _lastBlock = await provider.getBlockNumber();
     const lastCheckedBlock = (txHistory && forceUpdate)? 11066942: txHistory?.lastBlock || 11066942;
 
-    console.log(deployedContracts.Controller);
-
     /* get the collateral transaction history */
     const collateralHistory = await getEventHistory(
       deployedContracts.Controller,
