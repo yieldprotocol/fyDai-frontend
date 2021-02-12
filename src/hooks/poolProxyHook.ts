@@ -38,7 +38,8 @@ export const usePoolProxy = () => {
 
   /* contexts */
   const  { state: { deployedContracts } }  = useContext<any>(YieldContext);
-  const  { state: { authorization: { dsProxyAddress, hasDelegatedDsProxy }, preferences } }  = useContext<any>(UserContext);
+  const  { state: userState }  = useContext<any>(UserContext);
+  const  { authorization: { dsProxyAddress, hasDelegatedDsProxy }, preferences } = userState;
 
   /* hooks */ 
   const { signer, provider } = useSignerAccount();
@@ -74,7 +75,7 @@ export const usePoolProxy = () => {
    * 
    * @param {IYieldSeries} series series to act on.
    * @param {number|BigNumber} daiUsed amount of Dai to use to mint liquidity.
-   * @param {boolean} stategy add liquidity strategy ('BUY' or 'BORROW')
+   * @param {boolean} forceBorrow OPTIONAL: add liquidity strategy ('BUY' or 'BORROW')
    *  
    * @note if BigNumber is used make sure it is in WEI
    */
@@ -91,7 +92,6 @@ export const usePoolProxy = () => {
     const poolContract = new ethers.Contract( poolAddr, Pool.abi as any, provider);
     const parsedDaiUsed = BigNumber.isBigNumber(daiUsed)? daiUsed : ethers.utils.parseEther(daiUsed.toString());
     const timeToMaturity = secondsToFrom(series.maturity.toString());
-
 
     /* calculate max expected fyDai value and factor in slippage */
     const daiReserves = await getBalance(deployedContracts.Dai, 'Dai', poolAddr);
@@ -175,25 +175,29 @@ export const usePoolProxy = () => {
     const signedSigs = await handleSignList(requestedSigs, genTxCode('ADD_LIQUIDITY', series?.maturity.toString()));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
-
-    /* is ALL sigs are '0x' set noSigsReqd */
+    /* if ALL sigs are '0x' then set noSigsReqd === true */
     const noSigsReqd = Array.from(signedSigs.values()).every(item => item === '0x');
 
     let calldata;
     let overrides;
 
-    /* Determine which addLiquidity function to use based on AVAILABLE LIQUIDITY, and build the call data from that one */ 
+    /* Determine which addLiquidity function to use based on AVAILABLE LIQUIDITY, build the call data from that one */ 
     if ( addLiquidityStrategy === 'BUY') { 
-      /* contract fn used: buyAddLiquidityWithSignature(IPool pool, uint256 fyDaiBought, uint256 maxDaiUsed, bytes memory daiSig, bytes memory fyDaiSig, bytes memory poolSig ) */
-      calldata = proxyContract.interface.encodeFunctionData( 
-        'buyAddLiquidityWithSignature', 
-        [ poolAddr, fyDaiIn, parsedDaiUsed, signedSigs.get('daiSig'), signedSigs.get('fyDaiSig'), signedSigs.get('poolSig') ]
-      );
+      /* BUY strategy with sigs or no sigs */
+      calldata = noSigsReqd ?
+        proxyContract.interface.encodeFunctionData( 
+          'buyAddLiquidity', 
+          [ poolAddr, fyDaiIn, parsedDaiUsed ]
+        ) :    
+        proxyContract.interface.encodeFunctionData( 
+          'buyAddLiquidityWithSignature', 
+          [ poolAddr, fyDaiIn, parsedDaiUsed, signedSigs.get('daiSig'), signedSigs.get('fyDaiSig'), signedSigs.get('poolSig') ]
+        );
       /* set override gas estiamtes based on strategy */
-      overrides = { gasLimit: BigNumber.from('450000'), value: 0 };
+      overrides = noSigsReqd ? { gasLimit: BigNumber.from('400000'), value: 0 } : { gasLimit: BigNumber.from('450000'), value: 0 };
 
     } else {
-      /* contract fn used: addLiquidityWithSignature(IPool pool,uint256 daiUsed,uint256 maxFYDai,bytes memory daiSig,bytes memory controllerSig) */
+      /* BORROW strategy with sigs or no sigs */
       calldata = noSigsReqd ? 
         proxyContract.interface.encodeFunctionData( 
           'addLiquidity', 
@@ -270,7 +274,7 @@ export const usePoolProxy = () => {
     let calldata:any;
     let overrides:any;
 
-    /* Build the call data based, removeLiquidity function is  dependant on SERIES MATURITY */
+    /* Build the call data based, removeLiquidity function is dependant on SERIES MATURITY */
     if (!series.isMature()) {
 
       /* calculate expected trade values  */ 
