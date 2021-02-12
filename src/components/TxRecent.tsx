@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { Box, Text } from 'grommet';
-import { UserContext } from '../contexts/UserContext';
+import { HistoryContext } from '../contexts/HistoryContext';
 import { TxContext } from '../contexts/TxContext';
 import RaisedButton from './RaisedButton';
 import EtherscanButton from './EtherscanButton';
@@ -11,7 +11,7 @@ import FlatButton from './FlatButton';
 const TxRecent = ({ setView }: any) => {
 
   const { state: { lastCompletedTx, pendingTxs }, dispatch } = useContext(TxContext);
-  const { state: { txHistory } } = useContext(UserContext);
+  const { state: { txHistory } } = useContext(HistoryContext);
   const [ lastTx, setLastTx] = useState<any>(null);
   
   useEffect(()=>{

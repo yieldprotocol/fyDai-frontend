@@ -3,15 +3,15 @@ import { NavLink, useParams } from 'react-router-dom';
 import { ethers } from 'ethers';
 import { Box, Keyboard, TextInput, Text, ResponsiveContext, Collapsible, Layer } from 'grommet';
 import { FiArrowRight as ArrowRight } from 'react-icons/fi';
-import { VscHistory as History } from 'react-icons/vsc';
+import { VscHistory as HistoryIcon } from 'react-icons/vsc';
 
 /* utils and support */
 import { cleanValue, genTxCode } from '../utils';
-import { logEvent } from '../utils/analytics';
 
 /* contexts */
 import { SeriesContext } from '../contexts/SeriesContext';
 import { UserContext } from '../contexts/UserContext';
+import { HistoryContext } from '../contexts/HistoryContext';
   
 /* hook pack */
 import { useSignerAccount } from '../hooks/connectionHooks';
@@ -24,6 +24,7 @@ import { useBorrowProxy } from '../hooks/borrowProxyHook';
 /* containers */
 import CloseDai from './CloseDai';
 import Redeem from './Redeem';
+import History from './History';
 
 /* components */
 import InputWrap from '../components/InputWrap';
@@ -34,7 +35,6 @@ import RaisedButton from '../components/RaisedButton';
 import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
 import SeriesMatureBox from '../components/SeriesMatureBox';
-import TxHistory from '../components/TxHistory';
 import HistoryWrap from '../components/HistoryWrap';
 import DaiMark from '../components/logos/DaiMark';
 import RaisedBox from '../components/RaisedBox';
@@ -56,6 +56,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
   const activeSeries = seriesData.get(activeSeriesId);
   const { state: userState, actions: userActions } = useContext(UserContext);
   const { daiBalance, daiBalance_ } = userState.position;
+  const { state: { historyLoading } } = useContext(HistoryContext);
 
   /* local state */ 
   const [ CloseDaiOpen, setCloseDaiOpen ] = useState<boolean>(false);
@@ -73,7 +74,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
   /* init hooks */ 
   const { previewPoolTx } = usePool();
   const { sellDai } = useBorrowProxy();
-  const { calculateAPR } = useMath();
+  const { calculateAPR, estTrade } = useMath();
   const { account, fallbackProvider } = useSignerAccount();
   const [ txActive ] = useTxActive(['SELL_DAI']);
   const [ closeTxActive ] = useTxActive(['BUY_DAI']);
@@ -103,14 +104,14 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
   /* Handle input (debounce input) changes */
   useEffect(() => {
     activeSeries && !(activeSeries?.isMature()) && !!debouncedInput && ( async () => {
-      const preview = await previewPoolTx('sellDai', activeSeries, debouncedInput);
+      const preview = estTrade('sellDai', activeSeries, debouncedInput);
       if (!(preview instanceof Error)) {
         setFYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
         const _apr = calculateAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity );
         setAPR( cleanValue(_apr.toString(), 2) );      
       } else {
         /* if the market doesnt have liquidity just estimate from rate */
-        const rate = await previewPoolTx('sellDai', activeSeries, 1);
+        const rate = estTrade('sellDai', activeSeries, 1 );
         !(rate instanceof Error) && setFYDaiValue(debouncedInput*parseFloat((ethers.utils.formatEther(rate))));
         (rate instanceof Error) && setFYDaiValue(0);
         setLendDisabled(true);
@@ -122,7 +123,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
   /* handle active series loads and changes */
   useEffect(() => {
     fallbackProvider && account && activeSeries?.fyDaiBalance_ && !(activeSeries?.isMature()) && ( async () => {
-      const preview = await previewPoolTx('SellFYDai', activeSeries, activeSeries.fyDaiBalance_);
+      const preview = estTrade('sellFYDai', activeSeries, activeSeries.fyDaiBalance_);
       !(preview instanceof Error) && setCurrentValue( ethers.utils.formatEther(preview));
     })();
   }, [ activeSeries, account, fallbackProvider ]);
@@ -168,7 +169,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
 
         { histOpen && 
         <HistoryWrap closeLayer={()=>setHistOpen(false)}>
-          <TxHistory 
+          <History 
             filterTerms={['Lent', 'Closed']}
             series={activeSeries}
           />
@@ -317,9 +318,6 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
                 />       
               </Box>
             </>}
-{/*           
-            { activeSeries?.isMature() &&
-            <SeriesMatureBox />} */}
             
             { !txActive && 
             !!account && 
@@ -335,9 +333,10 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
                 <Box alignSelf='start' margin={{ top:'medium' }}>
                   <FlatButton 
                     onClick={()=>setHistOpen(true)}
+                    disabled={historyLoading}
                     label={
                       <Box direction='row' gap='small' align='center'>
-                        <Text size='xsmall' color='text-weak'><History /></Text>                
+                        <Text size='xsmall' color='text-weak'><HistoryIcon /></Text>                
                         <Text size='xsmall' color='text-weak'>
                           Series Lend History
                         </Text>              

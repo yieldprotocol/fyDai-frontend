@@ -3,7 +3,7 @@ import { ITx } from '../types';
 
 
 /* utils and support */
-import { logEvent } from '../utils/analytics';
+import { logEvent } from '../utils';
 import { TxContext } from '../contexts/TxContext';
 import { NotifyContext } from '../contexts/NotifyContext';
 
@@ -36,53 +36,52 @@ export const useTxHelpers = () => {
   const [ pendingCache, setPendingCache ] = useCachedState('txPending', []);
 
   /* Notification Helpers */
+
   const txComplete = (receipt:any, txCode:string|null=null) => {  
     dispatch({ type: 'txComplete', payload: { receipt, txCode } } );
     setPendingCache(pendingCache.filter( (x:any)=> x.tx.hash === receipt.hash ));
   };
 
   const handleTxRejectError = (error:any) => {
-    /* clear the requested signatures and tx activity flag */
+    /* Clear the requested signatures and tx activity flag */
     dispatch({ type: 'setTxProcessActive', payload:{ txCode:null, sigs:[] }  });
-
-    /* if user cancelled/rejected the tx, then silence the errors */
+    /* If user cancelled/rejected the tx, then silence the errors */
     if ( error.code === 4001 ) {
       notify({ 
         type: 'notify',
         payload: { message: 'Transaction rejected by user' } 
-      });
+      }); 
     } else {
-    // eslint-disable-next-line no-console
-      console.log(error.message);
+      /* Else, the transaction was cancelled by the wallet provider */
       notify({ 
         type: 'notify', 
         payload: { message: 'The transaction was rejected by the wallet provider. Please see console', type:'error' } 
       });
+      // eslint-disable-next-line no-console
+      console.log(error.message);
     }
   };
   
   const handleTxError = (msg:string, receipt: any, error:any) => {
-    /* clear the requested signatures and tx activity flag */
+    /* Clear the requested signatures and tx activity flag */
     dispatch({ type: 'setTxProcessActive', payload:{ txCode:null, sigs:[] }  });
-    // eslint-disable-next-line no-console
-    console.log(error.message);
     notify({ 
       type: 'notify', 
       payload:{ message: msg, type:'error' } 
     });
     txComplete(receipt);
     setPendingCache([]);
+    // eslint-disable-next-line no-console
+    console.log(error.message);
   };
   
   const handleTx = async ( tx:ITx ) => {
-
-    /* assign an internal tracking code for the series and type of tx */
+    /* Assign an internal tracking code for the series and type of tx */
     const txCode = tx.type.concat( tx?.series?.maturity.toString() || '' );
-    /* add the tx to txContent */
+    /* Add the tx to txContent */
     dispatch({ type: 'txPending', payload: { ...tx, txCode } });
-    /* add the tx to the cache, for picking up on reload */
+    /* Add the tx to the cache, for picking up on reload */
     setPendingCache([{ ...tx, txCode }]);
-
     await tx.tx.wait()
       .then((receipt:any) => {
         logEvent(

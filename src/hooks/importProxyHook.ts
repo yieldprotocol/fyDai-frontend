@@ -19,16 +19,13 @@ import { useController } from './controllerHook';
 import { usePool } from './poolHook';
 
 import { genTxCode } from '../utils';
-import { calculateSlippage, floorDecimal, mulDecimal, ONE } from '../utils/yieldMath';
+import { calculateSlippage, floorDecimal, ONE } from '../utils/yieldMath';
 
 /**
  * Hook for interacting with the ImportProxy Contract.
  * 
  * @returns { function } importPosition
  * @returns { function } importVault
- * 
- * @returns { function } debtToDai
- * @returns { function } daiToDebt
  * 
  */
 export const useImportProxy = () => {
@@ -107,7 +104,7 @@ export const useImportProxy = () => {
 
     /* calculate expected max safety values  */  
     let maxDaiPrice:string;         
-    const preview = await previewPoolTx('buydai', series, ethers.utils.parseEther('1'));   
+    const preview = await previewPoolTx('buyDai', series, ethers.utils.parseEther('1'));   
     if ( !(preview instanceof Error) ) {
       
       // 1 + ( 1.1 * ( price - 1 ) )
@@ -254,7 +251,6 @@ export const useImportProxy = () => {
       importCdpWithSignature(IPool pool, uint256 cdp, uint256 maxDaiPrice, bytes memory controllerSig)
       importVaultWithSignature(IPool pool, address user, uint256 maxDaiPrice, bytes memory controllerSig) 
     */
-    console.log(poolAddr, cdpId.toString(), maxDaiPrice, signedSigs.get('controllerSig') );
 
     const calldata = viaCdpMan ?
       cdpProxyContract.interface.encodeFunctionData( 'importCdpWithSignature', [ poolAddr, cdpId.toString(), maxDaiPrice, signedSigs.get('controllerSig') ] ) :

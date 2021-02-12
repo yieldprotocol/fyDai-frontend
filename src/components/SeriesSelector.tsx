@@ -6,7 +6,8 @@ import {
   FiArrowLeft as ArrowLeft,
   FiCheck as Check,
 } from 'react-icons/fi';
-import { logEvent } from '../utils/analytics';
+
+import { logEvent, modColor  } from '../utils';
 
 import { SeriesContext } from '../contexts/SeriesContext';
 
@@ -15,7 +16,6 @@ import Loading from './Loading';
 import FlatButton from './FlatButton';
 import RaisedButton from './RaisedButton';
 import YieldMobileNav from './YieldMobileNav';
-import { modColor } from '../utils';
 
 const InsetBox = styled(Box)`
   border-radius: 8px;
@@ -55,10 +55,12 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
 
   const handleSelectSeries = (seriesMaturity: number) => {
     setActiveSeries(seriesMaturity);
+    
     logEvent('change_series', {
       from: activeSeries.maturity,
       to: seriesMaturity,
     });
+
     navHistory.push(`/${pathname.split('/')[1]}/${seriesMaturity}`);
     close();
   };
@@ -111,7 +113,6 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
             fill='horizontal'
             justify='between'
             gap='small'
-            // background={modColor(defaultBackground, -10)}
           >
             <Box basis={mobile?'30%':'30%'}>
               <Text alignSelf='start' size='small' color='text-weak' weight='bold'>APR</Text>
@@ -145,7 +146,6 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
                   onClick={()=>handleSelectSeries(x.maturity)}
                   hoverIndicator={modColor(defaultBackground, -10)}
                   background={activeSeries.maturity === x.maturity ? modColor(defaultBackground, -10):undefined}
-                  // border='top'
                   fill='horizontal'
                   pad='medium'
                   gap='small'

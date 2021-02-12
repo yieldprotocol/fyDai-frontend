@@ -2,12 +2,6 @@ import React, { useContext, useState, useEffect } from 'react';
 import { Box, ThemeContext, Text, ResponsiveContext, Collapsible, Stack } from 'grommet';
 import styled, { css } from 'styled-components';
 
-import { 
-  FiCheckCircle as Check,
-  FiChevronDown as ChevronDown,
-  FiLayers as ChangeSeries
-} from 'react-icons/fi';
-
 import { IYieldSeries } from '../types';
 
 import AprBadge from './AprBadge';
@@ -79,7 +73,7 @@ const  RollSelector = ( props:any ) =>  {
   }, [ activeSeries ]);
 
   const Item = (_props:any) => (
-    <Box direction='row' gap='xsmall' align='center' pad={{ left:'large', vertical:'xsmall' }} >
+    <Box direction='row' gap='xsmall' align='center' pad={{ left:'large', vertical:'xsmall' }}>
       {_props.series && <AprBadge activeView='Borrow' series={_props.series} animate={_props.animate || false} />}
       <Text size='small'>
         { mobile? _props.series?.displayNameMobile : _props.series?.displayName }
@@ -103,14 +97,14 @@ const  RollSelector = ( props:any ) =>  {
         </StyledBox>
 
         <Collapsible open={selectorOpen}>
-          <Box gap='small' pad={{ top:'small' }} >
+          <Box gap='small' pad={{ top:'small' }}>
             { 
               seriesArr?.filter((x:IYieldSeries) => x.maturity !== destinationSeries?.maturity)
                 .map( (x:IYieldSeries) => (
                   <Box 
                     key={x.maturity}
                     onClick={()=> makeSelection(x)} 
-                    hoverIndicator={ modColor(defaultBackground, -10) }
+                    hoverIndicator={modColor(defaultBackground, -10)}
                   >
                     <Item series={x} animate={true} />
                   </Box>

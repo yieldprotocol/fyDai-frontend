@@ -30,9 +30,9 @@ export const useController = () => {
   const { state : { deployedContracts } } = useContext<any>(YieldContext);
   const { actions: userActions } = useContext(UserContext);
 
-  /* controller contract for txs */
+  /* Controller contract for txs */
   const [controllerContract, setControllerContract] = useState<any>();
-  /* controller contract for reading, calls */
+  /* Controller contract for reading, calls */
   const [controllerProvider, setControllerProvider] = useState<any>();
 
   const { handleTx, handleTxRejectError } = useTxHelpers();
@@ -61,7 +61,8 @@ export const useController = () => {
 
   /**
    * @dev Delegate a 3rd party to act on behalf of the user in the controller
-   * @param {string} delegatedAddress address of the contract/entity getting delegated. 
+   * @param {string} delegatedAddress address of the contract/entity getting delegated.
+   * @param {boolean} asProxy OPTIONAL: delegate via dsProxy (default: false)
    */
   const addControllerDelegate = async (
     delegatedAddress:string,
@@ -70,8 +71,8 @@ export const useController = () => {
     let tx:any;
     /* Processing and sanitizing input */
     const delegatedAddr = ethers.utils.getAddress(delegatedAddress);
-    /* Contract interaction */
 
+    /* Contract interaction */
     if (!asProxy) {
       try {
         tx = await controllerContract.addDelegate(delegatedAddr);
@@ -101,7 +102,7 @@ export const useController = () => {
   /**
    * @dev Checks to see if an account (user) has delegated a contract/3rd Party for the controller.
    * @param {string} delegateAddress address of the delegate to be checked (yieldProxy contract getting approved). 
-   * @returns {Promise<boolean>} promise > approved or not
+   * @returns { Promise<boolean>}  promise > approved or not
    * @note call function
    */
   const checkControllerDelegate = async (
@@ -215,7 +216,6 @@ export const useController = () => {
    * @dev get the FyDai debt of a series
    * @param {string} collateralType collateral type to check (eg. ETH-A)
    * @param maturity Maturity of an added series
-   * 
    * @returns {Promise<BigNumber>} amount Dai (in Wei)
    * @note call function 
    */

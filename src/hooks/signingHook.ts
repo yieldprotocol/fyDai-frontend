@@ -7,7 +7,8 @@ import {
   IDomain,
   ISignListItem,
 } from '../types';
-import { MAX_INT } from '../utils/constants';
+
+import { MAX_INT } from '../utils';
 
 import { TxContext } from '../contexts/TxContext';
 import { UserContext } from '../contexts/UserContext';

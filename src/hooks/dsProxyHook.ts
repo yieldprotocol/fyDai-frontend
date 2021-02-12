@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useContext } from 'react';
 import { ethers }  from 'ethers';
 
 import { ITx } from '../types';
@@ -13,7 +13,6 @@ import { useTxHelpers } from './txHooks';
  * Hook for interacting with the Yield Proxy Contract.
  * 
  * @returns { function } dsBuild
- * @returns { boolean } buildActive
  * 
  */
 
@@ -24,9 +23,6 @@ export const useDsProxy = () => {
 
   /* state from contexts */
   const  { state }  = useContext<any>(UserContext);
-
-  /* local state */
-  const [ executeActive, setExecuteActive ] = useState<boolean>(false);
 
   /* hooks */ 
   const { signer } = useSignerAccount();
@@ -46,20 +42,20 @@ export const useDsProxy = () => {
     );
 
     let tx:any; // type
-    setExecuteActive(true);
+
     try {
       tx = await dsProxyContract['execute(address,bytes)'](contractAddress, calldata, overrides);
     } catch (e) {
       handleTxRejectError(e);
-      setExecuteActive(false);
+
       return;
     }
     await handleTx({ ...txInfo, tx });
-    setExecuteActive(true);
+
   };
 
   return {
     /* dsProxy eq. fns */
-    proxyExecute, executeActive,
+    proxyExecute
   } as const;
 };

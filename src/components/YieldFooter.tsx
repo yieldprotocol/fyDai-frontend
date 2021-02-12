@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import { Anchor, Footer, Text, Box } from 'grommet';
 import { FaDiscord as Discord } from 'react-icons/fa';
 import {
@@ -10,7 +10,7 @@ import {
 } from 'react-icons/fi';
 import { CgSleep as Moodlight } from 'react-icons/cg';
 
-import { logEvent } from '../utils/analytics';
+import { logEvent } from '../utils';
 
 import { YieldContext } from '../contexts/YieldContext';
 import { UserContext } from '../contexts/UserContext';
@@ -112,7 +112,6 @@ const YieldFooter = (props: any) => {
           </Anchor>
         }
       </Box>
-      {/* <Box onClick={()=>genVault(authorization.dsProxyAddress)}>test</Box> */}
     </Footer>
   );
 };

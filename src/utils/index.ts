@@ -1,4 +1,12 @@
 import { format, subDays } from 'date-fns';
+import { ethers, BigNumber } from 'ethers';
+
+/* constants */
+export const BN_RAY = BigNumber.from('1000000000000000000000000000');
+export const ETH_BYTES = ethers.utils.formatBytes32String('ETH-A');
+export const CHAI_BYTES = ethers.utils.formatBytes32String('CHAI');
+export const MAX_INT = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+export const ZERO = BigNumber.from('1000000000000000000000000000');
 
 /* Trunctate a string value to a certain number of 'decimal' point */
 export const cleanValue = (input:string, decimals:number=12) => {
@@ -20,17 +28,15 @@ export const abbreviateHash = (addr:string, buffer:number=4) => {
   return `${addr?.substring(0, buffer)}...${addr?.substring(addr.length - buffer)}`; 
 };
 
-/* get the series name from the maturity number */
+/* Generate the series name from the maturity number */
 export const nameFromMaturity = ( maturity: number, style:string='MMMM yyyy') => {
-
   /* 
+      Examples: 
       full (defualt) : 'MMMM yyyy'
-      apr badge : 'MMM yy'
+      apr badge  : 'MMM yy'
       mobile: 'MMM yyyy'  
   */ 
-
-  return format( subDays( new Date(maturity*1000), 2), style); 
- 
+  return format( subDays( new Date(maturity*1000), 2), style);
 };
 
 /**
@@ -123,4 +129,11 @@ export const buildGradient = (colorFrom:string, colorTo:string  ) => {
     ${modColor( colorTo, 25)}, 
     ${modColor( colorTo, 0)}, 
     ${modColor( colorTo, 0)})`;
+};
+
+/* google analytics log event */
+export const logEvent = (eventName: string, eventParams: any ) => {
+  if (eventName) {
+    window?.gtag('event', eventName, eventParams);
+  }
 };

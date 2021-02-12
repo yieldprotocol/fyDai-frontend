@@ -8,11 +8,11 @@ import {
   FiChevronUp as ChevronUp,
 } from 'react-icons/fi';
 
-import { UserContext } from '../contexts/UserContext';
-import EtherscanButton from './EtherscanButton';
+import { HistoryContext } from '../contexts/HistoryContext';
+import EtherscanButton from '../components/EtherscanButton';
 import { IYieldSeries } from '../types';
-import Loading from './Loading';
-import HashWrap from './HashWrap';
+import Loading from '../components/Loading';
+import HashWrap from '../components/HashWrap';
 import { modColor, cleanValue, nameFromMaturity } from '../utils';
 
 
@@ -29,8 +29,9 @@ const InsetBox = styled(Box)`
       box-shadow: inset 6px 6px 11px ${modColor(props.background, -20)}, inset -6px -6px 11px ${modColor(props.background, 10)};
   `}`;
 
-const TxHistory = ( { filterTerms, series }: HistoryProps) => {
-  const { state } = useContext(UserContext);
+const History = ( { filterTerms, series }: HistoryProps) => {
+  const { state } = useContext(HistoryContext);
+  
   const [ txHistory, setTxHistory] = useState<any>([]);
   const [ itemOpen, setItemOpen ] = useState<any>(null);
 
@@ -45,16 +46,20 @@ const TxHistory = ( { filterTerms, series }: HistoryProps) => {
         <Box direction='row' gap='xsmall' align='center'>
           <Text size='xsmall' color={series?.seriesColor || 'text-weak'}>{item.event}</Text>
           <Text size='xxsmall'> 
+
             { (item.event === 'Deposited' || item.event === 'Withdrew') && `${item.collateral} collateral`}
-            { (item.event === 'Added' || item.event === 'Removed') && 'liquidity Tokens '} 
+            { item.event === 'Removed' && 'tokens from '}  
+            { item.event === 'Added' && 'liquidity tokens to '}    
             
-            { item.event === 'Imported' && ' Maker debt to ' }    
+            { item.event === 'Rolled' && `debt from ${ nameFromMaturity(item.maturityFrom, 'MMM yy') } to ` }
+            { item.event === 'Imported' && 'Maker debt to ' }
+            { item.event === 'Repaid' && 'debt from ' }
 
-            { item.APR && `@ ${ cleanValue(item.APR, 2) }%` }
+            { item.event === 'Lent' && 'to ' }
+            { item.event === 'Closed' && 'from ' }
 
-            { item.event === 'Rolled' && 'debt to '}
-
-            { item.maturity && nameFromMaturity(item.maturity) }
+            { item.event === 'Borrowed' && item.APR && ` @ ${ cleanValue(item.APR, 2) }% ` }
+            { item.maturity && nameFromMaturity(item.maturity ) }
           </Text>
         </Box>
       );
@@ -135,10 +140,10 @@ const TxHistory = ( { filterTerms, series }: HistoryProps) => {
     const sortedList = seriesFilteredHist.sort( (a:any, b:any) => b.date - a.date ); 
     setTxHistory(sortedList);
 
-  }, [ state.txHistory, series, filterTerms ]);
+  }, [ state, series, filterTerms ]);
 
   return (
-    <Loading condition={state.userLoading} size='large'>
+    <Loading condition={state.historyLoading} size='large'>
       <InsetBox
         background={defaultBackground}
         fill='horizontal'
@@ -204,7 +209,7 @@ const TxHistory = ( { filterTerms, series }: HistoryProps) => {
               );
             }):
             <Box align='center' pad='medium'>
-              <Loading condition={state.userLoading} size='large'>
+              <Loading condition={state.historyLoading} size='large'>
                 <Box pad='xsmall'> 
                   <Text size='xxsmall'> No history yet.</Text>
                 </Box>
@@ -217,4 +222,4 @@ const TxHistory = ( { filterTerms, series }: HistoryProps) => {
   );
 };
 
-export default TxHistory;
+export default History;

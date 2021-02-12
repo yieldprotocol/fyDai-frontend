@@ -12,6 +12,7 @@ import { YieldProvider }  from './contexts/YieldContext';
 import { UserProvider }  from './contexts/UserContext';
 import { SeriesProvider }  from './contexts/SeriesContext';
 import { TxProvider } from './contexts/TxContext';
+import { HistoryProvider } from './contexts/HistoryContext';
 
 function getLibrary(provider: any) {
   const library = new ethers.providers.Web3Provider(provider);
@@ -37,9 +38,11 @@ ReactDOM.render(
               <UserProvider>
                 <SeriesProvider>
                   <TxProvider>
+                    <HistoryProvider>
     
-                    <App />
+                      <App />
                     
+                    </HistoryProvider>                  
                   </TxProvider>
                 </SeriesProvider>
               </UserProvider>

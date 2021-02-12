@@ -31,7 +31,8 @@ const contractMap = new Map<string, any>([
  * @returns { function } getEvents
  */
 export const useEvents = () => {
-  const { provider } = useSignerAccount();
+
+  const { provider, fallbackProvider } = useSignerAccount();
 
   /**
    * Setup an event listener.
@@ -46,9 +47,9 @@ export const useEvents = () => {
     filterArgs:any[],
     callback:any
   ) => {
-    const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), provider);
+    const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), provider || fallbackProvider);
     const filter = contract.filters[filterEvent](...filterArgs);
-    contract.on(filter, (x:any) => callback(x));
+    contract.on(filter, (x:any) => callback(x) );
   };
 
   /**
@@ -66,13 +67,14 @@ export const useEvents = () => {
     filterArgs:any[],
     block:number
   ) => {
-    const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), provider);
+
+    const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), provider || fallbackProvider );
     const filter = contract.filters[filterEvent](...filterArgs);
     const logs = await contract.queryFilter( filter, block, 'latest');
     return logs;
   };
 
-  /* adds a parsed layer onto the returned values  (format dates, numbers to strings, */ 
+  /* Adds a parsed layer onto the returned values (for example, this will format dates, numbers to strings, */ 
   const parseEventList = async (eventList:any) => {
     const parsedList = Promise.all( eventList.map(async (x:any)=>{
       const { timestamp } = await provider.getBlock(x.blockNumber);

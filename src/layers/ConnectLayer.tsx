@@ -18,15 +18,18 @@ import {
 
 import { UserContext } from '../contexts/UserContext';
 import { YieldContext } from '../contexts/YieldContext';
+import { HistoryContext } from '../contexts/HistoryContext';
 
 import { useSignerAccount, useConnection } from '../hooks/connectionHooks';
 import { injected, walletconnect } from '../connectors';
 import metamaskImage from '../assets/images/providers/metamask.png';
 import walletConnectImage from '../assets/images/providers/walletconnect.png';
 
+
+import History from '../containers/History';
+
 import RaisedButton from '../components/RaisedButton';
 import FlatButton from '../components/FlatButton';
-import TxHistory from '../components/TxHistory';
 import YieldSettings from '../components/YieldSettings';
 import ExperimentWrap from '../components/ExperimentWrap';
 import HashWrap from '../components/HashWrap';
@@ -35,11 +38,11 @@ import TxRecent from '../components/TxRecent';
 const ConnectLayer = ({ view, target, closeLayer }: any) => {
 
   const { state: { yieldData } } = useContext(YieldContext);
+  const { state: { position } } = useContext(UserContext);
+  const { actions } = useContext(HistoryContext);
 
-  const { state: { position }, actions } = useContext(UserContext);
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
-  
   const { handleSelectConnector } = useConnection();
   const { account, provider, chainId } = useSignerAccount();
 
@@ -47,10 +50,9 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
   const [ histOpen, setHistOpen] = useState<string>('BORROW');
   const [ diagnosticsOpen, setDiagnosticsOpen] = useState<boolean>(false);
 
-  
   const connectorList = [
     { name: 'Metamask', image: metamaskImage, connection: injected, trial: false },
-    { name: 'Wallet Connect', image: walletConnectImage, connection: walletconnect, trial: true },
+    { name: 'Wallet Connect', image: walletConnectImage, connection: walletconnect, trial: false },
   ];
 
   useEffect(()=>{
@@ -183,16 +185,13 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                     } return <ConnectButton key={x.name} />;
                   }
                   )}
-                  {/* <Box align='end'>
-                    <FlatButton 
-                      label={<Text size='xxsmall'>Disconnect current wallet</Text>}
-                      onClick={()=>web3React.deactivate()}
-                    /> 
-                  </Box> */}
                 </Box>
               </Box>}
 
-              { account && layerView === 'HISTORY' &&      
+              { 
+              
+              account && 
+              layerView === 'HISTORY' &&
               <Box pad="medium" gap="large"> 
                 <Box direction='row' justify='evenly'>
                   <FlatButton 
@@ -217,9 +216,9 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                 </Box>
 
                 <Box>
-                  {histOpen === 'BORROW' && <TxHistory filterTerms={['Borrowed', 'Repaid', 'Deposited', 'Withdrew', 'Imported', 'Rolled']} series={null} />}
-                  {histOpen === 'LEND' && <TxHistory filterTerms={['Closed', 'Lent' ]} series={null} />}
-                  {histOpen === 'POOL' && <TxHistory filterTerms={['Added', 'Removed' ]} series={null} />}
+                  {histOpen === 'BORROW' && <History filterTerms={['Borrowed', 'Repaid', 'Deposited', 'Withdrew', 'Imported', 'Rolled']} series={null} />}
+                  {histOpen === 'LEND' && <History filterTerms={['Closed', 'Lent' ]} series={null} />}
+                  {histOpen === 'POOL' && <History filterTerms={['Added', 'Removed' ]} series={null} />}
                 </Box>
               </Box> }
 

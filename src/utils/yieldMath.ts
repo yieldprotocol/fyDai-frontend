@@ -8,18 +8,17 @@ export const ONE: Decimal = new Decimal(1);
 export const TWO: Decimal = new Decimal(2);
 export const SECONDS_PER_YEAR: number = (365 * 24 * 60 * 60);
 
-export const k = new Decimal(1 / (4 * SECONDS_PER_YEAR) ); // inv of seconds in 4 years
+export const k = new Decimal(1 / 126144000 ); // inv of seconds in 4 years
 export const g1 = new Decimal(950 / 1000);
 export const g2 = new Decimal(1000 / 950);
 const precisionFee = new Decimal(1000000000000);
 
-// https://www.desmos.com/calculator/mllhtohxfx
 export function mint(
   daiReserves: BigNumber | string, 
   fyDaiReserves: BigNumber | string, 
   totalSupply: BigNumber | string, 
   dai: BigNumber | string
-) : [any, any] {
+) : [ any, any ] {
   const daiReserves_ = new Decimal(daiReserves.toString());
   const fyDaiReserves_ = new Decimal(fyDaiReserves.toString());
   const supply_ = new Decimal(totalSupply.toString());
@@ -31,7 +30,6 @@ export function mint(
   return [ m, y ];
 }
 
-// https://www.desmos.com/calculator/ubsalzunpo
 export function burn(
   daiReserves: BigNumber | string, 
   fyDaiReserves: BigNumber | string, 
@@ -49,15 +47,13 @@ export function burn(
   return [ z, y ];
 }
 
-
-// https://www.desmos.com/calculator/5nf2xuy6yb
 export function sellDai(
   daiReserves: BigNumber | string, 
   fyDaiReserves: BigNumber | string, 
   dai: BigNumber | string, 
   timeTillMaturity: BigNumber | string,
   withNoFee: boolean = false // optional: default === false
-): any {
+): string {
   
   const daiReserves_ = new Decimal(daiReserves.toString());
   const fyDaiReserves_ = new Decimal(fyDaiReserves.toString());
@@ -79,14 +75,13 @@ export function sellDai(
   return yFee.toString();
 }
 
-// https://www.desmos.com/calculator/6jlrre7ybt
 export function sellFYDai(
   daiReserves: BigNumber | string, 
   fyDaiReserves: BigNumber | string, 
   fyDai: BigNumber | string, 
   timeTillMaturity: BigNumber | string,
   withNoFee: boolean = false // optional: default === false
-): any {
+): string {
   const daiReserves_ = new Decimal(daiReserves.toString());
   const fyDaiReserves_ = new Decimal(fyDaiReserves.toString());
   const timeTillMaturity_ = new Decimal(timeTillMaturity.toString());
@@ -107,14 +102,13 @@ export function sellFYDai(
   return yFee.toString();
 }
 
-// https://www.desmos.com/calculator/0rgnmtckvy
 export function buyDai(
   daiReserves: BigNumber | string,
   fyDaiReserves: BigNumber | string,
   dai: BigNumber | string, 
   timeTillMaturity: BigNumber | string,
   withNoFee: boolean = false // optional: default === false
-): any {
+): string {
 
   const daiReserves_ = new Decimal(daiReserves.toString());
   const fyDaiReserves_ = new Decimal(fyDaiReserves.toString());
@@ -136,7 +130,6 @@ export function buyDai(
   return yFee.toString();
 }
 
-// https://www.desmos.com/calculator/ws5oqj8x5i
 export function buyFYDai(
   daiReserves: BigNumber | string, 
   fyDaiReserves: BigNumber | string, 
@@ -166,22 +159,21 @@ export function buyFYDai(
 }
 
 export function getFee(
-  fyDaiReserves: BigNumber | string, 
-  daiReserves: BigNumber | string, 
-  timeTillMaturity: BigNumber | string,
-  fyDai: BigNumber | string
+  daiReserves: BigNumber | string,
+  fyDaiReserves: BigNumber | string,
+  fyDai: BigNumber | string,
+  timeTillMaturity: BigNumber | string
 ): string {
   let fee_: Decimal = ZERO;
   const fyDai_: BigNumber =  BigNumber.isBigNumber(fyDai) ? fyDai : BigNumber.from(fyDai);
 
   if (fyDai_.gte(ethers.constants.Zero)) {
-    const daiWithFee: string = buyFYDai(fyDaiReserves, daiReserves, timeTillMaturity, fyDai);
-    const daiWithoutFee: string = buyFYDai(fyDaiReserves, daiReserves, timeTillMaturity, fyDai, true);
+    const daiWithFee: string = buyFYDai(daiReserves, fyDaiReserves, fyDai, timeTillMaturity);
+    const daiWithoutFee: string = buyFYDai(daiReserves, fyDaiReserves, fyDai, timeTillMaturity, true);
     fee_ = (new Decimal(daiWithFee)).sub(new Decimal(daiWithoutFee)); 
-
   } else {
-    const daiWithFee:string = sellFYDai(fyDaiReserves, daiReserves, timeTillMaturity, fyDai_.mul(BigNumber.from('-1')) );
-    const daiWithoutFee:string = sellFYDai(fyDaiReserves, daiReserves, timeTillMaturity, fyDai_.mul(BigNumber.from('-1')), true);
+    const daiWithFee:string = sellFYDai(daiReserves, fyDaiReserves, fyDai_.mul(BigNumber.from('-1')), timeTillMaturity );
+    const daiWithoutFee:string = sellFYDai(daiReserves, fyDaiReserves, fyDai_.mul(BigNumber.from('-1')), timeTillMaturity, true);
     fee_ = (new Decimal(daiWithoutFee)).sub(new Decimal(daiWithFee));
   }
   return fee_.toString();
@@ -241,11 +233,12 @@ export const splitLiquidity =(
   xAmount: BigNumber | string,
 ) : [string, string] => {
 
-  const xAmount_ = new Decimal(xAmount.toString());
   const xReserves_ = new Decimal(xReserves.toString());
   const yReserves_ = new Decimal(yReserves.toString()); 
+  const xAmount_ = new Decimal(xAmount.toString());
 
   const xPortion = ( xAmount_.mul(xReserves_) ).div( yReserves_.add(xReserves_) );
+  
   const yPortion = xAmount_.sub(xPortion);
   return [ xPortion.toFixed(), yPortion.toFixed() ];
 };
@@ -253,23 +246,30 @@ export const splitLiquidity =(
 /**
    * Calculate amount of LP Tokens that will be minted  
    *
-   * @param { BigNumber } xReserves // eg. dai balance of pool
-   * @param { BigNumber } yReserves// eg. yDai series balance of Pool
-   * @param { BigNumber } totalSupply // total LP tokens
-   * @param { BigNumber } xInput // dai input value by user
+   * @param { BigNumber | string } xReserves // eg. dai balance of pool
+   * @param { BigNumber  | string} yReserves// eg. yDai series balance of Pool
+   * @param { BigNumber | string  } totalSupply // total LP tokens
+   * @param { BigNumber | string } xInput // dai input value by user
    * 
-   * @returns { BigNumber } number of tokens minted
+   * @returns { string } number of tokens minted
    */
 export const calcTokensMinted =(
-  xReserves: BigNumber,
-  yReserves: BigNumber,
-  totalSupply: BigNumber,
-  xInput: BigNumber,
-) => {
-  const xOffered = (xInput.mul(xReserves)).div(yReserves.add(xReserves));
-  return (totalSupply).mul(xOffered).div(xReserves);
-};
+  xReserves: BigNumber | string,
+  yReserves: BigNumber | string,
+  totalSupply: BigNumber| string,
+  xInput: BigNumber | string,
+) : string => {
 
+  const xReserves_ = new Decimal(xReserves.toString());
+  const _totalSupply = new Decimal(totalSupply.toString());
+  const _yReserves = new Decimal(yReserves.toString());
+  const _xInput = new Decimal(xInput.toString());
+
+  const xOffered = (_xInput.mul(xReserves_)).div( _yReserves.add(xReserves_) );   
+  // const [xOffered, ] =  splitLiquidity(xReserves, yReserves, xInput);
+
+  return (_totalSupply).mul(xOffered).div(xReserves_).toString() ;
+};
 
 /**
    * Calculate Slippage 
@@ -280,7 +280,11 @@ export const calcTokensMinted =(
    * 
    * @returns { string } human readable string
    */
-export const calculateSlippage = (value: BigNumber | string, slippage: BigNumber | string = '0.005', minimise:boolean=false ):string => {
+export const calculateSlippage = (
+  value: BigNumber | string, 
+  slippage: BigNumber | string = '0.005', 
+  minimise:boolean=false 
+):string => {
   const value_ = new Decimal(value.toString()); 
   const _slippageAmount = floorDecimal( mulDecimal(value, slippage));
   if (minimise) {
@@ -292,32 +296,36 @@ export const calculateSlippage = (value: BigNumber | string, slippage: BigNumber
 /**
    * Calculate Annualised Yield Rate
    *
-   * @param { BigNumber } rate // current [Dai] price per unit y[Dai]
-   * @param { BigNumber } amount // y[Dai] amount at maturity
+   * @param { BigNumber | string } rate // current [Dai] price per unit y[Dai]
+   * @param { BigNumber | string } amount // y[Dai] amount at maturity
    * @param { number } maturity  // date of maturity
    * @param { number } fromDate // ***optional*** start date - defaults to now()
    * 
    * @returns { string | undefined } human readable string
    */
 export const calculateAPR =(
-  rate: BigNumber,
-  amount: BigNumber,
+  tradeValue: BigNumber | string,
+  amount: BigNumber | string,
   maturity: number,
-  fromDate:number = (Math.round(new Date().getTime() / 1000)), // if not provided, defaults to current time.
+  fromDate: number = (Math.round(new Date().getTime() / 1000)), // if not provided, defaults to current time.
 ): string | undefined => {
-  const rate_ = new Decimal(rate.toString());
+
+  const tradeValue_ = new Decimal(tradeValue.toString());
   const amount_ = new Decimal(amount.toString());
+
   if (
     maturity > Math.round(new Date().getTime() / 1000)
   ) {
     const secsToMaturity = maturity - fromDate;
     const propOfYear = new Decimal(secsToMaturity/SECONDS_PER_YEAR);
-    const priceRatio = amount_.div(rate_);
+    const priceRatio = amount_.div(tradeValue_);
     const powRatio = ONE.div(propOfYear);
     const apr = (priceRatio.pow(powRatio)).sub(ONE);
+    
     if(apr.gt(ZERO) && apr.lt(100)) {
       return apr.mul(100).toFixed();
     }
+
     return undefined;
   }
   return undefined;
@@ -377,7 +385,6 @@ export const borrowingPower = (
   const _max = debtValue_.lt(maxSafeDebtValue_) ? maxSafeDebtValue_.sub(debtValue_) : new Decimal('0');
   return _max.toFixed(0);
 };
-
 
 /**
  * 

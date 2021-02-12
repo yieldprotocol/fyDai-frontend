@@ -11,7 +11,6 @@ import { useTxHelpers } from './txHooks';
  * Hook for interacting with the Yield Proxy Contract.
  * 
  * @returns { function } dsBuild
- * @returns { boolean } buildActive
  * 
  */
 export const useDsRegistry = () => {
@@ -19,25 +18,31 @@ export const useDsRegistry = () => {
   /* Preset the dsProxyRegistry contract to be used */
   const { abi: ProxyRegistryAbi } = ProxyRegistry;
   const [ proxyRegistryContract, setProxyRegistryContract] = useState<any>();
+  const [ fallbackProxyRegistryContract, setFallbackProxyRegistryContract] = useState<any>();
 
   /* state from contexts */
   const  { state: { deployedContracts } }  = useContext<any>(YieldContext);
 
-  /* local state */
-  const [ buildActive, setBuildActive ] = useState<boolean>(false);
-
   /* hooks */ 
-  const { signer, account } = useSignerAccount();
+  const { fallbackProvider, signer, account} = useSignerAccount();
   const { handleTx, handleTxRejectError } = useTxHelpers();
 
   useEffect(()=>{
-    deployedContracts.ProxyRegistry && signer &&
+    deployedContracts?.ProxyRegistry && signer &&
       setProxyRegistryContract( new ethers.Contract(
         ethers.utils.getAddress(deployedContracts.ProxyRegistry),
         ProxyRegistryAbi,
         signer
       ));
-  }, [signer, deployedContracts.ProxyRegistry, ProxyRegistryAbi]);
+
+    deployedContracts?.ProxyRegistry &&
+      setFallbackProxyRegistryContract( new ethers.Contract(
+        ethers.utils.getAddress(deployedContracts?.ProxyRegistry),
+        ProxyRegistryAbi,
+        fallbackProvider
+      ));
+
+  }, [signer, deployedContracts, ProxyRegistryAbi]);
 
   /**
    * @dev builds a DsProxy for the caller.
@@ -45,17 +50,15 @@ export const useDsRegistry = () => {
    * */
   const buildDsProxy = async () => {
     let tx:any;
-    setBuildActive(true);
     try {
       tx = await proxyRegistryContract['build()']();
     } catch (e) {
       handleTxRejectError(e);
-      setBuildActive(false);
       return;
     }
-    console.log('building dsProxy');
+    // eslint-disable-next-line no-console
+    console.log('Building dsProxy');
     await handleTx({ tx, msg:'Building new dsProxy', type:'CREATE_PROXY', series: null, value: null });
-    setBuildActive(false);
   };
 
   /**
@@ -65,10 +68,14 @@ export const useDsRegistry = () => {
    */
   const getDsProxyAddress = async (
   ): Promise<string> => {
+
     const userAddr = account && ethers.utils.getAddress(account);
+    console.log('user', userAddr);
+    console.log(fallbackProxyRegistryContract);
+
     let res;
     try {
-      res = await proxyRegistryContract.proxies(userAddr);
+      res = await fallbackProxyRegistryContract.proxies(userAddr);
     }  catch (e) {
       // eslint-disable-next-line no-console
       console.log(e);
@@ -78,7 +85,7 @@ export const useDsRegistry = () => {
 
   return {
     /* dsProxy eq. fns */
-    buildDsProxy, buildActive,
+    buildDsProxy,
     getDsProxyAddress,
     
   } as const;
