@@ -1,7 +1,6 @@
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 import { ethers, BigNumber }  from 'ethers';
 
-import { parse } from 'mathjs';
 import FYDai from '../contracts/FYDai.json';
 
 import { useSignerAccount } from './connectionHooks';
@@ -12,12 +11,15 @@ import { IYieldSeries } from '../types';
 /**
  * Hook for interacting with the yield 'eDAI' Contract
  * @returns { function } redeem
- * @returns { boolean } redeemActive
+ * 
+ * @returns { number } seriesMaturity,
+ *  @returns {string } seriesSymbol,
+ *  @returns { boolean } hasBeenMatured, 
+ * 
  */
 export const useFYDai = () => {
   const { provider, signer, account } = useSignerAccount();
   const { abi: fyDaiAbi } = FYDai;
-  const [ redeemActive, setRedeemActive ] = useState<boolean>(false);
   const { handleTx, handleTxRejectError } = useTxHelpers();
 
   /**
@@ -41,15 +43,15 @@ export const useFYDai = () => {
       gasLimit: BigNumber.from('500000')
     };
 
-    setRedeemActive(true);
     const contract = new ethers.Contract( fyDaiAddr, fyDaiAbi, signer );
+
     try {
       tx = await contract.redeem(fromAddr, toAddr, parsedAmount, overrides);
     } catch (e) {
       handleTxRejectError(e);
-      setRedeemActive(false);
       return;
     }
+
     await handleTx({ 
       tx, 
       msg: `Redeeming ${amount} pending...`, 
@@ -57,7 +59,6 @@ export const useFYDai = () => {
       series, 
       value: parsedAmount.toString()
     });
-    setRedeemActive(false);
   };
 
   /**
@@ -127,7 +128,6 @@ export const useFYDai = () => {
     seriesMaturity,
     seriesSymbol,
     hasBeenMatured, 
-    redeem, 
-    redeemActive
+    redeem
   } as const;
 };

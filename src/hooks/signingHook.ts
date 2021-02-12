@@ -7,7 +7,8 @@ import {
   IDomain,
   ISignListItem,
 } from '../types';
-import { MAX_INT } from '../utils/constants';
+
+import { MAX_INT } from '../utils';
 
 import { TxContext } from '../contexts/TxContext';
 import { UserContext } from '../contexts/UserContext';
@@ -41,7 +42,7 @@ const createTypedDelegableData = (message: IDelegableMessage, domain: IDomain) =
 export const useSigning = () => {
   const { account, provider, chainId } = useSignerAccount();
   const { dispatch } = useContext(TxContext);
-  const { state: { preferences: { useTxApproval }, authorization: { dsProxyAddress } } } = useContext(UserContext);
+  const { state: { preferences: { useTxApproval } } } = useContext(UserContext);
 
   // const fromAddr = dsProxyAddress && ethers.utils.getAddress(dsProxyAddress);
   const fromAddr = account && ethers.utils.getAddress(account);
@@ -112,8 +113,10 @@ export const useSigning = () => {
   };
 
   const handleSignList = async ( 
-    requestedSigs:Map<string, 
-    ISignListItem>, txCode:string 
+
+    requestedSigs:Map<string, ISignListItem>, 
+    txCode:string 
+    
   ): Promise<Map<string, string|undefined>> => {
 
     const signedMap: Map<string, string|undefined> = new Map();

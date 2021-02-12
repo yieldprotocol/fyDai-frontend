@@ -6,7 +6,6 @@ import { FiArrowLeft as ArrowLeft } from 'react-icons/fi';
 
 /* utils and support */
 import { cleanValue } from '../utils';
-import { logEvent } from '../utils/analytics';
 
 /* contexts */
 import { SeriesContext } from '../contexts/SeriesContext';
@@ -17,6 +16,7 @@ import { useSignerAccount } from '../hooks/connectionHooks';
 import { useDebounce, useIsLol } from '../hooks/appHooks';
 import { useTxActive } from '../hooks/txHooks';
 import { usePoolProxy } from '../hooks/poolProxyHook';
+import { useMath } from '../hooks/mathHooks';
 
 /* components */
 import InputWrap from '../components/InputWrap';
@@ -27,6 +27,7 @@ import FlatButton from '../components/FlatButton';
 import YieldMark from '../components/logos/YieldMark';
 import YieldMobileNav from '../components/YieldMobileNav';
 import SeriesDescriptor from '../components/SeriesDescriptor';
+
 
 interface IRemoveLiquidityProps {
   openConnectLayer?:any
@@ -44,7 +45,6 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
 
   /* local state */
   const [ newShare, setNewShare ] = useState<string>(activeSeries?.poolPercent);
-  const [ calculating, setCalculating ] = useState<boolean>(false);
   const [ inputValue, setInputValue ] = useState<any>();
   const [inputRef, setInputRef] = useState<any>(null);
   const [ removeLiquidityDisabled, setRemoveLiquidityDisabled ] = useState<boolean>(true);
@@ -52,6 +52,7 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
   const [ errorMsg, setErrorMsg] = useState<string|null>(null);
 
   /* init hooks */
+  const { estPoolShare } = useMath();
   const { account } = useSignerAccount();
   const { removeLiquidity } = usePoolProxy();
   const [ txActive ] = useTxActive(['REMOVE_LIQUIDITY']);
@@ -62,10 +63,11 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
   const removeLiquidityProcedure = async (value:number) => {
     if ( !removeLiquidityDisabled ) {
 
+      /* if sereis inst mature, close window immediately on action */
       !activeSeries?.isMature() && close();
+
       await removeLiquidity(activeSeries, value);
       
-
       /* clean up and refresh */ 
       setInputValue(undefined);
       if (activeSeries?.isMature()) {
@@ -80,22 +82,13 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
     }
   };
 
-  // TODO move to math
-  const calculateNewShare = async () => {
-    if (activeSeries) {
-      setCalculating(true);
-      const newBalance = activeSeries.poolTokens.sub(ethers.utils.parseEther(debouncedInput));
-      const percent= (
-        parseFloat(ethers.utils.formatEther(newBalance))/
-        parseFloat(ethers.utils.formatEther(activeSeries.totalSupply)))*100;
-      setNewShare(percent.toFixed(4));
-      setCalculating(false);
-    }
-  };
-
   /* handle value calculations based on input changes */
   useEffect(() => {
-    debouncedInput && calculateNewShare();
+    // debouncedInput && calculateNewShare();
+    if ( debouncedInput) {
+      const estShare = estPoolShare(activeSeries, `-${debouncedInput}`, true );
+      setNewShare(cleanValue(estShare, 3));
+    }
   }, [debouncedInput]);
 
   /* handle warnings input errors */
@@ -146,7 +139,7 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
         fill
         background='background'
         round='small'
-        pad='large'
+        pad={activeSeries?.isMature()? { vertical: undefined, horizontal:'large' } :'large'}
         gap='medium'
       >
         <Text alignSelf='start' size='large' color='text' weight='bold'>Remove Liquidity Tokens</Text>
@@ -181,7 +174,7 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
                 label: 'Share of the Pool After withdraw',
                 visible: true,
                 active: inputValue,
-                loading: calculating,           
+                loading: false,           
                 value: parseFloat(newShare)>=0 ? `${newShare}%`: '',
                 valuePrefix: null,
                 valueExtra: null, 

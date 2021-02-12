@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect, useReducer } from 'react';
 import { useWeb3React } from '@web3-react/core';
 
 /* utils and support */
-import { logEvent } from '../utils/analytics';
+import { logEvent } from '../utils';
 
 import { useCachedState } from '../hooks/appHooks';
 import { IReducerAction, ITxState } from '../types';
@@ -97,7 +97,8 @@ const TxProvider = ({ children }:any) => {
         })
         );
         // eslint-disable-next-line no-console
-        console.log('cache txs processed');
+        console.log('Transaction cache processed');
+
         // setPendingCache( state.pendingTxs );
         setHasReadCache(true);
       }

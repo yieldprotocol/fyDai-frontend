@@ -28,8 +28,7 @@ const YieldSettings = () => {
           <Box round>
             <FlatButton
               disabled
-              // eslint-disable-next-line no-console
-              onClick={()=>console.log('STILL TO DO!')}
+              onClick={()=>null}
               label={<Text size='xsmall'>More settings</Text>}
             /> 
           </Box>

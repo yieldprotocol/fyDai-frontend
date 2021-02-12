@@ -1,5 +1,4 @@
 import React, { useContext, useState, useEffect } from 'react';
-import moment from 'moment';
 import { Box, ResponsiveContext, Text } from 'grommet';
 
 import {
@@ -8,6 +7,8 @@ import {
 } from 'react-icons/fi';
 
 import { IYieldSeries } from '../types';
+
+import { nameFromMaturity } from '../utils';
 import Loading from './Loading';
 
 interface IAprBadgeProps {
@@ -25,7 +26,7 @@ function AprBadge({ activeView, series, animate }:IAprBadgeProps) {
   /* Set Series description/display name */
   useEffect(()=>{
     setSeriesMature(series.isMature());
-    setSeriesApr(moment(series.maturity*1000).format('MMM \'YY'));
+    setSeriesApr( nameFromMaturity(series.maturity, 'MMM yy') );
     series.poolState?.active && ( async () => setSeriesApr( `${series.yieldAPR_} %`) )(); 
   }, [ series ]);
 
@@ -66,7 +67,14 @@ function AprBadge({ activeView, series, animate }:IAprBadgeProps) {
           direction='row'
         >
           <Loading condition={!seriesApr} size='xsmall'>
-            <Text size={mobile?'xxsmall':'xsmall'} color={series?.seriesTextColor}> { activeView==='pool'? moment.utc(series?.maturity_).format('MMM \'YY') : seriesApr } </Text> 
+            <Text 
+              size={mobile?'xxsmall':'xsmall'} 
+              color={series?.seriesTextColor}
+            > 
+              { activeView==='pool'? 
+                nameFromMaturity( series.maturity, 'MMM yy' )
+                : seriesApr } 
+            </Text> 
           </Loading>
         </Box>
       </Box>

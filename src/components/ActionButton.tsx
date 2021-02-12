@@ -73,66 +73,68 @@ function ActionButton({ ...props }:any ) {
     }
   };
 
-  return (
-    <>
+  /* internal components */
+  const ButtonForWeb = () => (
+    <StyledBox 
+      {...props}
+      onClick={hasDsProxy ? props.onClick : ()=> buildProxyProcedure()}
+      fill='horizontal'
+      align='center'
+      pad='small'
+      background={defaultBackground}
+    >
       { 
       !props.disabled &&
-       (!mobile ? 
-         <StyledBox 
-           {...props}
-           onClick={hasDsProxy ? props.onClick : ()=> buildProxyProcedure()}
-           fill='horizontal'
-           align='center'
-           pad='small'
-           background={defaultBackground}
-         >
-           <Text 
-             weight='bold'
-             size='large'
-           >
-             {hasDsProxy ? props.label : proxyLabel } 
-           </Text>
-         </StyledBox> 
-         :
-         <Layer
-           position='bottom'
-           modal={false}
-           responsive={false}
-           full='horizontal'
-         >
-           <Box
-             // background='background'
-             direction="row"  
-             elevation='medium'
-             pad="medium"
-             justify='between'
-             align='center'
-             background={defaultBackground}
-           >          
-             <Box
-               onClick={()=>props.clearInput()}
-             > 
-               <Text size='xxsmall'>Cancel</Text>
-             </Box>
-             <Box {...props} direction='row' align='center' gap='small'>  
-               <Text weight='bold'> {props.label} </Text>
-               <ArrowRight color={activeSeries?.seriesColor} />
-             </Box>     
-           </Box>
-         </Layer>
-       )
+      <Text 
+        weight='bold'
+        size='large'
+      >
+        {hasDsProxy ? props.label : proxyLabel } 
+      </Text>
       }
+    </StyledBox> 
+  );
 
+  const ButtonForMobile = () => (
+    <Layer
+      position='bottom'
+      modal={false}
+      responsive={false}
+      full='horizontal'
+    >
+      <Box
+        direction="row"  
+        elevation='medium'
+        pad="medium"
+        justify='between'
+        align='center'
+        background={defaultBackground}
+      >          
+        <Box
+          onClick={()=>props.clearInput()}
+        > 
+          <Text size='xxsmall'>Cancel</Text>
+        </Box>
+        <Box {...props} direction='row' align='center' gap='small'>  
+          <Text weight='bold'> {props.label} </Text>
+          <ArrowRight color={activeSeries?.seriesColor} />
+        </Box>     
+      </Box>
+    </Layer>
+  );
+
+  return (
+    <>
+      { !props.disbled &&  mobile ? <ButtonForMobile /> : <ButtonForWeb /> }
       { 
-      !mobile && 
-      props.disabled && 
-        <Box 
-          fill='horizontal'
-          align='center'
-          pad='medium'
-          background={defaultBackground}
-        />
-      }
+      props.disabled &&
+      <Box 
+        fill='horizontal'
+        align='center'
+        pad='medium'
+        background={defaultBackground}
+      />
+      }  
     </>
   );
 }

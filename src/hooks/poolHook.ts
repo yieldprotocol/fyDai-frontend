@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { ethers, BigNumber }  from 'ethers';
 
 import Pool from '../contracts/Pool.json';
@@ -7,6 +6,9 @@ import { useSignerAccount } from './connectionHooks';
 import { IYieldSeries } from '../types';
 import { useTxHelpers } from './txHooks';
 import { useDsProxy } from './dsProxyHook';
+import { useToken } from './tokenHook';
+
+import { useMath } from './mathHooks';
 
 /**
  * Hook for interacting with the yield 'Pool' Contract
@@ -14,18 +16,18 @@ import { useDsProxy } from './dsProxyHook';
 export const usePool = () => {
 
   const { abi: poolAbi } = Pool;
-
   const { fallbackProvider, provider, signer, account } = useSignerAccount();
-
   const { handleTx, handleTxRejectError } = useTxHelpers();
   const { proxyExecute } = useDsProxy();
+  const { getBalance } = useToken();
+  const { estTrade } = useMath();
 
   /**
    * @dev Sell fyDai for Dai ( Chai )
    * @note NOT limit pool
    * 
-   * @param {IYieldSeries} series of the fyDai market series
-   * @param {number} fyDaiIn Amount of fyDai being sold that will be taken from the user's wallet (in human numbers)
+   * @param { IYieldSeries } series of the fyDai market series
+   * @param { number } fyDaiIn Amount of fyDai being sold that will be taken from the user's wallet (in human numbers)
    *
    * @return Amount of chai that will be deposited on `to` wallet
    */
@@ -36,14 +38,14 @@ export const usePool = () => {
     const parsedAmount = ethers.utils.parseEther(fyDaiIn.toString());
     const fromAddr = account && ethers.utils.getAddress(account);
     const toAddr = fromAddr;
-    const marketAddr = ethers.utils.getAddress(series.poolAddress);
+    const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const overrides = { 
       gasLimit: BigNumber.from('300000')
     };
     
     let tx:any;
 
-    const contract = new ethers.Contract( marketAddr, poolAbi, signer );
+    const contract = new ethers.Contract( poolAddr, poolAbi, signer );
     try {
       tx = await contract.sellFYDai(fromAddr, toAddr, parsedAmount, overrides);
     } catch (e) {
@@ -75,13 +77,13 @@ export const usePool = () => {
     const parsedAmount = ethers.utils.parseEther(fyDaiOut.toString());
     const fromAddr = ethers.utils.getAddress(series.fyDaiAddress);
     const toAddr = account && ethers.utils.getAddress(account);
-    const marketAddr = ethers.utils.getAddress(series.poolAddress);
+    const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const overrides = { 
       gasLimit: BigNumber.from('250000')
     };
 
     let tx:any;
-    const contract = new ethers.Contract( marketAddr, poolAbi, signer );
+    const contract = new ethers.Contract( poolAddr, poolAbi, signer );
     try {
       tx = await contract.buyFYDai(fromAddr, toAddr, parsedAmount, overrides);
     } catch (e) {
@@ -113,14 +115,14 @@ export const usePool = () => {
     const parsedAmount = ethers.utils.parseEther(daiIn.toString());
     const fromAddr = account && ethers.utils.getAddress(account);
     const toAddr = fromAddr;
-    const marketAddr = ethers.utils.getAddress(series.poolAddress);
+    const poolAddr = ethers.utils.getAddress(series.poolAddress);
 
     const overrides = { 
       gasLimit: BigNumber.from('300000')
     };
 
     let tx:any;
-    const contract = new ethers.Contract( marketAddr, poolAbi, signer );
+    const contract = new ethers.Contract( poolAddr, poolAbi, signer );
     try {
       tx = await contract.sellDai(fromAddr, toAddr, parsedAmount, overrides);
     } catch (e) {
@@ -155,14 +157,14 @@ export const usePool = () => {
     const parsedAmount = ethers.utils.parseEther(daiOut.toString());
     const fromAddr = account && ethers.utils.getAddress(account);
     const toAddr = account && ethers.utils.getAddress(account);
-    const marketAddr = ethers.utils.getAddress(series.poolAddress);
+    const poolAddr = ethers.utils.getAddress(series.poolAddress);
     
     const overrides = { 
       gasLimit: BigNumber.from('300000')
     };
 
     let tx:any;
-    const contract = new ethers.Contract( marketAddr, poolAbi, signer );
+    const contract = new ethers.Contract(poolAddr, poolAbi, signer );
     try {
       tx = await contract.buyDai(fromAddr, toAddr, parsedAmount, overrides );
     } catch (e) {
@@ -211,7 +213,7 @@ export const usePool = () => {
       
     } else { 
       const calldata = contract.interface.encodeFunctionData('addDelegate', [delegatedAddr]);
-      tx = await proxyExecute( 
+      tx = await proxyExecute(
         poolAddr,
         calldata,
         { },
@@ -220,7 +222,7 @@ export const usePool = () => {
           msg: 'Yield Series Pool authorization', 
           type:'AUTH_POOL', 
           series, 
-          value: null
+          value: null 
         }
       );
     }
@@ -229,7 +231,6 @@ export const usePool = () => {
     return true;
   };
 
-  
   /**
    * @dev Checks to see if an account (user) has delegated a contract/3rd Party for a particular market. 
    * @param {string} poolAddress address of the market in question.
@@ -294,6 +295,47 @@ export const usePool = () => {
     return res;
   };
 
+  /**
+   * @dev gets all the reserves for a pool().
+   * @param {IYieldSeries} series series in question.
+   * @returns {Promise<String[]>}  [ daiReserves, fyDaiRealReserves, fyDaiVirtualReserves, fyDaiCombinedReserves ] 
+   * @note call function
+   */
+  const getReserves = async (
+    series: IYieldSeries,
+
+  ): Promise<string[]> => {
+    const poolAddr = ethers.utils.getAddress(series.poolAddress);
+    const fyDaiAddr = ethers.utils.getAddress(series.fyDaiAddress);
+    const contract = new ethers.Contract( poolAddr, poolAbi, fallbackProvider);
+
+    let daiRes = BigNumber.from('0');
+    let fyDaiReal = BigNumber.from('0');
+    let fyDaiVirtual = BigNumber.from('0');
+    
+    try {
+      [ daiRes, fyDaiReal, fyDaiVirtual ] = await Promise.all( [
+        contract.getDaiReserves(),
+        getBalance(fyDaiAddr, 'FYDai', poolAddr),
+        contract.getFYDaiReserves(),
+      ]);
+    }  catch (e) {
+      // eslint-disable-next-line no-console
+      console.log(e);
+      return [ 
+        daiRes.toString(), 
+        fyDaiReal.toString(), 
+        fyDaiVirtual.toString() 
+      ];
+    }
+
+    return [ 
+      daiRes.toString(), 
+      fyDaiReal.toString(), 
+      fyDaiVirtual.toString(),
+      fyDaiReal.add(fyDaiVirtual).toString() 
+    ];
+  };
 
   /**
    * @dev Preview buy/sell transactions
@@ -303,46 +345,51 @@ export const usePool = () => {
    * buyFYDai -> Returns how much Dai would be required to buy x fyDai
    * sellDai -> Returns how much fyDai would be obtained by selling x Dai
    * 
-   * @param {string} txType string represnting transaction type //TODO tyescript it out
+   * @param {string} previewType string represnting transaction type //TODO tyescript it out
    * @param {IYieldSeries} series fyDai series to redeem from.
    * @param {number | BigNumber} amount input to preview
+   * @param {boolean} runLocal run the simulation locally (no blockchain call required)
    * 
-   * @note NB NB if in BigNumber must be in wei
-   *  
    * @returns {BigNumber| null} BigNumber in WEI/WAD precision - Dai or fyDai (call dependent)
    * 
    * @note call function 
    */
   const previewPoolTx = async (
-    txType: string,
+    previewType: string,
     series: IYieldSeries,
     amount: number | BigNumber,
+    runLocal: boolean = false,
   ): Promise<BigNumber|Error> => {
-    const type=txType.toUpperCase();
+    // const type = previewType.toUpperCase();
     const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(amount.toString());
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const contract = new ethers.Contract( poolAddr, poolAbi, fallbackProvider);
     let value = BigNumber.from('0');
+      
     try {
-      if ( series.isMature() === false ) {
-        switch (type) {
-          case 'BUYDAI':
+      if ( series.isMature() === false && !runLocal ) {
+        switch (previewType) {
+          case 'buyDai':
             value = await contract.buyDaiPreview(parsedAmount); break;
-          case 'SELLDAI': 
+          case 'sellDai': 
             value = await contract.sellDaiPreview(parsedAmount); break;
-          case 'BUYFYDAI':
+          case 'buyFYDai':
             value = await contract.buyFYDaiPreview(parsedAmount); break;
-          case 'SELLFYDAI':
+          case 'sellFYDai':
             value = await contract.sellFYDaiPreview(parsedAmount); break;
           default: 
             value = await BigNumber.from('0');
         }
         return value; 
       }
-      return value; // assuming that if the series has matured, the rates on whatever trade will be 0. 
+
+      /* if runLocal, use the mathHooks estTrade fn. */
+      return estTrade( previewType, series, parsedAmount );
+
     } catch (e) {
       return e;
     }
+
   };
 
   /**
@@ -369,6 +416,7 @@ export const usePool = () => {
     sellDai,
     buyDai,
 
+    getReserves,
     getFyDaiReserves,
 
     addPoolDelegate,

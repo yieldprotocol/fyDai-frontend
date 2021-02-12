@@ -74,10 +74,10 @@ const useInactiveListener = (suppress: boolean = false) => {
     const { ethereum } = window as any;
     if (ethereum && ethereum.on && !active && !error && !suppress) {
       const handleConnect = () => {
-        console.log("Handling 'connect' event");
+        console.log('Handling CONNECT event');
         // activate(injected);
         if ((cachedChainId !== _chainId) && active) {
-          console.log('chainId changed');
+          console.log('Chain Id changed');
           // localStorage.clear();
           // // eslint-disable-next-line no-restricted-globals
           // location.reload();
@@ -85,7 +85,7 @@ const useInactiveListener = (suppress: boolean = false) => {
       };
 
       const handleAccountsChanged = (accounts: string[]) => {
-        console.log("Handling 'accountsChanged' event with payload", accounts);
+        console.log('Handling ACCOUNT CHANGED', accounts);
         if (accounts.length > 0) {
           // activate(injected);
           // if ( cachedAddress !== accounts[0] ){

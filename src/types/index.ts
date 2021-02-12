@@ -7,36 +7,30 @@ export interface IYieldSeries {
   maturity_: Date;
   poolAddress: string;
   fyDaiAddress: string;
-  liquidityProxyAddress: string;
   hasPoolDelegatedProxy: boolean;
-  hasPoolDelegatedAltProxy: boolean;
-  hasPoolDelegatedDsProxy: boolean;
-  hasDaiAuth: boolean;
-  hasFyDaiAuth: boolean;
-  hasCloseAuth: boolean;
-  authComplete: boolean;
   isMature: any; // function typeScript this out
   fyDaiBalance_: number;
   fyDaiBalance: BigNumber;
-  totalSupply?: BigNumber;
-  totalSupply_?: number;
-  poolTokens?:  BigNumber;
-  poolTokens_?: number;
-  poolState?: any;
-  poolPercent_?:string;
-  symbol?: string;
-  id?: string;
-  currentValue?: any;
   seriesColor: string;
   seriesDarkColor: string;
   seriesLightColor: string;
   seriesTextColor:string;
-  wethDebtDai?: BigNumber;
-  wethDebtDai_?: number;
-  wethDebtFYDai?: BigNumber;
-  wethDebtFYDai_?: number;
-  yieldAPR?: string;
-  yieldAPR_?: string;
+  totalSupply: BigNumber;
+  totalSupply_: number;
+  daiReserves: BigNumber;
+  fyDaiReserves: BigNumber;
+  fyDaiVirtualReserves: BigNumber;
+  symbol: string;
+  id: string;
+  yieldAPR: string;
+  yieldAPR_: string;
+  poolTokens?:  BigNumber;
+  poolTokens_?: number;
+  poolState?: any;
+  ethDebtDai?: BigNumber;
+  ethDebtDai_?: number;
+  ethDebtFYDai?: BigNumber;
+  ethDebtFYDai_?: number;
 }
 
 export interface IConnection {
@@ -50,16 +44,7 @@ export interface IConnection {
 }
 
 export interface IYieldUser {
-  appPrefs: any;
-  account?: string;
-  ethBalance?: BigNumber;
-  ethBalance_?: number;
-  ethPosted?: BigNumber;
-  ethPosted_?: number;
-  totalDebtFYDai?: BigNumber;
-  totalDebtFYDai_?: number;
-  ethAvailable?:BigNumber;
-  ethAvailable_?:BigNumber;
+
 }
 
 export interface INotification {

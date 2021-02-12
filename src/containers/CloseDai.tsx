@@ -15,7 +15,7 @@ import { UserContext } from '../contexts/UserContext';
 import { useSignerAccount } from '../hooks/connectionHooks';
 import { useDebounce, useIsLol } from '../hooks/appHooks';
 import { useTxActive } from '../hooks/txHooks';
-import { usePool } from '../hooks/poolHook';
+import { useMath } from '../hooks/mathHooks';
 import { useBorrowProxy } from '../hooks/borrowProxyHook';
 
 /* components */
@@ -51,7 +51,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
   const [ interestEarned, setInterestEarned ] = useState<string>();
 
   /* init hooks */
-  const { previewPoolTx }  = usePool();
+  const { estTrade }  = useMath();
   const { buyDai }  = useBorrowProxy();
   const { account, fallbackProvider } = useSignerAccount();
   const [ txActive ] = useTxActive(['BUY_DAI', 'AUTH']);
@@ -78,7 +78,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
   /* set maximum available to withdraw */
   useEffect(()=> {
     fallbackProvider && account && activeSeries?.fyDaiBalance && (async () => {
-      const preview = await previewPoolTx('sellFYDai', activeSeries, activeSeries.fyDaiBalance);
+      const preview = estTrade('sellFYDai', activeSeries, activeSeries.fyDaiBalance);
       if (!(preview instanceof Error)) {
         setMaxWithdraw(cleanValue(ethers.utils.formatEther(preview), 6));
       }
@@ -90,17 +90,17 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
   useEffect(()=> {
     inputValue && 
     inputValue > 0  && 
-    activeSeries.fyDaiBalance && 
+    activeSeries?.fyDaiBalance && 
     (async () => {
       const originalInWei = ethers.utils.parseEther(inputValue);
-      const preview = await previewPoolTx('sellFYDai', activeSeries, originalInWei);
+      const preview = estTrade('sellFYDai', activeSeries, originalInWei);
       if (!(preview instanceof Error)) {
         const previewEth = parseFloat(ethers.utils.formatEther(preview));
         const percent = (inputValue - previewEth)/inputValue * 100; 
         setInterestEarned((percent.toFixed(2)).toString());
       }
     })();
-  }, [inputValue, activeSeries.fyDaiBalance]);
+  }, [inputValue, activeSeries]);
 
   /* Withdraw DAi button disabling logic */
   /* Withdraw disabling logic */

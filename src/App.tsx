@@ -73,7 +73,7 @@ const App = (props:any) => {
     serviceWorker.register({ 
       onUpdate: (registration:any) => {
         // eslint-disable-next-line no-console
-        console.log( 'A new version of the app is available!' );
+        console.log( 'A new version of the app is available.' );
         dispatch({ 
           type: 'updateAvailable',
           payload: {
@@ -91,7 +91,7 @@ const App = (props:any) => {
       },
       onWaiting: (registration:any) => { 
         // eslint-disable-next-line no-console
-        console.log( 'A new version of the app is still available.' );
+        console.log( 'A new version of the app is available.' );
         dispatch({ 
           type: 'updateAvailable',
           payload: {
