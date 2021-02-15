@@ -61,8 +61,8 @@
         "ImportCdpProxy": "0xE09E6F95863fAd23488076096F8E5E36657C00dA",
         "RollProxy": "0x9FF558d66Fa807aF34Fc89daA203B96c8587584e",
         "DssPsm": "0x89B78CfA322F6C5dE0aBcEecab66Aee45393cC5A",
-        "USDC": " ",
-        "USDCProxy": " "
+        "USDC":           "0xBD84be3C303f6821ab297b840a99Bd0d4c4da6b5",
+        "USDCProxy":      "0x53DFb0D02CB0Bf1a5ABc0fDb9c0566E1E69E2a28"
         
     },
 

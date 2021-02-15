@@ -6,7 +6,7 @@ import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 import { VscHistory as HistoryIcon } from 'react-icons/vsc';
 
 /* utils and support */
-import { abbreviateHash, cleanValue, genTxCode } from '../utils';
+import { abbreviateHash, cleanValue, genTxCode, ONE } from '../utils';
 
 /* contexts */
 import { SeriesContext } from '../contexts/SeriesContext';
@@ -78,6 +78,8 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
   const [ histOpen, setHistOpen ] = useState<boolean>(false);
   const [ borrowDisabled, setBorrowDisabled ] = useState<boolean>(true);
   const [ fyDaiValue, setFYDaiValue ] = useState<number>(0);
+  const [ USDCValueInDai, setUSDCValueInDai ] = useState<string| undefined>(undefined);
+
   const [ APR, setAPR ] = useState<string>();
   const [ estPercent, setEstPercent ] = useState<string|undefined>(undefined);
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
@@ -89,7 +91,7 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
 
   /* init hooks */
   const { borrowDai } = useBorrowProxy();
-  const { borrowUSDC } = useUSDCProxy();
+  const { borrowUSDC, checkPsm } = useUSDCProxy();
   const { calculateAPR, estCollateralRatio, estTrade } = useMath();
   const { account } = useSignerAccount();
   const [ txActive ] = useTxActive(['BORROW']); /* txs to watch for */
@@ -103,7 +105,6 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
    */
   const borrowProcedure = async () => {
     if (inputValue && !borrowDisabled) {
-
       currency === 'DAI' && await borrowDai(activeSeries, 'ETH-A', inputValue);
       currency === 'USDC' && await borrowUSDC(activeSeries, 'ETH-A', inputValue);
 
@@ -153,7 +154,17 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
     })();
 
   }, [position, debouncedInput, activeSeries]);
-    
+
+  /* Calculate the USDC rate on input change */
+  useEffect(() => {
+    activeSeries && currency === 'USDC' &&  debouncedInput>0 && ( async () => {
+      const usdcFee = await checkPsm();
+      const input_ = ethers.utils.parseEther(debouncedInput.toString());
+      const valueInDai = (input_.mul(usdcFee).div(ONE)).add(input_);
+      setUSDCValueInDai(cleanValue(ethers.utils.formatEther(valueInDai.toString()), 2));
+    })();
+  }, [ currency, debouncedInput, activeSeries]);
+  
   /* Handle borrow disabling deposits - disable if any of the conditions are met */
   useEffect(()=>{
     (
@@ -164,7 +175,6 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
       parseFloat(inputValue) <= 0
     ) ? setBorrowDisabled(true): setBorrowDisabled(false);
   }, [ inputValue ]);
-
 
   /* Handle input exception logic (using debouncedInput to allow for small mistakes/corrections) */
   useEffect(() => {
@@ -548,6 +558,14 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
                   />
                 </Collapsible>
               </Box>
+
+              { 
+                currency === 'USDC' &&
+                !!inputValue &&
+                inputValue>0 &&
+                // <Text size='xxsmall'>Note: You are borrowing 200.1 DAI. You will receive 200 USDC.</Text>
+                <Text size='xxsmall'>Note: You are borrowing { USDCValueInDai } DAI. You will receive {debouncedInput} USDC.  </Text>             
+              }
 
               { 
               account &&  
