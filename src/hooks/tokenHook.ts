@@ -5,6 +5,7 @@ import { IYieldSeries } from '../types';
 
 import FYDai from '../contracts/FYDai.json';
 import Dai from '../contracts/Dai.json';
+import USDC from '../contracts/USDC.json';
 import Pool from '../contracts/Pool.json';
 
 import { useTxHelpers } from './txHooks';
@@ -14,6 +15,7 @@ import { useDsProxy } from './dsProxyHook';
 const contractMap = new Map<string, any>([
   ['FYDai', FYDai.abi],
   ['Dai', Dai.abi],
+  ['USDC', USDC.abi],
   ['Pool', Pool.abi],
 ]);
 
