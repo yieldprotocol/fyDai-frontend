@@ -479,12 +479,23 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
 
               </InputWrap>
 
+              { 
+                currency === 'USDC' &&
+                !!inputValue &&
+                inputValue>0 &&
+                // <Text size='xxsmall'>Note: You are borrowing 200.1 DAI. You will receive 200 USDC.</Text>
+                <Text size='small'>
+                  <Text size='small' weight='bold'>Note: </Text> 
+                  You are borrowing { USDCValueInDai } DAI. You will receive {debouncedInput} USDC.
+                </Text>             
+              }
+
               <Box fill>
                 <Collapsible open={!!inputValue&&inputValue>0}>
                   <InfoGrid entries={[
                     {
                       label: 'Estimated APR',
-                      labelExtra: `if ${inputValue && cleanValue(inputValue, 2)} ${currency} are borrowed`,
+                      labelExtra: `if ${currency === 'DAI' ? inputValue && cleanValue(inputValue, 2) : USDCValueInDai } DAI are borrowed`,
                       visible: !!inputValue,
                       active: !!inputValue&&inputValue>0,
                       loading: false,    
@@ -520,7 +531,7 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
                     },
                     {
                       label: 'Collateralization Ratio',
-                      labelExtra: `after borrowing ${inputValue && cleanValue(inputValue, 2)} ${currency} `,
+                      labelExtra: `after borrowing ${currency === 'DAI' ? inputValue && cleanValue(inputValue, 2) : USDCValueInDai } DAI`,
                       visible: !!inputValue && !!account && position.ethPosted_>0,
                       active: true,
                       loading: false,        
@@ -560,18 +571,10 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
               </Box>
 
               { 
-                currency === 'USDC' &&
-                !!inputValue &&
-                inputValue>0 &&
-                // <Text size='xxsmall'>Note: You are borrowing 200.1 DAI. You will receive 200 USDC.</Text>
-                <Text size='xxsmall'>Note: You are borrowing { USDCValueInDai } DAI. You will receive {debouncedInput} USDC.  </Text>             
-              }
-
-              { 
               account &&  
               <ActionButton
                 onClick={()=>borrowProcedure()}
-                label={`Borrow ${inputValue || ''} ${currency}`}
+                label={currency === 'DAI'? `Borrow ${inputValue || ''} DAI` : `Borrow ${USDCValueInDai || ''} DAI & Receive ${inputValue || ''} USDC`}
                 disabled={borrowDisabled}
                 hasPoolDelegatedProxy={activeSeries.hasPoolDelegatedProxy}
                 clearInput={()=>setInputValue(undefined)}
