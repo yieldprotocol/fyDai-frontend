@@ -19,6 +19,7 @@ import { useDebounce, useIsLol } from '../hooks/appHooks';
 import { useMath } from '../hooks/mathHooks';
 import { useTxActive } from '../hooks/txHooks';
 import { useBorrowProxy } from '../hooks/borrowProxyHook';
+import { useUSDCProxy } from '../hooks/USDCProxyHook';
 
 /* containers */
 import Repay from './Repay';
@@ -88,6 +89,7 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
 
   /* init hooks */
   const { borrowDai } = useBorrowProxy();
+  const { borrowUSDC } = useUSDCProxy();
   const { calculateAPR, estCollateralRatio, estTrade } = useMath();
   const { account } = useSignerAccount();
   const [ txActive ] = useTxActive(['BORROW']); /* txs to watch for */
@@ -103,7 +105,7 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
     if (inputValue && !borrowDisabled) {
 
       currency === 'DAI' && await borrowDai(activeSeries, 'ETH-A', inputValue);
-      currency === 'USDC' && console.log( 'Borrowing USDC THIS TIME' ); // await borrowUSDC(activeSeries, 'ETH-A', inputValue);
+      currency === 'USDC' && await borrowUSDC(activeSeries, 'ETH-A', inputValue);
 
       /* clean up and refresh */               
       setInputValue(undefined);
@@ -209,7 +211,7 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
         target='document'
       >
         { 
-        repayOpen && 
+        repayOpen && !activeSeries?.isMature() &&
         <Layer
           onClickOutside={()=>setRepayOpen(false)}
           responsive={true}
@@ -430,17 +432,16 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
                     selectItemCallback={(x:any) => setCurrency(x === 0 ? 'DAI' : 'USDC')}             
                     items={[
                       <Box 
-                        key='dai' 
+                        key='DAI' 
                         direction='row' 
                         gap='xsmall' 
                         align='center' 
                         pad={{ left:'small', vertical:'xsmall' }}
                       >
                         <DaiMark /> <Text size='small'> DAI </Text>
-                      </Box> 
-                      , 
+                      </Box>,
                       <Box 
-                        key='usdc' 
+                        key='USDC' 
                         direction='row' 
                         gap='xsmall' 
                         align='center' 
