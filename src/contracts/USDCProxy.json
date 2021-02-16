@@ -44,71 +44,6 @@
       "type": "function"
     },
     {
-      "inputs": [],
-      "name": "controller",
-      "outputs": [
-        {
-          "internalType": "contract IController",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "dai",
-      "outputs": [
-        {
-          "internalType": "contract DaiAbstract",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "psm",
-      "outputs": [
-        {
-          "internalType": "contract DssPsmAbstract",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "treasury",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "usdc",
-      "outputs": [
-        {
-          "internalType": "contract IUSDC",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
       "inputs": [
         {
           "internalType": "contract IPool",
@@ -142,152 +77,6 @@
         }
       ],
       "name": "borrowUSDCForMaximumFYDai",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "contract IPool",
-          "name": "pool",
-          "type": "address"
-        },
-        {
-          "internalType": "bytes32",
-          "name": "collateral",
-          "type": "bytes32"
-        },
-        {
-          "internalType": "uint256",
-          "name": "maturity",
-          "type": "uint256"
-        },
-        {
-          "internalType": "address",
-          "name": "to",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "usdcRepayment",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "minFYDaiRepayment",
-          "type": "uint256"
-        }
-      ],
-      "name": "repayDebtEarly",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "contract IPool",
-          "name": "pool",
-          "type": "address"
-        },
-        {
-          "internalType": "bytes32",
-          "name": "collateral",
-          "type": "bytes32"
-        },
-        {
-          "internalType": "uint256",
-          "name": "maturity",
-          "type": "uint256"
-        },
-        {
-          "internalType": "address",
-          "name": "to",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "maxUSDCIn",
-          "type": "uint256"
-        }
-      ],
-      "name": "repayAllEarly",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "bytes32",
-          "name": "collateral",
-          "type": "bytes32"
-        },
-        {
-          "internalType": "uint256",
-          "name": "maturity",
-          "type": "uint256"
-        },
-        {
-          "internalType": "address",
-          "name": "to",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "daiRepayment",
-          "type": "uint256"
-        }
-      ],
-      "name": "repayDebtMature",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "bytes32",
-          "name": "collateral",
-          "type": "bytes32"
-        },
-        {
-          "internalType": "uint256",
-          "name": "maturity",
-          "type": "uint256"
-        },
-        {
-          "internalType": "address",
-          "name": "to",
-          "type": "address"
-        }
-      ],
-      "name": "repayAllMature",
       "outputs": [
         {
           "internalType": "uint256",
@@ -350,6 +139,245 @@
         }
       ],
       "name": "borrowUSDCForMaximumFYDaiWithSignature",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "controller",
+      "outputs": [
+        {
+          "internalType": "contract IController",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "dai",
+      "outputs": [
+        {
+          "internalType": "contract DaiAbstract",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "psm",
+      "outputs": [
+        {
+          "internalType": "contract DssPsmAbstract",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "contract IPool",
+          "name": "pool",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "collateral",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint256",
+          "name": "maturity",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "maxUSDCIn",
+          "type": "uint256"
+        }
+      ],
+      "name": "repayAllEarly",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "contract IPool",
+          "name": "pool",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "collateral",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint256",
+          "name": "maturity",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "maxUSDCIn",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes",
+          "name": "usdcSig",
+          "type": "bytes"
+        },
+        {
+          "internalType": "bytes",
+          "name": "controllerSig",
+          "type": "bytes"
+        }
+      ],
+      "name": "repayAllEarlyWithSignature",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "collateral",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint256",
+          "name": "maturity",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        }
+      ],
+      "name": "repayAllMature",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "collateral",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint256",
+          "name": "maturity",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes",
+          "name": "usdcSig",
+          "type": "bytes"
+        },
+        {
+          "internalType": "bytes",
+          "name": "controllerSig",
+          "type": "bytes"
+        }
+      ],
+      "name": "repayAllMatureWithSignature",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "contract IPool",
+          "name": "pool",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "collateral",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint256",
+          "name": "maturity",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "usdcRepayment",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "minFYDaiRepayment",
+          "type": "uint256"
+        }
+      ],
+      "name": "repayDebtEarly",
       "outputs": [
         {
           "internalType": "uint256",
@@ -430,11 +458,6 @@
     {
       "inputs": [
         {
-          "internalType": "contract IPool",
-          "name": "pool",
-          "type": "address"
-        },
-        {
           "internalType": "bytes32",
           "name": "collateral",
           "type": "bytes32"
@@ -451,21 +474,11 @@
         },
         {
           "internalType": "uint256",
-          "name": "maxUSDCIn",
+          "name": "daiRepayment",
           "type": "uint256"
-        },
-        {
-          "internalType": "bytes",
-          "name": "usdcSig",
-          "type": "bytes"
-        },
-        {
-          "internalType": "bytes",
-          "name": "controllerSig",
-          "type": "bytes"
         }
       ],
-      "name": "repayAllEarlyWithSignature",
+      "name": "repayDebtMature",
       "outputs": [
         {
           "internalType": "uint256",
@@ -528,34 +541,8 @@
       "type": "function"
     },
     {
-      "inputs": [
-        {
-          "internalType": "bytes32",
-          "name": "collateral",
-          "type": "bytes32"
-        },
-        {
-          "internalType": "uint256",
-          "name": "maturity",
-          "type": "uint256"
-        },
-        {
-          "internalType": "address",
-          "name": "to",
-          "type": "address"
-        },
-        {
-          "internalType": "bytes",
-          "name": "usdcSig",
-          "type": "bytes"
-        },
-        {
-          "internalType": "bytes",
-          "name": "controllerSig",
-          "type": "bytes"
-        }
-      ],
-      "name": "repayAllMatureWithSignature",
+      "inputs": [],
+      "name": "tin",
       "outputs": [
         {
           "internalType": "uint256",
@@ -563,8 +550,48 @@
           "type": "uint256"
         }
       ],
-      "stateMutability": "nonpayable",
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "tout",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "treasury",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "usdc",
+      "outputs": [
+        {
+          "internalType": "contract IUSDC",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     }
   ]
+  
 }
