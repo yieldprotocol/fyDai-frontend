@@ -2,7 +2,7 @@ import { useEffect, useState, useContext } from 'react';
 import { ethers, BigNumber }  from 'ethers';
 
 import { MAX_INT, cleanValue, genTxCode, ONE  } from '../utils';
-import { calculateSlippage } from '../utils/yieldMath';
+import { calculateSlippage, psmDaiOut } from '../utils/yieldMath';
 
 import { IDomain, ISignListItem, IYieldSeries } from '../types';
 
@@ -116,7 +116,7 @@ export const useUSDCProxy = () => {
     const parsedMaturity = series.maturity.toString();
     const collatType = ethers.utils.formatBytes32String(collateralType);
 
-    /* calc amount of dai */
+    /* calc amount of dai from the input */
     const tout = await checkPsm(); // in WAD
     const inputAsWad_ = ethers.utils.parseEther(USDCToBorrow.toString());
     const valueInDai = (inputAsWad_.mul(tout).div(ONE)).add(inputAsWad_);
@@ -129,13 +129,6 @@ export const useUSDCProxy = () => {
     } else {
       throw(preview);
     }
-
-    /* CHECKS: */
-    // console.log('usdc input:', usdc.toString());
-    // console.log('tout:', tout.toString());
-    // console.log('dai value in wad :', valueInDai.toString());
-    // console.log('max fyDai:', maxFYDai.toString());
-    // console.log('dai value :', ethers.utils.formatEther(valueInDai));
 
     /* build and use signature if required , else '0x' */
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
@@ -209,11 +202,15 @@ export const useUSDCProxy = () => {
     repaymentInUSDC: number,
   ) => {
 
-    const usdc = ethers.utils.parseUnits(repaymentInUSDC.toString(), 'mwei');   
+    const usdc = ethers.utils.parseUnits(repaymentInUSDC.toString(), 'mwei'); 
+    const usdcWad = ethers.utils.parseEther(repaymentInUSDC.toString());  
     const collatType = ethers.utils.formatBytes32String(collateralType);
     const toAddr = account && ethers.utils.getAddress(account);
     const parsedMaturity = series.maturity.toString();
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
+
+    /* get the dai value of the usdc to be repayed */
+    const daiValueOfUsdc = BigNumber.from( psmDaiOut( usdcWad, await checkPsm('tin') ) ) ;
 
     /* build and use signature if required , else '0x' */
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
@@ -228,31 +225,22 @@ export const useUSDCProxy = () => {
 
     /* we have to build a USDC custom daomin - because of USDC Versioning '2' */
     const buildUSDCDomain = async () : Promise<IDomain> => {
+      // TODO use:  await USDCContract.DOMAIN_SEPARATOR();
       return {
         name: await USDCContract.name(),
-        version: '1',
+        version: '2',
         chainId: chainId || 1,
         verifyingContract: deployedContracts.USDC,
       };
     };
 
-    // /* we have to build a USDC custom daomin - because of USDC Versioning '2' */
-    // const buildUSDCDomain = async () : Promise<IDomain> => {
-
-    //   const domain = await USDCContract.DOMAIN_SEPARATOR();
-    //   console.log(domain);
-    //   return domain;
-    
-    // };
-    // buildUSDCDomain();
-
-
     // USDC User to treasury 
     requestedSigs.set('USDCSig',
       { id: genTxCode('AUTH_USDC', series?.maturity.toString()),
         desc: 'Allow USDC transfers',
-        conditional: false, // ( await getTokenAllowance(deployedContracts.USDC, 'USDC', deployedContracts.USDCProxy) ) > 0,
+        conditional: ( await getTokenAllowance(deployedContracts.USDC, 'USDC', deployedContracts.USDCProxy) ) > 0,
         signFn: async () => ERC2612PermitSignature(deployedContracts.USDC, deployedContracts.USDCProxy, await buildUSDCDomain()),
+        // signFn: async () => ERC2612PermitSignature(deployedContracts.USDC, deployedContracts.USDCProxy, await USDCContract.DOMAIN_SEPARATOR() ),
         fallbackFn: () => approveToken(deployedContracts.USDC, deployedContracts.USDCProxy, MAX_INT, series),
       });
 
@@ -265,42 +253,57 @@ export const useUSDCProxy = () => {
           
     let calldata:any;
 
+    /* get estimated minimumFYDai */
+    // let minFyDaiRepay :string;
+    const getMinFyDaiRepay = async () : Promise<string> => {
+      const buyDaiPreview = await previewPoolTx( 'buyDai', series, daiValueOfUsdc );  // gets the amount of fydai for daiAmnt
+      if ( !(buyDaiPreview instanceof Error) ) {
+        return calculateSlippage(buyDaiPreview, slippage, true );
+      } 
+      throw(buyDaiPreview);
+    };
+
+    /* get estimated maxUSDC */
+    const getMaxUSDC = async () : Promise<string> => {
+      return MAX_INT;
+    };
+
     /* fn select Function options: series mature  > fyDaiDebt more than requested? > sigs reqd? */
-
-    console.log(' mature : ', series.isMature() );
-    console.log(' noSigsReqd : ', noSigsReqd );
-
-    const minFyDaiRepay = BigNumber.from('0');
-    const maxUSDC = MAX_INT;
 
     /* Repay SOME early */
     !series.isMature() &&  
+    daiValueOfUsdc.lt(series.ethDebtDai!) && 
+
     ( calldata = noSigsReqd ? 
       proxyContract.interface.encodeFunctionData(
         'repayDebtEarly', 
-        [ poolAddr, collatType, parsedMaturity, toAddr, usdc, minFyDaiRepay ] 
+        [ poolAddr, collatType, parsedMaturity, toAddr, usdc, await getMinFyDaiRepay() ] 
       ) :
       proxyContract.interface.encodeFunctionData(
         'repayDebtEarlyWithSignature', 
-        [ poolAddr, collatType, parsedMaturity, toAddr, usdc, minFyDaiRepay, signedSigs.get('USDCSig'), signedSigs.get('controllerSig')] 
+        [ poolAddr, collatType, parsedMaturity, toAddr, usdc, await getMinFyDaiRepay(), signedSigs.get('USDCSig'), signedSigs.get('controllerSig')] 
       )  
     );
 
     /* Repay ALL early */
-    !series.isMature() && false && 
+    !series.isMature() && 
+    daiValueOfUsdc.gte(series.ethDebtDai!) && 
+
     ( calldata = noSigsReqd ? 
       proxyContract.interface.encodeFunctionData(
         'repayAllEarly', 
-        [ poolAddr, collatType, parsedMaturity, toAddr, usdc ] 
+        [ poolAddr, collatType, parsedMaturity, toAddr, await getMaxUSDC() ] 
       ) :
       proxyContract.interface.encodeFunctionData(
         'repayAllEarlyWithSignature', 
-        [ poolAddr, collatType, parsedMaturity, toAddr, usdc, signedSigs.get('USDCSig'), signedSigs.get('controllerSig')] 
+        [ poolAddr, collatType, parsedMaturity, toAddr, await getMaxUSDC(), signedSigs.get('USDCSig'), signedSigs.get('controllerSig')] 
       )  
     );
 
     /* Repay SOME if series is mature */
     series.isMature() && 
+    daiValueOfUsdc.lt(series.ethDebtDai!) &&
+
     ( calldata = noSigsReqd ? 
       proxyContract.interface.encodeFunctionData(
         'repayDebtMature', 
@@ -309,11 +312,13 @@ export const useUSDCProxy = () => {
       proxyContract.interface.encodeFunctionData(
         'repayDebtMatureWithSignature', 
         [ collatType, parsedMaturity, toAddr, usdc, signedSigs.get('USDCSig'), signedSigs.get('controllerSig')] 
-      )  
+      )
     );
 
     /* Repay ALL if series is mature */
-    series.isMature() &&  false &&
+    series.isMature() && 
+    daiValueOfUsdc.gte(series.ethDebtDai!) && 
+
     ( calldata = noSigsReqd ? 
       proxyContract.interface.encodeFunctionData(
         'repayAllMature', 

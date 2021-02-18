@@ -36,7 +36,7 @@ import StickyButton from '../components/StickyButton';
 import Selector from '../components/Selector';
 import USDCMark from '../components/logos/USDCMark';
 import AprBadge from '../components/AprBadge';
-import { daiToUSDC } from '../utils/yieldMath';
+import { psmUSDCOut } from '../utils/yieldMath';
 
 interface IRepayProps {
   close?:any;
@@ -148,7 +148,7 @@ function Repay({ close }:IRepayProps) {
     currency === 'USDC' && activeSeries?.ethDebtDai && (async () => {
       const tin =  await checkPsm('tin'); // sell = xtin :  buy = xtout
       const reqdOut = activeSeries?.ethDebtDai;
-      const amntNeeded = ethers.utils.parseEther( daiToUSDC( reqdOut, tin)) ;
+      const amntNeeded = ethers.utils.parseEther( psmUSDCOut( reqdOut, tin) ) ;
 
       usdcBalanceWad?.gt(amntNeeded) ?
         setMaxRepay(amntNeeded.add(ethers.BigNumber.from('1000000000000') )):
