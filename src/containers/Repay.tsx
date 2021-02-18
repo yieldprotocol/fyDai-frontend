@@ -435,7 +435,7 @@ function Repay({ close }:IRepayProps) {
                      label={
                       currency === 'DAI' ?                       
                         `${isRollDebt? 'Roll':'Repay'} ${inputValue} Dai ${isRollDebt?'to':''} ${isRollDebt?destinationSeries?.displayNameMobile:''}` : 
-                        `Repay ${USDCValueInDai} Dai Debt with ${inputValue} USDC`
+                        `Repay ${USDCValueInDai} Dai Debt with ${ cleanValue(inputValue, 2)} USDC`
                       }
                      disabled={repayDisabled}
                      hasPoolDelegatedProxy={true}
