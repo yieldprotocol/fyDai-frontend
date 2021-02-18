@@ -81,7 +81,7 @@ export const useSigning = () => {
     const _domain: IDomain = {
       name: 'Yield',
       version: '1',
-      chainId: chainId === 42? 42 : 1, // TODO remove this lock into kovan or mainnet
+      chainId: chainId || 1, 
       verifyingContract: delegationContract.address,
     };
 
