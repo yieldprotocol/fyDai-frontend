@@ -112,7 +112,7 @@ export const useTimeTravel = () => {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: '{"id":1337,"jsonrpc":"2.0","method":"evm_snapshot","params":[]}'
+      body: '{"id":31337,"jsonrpc":"2.0","method":"evm_snapshot","params":[]}'
     });
     const num = await res.json();
     // eslint-disable-next-line no-console
@@ -128,7 +128,7 @@ export const useTimeTravel = () => {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: `{"id":1337,"jsonrpc":"2.0","method":"evm_revert","params":["${window.localStorage.getItem('snapshot')}"]}`
+      body: `{"id":31337,"jsonrpc":"2.0","method":"evm_revert","params":["${window.localStorage.getItem('snapshot')}"]}`
     });
     // eslint-disable-next-line no-console
     console.log('Reverted to Snapshot', (await res.json()).result );
@@ -144,7 +144,7 @@ export const useTimeTravel = () => {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: '{"id":1337,"jsonrpc":"2.0","method":"evm_revert","params":["0x1"]}'
+      body: '{"id":31337,"jsonrpc":"2.0","method":"evm_revert","params":["0x1"]}'
     });
     // eslint-disable-next-line no-console
     console.log('Reverted to first snapshot', (await res.json()).result );
@@ -160,7 +160,7 @@ export const useTimeTravel = () => {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: `{"id":1337,"jsonrpc":"2.0","method":"evm_increaseTime","params":[${time}]}`
+      body: `{"id":31337,"jsonrpc":"2.0","method":"evm_increaseTime","params":[${time}]}`
     });
     // eslint-disable-next-line no-console
     console.log(await res.json()); 
@@ -174,7 +174,7 @@ export const useTimeTravel = () => {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: '{"id":1337,"jsonrpc":"2.0","method":"evm_mine","params":[]}'
+      body: '{"id":31337,"jsonrpc":"2.0","method":"evm_mine","params":[]}'
     });
     // eslint-disable-next-line no-console
     console.log(await res.json());

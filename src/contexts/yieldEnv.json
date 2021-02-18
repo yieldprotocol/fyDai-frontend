@@ -61,9 +61,8 @@
         "ImportCdpProxy": "0xE09E6F95863fAd23488076096F8E5E36657C00dA",
         "RollProxy": "0x9FF558d66Fa807aF34Fc89daA203B96c8587584e",
         "DssPsm": "0x89B78CfA322F6C5dE0aBcEecab66Aee45393cC5A",
-        "USDC":           "0xBD84be3C303f6821ab297b840a99Bd0d4c4da6b5",
-        "USDCProxy":      "0x53DFb0D02CB0Bf1a5ABc0fDb9c0566E1E69E2a28"
-        
+        "USDC":           "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "USDCProxy":      "0x45637e919fBD489100c60B134Fed86d48fDaC81e"       
     },
 
     "42": {
@@ -99,7 +98,6 @@
         "ProxyFactory":   "0xe11E3b391F7E8bC47247866aF32AF67Dd58Dc800",
         "ProxyRegistry":  "0x64A436ae831C1672AE81F674CAb8B6775df3475C",
         "RollProxy":      "0xdB2ed810347f0BE4b88c64787fcA8325C57C0d76",
-
         "USDC":           "0xBD84be3C303f6821ab297b840a99Bd0d4c4da6b5",
         "USDCProxy":      "0xA2DAA3B76f35f141641ED70b435574f9A931ac13",
         "DssPsm":         "0xe4dC42e438879987e287A6d9519379936d7b065A"
