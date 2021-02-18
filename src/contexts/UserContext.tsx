@@ -99,11 +99,13 @@ const UserProvider = ({ children }: any) => {
     /* Get balances and posted collateral */
     const [
       ethBalance, 
-      daiBalance, 
+      daiBalance,
+      usdcBalance, // note: in mwei
       ethPosted,  
     ]:any[] = await Promise.all([
       getBalance(),
       getBalance(deployedContracts.Dai, 'Dai'),
+      getBalance(deployedContracts.USDC, 'USDC'),
       collateralPosted('ETH-A'),
     ]);
 
@@ -119,10 +121,13 @@ const UserProvider = ({ children }: any) => {
     const collateralRatio = collateralizationRatio(ethPosted, feedData.ethPrice, debtValue) || '0';
     const collateralPercent = collateralizationRatio(ethPosted, feedData.ethPrice, debtValue, true) || '0';
     const maxDaiBorrow = borrowingPower( ethPosted, feedData.ethPrice, debtValue );
+    const usdcBalanceWad = usdcBalance.mul('1000000000000');
 
     const values = {
       ethBalance, 
-      daiBalance, 
+      daiBalance,
+      usdcBalance, // note: in mwei
+      usdcBalanceWad,
       ethPosted,
       ethLocked, 
       debtValue,
@@ -136,6 +141,7 @@ const UserProvider = ({ children }: any) => {
     const parsedValues = {  
       ethBalance_ : cleanValue(ethers.utils.formatEther(ethBalance), 6),
       daiBalance_ : cleanValue(ethers.utils.formatEther(daiBalance), 2),
+      usdcBalance_ : cleanValue(ethers.utils.formatUnits(usdcBalance, 'mwei'), 2),
       ethPosted_ : cleanValue(ethers.utils.formatEther(ethPosted), 6),
       ethLocked_ : cleanValue(ethers.utils.formatEther(ethLocked), 6),
       debtValue_ : cleanValue(ethers.utils.formatEther(debtValue), 2),
