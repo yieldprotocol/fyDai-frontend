@@ -26,12 +26,12 @@ function getFallbackLibrary(provider: any) {
   
   let library: ethers.providers.InfuraProvider | ethers.providers.JsonRpcProvider ;
   
-  ( process.env.REACT_APP_FORCE_ENV === 'development' || process.env.NODE_ENV === 'development') && provider.chainId !== 42 ?
-    library = new ethers.providers.JsonRpcProvider() :
+  process.env.REACT_APP_FORCE_ENV === 'development' ?
+    library = new ethers.providers.JsonRpcProvider() : 
     library = new ethers.providers.InfuraProvider(provider.chainId, '646dc0f33d2449878b28e0afa25267f6');
 
-  ( process.env.REACT_APP_FORCE_ENV === 'development' || process.env.NODE_ENV === 'development') && provider.chainId !== 42 ? 
-    console.log('Using RPC Provider as fallback') : console.log('Using Infura Provider as fallback');
+  // ( process.env.REACT_APP_FORCE_ENV === 'development' || process.env.NODE_ENV === 'development') && provider.chainId !== 42 ? 
+  //   console.log('Using RPC Provider as fallback') : console.log('Using Infura Provider as fallback');
 
   library.pollingInterval = 12000;
 
