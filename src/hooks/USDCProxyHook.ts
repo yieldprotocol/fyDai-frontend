@@ -1,15 +1,15 @@
 import { useEffect, useState, useContext } from 'react';
 import { ethers, BigNumber }  from 'ethers';
 
-import { MAX_INT, cleanValue, genTxCode  } from '../utils';
+import { MAX_INT, cleanValue, genTxCode, ONE  } from '../utils';
 import { calculateSlippage } from '../utils/yieldMath';
 
-import { ISignListItem, IYieldSeries } from '../types';
+import { IDomain, ISignListItem, IYieldSeries } from '../types';
 
 import USDCProxy from '../contracts/USDCProxy.json';
 import Controller from '../contracts/Controller.json';
 import DssPsm from '../contracts/DssPsm.json';
-
+import USDC from '../contracts/USDC.json';
 
 import { YieldContext } from '../contexts/YieldContext';
 import { UserContext } from '../contexts/UserContext';
@@ -40,7 +40,7 @@ export const useUSDCProxy = () => {
   const { preferences: { slippage }, authorization: { dsProxyAddress, hasDelegatedDsProxy } } = userState; 
 
   /* hooks */ 
-  const { signer, fallbackProvider, account } = useSignerAccount();
+  const { signer, fallbackProvider, account, chainId } = useSignerAccount();
   const { previewPoolTx, addPoolDelegate, checkPoolDelegate } = usePool();
   const { approveToken, getTokenAllowance } = useToken();
   const { addControllerDelegate } = useController();
@@ -51,11 +51,13 @@ export const useUSDCProxy = () => {
   const { abi: USDCProxyAbi } = USDCProxy;
   const { abi: controllerAbi } = Controller;
   const { abi: psmAbi } = DssPsm;
+  const { abi: usdcAbi } = USDC;
 
   /* Preset the USDCProxy and controller contracts to be used with all fns */
   const [ proxyContract, setProxyContract] = useState<any>();
   const [ controllerContract, setControllerContract ] = useState<any>();
   const [ psmContract, setPsmContract ] = useState<any>();
+  const [ USDCContract, setUSDCContract ] = useState<any>();
 
   useEffect(()=> {
     deployedContracts?.USDCProxy && signer &&
@@ -64,14 +66,23 @@ export const useUSDCProxy = () => {
       USDCProxyAbi,
       signer
     ));
-    deployedContracts?.Controller && signer && setControllerContract( new ethers.Contract( 
+    deployedContracts?.Controller && signer && 
+    setControllerContract( new ethers.Contract( 
       ethers.utils.getAddress(deployedContracts?.Controller), 
       controllerAbi,
       signer
     ));
-    deployedContracts?.Controller && signer && setPsmContract( new ethers.Contract( 
+    deployedContracts?.Controller && 
+    setPsmContract( new ethers.Contract( 
       ethers.utils.getAddress(deployedContracts?.DssPsm), 
       psmAbi,
+      fallbackProvider
+    ));
+
+    deployedContracts?.Controller && 
+    setUSDCContract( new ethers.Contract( 
+      ethers.utils.getAddress(deployedContracts?.USDC), 
+      usdcAbi,
       fallbackProvider
     ));
 
@@ -92,24 +103,39 @@ export const useUSDCProxy = () => {
   const borrowUSDC = async (
     series:IYieldSeries,
     collateralType: string,
-    USDCToBorrow: number,
+    USDCToBorrow: number | BigNumber, // NB if BigNumber - it must be in MWEI  (6decimals)
   ) => {
 
     /* Parse/clean the inputs */
-    const usdc = ethers.utils.parseEther(USDCToBorrow.toString());
+    const usdc = BigNumber.isBigNumber(USDCToBorrow) ? 
+      USDCToBorrow : 
+      ethers.utils.parseUnits( USDCToBorrow.toString(), 'mwei' ); 
+
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const toAddr = account && ethers.utils.getAddress(account);
     const parsedMaturity = series.maturity.toString();
     const collatType = ethers.utils.formatBytes32String(collateralType);
 
+    /* calc amount of dai */
+    const tout = await checkPsm(); // in WAD
+    const inputAsWad_ = ethers.utils.parseEther(USDCToBorrow.toString());
+    const valueInDai = (inputAsWad_.mul(tout).div(ONE)).add(inputAsWad_);
+
     /* get estimated maxFYDai */
     let maxFYDai:string;
-    const preview = await previewPoolTx('buyDai', series, USDCToBorrow); 
+    const preview = await previewPoolTx('buyDai', series, valueInDai); 
     if ( !(preview instanceof Error) ) {
       maxFYDai = calculateSlippage(preview, slippage);
     } else {
       throw(preview);
     }
+
+    /* CHECKS: */
+    // console.log('usdc input:', usdc.toString());
+    // console.log('tout:', tout.toString());
+    // console.log('dai value in wad :', valueInDai.toString());
+    // console.log('max fyDai:', maxFYDai.toString());
+    // console.log('dai value :', ethers.utils.formatEther(valueInDai));
 
     /* build and use signature if required , else '0x' */
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
@@ -121,9 +147,17 @@ export const useUSDCProxy = () => {
         signFn: () => delegationSignature(controllerContract, dsProxyAddress),    
         fallbackFn: () => addControllerDelegate(dsProxyAddress),
       });
+    
+    // requestedSigs.set('daiSig',
+    //   { id: genTxCode('AUTH_DAI', series?.maturity.toString()),
+    //     desc: 'Allow Dai transfers to the maker PSM',
+    //     conditional: await getTokenAllowance(deployedContracts.Dai, 'Dai', deployedContracts?.DssPsm) > 0,
+    //     signFn: () => daiPermitSignature(deployedContracts.Dai, deployedContracts?.DssPsm),
+    //     fallbackFn: () => approveToken(deployedContracts.Dai, deployedContracts?.DssPsm, MAX_INT, series), 
+    //   });
 
     /* Send the required signatures out for signing, or approval tx if fallback is required */
-    const signedSigs = await handleSignList(requestedSigs, genTxCode('BORROW', series?.maturity.toString()));
+    const signedSigs = await handleSignList(requestedSigs, genTxCode('BORROW_USDC', series?.maturity.toString()));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
     /* if ALL sigs are '0x' set noSigsReqd */
@@ -141,7 +175,7 @@ export const useUSDCProxy = () => {
       );
     
     /* set the gas limits based on whether sigs are required */
-    const overrides = noSigsReqd ? { gasLimit: BigNumber.from('500000'), value:0 } :{ gasLimit: BigNumber.from('500000'), value:0 };
+    const overrides = noSigsReqd ? { gasLimit: BigNumber.from('1000000'), value:0 } :{ gasLimit: BigNumber.from('1000000'), value:0 };
 
     /* send to the proxy for execution */
     await proxyExecute( 
@@ -151,7 +185,7 @@ export const useUSDCProxy = () => {
       { 
         tx: null, 
         msg: `Borrowing ${USDCToBorrow} USDC from ${series.displayNameMobile}`, 
-        type:'BORROW', 
+        type:'BORROW_USDC', 
         series, 
         value: usdc.toString() 
       }
@@ -159,7 +193,7 @@ export const useUSDCProxy = () => {
   };
 
   /**
-   * @dev Repay an amount of fyDai debt in Controller using a given amount of Dai exchanged for fyDai at pool rates, with a minimum of fyDai debt required to be paid.
+   * @dev Repay an amount of fyDai debt in Controller using a given amount of USDC exchanged for fyDai at pool rates, with a minimum of fyDai debt required to be paid.
    * Post maturity the user is asked for a signature allowing the treasury access to dai
    * 
    * @param {IYieldSeries} series the yield series to interact with.
@@ -175,10 +209,11 @@ export const useUSDCProxy = () => {
     repaymentInUSDC: number,
   ) => {
 
-    const usdc = ethers.utils.parseEther(repaymentInUSDC.toString());   
+    const usdc = ethers.utils.parseUnits(repaymentInUSDC.toString(), 'mwei');   
     const collatType = ethers.utils.formatBytes32String(collateralType);
     const toAddr = account && ethers.utils.getAddress(account);
     const parsedMaturity = series.maturity.toString();
+    const poolAddr = ethers.utils.getAddress(series.poolAddress);
 
     /* build and use signature if required , else '0x' */
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
@@ -190,33 +225,110 @@ export const useUSDCProxy = () => {
         signFn: () => delegationSignature(controllerContract, dsProxyAddress),    
         fallbackFn: () => addControllerDelegate(dsProxyAddress),
       });
- 
-    // USDC User to treasury > no ds proxy 
+
+    /* we have to build a USDC custom daomin - because of USDC Versioning '2' */
+    const buildUSDCDomain = async () : Promise<IDomain> => {
+      return {
+        name: await USDCContract.name(),
+        version: '1',
+        chainId: chainId || 1,
+        verifyingContract: deployedContracts.USDC,
+      };
+    };
+
+    // /* we have to build a USDC custom daomin - because of USDC Versioning '2' */
+    // const buildUSDCDomain = async () : Promise<IDomain> => {
+
+    //   const domain = await USDCContract.DOMAIN_SEPARATOR();
+    //   console.log(domain);
+    //   return domain;
+    
+    // };
+    // buildUSDCDomain();
+
+
+    // USDC User to treasury 
     requestedSigs.set('USDCSig',
       { id: genTxCode('AUTH_USDC', series?.maturity.toString()),
-        desc: 'Allow USDC transfers to the fyDai Treasury',
-        conditional: ( await getTokenAllowance(deployedContracts.USDC, 'USDC', deployedContracts.Treasury) ) > 0,
-        signFn: () => ERC2612PermitSignature( deployedContracts.USDC, deployedContracts.Treasury),
-        fallbackFn: () => approveToken(deployedContracts.USDC, deployedContracts.Treasury, MAX_INT, series),
+        desc: 'Allow USDC transfers',
+        conditional: false, // ( await getTokenAllowance(deployedContracts.USDC, 'USDC', deployedContracts.USDCProxy) ) > 0,
+        signFn: async () => ERC2612PermitSignature(deployedContracts.USDC, deployedContracts.USDCProxy, await buildUSDCDomain()),
+        fallbackFn: () => approveToken(deployedContracts.USDC, deployedContracts.USDCProxy, MAX_INT, series),
       });
 
     /* Send the required signatures out for signing, or approval tx if fallback is required */
-    const signedSigs = await handleSignList(requestedSigs, genTxCode('REPAY', series?.maturity.toString()));
+    const signedSigs = await handleSignList(requestedSigs, genTxCode('REPAY_USDC', series?.maturity.toString()));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
     /* is ALL sigs are '0x' set noSigsReqd */
     const noSigsReqd = Array.from(signedSigs.values()).every(item => item === '0x');
           
-    // repayDaiWithSignature(bytes32 collateral, uint256 maturity, address to, uint256 daiAmount, bytes memory daiSig, bytes memory controllerSig)
-    const calldata = proxyContract.interface.encodeFunctionData( 
-      'repayUSDCWithSignature', 
-      [ collatType, parsedMaturity, toAddr, usdc, signedSigs.get('USDCSig'), signedSigs.get('controllerSig')]
+    let calldata:any;
+
+    /* fn select Function options: series mature  > fyDaiDebt more than requested? > sigs reqd? */
+
+    console.log(' mature : ', series.isMature() );
+    console.log(' noSigsReqd : ', noSigsReqd );
+
+    const minFyDaiRepay = BigNumber.from('0');
+    const maxUSDC = MAX_INT;
+
+    /* Repay SOME early */
+    !series.isMature() &&  
+    ( calldata = noSigsReqd ? 
+      proxyContract.interface.encodeFunctionData(
+        'repayDebtEarly', 
+        [ poolAddr, collatType, parsedMaturity, toAddr, usdc, minFyDaiRepay ] 
+      ) :
+      proxyContract.interface.encodeFunctionData(
+        'repayDebtEarlyWithSignature', 
+        [ poolAddr, collatType, parsedMaturity, toAddr, usdc, minFyDaiRepay, signedSigs.get('USDCSig'), signedSigs.get('controllerSig')] 
+      )  
     );
 
-    /* set the gas limits based on whether sigs are required */
+    /* Repay ALL early */
+    !series.isMature() && false && 
+    ( calldata = noSigsReqd ? 
+      proxyContract.interface.encodeFunctionData(
+        'repayAllEarly', 
+        [ poolAddr, collatType, parsedMaturity, toAddr, usdc ] 
+      ) :
+      proxyContract.interface.encodeFunctionData(
+        'repayAllEarlyWithSignature', 
+        [ poolAddr, collatType, parsedMaturity, toAddr, usdc, signedSigs.get('USDCSig'), signedSigs.get('controllerSig')] 
+      )  
+    );
+
+    /* Repay SOME if series is mature */
+    series.isMature() && 
+    ( calldata = noSigsReqd ? 
+      proxyContract.interface.encodeFunctionData(
+        'repayDebtMature', 
+        [ collatType, parsedMaturity, toAddr, usdc ] 
+      ) :
+      proxyContract.interface.encodeFunctionData(
+        'repayDebtMatureWithSignature', 
+        [ collatType, parsedMaturity, toAddr, usdc, signedSigs.get('USDCSig'), signedSigs.get('controllerSig')] 
+      )  
+    );
+
+    /* Repay ALL if series is mature */
+    series.isMature() &&  false &&
+    ( calldata = noSigsReqd ? 
+      proxyContract.interface.encodeFunctionData(
+        'repayAllMature', 
+        [ collatType, parsedMaturity, toAddr ] 
+      ) :
+      proxyContract.interface.encodeFunctionData(
+        'repayAllMatureSignature', 
+        [ collatType, parsedMaturity, toAddr, signedSigs.get('USDCSig'), signedSigs.get('controllerSig')] 
+      )  
+    );
+
+    /* Set the gas limits based on whether sigs are required */
     const overrides = noSigsReqd ? { gasLimit: BigNumber.from('350000'), value:0 } :{ gasLimit: BigNumber.from('350000'), value:0 };
 
-    /* send to the proxy for execution */
+    /* Send to the proxy for execution */
     await proxyExecute( 
       proxyContract.address, 
       calldata,
@@ -224,7 +336,7 @@ export const useUSDCProxy = () => {
       { 
         tx:null, 
         msg: `Repaying ${repaymentInUSDC} USDC to ${series.displayNameMobile}`, 
-        type:'REPAY', 
+        type:'REPAY_USDC', 
         series,
         value: usdc.toString()
       }
