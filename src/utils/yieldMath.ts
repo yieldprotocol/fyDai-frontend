@@ -431,13 +431,30 @@ export const secondsToFrom  = (
   return to_.sub(from_).toString();
 };
 
-export const daiToUSDC = ( 
-  dai:BigNumber| string, 
-  tin: BigNumber| string
+/* USD Obtained from selling x Dai */ 
+export const psmUSDCOut = ( 
+  dai:BigNumber| string, // WAD precision
+  tin: BigNumber| string,
+  buy: boolean = false
 ) : string => {
+
   const dai_ = new Decimal(dai.toString());
   const tin_ = new Decimal(tin.toString());
   const wad = new Decimal(1e18);
-  return dai_.div( wad.sub(tin_) ).toFixed(18);
+  return dai_.div( wad.sub(tin_) ).toFixed(18); // dai/(1-tin)
+
+};
+
+/* Dai Obtained from selling x USDC */ 
+export const psmDaiOut = ( 
+  usdc:BigNumber| string, // WAD precision
+  tin: BigNumber| string,
+  buy: boolean = false
+) : string => {
+
+  const usdc_ = new Decimal(usdc.toString());
+  const tin_ = new Decimal(tin.toString());
+  const wad = new Decimal(1e18);
+  return Decimal.floor( usdc_.mul(wad.sub(tin_)).div(wad) ).toFixed(); // usdc*(1-tin)
 
 };
