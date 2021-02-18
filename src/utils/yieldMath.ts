@@ -430,3 +430,14 @@ export const secondsToFrom  = (
 
   return to_.sub(from_).toString();
 };
+
+export const daiToUSDC = ( 
+  dai:BigNumber| string, 
+  tin: BigNumber| string
+) : string => {
+  const dai_ = new Decimal(dai.toString());
+  const tin_ = new Decimal(tin.toString());
+  const wad = new Decimal(1e18);
+  return dai_.div( wad.sub(tin_) ).toFixed(18);
+
+};
