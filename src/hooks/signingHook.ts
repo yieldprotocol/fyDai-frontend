@@ -65,7 +65,10 @@ export const useSigning = () => {
     _provider.sendAsync( payload, callback );
   });
 
-  const delegationSignature = async (delegationContract:any, delegateAddr:string) => {
+  const delegationSignature = async (
+    delegationContract:any, 
+    delegateAddr:string,
+  ) => {
     const _nonce = await delegationContract.signatureCount(fromAddr) ;
     const msg: IDelegableMessage = {
       // @ts-ignore
@@ -74,25 +77,30 @@ export const useSigning = () => {
       nonce: _nonce.toHexString(),
       deadline: MAX_INT,
     };
-    const domain: IDomain = {
+    
+    const _domain: IDomain = {
       name: 'Yield',
       version: '1',
-      chainId: chainId || 1,
+      chainId: chainId === 42? 42 : 1, // TODO remove this lock into kovan or mainnet
       verifyingContract: delegationContract.address,
     };
-    
+
     const sig = await sendForSig(
       provider.provider, 
       'eth_signTypedData_v4', 
-      [fromAddr, createTypedDelegableData(msg, domain)],
+      [fromAddr, createTypedDelegableData( msg, _domain )], 
     );
     return sig;
   };
 
-  const daiPermitSignature = async (permitContractAddr:string, permitAddr:string) => {
+  const daiPermitSignature = async (
+    permitContractAddr:string, 
+    permitAddr:string,
+    domain: IDomain | null = null  // Provid a custom domain if reqd. default null
+  ) => {
     const dResult = await signDaiPermit(
       provider.provider, 
-      permitContractAddr, 
+      domain || permitContractAddr,  // use custom domain if provided
       fromAddr as string, 
       permitAddr
     );
@@ -100,10 +108,14 @@ export const useSigning = () => {
     return sig;
   };
 
-  const ERC2612PermitSignature = async (permitContractAddr:string, permitAddr:string) => {
+  const ERC2612PermitSignature = async (
+    permitContractAddr:string, 
+    permitAddr:string, 
+    domain: IDomain | null = null // Provid a custom domain if reqd. default null
+  ) => {
     const yResult = await signERC2612Permit(
       provider.provider, 
-      permitContractAddr, 
+      domain || permitContractAddr,  // use custom domain if provided
       fromAddr as string, 
       permitAddr, 
       MAX_INT
