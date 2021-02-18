@@ -184,7 +184,10 @@ export const useBorrowProxy = () => {
   ) => {
 
     /* Parse/clean the inputs */
-    const dai = ethers.utils.parseEther(daiToBorrow.toString());
+    const dai = BigNumber.isBigNumber(daiToBorrow) ? 
+      daiToBorrow : 
+      ethers.utils.parseEther(daiToBorrow.toString());  
+
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
     const toAddr = account && ethers.utils.getAddress(account);
     const parsedMaturity = series.maturity.toString();
@@ -211,7 +214,7 @@ export const useBorrowProxy = () => {
       });
 
     /* Send the required signatures out for signing, or approval tx if fallback is required */
-    const signedSigs = await handleSignList(requestedSigs, genTxCode('BORROW', series?.maturity.toString()));
+    const signedSigs = await handleSignList(requestedSigs, genTxCode('BORROW_DAI', series?.maturity.toString()));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
     /* if ALL sigs are '0x' set noSigsReqd */
@@ -239,7 +242,7 @@ export const useBorrowProxy = () => {
       { 
         tx:null, 
         msg: `Borrowing ${daiToBorrow} Dai from ${series.displayNameMobile}`, 
-        type:'BORROW', 
+        type:'BORROW_DAI', 
         series, 
         value: dai.toString() 
       }
@@ -263,7 +266,9 @@ export const useBorrowProxy = () => {
     repaymentInDai: number,
   ) => {
 
-    const dai = ethers.utils.parseEther(repaymentInDai.toString());   
+    const dai = BigNumber.isBigNumber(repaymentInDai) ? 
+      repaymentInDai : 
+      ethers.utils.parseEther(repaymentInDai.toString());   
     const collatType = ethers.utils.formatBytes32String(collateralType);
     const toAddr = account && ethers.utils.getAddress(account);
     const parsedMaturity = series.maturity.toString();
@@ -289,7 +294,7 @@ export const useBorrowProxy = () => {
       });
 
     /* Send the required signatures out for signing, or approval tx if fallback is required */
-    const signedSigs = await handleSignList(requestedSigs, genTxCode('REPAY', series?.maturity.toString()));
+    const signedSigs = await handleSignList(requestedSigs, genTxCode('REPAY_DAI', series?.maturity.toString()));
     /* if ANY of the sigs are 'undefined' cancel/breakout the transaction operation */
     if ( Array.from(signedSigs.values()).some(item => item === undefined) ) { return; }
     /* is ALL sigs are '0x' set noSigsReqd */
@@ -312,7 +317,7 @@ export const useBorrowProxy = () => {
       { 
         tx:null, 
         msg: `Repaying ${repaymentInDai} Dai to ${series.displayNameMobile}`, 
-        type:'REPAY', 
+        type:'REPAY_DAI', 
         series,
         value: dai.toString()
       }
@@ -409,7 +414,7 @@ export const useBorrowProxy = () => {
    * */ 
   const buyDai = async ( 
     series: IYieldSeries, 
-    daiOut:number,
+    daiOut: number | BigNumber,
   ) => {
     /* Processing and/or sanitizing input */
     const poolAddr = ethers.utils.getAddress(series.poolAddress);
