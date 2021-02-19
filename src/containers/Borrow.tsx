@@ -73,7 +73,7 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
   } = position;
 
   /* local state */
-  const [ repayOpen, setRepayOpen ] = useState<boolean>(true);
+  const [ repayOpen, setRepayOpen ] = useState<boolean>(false);
   const [ rateLockOpen, setRateLockOpen ] = useState<boolean>(false);
   const [ histOpen, setHistOpen ] = useState<boolean>(false);
   const [ borrowDisabled, setBorrowDisabled ] = useState<boolean>(true);
