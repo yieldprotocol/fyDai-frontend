@@ -157,15 +157,10 @@ export const useUSDCProxy = () => {
     const noSigsReqd = Array.from(signedSigs.values()).every(item => item === '0x');
 
     /* construct the calldata from method and reqd. args */
-    const calldata = noSigsReqd ? 
-      proxyContract.interface.encodeFunctionData( 
-        'borrowUSDCForMaximumFYDai', 
-        [ poolAddr, collatType, parsedMaturity, toAddr, usdc, maxFYDai ]
-      ) :
-      proxyContract.interface.encodeFunctionData( 
-        'borrowUSDCForMaximumFYDaiWithSignature', 
-        [ poolAddr, collatType, parsedMaturity, toAddr, usdc, maxFYDai, signedSigs.get('controllerSig') ]
-      );
+    const calldata = proxyContract.interface.encodeFunctionData( 
+      'borrowUSDCForMaximumFYDaiWithSignature', 
+      [ poolAddr, collatType, parsedMaturity, toAddr, usdc, maxFYDai, signedSigs.get('controllerSig') ]
+    );
     
     /* set the gas limits based on whether sigs are required */
     const overrides = noSigsReqd ? { gasLimit: BigNumber.from('1000000'), value:0 } :{ gasLimit: BigNumber.from('1000000'), value:0 };
@@ -223,9 +218,8 @@ export const useUSDCProxy = () => {
         fallbackFn: () => addControllerDelegate(dsProxyAddress),
       });
 
-    /* we have to build a USDC custom daomin - because of USDC Versioning '2' */
+    /* we have to build a USDC custom domain - because of USDC Versioning '2' */
     const buildUSDCDomain = async () : Promise<IDomain> => {
-      // TODO use:  await USDCContract.DOMAIN_SEPARATOR();
       return {
         name: await USDCContract.name(),
         version: '2',
@@ -238,10 +232,9 @@ export const useUSDCProxy = () => {
     requestedSigs.set('USDCSig',
       { id: genTxCode('AUTH_USDC', series?.maturity.toString()),
         desc: 'Allow USDC transfers',
-        conditional: ( await getTokenAllowance(deployedContracts.USDC, 'USDC', deployedContracts.USDCProxy) ) > 0,
-        signFn: async () => ERC2612PermitSignature(deployedContracts.USDC, deployedContracts.USDCProxy, await buildUSDCDomain()),
-        // signFn: async () => ERC2612PermitSignature(deployedContracts.USDC, deployedContracts.USDCProxy, await USDCContract.DOMAIN_SEPARATOR() ),
-        fallbackFn: () => approveToken(deployedContracts.USDC, deployedContracts.USDCProxy, MAX_INT, series),
+        conditional: ( await getTokenAllowance(deployedContracts.USDC, 'USDC', dsProxyAddress) ) > 0,
+        signFn: async () => ERC2612PermitSignature(deployedContracts.USDC, dsProxyAddress, await buildUSDCDomain()),
+        fallbackFn: () => approveToken(deployedContracts.USDC, dsProxyAddress, MAX_INT, series),
       });
 
     /* Send the required signatures out for signing, or approval tx if fallback is required */
@@ -273,65 +266,43 @@ export const useUSDCProxy = () => {
     /* Repay SOME early */
     !series.isMature() &&  
     daiValueOfUsdc.lt(series.ethDebtDai!) && 
-
-    ( calldata = noSigsReqd ? 
-      proxyContract.interface.encodeFunctionData(
-        'repayDebtEarly', 
-        [ poolAddr, collatType, parsedMaturity, toAddr, usdc, await getMinFyDaiRepay() ] 
-      ) :
-      proxyContract.interface.encodeFunctionData(
-        'repayDebtEarlyWithSignature', 
-        [ poolAddr, collatType, parsedMaturity, toAddr, usdc, await getMinFyDaiRepay(), signedSigs.get('USDCSig'), signedSigs.get('controllerSig')] 
-      )  
+    ( calldata = proxyContract.interface.encodeFunctionData(
+      'repayDebtEarlyWithSignature', 
+      [ poolAddr, collatType, parsedMaturity, toAddr, usdc, await getMinFyDaiRepay(), signedSigs.get('USDCSig'), signedSigs.get('controllerSig')] 
+    )  
     );
 
     /* Repay ALL early */
     !series.isMature() && 
     daiValueOfUsdc.gte(series.ethDebtDai!) && 
 
-    ( calldata = noSigsReqd ? 
-      proxyContract.interface.encodeFunctionData(
-        'repayAllEarly', 
-        [ poolAddr, collatType, parsedMaturity, toAddr, await getMaxUSDC() ] 
-      ) :
-      proxyContract.interface.encodeFunctionData(
-        'repayAllEarlyWithSignature', 
-        [ poolAddr, collatType, parsedMaturity, toAddr, await getMaxUSDC(), signedSigs.get('USDCSig'), signedSigs.get('controllerSig')] 
-      )  
+    ( calldata = proxyContract.interface.encodeFunctionData(
+      'repayAllEarlyWithSignature', 
+      [ poolAddr, collatType, parsedMaturity, toAddr, await getMaxUSDC(), signedSigs.get('USDCSig'), signedSigs.get('controllerSig')] 
+    )  
     );
 
     /* Repay SOME if series is mature */
     series.isMature() && 
     daiValueOfUsdc.lt(series.ethDebtDai!) &&
-
-    ( calldata = noSigsReqd ? 
-      proxyContract.interface.encodeFunctionData(
-        'repayDebtMature', 
-        [ collatType, parsedMaturity, toAddr, usdc ] 
-      ) :
-      proxyContract.interface.encodeFunctionData(
-        'repayDebtMatureWithSignature', 
-        [ collatType, parsedMaturity, toAddr, usdc, signedSigs.get('USDCSig'), signedSigs.get('controllerSig')] 
-      )
+    ( calldata = proxyContract.interface.encodeFunctionData(
+      'repayDebtMatureWithSignature', 
+      [ collatType, parsedMaturity, toAddr, usdc, signedSigs.get('USDCSig'), signedSigs.get('controllerSig')] 
+    )
     );
 
     /* Repay ALL if series is mature */
     series.isMature() && 
     daiValueOfUsdc.gte(series.ethDebtDai!) && 
 
-    ( calldata = noSigsReqd ? 
-      proxyContract.interface.encodeFunctionData(
-        'repayAllMature', 
-        [ collatType, parsedMaturity, toAddr ] 
-      ) :
-      proxyContract.interface.encodeFunctionData(
-        'repayAllMatureSignature', 
-        [ collatType, parsedMaturity, toAddr, signedSigs.get('USDCSig'), signedSigs.get('controllerSig')] 
-      )  
+    ( calldata = proxyContract.interface.encodeFunctionData(
+      'repayAllMatureSignature', 
+      [ collatType, parsedMaturity, toAddr, signedSigs.get('USDCSig'), signedSigs.get('controllerSig')] 
+    )  
     );
 
     /* Set the gas limits based on whether sigs are required */
-    const overrides = noSigsReqd ? { gasLimit: BigNumber.from('350000'), value:0 } :{ gasLimit: BigNumber.from('350000'), value:0 };
+    const overrides = noSigsReqd ? { gasLimit: BigNumber.from('1000000'), value:0 } :{ gasLimit: BigNumber.from('1000000'), value:0 };
 
     /* Send to the proxy for execution */
     await proxyExecute( 
