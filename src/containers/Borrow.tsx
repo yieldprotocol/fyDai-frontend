@@ -6,7 +6,7 @@ import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 import { VscHistory as HistoryIcon } from 'react-icons/vsc';
 
 /* utils and support */
-import { abbreviateHash, cleanValue, genTxCode } from '../utils';
+import { abbreviateHash, cleanValue, genTxCode, ONE } from '../utils';
 
 /* contexts */
 import { SeriesContext } from '../contexts/SeriesContext';
@@ -19,6 +19,7 @@ import { useDebounce, useIsLol } from '../hooks/appHooks';
 import { useMath } from '../hooks/mathHooks';
 import { useTxActive } from '../hooks/txHooks';
 import { useBorrowProxy } from '../hooks/borrowProxyHook';
+import { useUSDCProxy } from '../hooks/USDCProxyHook';
 
 /* containers */
 import Repay from './Repay';
@@ -40,6 +41,8 @@ import HistoryWrap from '../components/HistoryWrap';
 import RaisedBox from '../components/RaisedBox';
 import YieldMobileNav from '../components/YieldMobileNav';
 import Loading from '../components/Loading';
+import Selector from '../components/Selector';
+import USDCMark from '../components/logos/USDCMark';
 
 interface IBorrowProps {
   openConnectLayer:any;
@@ -58,7 +61,7 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
 
   const { state: { historyLoading } } = useContext(HistoryContext);
   const { state: userState, actions: userActions } = useContext(UserContext);
-  const { position, makerVaults, userLoading } = userState;
+  const { position, makerVaults, userLoading, preferences } = userState;
   const { 
     ethPosted,
     ethPosted_,
@@ -75,30 +78,36 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
   const [ histOpen, setHistOpen ] = useState<boolean>(false);
   const [ borrowDisabled, setBorrowDisabled ] = useState<boolean>(true);
   const [ fyDaiValue, setFYDaiValue ] = useState<number>(0);
+  
+  const [ USDCValueInDai, setUSDCValueInDai ] = useState<string| undefined>(undefined);
+
   const [ APR, setAPR ] = useState<string>();
   const [ estPercent, setEstPercent ] = useState<string|undefined>(undefined);
   const [ warningMsg, setWarningMsg] = useState<string|null>(null);
   const [ errorMsg, setErrorMsg] = useState<string|any>(null);
   const [ inputValue, setInputValue ] = useState<any|undefined>(amnt || undefined);
+  const [ inputRef, setInputRef ] = useState<any>(null);
 
-  const [inputRef, setInputRef] = useState<any>(null);
+  const [ currency, setCurrency ] = useState<string>('DAI');
 
   /* init hooks */
   const { borrowDai } = useBorrowProxy();
+  const { borrowUSDC, checkPsm } = useUSDCProxy();
   const { calculateAPR, estCollateralRatio, estTrade } = useMath();
   const { account } = useSignerAccount();
   const [ txActive ] = useTxActive(['BORROW']); /* txs to watch for */
   const [ repayTxActive ] = useTxActive(['REPAY']); /* txs to watch for */
   const debouncedInput = useDebounce(inputValue, 500);
   const [ rollDebtTxActive ] = useTxActive(['ROLL_DEBT']); /* txs to watch for */
-  const isLol = useIsLol(inputValue);
+  // const isLol = useIsLol(inputValue);
 
   /* 
    * execution procedure
    */
   const borrowProcedure = async () => {
     if (inputValue && !borrowDisabled) {
-      await borrowDai(activeSeries, 'ETH-A', inputValue);
+      currency === 'DAI' && await borrowDai(activeSeries, 'ETH-A', inputValue);
+      currency === 'USDC' && await borrowUSDC(activeSeries, 'ETH-A', inputValue);
 
       /* clean up and refresh */               
       setInputValue(undefined);
@@ -146,7 +155,18 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
     })();
 
   }, [position, debouncedInput, activeSeries]);
-    
+
+  /* Calculate the USDC rate on input change */
+  useEffect(() => {
+    activeSeries && currency === 'USDC' &&  debouncedInput>0 && ( async () => {
+      const tout =  await checkPsm(); // sell = .tin :  buy = .tout
+      const _amnt = ethers.utils.parseEther(debouncedInput.toString());
+      const fee = _amnt.mul(tout).div(ONE);
+      const daiAmnt = _amnt.add(fee); // sell = sub : buy = add
+      setUSDCValueInDai(cleanValue(ethers.utils.formatEther(daiAmnt.toString()), 2));
+    })();
+  }, [ currency, debouncedInput, activeSeries]);
+  
   /* Handle borrow disabling deposits - disable if any of the conditions are met */
   useEffect(()=>{
     (
@@ -169,7 +189,7 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
       setWarningMsg(null);
       setErrorMsg(
         <Box direction='row-responsive' gap='small'>
-          <Text size='xsmall'>That amount exceeds the amount of Dai you can borrow based on your collateral.</Text>
+          <Text size='xsmall'>That amount exceeds the amount you can borrow based on your collateral.</Text>
           <RaisedButton 
             label={<Box pad={{ horizontal:'small' }}><Text size='xsmall'>Manage Collateral</Text></Box>}
             onClick={()=>navHistory.push('/post/')}
@@ -189,6 +209,7 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
     }
   }, [ debouncedInput ]);
 
+
   return (
     <RaisedBox>
       <Keyboard 
@@ -202,7 +223,7 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
         target='document'
       >
         { 
-        repayOpen && 
+        repayOpen && !activeSeries?.isMature() &&
         <Layer
           onClickOutside={()=>setRepayOpen(false)}
           responsive={true}
@@ -255,7 +276,7 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
                     >
                       <FlatButton            
                         onClick={()=>navHistory.push('/post/')}
-                        label={<Text size='xsmall' color='#DDDDDD'> Manage Collateral</Text>}
+                        label={<Text size='xsmall' color='#DDDDDD'>Manage Collateral</Text>}
                         background='#55555580'
                       />
                     </Box>
@@ -309,7 +330,7 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
                 valueExtra:null,
               },
               {
-                label: 'Dai Debt + Interest',
+                label: 'DAI Debt + Interest',
                 labelExtra: 'owed at maturity',
                 visible:
                   !!account &&
@@ -331,8 +352,8 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
                   parseFloat(ethPosted_) > 0,
                 active: maxDaiBorrow_,
                 loading: false,
-                value: maxDaiBorrow_? `${maxDaiBorrow_} DAI`: '0 DAI',           
-                valuePrefix: null,
+                value: maxDaiBorrow_? `${maxDaiBorrow_} ${currency}`: `0 ${currency}`,           
+                valuePrefix: currency === 'USDC'? '~': null,
                 valueExtra: null,
               },
               {
@@ -417,23 +438,66 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
               </Box>
 
               <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
+                <Box basis='25%'>
+                  <Selector
+                    selectedIndex={0} 
+                    selectItemCallback={(x:any) => setCurrency(x === 0 ? 'DAI' : 'USDC')}             
+                    items={[
+                      <Box 
+                        key='DAI' 
+                        direction='row' 
+                        gap='xsmall' 
+                        align='center' 
+                        pad={{ left:'small', vertical:'xsmall' }}
+                      >
+                        <DaiMark /> <Text size='small'> DAI </Text>
+                      </Box>,
+                      <Box 
+                        key='USDC' 
+                        direction='row' 
+                        gap='xsmall' 
+                        align='center' 
+                        pad={{ left:'small', vertical:'xsmall' }}
+                      >
+                        <USDCMark /> <Text size='small'> USDC </Text>
+                      </Box>  
+                    ]}
+                  />
+                </Box>
+
                 <TextInput
                   ref={(el:any) => {el && !repayOpen && !rateLockOpen && !mobile && el.focus(); setInputRef(el);}} 
                   type="number"
-                  placeholder={!mobile ? 'Enter the amount of Dai to borrow': 'DAI'} 
+                  placeholder={!mobile ? `Enter the amount of ${currency} to borrow`: currency} 
                   value={inputValue || ''}
                   plain
                   onChange={(event:any) => setInputValue( cleanValue(event.target.value) )}
-                  icon={isLol ? <span role='img' aria-label='lol'>😂</span> : <DaiMark />}
+                  // icon={
+                  //   isLol ? 
+                  //     <span role='img' aria-label='lol'>😂</span> :
+                  //     <DaiMark />                   
+                  // }
                 />
+
               </InputWrap>
+
+              { 
+                currency === 'USDC' &&
+                !!inputValue &&
+                inputValue>0 &&
+                // <Text size='xxsmall'>Note: You are borrowing 200.1 DAI. You will receive 200 USDC.</Text>
+                <Text size='small'>
+                  <Text size='small' weight='bold'>Note: </Text> 
+                  You are borrowing { USDCValueInDai } DAI. You will receive {debouncedInput} USDC.
+                </Text>             
+              }
 
               <Box fill>
                 <Collapsible open={!!inputValue&&inputValue>0}>
                   <InfoGrid entries={[
                     {
                       label: 'Estimated APR',
-                      labelExtra: `if ${inputValue && cleanValue(inputValue, 2)} Dai are borrowed`,
+                      labelExtra: `if ${currency === 'DAI' ? inputValue && cleanValue(inputValue, 2) : USDCValueInDai } DAI are borrowed`,
                       visible: !!inputValue,
                       active: !!inputValue&&inputValue>0,
                       loading: false,    
@@ -442,7 +506,7 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
                       valueExtra: null, 
                     },
                     {
-                      label: 'Dai that will be owed',
+                      label: 'Amount owed',
                       labelExtra: 'at maturity',
                       visible: !!inputValue,
                       active: !!inputValue&&inputValue>0,
@@ -469,7 +533,7 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
                     },
                     {
                       label: 'Collateralization Ratio',
-                      labelExtra: `after borrowing ${inputValue && cleanValue(inputValue, 2)} Dai`,
+                      labelExtra: `after borrowing ${currency === 'DAI' ? inputValue && cleanValue(inputValue, 2) : USDCValueInDai } DAI`,
                       visible: !!inputValue && !!account && position.ethPosted_>0,
                       active: true,
                       loading: false,        
@@ -485,7 +549,7 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
                       )
                     },
                     {
-                      label: 'Want to borrow Dai?',
+                      label: 'Want to borrow DAI or USDC?',
                       labelExtra: '',
                       visible: !!inputValue&&inputValue>0 && !!account && position.ethPosted <= 0,
                       active: !!inputValue,
@@ -502,17 +566,16 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
                         </Box>
                       )
                     },
-
                   ]}
                   />
                 </Collapsible>
               </Box>
 
-              { 
-              account &&  
+              {
+              account &&
               <ActionButton
                 onClick={()=>borrowProcedure()}
-                label={`Borrow ${inputValue || ''} DAI`}
+                label={currency === 'DAI'? `Borrow ${inputValue || ''} DAI` : `Borrow Dai, Receive ${inputValue || ''} USDC`}
                 disabled={borrowDisabled}
                 hasPoolDelegatedProxy={activeSeries.hasPoolDelegatedProxy}
                 clearInput={()=>setInputValue(undefined)}

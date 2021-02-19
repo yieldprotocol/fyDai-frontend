@@ -13,7 +13,7 @@ import { NotifyContext } from './NotifyContext';
 import { useCachedState, } from '../hooks/appHooks';
 import { useCallTx } from '../hooks/chainHooks';
 import { useSignerAccount } from '../hooks/connectionHooks';
-import { useMigrations } from '../hooks/migrationHook';
+// import { useMigrations } from '../hooks/migrationHook';
 
 const YieldContext = createContext<any>({});
 
@@ -26,7 +26,7 @@ const getAddresses = (
   contractNameList: string[],
   chainId: number,
 ): { [name: string]: string; } => {
-  const addrs = (addresses as any)[chainId];
+  const addrs = (addresses as any)[ chainId === 42 ? 42 : 1 ];
   const res = Object.keys(addrs).reduce((filtered: any, key) => {
     if (contractNameList.indexOf(key) !== -1) {
       // eslint-disable-next-line no-param-reassign
@@ -37,8 +37,10 @@ const getAddresses = (
   return res;
 };
 
-const getFyDaiNames = (chainId: number): string[] => {
-  const addrs = (addresses as any)[chainId];
+const getFyDaiNames = (
+  chainId: number
+): string[] => {
+  const addrs = (addresses as any)[ chainId === 42 ? 42 : 1 ];
   return Object.keys(addrs).filter((x) => x.startsWith('fyDai') && x.indexOf('LP') === -1);
 };
 
@@ -101,7 +103,7 @@ const YieldProvider = ({ children }: any) => {
 
   /* hook declarations */
   const [ callTx ] = useCallTx();
-  const { getYieldVersion } = useMigrations();
+  // const { getYieldVersion } = useMigrations();
 
   /**
    * @dev internal fn: Get all public Yield addresses from localStorage (or chain if no cache)
@@ -121,7 +123,7 @@ const YieldProvider = ({ children }: any) => {
     console.log('Yield contract addresses:', _deployedContracts);
 
     /* Load series specific contract addrs */
-    const fyDaiList = getFyDaiNames(chainId!);
+    const fyDaiList = getFyDaiNames( chainId! );
     if (!cachedSeries || (cachedSeries.length !== fyDaiList.length) || forceUpdate) {
       const _list = getAddresses(fyDaiList, chainId!);
       const _poolList = getAddresses(fyDaiList.map((x:any)=> `fyDaiLP${x.slice(5)}`), chainId!);
@@ -196,10 +198,9 @@ const YieldProvider = ({ children }: any) => {
    */
   const _getYieldData = async (_deployedContracts: any, _deployedSeries: IYieldSeries[]): Promise<any> => {
     const _yieldData: any = {};
-    _yieldData.contractsVersion = await getYieldVersion();
     _yieldData.appVersion = process.env.REACT_APP_VERSION;
     // eslint-disable-next-line no-console
-    console.log('Contract Version:', _yieldData.contractsVersion, 'Contract Version:', _yieldData.appVersion, );
+    console.log('App Version:', _yieldData.appVersion, );
     return {
       ..._yieldData,
     };

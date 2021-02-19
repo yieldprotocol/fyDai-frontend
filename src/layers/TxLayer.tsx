@@ -40,13 +40,16 @@ const TxLayer = () => {
     'AUTH_TOKEN', 
     'AUTH_CONTROLLER', 
     'AUTH_POOL', 
-    'CREATE_PROXY' 
+    'AUTH_USDC',
+    'CREATE_PROXY'
   ]);
   const [ txActive ] = useTxActive([
     'POST', 
     'WITHDRAW', 
-    'BORROW', 
-    'REPAY',
+    'BORROW_DAI', 
+    'REPAY_DAI',
+    'BORROW_USDC', 
+    'REPAY_USDC',
     'SELL_DAI', 
     'BUY_DAI', 
     'REDEEM',
@@ -324,7 +327,7 @@ const TxLayer = () => {
             { // if the action is already being processed: 
               processIsCurrentTx && 
               <>
-                <TxStatus tx={txActive || authActive} />
+                <TxStatus tx={ txActive || authActive } />
                 <Box alignSelf='start'>
                   <FlatButton
                     onClick={()=>closeAuth()}

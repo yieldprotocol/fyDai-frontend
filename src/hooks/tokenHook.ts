@@ -1,10 +1,11 @@
 import { ethers }  from 'ethers';
 import { useSignerAccount } from './connectionHooks';
 
-import { IYieldSeries } from '../types';
+import { IDomain, IYieldSeries } from '../types';
 
 import FYDai from '../contracts/FYDai.json';
 import Dai from '../contracts/Dai.json';
+import USDC from '../contracts/USDC.json';
 import Pool from '../contracts/Pool.json';
 
 import { useTxHelpers } from './txHooks';
@@ -14,6 +15,7 @@ import { useDsProxy } from './dsProxyHook';
 const contractMap = new Map<string, any>([
   ['FYDai', FYDai.abi],
   ['Dai', Dai.abi],
+  ['USDC', USDC.abi],
   ['Pool', Pool.abi],
 ]);
 
@@ -52,6 +54,24 @@ export function useToken() {
       return fallbackProvider.getBalance(addrToCheck);
     } 
     return ethers.BigNumber.from('0');
+  };
+
+  /**
+   * Gets Domain separator of a permitable toeken
+   * 
+   * @param {string} tokenAddr address of the Token, *optional, omit for ETH
+   * @param {string} contractName abi of the token (probably ERC20 in most cases) *optional, omit for ETH
+   * 
+   * @returns {IDomain} domain separator
+   */
+  const getDomain = async (
+    tokenAddr:string, 
+    contractName:string, 
+  ) => {  
+    const contract = new ethers.Contract(tokenAddr, contractMap.get(contractName), fallbackProvider );
+    const domain = await contract.DOMAIN_SEPARATOR();
+    console.log(domain);
+    return domain;
   };
 
   /**
@@ -136,5 +156,5 @@ export function useToken() {
 
   };
 
-  return { approveToken, getTokenAllowance, getBalance } as const;
+  return { approveToken, getTokenAllowance, getBalance, getDomain } as const;
 }

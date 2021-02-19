@@ -12,7 +12,10 @@
     "BorrowProxy",
     "ImportProxy",
     "ImportCdpProxy", 
-    "RollProxy"
+    "RollProxy", 
+    "USDCProxy",
+    "USDC", 
+    "DssPsm"
   ],
 
   "colors" : {
@@ -52,11 +55,14 @@
         "ProxyRegistry": "0x4678f0a6958e4D2Bc4F1BAF7Bc52E8F3564f3fE4",
         "BorrowProxy": "0xf30B142F50E2b59c4C7ca15eB2bd8427907B7Dca",
         "PoolProxy": "0x07cA8D4db0c7462C03cbCaA61bb2712ABC1d5b6D",
-        "GetCdps": "0x36a724Bd100c39f0Ea4D3A20F7097eE01A8Ff573",
-        "DssCdpManager": "0x5ef30b9986345249bc32d8928B7ee64DE9435E39",
-        "ImportProxy": "0x419f8A3Eae18ecFFd956cDa0782610a749e567c8",
+        "GetCdps":        "0x36a724Bd100c39f0Ea4D3A20F7097eE01A8Ff573",
+        "DssCdpManager":  "0x5ef30b9986345249bc32d8928B7ee64DE9435E39",
+        "ImportProxy":    "0x419f8A3Eae18ecFFd956cDa0782610a749e567c8",
         "ImportCdpProxy": "0xE09E6F95863fAd23488076096F8E5E36657C00dA",
-        "RollProxy": "0x9FF558d66Fa807aF34Fc89daA203B96c8587584e"
+        "RollProxy":      "0x9FF558d66Fa807aF34Fc89daA203B96c8587584e",
+        "DssPsm":         "0x89B78CfA322F6C5dE0aBcEecab66Aee45393cC5A",
+        "USDC":           "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "USDCProxy":      "0x45637e919fBD489100c60B134Fed86d48fDaC81e"       
     },
 
     "42": {
@@ -91,7 +97,10 @@
         "DssCdpManager":  "0x1476483dD8C35F25e568113C5f70249D3976ba21",
         "ProxyFactory":   "0xe11E3b391F7E8bC47247866aF32AF67Dd58Dc800",
         "ProxyRegistry":  "0x64A436ae831C1672AE81F674CAb8B6775df3475C",
-        "RollProxy":      "0xdB2ed810347f0BE4b88c64787fcA8325C57C0d76"
+        "RollProxy":      "0xdB2ed810347f0BE4b88c64787fcA8325C57C0d76",
+        "USDC":           "0xF47e7B0b911523aB30D282Cfa229373a964e1Bb7",
+        "USDCProxy":      "0x90E43d01BC0c1e84a69D01d1fB1fF006525D9a31",
+        "DssPsm":         "0x5414e1ACBe734a4a71901e35Edb5eF8Dd06e56c2"
     }
   }
 }

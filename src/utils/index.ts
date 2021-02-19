@@ -6,7 +6,8 @@ export const BN_RAY = BigNumber.from('1000000000000000000000000000');
 export const ETH_BYTES = ethers.utils.formatBytes32String('ETH-A');
 export const CHAI_BYTES = ethers.utils.formatBytes32String('CHAI');
 export const MAX_INT = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
-export const ZERO = BigNumber.from('1000000000000000000000000000');
+export const ZERO = BigNumber.from('0');
+export const ONE = BigNumber.from('1000000000000000000');
 
 /* Trunctate a string value to a certain number of 'decimal' point */
 export const cleanValue = (input:string, decimals:number=12) => {

@@ -1,11 +1,7 @@
-import React, { useContext, useState, useEffect } from 'react';
-import { Box, ThemeContext, Text, ResponsiveContext, Collapsible, Stack } from 'grommet';
+import React, { useContext, useState } from 'react';
+import { Box, ThemeContext, ResponsiveContext, Collapsible, Stack } from 'grommet';
 import styled, { css } from 'styled-components';
 
-import { IYieldSeries } from '../types';
-
-import AprBadge from './AprBadge';
-import { SeriesContext } from '../contexts/SeriesContext';
 import { modColor } from '../utils';
 
 const StyledBox = styled(Box)`
@@ -38,48 +34,34 @@ ${(props:any) => props.background && css`
 `}
 `;
 
+interface ISelectorProps {
+  items: any[];
+  selectedIndex: number;
+  selectItemCallback: any;
+}
 
-const  RollSelector = ( props:any ) =>  {
+const Selector = ( { 
+  
+  items, 
+  selectedIndex : _selectedIndex, 
+  selectItemCallback 
+
+}:ISelectorProps ) =>  {
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
   const theme:any = useContext(ThemeContext);
-  // const defaultColor = theme.dark? theme?.global?.colors['text'].dark: theme?.global?.colors['text'].light;
   const themeBackground = theme.global.colors.background;
   const defaultBackground = theme.dark === true ? themeBackground.dark: themeBackground.light;
-  
-  /* state from context */
-  const { state: { activeSeriesId, seriesData } } = useContext(SeriesContext);
-  const activeSeries = seriesData.get(activeSeriesId);
 
   /* local state */
   const [ selectorOpen, setSelectorOpen ] = useState<boolean>();
-  const [ seriesArr, setSeriesArr ] = useState<IYieldSeries[]>();
-  const [ destinationSeries, setDestinationSeries ] = useState<IYieldSeries>();
+  const [ selectedIndex, setSelectedIndex ] = useState<number>(_selectedIndex);
 
-  const makeSelection = (_series:IYieldSeries) => {
-    setDestinationSeries(_series);
-    props.changeDestination(_series);
+  const makeSelection = (_index:number) => {
+    setSelectedIndex(_index); 
+    selectItemCallback(_index);
   };
-
-  /* get seriesData into an array and filter out the active series and mature series */
-  useEffect(()=>{
-
-    const arr = [...seriesData].map(([ ,value]) => (value));
-    const filteredArr = arr.filter((x:IYieldSeries) => !x.isMature() && x.maturity !== activeSeries.maturity );
-    setSeriesArr(filteredArr);
-    setDestinationSeries(filteredArr[0]);
-
-  }, [ activeSeries ]);
-
-  const Item = (_props:any) => (
-    <Box direction='row' gap='xsmall' align='center' pad={{ left:'large', vertical:'xsmall' }}>
-      {_props.series && <AprBadge activeView='Borrow' series={_props.series} animate={_props.animate || false} />}
-      <Text size='small'>
-        { mobile? _props.series?.displayNameMobile : _props.series?.displayName }
-      </Text>
-    </Box>
-  );
 
   return (
     <Stack fill='horizontal' alignSelf='start'>
@@ -89,26 +71,24 @@ const  RollSelector = ( props:any ) =>  {
         onClick={()=>setSelectorOpen(!selectorOpen)}
         border
         background={defaultBackground}
-        margin={{ top:'-10px' }}
       >
-
         <StyledBox background={selectorOpen? undefined : defaultBackground}>
-          <Item series={destinationSeries} />
+          { items[ selectedIndex ] }
         </StyledBox>
 
         <Collapsible open={selectorOpen}>
           <Box gap='small' pad={{ top:'small' }}>
             { 
-              seriesArr?.filter((x:IYieldSeries) => x.maturity !== destinationSeries?.maturity)
-                .map( (x:IYieldSeries) => (
-                  <Box 
-                    key={x.maturity}
-                    onClick={()=> makeSelection(x)} 
+              items?.map( (x:any, i:number) => (
+                i !== selectedIndex && 
+                  <Box
+                    key={i}
+                    onClick={()=> makeSelection(i)} 
                     hoverIndicator={modColor(defaultBackground, -10)}
                   >
-                    <Item series={x} animate={true} />
+                    {x}
                   </Box>
-                ))
+              ))
               }
           </Box>
         </Collapsible>
@@ -117,9 +97,4 @@ const  RollSelector = ( props:any ) =>  {
   );
 };
 
-RollSelector.defaultProps = { color:null };
-
-export default RollSelector;
-
-
-
+export default Selector;
