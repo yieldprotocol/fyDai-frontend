@@ -15,6 +15,9 @@ import { useFYDai } from '../hooks/fyDaiHook';
 import InlineAlert from '../components/InlineAlert';
 import TxStatus from '../components/TxStatus';
 import ActionButton from '../components/ActionButton';
+import { useSignerAccount } from '../hooks/connectionHooks';
+import { ethers } from 'ethers';
+import { logEvent } from '../utils';
 
 interface IRedeemProps {
   close?:any,
@@ -36,10 +39,22 @@ const Redeem  = ({ close }:IRedeemProps)  => {
   /* init hooks */
   const { hasBeenMatured, redeem } = useFYDai();
   const [ txActive ] = useTxActive(['redeem']);
+  const { account } = useSignerAccount();
 
   /* execution procedure */
   const redeemProcedure = async () =>{
     if(!redeemDisabled) {
+
+      logEvent(
+        'Redeem_initiated', 
+        {
+          value: ethers.utils.parseEther( activeSeries.fyDaiBalance),
+          series: activeSeries ? activeSeries.displayName : null,
+          maturity: activeSeries ? activeSeries.maturity: null, 
+          time_to_maturity: activeSeries ? (new Date().getTime()/1000) - activeSeries?.maturity : null,
+          account: account?.substring(2),
+        });
+
       await redeem(activeSeries, activeSeries.fyDaiBalance.toString());
 
       /* clean up and refresh */ 

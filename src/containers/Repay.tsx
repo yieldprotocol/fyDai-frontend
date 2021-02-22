@@ -8,7 +8,7 @@ import {
   FiArrowLeft as ArrowLeft
 } from 'react-icons/fi';
 
-import { cleanValue, ONE } from '../utils';
+import { cleanValue, logEvent, ONE } from '../utils';
 import { IYieldSeries } from '../types';
 
 import { SeriesContext } from '../contexts/SeriesContext';
@@ -80,6 +80,16 @@ function Repay({ close }:IRepayProps) {
   const repayProcedure = async (value:number) => {
     if (!repayDisabled) {
 
+      logEvent(
+        'Repay_initiated', 
+        {
+          value: inputValue,
+          series: activeSeries ? activeSeries.displayName : null,
+          maturity: activeSeries ? activeSeries.maturity: null, 
+          time_to_maturity: activeSeries ? (new Date().getTime()/1000) - activeSeries?.maturity : null,
+          account: account?.substring(2),
+        });
+
       !activeSeries?.isMature() && close();
       /* repay using proxy */
       currency === 'DAI' && await repayDaiDebt(activeSeries, 'ETH-A', value);
@@ -102,6 +112,17 @@ function Repay({ close }:IRepayProps) {
 
   const rollDebtProcedure = async (value:number) => {
     if (!repayDisabled && destinationSeries) {
+
+      logEvent(
+        'Roll_initiated', 
+        {
+          value: inputValue,
+          series: activeSeries ? activeSeries.displayName : null,
+          maturity: activeSeries ? activeSeries.maturity: null, 
+          time_to_maturity: activeSeries ? (new Date().getTime()/1000) - activeSeries?.maturity : null,
+          account: account?.substring(2),
+        });
+
       !activeSeries?.isMature() && close();
       /* roll using proxy */
       await rollDebt(activeSeries, destinationSeries, value.toString(), 'ETH-A' );

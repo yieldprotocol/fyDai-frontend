@@ -11,13 +11,12 @@ import { useSignerAccount } from './connectionHooks';
 
 import { useCachedState } from './appHooks';
 import { secondsToFrom } from '../utils/yieldMath';
-
+import { ethers } from 'ethers';
 
 
 /* Simple Hook for checking if a transaction family/families is in process */
 export const useTxActive = (typeList:string[]) => {
   const { state: { pendingTxs } } = useContext(TxContext);
-  const { account  } = useSignerAccount();
 
   const [txActive, setTxActive] = useState<any>(null);
   const upperTypeList = typeList.map( (x:any) => x.toUpperCase() );
@@ -87,7 +86,7 @@ export const useTxHelpers = () => {
         logEvent(
           tx.type, 
           {
-            value: tx.value,
+            value: ethers.utils.parseEther(tx.value||''),
             series: tx.series ? tx.series.displayName : null,
             maturity: tx.series ? tx.series.maturity : null, 
             time_to_maturity: tx.series ? secondsToFrom(tx.series.maturity.toString()) : null,
