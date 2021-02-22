@@ -6,7 +6,7 @@ import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 import { VscHistory as HistoryIcon } from 'react-icons/vsc';
 
 /* utils and support */
-import { cleanValue, genTxCode } from '../utils';
+import { cleanValue, genTxCode, logEvent } from '../utils';
 
 /* contexts */
 import { SeriesContext } from '../contexts/SeriesContext';
@@ -89,6 +89,17 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
   
   /* Lend execution flow */
   const lendProcedure = async () => {
+
+    logEvent(
+      'lend_initiated', 
+      {
+        value: inputValue,
+        series: activeSeries ? activeSeries.displayName : null,
+        maturity: activeSeries ? activeSeries.maturity: null, 
+        time_to_maturity: activeSeries ? (new Date().getTime()/1000) - activeSeries?.maturity : null,
+        account: account?.substring(2),
+      });
+
     if (inputValue && !lendDisabled ) {
       await sellDai( activeSeries, inputValue);
 

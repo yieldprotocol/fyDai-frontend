@@ -1,13 +1,17 @@
 import React, { useState, useContext, useEffect, useReducer } from 'react';
 import { useWeb3React } from '@web3-react/core';
+import { ethers } from 'ethers';
 
 /* utils and support */
 import { logEvent } from '../utils';
 
 import { useCachedState } from '../hooks/appHooks';
+import { useSignerAccount } from '../hooks/connectionHooks'; 
+
 import { IReducerAction, ITxState } from '../types';
 
 import { YieldContext } from './YieldContext';
+
 
 const TxContext = React.createContext<any>({});
 
@@ -71,6 +75,7 @@ const TxProvider = ({ children }:any) => {
   const [ pendingCache, setPendingCache ] = useCachedState('txPending', []);
   const { library } = useWeb3React('fallback');
   const [ hasReadCache, setHasReadCache] = useState<boolean>(false);
+  const { account  } = useSignerAccount();
   
   useEffect(() => {
     /* handle registering and monitoring the cached transaction if any */
@@ -84,10 +89,12 @@ const TxProvider = ({ children }:any) => {
               logEvent(
                 x.tx.type, 
                 {
-                  value: x.tx.value,
+                  value: ethers.utils.parseEther(x.tx.value),
                   series: x.tx.series ? x.tx.series.displayName : null,
                   maturity: x.tx.series ? x.tx.series.maturity : null, 
-                  time_to_maturity: x.tx.series ? (new Date().getTime()/1000) - x.tx.series?.maturity : null,    
+                  time_to_maturity: x.tx.series ? (new Date().getTime()/1000) - x.tx.series?.maturity : null, 
+                  account: account?.substring(2),
+                  hash: x.tx.hash.substring(2)
                 });
 
               dispatch({ type: 'txComplete', payload: { receipt, txCode: x.txCode } } );

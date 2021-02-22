@@ -6,7 +6,7 @@ import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 import { VscHistory as HistoryIcon } from 'react-icons/vsc';
 
 /* utils and support */
-import { abbreviateHash, cleanValue, genTxCode, ONE } from '../utils';
+import { abbreviateHash, cleanValue, genTxCode, logEvent, ONE } from '../utils';
 
 /* contexts */
 import { SeriesContext } from '../contexts/SeriesContext';
@@ -61,7 +61,7 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
 
   const { state: { historyLoading } } = useContext(HistoryContext);
   const { state: userState, actions: userActions } = useContext(UserContext);
-  const { position, makerVaults, userLoading, preferences } = userState;
+  const { position, makerVaults, userLoading } = userState;
   const { 
     ethPosted,
     ethPosted_,
@@ -106,6 +106,17 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
    */
   const borrowProcedure = async () => {
     if (inputValue && !borrowDisabled) {
+
+      logEvent(
+        'Borrow_initiated', 
+        {
+          value: inputValue,
+          series: activeSeries ? activeSeries.displayName : null,
+          maturity: activeSeries ? activeSeries.maturity: null, 
+          time_to_maturity: activeSeries ? (new Date().getTime()/1000) - activeSeries?.maturity : null,
+          account: account?.substring(2),
+        });
+        
       currency === 'DAI' && await borrowDai(activeSeries, 'ETH-A', inputValue);
       currency === 'USDC' && await borrowUSDC(activeSeries, 'ETH-A', inputValue);
 

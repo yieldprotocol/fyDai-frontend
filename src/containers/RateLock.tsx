@@ -120,6 +120,16 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
   const importProcedure = async () => {
     if ( collInputValue || debtInputValue && !advancedDisabled ) {
 
+      logEvent(
+        'import_initiated', 
+        {
+          value: debtInputValue,
+          series: activeSeries ? activeSeries.displayName : null,
+          maturity: activeSeries ? activeSeries.maturity: null, 
+          time_to_maturity: activeSeries ? (new Date().getTime()/1000) - activeSeries?.maturity : null,
+          account: account?.substring(2),
+        });
+
       /* if  or, there is no dai, but there is collateral left, the collateral value needs to be exact */ 
       const valueColl = ( collInputValue >= selectedVault.vaultCollateral_ ) || parseFloat(selectedVault.vaultMakerDebt_)===0  ?
         selectedVault.vaultCollateral : 

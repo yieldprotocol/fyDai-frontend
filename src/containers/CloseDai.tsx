@@ -5,7 +5,7 @@ import { Box, TextInput, Text, Keyboard, ResponsiveContext } from 'grommet';
 import { FiArrowLeft as ArrowLeft } from 'react-icons/fi';
 
 /* utils and support */
-import { cleanValue } from '../utils';
+import { cleanValue, logEvent } from '../utils';
 
 /* contexts */
 import { SeriesContext } from '../contexts/SeriesContext';
@@ -61,6 +61,16 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
   /* execution procedure */
   const closeProcedure = async () => {
     if ( !closeDisabled ) {
+
+      logEvent(
+        'Close_initiated', 
+        {
+          value: inputValue,
+          series: activeSeries ? activeSeries.displayName : null,
+          maturity: activeSeries ? activeSeries.maturity: null, 
+          time_to_maturity: activeSeries ? (new Date().getTime()/1000) - activeSeries?.maturity : null,
+          account: account?.substring(2),
+        });
 
       !activeSeries?.isMature() && close();
       await buyDai(

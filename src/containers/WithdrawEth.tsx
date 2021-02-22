@@ -5,7 +5,7 @@ import ethers from 'ethers';
 import { FiArrowLeft as ArrowLeft } from 'react-icons/fi';
 
 /* utils and support */
-import { cleanValue } from '../utils';
+import { cleanValue, logEvent } from '../utils';
 
 /* contexts */
 import { UserContext } from '../contexts/UserContext';
@@ -23,6 +23,7 @@ import ActionButton from '../components/ActionButton';
 import FlatButton from '../components/FlatButton';
 import EthMark from '../components/logos/EthMark';
 import YieldMobileNav from '../components/YieldMobileNav';
+import { useSignerAccount } from '../hooks/connectionHooks';
 
 interface IWithDrawProps {
   close?: any;
@@ -57,10 +58,22 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
   const [ txActive ] = useTxActive(['WITHDRAW']);
   const debouncedInput = useDebounce(inputValue, 500);
   const isLol = useIsLol(inputValue);
+  const { account } = useSignerAccount();
 
   /* execution procedure */
   const withdrawProcedure = async () => {
     if (inputValue && !withdrawDisabled ) {
+
+      logEvent(
+        'Withdraw_initiated', 
+        {
+          value: inputValue,
+          series: null,
+          maturity: null, 
+          time_to_maturity: null,
+          account: account?.substring(2),
+        });
+        
       close(); // close immediately, no need to track withdrawPending
       await withdrawEth(inputValue);
 

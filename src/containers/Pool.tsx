@@ -10,7 +10,7 @@ import {
 import { VscHistory as HistoryIcon } from 'react-icons/vsc';
 
 /* utils and support */
-import { cleanValue, nFormatter } from '../utils';
+import { cleanValue, logEvent, nFormatter } from '../utils';
 import { secondsToFrom, fyDaiForMint } from '../utils/yieldMath';
 
 /* contexts */
@@ -89,6 +89,16 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
   /* execution procedure */ 
   const addLiquidityProcedure = async () => { 
     if (inputValue && !addLiquidityDisabled ) {
+
+      logEvent(
+        'addLiquidity_initiated', 
+        {
+          value: inputValue,
+          series: activeSeries ? activeSeries.displayName : null,
+          maturity: activeSeries ? activeSeries.maturity: null, 
+          time_to_maturity: activeSeries ? (new Date().getTime()/1000) - activeSeries?.maturity : null,
+          account: account?.substring(2),
+        });
 
       await addLiquidity( activeSeries, inputValue, forceBorrow );
       
