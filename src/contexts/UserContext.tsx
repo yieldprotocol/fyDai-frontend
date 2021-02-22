@@ -105,6 +105,7 @@ const UserProvider = ({ children }: any) => {
     ]:any[] = await Promise.all([
       getBalance(),
       getBalance(deployedContracts.Dai, 'Dai'),
+      // getBalance(deployedContracts.Dai, 'Dai'),
       getBalance(deployedContracts.USDC, 'USDC'),
       collateralPosted('ETH-A'),
     ]);

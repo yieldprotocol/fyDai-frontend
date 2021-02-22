@@ -38,13 +38,15 @@ interface ISelectorProps {
   items: any[];
   selectedIndex: number;
   selectItemCallback: any;
+  flat?: boolean;
 }
 
 const Selector = ( { 
   
   items, 
   selectedIndex : _selectedIndex, 
-  selectItemCallback 
+  selectItemCallback,
+  flat 
 
 }:ISelectorProps ) =>  {
 
@@ -69,12 +71,18 @@ const Selector = ( {
       <Box
         round={selectorOpen? 'small': 'large'}
         onClick={()=>setSelectorOpen(!selectorOpen)}
-        border
+        border={selectorOpen ? 'all': undefined}
         background={defaultBackground}
       >
-        <StyledBox background={selectorOpen? undefined : defaultBackground}>
-          { items[ selectedIndex ] }
-        </StyledBox>
+        {
+        !flat ?
+          <StyledBox background={selectorOpen? undefined : defaultBackground}>
+            { items[ selectedIndex ] }
+          </StyledBox> :
+          <Box>
+            { items[ selectedIndex ] }  
+          </Box>        
+        }
 
         <Collapsible open={selectorOpen}>
           <Box gap='small' pad={{ top:'small' }}>
@@ -96,5 +104,7 @@ const Selector = ( {
     </Stack>
   );
 };
+
+Selector.defaultProps={ flat:false };
 
 export default Selector;

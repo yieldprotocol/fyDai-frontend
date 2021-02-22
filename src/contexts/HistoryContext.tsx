@@ -104,7 +104,7 @@ const HistoryProvider = ({ children }: any) => {
         return parsedList.map((x:any) => {
           return {
             ...x,
-            event: x.args_[3]<0? 'Repaid' : 'Borrowed_direct',
+            event: x.args_[3]<0? 'Repaid' : 'Borrowed Directly',
             type: 'controller_borrowed',
             collateral: ethers.utils.parseBytes32String(x.args_[0]),
             maturity: parseInt(x.args_[1], 10),
@@ -304,6 +304,27 @@ const HistoryProvider = ({ children }: any) => {
           };
         });     
       });
+
+    /* get the repayment hisotry from the controller */
+    const usdcHistory = await getEventHistory(
+      deployedContracts.USDCProxy,
+      'USDCProxy',
+      'BorrowedUSDC',
+      [ account ],
+      lastCheckedBlock+1
+    )
+      .then((res: any) => parseEventList(res, true))        /* then parse returned values */
+      .then((parsedList: any) => {                    /* then add extra info and calculated values */
+        return parsedList.map((x:any) => {
+          return {
+            ...x,
+            event: 'Borrowed for USDC',
+            type: 'borrow_usdc',
+            maturity: null,
+            amount: parseFloat(ethers.utils.formatEther(x.amount))
+          };
+        });      
+      });
      
     const updatedHistory = [
       ...collateralHistory,
@@ -313,7 +334,8 @@ const HistoryProvider = ({ children }: any) => {
       ...removeLiquidityHistory,
       ...cdpMigrationHistory,
       ...migrationHistory,
-      ...rolledHistory
+      ...rolledHistory,
+      ...usdcHistory,
     ];
 
     const _payload = {
