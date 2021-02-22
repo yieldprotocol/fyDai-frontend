@@ -135,6 +135,11 @@ export const buildGradient = (colorFrom:string, colorTo:string  ) => {
 /* google analytics log event */
 export const logEvent = (eventName: string, eventParams: any ) => {
   if (eventName) {
+    try {
     window?.gtag('event', eventName, eventParams);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log(e);
+    }
   }
 };
