@@ -23,6 +23,8 @@ import DaiMark from './logos/DaiMark';
 import Loading from './Loading';
 import TxStatus from './TxStatus';
 import EthMark from './logos/EthMark';
+import Selector from './Selector';
+import USDCMark from './logos/USDCMark';
 
 const AccountButton = (props: any) => {
   
@@ -91,33 +93,12 @@ const AccountButton = (props: any) => {
     <Box
       round
       direction='row'
-      align='center'
+      // align='center'
       background='background'
     > 
-      { txStatusOpen &&  <TxStatusLayer /> }    
       { 
-        txCompleteOpen && 
-          <Box
-            ref={completeRef}
-            direction='row'
-            margin={{ right:'-20px' }}
-            pad={{ vertical: 'xsmall', left:'small', right:'25px' }}
-            round
-            animation='slideLeft'
-            onClick={()=>setTxStatusOpen(true)}
-          >
-            {lastCompletedTx?.status === 1 &&
-            <Box direction='row' gap='xsmall'> 
-              <Text color='green' textAlign='center' size='xsmall'><Check /></Text>
-              { pendingTxs.length===0 && <Text color='green' textAlign='center' size='xsmall'>Transaction Complete</Text>}
-            </Box>}
-    
-            {lastCompletedTx?.status !== 1 &&
-            <Box direction='row' gap='xsmall'>
-              <Text color='red' textAlign='center' size='xsmall'>Transaction failed</Text>
-            </Box>}
-    
-          </Box>
+        txStatusOpen &&  
+        <TxStatusLayer />
       }
 
       { 
@@ -125,32 +106,53 @@ const AccountButton = (props: any) => {
       !mobile && 
       pendingTxs.length===0 && 
       !txCompleteOpen && 
-      <Box 
-        pad={{ left:'small', right:'large' }} 
-        direction='row' 
-        gap='medium' 
-        align='center'
-        onMouseOver={() => setDetailsOpen(true)}
-        onMouseLeave={() => setDetailsOpen(false)}
-        onFocus={() => setDetailsOpen(true)}
-        onBlur={() => setDetailsOpen(false)}
-      >
-        <Collapsible open={detailsOpen} direction='horizontal'>
-          { detailsOpen && 
-          <Box overflow='scroll' gap='xsmall' direction='row' animation='slideLeft'>    
-            <EthMark /> 
-            <Text size='xsmall' weight='bold'>{position?.ethBalance_}</Text>
-            <Text size='xsmall' weight='bold'>ETH</Text>
-          </Box>}
-        </Collapsible>
-    
-        <Box gap='xsmall' direction='row'>
-          <DaiMark />
-          <Loading condition={!position.daiBalance} size='xsmall'>
-            <Text size='xsmall' weight='bold'>{position?.daiBalance_} DAI </Text>
-          </Loading>
+        <Box 
+          gap='medium' 
+          width={{ min:'150px' }}
+        >
+          <Selector 
+            selectedIndex={0} 
+            selectItemCallback={(x:any) => null}
+            flat        
+            items={[
+              <Box 
+                key='DAI' 
+                direction='row' 
+                gap='xsmall' 
+                align='center' 
+                pad={{ left:'small', vertical:'xsmall' }}
+              >
+                <DaiMark /> 
+                <Text size='xsmall' weight='bold'>{position?.daiBalance_}</Text>
+                <Text size='small'> DAI </Text>
+              </Box>,
+
+              <Box
+                key='ETH' 
+                direction='row' 
+                gap='xsmall' 
+                align='center' 
+                pad={{ left:'small', vertical:'xsmall' }}
+              >    
+                <EthMark /> 
+                <Text size='xsmall' weight='bold'>{position?.ethBalance_}</Text>
+                <Text size='xsmall' weight='bold'>ETH</Text>
+              </Box>,
+
+              <Box 
+                key='USDC' 
+                direction='row' 
+                gap='xsmall' 
+                align='center' 
+                pad={{ left:'small', vertical:'xsmall' }}
+              >
+                <USDCMark /> 
+                <Text size='xsmall' weight='bold'>{position?.usdcBalance_}</Text>
+                <Text size='small'> USDC </Text>
+              </Box>  
+            ]}
+          />
         </Box>
-      </Box>
       }
       
       {
@@ -168,6 +170,31 @@ const AccountButton = (props: any) => {
           <Text size='xsmall'> Transaction pending ... </Text>  
         </Box>
       }
+
+      { 
+        txCompleteOpen && 
+        <Box
+          ref={completeRef}
+          direction='row'
+          margin={{ right:'-20px' }}
+          pad={{ vertical: 'xsmall', left:'small', right:'25px' }}
+          round
+          animation='slideLeft'
+          onClick={()=>setTxStatusOpen(true)}
+        >
+          {lastCompletedTx?.status === 1 &&
+          <Box direction='row' gap='xsmall'> 
+            <Text color='green' textAlign='center' size='xsmall'><Check /></Text>
+            { pendingTxs.length===0 && <Text color='green' textAlign='center' size='xsmall'>Transaction Complete</Text>}
+          </Box>}
+  
+          {lastCompletedTx?.status !== 1 &&
+          <Box direction='row' gap='xsmall'>
+            <Text color='red' textAlign='center' size='xsmall'>Transaction failed</Text>
+          </Box>}  
+        </Box>
+      }
+  
 
       { 
       account ?
