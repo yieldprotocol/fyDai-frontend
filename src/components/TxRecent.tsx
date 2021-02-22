@@ -76,8 +76,7 @@ const TxRecent = ({ setView }: any) => {
             round='xsmall'
             border='all'
             pad='xsmall'
-          >
-          
+          >      
             { 
             pendingTxs.map((x:any)=>(        
               <Box
@@ -95,7 +94,7 @@ const TxRecent = ({ setView }: any) => {
                 </HashWrap>
                 <FlatButton 
                   label={<Text size='xxsmall'>Stuck?</Text>}
-                  onClick={()=> dispatch({ type:'txComplete', payload: x.tx })}
+                  onClick={()=> dispatch({ type:'forceClear', payload: null })}
                 />
                
               </Box>

@@ -327,8 +327,8 @@ const TxLayer = () => {
             { // if the action is already being processed: 
               processIsCurrentTx && 
               <>
-                <TxStatus tx={ txActive || authActive } />
-                <Box alignSelf='start'>
+                <TxStatus tx={txActive || authActive} />
+                <Box direction='row' justify='between'>
                   <FlatButton
                     onClick={()=>closeAuth()}
                     label={
@@ -338,6 +338,12 @@ const TxLayer = () => {
                       </Box>
                   }
                   />
+
+                  <FlatButton 
+                    label={<Text size='xxsmall' color='text-xweak'>Stuck?</Text>}
+                    onClick={()=> dispatch({ type:'forceClear', payload: null })}
+                  />
+
                 </Box>
               </>
             }
