@@ -5,7 +5,7 @@ import ethers from 'ethers';
 import { FiArrowLeft as ArrowLeft } from 'react-icons/fi';
 
 /* utils and support */
-import { cleanValue, logEvent } from '../utils';
+import { cleanValue, analyticsLogEvent } from '../utils';
 
 /* contexts */
 import { UserContext } from '../contexts/UserContext';
@@ -64,7 +64,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
   const withdrawProcedure = async () => {
     if (inputValue && !withdrawDisabled ) {
 
-      logEvent(
+      analyticsLogEvent(
         'Withdraw_initiated', 
         {
           value: inputValue,

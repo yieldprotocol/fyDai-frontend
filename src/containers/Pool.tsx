@@ -10,7 +10,7 @@ import {
 import { VscHistory as HistoryIcon } from 'react-icons/vsc';
 
 /* utils and support */
-import { cleanValue, logEvent, nFormatter } from '../utils';
+import { analyticsLogEvent, cleanValue, nFormatter } from '../utils';
 import { secondsToFrom, fyDaiForMint } from '../utils/yieldMath';
 
 /* contexts */
@@ -90,7 +90,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
   const addLiquidityProcedure = async () => { 
     if (inputValue && !addLiquidityDisabled ) {
 
-      logEvent(
+      analyticsLogEvent(
         'addLiquidity_initiated', 
         {
           value: inputValue,

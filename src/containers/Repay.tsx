@@ -8,7 +8,7 @@ import {
   FiArrowLeft as ArrowLeft
 } from 'react-icons/fi';
 
-import { cleanValue, logEvent, ONE } from '../utils';
+import { cleanValue, analyticsLogEvent, ONE } from '../utils';
 import { IYieldSeries } from '../types';
 
 import { SeriesContext } from '../contexts/SeriesContext';
@@ -80,7 +80,7 @@ function Repay({ close }:IRepayProps) {
   const repayProcedure = async (value:number) => {
     if (!repayDisabled) {
 
-      logEvent(
+      analyticsLogEvent(
         'Repay_initiated', 
         {
           value: inputValue,
@@ -113,7 +113,7 @@ function Repay({ close }:IRepayProps) {
   const rollDebtProcedure = async (value:number) => {
     if (!repayDisabled && destinationSeries) {
 
-      logEvent(
+      analyticsLogEvent(
         'Roll_initiated', 
         {
           value: inputValue,

@@ -13,7 +13,7 @@ import {
 } from 'react-icons/fi';
 
 /* utils and support */
-import { cleanValue, modColor, buildGradient, logEvent } from '../utils';
+import { cleanValue, modColor, buildGradient, analyticsLogEvent } from '../utils';
 import logoDark from '../assets/images/logo.svg';
 
 /* contexts */
@@ -120,7 +120,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
   const importProcedure = async () => {
     if ( collInputValue || debtInputValue && !advancedDisabled ) {
 
-      logEvent(
+      analyticsLogEvent(
         'import_initiated', 
         {
           value: debtInputValue,
@@ -147,16 +147,6 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
       setCollInputValue(undefined);
       setDebtInputValue(undefined);
 
-      // logEvent('import_position', {
-      //   value_coll: String(valueColl),
-      //   type_coll: 'ETH-A',
-      //   value_debt: String(valueDebt),
-      //   type_debt: 'DAI',
-      //   one_click: false,
-      //   label: activeSeries.displayName,
-      //   time_to_maturity: (new Date().getTime()/1000) - activeSeries.maturity, 
-      // });
-
       close && close();
       await Promise.all([
         userActions.updateUser(),
@@ -169,7 +159,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
 
     if (!allDisabled) {
       await importVault(activeSeries, id);
-      logEvent('import_position', {
+      analyticsLogEvent('import_position', {
         value_coll: String(selectedVault?.vaultCollateral_),
         type_coll: 'ETH-A',
         value_debt: String(selectedVault?.vaultDaiDebt_),

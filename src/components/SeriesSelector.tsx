@@ -7,7 +7,7 @@ import {
   FiCheck as Check,
 } from 'react-icons/fi';
 
-import { logEvent, modColor  } from '../utils';
+import { analyticsLogEvent, modColor  } from '../utils';
 
 import { SeriesContext } from '../contexts/SeriesContext';
 
@@ -56,7 +56,7 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
   const handleSelectSeries = (seriesMaturity: number) => {
     setActiveSeries(seriesMaturity);
     
-    logEvent('change_series', {
+    analyticsLogEvent('change_series', {
       from: activeSeries.maturity,
       to: seriesMaturity,
     });

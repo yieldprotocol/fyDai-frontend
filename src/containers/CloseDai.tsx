@@ -5,7 +5,7 @@ import { Box, TextInput, Text, Keyboard, ResponsiveContext } from 'grommet';
 import { FiArrowLeft as ArrowLeft } from 'react-icons/fi';
 
 /* utils and support */
-import { cleanValue, logEvent } from '../utils';
+import { analyticsLogEvent, cleanValue } from '../utils';
 
 /* contexts */
 import { SeriesContext } from '../contexts/SeriesContext';
@@ -62,7 +62,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
   const closeProcedure = async () => {
     if ( !closeDisabled ) {
 
-      logEvent(
+      analyticsLogEvent(
         'Close_initiated', 
         {
           value: inputValue,

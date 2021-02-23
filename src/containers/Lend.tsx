@@ -6,7 +6,7 @@ import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 import { VscHistory as HistoryIcon } from 'react-icons/vsc';
 
 /* utils and support */
-import { cleanValue, genTxCode, logEvent } from '../utils';
+import { analyticsLogEvent, cleanValue, genTxCode } from '../utils';
 
 /* contexts */
 import { SeriesContext } from '../contexts/SeriesContext';
@@ -90,7 +90,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
   /* Lend execution flow */
   const lendProcedure = async () => {
 
-    logEvent(
+    analyticsLogEvent(
       'lend_initiated', 
       {
         value: inputValue,
