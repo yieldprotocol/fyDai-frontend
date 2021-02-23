@@ -17,7 +17,7 @@ import {
 } from 'react-icons/fi';
 
 /* utils and support */
-import { cleanValue, logEvent } from '../utils';
+import { analyticsLogEvent, cleanValue } from '../utils';
 
 /* contexts */
 import { UserContext } from '../contexts/UserContext';
@@ -93,7 +93,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
   const depositProcedure = async () => {
     if (inputValue && !depositDisabled ) {
 
-      logEvent(
+      analyticsLogEvent(
         'Deposit_initiated', 
         {
           value: inputValue,
@@ -171,7 +171,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
   }, [debouncedInput, ethBalance]);
 
   return (
-    <RaisedBox>
+    <RaisedBox expand>
       <Keyboard 
         onEsc={() => setInputValue(undefined)}
         onEnter={()=> depositProcedure()}

@@ -3,7 +3,7 @@ import { useWeb3React } from '@web3-react/core';
 import { ethers } from 'ethers';
 
 /* utils and support */
-import { logEvent } from '../utils';
+import { analyticsLogEvent } from '../utils';
 
 import { useCachedState } from '../hooks/appHooks';
 import { useSignerAccount } from '../hooks/connectionHooks'; 
@@ -94,7 +94,7 @@ const TxProvider = ({ children }:any) => {
           await library.waitForTransaction(x.tx.hash, 2)
             .then((receipt:any) => {
 
-              logEvent(
+              analyticsLogEvent(
                 x.tx.type, 
                 {
                   value: ethers.utils.parseEther(x.tx.value),

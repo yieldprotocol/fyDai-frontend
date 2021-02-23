@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
+import { ethers } from 'ethers';
 import { Box } from 'grommet';
 
 /* utils and support */
@@ -16,8 +17,8 @@ import InlineAlert from '../components/InlineAlert';
 import TxStatus from '../components/TxStatus';
 import ActionButton from '../components/ActionButton';
 import { useSignerAccount } from '../hooks/connectionHooks';
-import { ethers } from 'ethers';
-import { logEvent } from '../utils';
+
+import { analyticsLogEvent } from '../utils';
 
 interface IRedeemProps {
   close?:any,
@@ -45,7 +46,7 @@ const Redeem  = ({ close }:IRedeemProps)  => {
   const redeemProcedure = async () =>{
     if(!redeemDisabled) {
 
-      logEvent(
+      analyticsLogEvent(
         'Redeem_initiated', 
         {
           value: ethers.utils.parseEther( activeSeries.fyDaiBalance),

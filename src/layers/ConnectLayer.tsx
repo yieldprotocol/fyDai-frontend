@@ -34,6 +34,9 @@ import YieldSettings from '../components/YieldSettings';
 import ExperimentWrap from '../components/ExperimentWrap';
 import HashWrap from '../components/HashWrap';
 import TxRecent from '../components/TxRecent';
+import EthMark from '../components/logos/EthMark';
+import DaiMark from '../components/logos/DaiMark';
+import USDCMark from '../components/logos/USDCMark';
 
 const ConnectLayer = ({ view, target, closeLayer }: any) => {
 
@@ -83,9 +86,12 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
             > 
               { account && layerView === 'ACCOUNT' &&
               <Box gap='medium' flex={false}>
+
+
                 <Box pad="small" gap="small">
+
                   <Box direction='row' justify='between'>
-                    <Text alignSelf='center' size='large' weight='bold'>Connected Wallet</Text>   
+                    <Text alignSelf='center' size='small' weight='bold'>Connected Wallet</Text>   
                     <Box direction='row' gap='small'>
                       <RaisedButton
                         onClick={()=>setLayerView('CONNECT')}
@@ -98,23 +104,35 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                     pad={{ vertical:'small' }}
                     justify="center"
                     gap='small'
-                  >
-                    <Box direction='row' gap='small'>
-                      <Text size='xsmall'>Account:</Text> 
+                  >          
+                    <Box direction='row' gap='small' justify='between'>
+                      <Text size='xxsmall'>Address:</Text> 
                       <Text size='xsmall'> <HashWrap hash={account}>{account}</HashWrap> </Text>                   
                     </Box>               
 
-                    {/* <Box direction='row' justify='between' > */}
-                    <Box direction='row' gap='small'>
-                      <Text size='xsmall'>ETH balance:</Text>
-                      <Text size='xsmall'>{ position?.ethBalance_ || '' }</Text>
+                    <Box direction='row' justify='between'>
+                      <Text size='xxsmall'>Balances:</Text> 
+                      <Box direction='row' gap='small'>
+                        <Box direction='row' gap='small'>
+                          {/* <Text size='xxsmall'>ETH:</Text> */}
+                          <EthMark />
+                          <Text size='xxsmall'>{ position?.ethBalance_ || '' }</Text>
+                        </Box>
+                        <Box direction='row' gap='small'>
+                          {/* <Text size='xxsmall'>DAI:</Text> */}
+                          <DaiMark />
+                          <Text size='xxsmall'>{ position?.daiBalance_ || '' }</Text>
+                        </Box>
+                        <Box direction='row' gap='small'>
+                          {/* <Text size='xxsmall'>USDC:</Text> */}
+                          <USDCMark />
+                          <Text size='xxsmall'>{ position?.usdcBalance_ || '' }</Text>
+                        </Box>
+                      </Box>
+
                     </Box>
-                    <Box direction='row' gap='small'>
-                      <Text size='xsmall'>DAI balance:</Text>
-                      <Text size='xsmall'>{ position?.daiBalance_ || '' }</Text>
-                    </Box>
-                    {/* </Box> */}
                   </Box>
+
                 </Box>
 
                 <TxRecent setView={()=>setLayerView('HISTORY')} />
@@ -216,11 +234,12 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                 </Box>
 
                 <Box>
-                  {histOpen === 'BORROW' && <History filterTerms={['Borrowed', 'Repaid', 'Deposited', 'Withdrew', 'Imported', 'Rolled']} series={null} />}
+                  {histOpen === 'BORROW' && <History filterTerms={['Borrowed', 'Repaid', 'Deposited', 'Withdrew', 'Imported', 'Rolled', 'Borrowed for USDC']} series={null} />}
                   {histOpen === 'LEND' && <History filterTerms={['Closed', 'Lent' ]} series={null} />}
                   {histOpen === 'POOL' && <History filterTerms={['Added', 'Removed' ]} series={null} />}
                 </Box>
-              </Box> }
+              </Box> 
+}
 
               { !account && layerView === 'ACCOUNT' &&
               <Box pad='medium' align='center'>  

@@ -6,7 +6,7 @@ import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 import { VscHistory as HistoryIcon } from 'react-icons/vsc';
 
 /* utils and support */
-import { abbreviateHash, cleanValue, genTxCode, logEvent, ONE } from '../utils';
+import { abbreviateHash, cleanValue, genTxCode, analyticsLogEvent, ONE } from '../utils';
 
 /* contexts */
 import { SeriesContext } from '../contexts/SeriesContext';
@@ -56,7 +56,7 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
   const theme = useContext<any>(ThemeContext);
 
   /* state from context */
-  const { state: { activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
+  const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
   const activeSeries = seriesData.get(activeSeriesId);
 
   const { state: { historyLoading } } = useContext(HistoryContext);
@@ -107,7 +107,7 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
   const borrowProcedure = async () => {
     if (inputValue && !borrowDisabled) {
 
-      logEvent(
+      analyticsLogEvent(
         'Borrow_initiated', 
         {
           value: inputValue,
@@ -220,9 +220,8 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
     }
   }, [ debouncedInput ]);
 
-
   return (
-    <RaisedBox>
+    <RaisedBox expand={!seriesLoading}>
       <Keyboard 
         onEsc={() => setInputValue(undefined)}
         onEnter={()=> borrowProcedure()}

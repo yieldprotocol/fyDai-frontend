@@ -1,9 +1,9 @@
 import { useEffect, useState, useContext } from 'react';
+import { ethers } from 'ethers';
 import { ITx } from '../types';
 
-
 /* utils and support */
-import { logEvent } from '../utils';
+import { analyticsLogEvent } from '../utils';
 import { TxContext } from '../contexts/TxContext';
 import { NotifyContext } from '../contexts/NotifyContext';
 
@@ -11,7 +11,7 @@ import { useSignerAccount } from './connectionHooks';
 
 import { useCachedState } from './appHooks';
 import { secondsToFrom } from '../utils/yieldMath';
-import { ethers } from 'ethers';
+
 
 
 /* Simple Hook for checking if a transaction family/families is in process */
@@ -83,7 +83,7 @@ export const useTxHelpers = () => {
     setPendingCache([{ ...tx, txCode }]);
     await tx.tx.wait()
       .then((receipt:any) => {
-        logEvent(
+        analyticsLogEvent(
           tx.type, 
           {
             value: ethers.utils.parseEther(tx.value||''),
@@ -96,7 +96,7 @@ export const useTxHelpers = () => {
         txComplete(receipt, txCode);
       }, ( error:any ) => {
         handleTxError('Error: Transaction failed. Please see console', tx.tx, error);
-        logEvent('TX_ERROR', { user: account?.substring(2), hash: tx.tx.hash.substring(2) } );
+        analyticsLogEvent('TX_ERROR', { user: account?.substring(2), hash: tx.tx.hash.substring(2) } );
       });
   };
 

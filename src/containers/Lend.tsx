@@ -6,7 +6,7 @@ import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 import { VscHistory as HistoryIcon } from 'react-icons/vsc';
 
 /* utils and support */
-import { cleanValue, genTxCode, logEvent } from '../utils';
+import { analyticsLogEvent, cleanValue, genTxCode } from '../utils';
 
 /* contexts */
 import { SeriesContext } from '../contexts/SeriesContext';
@@ -52,7 +52,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   
   /* state from contexts */
-  const { state: { activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
+  const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
   const activeSeries = seriesData.get(activeSeriesId);
   const { state: userState, actions: userActions } = useContext(UserContext);
   const { daiBalance, daiBalance_ } = userState.position;
@@ -90,7 +90,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
   /* Lend execution flow */
   const lendProcedure = async () => {
 
-    logEvent(
+    analyticsLogEvent(
       'lend_initiated', 
       {
         value: inputValue,
@@ -162,7 +162,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
   }, [ debouncedInput, daiBalance ]);
 
   return (
-    <RaisedBox>
+    <RaisedBox expand={!seriesLoading}>
       <Keyboard 
         onEsc={() => setInputValue(undefined)}
         onEnter={()=> lendProcedure()}
