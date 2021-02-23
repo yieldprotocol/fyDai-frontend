@@ -187,20 +187,18 @@ const App = (props:any) => {
           <Route path="/borrow/:series?/:amnt?"> <Borrow openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route>      
           <Route path="/lend/:series?/:amnt?"> <Lend openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route>
           <Route path="/pool/:series?/:amnt?"> <Pool openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route>
-          <Route path="/ratelock/:vault?/:series?"> <RaisedBox><RateLock openConnectLayer={() => setShowConnectLayer('CONNECT')} /></RaisedBox> </Route>  
-          
+          <Route path="/ratelock/:vault?/:series?"> <RaisedBox expand={!seriesLoading}><RateLock openConnectLayer={() => setShowConnectLayer('CONNECT')} /></RaisedBox> </Route>       
           <Route path="/withdraw/:amnt?"> <WithdrawEth /> </Route> 
           <Route path="/repay/:series/:amnt?"> <Repay /> </Route>
           <Route path="/close/:series/:amnt?"> <CloseDai close={()=>null} /> </Route> 
           <Route path="/removeLiquidity/:series/:amnt?"> <RemoveLiquidity /> </Route>
-
           <Route exact path="/"> <Redirect to={`${cachedLastVisit || '/borrow/'}`} /> </Route>
           <Route path="/*"> 404 </Route>
         </Switch>  
         }            
       </Main>
 
-      <Footer margin={mobile? undefined: { horizontal:'xlarge' }}>
+      <Footer margin={mobile? undefined: { horizontal:'xlarge' }} animation='fadeIn'>
         {!mobile &&
         <YieldFooter
           themeMode={props.themeMode}

@@ -57,7 +57,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
   /* state from contexts */
-  const { state: { activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
+  const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
   const activeSeries = seriesData.get(activeSeriesId);
   const { state: { historyLoading } } = useContext(HistoryContext);
   const { state: userState, actions: userActions } = useContext(UserContext);
@@ -156,7 +156,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
   }, [ debouncedInput, daiBalance ]);
 
   return (
-    <RaisedBox>
+    <RaisedBox expand={ !seriesLoading }>
       <Keyboard 
         onEsc={() => setInputValue(undefined)}
         onEnter={()=> addLiquidityProcedure()}

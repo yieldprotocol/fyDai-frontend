@@ -52,7 +52,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   
   /* state from contexts */
-  const { state: { activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
+  const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
   const activeSeries = seriesData.get(activeSeriesId);
   const { state: userState, actions: userActions } = useContext(UserContext);
   const { daiBalance, daiBalance_ } = userState.position;
@@ -162,7 +162,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
   }, [ debouncedInput, daiBalance ]);
 
   return (
-    <RaisedBox>
+    <RaisedBox expand={!seriesLoading}>
       <Keyboard 
         onEsc={() => setInputValue(undefined)}
         onEnter={()=> lendProcedure()}

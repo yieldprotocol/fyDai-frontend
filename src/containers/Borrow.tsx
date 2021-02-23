@@ -56,7 +56,7 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
   const theme = useContext<any>(ThemeContext);
 
   /* state from context */
-  const { state: { activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
+  const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
   const activeSeries = seriesData.get(activeSeriesId);
 
   const { state: { historyLoading } } = useContext(HistoryContext);
@@ -220,9 +220,8 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
     }
   }, [ debouncedInput ]);
 
-
   return (
-    <RaisedBox>
+    <RaisedBox expand={!seriesLoading}>
       <Keyboard 
         onEsc={() => setInputValue(undefined)}
         onEnter={()=> borrowProcedure()}

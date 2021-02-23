@@ -171,7 +171,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
   }, [debouncedInput, ethBalance]);
 
   return (
-    <RaisedBox>
+    <RaisedBox expand>
       <Keyboard 
         onEsc={() => setInputValue(undefined)}
         onEnter={()=> depositProcedure()}
