@@ -91,7 +91,7 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                 <Box pad="small" gap="small">
 
                   <Box direction='row' justify='between'>
-                    <Text alignSelf='center' size='medium' weight='bold'>Connected Wallet</Text>   
+                    <Text alignSelf='center' size='small' weight='bold'>Connected Wallet</Text>   
                     <Box direction='row' gap='small'>
                       <RaisedButton
                         onClick={()=>setLayerView('CONNECT')}
@@ -106,26 +106,28 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                     gap='small'
                   >          
                     <Box direction='row' gap='small' justify='between'>
-                      {/* <Text size='xsmall'>Account:</Text>  */}
+                      <Text size='xxsmall'>Address:</Text> 
                       <Text size='xsmall'> <HashWrap hash={account}>{account}</HashWrap> </Text>                   
                     </Box>               
 
-                    <Box direction='row' gap='medium' >
-                      <Text size='xsmall'>Balances:</Text> 
+                    <Box direction='row' justify='between'>
+                      <Text size='xxsmall'>Balances:</Text> 
                       <Box direction='row' gap='small'>
-                        {/* <Text size='xxsmall'>ETH:</Text> */}
-                        <EthMark />
-                        <Text size='xxsmall'>{ position?.ethBalance_ || '' }</Text>
-                      </Box>
-                      <Box direction='row' gap='small'>
-                        {/* <Text size='xxsmall'>DAI:</Text> */}
-                        <DaiMark />
-                        <Text size='xxsmall'>{ position?.daiBalance_ || '' }</Text>
-                      </Box>
-                      <Box direction='row' gap='small'>
-                        {/* <Text size='xxsmall'>USDC:</Text> */}
-                        <USDCMark />
-                        <Text size='xxsmall'>{ position?.usdcBalance_ || '' }</Text>
+                        <Box direction='row' gap='small'>
+                          {/* <Text size='xxsmall'>ETH:</Text> */}
+                          <EthMark />
+                          <Text size='xxsmall'>{ position?.ethBalance_ || '' }</Text>
+                        </Box>
+                        <Box direction='row' gap='small'>
+                          {/* <Text size='xxsmall'>DAI:</Text> */}
+                          <DaiMark />
+                          <Text size='xxsmall'>{ position?.daiBalance_ || '' }</Text>
+                        </Box>
+                        <Box direction='row' gap='small'>
+                          {/* <Text size='xxsmall'>USDC:</Text> */}
+                          <USDCMark />
+                          <Text size='xxsmall'>{ position?.usdcBalance_ || '' }</Text>
+                        </Box>
                       </Box>
 
                     </Box>
@@ -232,7 +234,7 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
                 </Box>
 
                 <Box>
-                  {histOpen === 'BORROW' && <History filterTerms={['Borrowed', 'Repaid', 'Deposited', 'Withdrew', 'Imported', 'Rolled', 'Borrowed USDC']} series={null} />}
+                  {histOpen === 'BORROW' && <History filterTerms={['Borrowed', 'Repaid', 'Deposited', 'Withdrew', 'Imported', 'Rolled', 'Borrowed for USDC']} series={null} />}
                   {histOpen === 'LEND' && <History filterTerms={['Closed', 'Lent' ]} series={null} />}
                   {histOpen === 'POOL' && <History filterTerms={['Added', 'Removed' ]} series={null} />}
                 </Box>
