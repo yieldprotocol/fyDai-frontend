@@ -24,7 +24,7 @@ const YieldSettings = () => {
     <>
       <Box pad="small" gap="small">
         <Box direction='row' justify='between'>
-          <Text alignSelf='start' size='large' weight='bold'>Settings</Text> 
+          <Text alignSelf='start' size='medium' weight='bold'>Settings</Text> 
           <Box round>
             <FlatButton
               disabled
@@ -41,7 +41,7 @@ const YieldSettings = () => {
           direction='row'
           align='center'
         >
-          <Text size='xsmall'>Slippage tolerance:  </Text>
+          <Text size='xxsmall'>Slippage tolerance:  </Text>
 
           { slippageList.map( (x:any, i:number) => (
             <Box gap='small' align='center' key={x}>
@@ -67,7 +67,7 @@ const YieldSettings = () => {
           direction='row'
           align='center'
         >
-          <Text size='xsmall'>Authorization strategy: </Text>
+          <Text size='xxsmall'>Authorization strategy: </Text>
 
           <Box gap='small' align='center'>
             <StickyButton
