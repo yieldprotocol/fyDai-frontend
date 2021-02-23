@@ -44,12 +44,10 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
   
   const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
   const activeSeries = seriesData.get(activeSeriesId);
-
   const { setActiveSeries } = seriesActions;
 
   const [sortedList, setSortedList] = useState<any>(seriesData);
-
-  const [ selectedSeries, setSelectedSeries ] = useState<number>(activeSeries?.maturity);
+  const [ hasSelected, setHasSelected ] = useState<boolean>(false);
 
   const viewMap = new Map([
     ['BORROW', { head: 'DEBT', field: 'ethDebtFYDai_' }],
@@ -57,8 +55,9 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
     ['POOL', { head: 'POOL PERCENTAGE', field: 'poolPercent' }],
   ]);
 
-  const handleSelectSeries = (seriesMaturity: number) => {
 
+
+  const handleSelectSeries = (seriesMaturity: number) => {
     setActiveSeries(seriesMaturity);   
     analyticsLogEvent('change_series', {
       from: activeSeries.maturity,
@@ -140,12 +139,12 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
                 direction='row' 
                 justify='between'
                 onClick={()=>handleSelectSeries(x.maturity)}
-                onMouseOver={()=> setSelectedSeries(x.maturity)}
-                onMouseOut={()=> setSelectedSeries(activeSeries.maturity)}
+                onMouseDown={()=>setHasSelected(true)}
                 fill='horizontal'
                 pad='small'
                 gap='small'
-                selected={selectedSeries === x.maturity}
+                selected={!hasSelected && activeSeries.maturity === x.maturity}
+                align='center'
               >
                 <Box basis={mobile?'30%':'30%'} align='center'>
                   <Box direction='row' alignSelf='start'>
@@ -153,8 +152,8 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
                   </Box>
                 </Box>
 
-                <Box fill='horizontal' direction='row' justify='between' gap='small'>
-                  <Box fill align={mobile?'start':'start'}>
+                <Box fill='horizontal' direction='row' gap='small'>
+                  <Box fill>
                     <Text size='xsmall'>
                       { mobile? x.displayNameMobile : x.displayName }
                     </Text>
