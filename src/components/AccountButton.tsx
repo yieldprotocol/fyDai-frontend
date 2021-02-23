@@ -91,10 +91,8 @@ const AccountButton = (props: any) => {
 
   return (
     <Box
-      round
       direction='row'
-      // align='center'
-      background='background'
+      gap='xsmall'
     > 
       { 
         txStatusOpen &&  
@@ -105,54 +103,57 @@ const AccountButton = (props: any) => {
       account &&
       !mobile && 
       pendingTxs.length===0 && 
-      !txCompleteOpen && 
-        <Box 
-          gap='medium' 
-          width={{ min:'150px' }}
-        >
-          <Selector 
-            selectedIndex={0} 
-            selectItemCallback={(x:any) => null}
-            flat        
-            items={[
-              <Box 
-                key='DAI' 
-                direction='row' 
-                gap='xsmall' 
-                align='center' 
-                pad={{ left:'small', vertical:'xsmall' }}
-              >
-                <DaiMark /> 
+      !txCompleteOpen &&
+      <Box 
+        width={{ min:'120px' }}
+        animation='slideLeft'
+      >         
+        <Selector 
+          selectedIndex={0} 
+          selectItemCallback={(x:any) => null}
+          flat        
+          items={[       
+            <Box 
+              key='DAI' 
+              direction='row' 
+              gap='small' 
+              align='start'
+              pad={{ left:'small', vertical:'xsmall' }}
+            > 
+              <DaiMark /> 
+              <Loading condition={!position.daiBalance_} size='xxsmall'>
                 <Text size='xsmall' weight='bold'>{position?.daiBalance_}</Text>
-                <Text size='small'> DAI </Text>
-              </Box>,
+                {/* <Text size='small'> DAI </Text> */}
+              </Loading>
+            </Box>
+            ,
 
-              <Box
-                key='ETH' 
-                direction='row' 
-                gap='xsmall' 
-                align='center' 
-                pad={{ left:'small', vertical:'xsmall' }}
-              >    
-                <EthMark /> 
-                <Text size='xsmall' weight='bold'>{position?.ethBalance_}</Text>
-                <Text size='xsmall' weight='bold'>ETH</Text>
-              </Box>,
+            <Box
+              key='ETH' 
+              direction='row' 
+              gap='small' 
+              align='start'
+              pad={{ left:'small', vertical:'xsmall' }}
+            >    
+              <EthMark /> 
+              <Text size='xsmall' weight='bold'>{position?.ethBalance_}</Text>
+              {/* <Text size='xsmall' weight='bold'>ETH</Text> */}
+            </Box>,
 
-              <Box 
-                key='USDC' 
-                direction='row' 
-                gap='xsmall' 
-                align='center' 
-                pad={{ left:'small', vertical:'xsmall' }}
-              >
-                <USDCMark /> 
-                <Text size='xsmall' weight='bold'>{position?.usdcBalance_}</Text>
-                <Text size='small'> USDC </Text>
-              </Box>  
-            ]}
-          />
-        </Box>
+            <Box 
+              key='USDC' 
+              direction='row' 
+              gap='small' 
+              align='start'
+              pad={{ left:'small', vertical:'xsmall' }}
+            >
+              <USDCMark /> 
+              <Text size='xsmall' weight='bold'>{position?.usdcBalance_}</Text>
+              {/* <Text size='small'> USDC </Text> */}
+            </Box>  
+          ]}
+        /> 
+      </Box>
       }
       
       {
@@ -198,7 +199,7 @@ const AccountButton = (props: any) => {
 
       { 
       account ?
-        <>{!mobile && <FlatButton
+        <Box margin={{ top:'-1px' }}>{!mobile && <FlatButton
           onClick={()=>openConnectLayer('ACCOUNT')}
           label={
             <Box gap='small' direction='row' align='center'>
@@ -209,7 +210,7 @@ const AccountButton = (props: any) => {
             </Box>
             }
         />}
-        </> 
+        </Box> 
         : 
         <FlatButton 
           onClick={() => {
