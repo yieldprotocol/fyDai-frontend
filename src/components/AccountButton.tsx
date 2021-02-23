@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
+import styled from 'styled-components';
 import { useWeb3React } from '@web3-react/core';
 import {
   Text,
   Box,
   ResponsiveContext,
   Layer,
-  Collapsible,
 } from 'grommet';
 import { 
   FiSettings as Gear,
@@ -26,6 +26,7 @@ import EthMark from './logos/EthMark';
 import Selector from './Selector';
 import USDCMark from './logos/USDCMark';
 
+
 const AccountButton = (props: any) => {
   
   const { openConnectLayer } = props;
@@ -42,7 +43,6 @@ const AccountButton = (props: any) => {
   // flags
   const [txStatusOpen, setTxStatusOpen] = useState(false);
   const [txCompleteOpen, setTxCompleteOpen] = useState(false);
-  const [detailsOpen, setDetailsOpen] = useState<boolean>(false);
 
   /* show txComplete for a short amount of time */
   useEffect(()=>{  
@@ -54,7 +54,6 @@ const AccountButton = (props: any) => {
     })();
 
   }, [pendingTxs, lastCompletedTx ]);
-
 
   /* internal components */
 
@@ -93,6 +92,7 @@ const AccountButton = (props: any) => {
     <Box
       direction='row'
       gap='xsmall'
+      
     > 
       { 
         txStatusOpen &&  
@@ -123,11 +123,9 @@ const AccountButton = (props: any) => {
               <DaiMark /> 
               <Loading condition={!position.daiBalance_} size='xxsmall' color='lightgrey'>
                 <Text size='xsmall' weight='bold'>{position?.daiBalance_}</Text>
-                {/* <Text size='small'> DAI </Text> */}
               </Loading>
             </Box>
             ,
-
             <Box
               key='ETH' 
               direction='row' 
@@ -137,7 +135,6 @@ const AccountButton = (props: any) => {
             >    
               <EthMark /> 
               <Text size='xsmall' weight='bold'>{position?.ethBalance_}</Text>
-              {/* <Text size='xsmall' weight='bold'>ETH</Text> */}
             </Box>,
 
             <Box 
@@ -149,7 +146,6 @@ const AccountButton = (props: any) => {
             >
               <USDCMark /> 
               <Text size='xsmall' weight='bold'>{position?.usdcBalance_}</Text>
-              {/* <Text size='small'> USDC </Text> */}
             </Box>  
           ]}
         /> 
