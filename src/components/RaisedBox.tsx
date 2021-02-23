@@ -35,7 +35,7 @@ function RaisedBox({ expand, children, loading=false }:any ) {
           fill='horizontal'
           round='small'
           background={defaultBackground}
-          animation='fadeIn'
+          animation={expand? undefined: 'fadeIn'}
         >
           {
             !open &&
