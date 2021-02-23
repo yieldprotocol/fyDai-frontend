@@ -24,7 +24,7 @@ const TxRecent = ({ setView }: any) => {
     <Box gap="medium" pad='small'>
 
       <Box direction='row' gap='medium' align='center' justify='between'>
-        <Text alignSelf='start' size='medium' weight='bold'>Transactions</Text>   
+        <Text alignSelf='start' size='small' weight='bold'>Transactions</Text>   
         <RaisedButton
           onClick={()=>setView()}
           label={<Box pad={{ vertical:'xsmall', horizontal:'xsmall' }}><Text size='xxsmall'>Full history</Text></Box>}

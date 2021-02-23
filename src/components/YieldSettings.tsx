@@ -24,12 +24,12 @@ const YieldSettings = () => {
     <>
       <Box pad="small" gap="small">
         <Box direction='row' justify='between'>
-          <Text alignSelf='start' size='medium' weight='bold'>Settings</Text> 
+          <Text alignSelf='start' size='small' weight='bold'>Settings</Text> 
           <Box round>
             <FlatButton
               disabled
               onClick={()=>null}
-              label={<Text size='xsmall'>More settings</Text>}
+              label={<Text size='xxsmall'>More settings</Text>}
             /> 
           </Box>
         </Box> 

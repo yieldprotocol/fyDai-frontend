@@ -1,5 +1,5 @@
 import React, { useEffect, useContext, createContext, useReducer } from 'react';
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 
 import { cleanValue } from '../utils';
 
@@ -54,8 +54,8 @@ const HistoryProvider = ({ children }: any) => {
   const [txHistory, setTxHistory] = useCachedState('txHistory', null);
   
   /* hook declarations */
-  const { getEventHistory, parseEventList } = useEvents();
-  const { account, provider } = useSignerAccount();
+  const { getEventHistory, parseEventList, parseLogs } = useEvents();
+  const { account, provider, fallbackProvider } = useSignerAccount();
 
   /**
    * @dev gets user transaction history.
@@ -313,7 +313,26 @@ const HistoryProvider = ({ children }: any) => {
       [ account ],
       lastCheckedBlock+1
     )
-      .then((res: any) => parseEventList(res, true))        /* then parse returned values */
+      .then( async (res: any ) => {
+        const list:any[] = await Promise.all( res.map( async (x:any) => fallbackProvider.getTransactionReceipt(x.transactionHash)));
+        return res.map( (x:any, i:number) =>  {
+          // const parsedLog = parseLogs(list[i].logs, 'Pool');
+          // console.log(parsedLog);
+          // console.log( list[i].logs.filter( (x_:any) => x_.topics[0] === '0x3f207773c457c66e004ab34e2ce7ae1fcafc7b4c3286f63997c8742801421915' ) );
+          // console.log( list[i]);
+          const dai = list[i].logs[8];
+          const fyDai = list[i].logs[3];
+          const usdc = list[i].logs[11];
+          return {
+            ...x,
+            amount: BigNumber.from(dai.data), 
+            dai: BigNumber.from(dai.data),
+            fyDai: BigNumber.from(fyDai.data), 
+            usdc: BigNumber.from(usdc.data), 
+          };     
+        });
+      })
+      .then((res: any) => parseEventList(res))        /* then parse returned values */
       .then((parsedList: any) => {                    /* then add extra info and calculated values */
         return parsedList.map((x:any) => {
           return {

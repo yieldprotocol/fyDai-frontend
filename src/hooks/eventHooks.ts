@@ -77,23 +77,9 @@ export const useEvents = () => {
   };
 
   /* Adds a parsed layer onto the returned values (for example, this will format dates, numbers to strings, */ 
-  const parseEventList = async (eventList:any[], fromTxs:boolean=false) => {
-
-    let _eventList: any[];
-    if ( fromTxs ) {
-      const list = await Promise.all( eventList.map( async (x:any) => fallbackProvider.getTransactionReceipt(x.transactionHash)));
-      _eventList = eventList.map(  (x:any, i:number) =>  {
-        const extra = list[i].logs[3];
-        return {
-          ...x,
-          amount: BigNumber.from(extra.data), 
-        };     
-      });
-    } else {
-      _eventList = eventList;
-    }
+  const parseEventList = async (eventList:any[]) => {
     
-    const parsedList = Promise.all( _eventList.map(async (x:any)=>{
+    const parsedList = Promise.all( eventList.map(async (x:any)=>{
       const { timestamp } = await provider.getBlock(x.blockNumber);
       return {
         ...x,
@@ -118,12 +104,12 @@ export const useEvents = () => {
     return parsedList;
   };
   
-  const parseTransaction = async (transactionHash: string, contract: string) => {
+  const parseLogs = ( log:any, contract: string ) => {
     const contractAbi = contractMap.get(contract); 
     const contractIface = new ethers.utils.Interface(contractAbi);
-    fallbackProvider.getTransactionReceipt(transactionHash);
+    return contractIface.parseLog(log);
   };
 
-  return { getEventHistory, addEventListener, parseEventList, parseTransaction } as const;
+  return { getEventHistory, addEventListener, parseEventList, parseLogs } as const;
 
 };
