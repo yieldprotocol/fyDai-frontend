@@ -34,6 +34,15 @@ ${(props:any) => props.background && css`
 `}
 `;
 
+const GrowBox = styled(Box)`
+  -webkit-transition: transform 0.3s ease, box-shadow 0.3s ease  ; 
+  -moz-transition: transform 0.3s ease, box-shadow 0.3s ease ; 
+  transition: transform 0.3s ease, box-shadow 0.3s ease; 
+  :hover {
+    transform: scale(1.1);
+  }
+`;
+
 interface ISelectorProps {
   items: any[];
   selectedIndex: number;
@@ -90,17 +99,20 @@ const Selector = ( {
         }
 
         <Collapsible open={selectorOpen}>
-          <Box gap='small' pad={{ top:'small' }}>
+          <Box 
+            gap='small' 
+            pad={{ top:'small' }}      
+          >
             { 
               items?.map( (x:any, i:number) => (
                 i !== selectedIndex && 
-                  <Box
+                  <GrowBox
                     key={i}
                     onClick={()=> makeSelection(i)} 
-                    hoverIndicator={modColor(defaultBackground, -10)}
+                    // hoverIndicator={modColor(defaultBackground, -10)}
                   >
                     {x}
-                  </Box>
+                  </GrowBox>
               ))
               }
           </Box>

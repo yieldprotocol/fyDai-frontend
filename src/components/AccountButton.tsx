@@ -26,14 +26,6 @@ import EthMark from './logos/EthMark';
 import Selector from './Selector';
 import USDCMark from './logos/USDCMark';
 
-const StyledBox = styled(Box)`
-  -webkit-transition: transform 0.3s ease, box-shadow 0.3s ease  ; 
-  -moz-transition: transform 0.3s ease, box-shadow 0.3s ease ; 
-  transition: transform 0.3s ease, box-shadow 0.3s ease; 
-  :hover {
-    transform: scale(1.1);
-  }
-`;
 
 const AccountButton = (props: any) => {
   
@@ -122,7 +114,7 @@ const AccountButton = (props: any) => {
           selectItemCallback={(x:any) => null}
           flat        
           items={[       
-            <StyledBox 
+            <Box 
               key='DAI' 
               direction='row' 
               gap='small' 
@@ -133,9 +125,9 @@ const AccountButton = (props: any) => {
               <Loading condition={!position.daiBalance_} size='xxsmall' color='lightgrey'>
                 <Text size='xsmall' weight='bold'>{position?.daiBalance_}</Text>
               </Loading>
-            </StyledBox>
+            </Box>
             ,
-            <StyledBox
+            <Box
               key='ETH' 
               direction='row' 
               gap='small' 
@@ -144,9 +136,9 @@ const AccountButton = (props: any) => {
             >    
               <EthMark /> 
               <Text size='xsmall' weight='bold'>{position?.ethBalance_}</Text>
-            </StyledBox>,
+            </Box>,
 
-            <StyledBox 
+            <Box 
               key='USDC' 
               direction='row' 
               gap='small' 
@@ -155,7 +147,7 @@ const AccountButton = (props: any) => {
             >
               <USDCMark /> 
               <Text size='xsmall' weight='bold'>{position?.usdcBalance_}</Text>
-            </StyledBox>  
+            </Box>  
           ]}
         /> 
       </Box>
