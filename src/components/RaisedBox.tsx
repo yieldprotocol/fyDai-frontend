@@ -40,7 +40,7 @@ function RaisedBox({ expand, children, loading=false }:any ) {
           {
             !open &&
             <Box pad='small' align='center' animation='fadeIn'>
-              <Loading condition size='large'>
+              <Loading condition size='large' color='lightgrey'>
                 <Box />
               </Loading>
             </Box>
