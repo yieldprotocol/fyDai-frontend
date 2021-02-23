@@ -55,7 +55,6 @@ const AccountButton = (props: any) => {
 
   }, [pendingTxs, lastCompletedTx ]);
 
-
   /* internal components */
 
   const TxStatusLayer = () => (

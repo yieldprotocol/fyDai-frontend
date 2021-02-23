@@ -93,9 +93,9 @@ const Selector = ( {
           <StyledBox background={selectorOpen? undefined : defaultBackground}>
             { items[ selectedIndex ] }
           </StyledBox> :
-          <Box>
+          <GrowBox>
             { items[ selectedIndex ] }  
-          </Box>        
+          </GrowBox>        
         }
 
         <Collapsible open={selectorOpen}>
