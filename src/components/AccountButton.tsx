@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
+import styled from 'styled-components';
 import { useWeb3React } from '@web3-react/core';
 import {
   Text,
   Box,
   ResponsiveContext,
   Layer,
-  Collapsible,
 } from 'grommet';
 import { 
   FiSettings as Gear,
@@ -26,6 +26,15 @@ import EthMark from './logos/EthMark';
 import Selector from './Selector';
 import USDCMark from './logos/USDCMark';
 
+const StyledBox = styled(Box)`
+  -webkit-transition: transform 0.3s ease, box-shadow 0.3s ease  ; 
+  -moz-transition: transform 0.3s ease, box-shadow 0.3s ease ; 
+  transition: transform 0.3s ease, box-shadow 0.3s ease; 
+  :hover {
+    transform: scale(1.1);
+  }
+`;
+
 const AccountButton = (props: any) => {
   
   const { openConnectLayer } = props;
@@ -42,7 +51,6 @@ const AccountButton = (props: any) => {
   // flags
   const [txStatusOpen, setTxStatusOpen] = useState(false);
   const [txCompleteOpen, setTxCompleteOpen] = useState(false);
-  const [detailsOpen, setDetailsOpen] = useState<boolean>(false);
 
   /* show txComplete for a short amount of time */
   useEffect(()=>{  
@@ -93,6 +101,7 @@ const AccountButton = (props: any) => {
     <Box
       direction='row'
       gap='xsmall'
+      
     > 
       { 
         txStatusOpen &&  
@@ -113,7 +122,7 @@ const AccountButton = (props: any) => {
           selectItemCallback={(x:any) => null}
           flat        
           items={[       
-            <Box 
+            <StyledBox 
               key='DAI' 
               direction='row' 
               gap='small' 
@@ -123,12 +132,10 @@ const AccountButton = (props: any) => {
               <DaiMark /> 
               <Loading condition={!position.daiBalance_} size='xxsmall' color='lightgrey'>
                 <Text size='xsmall' weight='bold'>{position?.daiBalance_}</Text>
-                {/* <Text size='small'> DAI </Text> */}
               </Loading>
-            </Box>
+            </StyledBox>
             ,
-
-            <Box
+            <StyledBox
               key='ETH' 
               direction='row' 
               gap='small' 
@@ -137,10 +144,9 @@ const AccountButton = (props: any) => {
             >    
               <EthMark /> 
               <Text size='xsmall' weight='bold'>{position?.ethBalance_}</Text>
-              {/* <Text size='xsmall' weight='bold'>ETH</Text> */}
-            </Box>,
+            </StyledBox>,
 
-            <Box 
+            <StyledBox 
               key='USDC' 
               direction='row' 
               gap='small' 
@@ -149,8 +155,7 @@ const AccountButton = (props: any) => {
             >
               <USDCMark /> 
               <Text size='xsmall' weight='bold'>{position?.usdcBalance_}</Text>
-              {/* <Text size='small'> USDC </Text> */}
-            </Box>  
+            </StyledBox>  
           ]}
         /> 
       </Box>

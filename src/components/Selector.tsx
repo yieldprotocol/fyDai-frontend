@@ -66,13 +66,18 @@ const Selector = ( {
   };
 
   return (
-    <Stack fill='horizontal' alignSelf='start'>
+    <Stack 
+      fill='horizontal' 
+      alignSelf='start'
+      onMouseLeave={()=>setSelectorOpen(false)}
+    >
       <Box />
       <Box
         round={selectorOpen? 'small': 'large'}
         onClick={()=>setSelectorOpen(!selectorOpen)}
         border={selectorOpen ? 'all': undefined}
         background={defaultBackground}
+        
       >
         {
         !flat ?
