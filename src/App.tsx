@@ -10,6 +10,7 @@ import { yieldTheme } from './themes';
 import { modColor } from './utils';
 
 /* contexts */
+import { YieldContext } from './contexts/YieldContext';
 import { SeriesContext } from './contexts/SeriesContext';
 import { NotifyContext } from './contexts/NotifyContext';
 import { UserContext } from './contexts/UserContext';
@@ -40,6 +41,7 @@ import ErrorBoundary from './components/ErrorBoundry';
 import YieldNav from './components/YieldNav';
 import RaisedBox from './components/RaisedBox';
 
+
 declare global {
   interface Window {
     gtag: any;
@@ -50,6 +52,7 @@ const App = (props:any) => {
 
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
+  const { state: { yieldLoading } } = useContext(YieldContext);
   const activeSeries = seriesData.get(activeSeriesId);
   const { actions: userActions } = useContext(UserContext);
   const { dispatch } = useContext(NotifyContext);
@@ -144,9 +147,11 @@ const App = (props:any) => {
           undefined
       }
     >
-      <Header margin={mobile? undefined: { horizontal:'xlarge' }}>
-        <YieldHeader openConnectLayer={(view:string) => setShowConnectLayer(view)} />
-      </Header>
+      <Box animation='fadeIn'>
+        <Header margin={mobile? undefined: { horizontal:'xlarge' }}>
+          <YieldHeader openConnectLayer={(view:string) => setShowConnectLayer(view)} />
+        </Header>
+      </Box>
 
       <ConnectLayer view={showConnectLayer} closeLayer={() => setShowConnectLayer(null)} />
 
@@ -156,16 +161,27 @@ const App = (props:any) => {
 
       <NotifyLayer target={!mobile?leftSideRef.current:undefined} />
 
-      {!mobile && 
-        <Box margin='large' align='center'>
+      {
+      !mobile &&
+      !yieldLoading &&
+        <Box 
+          margin='large' 
+          align='center' 
+          animation='fadeIn'
+        >
           <YieldNav />
-        </Box>}
+        </Box>
+      }
 
       <Main 
         pad={{ vertical:'medium' }}
         align='center'
         flex
+        animation='fadeIn'
       >
+        
+        { 
+        !yieldLoading &&
         <Switch>
           <Route path="/post/:amnt?"> <Deposit openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route>
           <Route path="/borrow/:series?/:amnt?"> <Borrow openConnectLayer={() => setShowConnectLayer('CONNECT')} /> </Route>      
@@ -180,7 +196,8 @@ const App = (props:any) => {
 
           <Route exact path="/"> <Redirect to={`${cachedLastVisit || '/borrow/'}`} /> </Route>
           <Route path="/*"> 404 </Route>
-        </Switch>              
+        </Switch>  
+        }            
       </Main>
 
       <Footer margin={mobile? undefined: { horizontal:'xlarge' }}>

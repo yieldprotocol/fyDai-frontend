@@ -117,8 +117,13 @@ export const useEvents = () => {
 
     return parsedList;
   };
+  
+  const parseTransaction = async (transactionHash: string, contract: string) => {
+    const contractAbi = contractMap.get(contract); 
+    const contractIface = new ethers.utils.Interface(contractAbi);
+    fallbackProvider.getTransactionReceipt(transactionHash);
+  };
 
-
-  return { getEventHistory, addEventListener, parseEventList } as const;
+  return { getEventHistory, addEventListener, parseEventList, parseTransaction } as const;
 
 };
