@@ -3,6 +3,7 @@ import styled, { css } from 'styled-components';
 import { Box, Collapsible, ResponsiveContext, ThemeContext } from 'grommet';
 
 import { modColor } from '../utils';
+import Loading from './Loading';
 
 const StyledBox = styled(Box)`
 display: block;
@@ -16,9 +17,10 @@ ${(props:any) => props.background && css`
 `}
 `;
 
-function RaisedBox({ expand, children }:any ) {
+function RaisedBox({ expand, children, loading=false }:any ) {
 
   const open = expand;
+
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   const theme:any = React.useContext(ThemeContext);
   const themeBackground = theme.global.colors.background;
@@ -35,9 +37,17 @@ function RaisedBox({ expand, children }:any ) {
           background={defaultBackground}
           animation='fadeIn'
         >
+          {
+            !open &&
+            <Box pad='small' align='center' animation='fadeIn'>
+              <Loading condition size='large'>
+                <Box />
+              </Loading>
+            </Box>
+          }
           <Collapsible open={open}>
-            {children}  
-          </Collapsible>  
+            {children} 
+          </Collapsible> 
         </StyledBox>
         : 
         <Box
