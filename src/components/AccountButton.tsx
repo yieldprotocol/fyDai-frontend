@@ -121,7 +121,7 @@ const AccountButton = (props: any) => {
               pad={{ left:'small', vertical:'xsmall' }}
             > 
               <DaiMark /> 
-              <Loading condition={!position.daiBalance_} size='xxsmall'>
+              <Loading condition={!position.daiBalance_} size='xxsmall' color='lightgrey'>
                 <Text size='xsmall' weight='bold'>{position?.daiBalance_}</Text>
                 {/* <Text size='small'> DAI </Text> */}
               </Loading>
