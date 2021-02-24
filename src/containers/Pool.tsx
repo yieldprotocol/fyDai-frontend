@@ -156,7 +156,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
   }, [ debouncedInput, daiBalance ]);
 
   return (
-    <RaisedBox expand={ !seriesLoading }>
+    <RaisedBox expand={ !!seriesData }>
       <Keyboard 
         onEsc={() => setInputValue(undefined)}
         onEnter={()=> addLiquidityProcedure()}

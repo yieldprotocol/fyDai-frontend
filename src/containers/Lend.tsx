@@ -162,7 +162,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
   }, [ debouncedInput, daiBalance ]);
 
   return (
-    <RaisedBox expand={!seriesLoading}>
+    <RaisedBox expand={!!seriesData}>
       <Keyboard 
         onEsc={() => setInputValue(undefined)}
         onEnter={()=> lendProcedure()}

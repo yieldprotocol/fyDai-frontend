@@ -19,8 +19,6 @@ ${(props:any) => props.background && css`
 
 function RaisedBox({ expand, children, loading=false }:any ) {
 
-  const open = expand;
-
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
   const theme:any = React.useContext(ThemeContext);
   const themeBackground = theme.global.colors.background;
@@ -38,14 +36,14 @@ function RaisedBox({ expand, children, loading=false }:any ) {
           animation={expand? undefined: 'fadeIn'}
         >
           {
-            !open &&
+            !expand &&
             <Box pad='small' align='center' animation='fadeIn'>
               <Loading condition size='large' color='lightgrey'>
                 <Box />
               </Loading>
             </Box>
           }
-          <Collapsible open={open}>
+          <Collapsible open={expand}>
             {children} 
           </Collapsible> 
         </StyledBox>
