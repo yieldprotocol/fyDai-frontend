@@ -163,7 +163,7 @@ export const useUSDCProxy = () => {
     );
     
     /* set the gas limits based on whether sigs are required */
-    const overrides = noSigsReqd ? { gasLimit: BigNumber.from('500000'), value:0 } :{ gasLimit: BigNumber.from('500000'), value:0 };
+    const overrides = noSigsReqd ? { gasLimit: BigNumber.from('600000'), value:0 } :{ gasLimit: BigNumber.from('600000'), value:0 };
 
     /* send to the proxy for execution */
     await proxyExecute( 
@@ -302,8 +302,7 @@ export const useUSDCProxy = () => {
     );
 
     /* Set the gas limits based on whether sigs are required */
-    const overrides = series.isMature()? { gasLimit: BigNumber.from('600000'), value:0 } :{ gasLimit: BigNumber.from('500000'), value:0 };
-
+    const overrides = series.isMature()? { gasLimit: BigNumber.from('700000'), value:0 } :{ gasLimit: BigNumber.from('600000'), value:0 };
     /* Send to the proxy for execution */
     await proxyExecute( 
       proxyContract.address, 

@@ -221,7 +221,7 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
   }, [ debouncedInput ]);
 
   return (
-    <RaisedBox expand={!!seriesData}>
+    <RaisedBox expand={seriesData}>
       <Keyboard 
         onEsc={() => setInputValue(undefined)}
         onEnter={()=> borrowProcedure()}

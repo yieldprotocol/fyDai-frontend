@@ -43,7 +43,7 @@ function RaisedBox({ expand, children, loading=false }:any ) {
               </Loading>
             </Box>
           }
-          <Collapsible open={expand}>
+          <Collapsible open={ expand !== undefined }>
             {children} 
           </Collapsible> 
         </StyledBox>
