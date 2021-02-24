@@ -184,31 +184,21 @@ export const usePoolProxy = () => {
     /* Determine which addLiquidity function to use based on AVAILABLE LIQUIDITY, build the call data from that one */ 
     if ( addLiquidityStrategy === 'BUY') { 
       /* BUY strategy with sigs or no sigs */
-      calldata = noSigsReqd ?
-        proxyContract.interface.encodeFunctionData( 
-          'buyAddLiquidity', 
-          [ poolAddr, fyDaiIn, parsedDaiUsed ]
-        ) :    
-        proxyContract.interface.encodeFunctionData( 
-          'buyAddLiquidityWithSignature', 
-          [ poolAddr, fyDaiIn, parsedDaiUsed, signedSigs.get('daiSig'), signedSigs.get('fyDaiSig'), signedSigs.get('poolSig') ]
-        );
+      calldata = proxyContract.interface.encodeFunctionData( 
+        'buyAddLiquidityWithSignature', 
+        [ poolAddr, fyDaiIn, parsedDaiUsed, signedSigs.get('daiSig'), signedSigs.get('fyDaiSig'), signedSigs.get('poolSig') ]
+      );
       /* set override gas estiamtes based on strategy */
       overrides = noSigsReqd ? { gasLimit: BigNumber.from('400000'), value: 0 } : { gasLimit: BigNumber.from('450000'), value: 0 };
 
     } else {
       /* BORROW strategy with sigs or no sigs */
-      calldata = noSigsReqd ? 
-        proxyContract.interface.encodeFunctionData( 
-          'addLiquidity', 
-          [ poolAddr, parsedDaiUsed, maxFYDai ]
-        ):     
-        proxyContract.interface.encodeFunctionData( 
-          'addLiquidityWithSignature', 
-          [ poolAddr, parsedDaiUsed, maxFYDai, signedSigs.get('daiSig'), signedSigs.get('controllerSig') ]
-        );
+      calldata = proxyContract.interface.encodeFunctionData( 
+        'addLiquidityWithSignature', 
+        [ poolAddr, parsedDaiUsed, maxFYDai, signedSigs.get('daiSig'), signedSigs.get('controllerSig') ]
+      );
       /* set override gas estiamtes based on strategy */
-      overrides = noSigsReqd ?  { gasLimit: BigNumber.from('650000'), value: 0 } : { gasLimit: BigNumber.from('650000'), value: 0 };
+      overrides = { gasLimit: BigNumber.from('650000'), value: 0 };
     }
 
     /* send to the proxy for execution */
@@ -287,15 +277,10 @@ export const usePoolProxy = () => {
       }
 
       /* construct the calldata. Fn selection Based on current authorization status */
-      calldata = noSigsReqd? 
-        proxyContract.interface.encodeFunctionData(
-          'removeLiquidityEarlyDaiFixed', 
-          [ poolAddr, parsedTokens, minFYDaiPrice ]
-        ) :
-        proxyContract.interface.encodeFunctionData( 
-          'removeLiquidityEarlyDaiFixedWithSignature', 
-          [ poolAddr, parsedTokens, minFYDaiPrice, signedSigs.get('controllerSig'), signedSigs.get('poolSig') ]
-        );
+      calldata = proxyContract.interface.encodeFunctionData( 
+        'removeLiquidityEarlyDaiFixedWithSignature', 
+        [ poolAddr, parsedTokens, minFYDaiPrice, signedSigs.get('controllerSig'), signedSigs.get('poolSig') ]
+      );
 
       /* set the gas limits based on whether sigs are required */
       overrides = noSigsReqd ? { gasLimit: BigNumber.from('600000'), value:0 } :{ gasLimit: BigNumber.from('600000'), value:0 };
@@ -303,18 +288,13 @@ export const usePoolProxy = () => {
     } else {
 
       /* construct the calldata. Fn selection Based on current authorization status */
-      calldata = noSigsReqd ? 
-        proxyContract.interface.encodeFunctionData( 
-          'removeLiquidityMature', 
-          [ poolAddr, parsedTokens ]
-        ) : 
-        proxyContract.interface.encodeFunctionData( 
-          'removeLiquidityMatureWithSignature', 
-          [ poolAddr, parsedTokens, signedSigs.get('controllerSig'), signedSigs.get('poolSig') ]
-        );
+      calldata = proxyContract.interface.encodeFunctionData( 
+        'removeLiquidityMatureWithSignature', 
+        [ poolAddr, parsedTokens, signedSigs.get('controllerSig'), signedSigs.get('poolSig') ]
+      );
 
       /* set the gas limits based on whether sigs are required */
-      overrides = noSigsReqd ? { gasLimit: BigNumber.from('700000'), value:0 } :{ gasLimit: BigNumber.from('750000'), value:0 };
+      overrides = { gasLimit: BigNumber.from('750000'), value:0 };
 
     }
 

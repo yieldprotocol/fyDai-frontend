@@ -40,13 +40,16 @@ const TxLayer = () => {
     'AUTH_TOKEN', 
     'AUTH_CONTROLLER', 
     'AUTH_POOL', 
-    'CREATE_PROXY' 
+    'AUTH_USDC',
+    'CREATE_PROXY'
   ]);
   const [ txActive ] = useTxActive([
     'POST', 
     'WITHDRAW', 
-    'BORROW', 
-    'REPAY',
+    'BORROW_DAI', 
+    'REPAY_DAI',
+    'BORROW_USDC', 
+    'REPAY_USDC',
     'SELL_DAI', 
     'BUY_DAI', 
     'REDEEM',
@@ -325,7 +328,7 @@ const TxLayer = () => {
               processIsCurrentTx && 
               <>
                 <TxStatus tx={txActive || authActive} />
-                <Box alignSelf='start'>
+                <Box direction='row' justify='between'>
                   <FlatButton
                     onClick={()=>closeAuth()}
                     label={
@@ -335,6 +338,12 @@ const TxLayer = () => {
                       </Box>
                   }
                   />
+
+                  <FlatButton 
+                    label={<Text size='xxsmall' color='text-xweak'>Stuck?</Text>}
+                    onClick={()=> dispatch({ type:'forceClear', payload: null })}
+                  />
+
                 </Box>
               </>
             }

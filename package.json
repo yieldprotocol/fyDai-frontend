@@ -1,6 +1,6 @@
 {
   "name": "@yieldprotocol/fydai-ui",
-  "version": "0.5.0",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
     "@metamask/detect-provider": "^1.1.0",
@@ -24,7 +24,9 @@
   "scripts": {
     "analyze": "source-map-explorer 'build/static/js/*.js'",
     "start": "react-scripts start",
+    "start-dev": "REACT_APP_FORCE_ENV=development react-scripts start",
     "build": "react-scripts build",
+    "build-dev": "REACT_APP_FORCE_ENV=development react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx src --color",

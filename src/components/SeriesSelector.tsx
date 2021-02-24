@@ -7,7 +7,7 @@ import {
   FiCheck as Check,
 } from 'react-icons/fi';
 
-import { logEvent, modColor  } from '../utils';
+import { analyticsLogEvent, modColor  } from '../utils';
 
 import { SeriesContext } from '../contexts/SeriesContext';
 
@@ -16,6 +16,8 @@ import Loading from './Loading';
 import FlatButton from './FlatButton';
 import RaisedButton from './RaisedButton';
 import YieldMobileNav from './YieldMobileNav';
+import StickyButton from './StickyButton';
+import { IYieldSeries } from '../types';
 
 const InsetBox = styled(Box)`
   border-radius: 8px;
@@ -42,10 +44,10 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
   
   const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
   const activeSeries = seriesData.get(activeSeriesId);
-
   const { setActiveSeries } = seriesActions;
 
   const [sortedList, setSortedList] = useState<any>(seriesData);
+  const [ hasSelected, setHasSelected ] = useState<boolean>(false);
 
   const viewMap = new Map([
     ['BORROW', { head: 'DEBT', field: 'ethDebtFYDai_' }],
@@ -53,10 +55,11 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
     ['POOL', { head: 'POOL PERCENTAGE', field: 'poolPercent' }],
   ]);
 
+
+
   const handleSelectSeries = (seriesMaturity: number) => {
-    setActiveSeries(seriesMaturity);
-    
-    logEvent('change_series', {
+    setActiveSeries(seriesMaturity);   
+    analyticsLogEvent('change_series', {
       from: activeSeries.maturity,
       to: seriesMaturity,
     });
@@ -96,106 +99,75 @@ const SeriesSelector = ({ close, activeView }:ISeriesSelectorProps) => {
         fill
         background='background'
         pad={{ horizontal: 'medium', vertical:'large' }}
-        gap='large'
-        width={!mobile?{ min:'620px', max:'620px' }: undefined}
+        gap='small'
+        width={!mobile?{ min:'500px', max:'500px' }: undefined}
       >
-        <Box direction='row' gap='large' align='center'>
+        <Box direction='row' gap='small' align='center' pad='small'>
           { mobile && <Box onClick={() => close()}><ArrowLeft /></Box>}
           <Text weight='bold' size={mobile?'small':'large'}> Choose a Series</Text>
         </Box>
 
-        <InsetBox 
-          background={defaultBackground}
+        <Box 
+          direction='row'
+          pad='small'
+          fill='horizontal'
+          justify='between'
+          gap='small'
         >
-          <Box 
-            direction='row'
-            pad='medium'
-            fill='horizontal'
-            justify='between'
-            gap='small'
-          >
-            <Box basis={mobile?'30%':'30%'}>
-              <Text alignSelf='start' size='small' color='text-weak' weight='bold'>APR</Text>
-            </Box>
-            <Box fill='horizontal' direction='row' justify='between' gap='small'>
-              <Box fill align={mobile?'end':undefined}>
-                <Text size={mobile? 'xsmall':'small'} color='text-weak' weight='bold'>{mobile? 'SERIES' : 'SERIES MATURITY'}</Text>
-              </Box>
-              <Box fill align={mobile?'end':undefined}>
-                <Text size={mobile? 'xsmall':'small'} color='text-weak' weight='bold'>
-                  { viewMap.get(activeView.toUpperCase())?.head }         
-                </Text>
-              </Box>
-            </Box>
-            { !mobile && 
-              <Box direction='row' justify='end' basis='25%'>
-                <Text size={mobile? 'xsmall':'small'} color='text-weak' weight='bold'> </Text>
-              </Box>}
+          <Box basis={mobile?'30%':'30%'}>
+            <Text alignSelf='start' size='small' color='text-weak' weight='bold'>APR</Text>
           </Box>
+          <Box fill='horizontal' direction='row' justify='between' gap='small'>
+            <Box fill align={mobile?'end':undefined}>
+              <Text size={mobile? 'xsmall':'small'} color='text-weak' weight='bold'>{mobile? 'SERIES' : 'SERIES MATURITY'}</Text>
+            </Box>
+            <Box fill align='end'>
+              <Text size={mobile? 'xsmall':'small'} color='text-weak' weight='bold'>
+                { viewMap.get(activeView.toUpperCase())?.head }         
+              </Text>
+            </Box>
+          </Box>
+        </Box>
 
-          <Loading condition={seriesLoading} size='large'>
-            { !seriesLoading && [...sortedList.values() ].map((x:any, i:any) => {       
-              const _key = i;
-              const field = viewMap.get(activeView.toUpperCase())?.field || '';
-
-              return ( 
-                <Box
-                  key={_key}
-                  direction='row' 
-                  justify='between'
-                  onClick={()=>handleSelectSeries(x.maturity)}
-                  hoverIndicator={modColor(defaultBackground, -10)}
-                  background={activeSeries.maturity === x.maturity ? modColor(defaultBackground, -10):undefined}
-                  fill='horizontal'
-                  pad='medium'
-                  gap='small'
-                >
-                  <Box basis={mobile?'30%':'30%'} align='center'>
-                    <Box direction='row' alignSelf='start'>
-                      <AprBadge activeView={activeView} series={x} />
-                    </Box>
+        <Loading condition={seriesLoading} size='large'>
+          { !seriesLoading && [...sortedList.values() ].map((x:any, i:any) => {       
+            const _key = i;
+            const field = viewMap.get(activeView.toUpperCase())?.field || '';
+            return (       
+              <StickyButton
+                key={_key}
+                direction='row' 
+                justify='between'
+                onClick={()=>handleSelectSeries(x.maturity)}
+                onMouseDown={()=>setHasSelected(true)}
+                fill='horizontal'
+                pad='small'
+                gap='small'
+                selected={!hasSelected && activeSeries.maturity === x.maturity}
+                align='center'
+              >
+                <Box basis={mobile?'30%':'30%'} align='center'>
+                  <Box direction='row' alignSelf='start'>
+                    <AprBadge activeView={activeView} series={x} />
                   </Box>
-
-                  <Box fill='horizontal' direction='row' justify='between' gap='small'>
-                    <Box fill align={mobile?'start':'start'}>
-                      <Text size='xsmall'>
-                        { mobile? x.displayNameMobile : x.displayName }
-                      </Text>
-                    </Box>
-                    <Box fill align={mobile?'end':undefined}>
-                      <Text size='xsmall'>
-                        {x[field]}
-                      </Text>
-                    </Box>                 
-                  </Box>
-
-                  { 
-                  !mobile && 
-                  <Box basis='25%' direction='row' justify='end'>
-                    { 
-                    activeSeries && 
-                    activeSeries.maturity === x.maturity ?                     
-                      <Button 
-                        primary
-                        color={activeSeries.seriesColor}
-                        label={
-                          <Text size='small'>Selected</Text>           
-                        }
-                        icon={<Check />}
-                      /> : 
-                      <RaisedButton 
-                        background={activeSeries.maturity === x.maturity ? modColor(defaultBackground, -10):undefined}
-                        secondary
-                        label={<Text size='small'>Select</Text>}
-                      />
-                    }
-                  </Box>
-                  }
                 </Box>
-              );     
-            })}
-          </Loading>        
-        </InsetBox>
+
+                <Box fill='horizontal' direction='row' gap='small'>
+                  <Box fill>
+                    <Text size='xsmall'>
+                      { mobile? x.displayNameMobile : x.displayName }
+                    </Text>
+                  </Box>
+                  <Box fill align='end'>
+                    <Text size='xsmall'>
+                      {x[field]}
+                    </Text>
+                  </Box>                 
+                </Box>
+              </StickyButton>
+            );     
+          })}
+        </Loading>
 
         {
         !mobile &&

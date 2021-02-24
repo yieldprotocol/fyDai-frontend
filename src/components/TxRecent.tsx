@@ -24,7 +24,7 @@ const TxRecent = ({ setView }: any) => {
     <Box gap="medium" pad='small'>
 
       <Box direction='row' gap='medium' align='center' justify='between'>
-        <Text alignSelf='start' size='large' weight='bold'>Transactions</Text>   
+        <Text alignSelf='start' size='small' weight='bold'>Transactions</Text>   
         <RaisedButton
           onClick={()=>setView()}
           label={<Box pad={{ vertical:'xsmall', horizontal:'xsmall' }}><Text size='xxsmall'>Full history</Text></Box>}
@@ -40,7 +40,7 @@ const TxRecent = ({ setView }: any) => {
           align='center'
           gap='small'
         >
-          <Text size='xsmall'>Last successful transaction: </Text>
+          <Text size='xxsmall'>Last successful transaction: </Text>
           <HashWrap hash={lastTx?.transactionHash}> 
             <Box direction='row' gap='medium' align='center'>
               <Text weight='bold' size='xsmall'>{abbreviateHash(lastTx?.transactionHash, 8)} </Text>  
@@ -58,7 +58,7 @@ const TxRecent = ({ setView }: any) => {
           direction='row'
           justify='between'
         > 
-          <Text size='xsmall'>Last transaction this session: </Text>
+          <Text size='xxsmall'>Last transaction this session: </Text>
           <HashWrap hash={lastCompletedTx?.transactionHash}> 
             <Box direction='row' gap='medium' align='center'>
               <Text weight='bold' size='xsmall'>{abbreviateHash(lastCompletedTx?.transactionHash, 8)} </Text>  
@@ -71,13 +71,12 @@ const TxRecent = ({ setView }: any) => {
         { 
         pendingTxs.length>0 && 
         <Box gap='small'>
-          <Text size='xsmall'>Pending Transactions: </Text>
+          <Text size='xxsmall'>Pending Transactions: </Text>
           <Box
             round='xsmall'
             border='all'
             pad='xsmall'
-          >
-          
+          >      
             { 
             pendingTxs.map((x:any)=>(        
               <Box
@@ -95,7 +94,7 @@ const TxRecent = ({ setView }: any) => {
                 </HashWrap>
                 <FlatButton 
                   label={<Text size='xxsmall'>Stuck?</Text>}
-                  onClick={()=> dispatch({ type:'txComplete', payload: x.tx })}
+                  onClick={()=> dispatch({ type:'forceClear', payload: null })}
                 />
                
               </Box>

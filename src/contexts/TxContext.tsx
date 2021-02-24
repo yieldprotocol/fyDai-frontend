@@ -1,13 +1,17 @@
 import React, { useState, useContext, useEffect, useReducer } from 'react';
 import { useWeb3React } from '@web3-react/core';
+import { ethers } from 'ethers';
 
 /* utils and support */
-import { logEvent } from '../utils';
+import { analyticsLogEvent } from '../utils';
 
 import { useCachedState } from '../hooks/appHooks';
+import { useSignerAccount } from '../hooks/connectionHooks'; 
+
 import { IReducerAction, ITxState } from '../types';
 
 import { YieldContext } from './YieldContext';
+
 
 const TxContext = React.createContext<any>({});
 
@@ -35,15 +39,23 @@ function txReducer(state:ITxState, action:IReducerAction) {
         /* add the tx to the list of pending txs */
         pendingTxs: [ ...state.pendingTxs, action.payload],
       };
+    case 'forceClear': 
+      return {
+        ...state,
+        /* add the tx to the list of pending txs */
+        pendingTxs: [ ],
+        txProcessActive: null,
+      };
+
     case 'txComplete':
       return {
         ...state,
         /* remove the tx from the pending tx list */
-        pendingTxs: state.pendingTxs?.filter((x:any) => x.tx.hash !== ( action.payload.receipt.transactionHash || action.payload.receipt.hash)),
+        pendingTxs: state.pendingTxs?.filter((x:any) => x.tx.hash !== ( action.payload.receipt.transactionHash || action.payload.receipt.hash )),
         /* set the last completed tx to the one just finished */
         lastCompletedTx: { ...action.payload.receipt, transactionHash: action.payload.receipt.transactionHash || action.payload.receipt.hash },
         /* if the txCode is the same as the current activeProcces,. then reset that process */
-        txProcessActive: (action.payload.txCode === state?.txProcessActive)? null : state?.txProcessActive,
+        txProcessActive: ( action.payload.txCode === state?.txProcessActive )? null : state?.txProcessActive,
       };
     case 'setFallbackActive':
       return {
@@ -71,6 +83,7 @@ const TxProvider = ({ children }:any) => {
   const [ pendingCache, setPendingCache ] = useCachedState('txPending', []);
   const { library } = useWeb3React('fallback');
   const [ hasReadCache, setHasReadCache] = useState<boolean>(false);
+  const { account  } = useSignerAccount();
   
   useEffect(() => {
     /* handle registering and monitoring the cached transaction if any */
@@ -81,13 +94,15 @@ const TxProvider = ({ children }:any) => {
           await library.waitForTransaction(x.tx.hash, 2)
             .then((receipt:any) => {
 
-              logEvent(
+              analyticsLogEvent(
                 x.tx.type, 
                 {
-                  value: x.tx.value,
+                  value: ethers.utils.parseEther(x.tx.value),
                   series: x.tx.series ? x.tx.series.displayName : null,
                   maturity: x.tx.series ? x.tx.series.maturity : null, 
-                  time_to_maturity: x.tx.series ? (new Date().getTime()/1000) - x.tx.series?.maturity : null,    
+                  time_to_maturity: x.tx.series ? (new Date().getTime()/1000) - x.tx.series?.maturity : null, 
+                  account: account?.substring(2),
+                  hash: x.tx.hash.substring(2)
                 });
 
               dispatch({ type: 'txComplete', payload: { receipt, txCode: x.txCode } } );

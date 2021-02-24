@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
+import styled from 'styled-components';
 import { useWeb3React } from '@web3-react/core';
 import {
   Text,
   Box,
   ResponsiveContext,
   Layer,
-  Collapsible,
 } from 'grommet';
 import { 
   FiSettings as Gear,
@@ -23,6 +23,9 @@ import DaiMark from './logos/DaiMark';
 import Loading from './Loading';
 import TxStatus from './TxStatus';
 import EthMark from './logos/EthMark';
+import Selector from './Selector';
+import USDCMark from './logos/USDCMark';
+
 
 const AccountButton = (props: any) => {
   
@@ -40,7 +43,6 @@ const AccountButton = (props: any) => {
   // flags
   const [txStatusOpen, setTxStatusOpen] = useState(false);
   const [txCompleteOpen, setTxCompleteOpen] = useState(false);
-  const [detailsOpen, setDetailsOpen] = useState<boolean>(false);
 
   /* show txComplete for a short amount of time */
   useEffect(()=>{  
@@ -52,7 +54,6 @@ const AccountButton = (props: any) => {
     })();
 
   }, [pendingTxs, lastCompletedTx ]);
-
 
   /* internal components */
 
@@ -89,67 +90,65 @@ const AccountButton = (props: any) => {
 
   return (
     <Box
-      round
       direction='row'
-      align='center'
-      background='background'
+      gap='xsmall'
+      
     > 
-      { txStatusOpen &&  <TxStatusLayer /> }    
       { 
-        txCompleteOpen && 
-          <Box
-            ref={completeRef}
-            direction='row'
-            margin={{ right:'-20px' }}
-            pad={{ vertical: 'xsmall', left:'small', right:'25px' }}
-            round
-            animation='slideLeft'
-            onClick={()=>setTxStatusOpen(true)}
-          >
-            {lastCompletedTx?.status === 1 &&
-            <Box direction='row' gap='xsmall'> 
-              <Text color='green' textAlign='center' size='xsmall'><Check /></Text>
-              { pendingTxs.length===0 && <Text color='green' textAlign='center' size='xsmall'>Transaction Complete</Text>}
-            </Box>}
-    
-            {lastCompletedTx?.status !== 1 &&
-            <Box direction='row' gap='xsmall'>
-              <Text color='red' textAlign='center' size='xsmall'>Transaction failed</Text>
-            </Box>}
-    
-          </Box>
+        txStatusOpen &&  
+        <TxStatusLayer />
       }
 
       { 
       account &&
       !mobile && 
       pendingTxs.length===0 && 
-      !txCompleteOpen && 
+      !txCompleteOpen &&
       <Box 
-        pad={{ left:'small', right:'large' }} 
-        direction='row' 
-        gap='medium' 
-        align='center'
-        onMouseOver={() => setDetailsOpen(true)}
-        onMouseLeave={() => setDetailsOpen(false)}
-        onFocus={() => setDetailsOpen(true)}
-        onBlur={() => setDetailsOpen(false)}
-      >
-        <Collapsible open={detailsOpen} direction='horizontal'>
-          { detailsOpen && 
-          <Box overflow='scroll' gap='xsmall' direction='row' animation='slideLeft'>    
-            <EthMark /> 
-            <Text size='xsmall' weight='bold'>{position?.ethBalance_}</Text>
-            <Text size='xsmall' weight='bold'>ETH</Text>
-          </Box>}
-        </Collapsible>
-    
-        <Box gap='xsmall' direction='row'>
-          <DaiMark />
-          <Loading condition={!position.daiBalance} size='xsmall'>
-            <Text size='xsmall' weight='bold'>{position?.daiBalance_} DAI </Text>
-          </Loading>
-        </Box>
+        width={{ min:'120px' }}
+        animation='slideLeft'
+      >         
+        <Selector 
+          selectedIndex={0} 
+          selectItemCallback={(x:any) => null}
+          flat        
+          items={[       
+            <Box 
+              key='DAI' 
+              direction='row' 
+              gap='small' 
+              align='start'
+              pad={{ left:'small', vertical:'xsmall' }}
+            > 
+              <DaiMark /> 
+              <Loading condition={!position.daiBalance_} size='xxsmall' color='lightgrey'>
+                <Text size='xsmall' weight='bold'>{position?.daiBalance_}</Text>
+              </Loading>
+            </Box>
+            ,
+            <Box
+              key='ETH' 
+              direction='row' 
+              gap='small' 
+              align='start'
+              pad={{ left:'small', vertical:'xsmall' }}
+            >    
+              <EthMark /> 
+              <Text size='xsmall' weight='bold'>{position?.ethBalance_}</Text>
+            </Box>,
+
+            <Box 
+              key='USDC' 
+              direction='row' 
+              gap='small' 
+              align='start'
+              pad={{ left:'small', vertical:'xsmall' }}
+            >
+              <USDCMark /> 
+              <Text size='xsmall' weight='bold'>{position?.usdcBalance_}</Text>
+            </Box>  
+          ]}
+        /> 
       </Box>
       }
       
@@ -170,8 +169,33 @@ const AccountButton = (props: any) => {
       }
 
       { 
+        txCompleteOpen && 
+        <Box
+          ref={completeRef}
+          direction='row'
+          margin={{ right:'-20px' }}
+          pad={{ vertical: 'xsmall', left:'small', right:'25px' }}
+          round
+          animation='slideLeft'
+          onClick={()=>setTxStatusOpen(true)}
+        >
+          {lastCompletedTx?.status === 1 &&
+          <Box direction='row' gap='xsmall'> 
+            <Text color='green' textAlign='center' size='xsmall'><Check /></Text>
+            { pendingTxs.length===0 && <Text color='green' textAlign='center' size='xsmall'>Transaction Complete</Text>}
+          </Box>}
+  
+          {lastCompletedTx?.status !== 1 &&
+          <Box direction='row' gap='xsmall'>
+            <Text color='red' textAlign='center' size='xsmall'>Transaction failed</Text>
+          </Box>}  
+        </Box>
+      }
+  
+
+      { 
       account ?
-        <>{!mobile && <FlatButton
+        <Box margin={{ top:'-1px' }}>{!mobile && <FlatButton
           onClick={()=>openConnectLayer('ACCOUNT')}
           label={
             <Box gap='small' direction='row' align='center'>
@@ -182,7 +206,7 @@ const AccountButton = (props: any) => {
             </Box>
             }
         />}
-        </> 
+        </Box> 
         : 
         <FlatButton 
           onClick={() => {

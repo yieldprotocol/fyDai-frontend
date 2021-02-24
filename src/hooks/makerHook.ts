@@ -2,6 +2,8 @@ import { useMemo, useState, useContext } from 'react';
 import { ethers, BigNumber }  from 'ethers';
 
 import Vat from '../contracts/Vat.json';
+import DssGetCdps from '../contracts/DssGetCdps.json';
+
 import { divDecimal, floorDecimal } from '../utils/yieldMath';
 import { YieldContext } from '../contexts/YieldContext';
 import { useSignerAccount } from './connectionHooks';
@@ -22,9 +24,8 @@ import { useSignerAccount } from './connectionHooks';
  */
 export const useMaker = () => {
   const { abi: vatAbi } = Vat;
+  const { abi: getCdpsAbi } = DssGetCdps;
   
-  const getCdpsAbi = [{ 'constant':true, 'inputs':[{ 'internalType':'address', 'name':'manager', 'type':'address' }, { 'internalType':'address', 'name':'guy', 'type':'address' }], 'name':'getCdpsAsc', 'outputs':[{ 'internalType':'uint256[]', 'name':'ids', 'type':'uint256[]' }, { 'internalType':'address[]', 'name':'urns', 'type':'address[]' }, { 'internalType':'bytes32[]', 'name':'ilks', 'type':'bytes32[]' }], 'payable':false, 'stateMutability':'view', 'type':'function' }, { 'constant':true, 'inputs':[{ 'internalType':'address', 'name':'manager', 'type':'address' }, { 'internalType':'address', 'name':'guy', 'type':'address' }], 'name':'getCdpsDesc', 'outputs':[{ 'internalType':'uint256[]', 'name':'ids', 'type':'uint256[]' }, { 'internalType':'address[]', 'name':'urns', 'type':'address[]' }, { 'internalType':'bytes32[]', 'name':'ilks', 'type':'bytes32[]' }], 'payable':false, 'stateMutability':'view', 'type':'function' }];
-
   const { fallbackProvider, account } = useSignerAccount();
   const { state : { deployedContracts } } = useContext<any>(YieldContext);
 

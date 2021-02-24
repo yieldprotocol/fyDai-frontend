@@ -5,7 +5,7 @@ import { Box, Button, TextInput, Text, Keyboard, ResponsiveContext, Collapsible 
 import { FiArrowLeft as ArrowLeft } from 'react-icons/fi';
 
 /* utils and support */
-import { cleanValue } from '../utils';
+import { cleanValue, analyticsLogEvent } from '../utils';
 
 /* contexts */
 import { SeriesContext } from '../contexts/SeriesContext';
@@ -62,6 +62,16 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
   /* execution procedure */
   const removeLiquidityProcedure = async (value:number) => {
     if ( !removeLiquidityDisabled ) {
+
+      analyticsLogEvent(
+        'removeLiquidity_initiated', 
+        {
+          value: inputValue,
+          series: activeSeries ? activeSeries.displayName : null,
+          maturity: activeSeries ? activeSeries.maturity: null, 
+          time_to_maturity: activeSeries ? (new Date().getTime()/1000) - activeSeries?.maturity : null,
+          account: account?.substring(2),
+        });
 
       /* if sereis inst mature, close window immediately on action */
       !activeSeries?.isMature() && close();

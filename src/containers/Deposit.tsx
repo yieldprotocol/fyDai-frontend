@@ -17,7 +17,7 @@ import {
 } from 'react-icons/fi';
 
 /* utils and support */
-import { cleanValue } from '../utils';
+import { analyticsLogEvent, cleanValue } from '../utils';
 
 /* contexts */
 import { UserContext } from '../contexts/UserContext';
@@ -92,6 +92,17 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
   /* Steps required to deposit and update values */
   const depositProcedure = async () => {
     if (inputValue && !depositDisabled ) {
+
+      analyticsLogEvent(
+        'Deposit_initiated', 
+        {
+          value: inputValue,
+          series: null,
+          maturity: null, 
+          time_to_maturity: null,
+          account: account?.substring(2),
+        });
+
       setDepositPending(true);
       await postEth(inputValue);
       
@@ -160,7 +171,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
   }, [debouncedInput, ethBalance]);
 
   return (
-    <RaisedBox>
+    <RaisedBox expand>
       <Keyboard 
         onEsc={() => setInputValue(undefined)}
         onEnter={()=> depositProcedure()}

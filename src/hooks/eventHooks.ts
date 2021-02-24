@@ -1,5 +1,6 @@
-import { ethers }  from 'ethers';
+import { BigNumber, ethers }  from 'ethers';
 
+import { TransactionDescription } from 'ethers/lib/utils';
 import { useSignerAccount } from './connectionHooks';
 
 import FYDai from '../contracts/FYDai.json';
@@ -10,6 +11,7 @@ import Vat from '../contracts/Vat.json';
 import ImportCdpProxy from '../contracts/ImportCdpProxy.json';
 import ImportProxy from '../contracts/ImportProxy.json';
 import RollProxy from '../contracts/RollProxy.json';
+import USDCProxy from '../contracts/USDCProxy.json';
 
 // TODO abstract this out to a higher level
 const contractMap = new Map<string, any>([
@@ -18,6 +20,7 @@ const contractMap = new Map<string, any>([
   ['ImportCdpProxy', ImportCdpProxy.abi ],
   ['ImportProxy', ImportProxy.abi ],
   ['RollProxy', RollProxy.abi ],
+  ['USDCProxy', USDCProxy.abi ],
   ['Dai', Dai.abi],
   ['Pool', Pool.abi],
   ['Vat', Vat.abi], 
@@ -67,7 +70,6 @@ export const useEvents = () => {
     filterArgs:any[],
     block:number
   ) => {
-
     const contract = new ethers.Contract(contractAddr, contractMap.get(contractName), provider || fallbackProvider );
     const filter = contract.filters[filterEvent](...filterArgs);
     const logs = await contract.queryFilter( filter, block, 'latest');
@@ -75,7 +77,8 @@ export const useEvents = () => {
   };
 
   /* Adds a parsed layer onto the returned values (for example, this will format dates, numbers to strings, */ 
-  const parseEventList = async (eventList:any) => {
+  const parseEventList = async (eventList:any[]) => {
+    
     const parsedList = Promise.all( eventList.map(async (x:any)=>{
       const { timestamp } = await provider.getBlock(x.blockNumber);
       return {
@@ -87,7 +90,7 @@ export const useEvents = () => {
             return y.toString();
           } if (ethers.utils.isAddress(y)) {
             return ethers.utils.getAddress(y);
-          // eslint-disable-next-line no-constant-condition
+            // eslint-disable-next-line no-constant-condition
           } if (typeof y) {
             return y;
           }
@@ -97,9 +100,16 @@ export const useEvents = () => {
       };
     })
     );
+
     return parsedList;
   };
+  
+  const parseLogs = ( log:any, contract: string ) => {
+    const contractAbi = contractMap.get(contract); 
+    const contractIface = new ethers.utils.Interface(contractAbi);
+    return contractIface.parseLog(log);
+  };
 
-  return { getEventHistory, addEventListener, parseEventList } as const;
+  return { getEventHistory, addEventListener, parseEventList, parseLogs } as const;
 
 };

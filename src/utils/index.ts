@@ -6,7 +6,30 @@ export const BN_RAY = BigNumber.from('1000000000000000000000000000');
 export const ETH_BYTES = ethers.utils.formatBytes32String('ETH-A');
 export const CHAI_BYTES = ethers.utils.formatBytes32String('CHAI');
 export const MAX_INT = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
-export const ZERO = BigNumber.from('1000000000000000000000000000');
+export const ZERO = BigNumber.from('0');
+export const ONE = BigNumber.from('1000000000000000000');
+
+
+
+/* creates internal tracking code of a transaction type */
+export const genTxCode = (txType: string, series:string|null) => {
+  return `${txType}${series || ''}`; 
+};
+
+export const copyToClipboard=(str:string)=> {
+  const el = document.createElement('textarea');
+  el.value = str;
+  document.body.appendChild(el);
+  el.select();
+  document.execCommand('copy');
+  document.body.removeChild(el);
+};
+
+/* log to console + any extra action required, extracted  */
+export const toLog = (message: string, type: string = 'info') => {
+  // eslint-disable-next-line no-console
+  console.log(message);
+};
 
 /* Trunctate a string value to a certain number of 'decimal' point */
 export const cleanValue = (input:string, decimals:number=12) => {
@@ -16,11 +39,6 @@ export const cleanValue = (input:string, decimals:number=12) => {
     return inpu[1];
   }
   return input.valueOf();
-};
-
-/* creates internal tracking code of a transaction type */
-export const genTxCode = (txType: string, series:string|null) => {
-  return `${txType}${series || ''}`; 
 };
 
 /* handle Address/hash shortening */
@@ -60,15 +78,6 @@ export const nFormatter = (num:number, digits:number) => {
     }
   }
   return (num / si[i].value).toFixed(digits).replace(rx, '$1') + si[i].symbol;
-};
-
-export const copyToClipboard=(str:string)=> {
-  const el = document.createElement('textarea');
-  el.value = str;
-  document.body.appendChild(el);
-  el.select();
-  document.execCommand('copy');
-  document.body.removeChild(el);
 };
 
 /**
@@ -132,8 +141,14 @@ export const buildGradient = (colorFrom:string, colorTo:string  ) => {
 };
 
 /* google analytics log event */
-export const logEvent = (eventName: string, eventParams: any ) => {
+export const analyticsLogEvent = (eventName: string, eventParams: any ) => {
   if (eventName) {
+    try {
     window?.gtag('event', eventName, eventParams);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log(e);
+    }
   }
 };
+

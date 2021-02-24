@@ -87,6 +87,8 @@ const YieldNav = (props: any) => {
           to='/ratelock'
           activeStyle={{ transform: 'scale(1.1)', fontWeight: 'normal', color: `${textColor}` }}
         >
+          {
+          true &&
           <Box 
             pad={{ horizontal:'small', vertical:'xxsmall' }} 
             background={loc.pathname.includes('ratelock')? 'text-weak' : 'text-xweak'} 
@@ -97,7 +99,8 @@ const YieldNav = (props: any) => {
               size={mobile? 'small':'xlarge'}
             >RateLock
             </Text>
-          </Box>   
+          </Box> 
+          }  
         </StyledLink> 
 
       </Box>
