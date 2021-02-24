@@ -430,7 +430,7 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
 
             <Box gap='medium' align='center' fill='horizontal'>
               <Box direction='row' justify='between' fill>
-                <Text alignSelf='start' size='large' color='text' weight='bold'>Amount to borrow</Text>
+                <Text alignSelf='start' size='large' color='text' weight='bold'>Borrow details</Text>
                 { 
                   !mobile &&  !userLoading &&
                   <RaisedButton
@@ -478,7 +478,7 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
                 <TextInput
                   ref={(el:any) => {el && !repayOpen && !rateLockOpen && !mobile && el.focus(); setInputRef(el);}} 
                   type="number"
-                  placeholder={!mobile ? `Enter the amount of ${currency} to borrow`: currency} 
+                  placeholder={!mobile ? `Enter the amount of ${currency} to ${currency==='DAI'?'borrow':'receive'}`: currency} 
                   value={inputValue || ''}
                   plain
                   onChange={(event:any) => setInputValue( cleanValue(event.target.value) )}
