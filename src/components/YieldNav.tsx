@@ -88,7 +88,8 @@ const YieldNav = (props: any) => {
           activeStyle={{ transform: 'scale(1.1)', fontWeight: 'normal', color: `${textColor}` }}
         >
           {
-          true &&
+          !mobile &&
+
           <Box 
             pad={{ horizontal:'small', vertical:'xxsmall' }} 
             background={loc.pathname.includes('ratelock')? 'text-weak' : 'text-xweak'} 

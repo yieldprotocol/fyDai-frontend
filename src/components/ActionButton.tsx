@@ -125,7 +125,7 @@ function ActionButton({ ...props }:any ) {
 
   return (
     <>
-      { !props.disbled &&  mobile ? <ButtonForMobile /> : <ButtonForWeb /> }
+      { !props.disabled && mobile ? <ButtonForMobile /> : <ButtonForWeb /> }
       { 
       props.disabled &&
       <Box 
