@@ -320,7 +320,8 @@ function Repay({ close }:IRepayProps) {
                   <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
 
                     { 
-                    !isRollDebt &&
+                     !isRollDebt && 
+                     !mobile &&
                     <Box basis='30%'>
                       <Selector
                         selectedIndex={0} 
@@ -356,7 +357,7 @@ function Repay({ close }:IRepayProps) {
                       value={inputValue || ''}
                       plain
                       onChange={(event:any) => setInputValue(( cleanValue(event.target.value, 6) ))}
-                      icon={isRollDebt? <DaiMark /> : undefined}
+                      icon={isRollDebt || mobile ? <DaiMark /> : undefined}
                     />
                     <FlatButton 
                       label={!mobile ? `${isRollDebt? 'Roll Maximum': 'Repay Maximum'}`: 'Maximum'}
