@@ -170,6 +170,20 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
     }
   }, [debouncedInput, ethBalance]);
 
+  /* analytics input values  before submission */ 
+  const analyticsInput = useDebounce(inputValue, 3500);
+  useEffect(() => {
+    analyticsLogEvent(
+      'deposit_input', 
+      {
+        value: analyticsInput,
+        series: null,
+        maturity: null, 
+        time_to_maturity: null,
+        account: account?.substring(2),
+      });
+  }, [analyticsInput] );
+
   return (
     <RaisedBox expand>
       <Keyboard 

@@ -231,7 +231,7 @@ const UserProvider = ({ children }: any) => {
         _updatePreferences(null),
       ]);
 
-      console.log(auths?.dsProxyAddress);
+      // console.log(auths?.dsProxyAddress);
 
       /* Then get maker data if available */ 
       await _getMakerVaults(auths?.dsProxyAddress);

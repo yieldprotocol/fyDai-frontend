@@ -91,7 +91,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
   const lendProcedure = async () => {
 
     analyticsLogEvent(
-      'lend_initiated', 
+      'sell_initiated', 
       {
         value: inputValue,
         series: activeSeries ? activeSeries.displayName : null,
@@ -160,6 +160,20 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
       setErrorMsg(null);
     }
   }, [ debouncedInput, daiBalance ]);
+
+  /* analytics input values  before submission */ 
+  const analyticsInput = useDebounce(inputValue, 3500);
+  useEffect(() => {
+    analyticsLogEvent(
+      'lend_input', 
+      {
+        value: analyticsInput,
+        series: activeSeries ? activeSeries.displayName : null,
+        maturity: activeSeries ? activeSeries.maturity: null, 
+        time_to_maturity: activeSeries ? (new Date().getTime()/1000) - activeSeries?.maturity : null,
+        account: account?.substring(2),
+      });
+  }, [analyticsInput] );
 
   return (
     <RaisedBox expand={!!seriesData}>

@@ -220,6 +220,20 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
     }
   }, [ debouncedInput ]);
 
+  /* analytics input values  before submission */ 
+  const analyticsInput = useDebounce(inputValue, 3500);
+  useEffect(() => {
+    analyticsLogEvent(
+      'borrow_input', 
+      {
+        value: analyticsInput,
+        series: activeSeries ? activeSeries.displayName : null,
+        maturity: activeSeries ? activeSeries.maturity: null, 
+        time_to_maturity: activeSeries ? (new Date().getTime()/1000) - activeSeries?.maturity : null,
+        account: account?.substring(2),
+      });
+  }, [analyticsInput] );
+
   return (
     <RaisedBox expand={seriesData}>
       <Keyboard 

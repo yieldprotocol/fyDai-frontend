@@ -155,8 +155,23 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
     }
   }, [ debouncedInput, daiBalance ]);
 
+
+  /* analytics input values  before submission */ 
+  const analyticsInput = useDebounce(inputValue, 3500);
+  useEffect(() => {
+    analyticsLogEvent(
+      'pool_input', 
+      {
+        value: analyticsInput,
+        series: activeSeries ? activeSeries.displayName : null,
+        maturity: activeSeries ? activeSeries.maturity: null, 
+        time_to_maturity: activeSeries ? (new Date().getTime()/1000) - activeSeries?.maturity : null,
+        account: account?.substring(2),
+      });
+  }, [analyticsInput] );
+  
   return (
-    <RaisedBox expand={ !!seriesData }>
+    <RaisedBox expand={!!seriesData}>
       <Keyboard 
         onEsc={() => setInputValue(undefined)}
         onEnter={()=> addLiquidityProcedure()}
