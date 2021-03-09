@@ -31,11 +31,9 @@ export const useTxHelpers = () => {
   const  { state, dispatch  }  = useContext(TxContext);
 
   const { account  } = useSignerAccount();
-
   const [ pendingCache, setPendingCache ] = useCachedState('txPending', []);
 
   /* Notification Helpers */
-
   const txComplete = (receipt:any, txCode:string|null=null) => {  
     dispatch({ type: 'txComplete', payload: { receipt, txCode } } );
     setPendingCache(pendingCache.filter( (x:any)=> x.tx.hash === receipt.hash ));
@@ -81,19 +79,20 @@ export const useTxHelpers = () => {
     dispatch({ type: 'txPending', payload: { ...tx, txCode } });
     /* Add the tx to the cache, for picking up on reload */
     setPendingCache([{ ...tx, txCode }]);
+
     await tx.tx.wait()
       .then((receipt:any) => {
+        txComplete(receipt, txCode);
         analyticsLogEvent(
           tx.type, 
           {
-            value: ethers.utils.parseEther(tx.value||''),
+            value: tx.value ? ethers.utils.parseEther(tx.value): '',
             series: tx.series ? tx.series.displayName : null,
             maturity: tx.series ? tx.series.maturity : null, 
             time_to_maturity: tx.series ? secondsToFrom(tx.series.maturity.toString()) : null,
             account: account?.substring(2),
             hash: tx.tx.hash.substring(2)
-          });
-        txComplete(receipt, txCode);
+          });      
       }, ( error:any ) => {
         handleTxError('Error: Transaction failed. Please see console', tx.tx, error);
         analyticsLogEvent('TX_ERROR', { user: account?.substring(2), hash: tx.tx.hash.substring(2) } );
