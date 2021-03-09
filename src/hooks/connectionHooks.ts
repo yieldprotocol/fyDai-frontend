@@ -14,6 +14,7 @@ import { injected } from '../connectors';
 import { NotifyContext } from '../contexts/NotifyContext';
 
 import { useCachedState } from './appHooks';
+import { analyticsLogEvent } from '../utils';
 
 const defaultChainId = 1;
 const urls = { 
@@ -32,18 +33,19 @@ const clearAllButPrefs = () => {
 };
 
 const useEagerConnect = () => {
-  const { activate, active, chainId } = useWeb3React();
+  const { activate, active, chainId, account } = useWeb3React();
   const { activate: activateFallback } = useWeb3React('fallback');
   const [ cachedChainId, setCachedChainId ] = useCachedState('cache_chainId', null);
   const [ tried, setTried ] = useState(false);
   const { handleErrorMessage } = useWeb3Errors();
 
   useEffect(() => {
-    injected.isAuthorized().then((isAuthorized: boolean) => {
+    injected.isAuthorized().then( async (isAuthorized: boolean) => {
       if (isAuthorized) {
-        activate(injected, undefined, true).catch(() => {
+        await activate(injected, undefined, true).catch(() => {
           setTried(true);
         });
+        analyticsLogEvent( 'metamask_auto_connect', { });
       } else {
         setTried(true);
       }
@@ -74,7 +76,7 @@ const useInactiveListener = (suppress: boolean = false) => {
     const { ethereum } = window as any;
     if (ethereum && ethereum.on && !active && !error && !suppress) {
       const handleConnect = () => {
-        console.log('Handling CONNECT event');
+        
         // activate(injected);
         if ((cachedChainId !== _chainId) && active) {
           console.log('Chain Id changed');
@@ -170,6 +172,7 @@ export function useConnection() {
     if (activatingConnector && activatingConnector === connector) {
       setActivatingConnector(undefined);
     }
+
   }, [activatingConnector, connector]);
 
   /* 'Eager' connect checks to see if there is an active web3 browser connection */
@@ -196,6 +199,8 @@ export function useConnection() {
       _connection, 
       (x) => handleErrorMessage(x)
     );
+    // console.log('web3_manual_connect', connector );
+    analyticsLogEvent( 'web3_manual_connect', {});
   };
 
   return { handleSelectConnector };

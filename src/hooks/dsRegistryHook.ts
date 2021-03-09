@@ -70,8 +70,6 @@ export const useDsRegistry = () => {
   ): Promise<string> => {
 
     const userAddr = account && ethers.utils.getAddress(account);
-    console.log('user', userAddr);
-    console.log(fallbackProxyRegistryContract);
 
     let res;
     try {
