@@ -171,7 +171,7 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
   useEffect(() => {
     activeSeries && currency === 'USDC' &&  debouncedInput>0 && ( async () => {
       const tout =  await checkPsm(); // sell = .tin :  buy = .tout
-      const _amnt = ethers.utils.parseEther(debouncedInput.toString());
+      const _amnt = ethers.utils.parseEther(debouncedInput.toString());   
       const fee = _amnt.mul(tout).div(ONE);
       const daiAmnt = _amnt.add(fee); // sell = sub : buy = add
       setUSDCValueInDai(cleanValue(ethers.utils.formatEther(daiAmnt.toString()), 2));
@@ -544,22 +544,6 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
                       valueExtra: null,
                     },
                     {
-                      label: 'Like what you see?',
-                      visible: !account && inputValue>0,
-                      active: inputValue,
-                      loading: false,            
-                      value: '',
-                      valuePrefix: null,
-                      valueExtra: () => (
-                        <Box pad={{ top:'small' }}>
-                          <RaisedButton
-                            label={<Box pad='xsmall'><Text size='xsmall'>Connect a wallet</Text></Box>}
-                            onClick={() => openConnectLayer()}
-                          /> 
-                        </Box>
-                      )
-                    },
-                    {
                       label: 'Collateralization Ratio',
                       labelExtra: `after borrowing ${currency === 'DAI' ? inputValue && cleanValue(inputValue, 2) : USDCValueInDai } DAI`,
                       visible: !!inputValue && !!account && position.ethPosted_>0,
@@ -599,16 +583,15 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
                 </Collapsible>
               </Box>
 
-              {
-              account &&
               <ActionButton
                 onClick={()=>borrowProcedure()}
                 label={currency === 'DAI'? `Borrow ${inputValue || ''} DAI` : `Borrow Dai, Receive ${inputValue || ''} USDC`}
                 disabled={borrowDisabled}
                 hasPoolDelegatedProxy={activeSeries.hasPoolDelegatedProxy}
                 clearInput={()=>setInputValue(undefined)}
+                openConnectLayer={()=>openConnectLayer()}
               />
-              }
+
             </Box>
             }
             
@@ -639,7 +622,7 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
                 />
               </Box>
               }
-            
+
               { 
               !activeSeries?.isMature() &&
               activeSeries?.ethDebtFYDai?.gt(ethers.constants.Zero) &&

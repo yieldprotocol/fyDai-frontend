@@ -381,23 +381,6 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                         valuePrefix: null,
                         valueExtra: null
                       },
-
-                      {
-                        label: 'Like what you see?',
-                        visible: !account && inputValue>0,
-                        active: true,
-                        loading: false,            
-                        value: '',
-                        valuePrefix: null,
-                        valueExtra: () => (
-                          <Box pad={{ top:'small' }}>
-                            <RaisedButton
-                              label={<Box pad='xsmall'><Text size='xsmall'>Connect a wallet</Text></Box>}
-                              onClick={() => openConnectLayer()}
-                            /> 
-                          </Box>
-                        )
-                      },
                     ]}
                     />
                     {
@@ -419,6 +402,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                   disabled={addLiquidityDisabled}
                   hasPoolDelegatedProxy={activeSeries.hasPoolDelegatedProxy}
                   clearInput={()=>setInputValue(undefined)}
+                  openConnectLayer={()=>openConnectLayer()}
                 />
               </Box>
             </>}

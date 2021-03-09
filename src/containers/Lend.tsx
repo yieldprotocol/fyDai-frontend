@@ -311,22 +311,6 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
                         valuePrefix: null,
                         valueExtra: null,
                       },
-                      {
-                        label: 'Like what you see?',
-                        visible: !account && inputValue>0,
-                        active: inputValue,
-                        loading: false,            
-                        value: '',
-                        valuePrefix: null,
-                        valueExtra: () => (
-                          <Box pad={{ top:'small' }}>
-                            <RaisedButton
-                              label={<Box pad='xsmall'><Text size='xsmall'>Connect a wallet</Text></Box>}
-                              onClick={() => openConnectLayer()}
-                            /> 
-                          </Box>
-                        )
-                      },
                     ]}
                     />
                   </Collapsible>
@@ -340,6 +324,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
                   disabled={lendDisabled}
                   hasPoolDelegatedProxy={activeSeries.hasPoolDelegatedProxy}
                   clearInput={()=>setInputValue(undefined)}
+                  openConnectLayer={()=>openConnectLayer()}
                 />       
               </Box>
             </>}

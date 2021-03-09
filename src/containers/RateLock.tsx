@@ -453,11 +453,6 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
                 </Box>
               </InsetBox>
             </Box>
-
-            {/* { 
-          activeSeries?.isMature() &&
-          <SeriesMatureBox />
-        } */}
            
             <Box direction='row' justify='between' align='center' pad='small'>
               <Text size='xsmall' color='text'> Selected Yield Series: </Text>
