@@ -366,6 +366,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
               disabled={depositDisabled}
               hasPoolDelegatedProxy={true}
               clearInput={()=>setInputValue(undefined)}
+              openConnectLayer={()=>openConnectLayer()}
             /> }
 
           {!mobile &&

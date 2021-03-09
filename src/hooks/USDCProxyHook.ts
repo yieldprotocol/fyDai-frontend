@@ -66,12 +66,14 @@ export const useUSDCProxy = () => {
       USDCProxyAbi,
       signer
     ));
+
     deployedContracts?.Controller && signer && 
     setControllerContract( new ethers.Contract( 
       ethers.utils.getAddress(deployedContracts?.Controller), 
       controllerAbi,
       signer
     ));
+
     deployedContracts?.Controller && 
     setPsmContract( new ethers.Contract( 
       ethers.utils.getAddress(deployedContracts?.DssPsm), 
@@ -329,12 +331,17 @@ export const useUSDCProxy = () => {
     call:string = 'tout'
   ): Promise<BigNumber> => {
     let res;
+    const contract = new ethers.Contract( 
+      ethers.utils.getAddress(deployedContracts?.DssPsm), 
+      psmAbi,
+      fallbackProvider
+    );
     try {
-      res = call === 'tin' ? await psmContract.tin() : await psmContract.tout();
+      res = call === 'tin' ? await contract.tin() : await contract.tout();
     }  catch (e) {
       // eslint-disable-next-line no-console
       console.log(e);
-      res = false;
+      res = BigNumber.from('0');
     }
     return res;
   };

@@ -449,20 +449,19 @@ function Repay({ close }:IRepayProps) {
                     </Collapsible>
                   </Box>
 
-                  {
-                   !repayDisabled &&
-                   <ActionButton
-                     onClick={isRollDebt? ()=> rollDebtProcedure(inputValue) : ()=>repayProcedure(inputValue)}
-                     label={
+ 
+                  <ActionButton
+                    onClick={isRollDebt? ()=> rollDebtProcedure(inputValue) : ()=>repayProcedure(inputValue)}
+                    label={
                       currency === 'DAI' ?                       
-                        `${isRollDebt? 'Roll':'Repay'} ${inputValue} Dai ${isRollDebt?'to':''} ${isRollDebt?destinationSeries?.displayNameMobile:''}` : 
-                        `Repay ${USDCValueInDai} Dai Debt with ${ inputValue && cleanValue(inputValue, 2)} USDC`
+                        `${isRollDebt? 'Roll':'Repay'} ${inputValue! || ''} Dai ${isRollDebt?'to':''} ${isRollDebt?destinationSeries?.displayNameMobile:''}` : 
+                        `Repay ${USDCValueInDai || '' } Dai Debt with ${ inputValue && cleanValue(inputValue, 2)} USDC`
                       }
-                     disabled={repayDisabled}
-                     hasPoolDelegatedProxy={true}
-                     clearInput={()=>setInputValue(undefined)}
-                   />                 
-                  }
+                    disabled={repayDisabled}
+                    hasPoolDelegatedProxy={true}
+                    clearInput={()=>setInputValue(undefined)}
+                  />                 
+
 
                   {!activeSeries?.isMature() && !mobile &&
                   <Box alignSelf='start' margin={{ top:'medium' }}> 

@@ -83,6 +83,10 @@ export const yieldTheme = {
         dark: '#999999',
         light: '#5f767e96',
       },
+      'text-xxweak': {
+        dark: '#555555',
+        light: '#DDDDDD',
+      },
       border: {
         dark: 'rgba(0, 0, 0, 0.08)',
         light: 'rgba(0, 0, 0, 0.08)',
