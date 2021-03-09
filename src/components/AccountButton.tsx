@@ -194,27 +194,29 @@ const AccountButton = (props: any) => {
   
 
       { 
-      account ?
-        <Box margin={{ top:'-1px' }}>{!mobile && <FlatButton
-          onClick={()=>openConnectLayer('ACCOUNT')}
-          label={
-            <Box gap='small' direction='row' align='center'>
-              <Text size='small'>
-                { abbreviateHash(account) }
-              </Text>
-              <Gear />
-            </Box>
+      !mobile &&  
+        ( account ?
+          <Box margin={{ top:'-1px' }}>{!mobile && <FlatButton
+            onClick={()=>openConnectLayer('ACCOUNT')}
+            label={
+              <Box gap='small' direction='row' align='center'>
+                <Text size='small'>
+                  { abbreviateHash(account) }
+                </Text>
+                <Gear />
+              </Box>
             }
-        />}
-        </Box> 
-        : 
-        <FlatButton 
-          onClick={() => {
-            openConnectLayer('CONNECT');
-          }}
-          label={<Box pad='xsmall'><Text size='small'>Connect a wallet</Text></Box>}
-        />
-    }
+          />}
+          </Box> 
+          : 
+          <FlatButton 
+            onClick={() => {
+              openConnectLayer('CONNECT');
+            }}
+            label={<Box pad='xsmall'><Text size='small'>Connect a wallet</Text></Box>}
+          />
+        )
+      }
     </Box>
   );
 };

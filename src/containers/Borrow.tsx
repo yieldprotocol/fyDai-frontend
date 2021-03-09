@@ -181,13 +181,13 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
   /* Handle borrow disabling deposits - disable if any of the conditions are met */
   useEffect(()=>{
     (
-      (ethPosted && ethPosted.eq(ethers.constants.Zero) ) ||
-      (inputValue && maxDaiBorrow && ethers.utils.parseEther(inputValue).gte(maxDaiBorrow)) ||
+      ( ethPosted && ethPosted.eq(ethers.constants.Zero) ) ||
+      (inputValue && maxDaiBorrow && ethers.utils.parseEther(inputValue!).gte(maxDaiBorrow!)) ||
       !account ||
       !inputValue ||
       parseFloat(inputValue) <= 0
     ) ? setBorrowDisabled(true): setBorrowDisabled(false);
-  }, [ inputValue ]);
+  }, [ inputValue, ethPosted, maxDaiBorrow, account ]);
 
   /* Handle input exception logic (using debouncedInput to allow for small mistakes/corrections) */
   useEffect(() => {
@@ -462,6 +462,8 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
               </Box>
 
               <InputWrap errorMsg={errorMsg} warningMsg={warningMsg}>
+                {
+                !mobile &&
                 <Box basis='25%'>
                   <Selector
                     selectedIndex={0} 
@@ -488,6 +490,12 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
                     ]}
                   />
                 </Box>
+                }
+                { 
+                  mobile
+                
+                
+                }
 
                 <TextInput
                   ref={(el:any) => {el && !repayOpen && !rateLockOpen && !mobile && el.focus(); setInputRef(el);}} 
@@ -496,11 +504,7 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
                   value={inputValue || ''}
                   plain
                   onChange={(event:any) => setInputValue( cleanValue(event.target.value) )}
-                  // icon={
-                  //   isLol ? 
-                  //     <span role='img' aria-label='lol'>😂</span> :
-                  //     <DaiMark />                   
-                  // }
+                  icon={mobile? <DaiMark /> : undefined}
                 />
 
               </InputWrap>
