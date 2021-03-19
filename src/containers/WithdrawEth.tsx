@@ -5,7 +5,7 @@ import ethers from 'ethers';
 import { FiArrowLeft as ArrowLeft } from 'react-icons/fi';
 
 /* utils and support */
-import { cleanValue, analyticsLogEvent } from '../utils';
+import { cleanValue, analyticsLogEvent, ZERO } from '../utils';
 
 /* contexts */
 import { UserContext } from '../contexts/UserContext';
@@ -99,12 +99,18 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
 
   /* Withdraw disabled logic */
   useEffect(()=>{
-    ( !estPercent ||
-      parseFloat(estPercent) < 150 ||
-      txActive ||
-      !inputValue ||
-      parseFloat(inputValue) <= 0
-    ) ? setWithdrawDisabled(true) : setWithdrawDisabled(false);
+
+    if (debtValue.lte(ZERO) && parseFloat(inputValue) > 0 && !txActive) {
+      setWithdrawDisabled(false);
+    } else {
+      ( !estPercent ||
+        parseFloat(estPercent) < 150 ||
+        txActive ||
+        !inputValue ||
+        parseFloat(inputValue) <= 0
+      ) ? setWithdrawDisabled(true) : setWithdrawDisabled(false);
+    }
+
   }, [ inputValue, estPercent ]);
 
   /* show warnings and errors with collateralization ratio levels and inputs */
