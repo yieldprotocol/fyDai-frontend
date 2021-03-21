@@ -85,7 +85,19 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
 
   /* Calculate maximum available to withdraw */
   useEffect(()=>{
-    ethPosted && ethLocked && setMaxWithdraw( ethers.utils.formatEther(ethPosted.sub(ethLocked) )) ;
+
+    if  ( ethPosted && ethLocked ) {
+      const max= ethPosted.sub(ethLocked); 
+      const hardMin = ethers.utils.parseEther('0.05');
+
+      (ethPosted.sub(max)).gt( hardMin ) ? 
+        setMaxWithdraw( ethers.utils.formatEther(max)) :
+        setMaxWithdraw( ethers.utils.formatEther(max.sub(hardMin)));
+    }
+    // }
+    // ethPosted && ethLocked && setMaxWithdraw( ethers.utils.formatEther(ethPosted.sub(ethLocked) )) ;
+
+
   }, [ethPosted, ethLocked]);
 
   /* Calculate collateralization Ratio based on input */ 
