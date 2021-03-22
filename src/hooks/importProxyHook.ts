@@ -105,8 +105,8 @@ export const useImportProxy = () => {
     /* calculate expected max safety values  */  
     let maxDaiPrice:string;         
     const preview = await previewPoolTx('buyDai', series, ethers.utils.parseEther('1'));   
-    if ( !(preview instanceof Error) ) {
-      
+
+    if ( !(preview instanceof Error) ) { 
       // 1 + ( 1.1 * ( price - 1 ) )
       const _one = ONE.mul('1e18');
       const diff = preview.sub(_one.toFixed());
@@ -202,7 +202,8 @@ export const useImportProxy = () => {
  
     /* calculate expected max safety values */  
     let maxDaiPrice: string; 
-    const preview = await previewPoolTx('buydai', series, ethers.utils.parseEther('1'));   
+
+    const preview = await previewPoolTx('buyDai', series, ethers.utils.parseEther('1'));  
     
     if ( !(preview instanceof Error) ) { 
       // 1 + ( 1.1 * ( price - 1 ) )
@@ -210,12 +211,10 @@ export const useImportProxy = () => {
       const adjPrev = calculateSlippage(preview, preferences.slippage);
       const prevAsRay = (_zero.add(adjPrev)).mul('1000000000'); 
       maxDaiPrice =  prevAsRay.toFixed();
-
     }  else {
       throw(preview);
     }
    
-
     /* build and use signature if required , else '0x' */
     const requestedSigs:Map<string, ISignListItem> = new Map([]);
 
