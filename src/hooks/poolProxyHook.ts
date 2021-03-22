@@ -283,7 +283,7 @@ export const usePoolProxy = () => {
       );
 
       /* set the gas limits based on whether sigs are required */
-      overrides = noSigsReqd ? { gasLimit: BigNumber.from('600000'), value:0 } :{ gasLimit: BigNumber.from('600000'), value:0 };
+      overrides = noSigsReqd ? { gasLimit: BigNumber.from('650000'), value:0 } :{ gasLimit: BigNumber.from('750000'), value:0 };
     
     } else {
 
