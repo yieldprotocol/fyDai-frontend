@@ -104,7 +104,7 @@ export const useImportProxy = () => {
 
     /* calculate expected max safety values  */  
     let maxDaiPrice:string;         
-    const preview = await previewPoolTx('buyDai', series, ethers.utils.parseEther('1'));   
+    const preview = await previewPoolTx('buyDai', series, ethers.utils.parseEther('1'), true);   
 
     if ( !(preview instanceof Error) ) { 
       // 1 + ( 1.1 * ( price - 1 ) )
@@ -203,7 +203,7 @@ export const useImportProxy = () => {
     /* calculate expected max safety values */  
     let maxDaiPrice: string; 
 
-    const preview = await previewPoolTx('buyDai', series, ethers.utils.parseEther('1'));  
+    const preview = await previewPoolTx('buyDai', series, ethers.utils.parseEther('1'), true);  
     
     if ( !(preview instanceof Error) ) { 
       // 1 + ( 1.1 * ( price - 1 ) )
