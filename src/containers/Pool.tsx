@@ -114,24 +114,24 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
 
   /* handle value calculations based on input changes */
   useEffect(()=>{
-    if (activeSeries && debouncedInput) {
+    if (activeSeries && inputValue) {
 
       /* calculate new pool share */
-      const estShare = estPoolShare(activeSeries, debouncedInput);
+      const estShare = estPoolShare(activeSeries, inputValue);
       setNewPoolShare(cleanValue(estShare, 3));
 
-      /* check whether to froce 'BORROW and POOL' stratgey */
-      const fyDaiMinted = fyDaiForMint(
-        activeSeries.daiReserves, 
-        activeSeries.fyDaiReserves, 
-        activeSeries.fyDaiVirtualReserves, 
-        ethers.utils.parseEther(debouncedInput), 
-        secondsToFrom(activeSeries.maturity) 
-      );
-      (ethers.BigNumber.from(fyDaiMinted)).gte(activeSeries.fyDaiReserves,) && setForceBorrow(true); 
+      /* check whether to force 'BORROW and POOL' stratgey */
+      // const fyDaiMinted = fyDaiForMint(
+      //   activeSeries.daiReserves, 
+      //   activeSeries.fyDaiReserves, 
+      //   activeSeries.fyDaiVirtualReserves, 
+      //   ethers.utils.parseEther(inputValue), 
+      //   secondsToFrom(activeSeries.maturity) 
+      // );
+      // (ethers.BigNumber.from(fyDaiMinted)).gte(activeSeries.fyDaiReserves,) && setForceBorrow(true); 
     }
 
-  }, [debouncedInput]);
+  }, [inputValue]);
   
   /* Add liquidity disabling logic */
   useEffect(()=>{
