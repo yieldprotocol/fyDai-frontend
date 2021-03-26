@@ -144,7 +144,7 @@ export const useMath = () => {
   const estTrade = (
     tradeType: string,
     series: IYieldSeries,  
-    amount: number | BigNumber,
+    amount: number | string | BigNumber,
   ): BigNumber | Error => {
 
     const parsedAmount = BigNumber.isBigNumber(amount)? amount : ethers.utils.parseEther(amount.toString());
@@ -162,9 +162,10 @@ export const useMath = () => {
         case 'sellFYDai':
           return BigNumber.from( floorDecimal( sellFYDai(daiReserves, fyDaiVirtualReserves, parsedAmount, ttm)) );
         default: 
-          return BigNumber.from('0');
+          return new Error;
       }
     } catch (e) {
+      /* error here is probably that pool doesn't have enough liquidity */
       return e;
     }
   };

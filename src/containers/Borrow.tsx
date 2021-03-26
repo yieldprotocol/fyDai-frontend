@@ -157,7 +157,7 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
         setAPR(cleanValue(_apr.toString(), 2) );
       } else {
         /* if the market doesnt have liquidity just estimate from rate */
-        const rate = estTrade('buyDai', activeSeries, 1);
+        const rate = estTrade('buyDai', activeSeries, '1');
         !(rate instanceof Error) && setFYDaiValue(debouncedInput*parseFloat((ethers.utils.formatEther(rate))));
         (rate instanceof Error) && setFYDaiValue(0);
         setBorrowDisabled(true);

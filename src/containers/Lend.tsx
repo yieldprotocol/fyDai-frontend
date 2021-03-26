@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { NavLink, useParams } from 'react-router-dom';
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import { Box, Keyboard, TextInput, Text, ResponsiveContext, Collapsible, Layer } from 'grommet';
 import { FiArrowRight as ArrowRight } from 'react-icons/fi';
 import { VscHistory as HistoryIcon } from 'react-icons/vsc';
@@ -112,24 +112,47 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
     }  
   };
 
-  /* Handle input (debounce input) changes */
+  /* Handle input changes */
   useEffect(() => {
-    activeSeries && !(activeSeries?.isMature()) && !!debouncedInput && ( async () => {
-      const preview = estTrade('sellDai', activeSeries, debouncedInput);
+  
+    let preview: BigNumber | Error = ethers.constants.Zero;
+    let _apr: Number;
+    if (
+      activeSeries && 
+      !(activeSeries?.isMature()) && 
+      !!inputValue
+    ) { 
+      preview = estTrade('sellDai', activeSeries, inputValue);
+      console.log(preview.toString());
       if (!(preview instanceof Error)) {
         setFYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
-        const _apr = calculateAPR( ethers.utils.parseEther(debouncedInput.toString()), preview, activeSeries?.maturity );
+        _apr = calculateAPR( ethers.utils.parseEther(inputValue.toString()), preview, activeSeries?.maturity );
         setAPR( cleanValue(_apr.toString(), 2) );      
-      } else {
-        /* if the market doesnt have liquidity just estimate from rate */
-        const rate = estTrade('sellDai', activeSeries, 1 );
-        !(rate instanceof Error) && setFYDaiValue(debouncedInput*parseFloat((ethers.utils.formatEther(rate))));
-        (rate instanceof Error) && setFYDaiValue(0);
+      } else {     
         setLendDisabled(true);
-        setErrorMsg('The Pool doesn\'t have the liquidity to support a transaction of that size just yet.');
       }
-    })();
-  }, [activeSeries, debouncedInput]);
+    }
+    
+    /* handle exceptions, errors and warnings on input changes */
+    const daiErrorTxt = 'That amount exceeds the amount of Dai you have';
+    const PoolErrorTxt = 'The Pool doesn\'t have the liquidity to support a transaction of that size just yet.';
+    
+    if ( preview instanceof Error || _apr! === 0 ) {
+      setWarningMsg(null);
+      setErrorMsg(PoolErrorTxt);
+    } else if ( 
+      daiBalance &&
+      inputValue &&
+      ethers.utils.parseEther(inputValue).gt(daiBalance)
+    ) {
+      setWarningMsg(null);
+      setErrorMsg(daiErrorTxt); 
+    } else {
+      setWarningMsg(null);
+      setErrorMsg(null);
+    }
+
+  }, [activeSeries, inputValue, daiBalance]);
 
   /* handle active series loads and changes */
   useEffect(() => {
@@ -149,17 +172,6 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
       parseFloat(inputValue) <= 0
     ) ? setLendDisabled(true): setLendDisabled(false);
   }, [ inputValue, hasDelegated, daiBalance]);
-
-  /* handle exceptions, errors and warnings */
-  useEffect(() => {
-    if ( daiBalance && debouncedInput && ethers.utils.parseEther(debouncedInput).gt(daiBalance)  ) {
-      setWarningMsg(null);
-      setErrorMsg('That amount exceeds the amount of Dai you have'); 
-    } else {
-      setWarningMsg(null);
-      setErrorMsg(null);
-    }
-  }, [ debouncedInput, daiBalance ]);
 
   /* analytics input values  before submission */ 
   const analyticsInput = useDebounce(inputValue, 3500);

@@ -155,7 +155,7 @@ function Repay({ close }:IRepayProps) {
     })();
   }, [ currency, debouncedInput, activeSeries]);
     
-  /* set the maximums avaiable to repay in DAI and USDC */
+  /* set the maximums available to repay in DAI and USDC */
   useEffect(()=>{
 
     /* If Dai in wallet greater than debt, then set the max value to the debt amount , else the wallet amount */
@@ -322,32 +322,32 @@ function Repay({ close }:IRepayProps) {
                     { 
                      !isRollDebt && 
                      !mobile &&
-                    <Box basis='30%'>
-                      <Selector
-                        selectedIndex={0} 
-                        selectItemCallback={(x:any) => setCurrency(x === 0 ? 'DAI' : 'USDC')}             
-                        items={[
-                          <Box 
-                            key='DAI' 
-                            direction='row' 
-                            gap='xsmall' 
-                            align='center' 
-                            pad={{ horizontal:'small', vertical:'xsmall' }}
-                          >
-                            <DaiMark /> <Text size='small'> DAI </Text>
-                          </Box>,
-                          <Box 
-                            key='USDC' 
-                            direction='row' 
-                            gap='xsmall' 
-                            align='center' 
-                            pad={{ left:'small', vertical:'xsmall' }}
-                          >
-                            <USDCMark /> <Text size='small'> USDC </Text>
-                          </Box>  
-                        ]}
-                      />
-                    </Box>
+                     <Box basis='30%'>
+                       <Selector
+                         selectedIndex={0} 
+                         selectItemCallback={(x:any) => setCurrency(x === 0 ? 'DAI' : 'USDC')}             
+                         items={[
+                           <Box 
+                             key='DAI' 
+                             direction='row' 
+                             gap='xsmall' 
+                             align='center' 
+                             pad={{ horizontal:'small', vertical:'xsmall' }}
+                           >
+                             <DaiMark /> <Text size='small'> DAI </Text>
+                           </Box>,
+                           <Box 
+                             key='USDC' 
+                             direction='row' 
+                             gap='xsmall' 
+                             align='center' 
+                             pad={{ left:'small', vertical:'xsmall' }}
+                           >
+                             <USDCMark /> <Text size='small'> USDC </Text>
+                           </Box>  
+                         ]}
+                       />
+                     </Box>
                     }
 
                     <TextInput
@@ -462,7 +462,6 @@ function Repay({ close }:IRepayProps) {
                     hasPoolDelegatedProxy={true}
                     clearInput={()=>setInputValue(undefined)}
                   />                 
-
 
                   {!activeSeries?.isMature() && !mobile &&
                   <Box alignSelf='start' margin={{ top:'medium' }}> 

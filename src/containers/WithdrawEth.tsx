@@ -87,16 +87,14 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
   useEffect(()=>{
 
     if  ( ethPosted && ethLocked ) {
-      const max= ethPosted.sub(ethLocked); 
+
       const hardMin = ethers.utils.parseEther('0.05');
+      const max = ethPosted.sub(ethLocked); 
 
-      (ethPosted.sub(max)).gt( hardMin ) ? 
-        setMaxWithdraw( ethers.utils.formatEther(max)) :
-        setMaxWithdraw( ethers.utils.formatEther(max.sub(hardMin)));
+      ethLocked.gt(0) && ethPosted.sub(max).lt(hardMin)  
+        ? setMaxWithdraw( ethers.utils.formatEther(max.sub(hardMin)))
+        : setMaxWithdraw( ethers.utils.formatEther(max));
     }
-    // }
-    // ethPosted && ethLocked && setMaxWithdraw( ethers.utils.formatEther(ethPosted.sub(ethLocked) )) ;
-
 
   }, [ethPosted, ethLocked]);
 
@@ -112,7 +110,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
   /* Withdraw disabled logic */
   useEffect(()=>{
 
-    if (debtValue.lte(ZERO) && parseFloat(inputValue) > 0 && !txActive) {
+    if (debtValue?.lte(ZERO) && parseFloat(inputValue) > 0 && !txActive) {
       setWithdrawDisabled(false);
     } else {
       ( !estPercent ||
