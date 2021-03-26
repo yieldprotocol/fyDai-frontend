@@ -123,7 +123,6 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
       !!inputValue
     ) { 
       preview = estTrade('sellDai', activeSeries, inputValue);
-      console.log(preview.toString());
       if (!(preview instanceof Error)) {
         setFYDaiValue( parseFloat(ethers.utils.formatEther(preview)) );
         _apr = calculateAPR( ethers.utils.parseEther(inputValue.toString()), preview, activeSeries?.maturity );
