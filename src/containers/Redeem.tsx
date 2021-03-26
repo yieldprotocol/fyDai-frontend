@@ -46,15 +46,19 @@ const Redeem  = ({ close }:IRedeemProps)  => {
   const redeemProcedure = async () =>{
     if(!redeemDisabled) {
 
-      analyticsLogEvent(
-        'Redeem_initiated', 
-        {
-          value: ethers.utils.parseEther( activeSeries.fyDaiBalance),
-          series: activeSeries ? activeSeries.displayName : null,
-          maturity: activeSeries ? activeSeries.maturity: null, 
-          time_to_maturity: activeSeries ? (new Date().getTime()/1000) - activeSeries?.maturity : null,
-          account: account?.substring(2),
-        });
+      try {
+        analyticsLogEvent(
+          'Redeem_initiated', 
+          {
+            value: activeSeries.fyDaiBalance_,
+            series: activeSeries ? activeSeries.displayName : null,
+            maturity: activeSeries ? activeSeries.maturity: null, 
+            time_to_maturity: activeSeries ? (new Date().getTime()/1000) - activeSeries?.maturity : null,
+            account: account?.substring(2),
+          });
+      } catch (e) {
+        console.log('Analytics error');
+      }
 
       await redeem(activeSeries, activeSeries.fyDaiBalance.toString());
 
@@ -88,7 +92,6 @@ const Redeem  = ({ close }:IRedeemProps)  => {
           onClick={()=>redeemProcedure()} 
           label={`Redeem ${activeSeries?.fyDaiBalance_ || ''} Dai`}
           disabled={redeemDisabled}
-          hasPoolDelegatedProxy={true}
         />
       </>}
       { txActive && <TxStatus tx={txActive} /> }

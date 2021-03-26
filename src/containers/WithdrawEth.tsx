@@ -64,15 +64,19 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
   const withdrawProcedure = async () => {
     if (inputValue && !withdrawDisabled ) {
 
-      analyticsLogEvent(
-        'Withdraw_initiated', 
-        {
-          value: inputValue,
-          series: null,
-          maturity: null, 
-          time_to_maturity: null,
-          account: account?.substring(2),
-        });
+      try {
+        analyticsLogEvent(
+          'Withdraw_initiated', 
+          {
+            value: inputValue,
+            series: null,
+            maturity: null, 
+            time_to_maturity: null,
+            account: account?.substring(2),
+          });
+      } catch (e) {
+        console.log('Analytics error');
+      }
         
       close(); // close immediately, no need to track withdrawPending
       await withdrawEth(inputValue);

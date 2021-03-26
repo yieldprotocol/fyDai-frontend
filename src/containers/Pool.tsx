@@ -90,15 +90,19 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
   const addLiquidityProcedure = async () => { 
     if (inputValue && !addLiquidityDisabled ) {
 
-      analyticsLogEvent(
-        'addLiquidity_initiated', 
-        {
-          value: inputValue,
-          series: activeSeries ? activeSeries.displayName : null,
-          maturity: activeSeries ? activeSeries.maturity: null, 
-          time_to_maturity: activeSeries ? (new Date().getTime()/1000) - activeSeries?.maturity : null,
-          account: account?.substring(2),
-        });
+      try {
+        analyticsLogEvent(
+          'addLiquidity_initiated', 
+          {
+            value: inputValue,
+            series: activeSeries ? activeSeries.displayName : null,
+            maturity: activeSeries ? activeSeries.maturity: null, 
+            time_to_maturity: activeSeries ? (new Date().getTime()/1000) - activeSeries?.maturity : null,
+            account: account?.substring(2),
+          });
+      } catch (e) {
+        console.log('Analytics error');
+      }
 
       await addLiquidity( activeSeries, inputValue, forceBorrow );
       

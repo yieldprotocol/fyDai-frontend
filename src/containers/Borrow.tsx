@@ -107,15 +107,19 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
   const borrowProcedure = async () => {
     if (inputValue && !borrowDisabled) {
 
-      analyticsLogEvent(
-        'Borrow_initiated', 
-        {
-          value: inputValue,
-          series: activeSeries ? activeSeries.displayName : null,
-          maturity: activeSeries ? activeSeries.maturity: null, 
-          time_to_maturity: activeSeries ? (new Date().getTime()/1000) - activeSeries?.maturity : null,
-          account: account?.substring(2),
-        });
+      try {
+        analyticsLogEvent(
+          'Borrow_initiated', 
+          {
+            value: inputValue,
+            series: activeSeries ? activeSeries.displayName : null,
+            maturity: activeSeries ? activeSeries.maturity: null, 
+            time_to_maturity: activeSeries ? (new Date().getTime()/1000) - activeSeries?.maturity : null,
+            account: account?.substring(2),
+          });
+      } catch (e) {
+        console.log('Analytics error');
+      }
         
       currency === 'DAI' && await borrowDai(activeSeries, 'ETH-A', inputValue);
       currency === 'USDC' && await borrowUSDC(activeSeries, 'ETH-A', inputValue);

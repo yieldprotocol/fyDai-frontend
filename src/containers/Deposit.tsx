@@ -93,15 +93,19 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
   const depositProcedure = async () => {
     if (inputValue && !depositDisabled ) {
 
-      analyticsLogEvent(
-        'Deposit_initiated', 
-        {
-          value: inputValue,
-          series: null,
-          maturity: null, 
-          time_to_maturity: null,
-          account: account?.substring(2),
-        });
+      try {
+        analyticsLogEvent(
+          'Deposit_initiated', 
+          {
+            value: inputValue,
+            series: null,
+            maturity: null, 
+            time_to_maturity: null,
+            account: account?.substring(2),
+          });
+      } catch (e) {
+        console.log('Analytics error');
+      }
 
       setDepositPending(true);
       await postEth(inputValue);

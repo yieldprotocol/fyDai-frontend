@@ -62,15 +62,19 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
   const closeProcedure = async () => {
     if ( !closeDisabled ) {
 
-      analyticsLogEvent(
-        'Close_initiated', 
-        {
-          value: inputValue,
-          series: activeSeries ? activeSeries.displayName : null,
-          maturity: activeSeries ? activeSeries.maturity: null, 
-          time_to_maturity: activeSeries ? (new Date().getTime()/1000) - activeSeries?.maturity : null,
-          account: account?.substring(2),
-        });
+      try { 
+        analyticsLogEvent(
+          'Close_initiated', 
+          {
+            value: inputValue,
+            series: activeSeries ? activeSeries.displayName : null,
+            maturity: activeSeries ? activeSeries.maturity: null, 
+            time_to_maturity: activeSeries ? (new Date().getTime()/1000) - activeSeries?.maturity : null,
+            account: account?.substring(2),
+          });
+      } catch (e) {
+        console.log('Analytics error');
+      }
 
       !activeSeries?.isMature() && close();
       await buyDai(

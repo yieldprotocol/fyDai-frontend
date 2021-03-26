@@ -90,15 +90,19 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
   /* Lend execution flow */
   const lendProcedure = async () => {
 
-    analyticsLogEvent(
-      'sell_initiated', 
-      {
-        value: inputValue,
-        series: activeSeries ? activeSeries.displayName : null,
-        maturity: activeSeries ? activeSeries.maturity: null, 
-        time_to_maturity: activeSeries ? (new Date().getTime()/1000) - activeSeries?.maturity : null,
-        account: account?.substring(2),
-      });
+    try {
+      analyticsLogEvent(
+        'sell_initiated', 
+        {
+          value: inputValue,
+          series: activeSeries ? activeSeries.displayName : null,
+          maturity: activeSeries ? activeSeries.maturity: null, 
+          time_to_maturity: activeSeries ? (new Date().getTime()/1000) - activeSeries?.maturity : null,
+          account: account?.substring(2),
+        });
+    } catch (e) {
+      console.log('Analytics error');
+    }
 
     if (inputValue && !lendDisabled ) {
       await sellDai( activeSeries, inputValue);

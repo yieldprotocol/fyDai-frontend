@@ -63,15 +63,19 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
   const removeLiquidityProcedure = async (value:number) => {
     if ( !removeLiquidityDisabled ) {
 
-      analyticsLogEvent(
-        'removeLiquidity_initiated', 
-        {
-          value: inputValue,
-          series: activeSeries ? activeSeries.displayName : null,
-          maturity: activeSeries ? activeSeries.maturity: null, 
-          time_to_maturity: activeSeries ? (new Date().getTime()/1000) - activeSeries?.maturity : null,
-          account: account?.substring(2),
-        });
+      try {
+        analyticsLogEvent(
+          'removeLiquidity_initiated', 
+          {
+            value: inputValue,
+            series: activeSeries ? activeSeries.displayName : null,
+            maturity: activeSeries ? activeSeries.maturity: null, 
+            time_to_maturity: activeSeries ? (new Date().getTime()/1000) - activeSeries?.maturity : null,
+            account: account?.substring(2),
+          });
+      } catch (e) {
+        console.log('Analytics error');
+      }
 
       /* if sereis inst mature, close window immediately on action */
       !activeSeries?.isMature() && close();
