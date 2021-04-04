@@ -120,6 +120,7 @@ function ActionButton({ ...props }:any ) {
         modal={false}
         responsive={false}
         full='horizontal'
+        animation='none'
       >
 
         <Box

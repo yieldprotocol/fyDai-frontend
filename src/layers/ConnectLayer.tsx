@@ -67,7 +67,6 @@ const ConnectLayer = ({ view, target, closeLayer }: any) => {
       {layerView && (
         <Layer
           onClickOutside={() => closeLayer(true)}
-          animation='slide'
           onEsc={() => closeLayer(true)}
           target={target || undefined}
         >
