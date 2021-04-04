@@ -136,7 +136,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
       setEstPercent(cleanValue(newPercent, 2) || undefined);
     }
     /* 2. Calculate the new borrowing power */
-    if (inputValue ) {
+    if (inputValue && ethPosted && debtValue ) {
       const inputInWei = ethers.utils.parseEther(inputValue );
       const postedPlusInput = ethPosted.add(inputInWei);
       const _newPower = estBorrowingPower(postedPlusInput, debtValue);
