@@ -58,20 +58,12 @@ function StickyButton({ children, ...props }:any) {
 
   return (
     <>
-      { !mobile ?
-        <StyledBox 
-          {...props}
-          background={props.background || defaultBackground}
-        >
-          {children}    
-        </StyledBox>
-        :
-        <Box
-          {...props}
-          background={props.background || defaultBackground}
-        >
-          {children}
-        </Box>}
+      <StyledBox 
+        {...props}
+        background={props.background || defaultBackground}
+      >
+        {children}    
+      </StyledBox>
     </>
   );
 }
