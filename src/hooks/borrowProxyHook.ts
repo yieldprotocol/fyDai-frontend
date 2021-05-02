@@ -227,7 +227,7 @@ export const useBorrowProxy = () => {
     );
     
     /* set the gas limits based on whether sigs are required */
-    const overrides = noSigsReqd ? { gasLimit: BigNumber.from('300000'), value:0 } :{ gasLimit: BigNumber.from('400000'), value:0 };
+    const overrides = noSigsReqd ? { gasLimit: BigNumber.from('400000'), value:0 } :{ gasLimit: BigNumber.from('400000'), value:0 };
 
     /* send to the proxy for execution */
     await proxyExecute( 

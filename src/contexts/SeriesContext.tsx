@@ -105,7 +105,7 @@ const SeriesProvider = ({ children }:any) => {
         };
       })
     );
-       
+    
     /* Parse the data */
     const _parsedReservesData = _reservesData.reduce((acc: Map<string, any>, x:any) => {   
       const _rate = sellFYDai(
