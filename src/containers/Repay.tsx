@@ -66,6 +66,7 @@ function Repay({ close }:IRepayProps) {
   const [ debtInDestinationSeries, setDebtDestinationSeries ] = useState<string>();
   
   const [ maxRepay, setMaxRepay ] = useState<any>();
+  const [ maxRoll, setMaxRoll ] = useState<any>();
   const [ USDCValueInDai, setUSDCValueInDai ] = useState<string| undefined>(undefined);
 
   /* init hooks */
@@ -158,15 +159,21 @@ function Repay({ close }:IRepayProps) {
       setUSDCValueInDai(cleanValue(ethers.utils.formatEther(daiAmnt.toString()), 2));
     })();
   }, [ currency, debouncedInput, activeSeries]);
+
     
   /* set the maximums available to repay in DAI and USDC */
   useEffect(()=>{
 
     /* If Dai in wallet greater than debt, then set the max value to the debt amount , else the wallet amount */
-    if ( currency === 'DAI' && activeSeries?.ethDebtDai ) {
+    if ( currency === 'DAI' && activeSeries?.ethDebtDai && !isRollDebt ) {
         daiBalance?.gt(activeSeries?.ethDebtDai) ? 
           setMaxRepay(activeSeries.ethDebtDai.add(ethers.BigNumber.from('1000000000000') )):
           setMaxRepay(daiBalance);
+    }
+
+    if ( currency === 'DAI' && activeSeries?.ethDebtDai) {
+      console.log('sdfsdf');
+      setMaxRoll(activeSeries.ethDebtDai.add(ethers.BigNumber.from('1000000000000') ));
     }
 
     /* If USDC in wallet greater than debt, then set the max value to the debt amount , else the wallet amount */
@@ -213,11 +220,19 @@ function Repay({ close }:IRepayProps) {
   /* Repay button DISABLING logic */
   useEffect(()=>{
     ( !account || !inputValue || parseFloat(inputValue) <= 0 ) ? setRepayDisabled(true): setRepayDisabled(false);  
-    if (currency === 'DAI' && daiBalance && parseFloat(inputValue) > 0 ) {
+    
+    if (currency === 'DAI' && daiBalance && parseFloat(inputValue) > 0 && !isRollDebt ) {
       ( daiBalance?.eq(ethers.constants.Zero) || ( ethers.utils.parseEther(inputValue).gt(daiBalance) )  )? 
         setRepayDisabled(true) : 
         setRepayDisabled(false);
     } 
+
+    if (currency === 'DAI' && parseFloat(inputValue) > 0 && isRollDebt ) {
+      ethers.utils.parseEther(inputValue).lte(ethers.constants.Zero)? 
+        setRepayDisabled(true) : 
+        setRepayDisabled(false);
+    } 
+
     /* note: USDC uses mwei precision */
     if (currency === 'USDC' && usdcBalance && parseFloat(inputValue) > 0 ) {
       ( usdcBalance?.eq(ethers.constants.Zero) || ethers.utils.parseUnits(inputValue, 'mwei').gt(usdcBalance)) ? 
@@ -365,7 +380,13 @@ function Repay({ close }:IRepayProps) {
                     />
                     <FlatButton 
                       label={!mobile ? `${isRollDebt? 'Roll Maximum': 'Repay Maximum'}`: 'Maximum'}
-                      onClick={()=>setInputValue( cleanValue(ethers.utils.formatEther(maxRepay), 6) )}
+                      onClick={()=> {
+                        if (isRollDebt) {
+                          setInputValue( cleanValue( ethers.utils.formatEther(maxRoll), 6) );
+                        } else {
+                          setInputValue( cleanValue(ethers.utils.formatEther(maxRepay), 6) );
+                        }
+                      }}
                     />
                   </InputWrap>
 
