@@ -172,7 +172,6 @@ function Repay({ close }:IRepayProps) {
     }
 
     if ( currency === 'DAI' && activeSeries?.ethDebtDai) {
-      console.log('sdfsdf');
       setMaxRoll(activeSeries.ethDebtDai.add(ethers.BigNumber.from('1000000000000') ));
     }
 
