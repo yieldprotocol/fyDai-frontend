@@ -3,16 +3,12 @@ import React, { useState, useEffect } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import FlatButton from './FlatButton';
 
-const networkMap = new Map([
-  [1, ''],
-  [42, 'kovan.'],
-]);
-
 const EtherscanButton = ({ txHash, background }: any) => {
   const { chainId } = useWeb3React();
   const [network, setNetwork] = useState<string>();
+  
   useEffect(()=>{
-    chainId && setNetwork(networkMap.get(chainId));
+    if (chainId === 42) {setNetwork('kovan.');} else {setNetwork('');}
   }, [chainId]);
 
   return (
