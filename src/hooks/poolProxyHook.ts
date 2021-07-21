@@ -198,7 +198,7 @@ export const usePoolProxy = () => {
         [ poolAddr, parsedDaiUsed, maxFYDai, signedSigs.get('daiSig'), signedSigs.get('controllerSig') ]
       );
       /* set override gas estiamtes based on strategy */
-      overrides = { gasLimit: BigNumber.from('650000'), value: 0 };
+      overrides = { gasLimit: BigNumber.from('1000000'), value: 0 };
     }
 
     /* send to the proxy for execution */
