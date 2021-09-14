@@ -51,6 +51,7 @@ function Repay({ close }:IRepayProps) {
   const activeSeries = seriesData.get(activeSeriesId);
   const { state: userState, actions: userActions } = useContext(UserContext);
   const { daiBalance, usdcBalance, usdcBalanceWad } = userState.position;
+  const { authorization :{ hasDsProxy } } = userState;
 
   /* local state */
   const [ inputValue, setInputValue ] = useState<any>();
@@ -482,7 +483,7 @@ function Repay({ close }:IRepayProps) {
                         `${isRollDebt? 'Roll':'Repay'} ${inputValue! || ''} Dai ${isRollDebt?'to':''} ${isRollDebt?destinationSeries?.displayNameMobile:''}` : 
                         `Repay ${USDCValueInDai || '' } Dai Debt with ${ inputValue && cleanValue(inputValue, 2)} USDC`
                       }
-                    disabled={repayDisabled}
+                    disabled={repayDisabled || !hasDsProxy}
                     hasPoolDelegatedProxy={true}
                     clearInput={()=>setInputValue(undefined)}
                   />                 

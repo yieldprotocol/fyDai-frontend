@@ -37,7 +37,10 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
   /* state from context */
-  const { actions: userActions } = useContext(UserContext);
+  const { state: userState, actions: userActions } = useContext(UserContext);
+
+  const { authorization :{ hasDsProxy } } = userState;
+
   const { state: { activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
   const activeSeries = seriesData.get(activeSeriesId);
 
@@ -213,7 +216,7 @@ const CloseDai = ({ close }:ICloseDaiProps) => {
           <ActionButton
             onClick={()=> closeProcedure()}
             label={`Reclaim ${inputValue || ''} Dai`}
-            disabled={closeDisabled}
+            disabled={closeDisabled || !hasDsProxy}
             hasPoolDelegatedProxy={activeSeries?.hasPoolDelegatedProxy}
             clearInput={()=>setInputValue(undefined)}
           />

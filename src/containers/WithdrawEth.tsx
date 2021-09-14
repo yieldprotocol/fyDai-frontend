@@ -34,7 +34,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
   const mobile:boolean = ( useContext<any>(ResponsiveContext) === 'small' );
 
   /* state from contexts */
-  const { state: { position }, actions: userActions } = useContext(UserContext);
+  const { state: { position, authorization :{ hasDsProxy } }, actions: userActions } = useContext(UserContext);
   const {
     ethPosted,
     ethLocked,
@@ -42,6 +42,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
     debtValue,
     debtValue_,
   } = position;
+
 
   /* local state */ 
   const [ inputValue, setInputValue ] = useState<any>();
@@ -210,7 +211,7 @@ const WithdrawEth = ({ close }:IWithDrawProps) => {
         <ActionButton
           onClick={() => withdrawProcedure()}
           label={`Withdraw ${inputValue || ''} Eth`}
-          disabled={withdrawDisabled}
+          disabled={withdrawDisabled || !hasDsProxy}
           hasPoolDelegatedProxy={true}
           clearInput={()=>setInputValue(undefined)}
         />

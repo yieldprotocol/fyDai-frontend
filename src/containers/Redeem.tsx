@@ -29,7 +29,8 @@ const Redeem  = ({ close }:IRedeemProps)  => {
   /* state from contexts */
   const { state: { activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
   const activeSeries = seriesData.get(activeSeriesId);
-  const { actions: userActions } = useContext(UserContext);
+  const { state: userState, actions: userActions } = useContext(UserContext);
+  const { authorization :{ hasDsProxy } } = userState;
 
   /* local state */ 
   const [ redeemDisabled, setRedeemDisabled] = useState<boolean>(true);
@@ -91,7 +92,7 @@ const Redeem  = ({ close }:IRedeemProps)  => {
         <ActionButton
           onClick={()=>redeemProcedure()} 
           label={`Redeem ${activeSeries?.fyDaiBalance_ || ''} Dai`}
-          disabled={redeemDisabled}
+          disabled={redeemDisabled || !hasDsProxy}
         />
       </>}
       { txActive && <TxStatus tx={txActive} /> }

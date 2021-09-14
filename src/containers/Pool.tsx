@@ -61,6 +61,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
   const activeSeries = seriesData.get(activeSeriesId);
   const { state: { historyLoading } } = useContext(HistoryContext);
   const { state: userState, actions: userActions } = useContext(UserContext);
+  const { authorization :{ hasDsProxy } } = userState;
   const { daiBalance } = userState.position;
   const { useBuyToAddLiquidity } = userState.preferences;
 
@@ -403,7 +404,7 @@ const Pool = ({ openConnectLayer }:IPoolProps) => {
                 <ActionButton
                   onClick={()=>addLiquidityProcedure()} 
                   label={`Supply ${inputValue || ''} DAI`}
-                  disabled={addLiquidityDisabled}
+                  disabled={addLiquidityDisabled || !hasDsProxy}
                   hasPoolDelegatedProxy={activeSeries.hasPoolDelegatedProxy}
                   clearInput={()=>setInputValue(undefined)}
                   openConnectLayer={()=>openConnectLayer()}

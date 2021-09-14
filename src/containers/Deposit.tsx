@@ -59,7 +59,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
 
   /* state from context */
   const { state: userState, actions: userActions } = useContext(UserContext);
-  const { position } = userState;
+  const { position, authorization :{ hasDsProxy } } = userState;
   const {
     ethBalance,
     ethPosted,
@@ -367,7 +367,7 @@ const Deposit = ({ openConnectLayer, modalView }:DepositProps) => {
             <ActionButton
               onClick={()=>depositProcedure()}
               label={`Deposit ${inputValue || ''} Eth`}
-              disabled={depositDisabled}
+              disabled={depositDisabled || !hasDsProxy}
               hasPoolDelegatedProxy={true}
               clearInput={()=>setInputValue(undefined)}
               openConnectLayer={()=>openConnectLayer()}

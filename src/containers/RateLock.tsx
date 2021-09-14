@@ -68,7 +68,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
   const { vault : vaultParam }:any = useParams();
 
   /* state from contexts */
-  const { state: { makerVaults, userLoading }, actions: userActions } = useContext(UserContext);
+  const { state: { makerVaults, userLoading, authorization :{ hasDsProxy } }, actions: userActions } = useContext(UserContext);
   const { state: { activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
   const activeSeries = seriesData.get(activeSeriesId);
   const { state:{ feedData } } = useContext(YieldContext);
@@ -636,7 +636,7 @@ const RateLock = ({ openConnectLayer, close, asLayer }:IRateLockProps) => {
                       <Text size='small' weight='normal'>{debouncedDebtInput} Dai @ {APR}% </Text>
                     </Box>             
                     }
-                  disabled={advancedDisabled || allDisabled}
+                  disabled={advancedDisabled || allDisabled || !hasDsProxy}
                   hasPoolDelegatedProxy={true}
                   clearInput={()=>{setCollInputValue(undefined); setDebtInputValue(undefined);}}
                 />

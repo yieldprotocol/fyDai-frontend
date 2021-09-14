@@ -61,7 +61,7 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
 
   const { state: { historyLoading } } = useContext(HistoryContext);
   const { state: userState, actions: userActions } = useContext(UserContext);
-  const { position, makerVaults, userLoading } = userState;
+  const { position, authorization :{ hasDsProxy }, makerVaults, userLoading   } = userState;
   const { 
     ethPosted,
     ethPosted_,
@@ -71,6 +71,7 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
     collateralPercent_,
     daiBalance_,
   } = position;
+
 
   /* local state */
   const [ repayOpen, setRepayOpen ] = useState<boolean>(false);
@@ -590,7 +591,7 @@ const Borrow = ({ openConnectLayer }:IBorrowProps) => {
               <ActionButton
                 onClick={()=>borrowProcedure()}
                 label={currency === 'DAI'? `Borrow ${inputValue || ''} DAI` : `Borrow Dai, Receive ${inputValue || ''} USDC`}
-                disabled={borrowDisabled}
+                disabled={borrowDisabled || !hasDsProxy}
                 hasPoolDelegatedProxy={activeSeries.hasPoolDelegatedProxy}
                 clearInput={()=>setInputValue(undefined)}
                 openConnectLayer={()=>openConnectLayer()}

@@ -55,6 +55,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
   const { state: { seriesLoading, activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
   const activeSeries = seriesData.get(activeSeriesId);
   const { state: userState, actions: userActions } = useContext(UserContext);
+  const { authorization :{ hasDsProxy } } = userState;
   const { daiBalance, daiBalance_ } = userState.position;
   const { state: { historyLoading } } = useContext(HistoryContext);
 
@@ -336,7 +337,7 @@ const Lend = ({ openConnectLayer }:ILendProps) => {
                 <ActionButton
                   onClick={()=>lendProcedure()}
                   label={`Lend ${inputValue || ''} DAI`}
-                  disabled={lendDisabled}
+                  disabled={lendDisabled || !hasDsProxy}
                   hasPoolDelegatedProxy={activeSeries.hasPoolDelegatedProxy}
                   clearInput={()=>setInputValue(undefined)}
                   openConnectLayer={()=>openConnectLayer()}

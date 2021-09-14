@@ -41,7 +41,8 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
   /* state from contexts */
   const { state: { activeSeriesId, seriesData }, actions: seriesActions } = useContext(SeriesContext);
   const activeSeries = seriesData.get(activeSeriesId);
-  const { actions: userActions } = useContext(UserContext);
+  const { state: userState, actions: userActions } = useContext(UserContext);
+  const { authorization :{ hasDsProxy } } = userState;
 
   /* local state */
   const [ newShare, setNewShare ] = useState<string>(activeSeries?.poolPercent);
@@ -217,7 +218,7 @@ const RemoveLiquidity = ({ openConnectLayer, close }:IRemoveLiquidityProps) => {
         <ActionButton
           onClick={()=> removeLiquidityProcedure(inputValue)}
           label={`Remove ${inputValue || ''} tokens`}
-          disabled={removeLiquidityDisabled}
+          disabled={removeLiquidityDisabled || !hasDsProxy}
           hasPoolDelegatedProxy={activeSeries?.hasPoolDelegatedProxy}
           clearInput={()=>setInputValue(undefined)}
         />
