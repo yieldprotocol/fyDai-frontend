@@ -34,7 +34,10 @@ export const useDsProxy = () => {
     overrides: any,
     txInfo: ITx,   
   ) => {
+    
+
     const proxyAddr = state.authorization?.dsProxyAddress || null;
+    
     const dsProxyContract = new ethers.Contract(
       ethers.utils.getAddress(proxyAddr),
       DsProxyAbi,
@@ -43,14 +46,17 @@ export const useDsProxy = () => {
 
     let tx:any; // type
 
-    try {
-      tx = await dsProxyContract['execute(address,bytes)'](contractAddress, calldata, overrides);
-    } catch (e) {
-      handleTxRejectError(e);
-
-      return;
+    if (proxyAddr !== ethers.constants.AddressZero) {
+      try {
+        tx = await dsProxyContract['execute(address,bytes)'](contractAddress, calldata, overrides);
+      } catch (e) {
+        handleTxRejectError(e);
+        return;
+      }
+      await handleTx({ ...txInfo, tx });
+    } else {
+      handleTxRejectError('NO PROXY');
     }
-    await handleTx({ ...txInfo, tx });
 
   };
 
