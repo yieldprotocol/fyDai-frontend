@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { NavLink, useHistory, useParams } from 'react-router-dom';
-import ethers from 'ethers';
+import { ethers } from 'ethers';
 import { 
   Box,
   Keyboard,

@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Box, Keyboard, TextInput, Text, ResponsiveContext, Collapsible } from 'grommet';
-import ethers from 'ethers';
+import { ethers }  from 'ethers';
 import { FiArrowLeft as ArrowLeft } from 'react-icons/fi';
 
 /* utils and support */

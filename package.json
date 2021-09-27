@@ -11,7 +11,7 @@
     "date-fns": "^2.16.1",
     "decimal.js": "^10.2.1",
     "eth-permit": "^0.1.4",
-    "ethers": "^5.0.2",
+    "ethers": "^5.4.7",
     "grommet": "^2.13.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
