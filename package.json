@@ -1,6 +1,6 @@
 {
   "name": "@yieldprotocol/fydai-ui",
-  "version": "1.0.18",
+  "version": "1.0.19",
   "private": true,
   "dependencies": {
     "@metamask/detect-provider": "^1.1.0",
