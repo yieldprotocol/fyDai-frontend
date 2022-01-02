@@ -278,10 +278,10 @@ const SeriesProvider = ({ children }: any) => {
       /* SET the active series (if there isn't one already)  */
       if (!state.activeSeriesId || seriesArr.length > 1) {
         /* if no active series, set it to non-mature series that is maturing soonest. */
-        const unmatureSeries: IYieldSeries[] = Array.from(seriesMap.values());
-        const toSelect = unmatureSeries
-          .filter((x: IYieldSeries) => !x.isMature())
-          .sort((a: IYieldSeries, b: IYieldSeries) => a.maturity - b.maturity);
+        // const unmatureSeries: IYieldSeries[] = Array.from(seriesMap.values());
+        // const toSelect = unmatureSeries
+        //   .filter((x: IYieldSeries) => !x.isMature())
+        //   .sort((a: IYieldSeries, b: IYieldSeries) => a.maturity - b.maturity);
 
         /* check if the value in the url is a valid series date, if so, use it as the active series */
         if (seriesMap.get(seriesFromUrl)) {
@@ -289,7 +289,7 @@ const SeriesProvider = ({ children }: any) => {
         } else {
           dispatch({
             type: 'setActiveSeriesId',
-            payload: toSelect[0].maturity,
+            payload: 1640995199,
           });
         }
       }
