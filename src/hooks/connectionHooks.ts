@@ -68,9 +68,7 @@ const useEagerConnect = () => {
 const useInactiveListener = (suppress: boolean = false) => {
   const { active, error, activate, chainId: _chainId } = useWeb3React();
   const { handleErrorMessage } = useWeb3Errors();
-
   const [ cachedChainId ] = useCachedState('cache_chainId', null);
-
   // eslint-disable-next-line consistent-return
   useEffect((): any => {
     const { ethereum } = window as any;
